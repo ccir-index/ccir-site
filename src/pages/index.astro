@@ -241,6 +241,11 @@ function chipDisplay(token: string): string {
         <a href="/spreads">/spreads</a> for the T1IF-anchored spread matrix,
         and <a href="/applications">/applications</a> for worked credit-document examples.
       </p>
+      <p class="meth-cta">
+        <a href="https://github.com/ccir-index/ccir-v2-data/blob/main/methodology/CCIR_Methodology_v2_0_0.md">
+          Read the full methodology · v2.0.0 →
+        </a>
+      </p>
     </section>
 
     <section class="disclosures">
@@ -534,6 +539,18 @@ function chipDisplay(token: string): string {
       font-size: var(--fs-sm);
       color: var(--ink-dim);
     }
+    .meth-cta {
+      margin: 14px 0 0;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      letter-spacing: 0.04em;
+    }
+    .meth-cta a {
+      color: var(--accent);
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 1px;
+    }
+    .meth-cta a:hover { opacity: 0.8; }
 
     .disclosures { margin: 32px 0 32px; }
     .disc-list {
