@@ -88,9 +88,17 @@ const shadowRates: Rate[] = parseCsv(shadowCsvText);
 // by parseCsv above.
 export const rates: Rate[] = [...publishedRates, ...shadowRates];
 
-// HEADLINE rows: premium-chip T1IF/T2IF/T3IF taxonomy. Drives the front of
-// the site (homepage, /tiers, /spreads, /applications).
+// HEADLINE rows: premium-chip T1IF/T2IF/T3IF taxonomy. Drives /explorer
+// Section 1 (Published + Shadow visible there with Shadow flagged in UI).
 export const headlineRates: Rate[] = rates.filter((r) => r.scope === 'headline');
+
+// FLAGSHIP rows: Published-only subset of headline. Drives the homepage
+// chip ladder, /tiers per-silicon table, and /spreads matrix. Below-gate
+// Shadow series do not surface in flagship views — the explorer is the
+// place to see them.
+export const flagshipRates: Rate[] = headlineRates.filter(
+  (r) => r.promotion_status === 'Published',
+);
 
 // INDICATIVE rows: long-tail chips, no tier coverage. Drives /explorer
 // Section 2 only.
@@ -113,17 +121,17 @@ function findHeadline(tier: Tier, chip: string, term: Term, pool: Rate[]): Rate 
   return match(want) ?? (want === 'GTD' ? match('ALL') : undefined);
 }
 
-// Baseline = headline rate per (tier, chip, term) under the native-product
-// rule. Headline-only.
+// Baseline = flagship rate per (tier, chip, term) under the native-product
+// rule. Published-only — Shadow rows are not surfaced in flagship views.
 export const baselineRates: Rate[] = (() => {
   const out: Rate[] = [];
   const seen = new Set<string>();
-  for (const r of headlineRates) {
+  for (const r of flagshipRates) {
     if (r.form_factor !== 'ALL' || r.region !== 'ALL') continue;
     if (!r.tier) continue;
     const key = `${r.tier}|${r.gpu_model}|${r.commitment_term}`;
     if (seen.has(key)) continue;
-    const headline = findHeadline(r.tier, r.gpu_model, r.commitment_term, headlineRates);
+    const headline = findHeadline(r.tier, r.gpu_model, r.commitment_term, flagshipRates);
     if (!headline) continue;
     seen.add(key);
     out.push(headline);
@@ -337,7 +345,7 @@ export type TierMatrixView = Record<Tier, Rate | undefined>;
 
 export function tierMatrix(chip: string): TierMatrixView {
   const out: TierMatrixView = { T1IF: undefined, T2IF: undefined, T3IF: undefined };
-  for (const r of headlineRates) {
+  for (const r of flagshipRates) {
     if (!r.tier) continue;
     if (r.gpu_model !== chip) continue;
     if (r.commitment_term !== 'OnDemand') continue;
@@ -346,7 +354,6 @@ export function tierMatrix(chip: string): TierMatrixView {
     if (r.interruptibility !== wantInt && out[r.tier]) continue;
     const existing = out[r.tier];
     if (!existing
-        || (existing.promotion_status === 'Shadow' && r.promotion_status === 'Published')
         || (existing.interruptibility !== wantInt && r.interruptibility === wantInt)) {
       out[r.tier] = r;
     }
