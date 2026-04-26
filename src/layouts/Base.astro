@@ -1,0 +1,129 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import Masthead from '../components/Masthead.astro';
+import Tape from '../components/Tape.astro';
+import { meta } from '../data/snapshot';
+
+interface Props {
+  title?: string;
+  description?: string;
+  showTape?: boolean;
+}
+
+const {
+  title = 'CCIR · Compute Credit Index Research',
+  description = 'Reference rate for GPU compute capacity. Aggregated from publicly-observed posted prices.',
+  showTape = true,
+} = Astro.props;
+---
+<!doctype html>
+<html lang="en" data-theme="editorial">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600&display=swap"
+    rel="stylesheet"
+  />
+  <script is:inline>
+    (function () {
+      try {
+        var t = localStorage.getItem('ccir-theme');
+        if (t === 'editorial' || t === 'terminal') {
+          document.documentElement.setAttribute('data-theme', t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <Masthead />
+  {showTape && <Tape />}
+  <main>
+    <slot />
+  </main>
+  <footer class="site-footer">
+    <div class="wrap disclosure-foot">
+      <strong>Independent · Observable · Posted · No positions in the markets we measure</strong>
+      Every rate is sourced from publicly-accessible, provider-operated
+      pricing pages and official documentation — no solicited quotes, no
+      broker-mediated prices, no sponsored feeds. If a tier is only exposed
+      through sales contact, it is not in the index.
+    </div>
+    <div class="wrap footer-inner">
+      <div class="lhs">
+        <strong>CCIR {meta.methodology_version}</strong> · Decomposed
+        benchmark rates across the Intelligence Factory Taxonomy. Each
+        tier is a defined capability bundle, with one reference rate
+        per tier. Published daily at 06:30 CT.
+      </div>
+      <div class="rhs">
+        <a href={`https://github.com/ccir-index/ccir-v2-data/tree/main/indices/snapshots/${meta.as_of_date}`}>Data</a>
+        <a href="/tiers">Tiers</a>
+        <a href="/applications">Applications</a>
+      </div>
+    </div>
+    <div class="wrap runid">run_id · {meta.run_id}</div>
+  </footer>
+  <style>
+    .site-footer {
+      border-top: 1px solid var(--rule-2);
+      background: var(--surface-2);
+      padding: 22px 0 24px;
+      margin-top: 56px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      line-height: 1.55;
+    }
+    .disclosure-foot {
+      max-width: 880px;
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.55;
+      margin-bottom: 18px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .disclosure-foot strong {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+      margin-bottom: 6px;
+    }
+    .footer-inner {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .footer-inner .lhs { max-width: 720px; }
+    .footer-inner .lhs strong { color: var(--ink); font-weight: var(--weight-strong); }
+    .footer-inner .rhs {
+      margin-left: auto;
+      display: flex;
+      gap: 16px;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .footer-inner .rhs a { color: var(--ink-dim); }
+    .footer-inner .rhs a:hover { color: var(--accent); text-decoration: none; }
+    .runid {
+      margin-top: 10px;
+      color: var(--ink-faint);
+      font-size: calc(var(--fs-xs) - 1px);
+      letter-spacing: 0.04em;
+    }
+  </style>
+</body>
+</html>

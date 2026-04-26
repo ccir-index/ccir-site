@@ -1,0 +1,250 @@
+---
+/*
+  Three Intelligence Factory tiers. Premium-chip algorithmic taxonomy —
+  T1IF / T2IF / T3IF, classified per-SKU from the capability bundle
+  (fabric, host topology, bundle depth, support).
+
+  Each tier is a WSJ-style feature box:
+    kicker (mono code badge) → serif headline (full IF name) →
+    standfirst (2-3 sentences, throughput framing) → capability matrix.
+*/
+import { TIERS, TIER_LABELS, type Tier } from '../data/types';
+
+interface Props {
+  compact?: boolean;
+  headerless?: boolean;
+}
+const { compact = false, headerless = false } = Astro.props;
+
+const tiers: Array<{
+  code: Tier;
+  name: string;
+  standfirst: string;
+}> = [
+  {
+    code: 'T1IF',
+    name: TIER_LABELS.T1IF,
+    standfirst:
+      'Top-grade fabric, dedicated single-tenant bare-metal, full enterprise bundle — managed operations, tiered support, observability, egress allowance, regulated-workload compliance. The rate buys capability that translates directly into useful compute per dollar at production scale.',
+  },
+  {
+    code: 'T2IF',
+    name: TIER_LABELS.T2IF,
+    standfirst:
+      'Dedicated single-tenant bare-metal with disclosed fabric, basic support, no managed-ops wrapper. Where most production training spend lands. The middle grade — the rate is lower, but each $/GPU-hr buys less of the bundle that turns silicon into output.',
+  },
+  {
+    code: 'T3IF',
+    name: TIER_LABELS.T3IF,
+    standfirst:
+      'Co-located or marketplace clearing on variable Ethernet fabric. Self-serve, no support tier, interruptibility common. The lowest rate band — and the lowest effective throughput per nominal $/GPU-hr once interrupt risk is priced in.',
+  },
+];
+
+// Capability matrix — five attributes across three tiers. Each cell is a
+// short editorial phrase, not a one-word label.
+type AttrKey = 'tenancy' | 'fabric' | 'bundle' | 'operators' | 'use';
+const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }> = [
+  {
+    key: 'tenancy',
+    label: 'Tenancy',
+    cells: {
+      T1IF: 'Dedicated bare-metal, single-tenant',
+      T2IF: 'Dedicated bare-metal, single-tenant',
+      T3IF: 'Shared-pool or marketplace',
+    },
+  },
+  {
+    key: 'fabric',
+    label: 'Fabric',
+    cells: {
+      T1IF: 'IB-NDR or eq. (3.2 Tbps RDMA, 8×400 Gbps)',
+      T2IF: 'IB-HDR / RoCE-v2 / EFA / mixed disclosed',
+      T3IF: 'Ethernet / variable / undisclosed',
+    },
+  },
+  {
+    key: 'bundle',
+    label: 'Bundle depth',
+    cells: {
+      T1IF: 'Managed ops, tiered support, observability, egress allowance, compliance',
+      T2IF: 'Basic support, no managed ops',
+      T3IF: 'Self-serve, no support tier',
+    },
+  },
+  {
+    key: 'operators',
+    label: 'Typical operators',
+    cells: {
+      T1IF: 'AWS · Azure · OCI · GCP · CoreWeave · Nebius',
+      T2IF: 'Lambda OD · RunPod Secure · Crusoe · Hyperstack',
+      T3IF: 'RunPod Community · Vast.ai · Together MoE',
+    },
+  },
+  {
+    key: 'use',
+    label: 'Use case',
+    cells: {
+      T1IF: 'Production training, regulated workloads',
+      T2IF: 'Dedicated training, less ceremony',
+      T3IF: 'Cost-sensitive batch, dev/test, spot',
+    },
+  },
+];
+---
+<section class={`tiers ${compact ? 'tiers-compact' : ''}`}>
+  {!headerless && (
+    <header class="tiers-header">
+      <div class="kicker">Intelligence Factory Taxonomy</div>
+      <h2>Three Production Tiers</h2>
+      <p class="standfirst">
+        Each tier is a defined capability bundle — fabric, host, support,
+        compliance. CCIR publishes one reference rate per tier so users
+        can match the index cited to the deployment grade they pay for,
+        narrowing basis risk relative to a single-rate alternative.
+      </p>
+    </header>
+  )}
+
+  <div class="tier-grid">
+    {tiers.map((t) => (
+      <article class={`tier-card tier-${t.code.toLowerCase()}`}>
+        <header class="tc-head">
+          <span class={`tc-badge tier-badge tier-badge-${t.code.toLowerCase()}`}>{t.code}</span>
+          <h3>{t.name}</h3>
+        </header>
+        <p class="tc-standfirst">{t.standfirst}</p>
+      </article>
+    ))}
+  </div>
+
+  <div class="cap-matrix-wrap">
+    <table class="data cap-matrix">
+      <thead>
+        <tr>
+          <th class="attr-col">Attribute</th>
+          {TIERS.map((t) => (
+            <th class={`tier-col tier-col-${t.toLowerCase()}`}>
+              <span class={`tier-badge tier-badge-${t.toLowerCase()}`}>{t}</span>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {attrs.map((a) => (
+          <tr>
+            <td class="attr-name">{a.label}</td>
+            {TIERS.map((t) => (
+              <td class="attr-cell">{a.cells[t]}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p class="cap-caption">
+      Each tier is a capability bundle. The matrix describes what the
+      rate at each tier actually packages — fabric, host, bundle depth,
+      typical operators, use case.
+    </p>
+  </div>
+</section>
+
+<style>
+  .tiers { margin: 8px 0 32px; }
+  .tiers-header { max-width: 80ch; margin-bottom: 18px; }
+  .tiers-header h2 {
+    font-size: var(--fs-2xl);
+    margin: 4px 0 10px;
+  }
+
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 18px;
+  }
+  @media (max-width: 900px) {
+    .tier-grid { grid-template-columns: 1fr; }
+  }
+
+  .tier-card {
+    background: var(--surface);
+    padding: 18px 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .tc-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .tc-head h3 {
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    color: var(--ink);
+    font-weight: var(--weight-display);
+    letter-spacing: -0.005em;
+  }
+  .tc-standfirst {
+    font-family: var(--font-body);
+    font-size: var(--fs-md);
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  .cap-matrix-wrap {
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+  table.cap-matrix { width: 100%; border-collapse: collapse; }
+  table.cap-matrix th.attr-col {
+    text-align: left;
+    width: 18%;
+    min-width: 140px;
+  }
+  table.cap-matrix th.tier-col {
+    text-align: left;
+    width: 27.33%;
+  }
+  table.cap-matrix td.attr-name {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    color: var(--ink-dim);
+    text-align: left;
+    background: var(--surface-2);
+    font-weight: var(--weight-strong);
+    white-space: nowrap;
+  }
+  table.cap-matrix td.attr-cell {
+    text-align: left;
+    font-family: var(--font-body);
+    color: var(--ink);
+    line-height: 1.45;
+    font-size: var(--fs-sm);
+  }
+  .cap-caption {
+    font-family: var(--font-body);
+    font-size: var(--fs-sm);
+    color: var(--ink-dim);
+    line-height: 1.55;
+    margin: 12px 16px 14px;
+    font-style: italic;
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
+    max-width: 80ch;
+  }
+
+  @media (max-width: 720px) {
+    table.cap-matrix th, table.cap-matrix td {
+      font-size: var(--fs-xs);
+      padding: 8px 10px;
+    }
+  }
+</style>

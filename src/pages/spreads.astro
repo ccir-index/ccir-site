@@ -1,0 +1,222 @@
+---
+import Base from '../layouts/Base.astro';
+import { spreadMatrix, meta } from '../data/snapshot';
+import { TIERS, TIER_LABELS, TIER_LABELS_SHORT, TERM_DISPLAY } from '../data/types';
+
+const rows = spreadMatrix();
+const fmt = (n: number, dp = 2) => n.toFixed(dp);
+const pctAbs = (n: number) => `${(Math.abs(n) * 100).toFixed(1)}%`;
+const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
+---
+<Base title="Tier spreads · CCIR">
+  <section class="wrap top">
+    <div class="hero-solo">
+      <div class="kicker">Disc./Prem. vs Tier 1 IF · {meta.as_of_date}</div>
+      <h1>Tier Spread Matrix</h1>
+      <p class="standfirst lede">
+        The matrix enables price-signal discovery in two dimensions.
+        <strong>Across a row</strong> (same chip, varying tier): the
+        deployment-environment spread — what the capability bundle costs
+        as you step down from <em>Tier 1</em> to <em>Tier 2</em> and
+        <em>Tier 3</em>. <strong>Down a column</strong> (same tier,
+        varying chip): the generation signal — what newer silicon is
+        worth when fabric, host, and operational bundle are held
+        constant. Capability priced once, generation priced once —
+        without the two confounding each other.
+      </p>
+    </div>
+
+    <div class="legend">
+      <span class="lk">Tier:</span>
+      {TIERS.map((t) => (
+        <span class="lc">
+          <span class={`sw tier-sw-${t.toLowerCase()}`}></span>
+          <span class="abbr">{t}</span>
+          <span class="nm">{TIER_LABELS[t]}</span>
+        </span>
+      ))}
+    </div>
+
+    <div class="table-wrap">
+      <table class="data matrix">
+        <thead>
+          <tr>
+            <th rowspan="2" class="cell-head">Chip</th>
+            <th rowspan="2" class="cell-head">Term</th>
+            {TIERS.map((t) => (
+              <th colspan="2" class={`tier-col tier-col-${t.toLowerCase()}`}>{t} · {TIER_LABELS_SHORT[t]}</th>
+            ))}
+          </tr>
+          <tr>
+            {TIERS.map(() => (
+              <>
+                <th class="sub">Posted</th>
+                <th class="sub">Disc. / Prem. vs T1IF</th>
+              </>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr>
+              <td class="chip">{row.chip}</td>
+              <td class="term">{TERM_DISPLAY[row.term] ?? row.term}</td>
+              {TIERS.map((t) => {
+                const c = row.cells[t];
+                if (!c) {
+                  return (
+                    <>
+                      <td class="num empty">—</td>
+                      <td class="num empty">—</td>
+                    </>
+                  );
+                }
+                const isT1 = t === 'T1IF';
+                return (
+                  <>
+                    <td class={`num posted ${isT1 ? 'baseline' : ''}`}
+                        title={`Median (headline) $${fmt(c.rate.price_median)} · Mean $${fmt(c.rate.price_mean)} · IQR $${fmt(c.rate.price_p25)}–$${fmt(c.rate.price_p75)} · ${c.rate.n_sources} sources / ${c.rate.n_observations} obs`}>
+                      ${fmt(c.rate.price_median)}
+                    </td>
+                    <td class="num disc">
+                      {isT1 ? (
+                        <span class="baseline-dash">baseline</span>
+                      ) : c.pct_discount_from_t1if == null ? (
+                        <span class="empty">—</span>
+                      ) : (() => {
+                          const isDiscount = c.pct_discount_from_t1if > 0;
+                          const sign = isDiscount ? '−' : '+';
+                          const cls = isDiscount ? 'disc-val' : 'prem-val';
+                          return (
+                            <span class={cls}>
+                              {sign}{pctAbs(c.pct_discount_from_t1if)}
+                              <span class="abs">({sign}{dollarAbs(c.absolute_from_t1if ?? 0)})</span>
+                            </span>
+                          );
+                        })()}
+                    </td>
+                  </>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+  </section>
+
+  <style>
+    .top { padding-top: 28px; }
+    h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .lede { font-size: var(--fs-lg); }
+    .lede em { font-style: italic; color: var(--accent); }
+
+    .hero-solo { margin-bottom: 28px; max-width: 80ch; }
+
+    .legend {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      margin: 8px 0 14px;
+      flex-wrap: wrap;
+    }
+    .legend .lk { color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); }
+    .legend .lc { display: inline-flex; align-items: center; gap: 6px; }
+    .legend .sw { width: 8px; height: 8px; display: inline-block; }
+    .legend .abbr { color: var(--ink); font-weight: var(--weight-strong); letter-spacing: 0.06em; }
+    .legend .nm { color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); }
+    .tier-sw-t1if { background: var(--tier-t1if); }
+    .tier-sw-t2if { background: var(--tier-t2if); }
+    .tier-sw-t3if { background: var(--tier-t3if); }
+
+    .table-wrap {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      overflow-x: auto;
+      margin-bottom: 32px;
+    }
+    table.matrix { min-width: 760px; }
+    table.matrix thead .tier-col {
+      text-align: center;
+      border-bottom: 1px solid var(--rule-2);
+      font-weight: var(--weight-strong);
+      background: var(--surface-2);
+    }
+    table.matrix thead .tier-col-t1if { color: var(--tier-t1if); }
+    table.matrix thead .tier-col-t2if { color: var(--tier-t2if); }
+    table.matrix thead .tier-col-t3if { color: var(--tier-t3if); }
+    table.matrix thead .sub {
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-body);
+    }
+    table.matrix thead .cell-head { text-align: left; }
+    table.matrix td.chip {
+      color: var(--ink);
+      font-weight: var(--weight-strong);
+    }
+    table.matrix td.term {
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
+    }
+    table.matrix td.posted { color: var(--ink); font-weight: var(--weight-strong); }
+    table.matrix td.posted.baseline { color: var(--tier-t1if); }
+    table.matrix td.empty { color: var(--ink-faint); }
+    table.matrix td.disc .disc-val { color: var(--pos); }
+    table.matrix td.disc .prem-val { color: var(--warn); font-weight: var(--weight-strong); }
+    table.matrix td.disc .abs {
+      margin-left: 6px;
+      color: var(--ink-faint);
+      font-size: var(--fs-xs);
+    }
+    table.matrix td.disc .baseline-dash {
+      color: var(--tier-t1if);
+      opacity: 0.7;
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+
+    .notes {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      padding: 16px 20px;
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      margin-bottom: 32px;
+      max-width: 80ch;
+    }
+    .notes h3 {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      margin-bottom: 10px;
+      font-weight: var(--weight-strong);
+    }
+    .notes ul { margin: 0; padding-left: 20px; line-height: 1.65; }
+    .notes code {
+      background: var(--surface-2);
+      padding: 1px 6px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-sm) - 1px);
+      color: var(--ink);
+    }
+    .notes strong { color: var(--ink); font-weight: var(--weight-strong); }
+  </style>
+</Base>

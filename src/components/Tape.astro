@@ -1,0 +1,141 @@
+---
+import { headlineRates, meta } from '../data/snapshot';
+import Sparkline from './Sparkline.astro';
+
+// Premium-chip series only. Featured flagship cells under the 7-segment
+// grammar. T1IF / T2IF / T3IF spread across the canonical 6 silicons.
+const featured = [
+  'CRI-T1IF-H100-ALL-GTD-OD-ALL',
+  'CRI-T2IF-H100-ALL-GTD-OD-ALL',
+  'CRI-T3IF-H100-ALL-ALL-OD-ALL',
+  'CRI-T1IF-H200-ALL-GTD-OD-ALL',
+  'CRI-T2IF-H200-ALL-GTD-OD-ALL',
+  'CRI-T3IF-H200-ALL-ALL-OD-ALL',
+  'CRI-T1IF-B200-ALL-GTD-OD-ALL',
+  'CRI-T2IF-B200-ALL-GTD-OD-ALL',
+  'CRI-T3IF-B200-ALL-ALL-OD-ALL',
+  'CRI-T1IF-GB200-ALL-GTD-OD-ALL',
+  'CRI-T2IF-A100-ALL-GTD-OD-ALL',
+  'CRI-T3IF-A100-ALL-ALL-OD-ALL',
+];
+
+const ticks = featured
+  .map((id) => headlineRates.find((r) => r.series_id === id))
+  .filter((r): r is NonNullable<typeof r> => !!r);
+
+const fmt = (n: number) => n.toFixed(2);
+const short = (r: typeof ticks[number]) => {
+  const parts = r.series_id.split('-');
+  const tier = parts[1]!;
+  const chip = parts.slice(2, parts.length - 4).join('-');
+  return `${tier} ${chip}`;
+};
+
+// Direction glyph from 7d → 1d trend (or flat when no movement).
+function direction(r: typeof ticks[number]): 'up' | 'down' | 'flat' {
+  const a = r.price_mean_7d;
+  const b = r.price_mean_1d;
+  if (!Number.isFinite(a) || !Number.isFinite(b) || a === 0) return 'flat';
+  if (b > a * 1.005) return 'up';
+  if (b < a * 0.995) return 'down';
+  return 'flat';
+}
+
+const runLabel = meta.as_of_date;
+---
+<div class="tape" role="region" aria-label="Published premium-chip rates">
+  <span class="tape-label">AS OF · {runLabel}</span>
+  <div class="tape-rail">
+    <div class="tape-marquee">
+      {[0, 1].map((dup) => (
+        <div class="tape-track" aria-hidden={dup === 1 ? 'true' : 'false'}>
+          {ticks.map((r) => {
+            const dir = direction(r);
+            return (
+              <span class="tick">
+                <span class="sym">{short(r)}</span>
+                <span class="px">${fmt(r.price_median)}</span>
+                <span class={`dir dir-${dir}`}>{dir === 'up' ? '▲' : dir === 'down' ? '▼' : '─'}</span>
+                <span class="spark"><Sparkline seriesId={r.series_id} median={r.price_median} width={42} height={14} /></span>
+              </span>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .tape {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+    border-top: 1px solid var(--rule);
+    display: flex;
+    align-items: stretch;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    overflow: hidden;
+  }
+  .tape-label {
+    padding: 8px 14px;
+    background: var(--surface-3);
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    border-right: 1px solid var(--rule);
+    font-weight: var(--weight-strong);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+  }
+  .tape-rail {
+    padding: 6px 0;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(
+      to right, transparent 0, black 24px,
+      black calc(100% - 24px), transparent 100%
+    );
+  }
+  .tape-marquee {
+    display: flex;
+    width: max-content;
+    animation: tape-scroll 50s linear infinite;
+  }
+  .tape-rail:hover .tape-marquee { animation-play-state: paused; }
+  .tape-track {
+    display: flex;
+    gap: 28px;
+    padding: 0 14px;
+  }
+  @keyframes tape-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tape-marquee { animation: none; }
+    .tape-rail { overflow-x: auto; mask-image: none; }
+  }
+  .tick {
+    display: inline-flex;
+    gap: 6px;
+    white-space: nowrap;
+    align-items: center;
+  }
+  .tick .sym {
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .tick .px {
+    color: var(--ink);
+    font-weight: var(--weight-strong);
+  }
+  .tick .dir { font-size: 9px; }
+  .tick .dir-up { color: var(--neg); }
+  .tick .dir-down { color: var(--pos); }
+  .tick .dir-flat { color: var(--ink-faint); }
+  .tick .spark { display: inline-flex; }
+</style>

@@ -1,0 +1,897 @@
+---
+import Base from '../layouts/Base.astro';
+import { headlineRates, meta } from '../data/snapshot';
+
+// Calibrate against the canonical T1IF H100 SXM guaranteed on-demand
+// series — the production-grade reference for premium silicon. T1IF is
+// where regulated, full-bundle credit-document mechanics anchor.
+const REF_SERIES_ID = 'CRI-T1IF-H100-SXM-GTD-OD-ALL';
+const ref = headlineRates.find((r) => r.series_id === REF_SERIES_ID);
+// Headline = median per METHODOLOGY §4.1 (locked 2026-04-25, manipulation-resistance).
+const closingRate = ref ? ref.price_median : 0;
+
+const round5c = (n: number) => Math.round(n / 0.05) * 0.05;
+const round1c = (n: number) => Math.round(n * 100) / 100;
+const fmt = (n: number) => n.toFixed(2);
+
+const TIER_2_THRESHOLD = round5c(closingRate * 0.92);
+const TIER_3_THRESHOLD = round5c(closingRate * 0.80);
+const TIER_4_THRESHOLD = round5c(closingRate * 0.69);
+
+interface TrajRow {
+  month: string;
+  pct: number;
+  value: number;
+  tier: 1 | 2 | 3 | 4;
+  tierLabel: string;
+  transition: boolean;
+  improvement: boolean;
+  triggered: string;
+  cure: string;
+}
+function classify(value: number): 1 | 2 | 3 | 4 {
+  if (value >= TIER_2_THRESHOLD) return 1;
+  if (value >= TIER_3_THRESHOLD) return 2;
+  if (value >= TIER_4_THRESHOLD) return 3;
+  return 4;
+}
+const TIER_LABELS: Record<number, string> = {
+  1: 'Tier 1 (Baseline)',
+  2: 'Tier 2 (Watch)',
+  3: 'Tier 3 (Step-Up)',
+  4: 'Tier 4 (Triggered)',
+};
+const TIER_REQS: Record<number, string> = {
+  1: '30% Committed Revenue Coverage; quarterly reporting',
+  2: '50% CRC; monthly reporting; no Restricted Payments',
+  3: '70% CRC; Reserve Account funded to 6 mo. debt service; 50% ECF Sweep; monthly reporting; no RP',
+  4: '85% CRC; Reserve Account to 12 mo. debt service; 100% ECF Sweep monthly; mandatory 2.5% accelerated amortization quarterly; monthly reporting; no RP',
+};
+
+const trajPcts: { month: string; pct: number; cure: string }[] = [
+  { month: 'Month 0 (Close)', pct: 1.00, cure: 'None — facility closes in compliance' },
+  { month: 'Month 3',         pct: 0.95, cure: 'None required' },
+  { month: 'Month 6',         pct: 0.88, cure: 'Commit additional customer contracts within 90 days; halt distributions immediately' },
+  { month: 'Month 9',         pct: 0.82, cure: 'None required (CRC already at floor from prior cure)' },
+  { month: 'Month 12',        pct: 0.76, cure: 'Commit additional contracts (90 days); fund Reserve Account (45 days); next quarterly sweep applies 50% of ECF' },
+  { month: 'Month 15',        pct: 0.71, cure: 'None required' },
+  { month: 'Month 18',        pct: 0.65, cure: 'Commit additional contracts (90 days); top up Reserve Account (45 days); first accelerated amortization on next quarterly date' },
+  { month: 'Month 21',        pct: 0.74, cure: 'Excess Reserve Account balance above 6-mo. floor releasable subject to compliance certificate' },
+];
+let prevTier: 1 | 2 | 3 | 4 = 1;
+const trajectory: TrajRow[] = trajPcts.map(({ month, pct, cure }) => {
+  const value = round1c(closingRate * pct);
+  const tier = classify(value);
+  const transition = tier > prevTier;
+  const improvement = tier < prevTier;
+  const row: TrajRow = {
+    month, pct, value, tier,
+    tierLabel: TIER_LABELS[tier],
+    transition, improvement,
+    triggered: TIER_REQS[tier],
+    cure,
+  };
+  prevTier = tier;
+  return row;
+});
+
+const facilityTerms: { term: string; value: string }[] = [
+  { term: 'Borrower', value: 'A GPU-rich neocloud SPE (the "Borrower")' },
+  { term: 'Facility type', value: 'Senior-secured term loan' },
+  { term: 'Facility size', value: '$200,000,000' },
+  { term: 'Tenor', value: '4 years, scheduled amortization with bullet at maturity' },
+  { term: 'Collateral', value: 'First-lien security interest in 1,000 H100 SXM 8-GPU nodes plus customary blanket lien' },
+  { term: 'Reference Rate', value: 'CRI-T1IF-H100-SXM-GTD-OD-ALL, as published by CCIR (Tier 1 Intelligence Factory, H100 SXM, guaranteed on-demand)' },
+  { term: 'Closing Date Reference Rate', value: `$${fmt(closingRate)} per GPU per hour (as of ${meta.as_of_date})` },
+  { term: 'Reference Rate Average lookback', value: '30 days' },
+  { term: 'Test frequency', value: 'Monthly (Determination Date = last business day of each calendar month)' },
+];
+
+const precedentRows: { feature: string; precedent: string }[] = [
+  { feature: 'Reference rate naming convention (publication + administrator + field)', precedent: 'Modern oil-swap confirmations (Brent Dated / S&P Global Platts / Crude Oil Marketwire); ICE Dated Brent Future' },
+  { feature: '30-day arithmetic average lookback', precedent: 'Adapted from RBL 24-month forward-strip averages; SEC 12-month first-of-month averages' },
+  { feature: 'Tiered operating requirements driven by published price', precedent: 'RBL minimum hedging covenant (e.g., Amplify Energy 60% PDP hedge requirement scaled by price tier); high-yield indenture price-driven covenant suite' },
+  { feature: 'Committed Revenue Coverage as functional analog to hedging', precedent: 'Adapted to GPU context where futures markets do not yet exist; hedging via committed customer contracts' },
+  { feature: 'Reserve Account funding triggered by price tier', precedent: 'E&P credit agreement reserve-account covenants; PDP ABS reserve account requirements' },
+  { feature: 'Cash sweep activation at price thresholds', precedent: 'Standard high-yield and leveraged loan cash sweep triggers, here keyed to a published commodity index rather than to leverage ratios' },
+  { feature: 'Mandatory accelerated amortization at lowest tier', precedent: 'RBL borrowing-base deficiency cure mechanics in tail tiers; PDP ABS amortization triggers' },
+  { feature: 'Disruption Events (Cessation / Administrator / Methodology / Publication)', precedent: 'ISDA 2018 Benchmarks Supplement; 2005 ISDA Commodity Definitions Market Disruption Events' },
+  { feature: 'Replacement Rate waterfall', precedent: 'ARRC hardwired LIBOR transition language' },
+  { feature: 'Tier Threshold Adjustment Spread', precedent: 'ARRC LIBOR transition; ISDA Benchmarks Supplement Adjustment Payment' },
+  { feature: 'Material Methodology Change with numerical threshold', precedent: 'Adapted from ISDA "Material Change in Formula/Content" with objective calibration to historical data' },
+  { feature: 'Conforming Changes authority', precedent: 'ARRC LIBOR transition language verbatim' },
+];
+---
+<Base title="Applications · CCIR">
+  <section class="wrap top">
+    <h1>Applications</h1>
+    <p class="dek">
+      Worked drafting examples showing how a CCIR rate fits into established
+      commodity-credit-document conventions. Each example references a
+      specific CCIR series — the published, observable rate that anchors the
+      mechanic — calibrated against today's snapshot. The reference series
+      is a Tier 1 Intelligence Factory rate: the deployment grade
+      where regulated, full-bundle GPU compute is offered, and the rate
+      band where the productivity-adjusted spread between tiers stops
+      widening. CCIR cites the list-ask at the deployment grade the SKU
+      describes, not the chip on the spec sheet — and the productivity
+      differential between tiers means a lower nominal rate at a
+      downstream tier is not a like-for-like substitute for the T1IF
+      reference.
+    </p>
+
+    <article class="usecase">
+      <header class="uc-head">
+        <span class="uc-kicker">Use case 01 · Senior-secured term loan</span>
+        <h2>Market price monitoring covenant tied to a CRI rate</h2>
+        <p class="uc-lede">
+          A worked drafting example showing how a CCIR rate would be cited in
+          a senior-secured term loan facility as the trigger input to a
+          tiered market price monitoring covenant. Modeled on the
+          reserve-based lending minimum hedging covenant — a structure in
+          which falling NYMEX strip prices automatically tighten operational
+          requirements (hedging floors, reserve funding, cash sweeps) without
+          immediately triggering default. Drafting illustration, not a model
+          form.
+        </p>
+      </header>
+
+      <section class="uc-rate">
+        <div class="rate-kicker">Reference rate (live, calibrating this example)</div>
+        <div class="rate-id">{REF_SERIES_ID}</div>
+        <div class="rate-price">${fmt(closingRate)}<span class="rate-unit">/GPU-hr</span></div>
+        <div class="rate-meta">
+          T1IF · Tier 1 Intelligence Factory · H100 SXM · Guaranteed on-demand
+          <span class="sep">·</span>
+          {ref?.n_sources} sources / {ref?.n_observations} observations
+          <span class="sep">·</span>
+          as of {meta.as_of_date}
+        </div>
+        <div class="rate-thresholds">
+          <span><strong>Tier 2 threshold</strong> ${fmt(TIER_2_THRESHOLD)} <span class="dim">(92% of close)</span></span>
+          <span><strong>Tier 3 threshold</strong> ${fmt(TIER_3_THRESHOLD)} <span class="dim">(80% of close)</span></span>
+          <span><strong>Tier 4 threshold</strong> ${fmt(TIER_4_THRESHOLD)} <span class="dim">(69% of close)</span></span>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">01</span> What a Market Price Monitoring Covenant Is</h3>
+        <p>
+          A market price monitoring covenant is a covenant that tests a
+          published reference price (or a function of published prices)
+          directly against contractually defined thresholds, with the price
+          level itself driving the triggered consequence. It is functionally
+          distinct from a valuation covenant (such as an LTV maintenance
+          test), in which the published price is an input to a calculation
+          and the test runs against the calculation rather than the price.
+        </p>
+        <p>
+          The canonical commodity-credit structure is the RBL minimum hedging
+          covenant, which tightens the borrower's hedging floor as the NYMEX
+          strip price falls beneath defined thresholds. Other examples found
+          across commodity credit documents include reserve-account funding
+          triggers tied to Henry Hub levels, cash sweep activations tied to
+          Platts assessments, dividend blockers tied to LME cash prices, and
+          springing covenants that come into effect only when a published
+          price index crosses a threshold.
+        </p>
+        <p>
+          The structural appeal is that the covenant operates on a
+          <em>signal</em>, not an <em>event</em>. There is no defaulting
+          borrower behavior to litigate. The published rate either is or is
+          not below the threshold on the test date. The lender's contractual
+          remedy is correspondingly graduated — operational tightening at
+          lower thresholds, financial tightening at lower-still thresholds,
+          mandatory action at the lowest. The borrower has visibility into
+          where the trigger sits and can manage its operations accordingly.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">02</span> Hypothetical Facility Terms</h3>
+        <div class="ftable-wrap">
+          <table class="ftable">
+            <tbody>
+              {facilityTerms.map(({ term, value }) => (
+                <tr>
+                  <th>{term}</th>
+                  <td>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">03</span> Defined Terms</h3>
+        <p>
+          Drafted to be embeddable in a credit agreement's Definitions
+          section. The dual-anchor convention — naming the publication, the
+          administrator, and the specific data field separately — is the
+          same as in modern oil-swap confirmations referencing "Brent
+          (Dated) as published by S&amp;P Global Platts" and in post-LIBOR
+          ARRC fallback language.
+        </p>
+        <pre class="cov-body">
+<span class="cov-h">"CRI Reference Rate"</span> means, as of any date of determination, the rate
+published as <strong>{REF_SERIES_ID}</strong> by the Reference Rate Administrator
+on its principal website (currently ccir.io), expressed in U.S. dollars
+per GPU per hour, for the most recent Publication Date on or prior to
+such date.
+
+<span class="cov-h">"Reference Rate Administrator"</span> means Compute Credit Index Research LLC,
+a Delaware limited liability company, or any successor administrator of
+the {REF_SERIES_ID} rate that (i) maintains a published methodology
+substantially consistent with the CCIR Methodology in effect on the
+Closing Date (or any successor version adopted in compliance with the
+Reference Rate Administrator's published Change Management Policy) and
+(ii) operates with structural independence from counterparties to GPU
+compute transactions.
+
+<span class="cov-h">"Reference Rate Average"</span> means, as of any Determination Date, the
+arithmetic mean of the CRI Reference Rate for each of the thirty (30)
+consecutive Publication Dates ending on (and including) such
+Determination Date.
+
+<span class="cov-h">"Committed Customer Contracts"</span> means binding customer agreements for
+compute capacity having a remaining contractual term of not less than
+six (6) months from the relevant Determination Date and providing for
+fixed pricing or pricing subject only to a contractually agreed
+adjustment formula.
+
+<span class="cov-h">"Committed Revenue Coverage"</span> means, as of any Determination Date, the
+quotient (expressed as a percentage) of (a) the projected revenue
+receivable under Committed Customer Contracts during the twelve (12)-
+month period beginning on such Determination Date, divided by (b) the
+Borrower's projected gross rental revenue from the Pool Nodes during
+such twelve-month period (assuming utilization at the Borrower's
+then-current operating run rate and pricing at the most recently
+published CRI Reference Rate).
+
+<span class="cov-h">"Excess Cash Flow"</span> has the meaning given to that term on Schedule 1.01(b).
+
+<span class="cov-h">"Reserve Account"</span> means the segregated, blocked deposit account
+established with the Administrative Agent pursuant to Section 4.05.</pre>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">04</span> The Covenant</h3>
+        <pre class="cov-body">
+<span class="cov-h">Section 7.01   Market Price Maintenance Covenant.</span>
+
+<span class="cov-h">(a)  Reference Rate Tiers.</span> As of each Determination Date, the
+Reference Rate Average shall be classified into one of the following
+tiers (each, a "Reference Rate Tier"):
+
+    "Tier 1 (Baseline)"     Reference Rate Average  ≥  ${fmt(TIER_2_THRESHOLD)} per GPU per hour
+    "Tier 2 (Watch)"        ${fmt(TIER_3_THRESHOLD)}   ≤  Reference Rate Average  &lt;  ${fmt(TIER_2_THRESHOLD)}
+    "Tier 3 (Step-Up)"      ${fmt(TIER_4_THRESHOLD)}   ≤  Reference Rate Average  &lt;  ${fmt(TIER_3_THRESHOLD)}
+    "Tier 4 (Triggered)"    Reference Rate Average  &lt;  ${fmt(TIER_4_THRESHOLD)}
+
+Each threshold dollar amount set forth above is referred to herein as
+a "Tier Threshold."
+
+<span class="cov-h">(b)  Tier-Based Operating Requirements.</span> From and after each
+Determination Date and until the next succeeding Determination Date,
+the Borrower shall comply with the operating requirements applicable
+to the Reference Rate Tier in effect for such Determination Date, as
+follows:
+
+  <span class="cov-h">Tier 1 (Baseline):</span>
+    (i)   Committed Revenue Coverage of not less than thirty percent (30%);
+    (ii)  Quarterly compliance certificates as set forth in Section 6.01.
+
+  <span class="cov-h">Tier 2 (Watch):</span>
+    (i)   Committed Revenue Coverage of not less than fifty percent (50%);
+    (ii)  Monthly compliance certificates;
+    (iii) No Restricted Payments to be made until restoration to Tier 1.
+
+  <span class="cov-h">Tier 3 (Step-Up):</span>
+    (i)   Committed Revenue Coverage of not less than seventy percent (70%);
+    (ii)  Monthly compliance certificates;
+    (iii) No Restricted Payments;
+    (iv)  Reserve Account funded with cash and Permitted Investments having
+          a market value of not less than six (6) months of scheduled debt
+          service (the "Tier 3 Reserve Floor");
+    (v)   Excess Cash Flow Sweep of fifty percent (50%) at the end of each
+          calendar quarter, applied to scheduled amortization in inverse
+          order of maturity.
+
+  <span class="cov-h">Tier 4 (Triggered):</span>
+    (i)   Committed Revenue Coverage of not less than eighty-five percent
+          (85%);
+    (ii)  Monthly compliance certificates;
+    (iii) No Restricted Payments;
+    (iv)  Reserve Account funded with cash and Permitted Investments having
+          a market value of not less than twelve (12) months of scheduled
+          debt service (the "Tier 4 Reserve Floor");
+    (v)   Excess Cash Flow Sweep of one hundred percent (100%) at the end
+          of each calendar month, applied to scheduled amortization in
+          inverse order of maturity;
+    (vi)  Mandatory accelerated amortization of two and one-half percent
+          (2.50%) of the original principal amount of the Loans on the
+          last Business Day of each calendar quarter, in addition to
+          scheduled amortization.
+
+<span class="cov-h">(c)  Phase-In on Tier Transition.</span> If the Reference Rate Tier in
+effect for any Determination Date is more restrictive than the
+Reference Rate Tier that was in effect for the immediately preceding
+Determination Date, the Borrower shall achieve compliance with the
+operating requirements of the new Reference Rate Tier no later than
+thirty (30) days after such Determination Date (the "Tier Transition
+Cure Period"); provided that (i) any change in Committed Revenue
+Coverage requirement shall be required to be achieved within ninety
+(90) days, and (ii) any change in the Reserve Account funding floor
+shall be required to be achieved within forty-five (45) days.
+
+<span class="cov-h">(d)  Step-Down on Tier Improvement.</span> If the Reference Rate Tier in
+effect for any Determination Date is less restrictive than the
+Reference Rate Tier that was in effect for the immediately preceding
+Determination Date, the operating requirements applicable to the new
+Reference Rate Tier shall apply automatically; provided that release
+of any cash from the Reserve Account in excess of the new applicable
+Reserve Floor shall require delivery of a compliance certificate
+confirming that no Default or Event of Default has occurred and is
+continuing.
+
+<span class="cov-h">(e)  Failure to Comply.</span> The failure of the Borrower to achieve
+compliance with the operating requirements of the applicable Reference
+Rate Tier within the Tier Transition Cure Period shall constitute an
+Event of Default.
+
+<span class="cov-h">(f)  Interim Test.</span> The Administrative Agent may, at the direction of
+the Required Lenders, designate any Business Day as an interim
+Determination Date upon five (5) Business Days' written notice to the
+Borrower if (i) the most recently published CRI Reference Rate is more
+than fifteen percent (15%) below the Reference Rate Average used for
+the most recent Determination Date or (ii) a Reference Rate Disruption
+Event has occurred and is continuing.</pre>
+        <p>
+          The structure matches the RBL minimum hedging covenant's tiered
+          logic — falling published price drives tighter operational and
+          cash-flow requirements automatically — adapted to the operational
+          realities of GPU-backed lending. Committed Revenue Coverage plays
+          the role that hedge coverage plays in RBL: it locks in expected
+          cash flow at progressively higher floors as rental rates fall,
+          insulating debt service capacity from further spot-price decline.
+        </p>
+        <p>
+          The Tier Transition Cure Period exists because some operational
+          responses (signing customer contracts, funding a reserve account)
+          cannot be executed within the 5-day reporting window that
+          triggered the tier change. The 30/45/90-day phase-in periods are
+          calibrated to the realistic timelines for each action.
+        </p>
+        <p>
+          The 15% interim-test threshold guards against fast moves between
+          Determination Dates. Without an interim test, a borrower could
+          stay in Tier 1 on a Friday Determination Date and trade through
+          Tier 4 over the subsequent week without any covenant response
+          until the next month-end.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">05</span> Fallback Architecture</h3>
+        <p>
+          The fallback waterfall draws from the ISDA 2018 Benchmarks
+          Supplement and the ARRC hardwired LIBOR transition language,
+          adapted to a PRA-style commodity index. The rate-disruption
+          mechanics are common to any covenant citing this rate.
+        </p>
+        <pre class="cov-body">
+<span class="cov-h">Section 7.01(g)  Reference Rate Disruption.</span>
+
+<span class="cov-h">(i)  Reference Rate Disruption Events.</span> Each of the following shall
+constitute a "Reference Rate Disruption Event":
+
+    (A)  <span class="cov-h">Cessation Event:</span> the Reference Rate Administrator publicly
+    announces that it has ceased or will cease to publish the CRI
+    Reference Rate, and no successor administrator has assumed
+    publication;
+
+    (B)  <span class="cov-h">Administrator Event:</span> the Reference Rate Administrator (1)
+    ceases to maintain a published methodology, (2) loses material
+    structural independence from counterparties to GPU compute
+    transactions, or (3) becomes the subject of an enforcement action
+    by a financial regulator for benchmark-related conduct;
+
+    (C)  <span class="cov-h">Material Methodology Change:</span> the Reference Rate Administrator
+    implements a change to the methodology governing the CRI Reference
+    Rate that, in the reasonable determination of the Administrative
+    Agent, is not substantively similar to the methodology in effect
+    on the Closing Date and would, if applied to the historical
+    period, have produced a Reference Rate Average more than ten
+    percent (10%) different from the actual published values; or
+
+    (D)  <span class="cov-h">Publication Disruption:</span> the Reference Rate Administrator
+    fails to publish the CRI Reference Rate for five (5) or more
+    consecutive Publication Dates other than as a result of a
+    scheduled publication holiday.
+
+<span class="cov-h">(ii) Replacement Rate Waterfall.</span> Upon the occurrence and during the
+continuance of a Reference Rate Disruption Event, the "Replacement
+Rate" shall be determined in the following order of priority:
+
+    First, any rate published by a successor administrator that has
+    publicly assumed responsibility for continued publication of the
+    {REF_SERIES_ID} rate using a methodology substantially consistent
+    with the CCIR Methodology then in effect;
+
+    Second, a rate constructed by the Administrative Agent using the
+    underlying observation data published by the Reference Rate
+    Administrator pursuant to its Data Publication Policy, applying
+    the aggregation methodology specified in the CCIR Methodology in
+    effect immediately prior to the Reference Rate Disruption Event;
+
+    Third, any other published GPU compute reference rate selected by
+    the Administrative Agent (with the consent of the Required Lenders)
+    that (1) is administered by an entity structurally independent from
+    counterparties to GPU compute transactions, (2) covers H100 SXM
+    8-GPU node pricing, and (3) is published with a frequency of at
+    least weekly; or
+
+    Fourth, a rate determined in good faith by the Administrative
+    Agent, based on then-available information regarding seller-posted
+    noninterruptible per-node prices for H100 SXM 8-GPU nodes from
+    sources of the type historically used by the Reference Rate
+    Administrator.
+
+<span class="cov-h">(iii) Tier Threshold Adjustment.</span> Upon application of any Replacement
+Rate, the Administrative Agent shall adjust each Tier Threshold by
+applying an adjustment spread (which may be positive or negative)
+calculated to neutralize the change in expected Reference Rate Tier
+classification arising solely from the change in rate input, measured
+over the thirty (30)-day period ending on the date of the Reference
+Rate Disruption Event.
+
+<span class="cov-h">(iv) Conforming Changes.</span> The Administrative Agent may, in connection
+with the implementation of any Replacement Rate, make such technical,
+administrative, or operational changes to this Agreement (including
+to the Determination Date schedule, publication-date references, and
+Tier Threshold dollar amounts) as the Administrative Agent reasonably
+determines are appropriate, without further consent of the Borrower
+or any Lender.</pre>
+        <p>
+          <strong>Material Methodology Change is operationalized with a
+          numerical test.</strong> Rather than leaving "material change" to
+          argument, the draft requires the change to produce more than a 10%
+          deviation from historical published values. This anchors the test
+          to objective data and is calibratable against CCIR's Change
+          Management Policy.
+        </p>
+        <p>
+          <strong>The second-tier fallback uses CCIR's own Bronze data.</strong>
+          This is only executable if CCIR publishes its underlying observation
+          data with sufficient granularity for an independent reconstruction.
+          It is one of the reasons CCIR's open-methodology positioning is
+          structurally valuable — it makes the second-tier fallback a real
+          option rather than an aspiration.
+        </p>
+        <p>
+          <strong>The Tier Threshold Adjustment is mandatory.</strong> Without
+          it, a benchmark replacement could re-tier the borrower arbitrarily.
+          The adjustment spread mechanic is the same one ARRC adopted for the
+          LIBOR transition.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">06</span> Worked Numerical Example</h3>
+        <p class="calib-note">
+          Calibration: example values below are derived from a Closing Date
+          Reference Rate of <strong>${fmt(closingRate)}</strong> per GPU per
+          hour ({REF_SERIES_ID}, as published by CCIR on {meta.as_of_date})
+          and a stylized 24-month rate trajectory. Tier Thresholds set at
+          92% / 80% / 69% of close, rounded to nearest $0.05.
+        </p>
+        <div class="ftable-wrap">
+          <table class="traj">
+            <thead>
+              <tr>
+                <th>Determination Date</th>
+                <th class="num">30-Day Avg</th>
+                <th class="num">% of Close</th>
+                <th>Tier</th>
+                <th>Triggered Operating Requirements</th>
+                <th>Cure Action by Borrower</th>
+              </tr>
+            </thead>
+            <tbody>
+              {trajectory.map((r) => (
+                <tr class={r.transition ? 'transition' : r.improvement ? 'improvement' : ''}>
+                  <td>{r.month}</td>
+                  <td class="num">${fmt(r.value)}</td>
+                  <td class="num">{(r.pct * 100).toFixed(0)}%</td>
+                  <td class={`tier tier-${r.tier} ${r.transition ? 'tier-transition' : ''} ${r.improvement ? 'tier-improvement' : ''}`}>
+                    {r.tierLabel}
+                  </td>
+                  <td class="reqs">{r.triggered}</td>
+                  <td class="cure">{r.cure}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>The covenant tightens automatically without negotiation.</strong>
+          Each tier transition triggers its consequences mechanically based on
+          the published rate. There is no lender consent required, no waiver
+          to negotiate, no event-of-default to declare.
+        </p>
+        <p>
+          <strong>Operational responses lag tier transitions, by design.</strong>
+          Customer contracts cannot be signed in five days. Reserve accounts
+          can be funded faster. The Phase-In provisions accommodate this with
+          30/45/90-day windows.
+        </p>
+        <p>
+          <strong>Step-down on improvement is automatic but releases require
+          certification.</strong> When the rate recovers (Month 21 in the
+          example), the borrower's operating constraints loosen automatically
+          — but cash held in the Reserve Account does not release without a
+          compliance certificate. Tighten fast, loosen with verification.
+        </p>
+        <p>
+          <strong>The covenant signals economic stress without triggering
+          default.</strong> Tier 4 is restrictive but not default. Default
+          occurs only on cure failure within the Phase-In window — a
+          separable, narrower event.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">07</span> Precedent Map</h3>
+        <p>
+          The covenant structure illustrated above maps to established
+          commodity-credit precedent as follows:
+        </p>
+        <div class="ftable-wrap">
+          <table class="ftable">
+            <thead>
+              <tr>
+                <th>Covenant feature</th>
+                <th>Precedent</th>
+              </tr>
+            </thead>
+            <tbody>
+              {precedentRows.map(({ feature, precedent }) => (
+                <tr>
+                  <td class="feat">{feature}</td>
+                  <td>{precedent}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>
+          The drafting innovation, to the extent there is one, is the
+          operationalization of a published commodity-index trigger into an
+          asset class — GPU compute — in which forward markets do not yet
+          exist. The hedging-floor concept that has carried RBL minimum
+          hedging covenants since their inception relies on the existence of
+          a liquid futures market into which producers can sell forward
+          production. For GPU compute, the functional analog is the
+          customer-contract market: locking in fixed-price customer
+          contracts at progressively higher floors achieves the same
+          insulation against further spot-rate decline.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">08</span> Limitations and Notes for Practitioners</h3>
+        <p>
+          <strong>This is illustrative, not transactional.</strong> The
+          hypothetical facility, dollar thresholds, tier breakpoints, and
+          percentage requirements are designed for clarity. Actual
+          transaction terms will depend on borrower credit, pool composition,
+          counterparty considerations, and market conditions at execution.
+        </p>
+        <p>
+          <strong>Tier breakpoint calibration is the central judgment input.</strong>
+          The illustrative thresholds (92% / 80% / 69% of Closing Date
+          Reference Rate) are calibrated to deliver meaningful covenant
+          response across a realistic range of rate movement. Real
+          transactions might use absolute dollar thresholds,
+          percentage-from-close thresholds (as drafted here), or hybrid
+          structures.
+        </p>
+        <p>
+          <strong>Committed Revenue Coverage requires careful definition.</strong>
+          The drafting above defines CRC by reference to a 12-month forward
+          window. Other formulations are possible: trailing 12-month (less
+          reactive but more verifiable); remaining-tenor-of-loan (more
+          stringent); weighted-average remaining-term (more sophisticated).
+          Each formulation produces different incentives for the borrower's
+          customer-contracting strategy.
+        </p>
+        <p>
+          <strong>The lender population for GPU-backed lending is still
+          forming.</strong> Unlike RBL, where decades of standardized
+          practice support a deep agent-bank ecosystem, GPU-backed lending
+          lacks established lender-internal alternatives to a published
+          reference rate. This means a CRI rate plays a structurally more
+          central role in the credit document than NYMEX strip plays in
+          RBL — governance, methodology transparency, and fallback
+          architecture matter more, not less, in this asset class than in
+          mature commodity markets.
+        </p>
+      </section>
+
+      <p class="source-note">
+        This example draws on conventions identified in the CCIR
+        commodity-index citation precedent survey, including reserve-based
+        lending borrowing-base mechanics (with particular reference to
+        minimum hedging covenants and reserve-account funding triggers),
+        PDP oil &amp; gas ABS indenture practice, the 2005 ISDA Commodity
+        Definitions, the ISDA 2018 Benchmarks Supplement, and ARRC
+        hardwired LIBOR transition language.
+      </p>
+    </article>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 0 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .dek {
+      font-family: var(--font-display);
+      max-width: 70ch;
+      color: var(--ink);
+      margin: 0 0 36px;
+      font-size: var(--fs-lg);
+      line-height: 1.5;
+    }
+    :global(html[data-theme="terminal"]) h1 { font-family: var(--font-mono); }
+    :global(html[data-theme="terminal"]) .dek {
+      font-family: var(--font-mono);
+      color: var(--ink-dim);
+      font-size: var(--fs-md);
+      line-height: 1.6;
+    }
+
+    .usecase {
+      border-top: 1px solid var(--rule-2);
+      padding-top: 24px;
+      margin-bottom: 40px;
+    }
+    .uc-head { max-width: 80ch; margin-bottom: 22px; }
+    .uc-kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+    }
+    .uc-head h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      margin: 4px 0 12px;
+      line-height: 1.2;
+    }
+    .uc-lede {
+      font-family: var(--font-display);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      margin: 0;
+      line-height: 1.55;
+    }
+    :global(html[data-theme="terminal"]) .uc-head h2 { font-family: var(--font-mono); }
+    :global(html[data-theme="terminal"]) .uc-lede { font-family: var(--font-mono); color: var(--ink-dim); }
+
+    .uc-rate {
+      background: var(--surface-2);
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 36px;
+      max-width: 56rem;
+    }
+    .rate-kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+    }
+    .rate-id {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      letter-spacing: 0.04em;
+      font-weight: var(--weight-strong);
+      word-break: break-all;
+    }
+    .rate-price {
+      font-family: var(--font-mono);
+      font-size: var(--fs-2xl);
+      color: var(--ink);
+      font-weight: var(--weight-strong);
+      letter-spacing: -0.02em;
+      margin-top: 4px;
+    }
+    .rate-unit {
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      font-weight: var(--weight-body);
+      margin-left: 4px;
+      letter-spacing: 0;
+    }
+    .rate-meta {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      line-height: 1.6;
+    }
+    .rate-meta .sep { color: var(--ink-faint); margin: 0 4px; }
+    .rate-thresholds {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px 24px;
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--rule-2);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink);
+    }
+    .rate-thresholds strong { color: var(--accent); margin-right: 4px; font-weight: var(--weight-strong); }
+    .rate-thresholds .dim { color: var(--ink-faint); margin-left: 4px; }
+
+    .sec {
+      margin: 32px 0;
+      max-width: 76ch;
+    }
+    .sec h3 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 14px;
+      color: var(--ink);
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec-n {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+      letter-spacing: 0.06em;
+    }
+    .sec p {
+      font-family: var(--font-display);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.6;
+      margin: 0 0 14px;
+    }
+    .sec p strong { color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p em { font-style: italic; color: var(--ink); }
+    :global(html[data-theme="terminal"]) .sec p { font-family: var(--font-mono); color: var(--ink-dim); font-size: var(--fs-sm); }
+
+    .calib-note {
+      font-family: var(--font-mono) !important;
+      font-size: var(--fs-xs) !important;
+      color: var(--ink-dim) !important;
+      padding: 10px 14px;
+      border: 1px dashed var(--rule-2);
+      background: var(--surface-2);
+      line-height: 1.6 !important;
+    }
+
+    .ftable-wrap {
+      max-width: none;
+      margin: 0 0 18px;
+      overflow-x: auto;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+    }
+    table.ftable, table.traj {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+    }
+    table.ftable th, table.ftable td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.55;
+    }
+    table.ftable th {
+      color: var(--ink);
+      font-weight: var(--weight-strong);
+      width: 30%;
+      letter-spacing: 0.02em;
+      background: var(--surface-2);
+    }
+    table.ftable td.feat { color: var(--ink); font-weight: var(--weight-strong); width: 38%; }
+    table.ftable td { color: var(--ink-dim); }
+
+    table.traj th, table.traj td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    table.traj thead th {
+      background: var(--surface-2);
+      color: var(--ink-dim);
+      font-weight: var(--weight-strong);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-size: calc(var(--fs-xs) - 1px);
+      border-bottom: 1px solid var(--rule-2);
+    }
+    table.traj td.num, table.traj th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    table.traj td.tier { font-weight: var(--weight-strong); white-space: nowrap; }
+    table.traj td.tier-1 { color: var(--pos); }
+    table.traj td.tier-2 { color: var(--warn); }
+    table.traj td.tier-3 { color: var(--neg); }
+    table.traj td.tier-4 { color: var(--neg); background: color-mix(in srgb, var(--neg) 10%, transparent); }
+    table.traj td.tier-transition { background: color-mix(in srgb, var(--neg) 14%, transparent); }
+    table.traj td.tier-improvement { background: color-mix(in srgb, var(--pos) 14%, transparent); }
+    table.traj td.reqs { color: var(--ink); min-width: 280px; }
+    table.traj td.cure { color: var(--ink-dim); min-width: 240px; }
+
+    .cov-body {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink);
+      line-height: 1.7;
+      margin: 0 0 16px;
+      padding: 16px 18px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-x: auto;
+    }
+    .cov-body .cov-h {
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+      letter-spacing: 0.02em;
+    }
+    .cov-body strong {
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+
+    .source-note {
+      font-family: var(--font-mono) !important;
+      font-size: calc(var(--fs-xs) - 1px) !important;
+      color: var(--ink-faint) !important;
+      max-width: 80ch;
+      margin: 36px 0 24px !important;
+      padding-top: 18px;
+      border-top: 1px solid var(--rule-2);
+      line-height: 1.6 !important;
+    }
+
+    .more-soon {
+      margin: 28px 0 48px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      padding: 14px 16px;
+      border: 1px dashed var(--rule-2);
+      background: var(--surface-2);
+    }
+    .more-soon a { color: var(--accent); font-weight: var(--weight-strong); }
+  </style>
+</Base>

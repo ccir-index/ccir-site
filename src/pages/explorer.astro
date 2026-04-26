@@ -1,0 +1,494 @@
+---
+import Base from '../layouts/Base.astro';
+import {
+  headlineRates, indicativeRates, meta,
+  premiumChipsList, indicativeChipsList,
+} from '../data/snapshot';
+import { TIERS, TIER_LABELS, REGION_LABELS } from '../data/types';
+
+const FORM_ORDER = ['SXM', 'PCIe', 'NVL', 'ALL'];
+const REGION_ORDER = ['US', 'EU', 'APAC', 'Other', 'ALL'];
+
+const headlineForms = Array.from(new Set(headlineRates.map((r) => r.form_factor))).sort(
+  (a, b) => FORM_ORDER.indexOf(a) - FORM_ORDER.indexOf(b),
+);
+const headlineRegions = Array.from(new Set(headlineRates.map((r) => r.region))).sort(
+  (a, b) => REGION_ORDER.indexOf(a) - REGION_ORDER.indexOf(b),
+);
+const headlineChips = premiumChipsList();
+const indChips = indicativeChipsList();
+
+// Map both pools into a slim shape for client-side rendering. Keep the
+// scope tag on each row so the client can route them into the right table.
+// Term is omitted because the loader has already filtered to OnDemand only —
+// the site is OD-only by spec.
+const headlineClient = headlineRates.map((r) => ({
+  id: r.series_id,
+  scope: 'headline' as const,
+  tier: r.tier!,
+  chip: r.gpu_model,
+  form: r.form_factor,
+  region: r.region,
+  region_label: REGION_LABELS[r.region],
+  interrupt: r.interruptibility,
+  mean: r.price_mean,
+  median: r.price_median,
+  p25: r.price_p25,
+  p75: r.price_p75,
+  n_src: r.n_sources,
+  n_obs: r.n_observations,
+  status: r.promotion_status,
+}));
+const indicativeClient = indicativeRates.map((r) => ({
+  id: r.series_id,
+  scope: 'indicative' as const,
+  chip: r.gpu_model,
+  form: r.form_factor,
+  region: r.region,
+  region_label: REGION_LABELS[r.region],
+  interrupt: r.interruptibility,
+  mean: r.price_mean,
+  median: r.price_median,
+  p25: r.price_p25,
+  p75: r.price_p75,
+  n_src: r.n_sources,
+  n_obs: r.n_observations,
+  status: r.promotion_status,
+}));
+---
+<Base title="Explorer · CCIR">
+  <section class="wrap top">
+    <div class="kicker">Series Explorer · {meta.as_of_date}</div>
+    <h1>Compare Series</h1>
+    <p class="standfirst lede">
+      Two sections. <strong>Headline rates</strong> are the premium-chip
+      T1IF/T2IF/T3IF series with full tier coverage. <strong>Reference
+      rates</strong> are panel medians for chips outside the v2.0
+      algorithmic tier scope — included for reference, not as benchmark
+      rates. On-demand only; committed-term series are not surfaced.
+    </p>
+
+    <!-- ============================ HEADLINE ============================ -->
+    <section class="section section-headline">
+      <header class="sec-head">
+        <span class="sec-kicker">Section 01 — Headline</span>
+        <span class="sec-sub">Full tier coverage · {headlineClient.length} series</span>
+      </header>
+
+      <div class="filter-bank">
+        <div class="filters" id="filters-headline">
+          <div class="fgroup">
+            <label for="hf-tier">Tier</label>
+            <select id="hf-tier" data-filter="tier">
+              <option value="">All</option>
+              {TIERS.map((t) => <option value={t}>{t} · {TIER_LABELS[t]}</option>)}
+            </select>
+          </div>
+          <div class="fgroup">
+            <label for="hf-chip">Chip</label>
+            <select id="hf-chip" data-filter="chip">
+              <option value="">All</option>
+              {headlineChips.map((c) => <option value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div class="fgroup">
+            <label for="hf-form">Form</label>
+            <select id="hf-form" data-filter="form">
+              <option value="">All</option>
+              {headlineForms.map((f) => <option value={f}>{f === 'ALL' ? 'Pooled' : f}</option>)}
+            </select>
+          </div>
+          <div class="fgroup">
+            <label for="hf-int">Interrupt</label>
+            <select id="hf-int" data-filter="interrupt">
+              <option value="">All</option>
+              <option value="GTD">Guaranteed</option>
+              <option value="INT">Interruptible</option>
+              <option value="ALL">Pooled</option>
+            </select>
+          </div>
+          <div class="fgroup">
+            <label for="hf-region">Region</label>
+            <select id="hf-region" data-filter="region">
+              <option value="">All</option>
+              {headlineRegions.map((rg) => <option value={rg}>{rg === 'ALL' ? 'Pooled' : REGION_LABELS[rg]}</option>)}
+            </select>
+          </div>
+          <div class="fgroup">
+            <label for="hf-status">Status</label>
+            <select id="hf-status" data-filter="status">
+              <option value="">Published + Shadow</option>
+              <option value="Published">Published only</option>
+              <option value="Shadow">Shadow only</option>
+            </select>
+          </div>
+          <div class="fgroup fgroup-search">
+            <label for="hf-search">Search</label>
+            <input type="text" id="hf-search" placeholder="series_id substring" />
+          </div>
+        </div>
+        <div class="filter-actions">
+          <span class="match-pill">Matching: <span id="match-headline">0</span></span>
+          <button type="button" id="reset-headline" class="reset-btn">Reset</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data" id="headline-table">
+          <thead>
+            <tr>
+              <th>Series</th>
+              <th>Tier</th>
+              <th>Chip</th>
+              <th>Form</th>
+              <th>Int</th>
+              <th>Region</th>
+              <th>Median</th>
+              <th>Trend</th>
+              <th>IQR</th>
+              <th>Src</th>
+              <th>Obs</th>
+            </tr>
+          </thead>
+          <tbody id="headline-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr class="section-rule" />
+
+    <!-- =========================== INDICATIVE =========================== -->
+    <section class="section section-indicative">
+      <header class="sec-head">
+        <span class="sec-kicker">Section 02 — Reference</span>
+        <span class="sec-sub">Indicative · no tier coverage · {indicativeClient.length} series</span>
+      </header>
+      <p class="ind-note">
+        These chips fall outside the v2.0 algorithmic tier scope. Rates are
+        reported as panel medians across operators offering the SKU; tier
+        classification is not applied.
+      </p>
+
+      <div class="filter-bank">
+        <div class="filters" id="filters-indicative">
+          <div class="fgroup">
+            <label for="if-chip">Chip</label>
+            <select id="if-chip" data-filter="chip">
+              <option value="">All</option>
+              {indChips.map((c) => <option value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div class="fgroup">
+            <label for="if-int">Interrupt</label>
+            <select id="if-int" data-filter="interrupt">
+              <option value="">All</option>
+              <option value="GTD">Guaranteed</option>
+              <option value="INT">Interruptible</option>
+              <option value="ALL">Pooled</option>
+            </select>
+          </div>
+          <div class="fgroup">
+            <label for="if-region">Region</label>
+            <select id="if-region" data-filter="region">
+              <option value="">All</option>
+              {REGION_ORDER.filter((rg) => indicativeClient.some((r) => r.region === rg)).map((rg) => <option value={rg}>{rg === 'ALL' ? 'Pooled' : REGION_LABELS[rg as keyof typeof REGION_LABELS]}</option>)}
+            </select>
+          </div>
+          <div class="fgroup fgroup-search">
+            <label for="if-search">Search</label>
+            <input type="text" id="if-search" placeholder="series_id substring" />
+          </div>
+        </div>
+        <div class="filter-actions">
+          <span class="match-pill">Matching: <span id="match-indicative">0</span></span>
+          <button type="button" id="reset-indicative" class="reset-btn">Reset</button>
+        </div>
+      </div>
+
+      <div class="table-wrap indicative-wrap">
+        <table class="data" id="indicative-table">
+          <thead>
+            <tr>
+              <th>Series</th>
+              <th>Chip</th>
+              <th>Form</th>
+              <th>Int</th>
+              <th>Region</th>
+              <th>Median</th>
+              <th>Trend</th>
+              <th>Src</th>
+            </tr>
+          </thead>
+          <tbody id="indicative-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <script is:inline define:vars={{ HEADLINE: headlineClient, INDICATIVE: indicativeClient }}>
+    (function () {
+      // -------- helpers --------
+      function fmt(n, dp) { return Number(n).toFixed(dp != null ? dp : 2); }
+      // Sparklines suppressed until 7d real history accumulates.
+      function sparkSvg(seriesId, median, w, h) {
+        return '<span class="sparkline-empty" style="display:inline-block;width:' + w + 'px;height:' + h + 'px;"></span>';
+      }
+
+      // -------- HEADLINE table --------
+      var H_FILTERS = { tier: '', chip: '', form: '', interrupt: '', region: '', status: '', search: '' };
+      var hTbody = document.getElementById('headline-tbody');
+      var hMatch = document.getElementById('match-headline');
+      function hMatches(r) {
+        if (H_FILTERS.tier && r.tier !== H_FILTERS.tier) return false;
+        if (H_FILTERS.chip && r.chip !== H_FILTERS.chip) return false;
+        if (H_FILTERS.form && r.form !== H_FILTERS.form) return false;
+        if (H_FILTERS.interrupt && r.interrupt !== H_FILTERS.interrupt) return false;
+        if (H_FILTERS.region && r.region !== H_FILTERS.region) return false;
+        if (H_FILTERS.status && r.status !== H_FILTERS.status) return false;
+        if (H_FILTERS.search && r.id.toLowerCase().indexOf(H_FILTERS.search.toLowerCase()) === -1) return false;
+        return true;
+      }
+      function renderHeadline() {
+        var rows = HEADLINE.filter(hMatches);
+        hMatch.textContent = rows.length;
+        hTbody.innerHTML = rows.map(function (r) {
+          var rowCls = r.status === 'Shadow' ? 'shadow' : '';
+          var statusBadge = r.status === 'Shadow'
+            ? '<span class="status-badge status-shadow" title="Below 3-source / 5-obs gate">SHD</span>' : '';
+          return '<tr class="' + rowCls + '">' +
+            '<td class="sid"><code>' + r.id + '</code>' + statusBadge + '</td>' +
+            '<td><span class="tier-badge tier-badge-' + r.tier.toLowerCase() + '">' + r.tier + '</span></td>' +
+            '<td class="chip">' + r.chip + '</td>' +
+            '<td class="dim">' + r.form + '</td>' +
+            '<td class="dim">' + r.interrupt + '</td>' +
+            '<td class="dim">' + r.region_label + '</td>' +
+            '<td class="num posted">$' + fmt(r.median) + '</td>' +
+            '<td class="num spark">' + sparkSvg(r.id, r.median, 56, 16) + '</td>' +
+            '<td class="num dim">$' + fmt(r.p25) + '–$' + fmt(r.p75) + '</td>' +
+            '<td class="num">' + r.n_src + '</td>' +
+            '<td class="num">' + r.n_obs + '</td>' +
+          '</tr>';
+        }).join('');
+      }
+      document.querySelectorAll('#filters-headline select, #filters-headline input').forEach(function (el) {
+        var key = el.getAttribute('data-filter') || (el.id === 'hf-search' ? 'search' : null);
+        if (!key) return;
+        el.addEventListener('input', function () { H_FILTERS[key] = el.value; renderHeadline(); });
+        el.addEventListener('change', function () { H_FILTERS[key] = el.value; renderHeadline(); });
+      });
+      document.getElementById('reset-headline').addEventListener('click', function () {
+        document.querySelectorAll('#filters-headline select').forEach(function (s) { s.value = ''; });
+        document.getElementById('hf-search').value = '';
+        H_FILTERS = { tier: '', chip: '', form: '', interrupt: '', region: '', status: '', search: '' };
+        renderHeadline();
+      });
+      renderHeadline();
+
+      // -------- INDICATIVE table --------
+      var I_FILTERS = { chip: '', interrupt: '', region: '', search: '' };
+      var iTbody = document.getElementById('indicative-tbody');
+      var iMatch = document.getElementById('match-indicative');
+      function iMatches(r) {
+        if (I_FILTERS.chip && r.chip !== I_FILTERS.chip) return false;
+        if (I_FILTERS.interrupt && r.interrupt !== I_FILTERS.interrupt) return false;
+        if (I_FILTERS.region && r.region !== I_FILTERS.region) return false;
+        if (I_FILTERS.search && r.id.toLowerCase().indexOf(I_FILTERS.search.toLowerCase()) === -1) return false;
+        return true;
+      }
+      function renderIndicative() {
+        var rows = INDICATIVE.filter(iMatches);
+        iMatch.textContent = rows.length;
+        iTbody.innerHTML = rows.map(function (r) {
+          return '<tr>' +
+            '<td class="sid"><code>' + r.id + '</code></td>' +
+            '<td class="chip">' + r.chip + '</td>' +
+            '<td class="dim">' + r.form + '</td>' +
+            '<td class="dim">' + r.interrupt + '</td>' +
+            '<td class="dim">' + r.region_label + '</td>' +
+            '<td class="num posted">$' + fmt(r.median) + '</td>' +
+            '<td class="num spark">' + sparkSvg(r.id, r.median, 56, 16) + '</td>' +
+            '<td class="num">' + r.n_src + '</td>' +
+          '</tr>';
+        }).join('');
+      }
+      document.querySelectorAll('#filters-indicative select, #filters-indicative input').forEach(function (el) {
+        var key = el.getAttribute('data-filter') || (el.id === 'if-search' ? 'search' : null);
+        if (!key) return;
+        el.addEventListener('input', function () { I_FILTERS[key] = el.value; renderIndicative(); });
+        el.addEventListener('change', function () { I_FILTERS[key] = el.value; renderIndicative(); });
+      });
+      document.getElementById('reset-indicative').addEventListener('click', function () {
+        document.querySelectorAll('#filters-indicative select').forEach(function (s) { s.value = ''; });
+        document.getElementById('if-search').value = '';
+        I_FILTERS = { chip: '', interrupt: '', region: '', search: '' };
+        renderIndicative();
+      });
+      renderIndicative();
+    })();
+  </script>
+
+  <style>
+    .top { padding-top: 28px; }
+    h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      margin: 6px 0 12px;
+      letter-spacing: -0.005em;
+    }
+    .lede {
+      max-width: 80ch;
+      margin: 8px 0 24px;
+    }
+    .lede strong { color: var(--accent); font-weight: var(--weight-strong); }
+
+    .section { margin-bottom: 28px; }
+    .section-rule {
+      border: none;
+      border-top: 1px solid var(--rule-2);
+      margin: 32px 0;
+    }
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .sec-kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+    }
+    .sec-sub {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
+    }
+    .ind-note {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      margin: 0 0 12px;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border-left: 2px solid var(--neutral);
+      max-width: 80ch;
+      line-height: 1.55;
+    }
+
+    .filter-bank {
+      background: var(--surface-2);
+      border: 1px solid var(--rule);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px 14px;
+      align-items: end;
+    }
+    .filter-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--rule);
+    }
+    .match-pill {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      letter-spacing: var(--tracking-eye);
+      text-transform: uppercase;
+    }
+    .match-pill span { color: var(--accent); font-weight: var(--weight-strong); }
+    .fgroup { display: flex; flex-direction: column; gap: 4px; }
+    .fgroup-search { grid-column: span 2; min-width: 0; }
+    .fgroup label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+    }
+    .fgroup select, .fgroup input {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--rule-2);
+      padding: 6px 8px;
+      border-radius: var(--rad);
+    }
+    .reset-btn {
+      background: transparent;
+      border: 1px solid var(--rule-2);
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      padding: 6px 14px;
+      cursor: pointer;
+      border-radius: var(--rad);
+      letter-spacing: var(--tracking-eye);
+      text-transform: uppercase;
+      font-weight: var(--weight-strong);
+    }
+    .reset-btn:hover { color: var(--ink); border-color: var(--accent); }
+
+    .table-wrap {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    /* Section 2 — visually muted to signal "no tier coverage" */
+    .indicative-wrap {
+      background: var(--surface-2);
+      opacity: 0.85;
+    }
+    .indicative-wrap td { color: var(--ink-dim); }
+    .indicative-wrap td.posted { color: var(--ink); font-weight: var(--weight-strong); }
+    .indicative-wrap td.chip { color: var(--ink); font-weight: var(--weight-strong); }
+    .indicative-wrap td.sid code { color: var(--ink-dim); }
+
+    #headline-table td.sid code, #indicative-table td.sid code {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-sm) - 1px);
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+    #headline-table td.chip { color: var(--ink); font-weight: var(--weight-strong); }
+    #headline-table td.posted { color: var(--ink); font-weight: var(--weight-strong); }
+    #headline-table tr.shadow td { opacity: 0.7; }
+
+    .status-badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 1px 6px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 2px);
+      font-weight: var(--weight-strong);
+      letter-spacing: 0.08em;
+      border: 1px solid;
+      border-radius: var(--rad);
+      vertical-align: middle;
+    }
+    .status-shadow {
+      color: var(--warn);
+      border-color: color-mix(in srgb, var(--warn) 50%, transparent);
+      background: color-mix(in srgb, var(--warn) 12%, transparent);
+    }
+
+    td.spark { color: var(--accent); padding: 4px 8px; }
+    .indicative-wrap td.spark { color: var(--neutral); opacity: 0.7; }
+    .sparkline { opacity: 0.5; vertical-align: middle; }
+  </style>
+</Base>

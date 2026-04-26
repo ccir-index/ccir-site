@@ -1,0 +1,150 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { meta } from '../data/snapshot';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const nav = [
+  { href: '/', label: 'Rates' },
+  { href: '/tiers', label: 'Tiers' },
+  { href: '/explorer', label: 'Explorer' },
+  { href: '/spreads', label: 'Spreads' },
+  { href: '/applications', label: 'Applications' },
+  { href: '/contact', label: 'Contact' },
+];
+
+// Format dateline like a broadsheet: "Sunday, April 26, 2026"
+function dateline(iso: string): string {
+  const d = new Date(iso + 'T00:00:00Z');
+  return d.toLocaleDateString('en-US', {
+    timeZone: 'UTC',
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+---
+<header class="masthead">
+  <div class="masthead-band wrap">
+    <a class="brand" href="/">
+      <span class="brand-mark">CCIR</span>
+      <span class="brand-name">Compute Credit Index Research</span>
+    </a>
+    <div class="masthead-meta">
+      <span class="dateline">{dateline(meta.as_of_date)}</span>
+      <span class="version">{meta.methodology_version}</span>
+      <ThemeToggle />
+    </div>
+  </div>
+  <div class="nav-band">
+    <div class="wrap nav-inner">
+      <nav class="nav">
+        {nav.map((n) => (
+          <a href={n.href} class:list={['nav-link', { on: path === n.href }]}>{n.label}</a>
+        ))}
+      </nav>
+      <span class="status">
+        <span class="dot" aria-hidden="true"></span>PIPELINE · 06:30 CT
+      </span>
+    </div>
+  </div>
+</header>
+
+<style>
+  .masthead { background: var(--surface); border-bottom: 1px solid var(--rule-2); }
+  .masthead-band {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-top: 14px;
+    padding-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .brand-mark {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-weight: var(--weight-strong);
+    font-size: var(--fs-md);
+    letter-spacing: 0.06em;
+  }
+  .brand-name {
+    font-family: var(--font-display);
+    font-weight: var(--weight-display);
+    font-size: var(--fs-xl);
+    letter-spacing: -0.005em;
+  }
+  .masthead-meta {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+  }
+  .dateline {
+    font-family: var(--font-mono);
+    color: var(--ink);
+    font-weight: var(--weight-strong);
+  }
+  .version {
+    padding: 3px 8px;
+    border: 1px solid var(--rule-2);
+    color: var(--accent);
+    font-weight: var(--weight-strong);
+    border-radius: var(--rad);
+  }
+
+  .nav-band {
+    background: var(--surface-2);
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    min-height: 36px;
+  }
+  .nav { display: flex; gap: 22px; }
+  .nav-link {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    color: var(--ink-dim);
+    padding: 4px 0;
+    border-bottom: 1px solid transparent;
+  }
+  .nav-link:hover { color: var(--ink); text-decoration: none; }
+  .nav-link.on { color: var(--accent); border-bottom-color: var(--accent); }
+  .status {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-dim);
+    letter-spacing: var(--tracking-eye);
+    text-transform: uppercase;
+  }
+  .status .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--pos);
+    box-shadow: 0 0 6px var(--pos);
+  }
+</style>

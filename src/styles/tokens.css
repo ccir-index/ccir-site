@@ -1,0 +1,130 @@
+/*
+  Dual-mode design tokens. Two themes ship side by side; ThemeToggle flips
+  the `data-theme` attribute on <html>, persisted in localStorage.
+
+    [data-theme="terminal"]  → Bloomberg-dark, mono-dense, amber accent
+    [data-theme="editorial"] → WSJ-cream, serif lead, navy accent
+
+  Status palette (--pos / --neg / --warn / --info) is shared semantically
+  across both themes; contrast is tuned per theme.
+*/
+
+:root,
+html[data-theme="terminal"] {
+  /* TERMINAL — Bloomberg-dark default */
+  --bg: #0b0c0e;
+  --surface: #111418;
+  --surface-2: #14181d;
+  --surface-3: #1a1f25;
+  --rule: #2a2d31;
+  --rule-2: #3b3f44;
+
+  --ink: #e8e6e1;
+  --ink-dim: #9a9991;
+  --ink-faint: #6b6a64;
+
+  --accent: #ff9100;
+  --accent-2: #ffb400;
+  --pos: #3aa676;
+  --neg: #c44a4a;
+  --warn: #d68a2a;
+  --info: #4dc4d9;
+  --neutral: #6b7176;
+
+  /* T-tier ramp — amber dominant, off-white middle, dim grey tail */
+  --tier-t1if: #ffb400;
+  --tier-t2if: #cfcdc6;
+  --tier-t3if: #6b7176;
+
+  /* Type — terminal: serif headlines + sans body + mono data */
+  --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
+
+  --weight-body: 400;
+  --weight-strong: 600;
+  --weight-display: 600;
+
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-base: 13px;
+  --fs-md: 14px;
+  --fs-lg: 17px;
+  --fs-xl: 22px;
+  --fs-2xl: 28px;
+  --fs-hero: 48px;
+  --lh-base: 1.55;
+  --lh-display: 1.15;
+  --tracking-eye: 0.10em;
+
+  --rad: 0px;
+  --pad-cell-y: 7px;
+  --pad-cell-x: 12px;
+  --pad-panel: 16px;
+  --panel-gap: 1px;
+  --row-h: 30px;
+  --density: terminal;
+
+  color-scheme: dark;
+}
+
+html[data-theme="editorial"] {
+  /* EDITORIAL — WSJ-cream */
+  --bg: #f5f1e8;
+  --surface: #fbf7ee;
+  --surface-2: #efeadd;
+  --surface-3: #e7e1d2;
+  --rule: #d4d0c4;
+  --rule-2: #b8b3a4;
+
+  --ink: #0d0d0d;
+  --ink-dim: #5b5852;
+  --ink-faint: #8e8a82;
+
+  --accent: #143055;
+  --accent-2: #1f4a7d;
+  --pos: #2c8055;
+  --neg: #a84040;
+  --warn: #b26e1e;
+  --info: #2d6a94;
+  --neutral: #6b7176;
+
+  /* T-tier ramp — navy dominant, mid grey middle, light grey tail */
+  --tier-t1if: #143055;
+  --tier-t2if: #6e6c66;
+  --tier-t3if: #b8b3a4;
+
+  --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "JetBrains Mono", Menlo, monospace;
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
+
+  --weight-body: 400;
+  --weight-strong: 600;
+  --weight-display: 600;
+
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-base: 14px;
+  --fs-md: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 24px;
+  --fs-2xl: 32px;
+  --fs-hero: 56px;
+  --lh-base: 1.6;
+  --lh-display: 1.18;
+  --tracking-eye: 0.12em;
+
+  --rad: 0px;
+  --pad-cell-y: 9px;
+  --pad-cell-x: 14px;
+  --pad-panel: 20px;
+  --panel-gap: 1px;
+  --row-h: 32px;
+  --density: editorial;
+
+  color-scheme: light;
+}

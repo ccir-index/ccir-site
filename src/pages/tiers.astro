@@ -1,0 +1,287 @@
+---
+import Base from '../layouts/Base.astro';
+import TierDefinitions from '../components/TierDefinitions.astro';
+import Sparkline from '../components/Sparkline.astro';
+import { tierMatrix, premiumChipsList, meta } from '../data/snapshot';
+import {
+  TIERS,
+  TIER_LABELS,
+  TIER_LABELS_SHORT,
+  PREMIUM_CHIPS,
+} from '../data/types';
+
+const fmt = (n: number) => n.toFixed(2);
+
+const chips = (() => {
+  const live = premiumChipsList();
+  return live.length > 0 ? live : [...PREMIUM_CHIPS];
+})();
+
+const ladder = chips.map((chip) => ({ chip, cells: tierMatrix(chip) }));
+
+function chipDisplay(token: string): string {
+  return token.replace(/-/g, ' ');
+}
+---
+<Base title="Tier structure · CCIR">
+  <section class="wrap top">
+    <div class="hero-solo">
+      <div class="kicker">Intelligence Factory Taxonomy · {meta.as_of_date}</div>
+      <h1>Three Tiers of Intelligence Factory</h1>
+      <p class="standfirst lede">
+        CCIR tier rates are <em>productivity-adjusted reference rates</em>.
+        There is no clean throughput number to settle the question —
+        usable compute per dollar depends on workload, framework, and
+        scale efficiency — so CCIR does what commodity markets do when
+        output is hard to measure: <strong>grade the inputs</strong>.
+        Crude oil prices light sweet, medium, and heavy sour as distinct
+        feedstock grades because refinery yield is hard to standardize
+        but feedstock is observable. Compute is the same: fabric, host
+        topology, and operational bundle are observable; effective
+        throughput is not.
+      </p>
+    </div>
+
+    <TierDefinitions headerless={true} />
+
+    <section class="ladder-section">
+      <header class="lh-head">
+        <div class="kicker">Per-Silicon Ladder · On-Demand · {meta.as_of_date}</div>
+        <h2>Same chip, three tiers.</h2>
+        <p class="standfirst">
+          Median rate per chip across each Intelligence Factory tier.
+          <em>n</em> is the number of independent operators contributing to
+          that median. An em-dash means the cell has no Published row in
+          today's snapshot.
+        </p>
+      </header>
+
+      <div class="table-wrap">
+        <table class="data ladder-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="chip-col">Silicon</th>
+              {TIERS.map((t) => (
+                <th colspan="3" class={`tier-col tier-col-${t.toLowerCase()}`}>
+                  <span class="th-tier">{t}</span>
+                  <span class="th-name">{TIER_LABELS_SHORT[t]}</span>
+                </th>
+              ))}
+            </tr>
+            <tr class="sub-row">
+              {TIERS.map(() => (
+                <>
+                  <th class="sub">Median $/hr</th>
+                  <th class="sub">Trend</th>
+                  <th class="sub">n</th>
+                </>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {ladder.map(({ chip, cells }) => (
+              <tr>
+                <td class="chip-cell">{chipDisplay(chip)}</td>
+                {TIERS.map((t) => {
+                  const c = cells[t];
+                  if (!c) {
+                    return (
+                      <>
+                        <td class="num empty">—</td>
+                        <td class="num empty"></td>
+                        <td class="num empty">—</td>
+                      </>
+                    );
+                  }
+                  const isShadow = c.promotion_status === 'Shadow';
+                  return (
+                    <>
+                      <td class={`num posted tier-pos-${t.toLowerCase()} ${isShadow ? 'shadow' : ''}`}
+                          title={`Median ${fmt(c.price_median)} · Mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs${isShadow ? ' · Shadow (panel below 3-source / 5-obs gate)' : ''}`}>
+                        ${fmt(c.price_median)}
+                      </td>
+                      <td class="num spark-cell">
+                        <Sparkline seriesId={c.series_id} median={c.price_median} width={56} height={16} />
+                      </td>
+                      <td class="num n">{c.n_sources}</td>
+                    </>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="ladder-foot">
+        The same chip can trade across all three tiers. An H100 SXM in a
+        Tier 1 hyperscale deployment, a Tier 2 dedicated cluster, and a
+        Tier 3 marketplace listing all carry identical silicon at
+        fundamentally different rate bands — because the deployment is the
+        product. A buyer can nominally pay less at T3IF and receive less
+        usable compute per dollar after interrupt risk, support gaps, and
+        operational overhead are priced in.
+      </p>
+    </section>
+
+    <section class="classification">
+      <header class="sec-head">
+        <div class="kicker">Classification</div>
+        <h2>How the algorithm assigns a tier.</h2>
+      </header>
+      <p class="class-body">
+        Tier assignment is per-SKU and grade-based — driven by the
+        capability bundle each SKU exposes, not by which operator hosts it.
+        An interruptible SKU from any operator routes to T3IF; a
+        dedicated-host SKU with disclosed IB-class fabric and full
+        enterprise bundle routes to T1IF; everything in between routes to
+        T2IF. The same operator can therefore appear in two or three tiers
+        across its SKU catalog, depending on what each SKU actually packages.
+      </p>
+    </section>
+
+    <nav class="cross-links">
+      <a class="cl-card" href="/spreads">
+        <span class="kicker">Cross-tier comparison</span>
+        <span class="cl-title">Tier Spread Matrix →</span>
+        <span class="cl-blurb">T1IF-anchored discounts and premiums per chip × term.</span>
+      </a>
+      <a class="cl-card" href="/explorer">
+        <span class="kicker">Filter and compare</span>
+        <span class="cl-title">Series Explorer →</span>
+        <span class="cl-blurb">All headline + indicative series with tier, chip, term, region filters.</span>
+      </a>
+    </nav>
+  </section>
+
+  <style>
+    .top { padding-top: 28px; }
+    h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      margin: 6px 0 14px;
+      letter-spacing: -0.005em;
+    }
+    .hero-solo { max-width: 78ch; margin-bottom: 28px; }
+    .lede { font-size: var(--fs-md); }
+    .lede em { font-style: italic; color: var(--accent); }
+
+    .ladder-section { margin: 32px 0 32px; }
+    .lh-head { max-width: 80ch; margin-bottom: 14px; }
+    .lh-head h2 {
+      font-size: var(--fs-xl);
+      margin: 4px 0 8px;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    table.ladder-table { width: 100%; border-collapse: collapse; }
+    table.ladder-table thead tr:first-child th {
+      padding: 10px 14px;
+    }
+    .tier-col {
+      text-align: center;
+    }
+    .tier-col .th-tier {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      font-weight: var(--weight-strong);
+      letter-spacing: 0.08em;
+    }
+    .tier-col .th-name {
+      display: block;
+      font-family: var(--font-display);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      font-weight: var(--weight-body);
+      margin-top: 2px;
+    }
+    .tier-col-t1if .th-tier { color: var(--tier-t1if); }
+    .tier-col-t2if .th-tier { color: var(--tier-t2if); }
+    .tier-col-t3if .th-tier { color: var(--tier-t3if); }
+
+    table.ladder-table th.sub {
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      font-weight: var(--weight-body);
+      letter-spacing: var(--tracking-eye);
+      text-transform: uppercase;
+      padding: 6px 14px 8px;
+    }
+    table.ladder-table .chip-cell {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      font-weight: var(--weight-strong);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    table.ladder-table td.posted { font-weight: var(--weight-strong); cursor: help; }
+    table.ladder-table td.posted.shadow { color: var(--ink-dim); font-style: italic; }
+    table.ladder-table td.tier-pos-t1if { color: var(--tier-t1if); }
+    table.ladder-table td.tier-pos-t2if { color: var(--ink); }
+    table.ladder-table td.tier-pos-t3if { color: var(--ink); }
+    table.ladder-table td.empty { color: var(--ink-faint); }
+    table.ladder-table td.spark-cell { text-align: center; color: var(--accent); padding: 4px 8px; }
+    table.ladder-table td.n { color: var(--ink-dim); }
+
+    .ladder-foot {
+      margin: 16px 0 0;
+      max-width: 80ch;
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    .classification { margin: 32px 0 32px; max-width: 80ch; }
+    .sec-head { margin-bottom: 12px; }
+    .sec-head h2 {
+      font-size: var(--fs-xl);
+      margin: 4px 0 10px;
+    }
+    .class-body {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .cross-links {
+      margin: 36px 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 720px) { .cross-links { grid-template-columns: 1fr; } }
+    .cl-card {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      border-left: 2px solid var(--accent);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .cl-card:hover { background: var(--surface-2); text-decoration: none; }
+    .cl-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+    .cl-blurb {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+  </style>
+</Base>

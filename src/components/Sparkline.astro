@@ -1,0 +1,23 @@
+---
+/*
+  Sparkline placeholder. Suppressed until 7d of real history accumulates.
+  Renders a width/height-preserving empty span so trend columns keep
+  their layout without showing fake data. Will be replaced with a real
+  polyline when history exists; consumers don't need to change.
+*/
+interface Props {
+  seriesId: string;
+  median: number;
+  width?: number;
+  height?: number;
+  color?: string;
+}
+
+const { width = 60, height = 18 } = Astro.props;
+---
+<span
+  class="sparkline-empty"
+  style={`display:inline-block;width:${width}px;height:${height}px;`}
+  aria-hidden="true"
+  role="presentation"
+></span>
