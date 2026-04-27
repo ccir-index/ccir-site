@@ -1,0 +1,105 @@
+name: Sync today's snapshot from ccir-v2-data
+
+on:
+  schedule:
+    # Dual UTC cron to land at 05:30 CT regardless of DST.
+    # 10:30 UTC = 05:30 CDT (summer) / 04:30 CST (winter, no-op until pipeline catches up)
+    # 11:30 UTC = 06:30 CDT (summer, no-op after morning push) / 05:30 CST (winter)
+    # Action is idempotent — only commits when meta/CSVs change vs. main.
+    - cron: '30 10 * * *'
+    - cron: '30 11 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-from-data
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve today's CT date and fetch snapshot
+        id: fetch
+        run: |
+          set -euo pipefail
+          DATE=$(TZ=America/Chicago date +%F)
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          BASE="https://raw.githubusercontent.com/ccir-index/ccir-v2-data/main/indices/snapshots/$DATE"
+          mkdir -p .sync
+          # Manifest is the gate. 404 on either run-of-the-day cron tick = pipeline
+          # hasn't published yet (typical during the wrong-DST half of the year).
+          status=$(curl -sS -o .sync/manifest.json -w "%{http_code}" "$BASE/manifest.json")
+          if [ "$status" != "200" ]; then
+            echo "no snapshot at $DATE yet (HTTP $status) — exiting cleanly"
+            echo "have_snapshot=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          curl -fsSL -o .sync/rates_daily.csv "$BASE/rates_daily.csv"
+          curl -fsSL -o .sync/rates_shadow.csv "$BASE/rates_shadow.csv"
+          echo "have_snapshot=true" >> "$GITHUB_OUTPUT"
+
+      - name: Verify hashes against manifest
+        if: steps.fetch.outputs.have_snapshot == 'true'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, sys
+          m = json.load(open('.sync/manifest.json'))
+          for fname, spec in m['files'].items():
+              if fname == 'term_structure.csv':
+                  continue  # not bundled into the site
+              path = f'.sync/{fname}'
+              data = open(path, 'rb').read()
+              got = hashlib.sha256(data).hexdigest()
+              if got != spec['sha256']:
+                  sys.exit(f'sha256 mismatch on {fname}: got {got} expected {spec["sha256"]}')
+              if len(data) != spec['byte_size']:
+                  sys.exit(f'byte_size mismatch on {fname}: got {len(data)} expected {spec["byte_size"]}')
+              print(f'ok {fname} ({spec["byte_size"]} bytes)')
+          PY
+
+      - name: Stage CSVs and rewrite meta.json
+        if: steps.fetch.outputs.have_snapshot == 'true'
+        run: |
+          set -euo pipefail
+          cp .sync/rates_daily.csv  src/data/rates_daily.csv
+          cp .sync/rates_shadow.csv src/data/rates_shadow.csv
+          python3 - <<'PY'
+          import json
+          m = json.load(open('.sync/manifest.json'))
+          pub = m['publication']
+          meta = {
+              'as_of_date': pub['as_of_date'],
+              'published_at_ct': pub['published_at_ct'],
+              'published_at_utc': pub['published_at_utc'],
+              'run_id': m['run_id'],
+              'methodology_version': m['methodology_version'],
+              'independence_declaration': m['independence_declaration'],
+              'contributing_today': m['panel']['contributing_today'],
+          }
+          with open('src/data/meta.json', 'w') as f:
+              json.dump(meta, f, indent=2)
+              f.write('\n')
+          PY
+          rm -rf .sync
+
+      - name: Commit + push if changed
+        if: steps.fetch.outputs.have_snapshot == 'true'
+        env:
+          DATE: ${{ steps.fetch.outputs.date }}
+        run: |
+          set -euo pipefail
+          git config user.email "ccir-pipeline@ccir.io"
+          git config user.name  "CCIR Pipeline"
+          git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/meta.json
+          if git diff --cached --quiet; then
+            echo "no changes to commit — site already at $DATE"
+            exit 0
+          fi
+          git commit -m "data: refresh snapshot to $DATE"
+          git push origin main

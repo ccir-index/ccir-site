@@ -12,6 +12,7 @@
 */
 import csvText from './rates_daily.csv?raw';
 import shadowCsvText from './rates_shadow.csv?raw';
+import metaJson from './meta.json';
 import type {
   Rate, Tier, Confidence, PromotionStatus, Term, SnapshotMeta,
   FormFactor, Interruptibility, Region,
@@ -154,13 +155,7 @@ function computeSourcesByTier(): Record<Tier, number> {
 }
 
 export const meta: SnapshotMeta = {
-  as_of_date: '2026-04-27',
-  published_at_ct: '2026-04-27T06:31:37-05:00',
-  published_at_utc: '2026-04-27T11:31:37+00:00',
-  run_id: 'export-20260427T113134Z-0176209b',
-  methodology_version: 'v2.0.0',
-  independence_declaration: 'All inputs publicly observable. No solicited quotes.',
-  contributing_today: 25,
+  ...metaJson,
   sources_by_tier: computeSourcesByTier(),
 };
 
