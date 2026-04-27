@@ -1,5 +1,5 @@
 ---
-import { headlineRates, meta } from '../data/snapshot';
+import { headlineRates, meta, prevMedians } from '../data/snapshot';
 import Sparkline from './Sparkline.astro';
 
 // Premium-chip series only. Featured flagship cells under the 7-segment
@@ -31,13 +31,18 @@ const short = (r: typeof ticks[number]) => {
   return `${tier} ${chip}`;
 };
 
-// Direction glyph from 7d → 1d trend (or flat when no movement).
+// Direction glyph: today's price_median vs prior day's. Round to the
+// displayed cents precision before comparing so a sub-cent rounding
+// difference never reads as a real move. When no prior median is
+// available (new series, first day, or missing prior CSV bundle), show
+// flat — the tick exists today but there's no day-over-day signal yet.
 function direction(r: typeof ticks[number]): 'up' | 'down' | 'flat' {
-  const a = r.price_mean_7d;
-  const b = r.price_mean_1d;
-  if (!Number.isFinite(a) || !Number.isFinite(b) || a === 0) return 'flat';
-  if (b > a * 1.005) return 'up';
-  if (b < a * 0.995) return 'down';
+  const today = Math.round(r.price_median * 100) / 100;
+  const prior = prevMedians.get(r.series_id);
+  if (prior === undefined || !Number.isFinite(prior)) return 'flat';
+  const yday = Math.round(prior * 100) / 100;
+  if (today > yday) return 'up';
+  if (today < yday) return 'down';
   return 'flat';
 }
 

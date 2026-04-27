@@ -28,8 +28,11 @@ jobs:
         run: |
           set -euo pipefail
           DATE=$(TZ=America/Chicago date +%F)
+          PREV=$(TZ=America/Chicago date -d "$DATE -1 day" +%F)
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "prev=$PREV" >> "$GITHUB_OUTPUT"
           BASE="https://raw.githubusercontent.com/ccir-index/ccir-v2-data/main/indices/snapshots/$DATE"
+          PREV_BASE="https://raw.githubusercontent.com/ccir-index/ccir-v2-data/main/indices/snapshots/$PREV"
           mkdir -p .sync
           # Manifest is the gate. 404 on either run-of-the-day cron tick = pipeline
           # hasn't published yet (typical during the wrong-DST half of the year).
@@ -41,6 +44,14 @@ jobs:
           fi
           curl -fsSL -o .sync/rates_daily.csv "$BASE/rates_daily.csv"
           curl -fsSL -o .sync/rates_shadow.csv "$BASE/rates_shadow.csv"
+          # Prior-day CSV powers the ticker's day-over-day arrows. Graceful
+          # skip if the prior date isn't published (e.g. holidays, gaps).
+          if curl -fsSL -o .sync/rates_daily_prev.csv "$PREV_BASE/rates_daily.csv"; then
+            echo "fetched prior-day CSV ($PREV)"
+          else
+            echo "no prior-day CSV at $PREV — ticker will show flat arrows for today"
+            : > .sync/rates_daily_prev.csv  # empty file — loader handles gracefully
+          fi
           echo "have_snapshot=true" >> "$GITHUB_OUTPUT"
 
       - name: Verify hashes against manifest
@@ -67,8 +78,9 @@ jobs:
         if: steps.fetch.outputs.have_snapshot == 'true'
         run: |
           set -euo pipefail
-          cp .sync/rates_daily.csv  src/data/rates_daily.csv
-          cp .sync/rates_shadow.csv src/data/rates_shadow.csv
+          cp .sync/rates_daily.csv      src/data/rates_daily.csv
+          cp .sync/rates_shadow.csv     src/data/rates_shadow.csv
+          cp .sync/rates_daily_prev.csv src/data/rates_daily_prev.csv
           python3 - <<'PY'
           import json
           m = json.load(open('.sync/manifest.json'))
@@ -96,7 +108,7 @@ jobs:
           set -euo pipefail
           git config user.email "ccir-pipeline@ccir.io"
           git config user.name  "CCIR Pipeline"
-          git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/meta.json
+          git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/rates_daily_prev.csv src/data/meta.json
           if git diff --cached --quiet; then
             echo "no changes to commit — site already at $DATE"
             exit 0

@@ -12,6 +12,7 @@
 */
 import csvText from './rates_daily.csv?raw';
 import shadowCsvText from './rates_shadow.csv?raw';
+import prevCsvText from './rates_daily_prev.csv?raw';
 import metaJson from './meta.json';
 import type {
   Rate, Tier, Confidence, PromotionStatus, Term, SnapshotMeta,
@@ -84,6 +85,31 @@ function parseCsv(text: string): Rate[] {
 
 const publishedRates: Rate[] = parseCsv(csvText);
 const shadowRates: Rate[] = parseCsv(shadowCsvText);
+
+// Previous-day medians per series_id. Drives the ticker arrows: today's
+// price_median vs prior-day price_median. Empty map on bootstrap days when
+// no prior CSV is bundled yet (loader treats absence as "indeterminate"
+// which surfaces as the flat glyph).
+export const prevMedians: Map<string, number> = (() => {
+  const out = new Map<string, number>();
+  // parseCsv filters to OnDemand only, but the previous CSV also has
+  // committed terms — re-parse minimally without that filter so the lookup
+  // covers every series the current snapshot might reference.
+  const text = prevCsvText.trim();
+  if (!text) return out;
+  const lines = text.split(/\r?\n/);
+  const headers = lines[0]!.split(',');
+  const idIdx = headers.indexOf('series_id');
+  const medIdx = headers.indexOf('price_median');
+  if (idIdx === -1 || medIdx === -1) return out;
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i]!.split(',');
+    const id = cells[idIdx];
+    const med = Number(cells[medIdx]);
+    if (id && Number.isFinite(med)) out.set(id, med);
+  }
+  return out;
+})();
 
 // Full series set — Published + Shadow. Already filtered to OnDemand only
 // by parseCsv above.
