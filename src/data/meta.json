@@ -1,8 +1,8 @@
 {
   "as_of_date": "2026-04-28",
-  "published_at_ct": "2026-04-28T09:21:05-05:00",
-  "published_at_utc": "2026-04-28T14:21:05+00:00",
-  "run_id": "export-20260428T142101Z-586e7984",
+  "published_at_ct": "2026-04-28T09:43:19-05:00",
+  "published_at_utc": "2026-04-28T14:43:19+00:00",
+  "run_id": "export-20260428T144316Z-bfc6c29a",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 25,
@@ -15,8 +15,8 @@
       "a100-sxm-80gb",
       "a100-sxm-40gb"
     ],
-    "filter": "region_country=US",
-    "total_rows": 85,
+    "filter": "global panel",
+    "total_rows": 123,
     "window_days": 90,
     "window_end": "2026-04-28",
     "window_start": "2026-01-29"

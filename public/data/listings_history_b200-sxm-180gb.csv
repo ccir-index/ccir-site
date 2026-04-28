@@ -1,6 +1,15 @@
 as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect_substrate,commitment_term,interruptibility,deployment_class,region,region_country,factory_type,tier_v3,price_usd_per_hour,bundled,bundled_inclusions,availability_state,methodology_version
 2026-04-28,aws,b200-sxm-180gb,B200,180GB,SXM,EFA,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T1IF,14.2416,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
 2026-04-28,coreweave,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-East,US,IIF,T1IF,8.6000,True,local-nvme;free-egress;support-tier;observability;managed-ops-plane,Available,v2.0.0
+2026-04-28,datacrunch,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,EU,EU,DIF,T3IF,1.7115,True,local-nvme,Available,v2.0.0
+2026-04-28,genesis_cloud,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T3IF,2.8000,False,,Available,v2.0.0
+2026-04-28,hyperstack,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,3.5000,True,local-nvme,Available,v2.0.0
 2026-04-28,lambda,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-East,US,IIF,T2IF,6.6900,True,local-nvme,Available,v2.0.0
+2026-04-28,nebius,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,EU,EU,IIF,T1IF,5.5000,True,observability;managed-ops-plane;free-egress,Available,v2.0.0
 2026-04-28,oci,b200-sxm-180gb,B200,180GB,SXM,RoCE-v2,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T2IF,14.0000,True,local-nvme;egress-capped;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-04-28,runpod_cluster,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T2IF,6.5880,True,local-nvme,Available,v2.0.0
+2026-04-28,runpod_community,b200-sxm-180gb,B200,180GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,5.9800,False,,Available,v2.0.0
+2026-04-28,runpod_secure,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T2IF,5.4900,True,local-nvme,Available,v2.0.0
 2026-04-28,vast_ai,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-Central,US,DIF,T3IF,6.1125,True,local-nvme,Available,v2.0.0
+2026-04-28,vast_ai,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,APAC,APAC,DIF,T3IF,3.6250,True,local-nvme,Available,v2.0.0
+2026-04-28,vast_ai,b200-sxm-180gb,B200,180GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,Other,Other,DIF,T3IF,2.6250,True,local-nvme,Available,v2.0.0
