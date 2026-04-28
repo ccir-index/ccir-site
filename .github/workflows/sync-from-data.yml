@@ -2,12 +2,19 @@ name: Sync today's snapshot from ccir-v2-data
 
 on:
   schedule:
-    # Dual UTC cron to land at 05:30 CT regardless of DST.
-    # 10:30 UTC = 05:30 CDT (summer) / 04:30 CST (winter, no-op until pipeline catches up)
-    # 11:30 UTC = 06:30 CDT (summer, no-op after morning push) / 05:30 CST (winter)
-    # Action is idempotent — only commits when meta/CSVs change vs. main.
+    # Quartet of UTC cron ticks. Action is idempotent (no-op if no diff vs. main),
+    # so extra ticks are safe and give resilience against GitHub Actions schedule
+    # lag — observed 2026-04-28: both the 10:30 and 11:30 UTC ticks were skipped
+    # by GitHub, the 11:30 fired at 12:08 UTC instead. With four chances we cover
+    # both DST halves of the year and survive an hour-plus of GH cron drift.
+    # 10:30 UTC = 05:30 CDT / 04:30 CST
+    # 11:30 UTC = 06:30 CDT / 05:30 CST
+    # 12:30 UTC = 07:30 CDT / 06:30 CST
+    # 13:30 UTC = 08:30 CDT / 07:30 CST
     - cron: '30 10 * * *'
     - cron: '30 11 * * *'
+    - cron: '30 12 * * *'
+    - cron: '30 13 * * *'
   workflow_dispatch:
 
 permissions:
