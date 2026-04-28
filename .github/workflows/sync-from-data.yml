@@ -59,6 +59,18 @@ jobs:
             echo "no prior-day CSV at $PREV — ticker will show flat arrows for today"
             : > .sync/rates_daily_prev.csv  # empty file — loader handles gracefully
           fi
+          # Per-chip listings_history CSVs power the public /markets time-series
+          # view. Graceful per-file skip — older snapshots predate this product
+          # and won't have the files; the site falls back to "no data yet" UI.
+          for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb gb200-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
+            fname="listings_history_${chip}.csv"
+            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              echo "fetched $fname"
+            else
+              echo "no $fname at $DATE — /markets will show empty for this chip"
+              : > ".sync/$fname"
+            fi
+          done
           echo "have_snapshot=true" >> "$GITHUB_OUTPUT"
 
       - name: Verify hashes against manifest
@@ -66,12 +78,18 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import hashlib, json, sys
+          import hashlib, json, os, sys
           m = json.load(open('.sync/manifest.json'))
+          # Skip files we don't bundle (term_structure) and any file we
+          # gracefully failed to fetch (left as a 0-byte placeholder above).
+          NOT_BUNDLED = {'term_structure.csv'}
           for fname, spec in m['files'].items():
-              if fname == 'term_structure.csv':
-                  continue  # not bundled into the site
+              if fname in NOT_BUNDLED:
+                  continue
               path = f'.sync/{fname}'
+              if not os.path.exists(path) or os.path.getsize(path) == 0:
+                  print(f'skip {fname} (not fetched)')
+                  continue
               data = open(path, 'rb').read()
               got = hashlib.sha256(data).hexdigest()
               if got != spec['sha256']:
@@ -88,6 +106,21 @@ jobs:
           cp .sync/rates_daily.csv      src/data/rates_daily.csv
           cp .sync/rates_shadow.csv     src/data/rates_shadow.csv
           cp .sync/rates_daily_prev.csv src/data/rates_daily_prev.csv
+          # listings_history CSVs land in public/data so the /markets page
+          # can fetch them client-side at runtime (they're too large to
+          # bundle at build time — ~1-2 MB each).
+          mkdir -p public/data
+          for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb gb200-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
+            fname="listings_history_${chip}.csv"
+            if [ -s ".sync/$fname" ]; then
+              cp ".sync/$fname" "public/data/$fname"
+              echo "staged public/data/$fname"
+            else
+              # Snapshot didn't include this chip — leave any previous
+              # version of the file in place rather than blanking it.
+              echo "no $fname in this snapshot; leaving public/data unchanged"
+            fi
+          done
           python3 - <<'PY'
           import json
           m = json.load(open('.sync/manifest.json'))
@@ -100,6 +133,7 @@ jobs:
               'methodology_version': m['methodology_version'],
               'independence_declaration': m['independence_declaration'],
               'contributing_today': m['panel']['contributing_today'],
+              'listings_history': m.get('listings_history'),
           }
           with open('src/data/meta.json', 'w') as f:
               json.dump(meta, f, indent=2)
@@ -116,6 +150,11 @@ jobs:
           git config user.email "ccir-pipeline@ccir.io"
           git config user.name  "CCIR Pipeline"
           git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/rates_daily_prev.csv src/data/meta.json
+          # public/data/listings_history_*.csv only exists once the upstream
+          # pipeline starts emitting these files; -A on a missing dir is fine.
+          if [ -d public/data ]; then
+            git add -A public/data
+          fi
           if git diff --cached --quiet; then
             echo "no changes to commit — site already at $DATE"
             exit 0

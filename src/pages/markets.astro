@@ -1,0 +1,496 @@
+---
+import Base from '../layouts/Base.astro';
+import { meta } from '../data/snapshot';
+import { PREMIUM_CHIPS, RESERVED_TENORS } from '../data/listings_history';
+
+const DEFAULT_CHIP = 'h100-sxm-80gb';
+const DEFAULT_TENOR = '1Y';
+
+const listingsMeta = (meta as any).listings_history;
+---
+<Base title="Markets · CCIR">
+  <section class="wrap top">
+    <div class="kicker">Provider list-asks · {listingsMeta?.window_days ?? 90}-day window · US-only</div>
+    <h1>Markets</h1>
+    <p class="standfirst lede">
+      Per-provider asking price over time, as posted on operator pricing
+      pages. Bundle-stripping is <strong>not</strong> applied — these are
+      list-asks at deployment grade. Each line is one operator; the index
+      median tracked elsewhere on the site is computed from these inputs
+      after operator-equal weighting.
+    </p>
+
+    <div class="controls">
+      <div class="control-row chip-row">
+        <span class="control-label">Chip</span>
+        <div class="pill-group" id="chip-pills" role="tablist">
+          {PREMIUM_CHIPS.map((c) => (
+            <button type="button" class="pill" data-chip={c.id} data-default={c.id === DEFAULT_CHIP}>
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="control-row class-row">
+        <span class="control-label">Class</span>
+        <div class="pill-group" id="class-pills" role="tablist">
+          <button type="button" class="pill" data-class="OnDemand" data-default="true">On-Demand</button>
+          <button type="button" class="pill" data-class="Spot">Spot</button>
+          <button type="button" class="pill" data-class="Reserved">Reserved</button>
+        </div>
+
+        <div class="tenor-block" id="tenor-block" hidden>
+          <span class="control-label">Tenor</span>
+          <select id="tenor-select" class="select">
+            {RESERVED_TENORS.map((t) => (
+              <option value={t} selected={t === DEFAULT_TENOR}>{t}</option>
+            ))}
+          </select>
+        </div>
+
+        <label class="bundled-toggle">
+          <input type="checkbox" id="bundled-toggle" checked />
+          Include bundled offerings
+        </label>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-status" id="chart-status">Loading…</div>
+      <canvas id="chart" aria-label="Provider list-asks over time"></canvas>
+    </div>
+
+    <section class="legend-section">
+      <header class="legend-head">
+        <span class="sec-kicker">Providers</span>
+        <span class="sec-sub" id="legend-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="legend-table">
+          <thead>
+            <tr>
+              <th>Provider</th>
+              <th>Tier</th>
+              <th class="num">Latest</th>
+              <th class="num">7-day Δ</th>
+              <th>Bundle</th>
+              <th class="num">Days</th>
+            </tr>
+          </thead>
+          <tbody id="legend-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="footnote">
+      Data is the per-provider raw observation feed (`gold.listings_history`),
+      US-only, as published in <code>listings_history_&lt;chip&gt;.csv</code>
+      under the daily snapshot. History begins on the first day this product
+      shipped — there is no backfill. Bundle-stripping research stays
+      separate; what you see here is what the operator publishes.
+    </p>
+  </section>
+
+  <script>
+    import Chart from 'chart.js/auto';
+    import 'chartjs-adapter-date-fns';
+    import {
+      fetchListingsCsv, filterRows, buildSeries, colorForSource,
+      type ChipId, type DeploymentClass, type ReservedTenor,
+      type ProviderSeries,
+    } from '../data/listings_history';
+
+    const DEFAULT_CHIP: ChipId = 'h100-sxm-80gb';
+    const DEFAULT_CLASS: DeploymentClass = 'OnDemand';
+    const DEFAULT_TENOR: ReservedTenor = '1Y';
+
+    const state = {
+      chip: DEFAULT_CHIP as ChipId,
+      dclass: DEFAULT_CLASS as DeploymentClass,
+      tenor: DEFAULT_TENOR as ReservedTenor,
+      include_bundled: true,
+      cache: new Map<ChipId, Awaited<ReturnType<typeof fetchListingsCsv>>>(),
+    };
+
+    const statusEl = document.getElementById('chart-status') as HTMLDivElement;
+    const canvas = document.getElementById('chart') as HTMLCanvasElement;
+    const tenorBlock = document.getElementById('tenor-block') as HTMLDivElement;
+    const tenorSelect = document.getElementById('tenor-select') as HTMLSelectElement;
+    const bundledToggle = document.getElementById('bundled-toggle') as HTMLInputElement;
+    const legendTbody = document.getElementById('legend-tbody') as HTMLElement;
+    const legendSummary = document.getElementById('legend-summary') as HTMLElement;
+
+    let chart: Chart<'line'> | null = null;
+
+    function setStatus(msg: string | null) {
+      if (msg === null) {
+        statusEl.style.display = 'none';
+        statusEl.textContent = '';
+      } else {
+        statusEl.style.display = 'block';
+        statusEl.textContent = msg;
+      }
+    }
+
+    function activatePill(group: string, value: string) {
+      const grp = document.getElementById(group);
+      if (!grp) return;
+      grp.querySelectorAll<HTMLButtonElement>('.pill').forEach((p) => {
+        const v = p.dataset.chip || p.dataset.class || '';
+        p.classList.toggle('on', v === value);
+      });
+    }
+
+    function fmtPrice(n: number): string {
+      return '$' + n.toFixed(2);
+    }
+
+    function fmtChange(latest: number, prev: number | null): string {
+      if (prev === null || prev === 0) return '—';
+      const d = ((latest - prev) / prev) * 100;
+      const sign = d > 0 ? '+' : '';
+      const cls = d > 0 ? 'up' : d < 0 ? 'down' : '';
+      return `<span class="${cls}">${sign}${d.toFixed(1)}%</span>`;
+    }
+
+    function renderLegend(series: ProviderSeries[], rowsForClass: ReturnType<typeof filterRows>) {
+      const tierBySrc = new Map<string, string>();
+      for (const r of rowsForClass) {
+        if (r.tier_v3) tierBySrc.set(r.source_name, r.tier_v3);
+        else if (!tierBySrc.has(r.source_name)) tierBySrc.set(r.source_name, r.factory_type);
+      }
+      legendSummary.textContent = `${series.length} providers · ${rowsForClass.length} observations`;
+      legendTbody.innerHTML = series.map((s) => {
+        const tier = tierBySrc.get(s.source_name) || '—';
+        const tierKey = /^[a-z0-9]+$/i.test(tier) ? tier.toLowerCase() : 'unknown';
+        const dot = `<span class="legend-dot" style="background:${colorForSource(s.source_name)}"></span>`;
+        const bundle = s.bundled_any
+          ? '<span class="bundle-badge">BUNDLED</span>'
+          : '<span class="dim">—</span>';
+        return '<tr>' +
+          `<td class="provider">${dot}<code>${s.source_name}</code></td>` +
+          `<td><span class="tier-badge tier-badge-${tierKey}">${tier}</span></td>` +
+          `<td class="num posted">${fmtPrice(s.latest_price)}</td>` +
+          `<td class="num">${fmtChange(s.latest_price, s.prev7_price)}</td>` +
+          `<td>${bundle}</td>` +
+          `<td class="num dim">${s.points.length}</td>` +
+        '</tr>';
+      }).join('');
+    }
+
+    function renderChart(series: ProviderSeries[]) {
+      const datasets = series.map((s) => ({
+        label: s.source_name,
+        data: s.points,
+        borderColor: colorForSource(s.source_name),
+        backgroundColor: colorForSource(s.source_name),
+        borderWidth: 1.5,
+        borderDash: s.bundled_any ? [4, 3] : [],
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        tension: 0.05,
+        spanGaps: true,
+      }));
+
+      if (chart) chart.destroy();
+
+      const styles = getComputedStyle(document.documentElement);
+      const inkColor = styles.getPropertyValue('--ink').trim() || '#0d0d0d';
+      const ruleColor = styles.getPropertyValue('--rule').trim() || '#d4d0c4';
+      const dimColor = styles.getPropertyValue('--ink-dim').trim() || '#5b5852';
+
+      chart = new Chart(canvas, {
+        type: 'line',
+        data: { datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              displayColors: true,
+              callbacks: {
+                title: (items) => items[0]?.parsed?.x
+                  ? new Date(items[0].parsed.x).toISOString().slice(0, 10)
+                  : '',
+                label: (ctx) => `${ctx.dataset.label}: $${(ctx.parsed.y as number).toFixed(2)}/h`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd', displayFormats: { day: 'MMM d' } },
+              ticks: { color: dimColor, maxRotation: 0, autoSkipPadding: 24 },
+              grid: { color: ruleColor, drawOnChartArea: false },
+              border: { color: ruleColor },
+            },
+            y: {
+              title: { display: true, text: '$/GPU-hour', color: dimColor },
+              ticks: { color: inkColor, callback: (v) => '$' + (v as number).toFixed(2) },
+              grid: { color: ruleColor },
+              border: { color: ruleColor },
+            },
+          },
+        },
+      });
+    }
+
+    async function refresh() {
+      setStatus('Loading…');
+      let rows = state.cache.get(state.chip);
+      if (!rows) {
+        try {
+          rows = await fetchListingsCsv(state.chip);
+          state.cache.set(state.chip, rows);
+        } catch (e) {
+          setStatus(`No data for ${state.chip} yet — history accrues as the daily pipeline runs.`);
+          if (chart) { chart.destroy(); chart = null; }
+          legendTbody.innerHTML = '';
+          legendSummary.textContent = '0 providers';
+          return;
+        }
+      }
+      const filtered = filterRows(rows, {
+        deployment_class: state.dclass,
+        reserved_tenor: state.dclass === 'Reserved' ? state.tenor : undefined,
+        include_bundled: state.include_bundled,
+      });
+      const series = buildSeries(filtered);
+      if (series.length === 0) {
+        setStatus(`No ${state.dclass} observations${state.dclass === 'Reserved' ? ' at ' + state.tenor : ''} for this chip yet.`);
+        if (chart) { chart.destroy(); chart = null; }
+        legendTbody.innerHTML = '';
+        legendSummary.textContent = '0 providers';
+        return;
+      }
+      setStatus(null);
+      renderChart(series);
+      renderLegend(series, filtered);
+    }
+
+    // Wire up controls
+    document.getElementById('chip-pills')!.addEventListener('click', (ev) => {
+      const t = ev.target as HTMLElement;
+      const pill = t.closest<HTMLButtonElement>('.pill');
+      if (!pill || !pill.dataset.chip) return;
+      state.chip = pill.dataset.chip as ChipId;
+      activatePill('chip-pills', state.chip);
+      refresh();
+    });
+    document.getElementById('class-pills')!.addEventListener('click', (ev) => {
+      const t = ev.target as HTMLElement;
+      const pill = t.closest<HTMLButtonElement>('.pill');
+      if (!pill || !pill.dataset.class) return;
+      state.dclass = pill.dataset.class as DeploymentClass;
+      activatePill('class-pills', state.dclass);
+      tenorBlock.hidden = state.dclass !== 'Reserved';
+      refresh();
+    });
+    tenorSelect.addEventListener('change', () => {
+      state.tenor = tenorSelect.value as ReservedTenor;
+      refresh();
+    });
+    bundledToggle.addEventListener('change', () => {
+      state.include_bundled = bundledToggle.checked;
+      refresh();
+    });
+
+    // Default state
+    activatePill('chip-pills', state.chip);
+    activatePill('class-pills', state.dclass);
+    refresh();
+  </script>
+
+  <style>
+    .top { padding-top: 28px; }
+    h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      margin: 6px 0 12px;
+      letter-spacing: -0.005em;
+    }
+    .lede {
+      max-width: 80ch;
+      margin: 8px 0 24px;
+    }
+    .lede strong { color: var(--accent); font-weight: var(--weight-strong); }
+
+    .controls {
+      background: var(--surface-2);
+      border: 1px solid var(--rule);
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .control-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+      min-width: 56px;
+    }
+    .pill-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--surface);
+      color: var(--ink-dim);
+      border: 1px solid var(--rule-2);
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: var(--rad);
+      font-weight: var(--weight-strong);
+    }
+    .pill:hover { color: var(--ink); border-color: var(--accent); }
+    .pill.on {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+
+    .tenor-block { display: flex; align-items: center; gap: 8px; }
+    .select {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--rule-2);
+      padding: 5px 8px;
+      border-radius: var(--rad);
+    }
+    .bundled-toggle {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .chart-wrap {
+      position: relative;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      padding: 16px;
+      height: 460px;
+      margin-bottom: 18px;
+    }
+    .chart-status {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      pointer-events: none;
+      padding: 0 24px;
+      text-align: center;
+    }
+
+    .legend-section { margin-top: 8px; }
+    .legend-head {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .sec-kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+    }
+    .sec-sub {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
+    }
+    .table-wrap {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    #legend-table { width: 100%; }
+    #legend-table td.provider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #legend-table td.provider code {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-sm) - 1px);
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .bundle-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 2px);
+      font-weight: var(--weight-strong);
+      letter-spacing: 0.08em;
+      border: 1px solid color-mix(in srgb, var(--info) 50%, transparent);
+      color: var(--info);
+      background: color-mix(in srgb, var(--info) 12%, transparent);
+      border-radius: var(--rad);
+    }
+    #legend-table .up { color: var(--neg); }
+    #legend-table .down { color: var(--pos); }
+
+    .footnote {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      margin: 18px 0 0;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border-left: 2px solid var(--neutral);
+      max-width: 80ch;
+      line-height: 1.55;
+    }
+    .footnote code {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-sm) - 1px);
+      color: var(--accent);
+    }
+
+    @media (max-width: 720px) {
+      .control-row { gap: 8px; }
+      .control-label { min-width: 0; }
+      .bundled-toggle { margin-left: 0; flex-basis: 100%; }
+      .chart-wrap { height: 360px; padding: 10px; }
+    }
+  </style>
+</Base>
