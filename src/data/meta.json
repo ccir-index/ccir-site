@@ -1,11 +1,11 @@
 {
   "as_of_date": "2026-04-28",
-  "published_at_ct": "2026-04-28T09:43:19-05:00",
-  "published_at_utc": "2026-04-28T14:43:19+00:00",
-  "run_id": "export-20260428T144316Z-bfc6c29a",
+  "published_at_ct": "2026-04-28T10:19:56-05:00",
+  "published_at_utc": "2026-04-28T15:19:56+00:00",
+  "run_id": "export-20260428T151952Z-3fea63ea",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
-  "contributing_today": 25,
+  "contributing_today": 26,
   "listings_history": {
     "chips": [
       "h100-sxm-80gb",
@@ -20,5 +20,26 @@
     "window_days": 90,
     "window_end": "2026-04-28",
     "window_start": "2026-01-29"
+  },
+  "marketplace_history": {
+    "chips": [
+      "h100-sxm-80gb",
+      "h200-sxm-141gb",
+      "b200-sxm-180gb",
+      "gb200-nvl-nvl",
+      "a100-sxm-80gb",
+      "a100-sxm-40gb"
+    ],
+    "sources": [
+      "vast_ai_verified",
+      "runpod_secure",
+      "runpod_spot",
+      "runpod_community",
+      "runpod_cluster"
+    ],
+    "total_rows": 27,
+    "window_days": 7,
+    "window_end": "2026-04-28",
+    "window_start": "2026-04-22"
   }
 }
