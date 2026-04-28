@@ -199,6 +199,26 @@ export function colorForSource(name: string): string {
   return `hsl(${hue}, 62%, 52%)`;
 }
 
+// Deterministic color per chip (matplotlib tab10 palette, colorblind-safe).
+// Used in multi-chip mode where line color encodes chip and line style
+// encodes the GTD/INT variant. Single-chip mode falls back to colorForSource.
+const _CHIP_COLORS: Record<ChipId, string> = {
+  'h100-sxm-80gb':  '#1f77b4',
+  'h200-sxm-141gb': '#ff7f0e',
+  'b200-sxm-180gb': '#2ca02c',
+  'gb200-nvl-nvl':  '#d62728',
+  'a100-sxm-80gb':  '#9467bd',
+  'a100-sxm-40gb':  '#8c564b',
+};
+
+export function colorForChip(chipId: ChipId): string {
+  return _CHIP_COLORS[chipId] ?? '#5b5852';
+}
+
+export function shortLabelForChip(chipId: ChipId): string {
+  return PREMIUM_CHIPS.find((c) => c.id === chipId)?.short ?? chipId;
+}
+
 export function fetchListingsCsv(chipId: ChipId): Promise<ListingRow[]> {
   return fetch(`/data/listings_history_${chipId}.csv`)
     .then((r) => {

@@ -8,10 +8,10 @@ const mktMeta = (meta as any).marketplace_history;
 ---
 <Base title="Marketplace · CCIR">
   <section class="wrap top">
-    <div class="kicker">Real-time market color · {mktMeta?.window_days ?? 7}-day window · cheapest available</div>
+    <div class="kicker">Real-time market color · {mktMeta?.window_days ?? 7}-day window · least expensive available</div>
     <h1>Marketplace</h1>
     <p class="standfirst lede">
-      Intraday cheapest-available rates from third-party-host marketplaces.
+      Intraday least-expensive available rates from third-party-host marketplaces.
       Vast.ai is restricted to verified hosts; RunPod is split by sub-product
       (Secure / Community / Spot / Cluster). Distinct from <a href="/markets">/markets</a>,
       which tracks operators that run their own datacenters.
@@ -20,13 +20,14 @@ const mktMeta = (meta as any).marketplace_history;
     <div class="controls">
       <div class="control-row chip-row">
         <span class="control-label">Chip</span>
-        <div class="pill-group" id="chip-pills" role="tablist">
+        <div class="pill-group" id="chip-pills" role="group" aria-label="Select up to 3 chips">
           {PREMIUM_CHIPS.map((c) => (
             <button type="button" class="pill" data-chip={c.id} data-default={c.id === DEFAULT_CHIP}>
               {c.label}
             </button>
           ))}
         </div>
+        <span class="chip-cap" id="chip-cap-hint">multi-select · up to 3</span>
       </div>
 
       <div class="control-row toggles-row">
@@ -38,12 +39,16 @@ const mktMeta = (meta as any).marketplace_history;
           <input type="checkbox" id="cluster-toggle" checked />
           Show RunPod Cluster (bare-metal)
         </label>
+        <label class="toggle log-toggle" id="log-toggle-wrap" hidden>
+          <input type="checkbox" id="log-toggle" />
+          Log scale
+        </label>
       </div>
     </div>
 
     <div class="chart-wrap">
       <div class="chart-status" id="chart-status">Loading…</div>
-      <canvas id="chart" aria-label="Marketplace cheapest-available over time"></canvas>
+      <canvas id="chart" aria-label="Marketplace least-expensive available over time"></canvas>
     </div>
 
     <section class="legend-section">
@@ -52,11 +57,12 @@ const mktMeta = (meta as any).marketplace_history;
         <span class="sec-sub" id="legend-summary">—</span>
       </header>
       <div class="table-wrap">
-        <table class="data" id="legend-table">
+        <table class="data multi-off" id="legend-table">
           <thead>
             <tr>
+              <th class="chip-col">Chip</th>
               <th>Sub-product</th>
-              <th class="num">Cheapest</th>
+              <th class="num">Least expensive</th>
               <th class="num">Listings</th>
               <th class="num">Cycles</th>
             </tr>
@@ -83,24 +89,33 @@ const mktMeta = (meta as any).marketplace_history;
     import 'chartjs-adapter-date-fns';
     import {
       fetchMarketplaceCsv, filterRows, buildSeries, colorForSource,
+      colorForChip, shortLabelForChip,
       type ChipId, type MarketplaceSeries,
     } from '../data/marketplace';
 
     const DEFAULT_CHIP: ChipId = 'h100-sxm-80gb';
+    const MAX_CHIPS = 3;
+
+    type Augmented = MarketplaceSeries & { chip: ChipId };
 
     const state = {
-      chip: DEFAULT_CHIP as ChipId,
+      chips: new Set<ChipId>([DEFAULT_CHIP]),
       include_spot: false,
       include_runpod_cluster: true,
-      cache: new Map<ChipId, Awaited<ReturnType<typeof fetchMarketplaceCsv>>>(),
+      log_scale: false,
+      // null entry = fetch failed / no data; treated as empty array downstream.
+      cache: new Map<ChipId, Awaited<ReturnType<typeof fetchMarketplaceCsv>> | null>(),
     };
 
     const statusEl = document.getElementById('chart-status') as HTMLDivElement;
     const canvas = document.getElementById('chart') as HTMLCanvasElement;
     const spotToggle = document.getElementById('spot-toggle') as HTMLInputElement;
     const clusterToggle = document.getElementById('cluster-toggle') as HTMLInputElement;
+    const logToggle = document.getElementById('log-toggle') as HTMLInputElement;
+    const logToggleWrap = document.getElementById('log-toggle-wrap') as HTMLElement;
     const legendTbody = document.getElementById('legend-tbody') as HTMLElement;
     const legendSummary = document.getElementById('legend-summary') as HTMLElement;
+    const legendTable = document.getElementById('legend-table') as HTMLElement;
 
     let chart: Chart<'line'> | null = null;
 
@@ -114,36 +129,50 @@ const mktMeta = (meta as any).marketplace_history;
       }
     }
 
-    function activatePill(group: string, value: string) {
-      const grp = document.getElementById(group);
+    function syncPills() {
+      const grp = document.getElementById('chip-pills');
       if (!grp) return;
+      const atCap = state.chips.size >= MAX_CHIPS;
       grp.querySelectorAll<HTMLButtonElement>('.pill').forEach((p) => {
-        p.classList.toggle('on', p.dataset.chip === value);
+        const isOn = state.chips.has(p.dataset.chip as ChipId);
+        p.classList.toggle('on', isOn);
+        // At cap + not selected → muted (visual only; click is a no-op).
+        p.classList.toggle('muted', atCap && !isOn);
       });
+      const multi = state.chips.size > 1;
+      legendTable.classList.toggle('multi-off', !multi);
+      legendTable.classList.toggle('multi-on', multi);
+      // Log toggle only meaningful in multi mode (single chip rarely needs it).
+      logToggleWrap.hidden = !multi;
     }
 
     function fmtPrice(n: number | null): string {
       return n === null ? '—' : '$' + n.toFixed(2);
     }
 
-    function renderLegend(series: MarketplaceSeries[]) {
-      // Collapse cheapest+median pairs into one row each per source for the
-      // legend; show cheapest as the headline and a note for median if present.
+    function renderLegend(series: Augmented[]) {
+      // Collapse cheapest+median pairs into one row each per (chip, source).
       const seen = new Set<string>();
       const rows = series.filter((s) => {
         if (s.variant !== 'cheapest') return false;
-        if (seen.has(s.source_name)) return false;
-        seen.add(s.source_name);
+        const key = `${s.chip}::${s.source_name}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
         return true;
       });
       const totalObs = series.reduce((acc, s) => acc + s.points.length, 0);
-      legendSummary.textContent = `${rows.length} sub-products · ${totalObs} observations`;
+      const subjectLabel = state.chips.size > 1
+        ? `${rows.length} chip-sub-product lines`
+        : `${rows.length} sub-products`;
+      legendSummary.textContent = `${subjectLabel} · ${totalObs} observations`;
+      const multi = state.chips.size > 1;
       legendTbody.innerHTML = rows.map((s) => {
-        const dot = `<span class="legend-dot" style="background:${colorForSource(s.source_name)}"></span>`;
-        const nCell = s.latest_n !== null
-          ? `${s.latest_n}`
-          : '<span class="dim">—</span>';
+        const lineColor = multi ? colorForChip(s.chip) : colorForSource(s.source_name);
+        const dot = `<span class="legend-dot" style="background:${lineColor}"></span>`;
+        const chipBadge = `<span class="chip-badge" style="background:${colorForChip(s.chip)}">${shortLabelForChip(s.chip)}</span>`;
+        const nCell = s.latest_n !== null ? `${s.latest_n}` : '<span class="dim">—</span>';
         return '<tr>' +
+          `<td class="chip-col">${chipBadge}</td>` +
           `<td class="provider">${dot}<code>${s.source_display_name}</code></td>` +
           `<td class="num posted">${fmtPrice(s.latest_price)}</td>` +
           `<td class="num">${nCell}</td>` +
@@ -152,22 +181,27 @@ const mktMeta = (meta as any).marketplace_history;
       }).join('');
     }
 
-    function renderChart(series: MarketplaceSeries[]) {
-      const datasets = series.map((s) => ({
-        label: s.source_display_name,
-        data: s.points,
-        borderColor: colorForSource(s.source_name),
-        backgroundColor: colorForSource(s.source_name),
-        borderWidth: s.variant === 'cheapest' ? 2 : 1,
-        // Median renders dashed and translucent (faded backdrop line).
-        borderDash: s.variant === 'median' ? [3, 3] : [],
-        pointRadius: s.variant === 'cheapest' ? 1.5 : 0,
-        pointHoverRadius: 4,
-        tension: 0,
-        spanGaps: true,
-        // Median lines render below cheapest lines.
-        order: s.variant === 'median' ? 2 : 1,
-      }));
+    function renderChart(series: Augmented[]) {
+      const multi = state.chips.size > 1;
+      const datasets = series.map((s) => {
+        const color = multi ? colorForChip(s.chip) : colorForSource(s.source_name);
+        const label = multi
+          ? `${shortLabelForChip(s.chip)} · ${s.source_display_name}`
+          : s.source_display_name;
+        return {
+          label,
+          data: s.points,
+          borderColor: color,
+          backgroundColor: color,
+          borderWidth: s.variant === 'cheapest' ? 2 : 1,
+          borderDash: s.variant === 'median' ? [3, 3] : [],
+          pointRadius: s.variant === 'cheapest' ? 1.5 : 0,
+          pointHoverRadius: 4,
+          tension: 0,
+          spanGaps: true,
+          order: s.variant === 'median' ? 2 : 1,
+        };
+      });
 
       if (chart) chart.destroy();
 
@@ -207,6 +241,7 @@ const mktMeta = (meta as any).marketplace_history;
               border: { color: ruleColor },
             },
             y: {
+              type: state.log_scale && multi ? 'logarithmic' : 'linear',
               title: { display: true, text: '$/GPU-hour', color: dimColor },
               ticks: { color: inkColor, callback: (v) => '$' + (v as number).toFixed(2) },
               grid: { color: ruleColor },
@@ -217,33 +252,44 @@ const mktMeta = (meta as any).marketplace_history;
       });
     }
 
+    async function ensureCached(chips: ChipId[]) {
+      const misses = chips.filter((c) => !state.cache.has(c));
+      await Promise.all(misses.map(async (c) => {
+        try {
+          state.cache.set(c, await fetchMarketplaceCsv(c));
+        } catch (e) {
+          state.cache.set(c, null);
+        }
+      }));
+    }
+
     async function refresh() {
       setStatus('Loading…');
-      let rows = state.cache.get(state.chip);
-      if (!rows) {
-        try {
-          rows = await fetchMarketplaceCsv(state.chip);
-          state.cache.set(state.chip, rows);
-        } catch (e) {
-          setStatus(`No data for ${state.chip} yet — history accrues as the daily pipeline runs.`);
-          if (chart) { chart.destroy(); chart = null; }
-          legendTbody.innerHTML = '';
-          legendSummary.textContent = '0 sub-products';
-          return;
-        }
+      const chips = [...state.chips];
+      await ensureCached(chips);
+
+      const series: Augmented[] = [];
+      for (const chip of chips) {
+        const rows = state.cache.get(chip) ?? [];
+        if (rows.length === 0) continue;
+        const filtered = filterRows(rows, {
+          include_spot: state.include_spot,
+          include_runpod_cluster: state.include_runpod_cluster,
+        });
+        for (const s of buildSeries(filtered)) series.push({ ...s, chip });
       }
-      const filtered = filterRows(rows, {
-        include_spot: state.include_spot,
-        include_runpod_cluster: state.include_runpod_cluster,
-      });
-      const series = buildSeries(filtered);
+
       if (series.length === 0) {
-        setStatus(`No matching observations for ${state.chip} yet.`);
+        const label = chips.length === 1
+          ? `No data for ${chips[0]} yet — history accrues as the daily pipeline runs.`
+          : 'No matching observations yet for the selected chips.';
+        setStatus(label);
         if (chart) { chart.destroy(); chart = null; }
         legendTbody.innerHTML = '';
         legendSummary.textContent = '0 sub-products';
         return;
       }
+
       setStatus(null);
       renderChart(series);
       renderLegend(series);
@@ -253,8 +299,15 @@ const mktMeta = (meta as any).marketplace_history;
       const t = ev.target as HTMLElement;
       const pill = t.closest<HTMLButtonElement>('.pill');
       if (!pill || !pill.dataset.chip) return;
-      state.chip = pill.dataset.chip as ChipId;
-      activatePill('chip-pills', state.chip);
+      const chip = pill.dataset.chip as ChipId;
+      if (state.chips.has(chip)) {
+        // Don't allow zero chips selected — drop is a no-op when only 1 left.
+        if (state.chips.size > 1) state.chips.delete(chip);
+      } else {
+        if (state.chips.size >= MAX_CHIPS) return;
+        state.chips.add(chip);
+      }
+      syncPills();
       refresh();
     });
     spotToggle.addEventListener('change', () => {
@@ -265,8 +318,12 @@ const mktMeta = (meta as any).marketplace_history;
       state.include_runpod_cluster = clusterToggle.checked;
       refresh();
     });
+    logToggle.addEventListener('change', () => {
+      state.log_scale = logToggle.checked;
+      refresh();
+    });
 
-    activatePill('chip-pills', state.chip);
+    syncPills();
     refresh();
   </script>
 
@@ -327,6 +384,16 @@ const mktMeta = (meta as any).marketplace_history;
       color: var(--accent);
       border-color: var(--accent);
       background: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+    .pill.muted { opacity: 0.45; cursor: not-allowed; }
+    .pill.muted:hover { color: var(--ink-dim); border-color: var(--rule-2); }
+
+    .chip-cap {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
+      margin-left: 8px;
     }
 
     .toggles-row { gap: 22px; }
@@ -415,6 +482,19 @@ const mktMeta = (meta as any).marketplace_history;
       height: 10px;
       border-radius: 50%;
     }
+    .chip-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      font-weight: var(--weight-strong);
+      color: #fff;
+      border-radius: var(--rad);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    /* Hide the chip column when only one chip is selected — keeps legend tight. */
+    #legend-table.multi-off .chip-col { display: none; }
 
     .footnote {
       font-family: var(--font-body);
