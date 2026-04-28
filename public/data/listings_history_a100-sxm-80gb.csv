@@ -1,0 +1,13 @@
+as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect_substrate,commitment_term,interruptibility,deployment_class,region,region_country,factory_type,tier_v3,price_usd_per_hour,bundled,bundled_inclusions,availability_state,methodology_version
+2026-04-28,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T1IF,3.4309,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-04-28,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,1Y,NonInterruptible,Reserved,US-East,US,HIF,T1IF,2.1752,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-04-28,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-East,US,HIF,T1IF,1.4647,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-04-28,azure,a100-sxm-80gb,A100,80GB,SXM,IB-HDR,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T2IF,4.0963,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-04-28,azure,a100-sxm-80gb,A100,80GB,SXM,IB-HDR,1Y,NonInterruptible,Reserved,US-East,US,HIF,T2IF,2.6216,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-04-28,azure,a100-sxm-80gb,A100,80GB,SXM,IB-HDR,3Y,NonInterruptible,Reserved,US-East,US,HIF,T2IF,1.8024,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-04-28,coreweave,a100-sxm-80gb,A100,80GB,SXM,IB-HDR,OnDemand,NonInterruptible,OnDemand,US-East,US,IIF,T2IF,2.7000,True,local-nvme;free-egress;support-tier;observability;managed-ops-plane,Available,v2.0.0
+2026-04-28,crusoe,a100-sxm-80gb,A100,80GB,SXM,IB-HDR,OnDemand,NonInterruptible,OnDemand,US-East,US,IIF,T2IF,1.9500,True,local-nvme;free-egress,Available,v2.0.0
+2026-04-28,lambda,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-East,US,IIF,T2IF,2.7900,True,local-nvme,Available,v2.0.0
+2026-04-28,massed_compute,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-East,US,DIF,T3IF,1.2800,False,,Available,v2.0.0
+2026-04-28,oci,a100-sxm-80gb,A100,80GB,SXM,RoCE-v2,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T2IF,4.0000,True,local-nvme;egress-capped;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-04-28,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-Central,US,DIF,T3IF,0.5200,True,local-nvme,Available,v2.0.0

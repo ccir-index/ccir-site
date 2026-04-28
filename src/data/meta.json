@@ -1,9 +1,24 @@
 {
   "as_of_date": "2026-04-28",
-  "published_at_ct": "2026-04-28T05:01:52-05:00",
-  "published_at_utc": "2026-04-28T10:01:52+00:00",
-  "run_id": "export-20260428T100148Z-7c93dbe8",
+  "published_at_ct": "2026-04-28T09:21:05-05:00",
+  "published_at_utc": "2026-04-28T14:21:05+00:00",
+  "run_id": "export-20260428T142101Z-586e7984",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
-  "contributing_today": 25
+  "contributing_today": 25,
+  "listings_history": {
+    "chips": [
+      "h100-sxm-80gb",
+      "h200-sxm-141gb",
+      "b200-sxm-180gb",
+      "gb200-nvl-nvl",
+      "a100-sxm-80gb",
+      "a100-sxm-40gb"
+    ],
+    "filter": "region_country=US",
+    "total_rows": 85,
+    "window_days": 90,
+    "window_end": "2026-04-28",
+    "window_start": "2026-01-29"
+  }
 }
