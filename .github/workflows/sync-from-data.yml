@@ -71,6 +71,17 @@ jobs:
               : > ".sync/$fname"
             fi
           done
+          # Per-chip marketplace CSVs power the public /marketplace intraday
+          # view. Same graceful per-file skip pattern.
+          for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb gb200-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
+            fname="marketplace_${chip}.csv"
+            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              echo "fetched $fname"
+            else
+              echo "no $fname at $DATE — /marketplace will show empty for this chip"
+              : > ".sync/$fname"
+            fi
+          done
           echo "have_snapshot=true" >> "$GITHUB_OUTPUT"
 
       - name: Verify hashes against manifest
@@ -111,15 +122,17 @@ jobs:
           # bundle at build time — ~1-2 MB each).
           mkdir -p public/data
           for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb gb200-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
-            fname="listings_history_${chip}.csv"
-            if [ -s ".sync/$fname" ]; then
-              cp ".sync/$fname" "public/data/$fname"
-              echo "staged public/data/$fname"
-            else
-              # Snapshot didn't include this chip — leave any previous
-              # version of the file in place rather than blanking it.
-              echo "no $fname in this snapshot; leaving public/data unchanged"
-            fi
+            for prefix in listings_history marketplace; do
+              fname="${prefix}_${chip}.csv"
+              if [ -s ".sync/$fname" ]; then
+                cp ".sync/$fname" "public/data/$fname"
+                echo "staged public/data/$fname"
+              else
+                # Snapshot didn't include this file — leave any previous
+                # version of the file in place rather than blanking it.
+                echo "no $fname in this snapshot; leaving public/data unchanged"
+              fi
+            done
           done
           python3 - <<'PY'
           import json
@@ -134,6 +147,7 @@ jobs:
               'independence_declaration': m['independence_declaration'],
               'contributing_today': m['panel']['contributing_today'],
               'listings_history': m.get('listings_history'),
+              'marketplace_history': m.get('marketplace_history'),
           }
           with open('src/data/meta.json', 'w') as f:
               json.dump(meta, f, indent=2)

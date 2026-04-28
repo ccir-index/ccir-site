@@ -1,0 +1,443 @@
+---
+import Base from '../layouts/Base.astro';
+import { meta } from '../data/snapshot';
+import { PREMIUM_CHIPS } from '../data/marketplace';
+
+const DEFAULT_CHIP = 'h100-sxm-80gb';
+const mktMeta = (meta as any).marketplace_history;
+---
+<Base title="Marketplace · CCIR">
+  <section class="wrap top">
+    <div class="kicker">Real-time market color · {mktMeta?.window_days ?? 7}-day window · cheapest available</div>
+    <h1>Marketplace</h1>
+    <p class="standfirst lede">
+      Intraday cheapest-available rates from third-party-host marketplaces.
+      Vast.ai is restricted to verified hosts; RunPod is split by sub-product
+      (Secure / Community / Spot / Cluster). Distinct from <a href="/markets">/markets</a>,
+      which tracks operators that run their own datacenters.
+    </p>
+
+    <div class="controls">
+      <div class="control-row chip-row">
+        <span class="control-label">Chip</span>
+        <div class="pill-group" id="chip-pills" role="tablist">
+          {PREMIUM_CHIPS.map((c) => (
+            <button type="button" class="pill" data-chip={c.id} data-default={c.id === DEFAULT_CHIP}>
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div class="control-row toggles-row">
+        <label class="toggle">
+          <input type="checkbox" id="spot-toggle" />
+          Show interruptible
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="cluster-toggle" checked />
+          Show RunPod Cluster (bare-metal)
+        </label>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-status" id="chart-status">Loading…</div>
+      <canvas id="chart" aria-label="Marketplace cheapest-available over time"></canvas>
+    </div>
+
+    <section class="legend-section">
+      <header class="legend-head">
+        <span class="sec-kicker">Sub-products</span>
+        <span class="sec-sub" id="legend-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="legend-table">
+          <thead>
+            <tr>
+              <th>Sub-product</th>
+              <th class="num">Cheapest</th>
+              <th class="num">Listings</th>
+              <th class="num">Cycles</th>
+            </tr>
+          </thead>
+          <tbody id="legend-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="footnote">
+      Per-cycle observation feed (<code>gold.marketplace_history</code>),
+      published in <code>marketplace_&lt;chip&gt;.csv</code> under the
+      daily snapshot. Vast.ai filter: <code>verification == 'verified'</code>
+      AND <code>is_vm_deverified == False</code> AND <code>reliability ≥ 90%</code>.
+      Headline price is the MIN per-GPU rate per cycle. Vast.ai's
+      <em>median</em> series shows where the typical verified listing sits
+      relative to the floor. History begins on the first day this product
+      shipped — there is no backfill.
+    </p>
+  </section>
+
+  <script>
+    import Chart from 'chart.js/auto';
+    import 'chartjs-adapter-date-fns';
+    import {
+      fetchMarketplaceCsv, filterRows, buildSeries, colorForSource,
+      type ChipId, type MarketplaceSeries,
+    } from '../data/marketplace';
+
+    const DEFAULT_CHIP: ChipId = 'h100-sxm-80gb';
+
+    const state = {
+      chip: DEFAULT_CHIP as ChipId,
+      include_spot: false,
+      include_runpod_cluster: true,
+      cache: new Map<ChipId, Awaited<ReturnType<typeof fetchMarketplaceCsv>>>(),
+    };
+
+    const statusEl = document.getElementById('chart-status') as HTMLDivElement;
+    const canvas = document.getElementById('chart') as HTMLCanvasElement;
+    const spotToggle = document.getElementById('spot-toggle') as HTMLInputElement;
+    const clusterToggle = document.getElementById('cluster-toggle') as HTMLInputElement;
+    const legendTbody = document.getElementById('legend-tbody') as HTMLElement;
+    const legendSummary = document.getElementById('legend-summary') as HTMLElement;
+
+    let chart: Chart<'line'> | null = null;
+
+    function setStatus(msg: string | null) {
+      if (msg === null) {
+        statusEl.style.display = 'none';
+        statusEl.textContent = '';
+      } else {
+        statusEl.style.display = 'flex';
+        statusEl.textContent = msg;
+      }
+    }
+
+    function activatePill(group: string, value: string) {
+      const grp = document.getElementById(group);
+      if (!grp) return;
+      grp.querySelectorAll<HTMLButtonElement>('.pill').forEach((p) => {
+        p.classList.toggle('on', p.dataset.chip === value);
+      });
+    }
+
+    function fmtPrice(n: number | null): string {
+      return n === null ? '—' : '$' + n.toFixed(2);
+    }
+
+    function renderLegend(series: MarketplaceSeries[]) {
+      // Collapse cheapest+median pairs into one row each per source for the
+      // legend; show cheapest as the headline and a note for median if present.
+      const seen = new Set<string>();
+      const rows = series.filter((s) => {
+        if (s.variant !== 'cheapest') return false;
+        if (seen.has(s.source_name)) return false;
+        seen.add(s.source_name);
+        return true;
+      });
+      const totalObs = series.reduce((acc, s) => acc + s.points.length, 0);
+      legendSummary.textContent = `${rows.length} sub-products · ${totalObs} observations`;
+      legendTbody.innerHTML = rows.map((s) => {
+        const dot = `<span class="legend-dot" style="background:${colorForSource(s.source_name)}"></span>`;
+        const nCell = s.latest_n !== null
+          ? `${s.latest_n}`
+          : '<span class="dim">—</span>';
+        return '<tr>' +
+          `<td class="provider">${dot}<code>${s.source_display_name}</code></td>` +
+          `<td class="num posted">${fmtPrice(s.latest_price)}</td>` +
+          `<td class="num">${nCell}</td>` +
+          `<td class="num dim">${s.points.length}</td>` +
+        '</tr>';
+      }).join('');
+    }
+
+    function renderChart(series: MarketplaceSeries[]) {
+      const datasets = series.map((s) => ({
+        label: s.source_display_name,
+        data: s.points,
+        borderColor: colorForSource(s.source_name),
+        backgroundColor: colorForSource(s.source_name),
+        borderWidth: s.variant === 'cheapest' ? 2 : 1,
+        // Median renders dashed and translucent (faded backdrop line).
+        borderDash: s.variant === 'median' ? [3, 3] : [],
+        pointRadius: s.variant === 'cheapest' ? 1.5 : 0,
+        pointHoverRadius: 4,
+        tension: 0,
+        spanGaps: true,
+        // Median lines render below cheapest lines.
+        order: s.variant === 'median' ? 2 : 1,
+      }));
+
+      if (chart) chart.destroy();
+
+      const styles = getComputedStyle(document.documentElement);
+      const inkColor = styles.getPropertyValue('--ink').trim() || '#0d0d0d';
+      const ruleColor = styles.getPropertyValue('--rule').trim() || '#d4d0c4';
+      const dimColor = styles.getPropertyValue('--ink-dim').trim() || '#5b5852';
+
+      chart = new Chart(canvas, {
+        type: 'line',
+        data: { datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              displayColors: true,
+              callbacks: {
+                title: (items) => items[0]?.parsed?.x
+                  ? new Date(items[0].parsed.x).toISOString().slice(0, 16).replace('T', ' ')
+                  : '',
+                label: (ctx) => `${ctx.dataset.label}: $${(ctx.parsed.y as number).toFixed(2)}/h`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                tooltipFormat: 'yyyy-MM-dd HH:mm',
+                displayFormats: { hour: 'MMM d HH:mm', day: 'MMM d' },
+              },
+              ticks: { color: dimColor, maxRotation: 0, autoSkipPadding: 32 },
+              grid: { color: ruleColor, drawOnChartArea: false },
+              border: { color: ruleColor },
+            },
+            y: {
+              title: { display: true, text: '$/GPU-hour', color: dimColor },
+              ticks: { color: inkColor, callback: (v) => '$' + (v as number).toFixed(2) },
+              grid: { color: ruleColor },
+              border: { color: ruleColor },
+            },
+          },
+        },
+      });
+    }
+
+    async function refresh() {
+      setStatus('Loading…');
+      let rows = state.cache.get(state.chip);
+      if (!rows) {
+        try {
+          rows = await fetchMarketplaceCsv(state.chip);
+          state.cache.set(state.chip, rows);
+        } catch (e) {
+          setStatus(`No data for ${state.chip} yet — history accrues as the daily pipeline runs.`);
+          if (chart) { chart.destroy(); chart = null; }
+          legendTbody.innerHTML = '';
+          legendSummary.textContent = '0 sub-products';
+          return;
+        }
+      }
+      const filtered = filterRows(rows, {
+        include_spot: state.include_spot,
+        include_runpod_cluster: state.include_runpod_cluster,
+      });
+      const series = buildSeries(filtered);
+      if (series.length === 0) {
+        setStatus(`No matching observations for ${state.chip} yet.`);
+        if (chart) { chart.destroy(); chart = null; }
+        legendTbody.innerHTML = '';
+        legendSummary.textContent = '0 sub-products';
+        return;
+      }
+      setStatus(null);
+      renderChart(series);
+      renderLegend(series);
+    }
+
+    document.getElementById('chip-pills')!.addEventListener('click', (ev) => {
+      const t = ev.target as HTMLElement;
+      const pill = t.closest<HTMLButtonElement>('.pill');
+      if (!pill || !pill.dataset.chip) return;
+      state.chip = pill.dataset.chip as ChipId;
+      activatePill('chip-pills', state.chip);
+      refresh();
+    });
+    spotToggle.addEventListener('change', () => {
+      state.include_spot = spotToggle.checked;
+      refresh();
+    });
+    clusterToggle.addEventListener('change', () => {
+      state.include_runpod_cluster = clusterToggle.checked;
+      refresh();
+    });
+
+    activatePill('chip-pills', state.chip);
+    refresh();
+  </script>
+
+  <style>
+    .top { padding-top: 28px; }
+    h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      margin: 6px 0 12px;
+      letter-spacing: -0.005em;
+    }
+    .lede {
+      max-width: 80ch;
+      margin: 8px 0 24px;
+    }
+    .lede a { color: var(--accent); }
+
+    .controls {
+      background: var(--surface-2);
+      border: 1px solid var(--rule);
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .control-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+      min-width: 56px;
+    }
+    .pill-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--surface);
+      color: var(--ink-dim);
+      border: 1px solid var(--rule-2);
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: var(--rad);
+      font-weight: var(--weight-strong);
+    }
+    .pill:hover { color: var(--ink); border-color: var(--accent); }
+    .pill.on {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+
+    .toggles-row { gap: 22px; }
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .chart-wrap {
+      position: relative;
+      border: 1px solid var(--rule);
+      /* Subtle distinguishing accent so users feel /marketplace is a different
+         surface than /markets. */
+      border-left-width: 3px;
+      border-left-color: var(--warn);
+      background: var(--surface);
+      padding: 16px;
+      height: 460px;
+      margin-bottom: 18px;
+    }
+    .chart-status {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      pointer-events: none;
+      padding: 0 24px;
+      text-align: center;
+    }
+
+    .legend-section { margin-top: 8px; }
+    .legend-head {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .sec-kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+    }
+    .sec-sub {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
+    }
+    .table-wrap {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    #legend-table { width: 100%; }
+    #legend-table td.provider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #legend-table td.provider code {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-sm) - 1px);
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .footnote {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      margin: 18px 0 0;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border-left: 2px solid var(--neutral);
+      max-width: 80ch;
+      line-height: 1.55;
+    }
+    .footnote code {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-sm) - 1px);
+      color: var(--accent);
+    }
+
+    @media (max-width: 720px) {
+      .control-row { gap: 8px; }
+      .control-label { min-width: 0; }
+      .toggles-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .chart-wrap { height: 360px; padding: 10px; }
+    }
+  </style>
+</Base>
