@@ -2,19 +2,17 @@ name: Sync today's snapshot from ccir-v2-data
 
 on:
   schedule:
-    # Quartet of UTC cron ticks. Action is idempotent (no-op if no diff vs. main),
-    # so extra ticks are safe and give resilience against GitHub Actions schedule
-    # lag — observed 2026-04-28: both the 10:30 and 11:30 UTC ticks were skipped
-    # by GitHub, the 11:30 fired at 12:08 UTC instead. With four chances we cover
-    # both DST halves of the year and survive an hour-plus of GH cron drift.
-    # 10:30 UTC = 05:30 CDT / 04:30 CST
-    # 11:30 UTC = 06:30 CDT / 05:30 CST
-    # 12:30 UTC = 07:30 CDT / 06:30 CST
-    # 13:30 UTC = 08:30 CDT / 07:30 CST
-    - cron: '30 10 * * *'
-    - cron: '30 11 * * *'
-    - cron: '30 12 * * *'
-    - cron: '30 13 * * *'
+    # Hourly at :30 UTC. The action is idempotent (no-op if no diff vs. main),
+    # so 24 ticks/day is fine — each is ~17s of GH Actions time (free for
+    # public repos). Hourly cadence covers both:
+    #   1. The morning daily-fix publish window (was 4 ticks 10:30-13:30 UTC,
+    #      added to handle observed GH cron lag — see 2026-04-28 incident
+    #      where the 10:30/11:30 ticks were both delayed/skipped and the
+    #      first successful run was at 12:08 UTC).
+    #   2. The intraday marketplace-fast publishes at :45 CT every 3 hr.
+    #      Each cycle's snapshot reaches GitHub within ~30 min of publish,
+    #      so the next :30 site-sync tick picks it up within an hour.
+    - cron: '30 * * * *'
   workflow_dispatch:
 
 permissions:
