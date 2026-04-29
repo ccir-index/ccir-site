@@ -1,8 +1,8 @@
 {
-  "as_of_date": "2026-04-28",
-  "published_at_ct": "2026-04-28T10:19:56-05:00",
-  "published_at_utc": "2026-04-28T15:19:56+00:00",
-  "run_id": "export-20260428T151952Z-3fea63ea",
+  "as_of_date": "2026-04-29",
+  "published_at_ct": "2026-04-29T08:59:50-05:00",
+  "published_at_utc": "2026-04-29T13:59:50+00:00",
+  "run_id": "export-20260429T135945Z-30321a9a",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 26,
@@ -16,10 +16,11 @@
       "a100-sxm-40gb"
     ],
     "filter": "global panel",
-    "total_rows": 123,
+    "status": "ok",
+    "total_rows": 270,
     "window_days": 90,
-    "window_end": "2026-04-28",
-    "window_start": "2026-01-29"
+    "window_end": "2026-04-29",
+    "window_start": "2026-01-30"
   },
   "marketplace_history": {
     "chips": [
@@ -37,9 +38,10 @@
       "runpod_community",
       "runpod_cluster"
     ],
-    "total_rows": 27,
+    "status": "ok",
+    "total_rows": 54,
     "window_days": 7,
-    "window_end": "2026-04-28",
-    "window_start": "2026-04-22"
+    "window_end": "2026-04-29",
+    "window_start": "2026-04-23"
   }
 }
