@@ -146,6 +146,17 @@ const listingsMeta = (meta as any).listings_history;
       return '$' + n.toFixed(2);
     }
 
+    // Eastern Time, DST-aware. Daily snapshots are stamped at UTC midnight;
+    // formatting in ET keeps the visible date aligned with all other site
+    // cadence labels.
+    const ET_TZ = 'America/New_York';
+    const fmtTickDayET = new Intl.DateTimeFormat('en-US', {
+      timeZone: ET_TZ, month: 'short', day: 'numeric',
+    });
+    const fmtTooltipDayET = new Intl.DateTimeFormat('en-US', {
+      timeZone: ET_TZ, year: 'numeric', month: 'short', day: 'numeric',
+    });
+
     function fmtChange(latest: number, prev: number | null): string {
       if (prev === null || prev === 0) return '—';
       const d = ((latest - prev) / prev) * 100;
@@ -218,9 +229,10 @@ const listingsMeta = (meta as any).listings_history;
             tooltip: {
               displayColors: true,
               callbacks: {
-                title: (items) => items[0]?.parsed?.x
-                  ? new Date(items[0].parsed.x).toISOString().slice(0, 10)
-                  : '',
+                title: (items) => {
+                  const x = items[0]?.parsed?.x;
+                  return x ? fmtTooltipDayET.format(x) : '';
+                },
                 label: (ctx) => `${ctx.dataset.label}: $${(ctx.parsed.y as number).toFixed(2)}/h`,
               },
             },
@@ -228,8 +240,17 @@ const listingsMeta = (meta as any).listings_history;
           scales: {
             x: {
               type: 'time',
-              time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd', displayFormats: { day: 'MMM d' } },
-              ticks: { color: dimColor, maxRotation: 0, autoSkipPadding: 24 },
+              time: { unit: 'day' },
+              ticks: {
+                color: dimColor,
+                maxRotation: 0,
+                autoSkipPadding: 24,
+                callback: (value) => {
+                  const ms = typeof value === 'number' ? value : Number(value);
+                  return fmtTickDayET.format(ms);
+                },
+              },
+              title: { display: true, text: 'Date (ET)', color: dimColor },
               grid: { color: ruleColor, drawOnChartArea: false },
               border: { color: ruleColor },
             },

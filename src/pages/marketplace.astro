@@ -150,6 +150,27 @@ const mktMeta = (meta as any).marketplace_history;
       return n === null ? '—' : '$' + n.toFixed(2);
     }
 
+    // Eastern Time, DST-aware. All site cadence labels are ET; chart ticks
+    // and tooltips align here so users don't mentally convert from UTC.
+    const ET_TZ = 'America/New_York';
+    const fmtTickET = new Intl.DateTimeFormat('en-US', {
+      timeZone: ET_TZ, month: 'short', day: 'numeric',
+      hour: 'numeric', minute: '2-digit', hourCycle: 'h23',
+    });
+    const fmtTickDayET = new Intl.DateTimeFormat('en-US', {
+      timeZone: ET_TZ, month: 'short', day: 'numeric',
+    });
+    const fmtTooltipET = new Intl.DateTimeFormat('en-US', {
+      timeZone: ET_TZ, year: 'numeric', month: 'short', day: 'numeric',
+      hour: 'numeric', minute: '2-digit', hourCycle: 'h23',
+    });
+    function isMidnightET(ms: number): boolean {
+      const parts = fmtTickET.formatToParts(ms);
+      const hh = parts.find((p) => p.type === 'hour')?.value ?? '';
+      const mm = parts.find((p) => p.type === 'minute')?.value ?? '';
+      return hh === '00' && mm === '00';
+    }
+
     function renderLegend(series: Augmented[]) {
       // Collapse cheapest+median pairs into one row each per (chip, source).
       const seen = new Set<string>();
@@ -160,13 +181,37 @@ const mktMeta = (meta as any).marketplace_history;
         seen.add(key);
         return true;
       });
+      // Pin a vast.ai legend row per selected chip even when the series is
+      // empty — explicit absence beats silent omission. Triggered only when
+      // the chart already has at least one line (the all-empty case is
+      // handled by the chart-status overlay upstream).
+      type LegendEntry =
+        | { kind: 'real'; series: Augmented }
+        | { kind: 'absent'; chip: ChipId };
+      const entries: LegendEntry[] = rows.map((s) => ({ kind: 'real', series: s }));
+      for (const chip of state.chips) {
+        const hasVast = rows.some((s) => s.chip === chip && s.source_name === 'vast_ai_verified');
+        if (!hasVast) entries.push({ kind: 'absent', chip });
+      }
       const totalObs = series.reduce((acc, s) => acc + s.points.length, 0);
       const subjectLabel = state.chips.size > 1
         ? `${rows.length} chip-sub-product lines`
         : `${rows.length} sub-products`;
       legendSummary.textContent = `${subjectLabel} · ${totalObs} observations`;
       const multi = state.chips.size > 1;
-      legendTbody.innerHTML = rows.map((s) => {
+      legendTbody.innerHTML = entries.map((e) => {
+        if (e.kind === 'absent') {
+          const chipBadge = `<span class="chip-badge" style="background:${colorForChip(e.chip)}">${shortLabelForChip(e.chip)}</span>`;
+          const dot = `<span class="legend-dot absent-dot" style="background:${colorForSource('vast_ai_verified')}"></span>`;
+          return '<tr class="absent-row">' +
+            `<td class="chip-col">${chipBadge}</td>` +
+            `<td class="provider">${dot}<code>vast_ai_verified</code><span class="absent-note">no data in window</span></td>` +
+            `<td class="num posted">—</td>` +
+            `<td class="num">—</td>` +
+            `<td class="num dim">0</td>` +
+          '</tr>';
+        }
+        const s = e.series;
         const lineColor = multi ? colorForChip(s.chip) : colorForSource(s.source_name);
         const dot = `<span class="legend-dot" style="background:${lineColor}"></span>`;
         const chipBadge = `<span class="chip-badge" style="background:${colorForChip(s.chip)}">${shortLabelForChip(s.chip)}</span>`;
@@ -222,9 +267,10 @@ const mktMeta = (meta as any).marketplace_history;
             tooltip: {
               displayColors: true,
               callbacks: {
-                title: (items) => items[0]?.parsed?.x
-                  ? new Date(items[0].parsed.x).toISOString().slice(0, 16).replace('T', ' ')
-                  : '',
+                title: (items) => {
+                  const x = items[0]?.parsed?.x;
+                  return x ? `${fmtTooltipET.format(x)} ET` : '';
+                },
                 label: (ctx) => `${ctx.dataset.label}: $${(ctx.parsed.y as number).toFixed(2)}/h`,
               },
             },
@@ -232,11 +278,16 @@ const mktMeta = (meta as any).marketplace_history;
           scales: {
             x: {
               type: 'time',
-              time: {
-                tooltipFormat: 'yyyy-MM-dd HH:mm',
-                displayFormats: { hour: 'MMM d HH:mm', day: 'MMM d' },
+              ticks: {
+                color: dimColor,
+                maxRotation: 0,
+                autoSkipPadding: 32,
+                callback: (value) => {
+                  const ms = typeof value === 'number' ? value : Number(value);
+                  return isMidnightET(ms) ? fmtTickDayET.format(ms) : fmtTickET.format(ms);
+                },
               },
-              ticks: { color: dimColor, maxRotation: 0, autoSkipPadding: 32 },
+              title: { display: true, text: 'Time (ET)', color: dimColor },
               grid: { color: ruleColor, drawOnChartArea: false },
               border: { color: ruleColor },
             },
@@ -495,6 +546,17 @@ const mktMeta = (meta as any).marketplace_history;
     }
     /* Hide the chip column when only one chip is selected — keeps legend tight. */
     #legend-table.multi-off .chip-col { display: none; }
+
+    .absent-row td { color: var(--ink-dim); }
+    .absent-row .absent-dot { opacity: 0.35; }
+    .absent-row .absent-note {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
+      margin-left: 8px;
+      font-style: italic;
+    }
 
     .footnote {
       font-family: var(--font-body);
