@@ -13,7 +13,7 @@ const mktMeta = (meta as any).marketplace_history;
     <p class="standfirst lede">
       Intraday least-expensive available rates from third-party-host marketplaces.
       Vast.ai is restricted to verified hosts; RunPod is split by sub-product
-      (Secure / Community / Spot / Cluster). Distinct from <a href="/markets">/markets</a>,
+      (Secure / Community / Spot / Cluster). Distinct from <a href="/markets">Providers</a>,
       which tracks operators that run their own datacenters.
     </p>
 
@@ -73,14 +73,12 @@ const mktMeta = (meta as any).marketplace_history;
     </section>
 
     <p class="footnote">
-      Per-cycle observation feed (<code>gold.marketplace_history</code>),
-      published in <code>marketplace_&lt;chip&gt;.csv</code> under the
-      daily snapshot. Vast.ai filter: <code>verification == 'verified'</code>
-      AND <code>is_vm_deverified == False</code> AND <code>reliability ≥ 90%</code>.
-      Headline price is the MIN per-GPU rate per cycle. Vast.ai's
-      <em>median</em> series shows where the typical verified listing sits
-      relative to the floor. History begins on the first day this product
-      shipped — there is no backfill.
+      Refreshed roughly every three hours. The plotted price is the
+      lowest per-GPU rate available in each cycle. Vast.ai is restricted
+      to verified hosts at 90% reliability or better; its dashed line
+      shows where the typical verified listing sits relative to that
+      floor. History begins on the day this product launched —
+      earlier periods are not backfilled.
     </p>
   </section>
 
@@ -200,12 +198,16 @@ const mktMeta = (meta as any).marketplace_history;
       legendSummary.textContent = `${subjectLabel} · ${totalObs} observations`;
       const multi = state.chips.size > 1;
       legendTbody.innerHTML = entries.map((e) => {
+        // Only emit the chip cell when comparing chips. Hiding via CSS broke
+        // because Astro scoped styles don't reach innerHTML-inserted nodes
+        // consistently — JS conditional render keeps header + body aligned.
         if (e.kind === 'absent') {
           const chipBadge = `<span class="chip-badge" style="background:${colorForChip(e.chip)}">${shortLabelForChip(e.chip)}</span>`;
-          const dot = `<span class="legend-dot absent-dot" style="background:${colorForSource('vast_ai_verified')}"></span>`;
-          return '<tr class="absent-row">' +
-            `<td class="chip-col">${chipBadge}</td>` +
-            `<td class="provider">${dot}<code>vast_ai_verified</code><span class="absent-note">no data in window</span></td>` +
+          const dot = `<span class="legend-dot" style="background:${colorForSource('vast_ai_verified')};opacity:0.35"></span>`;
+          const chipCell = multi ? `<td>${chipBadge}</td>` : '';
+          return `<tr style="color:var(--ink-dim)">` +
+            chipCell +
+            `<td class="provider">${dot}<code>vast_ai_verified</code><span style="font-family:var(--font-mono);font-size:calc(var(--fs-xs) - 1px);color:var(--ink-dim);letter-spacing:0.04em;margin-left:8px;font-style:italic;">no data in window</span></td>` +
             `<td class="num posted">—</td>` +
             `<td class="num">—</td>` +
             `<td class="num dim">0</td>` +
@@ -216,8 +218,9 @@ const mktMeta = (meta as any).marketplace_history;
         const dot = `<span class="legend-dot" style="background:${lineColor}"></span>`;
         const chipBadge = `<span class="chip-badge" style="background:${colorForChip(s.chip)}">${shortLabelForChip(s.chip)}</span>`;
         const nCell = s.latest_n !== null ? `${s.latest_n}` : '<span class="dim">—</span>';
+        const chipCell = multi ? `<td>${chipBadge}</td>` : '';
         return '<tr>' +
-          `<td class="chip-col">${chipBadge}</td>` +
+          chipCell +
           `<td class="provider">${dot}<code>${s.source_display_name}</code></td>` +
           `<td class="num posted">${fmtPrice(s.latest_price)}</td>` +
           `<td class="num">${nCell}</td>` +
@@ -544,19 +547,9 @@ const mktMeta = (meta as any).marketplace_history;
       letter-spacing: 0.05em;
       text-transform: uppercase;
     }
-    /* Hide the chip column when only one chip is selected — keeps legend tight. */
+    /* Hide the chip header when only one chip is selected. Body cell is
+       conditionally rendered in JS, so this only needs to hit the <th>. */
     #legend-table.multi-off .chip-col { display: none; }
-
-    .absent-row td { color: var(--ink-dim); }
-    .absent-row .absent-dot { opacity: 0.35; }
-    .absent-row .absent-note {
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-dim);
-      letter-spacing: 0.04em;
-      margin-left: 8px;
-      font-style: italic;
-    }
 
     .footnote {
       font-family: var(--font-body);

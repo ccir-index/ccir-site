@@ -6,10 +6,10 @@ import { PREMIUM_CHIPS } from '../data/listings_history';
 const DEFAULT_CHIP = 'h100-sxm-80gb';
 const listingsMeta = (meta as any).listings_history;
 ---
-<Base title="Markets · CCIR">
+<Base title="Providers · CCIR">
   <section class="wrap top">
     <div class="kicker">Provider rack rates · {listingsMeta?.window_days ?? 90}-day window</div>
-    <h1>Markets</h1>
+    <h1>Providers</h1>
     <p class="standfirst lede">
       Each operator's posted rack rate for the chosen chip, plotted over
       time. Solid lines are guaranteed (non-interruptible) availability;
@@ -76,10 +76,8 @@ const listingsMeta = (meta as any).listings_history;
     </section>
 
     <p class="footnote">
-      Per-provider observation feed (<code>gold.listings_history</code>),
-      published in <code>listings_history_&lt;chip&gt;.csv</code> under the
-      daily snapshot. History begins on the first day this product
-      shipped — there is no backfill.
+      Refreshed once daily at the morning publish. History begins on the
+      day this product launched — earlier periods are not backfilled.
     </p>
   </section>
 
@@ -179,8 +177,12 @@ const listingsMeta = (meta as any).listings_history;
         const bundle = s.bundled_any
           ? '<span class="bundle-badge">BUNDLED</span>'
           : '<span class="dim">—</span>';
+        // Only emit the chip cell when comparing chips. JS conditional render
+        // keeps header + body column counts in sync; CSS-based hiding doesn't
+        // reach innerHTML-inserted nodes reliably under Astro scoping.
+        const chipCell = multi ? `<td>${chipBadge}</td>` : '';
         return '<tr>' +
-          `<td class="chip-col">${chipBadge}</td>` +
+          chipCell +
           `<td class="provider">${dot}<code>${s.source_name}</code></td>` +
           `<td>${intBadge}</td>` +
           `<td class="num posted">${fmtPrice(s.latest_price)}</td>` +
