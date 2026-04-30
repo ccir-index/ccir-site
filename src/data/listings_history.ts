@@ -159,7 +159,7 @@ export function buildSeries(rows: ListingRow[]): ProviderSeries[] {
     const m = meta.get(key)!;
     const dates = [...dateMap.keys()].sort();
     const points = dates.map((d) => ({
-      x: Date.parse(d + 'T00:00:00Z'),
+      x: Date.parse(d + 'T12:00:00Z'),
       y: median(dateMap.get(d)!),
     }));
     if (points.length === 0) continue;
