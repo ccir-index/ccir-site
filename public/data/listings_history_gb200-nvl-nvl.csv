@@ -14,3 +14,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-04-30,azure,gb200-nvl-nvl,GB200,NVL,NVL-Rack,IB-NDR,3Y,NonInterruptible,Reserved,US-East,US,HIF,T1IF,5.9488,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
 2026-04-30,coreweave,gb200-nvl-nvl,GB200,NVL,NVL-Rack,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-East,US,IIF,T1IF,10.5000,True,local-nvme;free-egress;support-tier;observability;managed-ops-plane,Available,v2.0.0
 2026-04-30,oci,gb200-nvl-nvl,GB200,NVL,NVL-Rack,RoCE-v2,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T2IF,16.0000,True,local-nvme;egress-capped;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-05-01,azure,gb200-nvl-nvl,GB200,NVL,NVL-Rack,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T1IF,13.5200,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-05-01,azure,gb200-nvl-nvl,GB200,NVL,NVL-Rack,IB-NDR,1Y,NonInterruptible,Reserved,US-East,US,HIF,T1IF,8.6528,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-05-01,azure,gb200-nvl-nvl,GB200,NVL,NVL-Rack,IB-NDR,3Y,NonInterruptible,Reserved,US-East,US,HIF,T1IF,5.9488,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.0.0
+2026-05-01,coreweave,gb200-nvl-nvl,GB200,NVL,NVL-Rack,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-East,US,IIF,T1IF,10.5000,True,local-nvme;free-egress;support-tier;observability;managed-ops-plane,Available,v2.0.0
+2026-05-01,oci,gb200-nvl-nvl,GB200,NVL,NVL-Rack,RoCE-v2,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T2IF,16.0000,True,local-nvme;egress-capped;managed-ops-plane;support-tier;observability,Available,v2.0.0
