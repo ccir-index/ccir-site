@@ -83,6 +83,29 @@ jobs:
               : > ".sync/$fname"
             fi
           done
+          # Per-chip Vast CSVs power /vast — three files per chip (current-cycle
+          # offers, 30d distribution-history, current-cycle geographic) plus one
+          # cross-chip summary. Chip slugs derived from Vast gpu_name (spaces
+          # → hyphens, lowercased): see ccir-v2-notebooks/export/export_vast.py.
+          for chip in h100-sxm h200 b200 a100-sxm4 a100-pcie gb200 \
+                      rtx-4090 rtx-5090 rtx-3090 l40 l40s rtx-6000ada rtx-a6000; do
+            for prefix in vast_offers vast_distribution_history vast_geographic; do
+              fname="${prefix}_${chip}.csv"
+              if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+                echo "fetched $fname"
+              else
+                echo "no $fname at $DATE — /vast will show empty for this chip section"
+                : > ".sync/$fname"
+              fi
+            done
+          done
+          # Cross-chip summary file
+          if curl -fsSL -o ".sync/vast_summary.csv" "$BASE/vast_summary.csv"; then
+            echo "fetched vast_summary.csv"
+          else
+            echo "no vast_summary.csv at $DATE — /vast hero will fall back"
+            : > ".sync/vast_summary.csv"
+          fi
           echo "have_snapshot=true" >> "$GITHUB_OUTPUT"
 
       - name: Verify hashes against manifest
@@ -135,6 +158,23 @@ jobs:
               fi
             done
           done
+          # Stage Vast CSVs (per-chip × 3 prefixes + summary).
+          for chip in h100-sxm h200 b200 a100-sxm4 a100-pcie gb200 \
+                      rtx-4090 rtx-5090 rtx-3090 l40 l40s rtx-6000ada rtx-a6000; do
+            for prefix in vast_offers vast_distribution_history vast_geographic; do
+              fname="${prefix}_${chip}.csv"
+              if [ -s ".sync/$fname" ]; then
+                cp ".sync/$fname" "public/data/$fname"
+                echo "staged public/data/$fname"
+              else
+                echo "no $fname in this snapshot; leaving public/data unchanged"
+              fi
+            done
+          done
+          if [ -s ".sync/vast_summary.csv" ]; then
+            cp ".sync/vast_summary.csv" "public/data/vast_summary.csv"
+            echo "staged public/data/vast_summary.csv"
+          fi
           python3 - <<'PY'
           import json
           m = json.load(open('.sync/manifest.json'))
@@ -149,6 +189,7 @@ jobs:
               'contributing_today': m['panel']['contributing_today'],
               'listings_history': m.get('listings_history'),
               'marketplace_history': m.get('marketplace_history'),
+              'vast': m.get('vast'),
           }
           with open('src/data/meta.json', 'w') as f:
               json.dump(meta, f, indent=2)

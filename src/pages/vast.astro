@@ -1,0 +1,916 @@
+---
+import Base from '../layouts/Base.astro';
+import { meta } from '../data/snapshot';
+import { VAST_HEADLINE_CHIPS, VAST_LONGTAIL_CHIPS } from '../data/vast';
+
+const DEFAULT_CHIP = 'h100-sxm';
+const vastMeta = (meta as any).vast;
+---
+<Base title="Vast.ai Observatory · CCIR">
+  <section class="wrap top">
+    <div class="kicker">
+      Marketplace observatory · {vastMeta?.window_days ?? 30}-day window ·
+      {vastMeta?.n_chips ?? 13} chips · {vastMeta?.n_offers_latest_cycle ?? 0} offers tracked this cycle
+    </div>
+    <h1>Vast.ai Observatory</h1>
+    <p class="standfirst lede">
+      Vast.ai is the only deep-book live GPU marketplace in the panel —
+      hundreds to thousands of distinct offers per chip, refreshed in real
+      time. This page surfaces what the median alone hides: distribution
+      shape, quality bands, $/perf frontier, supply structure, geography,
+      hidden costs, network quality, long-tail catalog, and the time-series
+      of the spread itself. <strong>Observatory data — not part of the CCIR
+      rate methodology.</strong> Vast is the reference marketplace, not a tier.
+    </p>
+
+    <div class="controls">
+      <div class="control-row chip-row">
+        <span class="control-label">Chip</span>
+        <div class="pill-group" id="chip-pills" role="group" aria-label="Select chip">
+          <span class="chip-group-label">Headline</span>
+          {VAST_HEADLINE_CHIPS.map((c) => (
+            <button type="button" class="pill" data-chip={c.slug} data-default={c.slug === DEFAULT_CHIP}>
+              {c.short}
+            </button>
+          ))}
+          <span class="chip-group-label">Long-tail</span>
+          {VAST_LONGTAIL_CHIPS.map((c) => (
+            <button type="button" class="pill" data-chip={c.slug}>
+              {c.short}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Hero distribution histogram -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">§1</span>
+        <h2>Distribution shape — per-GPU $/hr histogram</h2>
+        <span class="sec-note" id="hist-summary">—</span>
+      </header>
+      <div class="chart-wrap" style="height:340px;">
+        <div class="chart-status" id="hist-status">Loading…</div>
+        <canvas id="histChart"></canvas>
+      </div>
+      <p class="footnote">
+        Every live offer on Vast for the selected chip, binned by per-whole-GPU
+        $/hr (log scale on x). The vertical orange line marks the median; the
+        dashed grey marks the median interruptible-bid floor. Where the
+        histogram has a long upper tail, that's the trust premium — buyers
+        pay 5-50× the floor for verified datacenter offers vs deverified
+        hosts. <code>per_gpu_dph = dph_total / num_gpus / gpu_frac</code>.
+      </p>
+    </section>
+
+    <!-- Section 2: Quality bands -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">§2</span>
+        <h2>Quality bands — verified vs deverified</h2>
+        <span class="sec-note" id="quality-summary">—</span>
+      </header>
+      <div class="chart-wrap" style="height:280px;">
+        <div class="chart-status" id="quality-status">Loading…</div>
+        <canvas id="qualityChart"></canvas>
+      </div>
+      <p class="footnote">
+        Median per-GPU $/hr for offers tagged <code>verified</code> (audited
+        datacenter hosts) vs <code>deverified</code> (hosted, unverified).
+        The premium varies sharply by chip — RTX 4090 verified is ~2× deverified
+        but H100 SXM verified can be <em>cheaper</em> than deverified.
+      </p>
+    </section>
+
+    <!-- Section 3: $/perf frontier -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">§3</span>
+        <h2>$/perf frontier — top 20 by dlperf per $/hr</h2>
+        <span class="sec-note" id="frontier-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="frontierTable">
+          <thead>
+            <tr>
+              <th class="num">$/hr</th>
+              <th class="num">DLPerf</th>
+              <th class="num">DLPerf/$/h</th>
+              <th class="num">GPUs</th>
+              <th>Verified</th>
+              <th>Country</th>
+              <th class="num">Reliability</th>
+            </tr>
+          </thead>
+          <tbody id="frontierTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 4: Multi-GPU supply -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">§4</span>
+        <h2>Multi-GPU supply structure</h2>
+        <span class="sec-note" id="multi-summary">—</span>
+      </header>
+      <div class="chart-wrap" style="height:240px;">
+        <div class="chart-status" id="multi-status">Loading…</div>
+        <canvas id="multiChart"></canvas>
+      </div>
+      <p class="footnote">
+        Count of live offers by GPU count (1×, 2×, 4×, 8×, other) for the
+        selected chip. Reveals whether the chip has scale-up supply or only
+        single-GPU rentals — material for buyers planning multi-node training.
+      </p>
+    </section>
+
+    <!-- Section 5: Geography -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">§5</span>
+        <h2>Geographic distribution</h2>
+        <span class="sec-note" id="geo-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="geoTable">
+          <thead>
+            <tr>
+              <th>Country / Region</th>
+              <th class="num">Offers</th>
+              <th class="num">Median $/hr</th>
+            </tr>
+          </thead>
+          <tbody id="geoTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 6: Hidden costs -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">§6</span>
+        <h2>Hidden costs — egress + storage</h2>
+        <span class="sec-note">Per-offer distribution</span>
+      </header>
+      <div class="grid-2">
+        <div class="chart-wrap" style="height:220px;">
+          <div class="chart-status" id="egress-status">Loading…</div>
+          <canvas id="egressChart"></canvas>
+        </div>
+        <div class="chart-wrap" style="height:220px;">
+          <div class="chart-status" id="storage-status">Loading…</div>
+          <canvas id="storageChart"></canvas>
+        </div>
+      </div>
+      <p class="footnote">
+        Egress cost ($/TB) and storage cost ($/GB-mo) distributions across
+        live offers. Egress ranges $0–$50/TB on Vast — most marketplaces
+        never surface this number per offer.
+      </p>
+    </section>
+
+    <!-- Section 7: Network -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">§7</span>
+        <h2>Network — internet-down distribution</h2>
+        <span class="sec-note" id="net-summary">—</span>
+      </header>
+      <div class="chart-wrap" style="height:240px;">
+        <div class="chart-status" id="net-status">Loading…</div>
+        <canvas id="netChart"></canvas>
+      </div>
+      <p class="footnote">
+        Bandwidth distribution is bimodal: consumer-hosted GPUs at gigabit-class,
+        proper datacenter offers at multi-Gbps. Same chip, very different
+        connectivity — matters for training jobs that pull from cloud storage.
+      </p>
+    </section>
+
+    <!-- Section 8: Long-tail catalog -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">§8</span>
+        <h2>Long-tail catalog — every chip Vast carries</h2>
+        <span class="sec-note" id="tail-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="summaryTable">
+          <thead>
+            <tr>
+              <th>Chip</th>
+              <th class="num">Offers</th>
+              <th class="num">Verified</th>
+              <th class="num">Min</th>
+              <th class="num">Median</th>
+              <th class="num">Max</th>
+              <th class="num">Spread×</th>
+            </tr>
+          </thead>
+          <tbody id="summaryTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 9: Spread evolution time-series -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">§9</span>
+        <h2>Spread evolution — distribution shape over 30 days</h2>
+        <span class="sec-note" id="spread-summary">—</span>
+      </header>
+      <div class="chart-wrap" style="height:340px;">
+        <div class="chart-status" id="spread-status">Loading…</div>
+        <canvas id="spreadChart"></canvas>
+      </div>
+      <p class="footnote">
+        Five lines show how the per-GPU $/hr distribution shifts over time:
+        p10 (cheapest 10%), p25, p50 (median), p75, p90 (most expensive 10%).
+        When spread widens, supply is fragmenting; when it narrows, the market
+        is converging. <strong>This is the unique CCIR view</strong> — no other
+        public source publishes the spread of a marketplace over time.
+      </p>
+    </section>
+
+    <p class="footnote-last">
+      Refreshed every three hours alongside <a href="/marketplace">/marketplace</a>.
+      Vast bundles API authenticated via CCIR research key — values are public list-asks
+      as Vast publishes them. Distribution shape captured at the cycle Vast served the
+      query; offers churn faster than this cadence so the histogram is a snapshot, not
+      a long-window aggregate.
+    </p>
+  </section>
+
+  <script>
+    import Chart from 'chart.js/auto';
+    import 'chartjs-adapter-date-fns';
+    import {
+      fetchVastOffers, fetchVastDistribution, fetchVastGeo, fetchVastSummary,
+      logBins, colorForVastChip, shortLabelForVastChip, chipBySlug,
+      VERIFIED_COLOR, DEVERIFIED_COLOR, OTHER_VERIFICATION_COLOR,
+      type VastChipSlug, type VastOfferRow, type VastDistributionRow,
+      type VastGeoRow, type VastSummaryRow,
+    } from '../data/vast';
+
+    const DEFAULT_CHIP: VastChipSlug = 'h100-sxm';
+
+    const state = {
+      chip: DEFAULT_CHIP as VastChipSlug,
+      offers: [] as VastOfferRow[],
+      distribution: [] as VastDistributionRow[],
+      geo: [] as VastGeoRow[],
+      summary: [] as VastSummaryRow[],
+    };
+
+    const charts: Record<string, Chart | null> = {
+      hist: null, quality: null, multi: null,
+      egress: null, storage: null, net: null, spread: null,
+    };
+
+    function setStatus(id: string, msg: string | null) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (msg === null) { (el as HTMLElement).style.display = 'none'; el.textContent = ''; }
+      else { (el as HTMLElement).style.display = 'flex'; el.textContent = msg; }
+    }
+
+    function fmtUsd(n: number | null, decimals = 2): string {
+      if (n === null || !Number.isFinite(n)) return '—';
+      return '$' + n.toFixed(decimals);
+    }
+    function fmtNum(n: number | null, decimals = 0): string {
+      if (n === null || !Number.isFinite(n)) return '—';
+      return n.toFixed(decimals);
+    }
+
+    function syncPills() {
+      document.querySelectorAll<HTMLButtonElement>('#chip-pills .pill').forEach((p) => {
+        p.classList.toggle('on', p.dataset.chip === state.chip);
+      });
+    }
+
+    // ---- Section renderers --------------------------------------------------
+
+    function renderHistogram() {
+      const offers = state.offers;
+      const values = offers
+        .map((o) => o.per_gpu_dph)
+        .filter((v): v is number => v !== null && Number.isFinite(v) && v > 0);
+      if (values.length === 0) {
+        setStatus('hist-status', `No offers for ${shortLabelForVastChip(state.chip)} in this cycle.`);
+        if (charts.hist) { charts.hist.destroy(); charts.hist = null; }
+        document.getElementById('hist-summary')!.textContent = '0 offers';
+        return;
+      }
+      setStatus('hist-status', null);
+
+      const bins = logBins(values, 25);
+      const median = quantile(values, 0.5);
+      const minBidVals = offers
+        .map((o) => o.min_bid && o.num_gpus ? o.min_bid / o.num_gpus / Math.max(o.gpu_frac ?? 1, 0.01) : null)
+        .filter((v): v is number => v !== null && Number.isFinite(v) && v > 0);
+      const minBidMedian = minBidVals.length ? quantile(minBidVals, 0.5) : null;
+
+      document.getElementById('hist-summary')!.textContent =
+        `${values.length} offers · median ${fmtUsd(median)} · range ${fmtUsd(Math.min(...values))} – ${fmtUsd(Math.max(...values))}`;
+
+      const labels = bins.map((b) => `$${b.lo.toFixed(2)}`);
+      const counts = bins.map((b) => b.count);
+
+      if (charts.hist) charts.hist.destroy();
+      charts.hist = new Chart(document.getElementById('histChart') as HTMLCanvasElement, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'offers',
+            data: counts,
+            backgroundColor: colorForVastChip(state.chip),
+            borderColor: colorForVastChip(state.chip),
+            borderWidth: 0,
+            barPercentage: 1.0,
+            categoryPercentage: 1.0,
+          }],
+        },
+        options: chartBaseOptions({
+          xTitle: 'Per-GPU $/hr (log-binned)',
+          yTitle: 'Offer count',
+          tooltipLabel: (ctx) => {
+            const idx = ctx.dataIndex;
+            const b = bins[idx];
+            return `$${b.lo.toFixed(2)}–$${b.hi.toFixed(2)}: ${ctx.parsed.y} offers`;
+          },
+          annotations: {
+            median: { value: median, color: '#d68a2a', label: `median ${fmtUsd(median)}` },
+            minBid: minBidMedian
+              ? { value: minBidMedian, color: '#5b5852', label: `bid floor ${fmtUsd(minBidMedian)}`, dash: true }
+              : null,
+            xLabels: labels,
+          },
+        }),
+      });
+    }
+
+    function renderQuality() {
+      const offers = state.offers.filter((o) => o.per_gpu_dph !== null);
+      if (offers.length === 0) {
+        setStatus('quality-status', 'No offers.');
+        if (charts.quality) { charts.quality.destroy(); charts.quality = null; }
+        document.getElementById('quality-summary')!.textContent = '—';
+        return;
+      }
+      setStatus('quality-status', null);
+      const groups = { verified: [] as number[], deverified: [] as number[], other: [] as number[] };
+      for (const o of offers) {
+        const v = o.verification;
+        const p = o.per_gpu_dph!;
+        if (v === 'verified') groups.verified.push(p);
+        else if (v === 'deverified') groups.deverified.push(p);
+        else groups.other.push(p);
+      }
+      const labels = ['Verified', 'Deverified', 'Other'];
+      const medians = [
+        groups.verified.length ? quantile(groups.verified, 0.5) : null,
+        groups.deverified.length ? quantile(groups.deverified, 0.5) : null,
+        groups.other.length ? quantile(groups.other, 0.5) : null,
+      ];
+      const counts = [groups.verified.length, groups.deverified.length, groups.other.length];
+      const colors = [VERIFIED_COLOR, DEVERIFIED_COLOR, OTHER_VERIFICATION_COLOR];
+
+      const summary = `verified n=${counts[0]} med ${fmtUsd(medians[0])} · deverified n=${counts[1]} med ${fmtUsd(medians[1])}`;
+      document.getElementById('quality-summary')!.textContent = summary;
+
+      if (charts.quality) charts.quality.destroy();
+      charts.quality = new Chart(document.getElementById('qualityChart') as HTMLCanvasElement, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'median $/hr',
+            data: medians.map((m) => m ?? 0),
+            backgroundColor: colors,
+            borderWidth: 0,
+          }],
+        },
+        options: chartBaseOptions({
+          xTitle: 'Verification band',
+          yTitle: 'Median per-GPU $/hr',
+          tooltipLabel: (ctx) => `${labels[ctx.dataIndex]}: ${fmtUsd(medians[ctx.dataIndex])} (n=${counts[ctx.dataIndex]})`,
+        }),
+      });
+    }
+
+    function renderFrontier() {
+      const tbody = document.getElementById('frontierTbody')!;
+      const top = state.offers
+        .filter((o) => o.dlperf_per_dphtotal !== null && o.per_gpu_dph !== null)
+        .sort((a, b) => (b.dlperf_per_dphtotal ?? 0) - (a.dlperf_per_dphtotal ?? 0))
+        .slice(0, 20);
+      document.getElementById('frontier-summary')!.textContent =
+        top.length ? `top ${top.length} of ${state.offers.length} offers` : '—';
+      tbody.innerHTML = top.map((o) => {
+        const verified = o.verification === 'verified'
+          ? '<span class="tag verified">verified</span>'
+          : (o.verification === 'deverified' ? '<span class="tag deverified">deverified</span>' : '—');
+        return `<tr>
+          <td class="num">${fmtUsd(o.per_gpu_dph)}</td>
+          <td class="num">${fmtNum(o.dlperf, 0)}</td>
+          <td class="num">${fmtNum(o.dlperf_per_dphtotal, 1)}</td>
+          <td class="num">${o.num_gpus}</td>
+          <td>${verified}</td>
+          <td>${o.geolocation ?? '—'}</td>
+          <td class="num">${o.reliability !== null ? o.reliability.toFixed(3) : '—'}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="7" class="dim">No offers with dlperf data.</td></tr>';
+    }
+
+    function renderMultiGPU() {
+      const counts = { 1: 0, 2: 0, 4: 0, 8: 0, other: 0 };
+      for (const o of state.offers) {
+        if (o.num_gpus === 1) counts[1]++;
+        else if (o.num_gpus === 2) counts[2]++;
+        else if (o.num_gpus === 4) counts[4]++;
+        else if (o.num_gpus === 8) counts[8]++;
+        else counts.other++;
+      }
+      const total = counts[1] + counts[2] + counts[4] + counts[8] + counts.other;
+      document.getElementById('multi-summary')!.textContent =
+        total ? `${total} offers · 1×: ${counts[1]} · 8×: ${counts[8]}` : '—';
+      if (total === 0) {
+        setStatus('multi-status', 'No offers.');
+        if (charts.multi) { charts.multi.destroy(); charts.multi = null; }
+        return;
+      }
+      setStatus('multi-status', null);
+
+      const labels = ['1×', '2×', '4×', '8×', 'other'];
+      const data = [counts[1], counts[2], counts[4], counts[8], counts.other];
+      const color = colorForVastChip(state.chip);
+
+      if (charts.multi) charts.multi.destroy();
+      charts.multi = new Chart(document.getElementById('multiChart') as HTMLCanvasElement, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'offers', data, backgroundColor: color, borderWidth: 0 }] },
+        options: chartBaseOptions({ xTitle: 'GPUs per offer', yTitle: 'Offer count' }),
+      });
+    }
+
+    function renderGeo() {
+      const tbody = document.getElementById('geoTbody')!;
+      const rows = state.geo.slice(0, 20);
+      document.getElementById('geo-summary')!.textContent =
+        state.geo.length ? `${state.geo.length} regions · top ${rows.length}` : '—';
+      tbody.innerHTML = rows.map((g) => `<tr>
+        <td>${g.geolocation || '(unknown)'}</td>
+        <td class="num">${g.n_offers}</td>
+        <td class="num">${fmtUsd(g.median_per_gpu_dph)}</td>
+      </tr>`).join('') || '<tr><td colspan="3" class="dim">No geographic data.</td></tr>';
+    }
+
+    function renderHiddenCosts() {
+      // Egress
+      const egressVals = state.offers
+        .map((o) => o.internet_down_cost_per_tb)
+        .filter((v): v is number => v !== null && Number.isFinite(v) && v >= 0);
+      if (egressVals.length === 0) {
+        setStatus('egress-status', 'No egress data.');
+        if (charts.egress) { charts.egress.destroy(); charts.egress = null; }
+      } else {
+        setStatus('egress-status', null);
+        const eBins = simpleBins(egressVals, 15);
+        if (charts.egress) charts.egress.destroy();
+        charts.egress = new Chart(document.getElementById('egressChart') as HTMLCanvasElement, {
+          type: 'bar',
+          data: {
+            labels: eBins.map((b) => `$${b.lo.toFixed(0)}`),
+            datasets: [{ label: 'egress $/TB', data: eBins.map((b) => b.count),
+              backgroundColor: '#a84040', borderWidth: 0 }],
+          },
+          options: chartBaseOptions({ xTitle: 'Egress $/TB', yTitle: 'Offers' }),
+        });
+      }
+
+      // Storage
+      const storVals = state.offers
+        .map((o) => o.storage_cost_per_gb_mo)
+        .filter((v): v is number => v !== null && Number.isFinite(v) && v >= 0);
+      if (storVals.length === 0) {
+        setStatus('storage-status', 'No storage data.');
+        if (charts.storage) { charts.storage.destroy(); charts.storage = null; }
+      } else {
+        setStatus('storage-status', null);
+        const sBins = simpleBins(storVals, 15);
+        if (charts.storage) charts.storage.destroy();
+        charts.storage = new Chart(document.getElementById('storageChart') as HTMLCanvasElement, {
+          type: 'bar',
+          data: {
+            labels: sBins.map((b) => `$${b.lo.toFixed(2)}`),
+            datasets: [{ label: 'storage $/GB-mo', data: sBins.map((b) => b.count),
+              backgroundColor: '#2d6a94', borderWidth: 0 }],
+          },
+          options: chartBaseOptions({ xTitle: 'Storage $/GB-mo', yTitle: 'Offers' }),
+        });
+      }
+    }
+
+    function renderNetwork() {
+      const vals = state.offers
+        .map((o) => o.inet_down_mbps)
+        .filter((v): v is number => v !== null && Number.isFinite(v) && v > 0);
+      if (vals.length === 0) {
+        setStatus('net-status', 'No bandwidth data.');
+        if (charts.net) { charts.net.destroy(); charts.net = null; }
+        document.getElementById('net-summary')!.textContent = '—';
+        return;
+      }
+      setStatus('net-status', null);
+      const med = quantile(vals, 0.5);
+      const p75 = quantile(vals, 0.75);
+      document.getElementById('net-summary')!.textContent =
+        `n=${vals.length} · median ${med.toFixed(0)} Mbps · p75 ${p75.toFixed(0)} Mbps`;
+      const bins = logBins(vals, 20);
+      if (charts.net) charts.net.destroy();
+      charts.net = new Chart(document.getElementById('netChart') as HTMLCanvasElement, {
+        type: 'bar',
+        data: {
+          labels: bins.map((b) => `${b.lo.toFixed(0)}`),
+          datasets: [{ label: 'offers', data: bins.map((b) => b.count),
+            backgroundColor: colorForVastChip(state.chip), borderWidth: 0 }],
+        },
+        options: chartBaseOptions({ xTitle: 'inet_down (Mbps, log-binned)', yTitle: 'Offers' }),
+      });
+    }
+
+    function renderSummary() {
+      const tbody = document.getElementById('summaryTbody')!;
+      const rows = state.summary;
+      document.getElementById('tail-summary')!.textContent =
+        rows.length ? `${rows.length} chips observed` : '—';
+      tbody.innerHTML = rows.map((s) => `<tr>
+        <td>${s.gpu_name}</td>
+        <td class="num">${s.n_offers}</td>
+        <td class="num">${s.n_verified}</td>
+        <td class="num">${fmtUsd(s.per_gpu_dph_min)}</td>
+        <td class="num">${fmtUsd(s.per_gpu_dph_median)}</td>
+        <td class="num">${fmtUsd(s.per_gpu_dph_max)}</td>
+        <td class="num">${s.spread_ratio !== null ? s.spread_ratio.toFixed(1) + '×' : '—'}</td>
+      </tr>`).join('') || '<tr><td colspan="7" class="dim">No summary yet.</td></tr>';
+    }
+
+    function renderSpread() {
+      const dist = state.distribution;
+      if (dist.length === 0) {
+        setStatus('spread-status',
+          `No distribution history yet for ${shortLabelForVastChip(state.chip)} — accrues on each pipeline cycle.`);
+        if (charts.spread) { charts.spread.destroy(); charts.spread = null; }
+        document.getElementById('spread-summary')!.textContent = '—';
+        return;
+      }
+      setStatus('spread-status', null);
+      document.getElementById('spread-summary')!.textContent =
+        `${dist.length} cycles · ${dist[0].collected_at.slice(0, 10)} → ${dist[dist.length - 1].collected_at.slice(0, 10)}`;
+
+      const series = ['p10', 'p25', 'p50', 'p75', 'p90'].map((p) => ({
+        label: p,
+        data: dist.map((r) => ({
+          x: r.collected_ms,
+          y: (r as any)[`per_gpu_dph_${p}`] as number | null,
+        })),
+      }));
+      const colors = ['#bbd6e8', '#7fb1d3', '#1f77b4', '#aa3333', '#d68a2a'];
+
+      if (charts.spread) charts.spread.destroy();
+      charts.spread = new Chart(document.getElementById('spreadChart') as HTMLCanvasElement, {
+        type: 'line',
+        data: {
+          datasets: series.map((s, i) => ({
+            label: s.label,
+            data: s.data,
+            borderColor: colors[i],
+            backgroundColor: colors[i],
+            borderWidth: s.label === 'p50' ? 2.2 : 1.2,
+            pointRadius: 0,
+            pointHoverRadius: 3,
+            tension: 0,
+            spanGaps: true,
+          })),
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { boxWidth: 12 } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label}: ${fmtUsd(ctx.parsed.y as number)}`,
+              },
+            },
+          },
+          scales: {
+            x: { type: 'time', title: { display: true, text: 'Date' } },
+            y: { type: 'linear', title: { display: true, text: 'Per-GPU $/hr' } },
+          },
+        },
+      });
+    }
+
+    // ---- Helpers -----------------------------------------------------------
+
+    function quantile(values: number[], q: number): number {
+      const sorted = [...values].sort((a, b) => a - b);
+      const idx = q * (sorted.length - 1);
+      const lo = Math.floor(idx);
+      const hi = Math.ceil(idx);
+      if (lo === hi) return sorted[lo];
+      return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+    }
+
+    function simpleBins(values: number[], n: number) {
+      if (values.length === 0) return [];
+      const lo = Math.min(...values);
+      const hi = Math.max(...values);
+      if (lo === hi) return [{ lo, hi, count: values.length }];
+      const step = (hi - lo) / n;
+      const bins = Array.from({ length: n }, (_, i) => ({
+        lo: lo + i * step, hi: lo + (i + 1) * step, count: 0,
+      }));
+      for (const v of values) {
+        let idx = Math.floor((v - lo) / step);
+        if (idx < 0) idx = 0;
+        if (idx >= n) idx = n - 1;
+        bins[idx].count++;
+      }
+      return bins;
+    }
+
+    function chartBaseOptions(opts: {
+      xTitle: string;
+      yTitle: string;
+      tooltipLabel?: (ctx: any) => string;
+      annotations?: any;
+    }) {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'nearest' as const, axis: 'x' as const, intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: opts.tooltipLabel
+              ? { label: opts.tooltipLabel }
+              : undefined,
+          },
+        },
+        scales: {
+          x: { title: { display: true, text: opts.xTitle }, ticks: { maxRotation: 45, autoSkipPadding: 16 } },
+          y: { title: { display: true, text: opts.yTitle }, beginAtZero: true },
+        },
+      };
+    }
+
+    // ---- Refresh + boot ----------------------------------------------------
+
+    async function refreshChip() {
+      // Show loading on every section.
+      ['hist-status', 'quality-status', 'multi-status',
+       'egress-status', 'storage-status', 'net-status', 'spread-status'].forEach((id) =>
+        setStatus(id, 'Loading…')
+      );
+      const [offers, dist, geo] = await Promise.all([
+        fetchVastOffers(state.chip),
+        fetchVastDistribution(state.chip),
+        fetchVastGeo(state.chip),
+      ]);
+      state.offers = offers;
+      state.distribution = dist;
+      state.geo = geo;
+      renderHistogram();
+      renderQuality();
+      renderFrontier();
+      renderMultiGPU();
+      renderGeo();
+      renderHiddenCosts();
+      renderNetwork();
+      renderSpread();
+    }
+
+    document.getElementById('chip-pills')!.addEventListener('click', (ev) => {
+      const t = ev.target as HTMLElement;
+      const pill = t.closest<HTMLButtonElement>('.pill');
+      if (!pill || !pill.dataset.chip) return;
+      state.chip = pill.dataset.chip as VastChipSlug;
+      syncPills();
+      refreshChip();
+    });
+
+    // Boot — load summary once, then chip-specific data.
+    (async function boot() {
+      const summary = await fetchVastSummary();
+      state.summary = summary;
+      renderSummary();
+      syncPills();
+      await refreshChip();
+    })();
+  </script>
+
+  <style>
+    .top { padding-top: 28px; }
+    h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      margin: 6px 0 12px;
+      letter-spacing: -0.005em;
+    }
+    .lede { max-width: 80ch; margin: 8px 0 24px; }
+    .lede a { color: var(--accent); }
+    .lede strong { color: var(--ink); font-weight: var(--weight-strong); }
+
+    .controls {
+      background: var(--surface-2);
+      border: 1px solid var(--rule);
+      padding: 14px 16px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .control-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+      min-width: 56px;
+    }
+    .pill-group {
+      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    }
+    .chip-group-label {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 0 6px;
+      opacity: 0.75;
+    }
+    .chip-group-label:not(:first-child) { border-left: 1px solid var(--rule-2); }
+    .pill {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--surface);
+      color: var(--ink-dim);
+      border: 1px solid var(--rule-2);
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: var(--rad);
+      font-weight: var(--weight-strong);
+    }
+    .pill:hover { color: var(--ink); border-color: var(--accent); }
+    .pill.on {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+
+    .vast-section {
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+    }
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .sec-num {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+      letter-spacing: var(--tracking-eye);
+    }
+    .sec-head h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      margin: 0;
+      font-weight: var(--weight-display);
+    }
+    .sec-note {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      letter-spacing: 0.04em;
+      margin-left: auto;
+    }
+
+    .chart-wrap {
+      position: relative;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .chart-status {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      pointer-events: none;
+      padding: 0 24px;
+      text-align: center;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 720px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .table-wrap {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    .data { width: 100%; border-collapse: collapse; }
+    .data th, .data td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--rule);
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      text-align: left;
+    }
+    .data th {
+      background: var(--surface-2);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+    }
+    .data td.num, .data th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .data td.dim { color: var(--ink-dim); }
+    .tag {
+      display: inline-block;
+      padding: 2px 7px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      border-radius: var(--rad);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .tag.verified { background: color-mix(in srgb, #2c8055 18%, transparent); color: #2c8055; }
+    .tag.deverified { background: color-mix(in srgb, #a84040 18%, transparent); color: #a84040; }
+
+    .footnote {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      margin: 12px 0 0;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      border-left: 2px solid var(--neutral);
+      max-width: 80ch;
+      line-height: 1.55;
+    }
+    .footnote code, .footnote em {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-sm) - 1px);
+      color: var(--accent);
+      font-style: normal;
+    }
+    .footnote-last {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      margin: 32px 0 0;
+      padding: 14px 18px;
+      background: var(--surface-2);
+      border-left: 2px solid var(--accent);
+      max-width: 80ch;
+    }
+    .footnote-last a { color: var(--accent); }
+  </style>
+</Base>
