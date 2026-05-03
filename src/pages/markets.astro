@@ -5,11 +5,23 @@ import { PREMIUM_CHIPS } from '../data/listings_history';
 
 const DEFAULT_CHIP = 'h100-sxm-80gb';
 const listingsMeta = (meta as any).listings_history;
+const windowDays = listingsMeta?.window_days ?? 90;
+const nChips = listingsMeta?.chips?.length ?? PREMIUM_CHIPS.length;
+const totalRows = listingsMeta?.total_rows ?? 0;
+const windowEnd = listingsMeta?.window_end ?? '—';
 ---
 <Base title="Providers · CCIR">
-  <section class="wrap top">
-    <div class="kicker">Provider rack rates · {listingsMeta?.window_days ?? 90}-day window</div>
+  <section class="wrap top vast-page markets-page">
+    <div class="kicker">PROVIDERS · DAILY LIST-ASK TIME-SERIES</div>
     <h1>Providers</h1>
+    <div class="ticker-strip" role="group" aria-label="Snapshot stats">
+      <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{windowDays}d</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Chips</span><span class="tk-val">{nChips}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Observations</span><span class="tk-val">{totalRows}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Last day</span><span class="tk-val">{windowEnd}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">1d</span></div>
+      <div class="tk-cell tk-status"><span class="tk-dot"></span><span class="tk-val">LIVE</span></div>
+    </div>
     <p class="standfirst lede">
       Each operator's posted rack rate for the chosen chip, plotted over
       time. Solid lines are guaranteed (non-interruptible) availability;
@@ -47,15 +59,15 @@ const listingsMeta = (meta as any).listings_history;
       </div>
     </div>
 
-    <div class="chart-wrap">
+    <div class="chart-wrap chart-wrap-hero">
       <div class="chart-status" id="chart-status">Loading…</div>
       <canvas id="chart" aria-label="Provider rack rates over time"></canvas>
     </div>
 
     <section class="legend-section">
       <header class="legend-head">
-        <span class="sec-kicker">Providers</span>
-        <span class="sec-sub" id="legend-summary">—</span>
+        <span class="sec-kicker-label">PROVIDERS</span>
+        <span class="sec-note" id="legend-summary">—</span>
       </header>
       <div class="table-wrap">
         <table class="data multi-off" id="legend-table">
@@ -155,6 +167,12 @@ const listingsMeta = (meta as any).listings_history;
       timeZone: ET_TZ, year: 'numeric', month: 'short', day: 'numeric',
     });
 
+    function readToken(name: string): string {
+      try {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      } catch { return ''; }
+    }
+
     function fmtChange(latest: number, prev: number | null): string {
       if (prev === null || prev === 0) return '—';
       const d = ((latest - prev) / prev) * 100;
@@ -172,10 +190,10 @@ const listingsMeta = (meta as any).listings_history;
         const dot = `<span class="legend-dot" style="background:${lineColor}"></span>`;
         const chipBadge = `<span class="chip-badge" style="background:${colorForChip(s.chip)}">${shortLabelForChip(s.chip)}</span>`;
         const intBadge = s.interruptibility === 'INT'
-          ? '<span class="int-badge">INT</span>'
-          : '<span class="gtd-badge">GTD</span>';
+          ? '<span class="tag int">INT</span>'
+          : '<span class="tag gtd">GTD</span>';
         const bundle = s.bundled_any
-          ? '<span class="bundle-badge">BUNDLED</span>'
+          ? '<span class="tag bundled">BUNDLED</span>'
           : '<span class="dim">—</span>';
         // Only emit the chip cell when comparing chips. JS conditional render
         // keeps header + body column counts in sync; CSS-based hiding doesn't
@@ -214,10 +232,10 @@ const listingsMeta = (meta as any).listings_history;
 
       if (chart) chart.destroy();
 
-      const styles = getComputedStyle(document.documentElement);
-      const inkColor = styles.getPropertyValue('--ink').trim() || '#0d0d0d';
-      const ruleColor = styles.getPropertyValue('--rule').trim() || '#d4d0c4';
-      const dimColor = styles.getPropertyValue('--ink-dim').trim() || '#5b5852';
+      const inkDim = readToken('--ink-dim') || '#9a9991';
+      const ink = readToken('--ink') || '#e8e6e1';
+      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
+      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
 
       chart = new Chart(canvas, {
         type: 'line',
@@ -244,7 +262,8 @@ const listingsMeta = (meta as any).listings_history;
               type: 'time',
               time: { unit: 'day' },
               ticks: {
-                color: dimColor,
+                color: inkDim,
+                font: monoFont,
                 maxRotation: 0,
                 autoSkipPadding: 24,
                 callback: (value) => {
@@ -252,16 +271,16 @@ const listingsMeta = (meta as any).listings_history;
                   return fmtTickDayET.format(ms);
                 },
               },
-              title: { display: true, text: 'Date (ET)', color: dimColor },
-              grid: { color: ruleColor, drawOnChartArea: false },
-              border: { color: ruleColor },
+              title: { display: true, text: 'Date (ET)', color: inkDim, font: monoFont },
+              grid: { color: grid, drawOnChartArea: false },
+              border: { color: grid },
             },
             y: {
               type: state.log_scale && multi ? 'logarithmic' : 'linear',
-              title: { display: true, text: '$/GPU-hour', color: dimColor },
-              ticks: { color: inkColor, callback: (v) => '$' + (v as number).toFixed(2) },
-              grid: { color: ruleColor },
-              border: { color: ruleColor },
+              title: { display: true, text: '$/GPU-hour', color: inkDim, font: monoFont },
+              ticks: { color: ink, font: monoFont, callback: (v) => '$' + (v as number).toFixed(2) },
+              grid: { color: grid },
+              border: { color: grid },
             },
           },
         },
@@ -343,34 +362,91 @@ const listingsMeta = (meta as any).listings_history;
   </script>
 
   <style>
-    .top { padding-top: 28px; }
-    h1 {
-      font-family: var(--font-display);
-      font-size: var(--fs-2xl);
-      margin: 6px 0 12px;
-      letter-spacing: -0.005em;
+    /* Markets / Providers styling reuses the Bloomberg-feel patterns from
+       /vast via the shared `.vast-page` wrap class plus the `--vast-*` token
+       group at the bottom of tokens.css. Page-specific `.markets-page` is
+       reserved for any one-off tweaks; today it just signals scope. */
+    .vast-page.top { padding-top: 24px; }
+
+    .vast-page > .kicker {
+      color: var(--accent);
+      letter-spacing: 0.14em;
+      margin-bottom: 4px;
     }
-    .lede {
-      max-width: 80ch;
-      margin: 8px 0 24px;
+    .vast-page h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 10px;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
     }
 
-    .controls {
-      background: var(--surface-2);
+    /* Ticker strip — Bloomberg-style horizontal stat band */
+    .vast-page .ticker-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      border: 1px solid var(--rule-2);
+      background: var(--vast-panel-bg);
+      margin: 0 0 18px;
+      font-family: var(--font-mono);
+    }
+    .vast-page .tk-cell {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 7px 14px;
+      border-right: 1px solid var(--rule);
+      flex: 0 0 auto;
+    }
+    .vast-page .tk-cell:last-child { border-right: 0; }
+    .vast-page .tk-lbl {
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      font-weight: var(--weight-strong);
+    }
+    .vast-page .tk-val {
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      font-weight: var(--weight-strong);
+    }
+    .vast-page .tk-status { margin-left: auto; gap: 6px; }
+    .vast-page .tk-status .tk-val { color: var(--pos); letter-spacing: 0.10em; }
+    .vast-page .tk-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--pos);
+      box-shadow: 0 0 6px var(--pos);
+      display: inline-block;
+      border-radius: 50%;
+      animation: vast-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes vast-pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.35; }
+    }
+
+    .vast-page .lede { max-width: 80ch; margin: 4px 0 22px; }
+
+    .vast-page .controls {
+      background: var(--vast-panel-bg);
       border: 1px solid var(--rule);
-      padding: 14px 16px;
+      padding: 12px 14px;
       margin-bottom: 18px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
-    .control-row {
+    .vast-page .control-row {
       display: flex;
       align-items: center;
       gap: 14px;
       flex-wrap: wrap;
     }
-    .control-label {
+    .vast-page .control-label {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       color: var(--ink-dim);
@@ -379,8 +455,8 @@ const listingsMeta = (meta as any).listings_history;
       font-weight: var(--weight-strong);
       min-width: 56px;
     }
-    .pill-group { display: flex; flex-wrap: wrap; gap: 6px; }
-    .pill {
+    .vast-page .pill-group { display: flex; flex-wrap: wrap; gap: 5px; }
+    .vast-page .pill {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       letter-spacing: 0.04em;
@@ -388,21 +464,21 @@ const listingsMeta = (meta as any).listings_history;
       background: var(--surface);
       color: var(--ink-dim);
       border: 1px solid var(--rule-2);
-      padding: 6px 12px;
+      padding: 5px 10px;
       cursor: pointer;
-      border-radius: var(--rad);
+      border-radius: 0;
       font-weight: var(--weight-strong);
     }
-    .pill:hover { color: var(--ink); border-color: var(--accent); }
-    .pill.on {
+    .vast-page .pill:hover { color: var(--ink); border-color: var(--accent); }
+    .vast-page .pill.on {
       color: var(--accent);
       border-color: var(--accent);
       background: color-mix(in srgb, var(--accent) 8%, transparent);
     }
-    .pill.muted { opacity: 0.45; cursor: not-allowed; }
-    .pill.muted:hover { color: var(--ink-dim); border-color: var(--rule-2); }
+    .vast-page .pill.muted { opacity: 0.45; cursor: not-allowed; }
+    .vast-page .pill.muted:hover { color: var(--ink-dim); border-color: var(--rule-2); }
 
-    .chip-cap {
+    .vast-page .chip-cap {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       color: var(--ink-dim);
@@ -410,8 +486,8 @@ const listingsMeta = (meta as any).listings_history;
       margin-left: 8px;
     }
 
-    .toggles-row { gap: 22px; }
-    .toggle {
+    .vast-page .toggles-row { gap: 22px; }
+    .vast-page .toggle {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -423,15 +499,24 @@ const listingsMeta = (meta as any).listings_history;
       cursor: pointer;
     }
 
-    .chart-wrap {
+    .vast-page .chart-wrap {
       position: relative;
       border: 1px solid var(--rule);
-      background: var(--surface);
-      padding: 16px;
+      background: var(--vast-panel-bg);
+      padding: 14px;
       height: 460px;
-      margin-bottom: 18px;
+      margin-bottom: 12px;
+      border-radius: 0;
     }
-    .chart-status {
+    .vast-page .chart-wrap-hero {
+      background: var(--vast-panel-bg-hero);
+      border-color: var(--rule-2);
+      /* Distinguishing hairline accent — info token signals daily-cadence
+         provider product (vs warn for intraday on /marketplace). */
+      border-left-width: 3px;
+      border-left-color: var(--vast-info);
+    }
+    .vast-page .chart-status {
       position: absolute;
       inset: 0;
       display: flex;
@@ -440,122 +525,169 @@ const listingsMeta = (meta as any).listings_history;
       font-family: var(--font-mono);
       font-size: var(--fs-sm);
       color: var(--ink-dim);
-      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      background: color-mix(in srgb, var(--vast-panel-bg-hero) 80%, transparent);
       pointer-events: none;
       padding: 0 24px;
       text-align: center;
     }
 
-    .legend-section { margin-top: 8px; }
-    .legend-head {
+    .vast-page .legend-section { margin-top: 14px; }
+    .vast-page .legend-head {
       display: flex;
       align-items: baseline;
-      gap: 16px;
-      margin-bottom: 12px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid var(--rule);
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
     }
-    .sec-kicker {
+    .vast-page .sec-kicker-label {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
-      color: var(--accent);
+      color: var(--ink-dim);
       text-transform: uppercase;
-      letter-spacing: var(--tracking-eye);
+      letter-spacing: 0.14em;
       font-weight: var(--weight-strong);
+      padding-left: 4px;
+      border-left: 1px solid var(--rule-2);
+      padding-right: 2px;
     }
-    .sec-sub {
+    .vast-page .sec-note {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       color: var(--ink-dim);
       letter-spacing: 0.04em;
+      margin-left: auto;
     }
-    .table-wrap {
+
+    .vast-page .table-wrap {
       border: 1px solid var(--rule);
-      background: var(--surface);
+      background: var(--vast-panel-bg);
       overflow-x: auto;
     }
-    #legend-table { width: 100%; }
-    #legend-table td.provider {
+    .vast-page .data {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+    }
+    .vast-page .data th,
+    .vast-page .data td {
+      padding: var(--vast-cell-y) var(--vast-cell-x);
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+      vertical-align: middle;
+      height: var(--vast-row-h);
+      font-variant-numeric: tabular-nums;
+    }
+    .vast-page .data th + th,
+    .vast-page .data td + td {
+      border-left: 1px solid var(--rule);
+    }
+    .vast-page .data th {
+      background: var(--surface-3);
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      font-weight: var(--weight-strong);
+      border-bottom: 1px solid var(--rule-2);
+      white-space: nowrap;
+    }
+    .vast-page .data td.num,
+    .vast-page .data th.num {
+      text-align: right;
+    }
+    .vast-page .data td.dim,
+    .vast-page .data .dim { color: var(--ink-dim); }
+    .vast-page .data tbody tr:nth-child(even) td {
+      background: var(--vast-row-stripe);
+    }
+    .vast-page .data tbody tr:hover td { background: var(--surface-3); }
+
+    .vast-page #legend-table { width: 100%; }
+    .vast-page #legend-table td.provider {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    #legend-table td.provider code {
+    .vast-page #legend-table td.provider code {
       font-family: var(--font-mono);
-      font-size: calc(var(--fs-sm) - 1px);
+      font-size: var(--fs-sm);
       color: var(--ink);
       letter-spacing: 0.02em;
     }
-    .legend-dot {
+    .vast-page .legend-dot {
       display: inline-block;
       width: 10px;
       height: 10px;
       border-radius: 50%;
     }
-    .chip-badge {
+    .vast-page .chip-badge {
       display: inline-block;
       padding: 2px 7px;
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 1px);
       font-weight: var(--weight-strong);
       color: #fff;
-      border-radius: var(--rad);
+      border-radius: 0;
       letter-spacing: 0.05em;
       text-transform: uppercase;
     }
     /* Hide the chip column when only one chip is selected — keeps legend tight. */
-    #legend-table.multi-off .chip-col { display: none; }
+    .vast-page #legend-table.multi-off .chip-col { display: none; }
 
-    .gtd-badge, .int-badge, .bundle-badge {
+    /* Tag pills — semantic tokens, hairline border, mono. Mirrors /vast. */
+    .vast-page .tag {
       display: inline-block;
       padding: 1px 6px;
       font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 2px);
+      font-size: calc(var(--fs-xs) - 1px);
       font-weight: var(--weight-strong);
       letter-spacing: 0.08em;
       border: 1px solid;
-      border-radius: var(--rad);
+      border-radius: 0;
+      text-transform: uppercase;
     }
-    .gtd-badge {
+    .vast-page .tag.gtd {
       color: var(--ink-dim);
       border-color: var(--rule-2);
       background: var(--surface-2);
     }
-    .int-badge {
-      color: var(--warn);
-      border-color: color-mix(in srgb, var(--warn) 50%, transparent);
-      background: color-mix(in srgb, var(--warn) 12%, transparent);
+    .vast-page .tag.int {
+      color: var(--vast-warn);
+      border-color: color-mix(in srgb, var(--vast-warn) 50%, transparent);
+      background: color-mix(in srgb, var(--vast-warn) 12%, transparent);
     }
-    .bundle-badge {
-      color: var(--info);
-      border-color: color-mix(in srgb, var(--info) 50%, transparent);
-      background: color-mix(in srgb, var(--info) 12%, transparent);
+    .vast-page .tag.bundled {
+      color: var(--vast-info);
+      border-color: color-mix(in srgb, var(--vast-info) 50%, transparent);
+      background: color-mix(in srgb, var(--vast-info) 12%, transparent);
     }
-    #legend-table .up { color: var(--neg); }
-    #legend-table .down { color: var(--pos); }
+    .vast-page #legend-table .up { color: var(--vast-neg); }
+    .vast-page #legend-table .down { color: var(--vast-pos); }
 
-    .footnote {
+    .vast-page .footnote {
       font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-size: var(--fs-xs);
       color: var(--ink-dim);
-      margin: 18px 0 0;
+      margin: 14px 0 0;
       padding: 10px 14px;
-      background: var(--surface-2);
+      background: var(--vast-panel-bg);
       border-left: 2px solid var(--neutral);
       max-width: 80ch;
       line-height: 1.55;
     }
-    .footnote code {
+    .vast-page .footnote code {
       font-family: var(--font-mono);
-      font-size: calc(var(--fs-sm) - 1px);
+      font-size: calc(var(--fs-xs));
       color: var(--accent);
     }
 
     @media (max-width: 720px) {
-      .control-row { gap: 8px; }
-      .control-label { min-width: 0; }
-      .toggles-row { flex-direction: column; align-items: flex-start; gap: 8px; }
-      .chart-wrap { height: 360px; padding: 10px; }
+      .vast-page .control-row { gap: 8px; }
+      .vast-page .control-label { min-width: 0; }
+      .vast-page .toggles-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .vast-page .chart-wrap { height: 360px; padding: 10px; }
     }
   </style>
 </Base>

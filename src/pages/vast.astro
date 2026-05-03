@@ -7,12 +7,16 @@ const DEFAULT_CHIP = 'h100-sxm';
 const vastMeta = (meta as any).vast;
 ---
 <Base title="Vast.ai Observatory · CCIR">
-  <section class="wrap top">
-    <div class="kicker">
-      Marketplace observatory · {vastMeta?.window_days ?? 30}-day window ·
-      {vastMeta?.n_chips ?? 13} chips · {vastMeta?.n_offers_latest_cycle ?? 0} offers tracked this cycle
-    </div>
+  <section class="wrap top vast-page">
+    <div class="kicker">VAST.AI · MARKETPLACE OBSERVATORY</div>
     <h1>Vast.ai Observatory</h1>
+    <div class="ticker-strip" role="group" aria-label="Snapshot stats">
+      <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{vastMeta?.window_days ?? 30}d</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Chips</span><span class="tk-val">{vastMeta?.n_chips ?? 13}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Offers / cycle</span><span class="tk-val">{vastMeta?.n_offers_latest_cycle ?? 0}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">3h</span></div>
+      <div class="tk-cell tk-status"><span class="tk-dot"></span><span class="tk-val">LIVE</span></div>
+    </div>
     <p class="standfirst lede">
       Vast.ai is the only deep-book live GPU marketplace in the panel —
       hundreds to thousands of distinct offers per chip, refreshed in real
@@ -44,19 +48,28 @@ const vastMeta = (meta as any).vast;
     </div>
 
     <!-- Section 1: Hero distribution histogram -->
-    <section class="vast-section">
+    <section class="vast-section vast-section-hero">
       <header class="sec-head">
-        <span class="sec-num">§1</span>
-        <h2>Distribution shape — per-GPU $/hr histogram</h2>
+        <span class="sec-num">01</span>
+        <span class="sec-kicker-label">DISTRIBUTION</span>
+        <h2>Per-GPU $/hr histogram</h2>
         <span class="sec-note" id="hist-summary">—</span>
       </header>
-      <div class="chart-wrap" style="height:340px;">
+      <div class="chart-wrap chart-wrap-hero" style="height:360px;">
         <div class="chart-status" id="hist-status">Loading…</div>
         <canvas id="histChart"></canvas>
       </div>
+      <div class="quant-strip" id="hist-quant-strip" aria-label="Distribution percentiles">
+        <div class="qs-cell"><span class="qs-lbl">MIN</span><span class="qs-val" id="qs-min">—</span></div>
+        <div class="qs-cell"><span class="qs-lbl">P25</span><span class="qs-val" id="qs-p25">—</span></div>
+        <div class="qs-cell qs-cell-hero"><span class="qs-lbl">MEDIAN</span><span class="qs-val" id="qs-p50">—</span></div>
+        <div class="qs-cell"><span class="qs-lbl">P75</span><span class="qs-val" id="qs-p75">—</span></div>
+        <div class="qs-cell"><span class="qs-lbl">MAX</span><span class="qs-val" id="qs-max">—</span></div>
+        <div class="qs-cell"><span class="qs-lbl">SPREAD</span><span class="qs-val" id="qs-spread">—</span></div>
+      </div>
       <p class="footnote">
         Every live offer on Vast for the selected chip, binned by per-whole-GPU
-        $/hr (log scale on x). The vertical orange line marks the median; the
+        $/hr (log scale on x). The vertical amber line marks the median; the
         dashed grey marks the median interruptible-bid floor. Where the
         histogram has a long upper tail, that's the trust premium — buyers
         pay 5-50× the floor for verified datacenter offers vs deverified
@@ -67,8 +80,9 @@ const vastMeta = (meta as any).vast;
     <!-- Section 2: Quality bands -->
     <section class="vast-section">
       <header class="sec-head">
-        <span class="sec-num">§2</span>
-        <h2>Quality bands — verified vs deverified</h2>
+        <span class="sec-num">02</span>
+        <span class="sec-kicker-label">QUALITY</span>
+        <h2>Verified vs deverified bands</h2>
         <span class="sec-note" id="quality-summary">—</span>
       </header>
       <div class="chart-wrap" style="height:280px;">
@@ -86,8 +100,9 @@ const vastMeta = (meta as any).vast;
     <!-- Section 3: $/perf frontier -->
     <section class="vast-section">
       <header class="sec-head">
-        <span class="sec-num">§3</span>
-        <h2>$/perf frontier — top 20 by dlperf per $/hr</h2>
+        <span class="sec-num">03</span>
+        <span class="sec-kicker-label">FRONTIER</span>
+        <h2>Top 20 by DLPerf per $/hr</h2>
         <span class="sec-note" id="frontier-summary">—</span>
       </header>
       <div class="table-wrap">
@@ -111,8 +126,9 @@ const vastMeta = (meta as any).vast;
     <!-- Section 4: Multi-GPU supply -->
     <section class="vast-section">
       <header class="sec-head">
-        <span class="sec-num">§4</span>
-        <h2>Multi-GPU supply structure</h2>
+        <span class="sec-num">04</span>
+        <span class="sec-kicker-label">SUPPLY</span>
+        <h2>Multi-GPU offer structure</h2>
         <span class="sec-note" id="multi-summary">—</span>
       </header>
       <div class="chart-wrap" style="height:240px;">
@@ -129,8 +145,9 @@ const vastMeta = (meta as any).vast;
     <!-- Section 5: Geography -->
     <section class="vast-section">
       <header class="sec-head">
-        <span class="sec-num">§5</span>
-        <h2>Geographic distribution</h2>
+        <span class="sec-num">05</span>
+        <span class="sec-kicker-label">GEOGRAPHY</span>
+        <h2>Country / region distribution</h2>
         <span class="sec-note" id="geo-summary">—</span>
       </header>
       <div class="table-wrap">
@@ -150,8 +167,9 @@ const vastMeta = (meta as any).vast;
     <!-- Section 6: Hidden costs -->
     <section class="vast-section">
       <header class="sec-head">
-        <span class="sec-num">§6</span>
-        <h2>Hidden costs — egress + storage</h2>
+        <span class="sec-num">06</span>
+        <span class="sec-kicker-label">FRICTION</span>
+        <h2>Egress + storage costs</h2>
         <span class="sec-note">Per-offer distribution</span>
       </header>
       <div class="grid-2">
@@ -174,8 +192,9 @@ const vastMeta = (meta as any).vast;
     <!-- Section 7: Network -->
     <section class="vast-section">
       <header class="sec-head">
-        <span class="sec-num">§7</span>
-        <h2>Network — internet-down distribution</h2>
+        <span class="sec-num">07</span>
+        <span class="sec-kicker-label">NETWORK</span>
+        <h2>Internet-down distribution</h2>
         <span class="sec-note" id="net-summary">—</span>
       </header>
       <div class="chart-wrap" style="height:240px;">
@@ -192,8 +211,9 @@ const vastMeta = (meta as any).vast;
     <!-- Section 8: Long-tail catalog -->
     <section class="vast-section">
       <header class="sec-head">
-        <span class="sec-num">§8</span>
-        <h2>Long-tail catalog — every chip Vast carries</h2>
+        <span class="sec-num">08</span>
+        <span class="sec-kicker-label">CATALOG</span>
+        <h2>Every chip Vast carries</h2>
         <span class="sec-note" id="tail-summary">—</span>
       </header>
       <div class="table-wrap">
@@ -215,13 +235,14 @@ const vastMeta = (meta as any).vast;
     </section>
 
     <!-- Section 9: Spread evolution time-series -->
-    <section class="vast-section">
+    <section class="vast-section vast-section-hero">
       <header class="sec-head">
-        <span class="sec-num">§9</span>
-        <h2>Spread evolution — distribution shape over 30 days</h2>
+        <span class="sec-num">09</span>
+        <span class="sec-kicker-label">SPREAD</span>
+        <h2>Distribution evolution over 30 days</h2>
         <span class="sec-note" id="spread-summary">—</span>
       </header>
-      <div class="chart-wrap" style="height:340px;">
+      <div class="chart-wrap chart-wrap-hero" style="height:380px;">
         <div class="chart-status" id="spread-status">Loading…</div>
         <canvas id="spreadChart"></canvas>
       </div>
@@ -293,6 +314,11 @@ const vastMeta = (meta as any).vast;
 
     // ---- Section renderers --------------------------------------------------
 
+    function setQs(id: string, v: string) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = v;
+    }
+
     function renderHistogram() {
       const offers = state.offers;
       const values = offers
@@ -302,19 +328,30 @@ const vastMeta = (meta as any).vast;
         setStatus('hist-status', `No offers for ${shortLabelForVastChip(state.chip)} in this cycle.`);
         if (charts.hist) { charts.hist.destroy(); charts.hist = null; }
         document.getElementById('hist-summary')!.textContent = '0 offers';
+        ['qs-min', 'qs-p25', 'qs-p50', 'qs-p75', 'qs-max', 'qs-spread'].forEach((id) => setQs(id, '—'));
         return;
       }
       setStatus('hist-status', null);
 
       const bins = logBins(values, 25);
+      const minV = Math.min(...values);
+      const maxV = Math.max(...values);
+      const p25 = quantile(values, 0.25);
       const median = quantile(values, 0.5);
+      const p75 = quantile(values, 0.75);
       const minBidVals = offers
         .map((o) => o.min_bid && o.num_gpus ? o.min_bid / o.num_gpus / Math.max(o.gpu_frac ?? 1, 0.01) : null)
         .filter((v): v is number => v !== null && Number.isFinite(v) && v > 0);
       const minBidMedian = minBidVals.length ? quantile(minBidVals, 0.5) : null;
 
       document.getElementById('hist-summary')!.textContent =
-        `${values.length} offers · median ${fmtUsd(median)} · range ${fmtUsd(Math.min(...values))} – ${fmtUsd(Math.max(...values))}`;
+        `${values.length} offers · median ${fmtUsd(median)} · range ${fmtUsd(minV)} – ${fmtUsd(maxV)}`;
+      setQs('qs-min', fmtUsd(minV));
+      setQs('qs-p25', fmtUsd(p25));
+      setQs('qs-p50', fmtUsd(median));
+      setQs('qs-p75', fmtUsd(p75));
+      setQs('qs-max', fmtUsd(maxV));
+      setQs('qs-spread', minV > 0 ? (maxV / minV).toFixed(1) + '×' : '—');
 
       const labels = bins.map((b) => `$${b.lo.toFixed(2)}`);
       const counts = bins.map((b) => b.count);
@@ -343,9 +380,9 @@ const vastMeta = (meta as any).vast;
             return `$${b.lo.toFixed(2)}–$${b.hi.toFixed(2)}: ${ctx.parsed.y} offers`;
           },
           annotations: {
-            median: { value: median, color: '#d68a2a', label: `median ${fmtUsd(median)}` },
+            median: { value: median, color: readToken('--vast-accent') || '#ff9100', label: `median ${fmtUsd(median)}` },
             minBid: minBidMedian
-              ? { value: minBidMedian, color: '#5b5852', label: `bid floor ${fmtUsd(minBidMedian)}`, dash: true }
+              ? { value: minBidMedian, color: readToken('--ink-faint') || '#5b5852', label: `bid floor ${fmtUsd(minBidMedian)}`, dash: true }
               : null,
             xLabels: labels,
           },
@@ -410,11 +447,12 @@ const vastMeta = (meta as any).vast;
         .slice(0, 20);
       document.getElementById('frontier-summary')!.textContent =
         top.length ? `top ${top.length} of ${state.offers.length} offers` : '—';
-      tbody.innerHTML = top.map((o) => {
+      tbody.innerHTML = top.map((o, i) => {
         const verified = o.verification === 'verified'
           ? '<span class="tag verified">verified</span>'
           : (o.verification === 'deverified' ? '<span class="tag deverified">deverified</span>' : '—');
-        return `<tr>
+        const cls = i === 0 ? ' class="row-top"' : '';
+        return `<tr${cls}>
           <td class="num">${fmtUsd(o.per_gpu_dph)}</td>
           <td class="num">${fmtNum(o.dlperf, 0)}</td>
           <td class="num">${fmtNum(o.dlperf_per_dphtotal, 1)}</td>
@@ -480,13 +518,14 @@ const vastMeta = (meta as any).vast;
       } else {
         setStatus('egress-status', null);
         const eBins = simpleBins(egressVals, 15);
+        const negColor = readToken('--vast-neg') || '#a84040';
         if (charts.egress) charts.egress.destroy();
         charts.egress = new Chart(document.getElementById('egressChart') as HTMLCanvasElement, {
           type: 'bar',
           data: {
             labels: eBins.map((b) => `$${b.lo.toFixed(0)}`),
             datasets: [{ label: 'egress $/TB', data: eBins.map((b) => b.count),
-              backgroundColor: '#a84040', borderWidth: 0 }],
+              backgroundColor: negColor, borderWidth: 0 }],
           },
           options: chartBaseOptions({ xTitle: 'Egress $/TB', yTitle: 'Offers' }),
         });
@@ -502,13 +541,14 @@ const vastMeta = (meta as any).vast;
       } else {
         setStatus('storage-status', null);
         const sBins = simpleBins(storVals, 15);
+        const infoColor = readToken('--vast-info') || '#2d6a94';
         if (charts.storage) charts.storage.destroy();
         charts.storage = new Chart(document.getElementById('storageChart') as HTMLCanvasElement, {
           type: 'bar',
           data: {
             labels: sBins.map((b) => `$${b.lo.toFixed(2)}`),
             datasets: [{ label: 'storage $/GB-mo', data: sBins.map((b) => b.count),
-              backgroundColor: '#2d6a94', borderWidth: 0 }],
+              backgroundColor: infoColor, borderWidth: 0 }],
           },
           options: chartBaseOptions({ xTitle: 'Storage $/GB-mo', yTitle: 'Offers' }),
         });
@@ -572,29 +612,39 @@ const vastMeta = (meta as any).vast;
       document.getElementById('spread-summary')!.textContent =
         `${dist.length} cycles · ${dist[0].collected_at.slice(0, 10)} → ${dist[dist.length - 1].collected_at.slice(0, 10)}`;
 
-      const series = ['p10', 'p25', 'p50', 'p75', 'p90'].map((p) => ({
-        label: p,
-        data: dist.map((r) => ({
-          x: r.collected_ms,
-          y: (r as any)[`per_gpu_dph_${p}`] as number | null,
-        })),
-      }));
-      const colors = ['#bbd6e8', '#7fb1d3', '#1f77b4', '#aa3333', '#d68a2a'];
+      const accent = readToken('--vast-accent') || '#ff9100';
+      const pos = readToken('--vast-pos') || '#3aa676';
+      const neg = readToken('--vast-neg') || '#c44a4a';
+      const inkDim = readToken('--ink-dim') || '#888';
+      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
+
+      const seriesDef: { label: string; key: string; color: string; w: number; fill?: any }[] = [
+        { label: 'p10', key: 'p10', color: pos, w: 1 },
+        { label: 'p25', key: 'p25', color: pos, w: 1.4, fill: { target: '+1', above: hexA(pos, 0.10), below: hexA(pos, 0.10) } },
+        { label: 'p75', key: 'p75', color: neg, w: 1.4 },
+        { label: 'p90', key: 'p90', color: neg, w: 1 },
+        { label: 'median (p50)', key: 'p50', color: accent, w: 2.4 },
+      ];
 
       if (charts.spread) charts.spread.destroy();
       charts.spread = new Chart(document.getElementById('spreadChart') as HTMLCanvasElement, {
         type: 'line',
         data: {
-          datasets: series.map((s, i) => ({
+          datasets: seriesDef.map((s) => ({
             label: s.label,
-            data: s.data,
-            borderColor: colors[i],
-            backgroundColor: colors[i],
-            borderWidth: s.label === 'p50' ? 2.2 : 1.2,
+            data: dist.map((r) => ({
+              x: r.collected_ms,
+              y: (r as any)[`per_gpu_dph_${s.key}`] as number | null,
+            })),
+            borderColor: s.color,
+            backgroundColor: s.fill ? hexA(s.color, 0.10) : s.color,
+            borderWidth: s.w,
             pointRadius: 0,
             pointHoverRadius: 3,
             tension: 0,
             spanGaps: true,
+            fill: s.fill ?? false,
+            order: s.key === 'p50' ? 0 : 1,
           })),
         },
         options: {
@@ -602,7 +652,11 @@ const vastMeta = (meta as any).vast;
           maintainAspectRatio: false,
           interaction: { mode: 'nearest', axis: 'x', intersect: false },
           plugins: {
-            legend: { display: true, position: 'bottom', labels: { boxWidth: 12 } },
+            legend: {
+              display: true,
+              position: 'bottom',
+              labels: { boxWidth: 12, color: inkDim, font: { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 } },
+            },
             tooltip: {
               callbacks: {
                 label: (ctx) => `${ctx.dataset.label}: ${fmtUsd(ctx.parsed.y as number)}`,
@@ -610,11 +664,42 @@ const vastMeta = (meta as any).vast;
             },
           },
           scales: {
-            x: { type: 'time', title: { display: true, text: 'Date' } },
-            y: { type: 'linear', title: { display: true, text: 'Per-GPU $/hr' } },
+            x: { type: 'time', title: { display: true, text: 'Date', color: inkDim }, grid: { color: grid }, ticks: { color: inkDim } },
+            y: { type: 'linear', title: { display: true, text: 'Per-GPU $/hr', color: inkDim }, grid: { color: grid }, ticks: { color: inkDim } },
           },
         },
       });
+    }
+
+    // Read a CSS custom property from :root, returning trimmed value or ''.
+    function readToken(name: string): string {
+      try {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      } catch { return ''; }
+    }
+    // Convert hex (#rgb / #rrggbb) or named-color string to rgba() with alpha.
+    // Falls back to inserting through a temp element when parsing fails.
+    function hexA(c: string, a: number): string {
+      const v = c.trim();
+      if (v.startsWith('#')) {
+        let h = v.slice(1);
+        if (h.length === 3) h = h.split('').map((x) => x + x).join('');
+        if (h.length === 6) {
+          const r = parseInt(h.slice(0, 2), 16);
+          const g = parseInt(h.slice(2, 4), 16);
+          const b = parseInt(h.slice(4, 6), 16);
+          return `rgba(${r}, ${g}, ${b}, ${a})`;
+        }
+      }
+      // Last resort — let the browser parse via a probe element.
+      const probe = document.createElement('span');
+      probe.style.color = v;
+      document.body.appendChild(probe);
+      const rgb = getComputedStyle(probe).color;
+      probe.remove();
+      const m = rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (m) return `rgba(${m[1]}, ${m[2]}, ${m[3]}, ${a})`;
+      return v;
     }
 
     // ---- Helpers -----------------------------------------------------------
@@ -652,6 +737,9 @@ const vastMeta = (meta as any).vast;
       tooltipLabel?: (ctx: any) => string;
       annotations?: any;
     }) {
+      const inkDim = readToken('--ink-dim') || '#888';
+      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
+      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
       return {
         responsive: true,
         maintainAspectRatio: false,
@@ -665,8 +753,17 @@ const vastMeta = (meta as any).vast;
           },
         },
         scales: {
-          x: { title: { display: true, text: opts.xTitle }, ticks: { maxRotation: 45, autoSkipPadding: 16 } },
-          y: { title: { display: true, text: opts.yTitle }, beginAtZero: true },
+          x: {
+            title: { display: true, text: opts.xTitle, color: inkDim, font: monoFont },
+            ticks: { maxRotation: 45, autoSkipPadding: 16, color: inkDim, font: monoFont },
+            grid: { color: grid },
+          },
+          y: {
+            title: { display: true, text: opts.yTitle, color: inkDim, font: monoFont },
+            ticks: { color: inkDim, font: monoFont },
+            grid: { color: grid },
+            beginAtZero: true,
+          },
         },
       };
     }
@@ -717,33 +814,93 @@ const vastMeta = (meta as any).vast;
   </script>
 
   <style>
-    .top { padding-top: 28px; }
-    h1 {
-      font-family: var(--font-display);
-      font-size: var(--fs-2xl);
-      margin: 6px 0 12px;
-      letter-spacing: -0.005em;
-    }
-    .lede { max-width: 80ch; margin: 8px 0 24px; }
-    .lede a { color: var(--accent); }
-    .lede strong { color: var(--ink); font-weight: var(--weight-strong); }
+    /* All rules below are scoped to .vast-page so the rest of the site is
+       unaffected.  /vast amplifies the existing terminal/financial-press
+       design language with denser tables, monospace propagation, and a
+       slightly darker chart panel. */
+    .vast-page.top { padding-top: 24px; }
 
-    .controls {
-      background: var(--surface-2);
+    .vast-page > .kicker {
+      color: var(--accent);
+      letter-spacing: 0.14em;
+      margin-bottom: 4px;
+    }
+    .vast-page h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 10px;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+    }
+
+    /* Ticker strip — Bloomberg-style horizontal stat band */
+    .vast-page .ticker-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      border: 1px solid var(--rule-2);
+      background: var(--vast-panel-bg);
+      margin: 0 0 18px;
+      font-family: var(--font-mono);
+    }
+    .vast-page .tk-cell {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 7px 14px;
+      border-right: 1px solid var(--rule);
+      flex: 0 0 auto;
+    }
+    .vast-page .tk-cell:last-child { border-right: 0; }
+    .vast-page .tk-lbl {
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      font-weight: var(--weight-strong);
+    }
+    .vast-page .tk-val {
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      font-weight: var(--weight-strong);
+    }
+    .vast-page .tk-status { margin-left: auto; gap: 6px; }
+    .vast-page .tk-status .tk-val { color: var(--pos); letter-spacing: 0.10em; }
+    .vast-page .tk-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--pos);
+      box-shadow: 0 0 6px var(--pos);
+      display: inline-block;
+      border-radius: 50%;
+      animation: vast-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes vast-pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.35; }
+    }
+
+    .vast-page .lede { max-width: 80ch; margin: 4px 0 22px; }
+    .vast-page .lede a { color: var(--accent); }
+    .vast-page .lede strong { color: var(--ink); font-weight: var(--weight-strong); }
+
+    .vast-page .controls {
+      background: var(--vast-panel-bg);
       border: 1px solid var(--rule);
-      padding: 14px 16px;
+      padding: 12px 14px;
       margin-bottom: 18px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
-    .control-row {
+    .vast-page .control-row {
       display: flex;
       align-items: center;
       gap: 14px;
       flex-wrap: wrap;
     }
-    .control-label {
+    .vast-page .control-label {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       color: var(--ink-dim);
@@ -752,10 +909,10 @@ const vastMeta = (meta as any).vast;
       font-weight: var(--weight-strong);
       min-width: 56px;
     }
-    .pill-group {
-      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    .vast-page .pill-group {
+      display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
     }
-    .chip-group-label {
+    .vast-page .chip-group-label {
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 1px);
       color: var(--ink-dim);
@@ -764,8 +921,8 @@ const vastMeta = (meta as any).vast;
       padding: 0 6px;
       opacity: 0.75;
     }
-    .chip-group-label:not(:first-child) { border-left: 1px solid var(--rule-2); }
-    .pill {
+    .vast-page .chip-group-label:not(:first-child) { border-left: 1px solid var(--rule-2); }
+    .vast-page .pill {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       letter-spacing: 0.04em;
@@ -773,44 +930,59 @@ const vastMeta = (meta as any).vast;
       background: var(--surface);
       color: var(--ink-dim);
       border: 1px solid var(--rule-2);
-      padding: 6px 12px;
+      padding: 5px 10px;
       cursor: pointer;
-      border-radius: var(--rad);
+      border-radius: 0;
       font-weight: var(--weight-strong);
     }
-    .pill:hover { color: var(--ink); border-color: var(--accent); }
-    .pill.on {
+    .vast-page .pill:hover { color: var(--ink); border-color: var(--accent); }
+    .vast-page .pill.on {
       color: var(--accent);
       border-color: var(--accent);
       background: color-mix(in srgb, var(--accent) 8%, transparent);
     }
 
-    .vast-section {
-      margin-top: 32px;
-      padding-top: 16px;
+    .vast-page .vast-section {
+      margin-top: 28px;
+      padding-top: 14px;
       border-top: 1px solid var(--rule);
     }
-    .sec-head {
+    .vast-page .sec-head {
       display: flex;
       align-items: baseline;
-      gap: 14px;
-      margin-bottom: 10px;
+      gap: 10px;
+      margin-bottom: 8px;
       flex-wrap: wrap;
     }
-    .sec-num {
+    .vast-page .sec-num {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
-      color: var(--accent);
+      color: var(--bg);
+      background: var(--accent);
       font-weight: var(--weight-strong);
-      letter-spacing: var(--tracking-eye);
+      letter-spacing: 0.06em;
+      padding: 2px 6px;
+      line-height: 1;
     }
-    .sec-head h2 {
+    .vast-page .sec-kicker-label {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: var(--weight-strong);
+      padding-left: 4px;
+      border-left: 1px solid var(--rule-2);
+      padding-right: 2px;
+    }
+    .vast-page .sec-head h2 {
       font-family: var(--font-display);
       font-size: var(--fs-lg);
       margin: 0;
       font-weight: var(--weight-display);
+      letter-spacing: -0.005em;
     }
-    .sec-note {
+    .vast-page .sec-note {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       color: var(--ink-dim);
@@ -818,14 +990,19 @@ const vastMeta = (meta as any).vast;
       margin-left: auto;
     }
 
-    .chart-wrap {
+    .vast-page .chart-wrap {
       position: relative;
       border: 1px solid var(--rule);
-      background: var(--surface);
-      padding: 12px;
+      background: var(--vast-panel-bg);
+      padding: 10px;
       margin-bottom: 8px;
+      border-radius: 0;
     }
-    .chart-status {
+    .vast-page .chart-wrap-hero {
+      background: var(--vast-panel-bg-hero);
+      border-color: var(--rule-2);
+    }
+    .vast-page .chart-status {
       position: absolute;
       inset: 0;
       display: flex;
@@ -834,83 +1011,165 @@ const vastMeta = (meta as any).vast;
       font-family: var(--font-mono);
       font-size: var(--fs-sm);
       color: var(--ink-dim);
-      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      background: color-mix(in srgb, var(--vast-panel-bg) 80%, transparent);
       pointer-events: none;
       padding: 0 24px;
       text-align: center;
     }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 720px) {
-      .grid-2 { grid-template-columns: 1fr; }
+    .vast-page .chart-wrap-hero .chart-status {
+      background: color-mix(in srgb, var(--vast-panel-bg-hero) 80%, transparent);
     }
 
-    .table-wrap {
-      border: 1px solid var(--rule);
-      background: var(--surface);
-      overflow-x: auto;
-    }
-    .data { width: 100%; border-collapse: collapse; }
-    .data th, .data td {
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--rule);
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
-      text-align: left;
-    }
-    .data th {
-      background: var(--surface-2);
+    /* Hero quant strip — sits directly under the §1 histogram */
+    .vast-page .quant-strip {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      border: 1px solid var(--rule-2);
+      border-top: 0;
+      background: var(--vast-panel-bg);
       font-family: var(--font-mono);
-      font-size: var(--fs-xs);
+      margin-bottom: 8px;
+    }
+    .vast-page .qs-cell {
+      padding: 6px 12px;
+      border-right: 1px solid var(--rule);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+    .vast-page .qs-cell:last-child { border-right: 0; }
+    .vast-page .qs-cell-hero { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+    .vast-page .qs-lbl {
+      font-size: calc(var(--fs-xs) - 1px);
       color: var(--ink-dim);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-eye);
+      letter-spacing: 0.10em;
       font-weight: var(--weight-strong);
     }
-    .data td.num, .data th.num { text-align: right; font-variant-numeric: tabular-nums; }
-    .data td.dim { color: var(--ink-dim); }
-    .tag {
-      display: inline-block;
-      padding: 2px 7px;
+    .vast-page .qs-val {
+      font-size: var(--fs-md);
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      font-weight: var(--weight-strong);
+    }
+    .vast-page .qs-cell-hero .qs-val { color: var(--accent); }
+    @media (max-width: 720px) {
+      .vast-page .quant-strip { grid-template-columns: repeat(3, 1fr); }
+      .vast-page .qs-cell:nth-child(3) { border-right: 0; }
+    }
+
+    .vast-page .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    @media (max-width: 720px) {
+      .vast-page .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .vast-page .table-wrap {
+      border: 1px solid var(--rule);
+      background: var(--vast-panel-bg);
+      overflow-x: auto;
+    }
+    .vast-page .data {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+    }
+    .vast-page .data th,
+    .vast-page .data td {
+      padding: var(--vast-cell-y) var(--vast-cell-x);
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+      vertical-align: middle;
+      height: var(--vast-row-h);
+      font-variant-numeric: tabular-nums;
+    }
+    .vast-page .data th + th,
+    .vast-page .data td + td {
+      border-left: 1px solid var(--rule);
+    }
+    .vast-page .data th {
+      background: var(--surface-3);
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 1px);
-      border-radius: var(--rad);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-    .tag.verified { background: color-mix(in srgb, #2c8055 18%, transparent); color: #2c8055; }
-    .tag.deverified { background: color-mix(in srgb, #a84040 18%, transparent); color: #a84040; }
-
-    .footnote {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
       color: var(--ink-dim);
-      margin: 12px 0 0;
-      padding: 10px 14px;
-      background: var(--surface-2);
+      text-transform: uppercase;
+      letter-spacing: 0.10em;
+      font-weight: var(--weight-strong);
+      border-bottom: 1px solid var(--rule-2);
+      white-space: nowrap;
+    }
+    .vast-page .data td.num,
+    .vast-page .data th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .vast-page .data td.dim { color: var(--ink-dim); }
+    .vast-page .data tbody tr:nth-child(even) td {
+      background: var(--vast-row-stripe);
+    }
+    .vast-page .data tbody tr:hover td { background: var(--surface-3); }
+    .vast-page .data tbody tr.row-top td {
+      background: var(--vast-frontier-top);
+      color: var(--ink);
+      font-weight: var(--weight-strong);
+    }
+    .vast-page .data tbody tr.row-top:hover td {
+      background: color-mix(in srgb, var(--accent) 22%, transparent);
+    }
+
+    .vast-page .tag {
+      display: inline-block;
+      padding: 1px 6px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      border-radius: 0;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: var(--weight-strong);
+    }
+    .vast-page .tag.verified {
+      background: color-mix(in srgb, var(--vast-pos) 16%, transparent);
+      color: var(--vast-pos);
+      border: 1px solid color-mix(in srgb, var(--vast-pos) 40%, transparent);
+    }
+    .vast-page .tag.deverified {
+      background: color-mix(in srgb, var(--vast-neg) 16%, transparent);
+      color: var(--vast-neg);
+      border: 1px solid color-mix(in srgb, var(--vast-neg) 40%, transparent);
+    }
+
+    .vast-page .footnote {
+      font-family: var(--font-body);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      margin: 10px 0 0;
+      padding: 9px 12px;
+      background: var(--vast-panel-bg);
       border-left: 2px solid var(--neutral);
       max-width: 80ch;
       line-height: 1.55;
     }
-    .footnote code, .footnote em {
+    .vast-page .footnote code,
+    .vast-page .footnote em {
       font-family: var(--font-mono);
-      font-size: calc(var(--fs-sm) - 1px);
+      font-size: calc(var(--fs-xs));
       color: var(--accent);
       font-style: normal;
     }
-    .footnote-last {
+    .vast-page .footnote-last {
       font-family: var(--font-body);
       font-size: var(--fs-sm);
       color: var(--ink-dim);
-      margin: 32px 0 0;
-      padding: 14px 18px;
-      background: var(--surface-2);
+      margin: 28px 0 0;
+      padding: 12px 16px;
+      background: var(--vast-panel-bg);
       border-left: 2px solid var(--accent);
       max-width: 80ch;
     }
-    .footnote-last a { color: var(--accent); }
+    .vast-page .footnote-last a { color: var(--accent); }
   </style>
 </Base>

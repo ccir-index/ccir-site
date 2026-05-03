@@ -128,3 +128,41 @@ html[data-theme="editorial"] {
 
   color-scheme: light;
 }
+
+/* -------------------------------------------------------------------------
+   /vast-scoped tokens — terminal amplification.
+   Scope: only consumed inside `.vast-page` on /vast. Other pages unaffected.
+   ------------------------------------------------------------------------- */
+:root,
+html[data-theme="terminal"] {
+  --vast-cell-y: 4px;
+  --vast-cell-x: 9px;
+  --vast-row-h: 24px;
+  --vast-panel-bg: var(--surface-2);
+  --vast-panel-bg-hero: var(--surface-3);
+  --vast-rule: var(--rule-2);
+  --vast-accent: var(--accent);
+  --vast-pos: var(--pos);
+  --vast-neg: var(--neg);
+  --vast-warn: var(--warn);
+  --vast-info: var(--info);
+  --vast-grid: color-mix(in srgb, var(--rule) 70%, transparent);
+  --vast-row-stripe: color-mix(in srgb, var(--surface-3) 60%, transparent);
+  --vast-frontier-top: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+html[data-theme="editorial"] {
+  --vast-cell-y: 5px;
+  --vast-cell-x: 10px;
+  --vast-row-h: 26px;
+  --vast-panel-bg: var(--surface-2);
+  --vast-panel-bg-hero: var(--surface-3);
+  --vast-rule: var(--rule-2);
+  --vast-accent: var(--accent);
+  --vast-pos: var(--pos);
+  --vast-neg: var(--neg);
+  --vast-warn: var(--warn);
+  --vast-info: var(--info);
+  --vast-grid: color-mix(in srgb, var(--rule) 80%, transparent);
+  --vast-row-stripe: color-mix(in srgb, var(--surface-3) 50%, transparent);
+  --vast-frontier-top: color-mix(in srgb, var(--accent) 10%, transparent);
+}
