@@ -150,4 +150,37 @@ function dateline(iso: string): string {
     background: var(--pos);
     box-shadow: 0 0 6px var(--pos);
   }
+
+  /* Mobile — contain nav overflow inside the nav band itself
+     instead of pushing the whole page wider than the viewport. */
+  @media (max-width: 720px) {
+    .nav-inner {
+      gap: 12px;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .nav {
+      gap: 16px;
+      overflow-x: auto;
+      flex: 1 1 auto;
+      min-width: 0;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 var(--wrap-pad, 16px);
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav-link {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .status { display: none; }
+    .masthead-band { gap: 14px; padding-top: 12px; padding-bottom: 10px; }
+    .masthead-meta { gap: 12px; }
+    .brand-name { font-size: var(--fs-md); }
+  }
+
+  @media (max-width: 480px) {
+    .brand-name { display: none; }
+    .nav { gap: 14px; }
+  }
 </style>
