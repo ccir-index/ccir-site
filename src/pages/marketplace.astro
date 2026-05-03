@@ -704,11 +704,69 @@ const windowEnd = mktMeta?.window_end ?? '—';
       color: var(--accent);
     }
 
+    /* ----------------------------------------------------------------------
+       MOBILE RESPONSIVE
+       Desktop layout above is unchanged. Mirrors the scaffolding from
+       /vast for cross-page consistency: ticker scrolls horizontally with
+       sticky LIVE cell, legend-head stacks, hero chart shrinks on the
+       smallest phones, .data tables stay inside .table-wrap.
+    ---------------------------------------------------------------------- */
     @media (max-width: 720px) {
       .vast-page .control-row { gap: 8px; }
       .vast-page .control-label { min-width: 0; }
       .vast-page .toggles-row { flex-direction: column; align-items: flex-start; gap: 8px; }
       .vast-page .chart-wrap { height: 360px; padding: 10px; }
+
+      /* Ticker strip — horizontal scroll with sticky LIVE cell */
+      .vast-page .ticker-strip {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+      }
+      .vast-page .tk-cell {
+        scroll-snap-align: start;
+        padding: 6px 10px;
+        gap: 6px;
+      }
+      .vast-page .tk-status {
+        position: sticky;
+        right: 0;
+        margin-left: auto;
+        background: var(--vast-panel-bg);
+        border-left: 1px solid var(--rule-2);
+      }
+
+      /* Legend header stacks so sec-note doesn't crowd the kicker */
+      .vast-page .legend-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .vast-page .legend-head .sec-note {
+        margin-left: 0;
+        font-size: calc(var(--fs-xs) - 1px);
+      }
+
+      /* Trim H1 a hair */
+      .vast-page h1 { font-size: calc(var(--fs-xl) - 2px); }
+
+      /* chip-cap (multi-select hint) drops to its own line */
+      .vast-page .chip-cap { margin-left: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .vast-page .chart-wrap { height: 300px; padding: 8px; }
+      .vast-page .data { font-size: calc(var(--fs-sm) - 1px); }
+      .vast-page .tk-cell { padding: 6px 8px; }
+      .vast-page .tk-lbl { font-size: calc(var(--fs-xs) - 2px); }
+
+      /* Legend table — Cycles col is least-load-bearing on a phone since
+         total observations already shows in legend-summary above. Hide
+         to keep the table fitting the viewport without horizontal scroll
+         in the common case. (table-wrap still allows scroll if needed.) */
+      .vast-page #legend-table th:last-child,
+      .vast-page #legend-table td:last-child { display: none; }
     }
   </style>
 </Base>

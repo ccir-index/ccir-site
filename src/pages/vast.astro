@@ -1053,18 +1053,11 @@ const vastMeta = (meta as any).vast;
       font-weight: var(--weight-strong);
     }
     .vast-page .qs-cell-hero .qs-val { color: var(--accent); }
-    @media (max-width: 720px) {
-      .vast-page .quant-strip { grid-template-columns: repeat(3, 1fr); }
-      .vast-page .qs-cell:nth-child(3) { border-right: 0; }
-    }
 
     .vast-page .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-    }
-    @media (max-width: 720px) {
-      .vast-page .grid-2 { grid-template-columns: 1fr; }
     }
 
     .vast-page .table-wrap {
@@ -1171,5 +1164,112 @@ const vastMeta = (meta as any).vast;
       max-width: 80ch;
     }
     .vast-page .footnote-last a { color: var(--accent); }
+
+    /* ----------------------------------------------------------------------
+       MOBILE RESPONSIVE
+       Desktop layout above is unchanged. All mobile fixes scoped to
+       <=720px and <=480px breakpoints. Goals:
+       - Ticker strip scrolls horizontally with sticky LIVE pill on the right
+       - Quant strip breaks 6→3 cols at 720px, 6→2 cols at 480px (MEDIAN
+         spans full width on the smallest viewport so it remains prominent)
+       - Section headers stack vertically (kicker row above, note below h2)
+       - Chip-group dividers drop their vertical hairline
+       - Tables remain inside .table-wrap (already overflow-x:auto)
+       - Hero charts shrink to 280-300px on the smallest phones
+    ---------------------------------------------------------------------- */
+    @media (max-width: 720px) {
+      /* Ticker strip — horizontal scroll with sticky LIVE cell on the right */
+      .vast-page .ticker-strip {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+      }
+      .vast-page .tk-cell {
+        scroll-snap-align: start;
+        padding: 6px 10px;
+        gap: 6px;
+      }
+      .vast-page .tk-status {
+        position: sticky;
+        right: 0;
+        margin-left: auto;
+        background: var(--vast-panel-bg);
+        border-left: 1px solid var(--rule-2);
+      }
+
+      /* Quant strip — 6→3 cols, 2 rows */
+      .vast-page .quant-strip { grid-template-columns: repeat(3, 1fr); }
+      .vast-page .qs-cell:nth-child(3) { border-right: 0; }
+      .vast-page .qs-cell:nth-child(-n+3) { border-bottom: 1px solid var(--rule); }
+
+      /* Section header — stack so .sec-note doesn't collide with h2 */
+      .vast-page .sec-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .vast-page .sec-head h2 { line-height: 1.2; }
+      .vast-page .sec-note {
+        margin-left: 0;
+        font-size: calc(var(--fs-xs) - 1px);
+      }
+      /* Keep num/kicker chips on the same line */
+      .vast-page .sec-num,
+      .vast-page .sec-kicker-label { display: inline-block; }
+
+      /* Chip-group label — drop the vertical divider, become block label */
+      .vast-page .chip-group-label:not(:first-child) { border-left: 0; }
+      .vast-page .chip-group-label {
+        display: block;
+        width: 100%;
+        padding: 4px 0 2px;
+        opacity: 0.85;
+      }
+
+      /* Two-up grid collapses to single column */
+      .vast-page .grid-2 { grid-template-columns: 1fr; }
+
+      /* H1 trims a hair so it doesn't dominate */
+      .vast-page h1 { font-size: calc(var(--fs-xl) - 2px); }
+
+      /* Footnote padding tightens */
+      .vast-page .footnote { padding: 8px 10px; }
+      .vast-page .footnote-last { padding: 10px 12px; }
+    }
+
+    @media (max-width: 480px) {
+      /* Quant strip — 6→2 cols. MEDIAN cell (3rd) spans full width to stay
+         prominent. Borders re-jiggered to match the new 2-col layout. */
+      .vast-page .quant-strip { grid-template-columns: repeat(2, 1fr); }
+      .vast-page .qs-cell { border-right: 1px solid var(--rule); }
+      .vast-page .qs-cell:nth-child(2n) { border-right: 0; }
+      .vast-page .qs-cell:not(:last-child) { border-bottom: 1px solid var(--rule); }
+      .vast-page .qs-cell-hero {
+        grid-column: 1 / -1;
+        border-right: 0;
+      }
+
+      /* Hero chart heights drop on the smallest phones */
+      .vast-page .chart-wrap-hero { height: 300px !important; }
+      .vast-page .chart-wrap:not(.chart-wrap-hero) { padding: 8px; }
+
+      /* Tighter table cells. Frontier (§3) has 7 cols — hide Reliability
+         which is the least-load-bearing on a phone (still visible by
+         scrolling .table-wrap horizontally; this just keeps the at-rest
+         view legible). Same idea for Catalog (§8): hide Verified count
+         since Min/Med/Max already convey the band. */
+      .vast-page .data {
+        font-size: calc(var(--fs-sm) - 1px);
+      }
+      .vast-page #frontierTable th:nth-child(7),
+      .vast-page #frontierTable td:nth-child(7) { display: none; }
+      .vast-page #summaryTable th:nth-child(3),
+      .vast-page #summaryTable td:nth-child(3) { display: none; }
+
+      /* Ticker cell padding tightens further */
+      .vast-page .tk-cell { padding: 6px 8px; }
+      .vast-page .tk-lbl { font-size: calc(var(--fs-xs) - 2px); }
+    }
   </style>
 </Base>
