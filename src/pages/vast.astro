@@ -814,9 +814,11 @@ const vastMeta = (meta as any).vast;
     })();
   </script>
 
-  <style>
-    /* All rules below are scoped to .vast-page so the rest of the site is
-       unaffected.  /vast amplifies the existing terminal/financial-press
+  <style is:global>
+    /* All rules below are class-scoped to .vast-page so the rest of the site is
+       unaffected. is:global lifts Astro's component scoping so the same
+       chrome is reusable from /availability (class="vast-page availability-page")
+       and any future observatory pages.  /vast amplifies the existing terminal/financial-press
        design language with denser tables, monospace propagation, and a
        slightly darker chart panel. */
     .vast-page.top { padding-top: 24px; }

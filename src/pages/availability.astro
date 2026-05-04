@@ -58,6 +58,10 @@ const availMeta = (meta as any).availability;
         <h2>Provider × region grid</h2>
         <span class="sec-note" id="grid-summary">—</span>
       </header>
+      <div class="grid-wrap grid-wrap-hero">
+        <div class="chart-status" id="grid-status">Loading…</div>
+        <div id="gridContainer" class="grid-container"></div>
+      </div>
       <div class="quant-strip" id="grid-quant-strip" aria-label="Headline stats">
         <div class="qs-cell"><span class="qs-lbl">SKU × REGION</span><span class="qs-val" id="qs-total">—</span></div>
         <div class="qs-cell"><span class="qs-lbl">AVAILABLE</span><span class="qs-val" id="qs-avail">—</span></div>
@@ -65,10 +69,6 @@ const availMeta = (meta as any).availability;
         <div class="qs-cell"><span class="qs-lbl">PROVIDERS</span><span class="qs-val" id="qs-providers">—</span></div>
         <div class="qs-cell"><span class="qs-lbl">CHEAPEST</span><span class="qs-val" id="qs-cheapest">—</span></div>
         <div class="qs-cell"><span class="qs-lbl">MEDIAN $/GPU</span><span class="qs-val" id="qs-median">—</span></div>
-      </div>
-      <div class="grid-wrap">
-        <div class="chart-status" id="grid-status">Loading…</div>
-        <div id="gridContainer" class="grid-container"></div>
       </div>
       <p class="footnote">
         Each cell is one (provider × region) pair for the selected chip. Green
@@ -448,16 +448,19 @@ const availMeta = (meta as any).availability;
       const rows = state.providers;
       document.getElementById('providers-summary')!.textContent =
         rows.length ? `${rows.length} providers` : '—';
-      tbody.innerHTML = rows.map((p) => `<tr>
-        <td>${escapeHtml(p.cloud_display)}</td>
-        <td class="num">${p.n_skus}</td>
-        <td class="num">${p.n_distinct_skus}</td>
-        <td class="num">${p.n_available}</td>
-        <td class="num">${fmtUsd(p.median_per_gpu_dph)}</td>
-        <td class="num">${fmtUsd(p.min_per_gpu_dph)}</td>
-        <td class="num">${fmtNum(p.median_boot_min_seconds, 0)}</td>
-        <td class="num">${fmtNum(p.median_boot_max_seconds, 0)}</td>
-      </tr>`).join('') || '<tr><td colspan="8" class="dim">No provider data.</td></tr>';
+      tbody.innerHTML = rows.map((p, i) => {
+        const cls = i === 0 ? ' class="row-top"' : '';
+        return `<tr${cls}>
+          <td>${escapeHtml(p.cloud_display)}</td>
+          <td class="num">${p.n_skus}</td>
+          <td class="num">${p.n_distinct_skus}</td>
+          <td class="num">${p.n_available}</td>
+          <td class="num">${fmtUsd(p.median_per_gpu_dph)}</td>
+          <td class="num">${fmtUsd(p.min_per_gpu_dph)}</td>
+          <td class="num">${fmtNum(p.median_boot_min_seconds, 0)}</td>
+          <td class="num">${fmtNum(p.median_boot_max_seconds, 0)}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="8" class="dim">No provider data.</td></tr>';
     }
 
     function renderSpread() {
@@ -487,7 +490,7 @@ const availMeta = (meta as any).availability;
       document.getElementById('spread-summary')!.textContent =
         `${providers.length} providers · gap ${fmtUsd(providers[0].min)} → ${fmtUsd(providers[providers.length - 1].max)}`;
 
-      const accent = readToken('--accent') || '#ff9100';
+      const accent = readToken('--vast-accent') || readToken('--accent') || '#ff9100';
       const inkDim = readToken('--ink-dim') || '#888';
       const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
       const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
@@ -523,7 +526,7 @@ const availMeta = (meta as any).availability;
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: true, position: 'bottom', labels: { color: inkDim, font: monoFont } },
+            legend: { display: false },
             tooltip: {
               callbacks: {
                 label: (ctx) => {
@@ -592,10 +595,11 @@ const availMeta = (meta as any).availability;
       document.getElementById('boot-summary')!.textContent =
         `${sorted.length} providers · fastest ${fmtNum(sorted[0].median_boot_min_seconds, 0)}s`;
 
-      const accent = readToken('--accent') || '#ff9100';
+      const accent = readToken('--vast-accent') || readToken('--accent') || '#ff9100';
       const inkDim = readToken('--ink-dim') || '#888';
       const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
       const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
+      const chipColor = colorForAvailabilityChip(state.chip);
 
       if (charts.boot) charts.boot.destroy();
       charts.boot = new Chart(document.getElementById('bootChart') as HTMLCanvasElement, {
@@ -606,7 +610,7 @@ const availMeta = (meta as any).availability;
             {
               label: 'min boot (s)',
               data: sorted.map((p) => p.median_boot_min_seconds ?? 0),
-              backgroundColor: AVAILABLE_COLOR,
+              backgroundColor: chipColor,
               borderWidth: 0,
             },
             {
@@ -621,7 +625,7 @@ const availMeta = (meta as any).availability;
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { display: true, position: 'bottom', labels: { color: inkDim, font: monoFont } },
+            legend: { display: false },
             tooltip: {
               callbacks: {
                 label: (ctx) => {
@@ -694,7 +698,7 @@ const availMeta = (meta as any).availability;
       document.getElementById('hist-summary')!.textContent =
         `${dist.length} cycles · ${dist[0].collected_at.slice(0, 10)} → ${dist[dist.length - 1].collected_at.slice(0, 10)}`;
 
-      const accent = readToken('--accent') || '#ff9100';
+      const accent = readToken('--vast-accent') || readToken('--accent') || '#ff9100';
       const inkDim = readToken('--ink-dim') || '#888';
       const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
       const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
@@ -851,18 +855,23 @@ const availMeta = (meta as any).availability;
     })();
   </script>
 
-  <style>
-    /* /availability inherits .vast-page chrome; this block adds page-specific
-       elements (the provider × region grid in section 1) and minor color
-       overrides scoped to .availability-page. */
+  <style is:global>
+    /* /availability inherits .vast-page chrome (defined as is:global in vast.astro);
+       this block adds the page-specific provider × region grid and the hero
+       wrap modifier. Also is:global so it applies despite Astro component scoping. */
 
     .availability-page .grid-wrap {
       position: relative;
       border: 1px solid var(--rule);
       background: var(--vast-panel-bg);
-      padding: 8px;
+      padding: 10px;
       margin-bottom: 8px;
       overflow-x: auto;
+    }
+    .availability-page .grid-wrap-hero {
+      background: var(--vast-panel-bg-hero, var(--vast-panel-bg));
+      border-color: var(--rule-2);
+      padding: 14px;
     }
     .availability-page .grid-container {
       display: grid;
@@ -906,27 +915,28 @@ const availMeta = (meta as any).availability;
       color: transparent;
     }
     .availability-page .grid-cell-on {
-      background: color-mix(in srgb, #2c8055 22%, var(--surface));
+      background: color-mix(in srgb, var(--vast-pos, #2c8055) 22%, var(--surface));
       color: var(--ink);
       font-weight: var(--weight-strong);
-      border-color: #2c8055;
+      border-color: var(--vast-pos, #2c8055);
     }
     .availability-page .grid-cell-off {
-      background: color-mix(in srgb, #a84040 18%, var(--surface));
+      background: color-mix(in srgb, var(--vast-neg, #a84040) 18%, var(--surface));
       color: var(--ink-dim);
-      border-color: color-mix(in srgb, #a84040 50%, transparent);
+      border-color: color-mix(in srgb, var(--vast-neg, #a84040) 50%, transparent);
       text-decoration: line-through;
     }
 
-    /* Tighter table density for the longer config / overlap tables */
-    .availability-page .data td.dim { color: var(--ink-dim); font-size: calc(var(--fs-xs) - 1px); }
-    .availability-page .data code {
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      background: color-mix(in srgb, var(--accent) 8%, transparent);
-      padding: 1px 5px;
-      border-radius: 0;
+    /* Top-row highlight on per-provider summary tables (mirrors /vast row-top) */
+    .availability-page .data tr.row-top td {
+      background: color-mix(in srgb, var(--vast-accent, var(--accent)) 8%, transparent);
+      border-top: 1px solid var(--vast-accent, var(--accent));
+      border-bottom: 1px solid var(--vast-accent, var(--accent));
+      font-weight: var(--weight-strong);
     }
+
+    /* (Removed override on .data code — global .vast-page .footnote code already
+       styles inline mono correctly; the prior pill background diverged from /vast.) */
 
     /* Mobile — keep grid horizontally scrollable */
     @media (max-width: 720px) {
