@@ -1,1 +1,3 @@
 as_of_date,collected_at,collection_window_id,chip_slug,n_total_sku_region,n_available_now,pct_available,n_providers_carrying,n_providers_with_any_availability,n_distinct_regions,per_gpu_dph_min,per_gpu_dph_p25,per_gpu_dph_p50,per_gpu_dph_p75,per_gpu_dph_p90,per_gpu_dph_max,cheapest_available_provider,cheapest_available_per_gpu_dph,median_boot_min_seconds,median_boot_max_seconds,methodology_version
+2026-05-03,2026-05-04 00:43:13.220256,2026-05-03-1800,h100-sxm,43,0,0.0,9,0,28,1.95,2.4,2.99,3.09,3.29,3.34,,,240.0,600.0,v2.0.0
+2026-05-03,2026-05-04 00:49:35.888877,2026-05-03-1800,h100-sxm,43,1,0.023255813953488372,9,1,28,1.95,2.4,2.99,3.09,3.29,3.34,Lambda Labs,3.19,240.0,600.0,v2.0.0
