@@ -111,7 +111,7 @@ const vastMeta = (meta as any).vast;
           <thead>
             <tr>
               <th class="num">$/hr</th>
-              <th class="num">DLPerf</th>
+              <th class="num">DLPerf/GPU</th>
               <th class="num">DLPerf/$/h</th>
               <th class="num">GPUs</th>
               <th>Verified</th>
@@ -122,6 +122,14 @@ const vastMeta = (meta as any).vast;
           <tbody id="frontierTbody"></tbody>
         </table>
       </div>
+      <p class="footnote">
+        <strong>DLPerf</strong> is Vast.ai's composite deep-learning benchmark — a
+        synthetic mixed-precision matmul/conv score that proxies training
+        throughput. Shown <em>per GPU</em> here so it lines up with the per-GPU
+        $/hr column. <strong>DLPerf/$/h</strong> is bundle perf-per-dollar; higher
+        is more performance per dollar of total spend on the offer (independent
+        of unit choice — same ratio whether you compute per-GPU or per-bundle).
+      </p>
     </section>
 
     <!-- Section 4: Multi-GPU supply -->
@@ -453,9 +461,13 @@ const vastMeta = (meta as any).vast;
           ? '<span class="tag verified">verified</span>'
           : (o.verification === 'deverified' ? '<span class="tag deverified">deverified</span>' : '—');
         const cls = i === 0 ? ' class="row-top"' : '';
+        const frac = o.gpu_frac && o.gpu_frac > 0 ? o.gpu_frac : 1;
+        const dlperfPerGpu = o.dlperf !== null && o.num_gpus > 0
+          ? o.dlperf / o.num_gpus / frac
+          : null;
         return `<tr${cls}>
           <td class="num">${fmtUsd(o.per_gpu_dph)}</td>
-          <td class="num">${fmtNum(o.dlperf, 0)}</td>
+          <td class="num">${fmtNum(dlperfPerGpu, 0)}</td>
           <td class="num">${fmtNum(o.dlperf_per_dphtotal, 1)}</td>
           <td class="num">${o.num_gpus}</td>
           <td>${verified}</td>
