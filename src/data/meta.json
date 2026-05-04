@@ -39,11 +39,32 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 395,
+    "total_rows": 410,
     "window_days": 7,
     "window_end": "2026-05-04",
     "window_start": "2026-04-28"
   },
   "vast": null,
-  "availability": null
+  "availability": {
+    "chips_observed": [
+      "a100-pcie-80gb",
+      "a100-sxm-80gb",
+      "b300",
+      "gh200",
+      "h100-pcie",
+      "h100-sxm",
+      "h200-sxm",
+      "l40s",
+      "rtx-pro-6000"
+    ],
+    "latest_collected_at_utc": "2026-05-04 12:48:17.373117",
+    "n_available_latest_cycle": 36,
+    "n_chips": 9,
+    "n_sku_regions_latest_cycle": 292,
+    "status": "ok",
+    "summary_file": "shadeform_summary.csv",
+    "window_days": 30,
+    "window_end": "2026-05-04",
+    "window_start": "2026-04-05"
+  }
 }

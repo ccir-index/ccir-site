@@ -1,3 +1,7 @@
 as_of_date,collected_at,collection_window_id,chip_slug,n_total_sku_region,n_available_now,pct_available,n_providers_carrying,n_providers_with_any_availability,n_distinct_regions,per_gpu_dph_min,per_gpu_dph_p25,per_gpu_dph_p50,per_gpu_dph_p75,per_gpu_dph_p90,per_gpu_dph_max,cheapest_available_provider,cheapest_available_per_gpu_dph,median_boot_min_seconds,median_boot_max_seconds,methodology_version
 2026-05-03,2026-05-04 00:43:13.220256,2026-05-03-1800,h100-pcie,42,9,0.21428571428571427,7,6,18,1.66,2.48,2.49,2.98,3.04,5.99,Hyperstack,1.9,180.0,480.0,v2.0.0
 2026-05-03,2026-05-04 00:49:35.888877,2026-05-03-1800,h100-pcie,42,9,0.21428571428571427,7,6,18,1.66,2.48,2.49,2.98,3.04,5.99,Hyperstack,1.9,180.0,480.0,v2.0.0
+2026-05-03,2026-05-04 03:45:28.727651,2026-05-03-1800,h100-pcie,42,7,0.16666666666666666,7,4,18,1.66,2.48,2.49,2.98,3.04,5.99,Hyperstack,1.9,180.0,480.0,v2.0.0
+2026-05-04,2026-05-04 06:45:26.561109,2026-05-03-1800,h100-pcie,42,6,0.14285714285714285,7,4,18,1.66,2.48,2.49,2.98,3.04,5.99,Hyperstack,1.9,180.0,480.0,v2.0.0
+2026-05-04,2026-05-04 09:45:31.080870,2026-05-03-1800,h100-pcie,42,4,0.09523809523809523,7,4,18,1.66,2.48,2.49,2.98,3.04,5.99,Hyperstack,1.9,180.0,480.0,v2.0.0
+2026-05-04,2026-05-04 12:48:17.373117,2026-05-04-0600,h100-pcie,42,3,0.07142857142857142,7,3,18,1.66,2.48,2.49,2.98,3.04,5.99,Latitude,1.99,180.0,480.0,v2.0.0
