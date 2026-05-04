@@ -106,6 +106,31 @@ jobs:
             echo "no vast_summary.csv at $DATE — /vast hero will fall back"
             : > ".sync/vast_summary.csv"
           fi
+          # Per-chip Shadeform CSVs power /availability — three files per chip
+          # (current-cycle SKU x region offers, 30d availability-history,
+          # current-cycle providers summary) plus one cross-chip summary. Chip
+          # slugs derived from AVAILABILITY_ALL_CHIPS in
+          # ccir-v2-notebooks/shared/config.py.
+          for chip in h100-sxm h100-pcie h200-sxm b200-sxm gb200 \
+                      a100-sxm-80gb a100-pcie-80gb \
+                      b300 gh200 rtx-pro-6000 l40s; do
+            for prefix in availability_offers shadeform_availability_history shadeform_providers; do
+              fname="${prefix}_${chip}.csv"
+              if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+                echo "fetched $fname"
+              else
+                echo "no $fname at $DATE — /availability will show empty for this chip section"
+                : > ".sync/$fname"
+              fi
+            done
+          done
+          # Cross-chip Shadeform summary
+          if curl -fsSL -o ".sync/shadeform_summary.csv" "$BASE/shadeform_summary.csv"; then
+            echo "fetched shadeform_summary.csv"
+          else
+            echo "no shadeform_summary.csv at $DATE — /availability summary will fall back"
+            : > ".sync/shadeform_summary.csv"
+          fi
           echo "have_snapshot=true" >> "$GITHUB_OUTPUT"
 
       - name: Verify hashes against manifest
@@ -175,6 +200,24 @@ jobs:
             cp ".sync/vast_summary.csv" "public/data/vast_summary.csv"
             echo "staged public/data/vast_summary.csv"
           fi
+          # Stage Shadeform CSVs (per-chip x 3 prefixes + summary).
+          for chip in h100-sxm h100-pcie h200-sxm b200-sxm gb200 \
+                      a100-sxm-80gb a100-pcie-80gb \
+                      b300 gh200 rtx-pro-6000 l40s; do
+            for prefix in availability_offers shadeform_availability_history shadeform_providers; do
+              fname="${prefix}_${chip}.csv"
+              if [ -s ".sync/$fname" ]; then
+                cp ".sync/$fname" "public/data/$fname"
+                echo "staged public/data/$fname"
+              else
+                echo "no $fname in this snapshot; leaving public/data unchanged"
+              fi
+            done
+          done
+          if [ -s ".sync/shadeform_summary.csv" ]; then
+            cp ".sync/shadeform_summary.csv" "public/data/shadeform_summary.csv"
+            echo "staged public/data/shadeform_summary.csv"
+          fi
           python3 - <<'PY'
           import json
           m = json.load(open('.sync/manifest.json'))
@@ -190,6 +233,7 @@ jobs:
               'listings_history': m.get('listings_history'),
               'marketplace_history': m.get('marketplace_history'),
               'vast': m.get('vast'),
+              'availability': m.get('availability'),
           }
           with open('src/data/meta.json', 'w') as f:
               json.dump(meta, f, indent=2)

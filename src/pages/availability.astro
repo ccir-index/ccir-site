@@ -1,0 +1,937 @@
+---
+import Base from '../layouts/Base.astro';
+import { meta } from '../data/snapshot';
+import { AVAILABILITY_HEADLINE_CHIPS, AVAILABILITY_LONGTAIL_CHIPS } from '../data/availability';
+
+const DEFAULT_CHIP = 'h100-sxm';
+const availMeta = (meta as any).availability;
+---
+<Base title="Availability Observatory · CCIR">
+  <!-- vast-page class brings the Bloomberg-terminal chrome (ticker strip,
+       sec-num chips, chart-wrap panels, mono tables, pulse dot, etc.).
+       availability-page adds /availability-specific overrides. -->
+  <section class="wrap top vast-page availability-page">
+    <div class="kicker">SHADEFORM AGGREGATOR · CROSS-PROVIDER OBSERVATORY</div>
+    <h1>Availability Observatory</h1>
+    <div class="ticker-strip" role="group" aria-label="Snapshot stats">
+      <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{availMeta?.window_days ?? 30}d</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Chips</span><span class="tk-val">{availMeta?.n_chips ?? 11}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">SKU × region</span><span class="tk-val">{availMeta?.n_sku_regions_latest_cycle ?? 0}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Available now</span><span class="tk-val">{availMeta?.n_available_latest_cycle ?? 0}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">3h</span></div>
+      <div class="tk-cell tk-status"><span class="tk-dot"></span><span class="tk-val">LIVE</span></div>
+    </div>
+    <p class="standfirst lede">
+      <strong>Shadeform aggregates 19 GPU clouds into a single live catalog.</strong>
+      This page surfaces what no single-source view can: where each chip is
+      procurable right now, across providers and regions; the per-provider
+      price spread; boot-time tradeoffs; config availability; long-tail chip
+      catalog. <strong>Observatory data — not part of the CCIR rate
+      methodology.</strong> Shadeform-reported pricing is third-party-attributed.
+    </p>
+
+    <div class="controls">
+      <div class="control-row chip-row">
+        <span class="control-label">Chip</span>
+        <div class="pill-group" id="chip-pills" role="group" aria-label="Select chip">
+          <span class="chip-group-label">Headline</span>
+          {AVAILABILITY_HEADLINE_CHIPS.map((c) => (
+            <button type="button" class="pill" data-chip={c.slug} data-default={c.slug === DEFAULT_CHIP}>
+              {c.short}
+            </button>
+          ))}
+          <span class="chip-group-label">Long-tail</span>
+          {AVAILABILITY_LONGTAIL_CHIPS.map((c) => (
+            <button type="button" class="pill" data-chip={c.slug}>
+              {c.short}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Hero — provider × region availability grid -->
+    <section class="vast-section vast-section-hero">
+      <header class="sec-head">
+        <span class="sec-num">01</span>
+        <span class="sec-kicker-label">AVAILABILITY</span>
+        <h2>Provider × region grid</h2>
+        <span class="sec-note" id="grid-summary">—</span>
+      </header>
+      <div class="quant-strip" id="grid-quant-strip" aria-label="Headline stats">
+        <div class="qs-cell"><span class="qs-lbl">SKU × REGION</span><span class="qs-val" id="qs-total">—</span></div>
+        <div class="qs-cell"><span class="qs-lbl">AVAILABLE</span><span class="qs-val" id="qs-avail">—</span></div>
+        <div class="qs-cell qs-cell-hero"><span class="qs-lbl">% AVAIL</span><span class="qs-val" id="qs-pct">—</span></div>
+        <div class="qs-cell"><span class="qs-lbl">PROVIDERS</span><span class="qs-val" id="qs-providers">—</span></div>
+        <div class="qs-cell"><span class="qs-lbl">CHEAPEST</span><span class="qs-val" id="qs-cheapest">—</span></div>
+        <div class="qs-cell"><span class="qs-lbl">MEDIAN $/GPU</span><span class="qs-val" id="qs-median">—</span></div>
+      </div>
+      <div class="grid-wrap">
+        <div class="chart-status" id="grid-status">Loading…</div>
+        <div id="gridContainer" class="grid-container"></div>
+      </div>
+      <p class="footnote">
+        Each cell is one (provider × region) pair for the selected chip. Green
+        = available now, red = offline. Hover for $/GPU/hr. Cells are sorted
+        by provider (rows) and region (columns), so chronic outages on a single
+        provider show up as a row of red. <code>per_gpu_dph = hourly_price ÷ 100 ÷ num_gpus</code>.
+      </p>
+    </section>
+
+    <!-- Section 2: Providers ranking -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">02</span>
+        <span class="sec-kicker-label">PROVIDERS</span>
+        <h2>Per-provider summary</h2>
+        <span class="sec-note" id="providers-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="providersTable">
+          <thead>
+            <tr>
+              <th>Provider</th>
+              <th class="num">SKUs</th>
+              <th class="num">Distinct</th>
+              <th class="num">Available</th>
+              <th class="num">Median $/GPU</th>
+              <th class="num">Min $/GPU</th>
+              <th class="num">Boot min (s)</th>
+              <th class="num">Boot max (s)</th>
+            </tr>
+          </thead>
+          <tbody id="providersTbody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">
+        Shadeform tracks 19 GPU clouds; not all carry the selected chip. Boot
+        times are minimum/maximum provisioning seconds reported by the provider.
+        Latitude commits to ~60s; some hyperscale-scale fleets need 180-240s.
+      </p>
+    </section>
+
+    <!-- Section 3: Spread (per-provider $/GPU strip) -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">03</span>
+        <span class="sec-kicker-label">SPREAD</span>
+        <h2>Per-provider price spread</h2>
+        <span class="sec-note" id="spread-summary">—</span>
+      </header>
+      <div class="chart-wrap" style="height:320px;">
+        <div class="chart-status" id="spread-status">Loading…</div>
+        <canvas id="spreadChart"></canvas>
+      </div>
+      <p class="footnote">
+        Each provider's min, median, and max per-GPU $/hr for the selected chip.
+        Wide bars mean broad SKU coverage; narrow bars mean a single configuration.
+        Cross-provider gap = arbitrage signal. (Same chip can clear $1.95-$2.99/GPU/hr
+        across nine venues for H100 SXM.)
+      </p>
+    </section>
+
+    <!-- Section 4: Configs (interconnect / NVLink / num_gpus) -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">04</span>
+        <span class="sec-kicker-label">CONFIGS</span>
+        <h2>Available configurations</h2>
+        <span class="sec-note" id="configs-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="configsTable">
+          <thead>
+            <tr>
+              <th>Provider</th>
+              <th>Interconnect</th>
+              <th>NVLink</th>
+              <th class="num">GPUs</th>
+              <th class="num">vCPU envelope</th>
+              <th class="num">RAM (GB)</th>
+              <th class="num">$/GPU/hr</th>
+              <th>Available</th>
+            </tr>
+          </thead>
+          <tbody id="configsTbody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">
+        Per-SKU configuration matrix. NVLink ✓ means the provider exposes
+        explicit NVLink topology — not just SXM form. Empty cells reflect
+        Shadeform's reporting; the underlying provider may have richer
+        config detail in their own API.
+      </p>
+    </section>
+
+    <!-- Section 5: Boot time -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">05</span>
+        <span class="sec-kicker-label">BOOT TIME</span>
+        <h2>Provisioning seconds by provider</h2>
+        <span class="sec-note" id="boot-summary">—</span>
+      </header>
+      <div class="chart-wrap" style="height:280px;">
+        <div class="chart-status" id="boot-status">Loading…</div>
+        <canvas id="bootChart"></canvas>
+      </div>
+      <p class="footnote">
+        Min / max provisioning seconds per provider. Matters for elasticity-
+        sensitive workloads — a 4× boot-time gap between providers can be
+        more material than a $0.10/GPU/hr price gap on short-duration jobs.
+      </p>
+    </section>
+
+    <!-- Section 6: Geography -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">06</span>
+        <span class="sec-kicker-label">GEOGRAPHY</span>
+        <h2>Region distribution</h2>
+        <span class="sec-note" id="geo-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="geoTable">
+          <thead>
+            <tr>
+              <th>Region</th>
+              <th class="num">SKUs</th>
+              <th class="num">Available</th>
+              <th class="num">% Avail</th>
+              <th class="num">Providers</th>
+              <th class="num">Min $/GPU</th>
+            </tr>
+          </thead>
+          <tbody id="geoTbody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">
+        Where on earth is the selected chip procurable. The same chip can
+        be online in Iceland but offline in Virginia, and price-anchored to
+        the cheapest available cell across all regions.
+      </p>
+    </section>
+
+    <!-- Section 7: Availability over time -->
+    <section class="vast-section vast-section-hero">
+      <header class="sec-head">
+        <span class="sec-num">07</span>
+        <span class="sec-kicker-label">TIME SERIES</span>
+        <h2>Availability % over 30 days</h2>
+        <span class="sec-note" id="hist-summary">—</span>
+      </header>
+      <div class="chart-wrap chart-wrap-hero" style="height:340px;">
+        <div class="chart-status" id="hist-status">Loading…</div>
+        <canvas id="histChart"></canvas>
+      </div>
+      <p class="footnote">
+        Per-cycle <code>pct_available = n_available ÷ n_total_sku_region</code>
+        for the selected chip. Drops indicate fleet-wide outages or supply
+        cliffs; sustained climbs indicate new capacity onboarding. <strong>This
+        is the unique CCIR view</strong> — Shadeform exposes current state
+        only; CCIR persists the cycle-by-cycle history.
+      </p>
+    </section>
+
+    <!-- Section 8: Provider overlap -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">08</span>
+        <span class="sec-kicker-label">OVERLAP</span>
+        <h2>Cross-provider redundancy</h2>
+        <span class="sec-note" id="overlap-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="overlapTable">
+          <thead>
+            <tr>
+              <th>Interconnect × num_GPUs</th>
+              <th class="num">Providers</th>
+              <th class="num">SKUs</th>
+              <th class="num">Available</th>
+              <th>Carriers</th>
+            </tr>
+          </thead>
+          <tbody id="overlapTbody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">
+        For each (interconnect × num_GPUs) configuration, how many providers
+        carry it. Single-provider rows mean concentration risk — capacity
+        loss has nowhere to fail over to. Multi-provider rows mean cross-
+        venue arbitrage is possible.
+      </p>
+    </section>
+
+    <!-- Section 9: Long-tail catalog -->
+    <section class="vast-section">
+      <header class="sec-head">
+        <span class="sec-num">09</span>
+        <span class="sec-kicker-label">CATALOG</span>
+        <h2>Cross-chip headline</h2>
+        <span class="sec-note" id="summary-summary">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="summaryTable">
+          <thead>
+            <tr>
+              <th>Chip</th>
+              <th class="num">SKU × region</th>
+              <th class="num">Available</th>
+              <th class="num">% Avail</th>
+              <th class="num">Providers</th>
+              <th class="num">Min $/GPU</th>
+              <th class="num">Median $/GPU</th>
+              <th>Cheapest provider</th>
+            </tr>
+          </thead>
+          <tbody id="summaryTbody"></tbody>
+        </table>
+      </div>
+      <p class="footnote">
+        Every chip Shadeform reports across the headline + long-tail panel.
+        B300, GH200, and RTX Pro 6000 give early visibility into chips before
+        they hit the CCIR rate panel.
+      </p>
+    </section>
+
+    <p class="footnote-last">
+      Refreshed every three hours alongside <a href="/marketplace">/marketplace</a>
+      and <a href="/vast">/vast</a>. Shadeform aggregator API authenticated via
+      CCIR research key — values are public list-asks as Shadeform reports them.
+      Aggregator depth: 19 GPU clouds, 28 GPU types, 269 instance types,
+      ~671 (type × region) availability cells per cycle.
+    </p>
+  </section>
+
+  <script>
+    import Chart from 'chart.js/auto';
+    import 'chartjs-adapter-date-fns';
+    import {
+      fetchAvailabilityOffers, fetchAvailabilityHistory,
+      fetchAvailabilityProviders, fetchAvailabilitySummary,
+      colorForAvailabilityChip, shortLabelForAvailabilityChip,
+      AVAILABLE_COLOR, UNAVAILABLE_COLOR,
+      type AvailabilityChipSlug, type AvailabilityOfferRow,
+      type AvailabilityHistoryRow, type AvailabilityProviderRow,
+      type AvailabilitySummaryRow,
+    } from '../data/availability';
+
+    const DEFAULT_CHIP: AvailabilityChipSlug = 'h100-sxm';
+
+    const state = {
+      chip: DEFAULT_CHIP as AvailabilityChipSlug,
+      offers: [] as AvailabilityOfferRow[],
+      history: [] as AvailabilityHistoryRow[],
+      providers: [] as AvailabilityProviderRow[],
+      summary: [] as AvailabilitySummaryRow[],
+    };
+
+    const charts: Record<string, Chart | null> = {
+      spread: null, boot: null, hist: null,
+    };
+
+    function setStatus(id: string, msg: string | null) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (msg === null) { (el as HTMLElement).style.display = 'none'; el.textContent = ''; }
+      else { (el as HTMLElement).style.display = 'flex'; el.textContent = msg; }
+    }
+
+    function fmtUsd(n: number | null | undefined, decimals = 2): string {
+      if (n === null || n === undefined || !Number.isFinite(n)) return '—';
+      return '$' + n.toFixed(decimals);
+    }
+    function fmtNum(n: number | null | undefined, decimals = 0): string {
+      if (n === null || n === undefined || !Number.isFinite(n)) return '—';
+      return n.toFixed(decimals);
+    }
+    function fmtPct(n: number | null | undefined): string {
+      if (n === null || n === undefined || !Number.isFinite(n)) return '—';
+      return (n * 100).toFixed(0) + '%';
+    }
+
+    function setQs(id: string, v: string) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = v;
+    }
+
+    function syncPills() {
+      document.querySelectorAll<HTMLButtonElement>('#chip-pills .pill').forEach((p) => {
+        p.classList.toggle('on', p.dataset.chip === state.chip);
+      });
+    }
+
+    function readToken(name: string): string {
+      try {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      } catch { return ''; }
+    }
+
+    // ---- Renderers ---------------------------------------------------------
+
+    function renderHeadline() {
+      const offers = state.offers;
+      if (offers.length === 0) {
+        setStatus('grid-status', `No SKUs reported by Shadeform for ${shortLabelForAvailabilityChip(state.chip)} this cycle.`);
+        ['qs-total', 'qs-avail', 'qs-pct', 'qs-providers', 'qs-cheapest', 'qs-median'].forEach((id) => setQs(id, '—'));
+        document.getElementById('grid-summary')!.textContent = '0 cells';
+        document.getElementById('gridContainer')!.innerHTML = '';
+        return;
+      }
+      setStatus('grid-status', null);
+      const total = offers.length;
+      const avail = offers.filter((o) => o.available).length;
+      const pct = total > 0 ? avail / total : 0;
+      const providers = new Set(offers.map((o) => o.cloud)).size;
+      const availOffers = offers.filter((o) => o.available && o.per_gpu_dph !== null);
+      let cheapest: AvailabilityOfferRow | null = null;
+      for (const o of availOffers) {
+        if (cheapest === null || (o.per_gpu_dph! < (cheapest.per_gpu_dph ?? Infinity))) cheapest = o;
+      }
+      const dphs = offers.map((o) => o.per_gpu_dph).filter((v): v is number => v !== null && Number.isFinite(v));
+      const median = dphs.length ? quantile(dphs, 0.5) : null;
+
+      setQs('qs-total', String(total));
+      setQs('qs-avail', String(avail));
+      setQs('qs-pct', fmtPct(pct));
+      setQs('qs-providers', String(providers));
+      setQs('qs-cheapest', cheapest ? `${fmtUsd(cheapest.per_gpu_dph)} ${cheapest.cloud_display}` : '—');
+      setQs('qs-median', fmtUsd(median));
+
+      document.getElementById('grid-summary')!.textContent =
+        `${total} cells · ${avail} available across ${providers} providers`;
+
+      // Build grid: rows = providers, columns = regions
+      const providerOrder = Array.from(new Set(offers.map((o) => o.cloud_display))).sort();
+      const regionOrder = Array.from(new Set(offers.map((o) => o.region_display ?? o.region))).sort();
+      // Aggregate by (provider, region) — pick the cheapest available, fallback to any
+      const cellMap = new Map<string, AvailabilityOfferRow>();
+      for (const o of offers) {
+        const key = `${o.cloud_display}|${o.region_display ?? o.region}`;
+        const prev = cellMap.get(key);
+        if (!prev) { cellMap.set(key, o); continue; }
+        if (o.available && !prev.available) { cellMap.set(key, o); continue; }
+        if (o.available === prev.available
+            && (o.per_gpu_dph ?? Infinity) < (prev.per_gpu_dph ?? Infinity)) {
+          cellMap.set(key, o);
+        }
+      }
+
+      const cellHtml: string[] = [];
+      // Header row
+      cellHtml.push(`<div class="grid-cell grid-cell-corner"></div>`);
+      for (const r of regionOrder) {
+        cellHtml.push(`<div class="grid-cell grid-cell-col-head" title="${escapeHtml(r)}">${escapeHtml(truncate(r, 18))}</div>`);
+      }
+      // Provider rows
+      for (const p of providerOrder) {
+        cellHtml.push(`<div class="grid-cell grid-cell-row-head" title="${escapeHtml(p)}">${escapeHtml(truncate(p, 22))}</div>`);
+        for (const r of regionOrder) {
+          const o = cellMap.get(`${p}|${r}`);
+          if (!o) {
+            cellHtml.push(`<div class="grid-cell grid-cell-empty"></div>`);
+          } else {
+            const cls = o.available ? 'grid-cell-on' : 'grid-cell-off';
+            const tooltip = `${p} / ${r}\\n${o.shade_instance_type}\\n${o.num_gpus}× ${o.gpu_type} ${o.interconnect ?? ''}\\n${fmtUsd(o.per_gpu_dph)}/GPU/hr · ${o.available ? 'available' : 'offline'}`;
+            cellHtml.push(`<div class="grid-cell ${cls}" title="${escapeHtml(tooltip)}">${fmtUsd(o.per_gpu_dph, 2)}</div>`);
+          }
+        }
+      }
+      const container = document.getElementById('gridContainer')!;
+      container.style.gridTemplateColumns = `170px repeat(${regionOrder.length}, minmax(72px, 1fr))`;
+      container.innerHTML = cellHtml.join('');
+    }
+
+    function renderProvidersTable() {
+      const tbody = document.getElementById('providersTbody')!;
+      const rows = state.providers;
+      document.getElementById('providers-summary')!.textContent =
+        rows.length ? `${rows.length} providers` : '—';
+      tbody.innerHTML = rows.map((p) => `<tr>
+        <td>${escapeHtml(p.cloud_display)}</td>
+        <td class="num">${p.n_skus}</td>
+        <td class="num">${p.n_distinct_skus}</td>
+        <td class="num">${p.n_available}</td>
+        <td class="num">${fmtUsd(p.median_per_gpu_dph)}</td>
+        <td class="num">${fmtUsd(p.min_per_gpu_dph)}</td>
+        <td class="num">${fmtNum(p.median_boot_min_seconds, 0)}</td>
+        <td class="num">${fmtNum(p.median_boot_max_seconds, 0)}</td>
+      </tr>`).join('') || '<tr><td colspan="8" class="dim">No provider data.</td></tr>';
+    }
+
+    function renderSpread() {
+      const offers = state.offers.filter((o) => o.per_gpu_dph !== null);
+      if (offers.length === 0) {
+        setStatus('spread-status', 'No price data.');
+        if (charts.spread) { charts.spread.destroy(); charts.spread = null; }
+        document.getElementById('spread-summary')!.textContent = '—';
+        return;
+      }
+      setStatus('spread-status', null);
+      const byProvider = new Map<string, number[]>();
+      for (const o of offers) {
+        const arr = byProvider.get(o.cloud_display) ?? [];
+        arr.push(o.per_gpu_dph!);
+        byProvider.set(o.cloud_display, arr);
+      }
+      const providers = Array.from(byProvider.entries())
+        .map(([name, vals]) => ({
+          name,
+          min: Math.min(...vals),
+          med: quantile(vals, 0.5),
+          max: Math.max(...vals),
+          n: vals.length,
+        }))
+        .sort((a, b) => a.med - b.med);
+      document.getElementById('spread-summary')!.textContent =
+        `${providers.length} providers · gap ${fmtUsd(providers[0].min)} → ${fmtUsd(providers[providers.length - 1].max)}`;
+
+      const accent = readToken('--accent') || '#ff9100';
+      const inkDim = readToken('--ink-dim') || '#888';
+      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
+      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
+
+      if (charts.spread) charts.spread.destroy();
+      charts.spread = new Chart(document.getElementById('spreadChart') as HTMLCanvasElement, {
+        type: 'bar',
+        data: {
+          labels: providers.map((p) => p.name),
+          datasets: [
+            {
+              label: 'min → max',
+              data: providers.map((p) => [p.min, p.max] as any),
+              backgroundColor: colorForAvailabilityChip(state.chip) + '88',
+              borderColor: colorForAvailabilityChip(state.chip),
+              borderWidth: 1,
+              borderSkipped: false,
+            },
+            {
+              label: 'median',
+              type: 'line' as any,
+              data: providers.map((p) => p.med),
+              borderColor: accent,
+              backgroundColor: accent,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              showLine: false,
+            } as any,
+          ],
+        },
+        options: {
+          indexAxis: 'y' as const,
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { color: inkDim, font: monoFont } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const p = providers[ctx.dataIndex];
+                  if (ctx.dataset.label === 'median') return `${p.name} median ${fmtUsd(p.med)}`;
+                  return `${p.name}: ${fmtUsd(p.min)} – ${fmtUsd(p.max)} (n=${p.n})`;
+                },
+              },
+            },
+          },
+          scales: {
+            x: { title: { display: true, text: 'Per-GPU $/hr', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid } },
+            y: { ticks: { color: inkDim, font: monoFont }, grid: { color: grid } },
+          },
+        },
+      });
+    }
+
+    function renderConfigsTable() {
+      const tbody = document.getElementById('configsTbody')!;
+      // Distinct (provider, interconnect, nvlink, num_gpus) rows, sorted by provider then num_gpus
+      const seen = new Map<string, AvailabilityOfferRow>();
+      for (const o of state.offers) {
+        const key = `${o.cloud_display}|${o.interconnect ?? ''}|${o.nvlink}|${o.num_gpus}`;
+        const prev = seen.get(key);
+        if (!prev) { seen.set(key, o); continue; }
+        if (o.available && !prev.available) seen.set(key, o);
+      }
+      const rows = Array.from(seen.values()).sort((a, b) => {
+        if (a.cloud_display !== b.cloud_display) return a.cloud_display.localeCompare(b.cloud_display);
+        return a.num_gpus - b.num_gpus;
+      });
+      document.getElementById('configs-summary')!.textContent =
+        rows.length ? `${rows.length} configurations` : '—';
+      tbody.innerHTML = rows.map((c) => {
+        const cpu = c.vcpus !== null ? String(c.vcpus) : '—';
+        const ram = c.memory_in_gb !== null ? String(c.memory_in_gb) : '—';
+        const tag = c.available
+          ? '<span class="tag verified">available</span>'
+          : '<span class="tag deverified">offline</span>';
+        return `<tr>
+          <td>${escapeHtml(c.cloud_display)}</td>
+          <td>${escapeHtml(c.interconnect ?? '—')}</td>
+          <td>${c.nvlink === true ? '✓' : (c.nvlink === false ? '—' : '?')}</td>
+          <td class="num">${c.num_gpus}</td>
+          <td class="num">${cpu}</td>
+          <td class="num">${ram}</td>
+          <td class="num">${fmtUsd(c.per_gpu_dph)}</td>
+          <td>${tag}</td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="8" class="dim">No configurations reported.</td></tr>';
+    }
+
+    function renderBootTime() {
+      const providers = state.providers.filter((p) =>
+        p.median_boot_min_seconds !== null || p.median_boot_max_seconds !== null);
+      if (providers.length === 0) {
+        setStatus('boot-status', 'No boot-time data.');
+        if (charts.boot) { charts.boot.destroy(); charts.boot = null; }
+        document.getElementById('boot-summary')!.textContent = '—';
+        return;
+      }
+      setStatus('boot-status', null);
+      const sorted = [...providers].sort((a, b) =>
+        (a.median_boot_min_seconds ?? Infinity) - (b.median_boot_min_seconds ?? Infinity));
+      document.getElementById('boot-summary')!.textContent =
+        `${sorted.length} providers · fastest ${fmtNum(sorted[0].median_boot_min_seconds, 0)}s`;
+
+      const accent = readToken('--accent') || '#ff9100';
+      const inkDim = readToken('--ink-dim') || '#888';
+      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
+      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
+
+      if (charts.boot) charts.boot.destroy();
+      charts.boot = new Chart(document.getElementById('bootChart') as HTMLCanvasElement, {
+        type: 'bar',
+        data: {
+          labels: sorted.map((p) => p.cloud_display),
+          datasets: [
+            {
+              label: 'min boot (s)',
+              data: sorted.map((p) => p.median_boot_min_seconds ?? 0),
+              backgroundColor: AVAILABLE_COLOR,
+              borderWidth: 0,
+            },
+            {
+              label: 'max boot (s)',
+              data: sorted.map((p) => (p.median_boot_max_seconds ?? 0) - (p.median_boot_min_seconds ?? 0)),
+              backgroundColor: accent,
+              borderWidth: 0,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { color: inkDim, font: monoFont } },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const p = sorted[ctx.dataIndex];
+                  return `${p.cloud_display}: ${fmtNum(p.median_boot_min_seconds, 0)}s – ${fmtNum(p.median_boot_max_seconds, 0)}s`;
+                },
+              },
+            },
+          },
+          scales: {
+            x: { stacked: true, ticks: { color: inkDim, font: monoFont, maxRotation: 45 }, grid: { color: grid } },
+            y: { stacked: true, title: { display: true, text: 'Seconds (median)', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid }, beginAtZero: true },
+          },
+        },
+      });
+    }
+
+    function renderGeo() {
+      const tbody = document.getElementById('geoTbody')!;
+      const offers = state.offers;
+      if (offers.length === 0) {
+        document.getElementById('geo-summary')!.textContent = '—';
+        tbody.innerHTML = '<tr><td colspan="6" class="dim">No region data.</td></tr>';
+        return;
+      }
+      const byRegion = new Map<string, { skus: number; avail: number; providers: Set<string>; minPrice: number | null }>();
+      for (const o of offers) {
+        const k = o.region_display ?? o.region;
+        const cur = byRegion.get(k) ?? { skus: 0, avail: 0, providers: new Set(), minPrice: null };
+        cur.skus += 1;
+        if (o.available) cur.avail += 1;
+        cur.providers.add(o.cloud);
+        if (o.per_gpu_dph !== null && (cur.minPrice === null || o.per_gpu_dph < cur.minPrice)) {
+          cur.minPrice = o.per_gpu_dph;
+        }
+        byRegion.set(k, cur);
+      }
+      const rows = Array.from(byRegion.entries())
+        .map(([region, v]) => ({
+          region,
+          skus: v.skus,
+          avail: v.avail,
+          pct: v.skus > 0 ? v.avail / v.skus : 0,
+          providers: v.providers.size,
+          minPrice: v.minPrice,
+        }))
+        .sort((a, b) => b.skus - a.skus);
+      document.getElementById('geo-summary')!.textContent =
+        `${rows.length} regions · top ${Math.min(rows.length, 25)}`;
+      tbody.innerHTML = rows.slice(0, 25).map((r) => `<tr>
+        <td>${escapeHtml(r.region)}</td>
+        <td class="num">${r.skus}</td>
+        <td class="num">${r.avail}</td>
+        <td class="num">${fmtPct(r.pct)}</td>
+        <td class="num">${r.providers}</td>
+        <td class="num">${fmtUsd(r.minPrice)}</td>
+      </tr>`).join('');
+    }
+
+    function renderHistory() {
+      const dist = state.history;
+      if (dist.length === 0) {
+        setStatus('hist-status',
+          `No history yet for ${shortLabelForAvailabilityChip(state.chip)} — accrues every 3 hours.`);
+        if (charts.hist) { charts.hist.destroy(); charts.hist = null; }
+        document.getElementById('hist-summary')!.textContent = '—';
+        return;
+      }
+      setStatus('hist-status', null);
+      document.getElementById('hist-summary')!.textContent =
+        `${dist.length} cycles · ${dist[0].collected_at.slice(0, 10)} → ${dist[dist.length - 1].collected_at.slice(0, 10)}`;
+
+      const accent = readToken('--accent') || '#ff9100';
+      const inkDim = readToken('--ink-dim') || '#888';
+      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
+      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
+
+      if (charts.hist) charts.hist.destroy();
+      charts.hist = new Chart(document.getElementById('histChart') as HTMLCanvasElement, {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              label: '% available',
+              data: dist.map((r) => ({ x: r.collected_ms, y: (r.pct_available ?? 0) * 100 })),
+              borderColor: accent,
+              backgroundColor: accent + '22',
+              borderWidth: 2.4,
+              pointRadius: 0,
+              tension: 0,
+              fill: true,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (ctx) => `${(ctx.parsed.y as number).toFixed(0)}% available` } },
+          },
+          scales: {
+            x: { type: 'time', title: { display: true, text: 'Date', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid } },
+            y: { title: { display: true, text: '% available', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid }, min: 0, max: 100 },
+          },
+        },
+      });
+    }
+
+    function renderOverlap() {
+      const tbody = document.getElementById('overlapTbody')!;
+      const offers = state.offers;
+      if (offers.length === 0) {
+        document.getElementById('overlap-summary')!.textContent = '—';
+        tbody.innerHTML = '<tr><td colspan="5" class="dim">No data.</td></tr>';
+        return;
+      }
+      const byConfig = new Map<string, { providers: Set<string>; skus: number; avail: number; carriers: Set<string> }>();
+      for (const o of offers) {
+        const k = `${o.interconnect ?? '?'} × ${o.num_gpus}`;
+        const cur = byConfig.get(k) ?? { providers: new Set(), skus: 0, avail: 0, carriers: new Set() };
+        cur.providers.add(o.cloud);
+        cur.skus += 1;
+        if (o.available) cur.avail += 1;
+        cur.carriers.add(o.cloud_display);
+        byConfig.set(k, cur);
+      }
+      const rows = Array.from(byConfig.entries())
+        .map(([key, v]) => ({
+          key,
+          providers: v.providers.size,
+          skus: v.skus,
+          avail: v.avail,
+          carriers: Array.from(v.carriers).sort().join(', '),
+        }))
+        .sort((a, b) => b.providers - a.providers);
+      document.getElementById('overlap-summary')!.textContent =
+        `${rows.length} configs · ${rows.filter((r) => r.providers >= 2).length} multi-provider`;
+      tbody.innerHTML = rows.map((r) => `<tr>
+        <td><code>${escapeHtml(r.key)}</code></td>
+        <td class="num">${r.providers}</td>
+        <td class="num">${r.skus}</td>
+        <td class="num">${r.avail}</td>
+        <td class="dim">${escapeHtml(r.carriers)}</td>
+      </tr>`).join('');
+    }
+
+    function renderSummaryTable() {
+      const tbody = document.getElementById('summaryTbody')!;
+      const rows = state.summary;
+      document.getElementById('summary-summary')!.textContent =
+        rows.length ? `${rows.length} chips observed` : '—';
+      tbody.innerHTML = rows.map((s) => `<tr>
+        <td>${escapeHtml(shortLabelForAvailabilityChip(s.chip_slug))}</td>
+        <td class="num">${s.n_sku_regions}</td>
+        <td class="num">${s.n_available_now}</td>
+        <td class="num">${fmtPct(s.pct_available)}</td>
+        <td class="num">${s.n_providers_carrying}</td>
+        <td class="num">${fmtUsd(s.per_gpu_dph_min)}</td>
+        <td class="num">${fmtUsd(s.per_gpu_dph_median)}</td>
+        <td>${escapeHtml(s.cheapest_available_provider ?? '—')}</td>
+      </tr>`).join('') || '<tr><td colspan="8" class="dim">No summary yet.</td></tr>';
+    }
+
+    // ---- Helpers -----------------------------------------------------------
+
+    function quantile(values: number[], q: number): number {
+      const sorted = [...values].sort((a, b) => a - b);
+      const idx = q * (sorted.length - 1);
+      const lo = Math.floor(idx);
+      const hi = Math.ceil(idx);
+      if (lo === hi) return sorted[lo];
+      return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+    }
+
+    function escapeHtml(s: string | null | undefined): string {
+      if (!s) return '';
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+              .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function truncate(s: string, n: number): string {
+      if (s.length <= n) return s;
+      return s.slice(0, n - 1) + '…';
+    }
+
+    // ---- Refresh + boot ----------------------------------------------------
+
+    async function refreshChip() {
+      ['grid-status', 'spread-status', 'boot-status', 'hist-status'].forEach((id) =>
+        setStatus(id, 'Loading…')
+      );
+      const [offers, history, providers] = await Promise.all([
+        fetchAvailabilityOffers(state.chip),
+        fetchAvailabilityHistory(state.chip),
+        fetchAvailabilityProviders(state.chip),
+      ]);
+      state.offers = offers;
+      state.history = history;
+      state.providers = providers;
+      renderHeadline();
+      renderProvidersTable();
+      renderSpread();
+      renderConfigsTable();
+      renderBootTime();
+      renderGeo();
+      renderHistory();
+      renderOverlap();
+    }
+
+    document.getElementById('chip-pills')!.addEventListener('click', (ev) => {
+      const t = ev.target as HTMLElement;
+      const pill = t.closest<HTMLButtonElement>('.pill');
+      if (!pill || !pill.dataset.chip) return;
+      state.chip = pill.dataset.chip as AvailabilityChipSlug;
+      syncPills();
+      refreshChip();
+    });
+
+    (async function boot() {
+      const summary = await fetchAvailabilitySummary();
+      state.summary = summary;
+      renderSummaryTable();
+      syncPills();
+      await refreshChip();
+    })();
+  </script>
+
+  <style>
+    /* /availability inherits .vast-page chrome; this block adds page-specific
+       elements (the provider × region grid in section 1) and minor color
+       overrides scoped to .availability-page. */
+
+    .availability-page .grid-wrap {
+      position: relative;
+      border: 1px solid var(--rule);
+      background: var(--vast-panel-bg);
+      padding: 8px;
+      margin-bottom: 8px;
+      overflow-x: auto;
+    }
+    .availability-page .grid-container {
+      display: grid;
+      gap: 1px;
+      min-width: 100%;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      font-variant-numeric: tabular-nums;
+    }
+    .availability-page .grid-cell {
+      padding: 5px 6px;
+      background: var(--surface);
+      color: var(--ink-dim);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid var(--rule-2);
+    }
+    .availability-page .grid-cell-corner {
+      background: var(--bg);
+      border: 0;
+    }
+    .availability-page .grid-cell-col-head {
+      font-weight: var(--weight-strong);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: calc(var(--fs-xs) - 2px);
+      background: var(--bg);
+      color: var(--ink-dim);
+    }
+    .availability-page .grid-cell-row-head {
+      font-weight: var(--weight-strong);
+      text-align: left;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    .availability-page .grid-cell-empty {
+      background: transparent;
+      border: 1px dashed var(--rule-2);
+      color: transparent;
+    }
+    .availability-page .grid-cell-on {
+      background: color-mix(in srgb, #2c8055 22%, var(--surface));
+      color: var(--ink);
+      font-weight: var(--weight-strong);
+      border-color: #2c8055;
+    }
+    .availability-page .grid-cell-off {
+      background: color-mix(in srgb, #a84040 18%, var(--surface));
+      color: var(--ink-dim);
+      border-color: color-mix(in srgb, #a84040 50%, transparent);
+      text-decoration: line-through;
+    }
+
+    /* Tighter table density for the longer config / overlap tables */
+    .availability-page .data td.dim { color: var(--ink-dim); font-size: calc(var(--fs-xs) - 1px); }
+    .availability-page .data code {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+      padding: 1px 5px;
+      border-radius: 0;
+    }
+
+    /* Mobile — keep grid horizontally scrollable */
+    @media (max-width: 720px) {
+      .availability-page .grid-container { font-size: calc(var(--fs-xs) - 2px); }
+      .availability-page .grid-cell { padding: 3px 4px; }
+    }
+  </style>
+</Base>
