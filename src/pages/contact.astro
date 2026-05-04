@@ -6,29 +6,10 @@ import { meta } from '../data/snapshot';
   <section class="wrap top">
     <div class="kicker">Get in touch · {meta.as_of_date}</div>
     <h1>Contact CCIR</h1>
-    <p class="standfirst lede">
-      For methodology questions, coverage suggestions, errata, or anything
-      else about the index.
-    </p>
 
     <article class="card">
       <div class="card-kicker">Email</div>
       <a class="email" href="mailto:research@ccir.io">research@ccir.io</a>
-      <p class="note">
-        We respond to research correspondence within two business days.
-        For tier-classification questions on a specific operator or SKU,
-        please include the URL of the public rate card you are observing.
-      </p>
-    </article>
-
-    <article class="card card-secondary">
-      <div class="card-kicker">Editorial framing</div>
-      <p class="note">
-        CCIR rates are productivity-adjusted reference rates. Each tier
-        is a defined capability bundle — fabric, host, support,
-        compliance. Users match the reference cited to the deployment
-        grade they pay for, narrowing basis risk.
-      </p>
     </article>
   </section>
 
@@ -37,12 +18,7 @@ import { meta } from '../data/snapshot';
     h1 {
       font-family: var(--font-display);
       font-size: var(--fs-2xl);
-      margin: 6px 0 14px;
-    }
-    .lede {
-      max-width: 64ch;
-      margin: 8px 0 28px;
-      font-size: var(--fs-md);
+      margin: 6px 0 20px;
     }
 
     .card {
@@ -51,12 +27,11 @@ import { meta } from '../data/snapshot';
       border-left: 2px solid var(--accent);
       padding: 20px 22px;
       max-width: 64ch;
-      margin-bottom: 16px;
+      margin-bottom: 40px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-    .card-secondary { border-left-color: var(--rule-2); margin-bottom: 40px; }
     .card-kicker {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
@@ -70,16 +45,9 @@ import { meta } from '../data/snapshot';
       font-size: var(--fs-xl);
       color: var(--accent);
       font-weight: var(--weight-strong);
-      margin: 4px 0 8px;
+      margin: 4px 0;
       word-break: break-all;
     }
     .card .email:hover { text-decoration: underline; }
-    .card .note {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
-      color: var(--ink);
-      margin: 0;
-      line-height: 1.6;
-    }
   </style>
 </Base>
