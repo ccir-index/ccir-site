@@ -1,7 +1,7 @@
 cloud,cloud_display,n_skus,n_distinct_skus,n_available,median_per_gpu_dph,min_per_gpu_dph,max_per_gpu_dph,median_boot_min_seconds,median_boot_max_seconds
-massedcompute,Massed Compute,14,4,1,1.26,1.24,1.28,120.0,420.0
+massedcompute,Massed Compute,14,4,0,1.26,1.24,1.28,120.0,420.0
 paperspace,Paperspace,12,4,2,3.2300000000000004,3.22,3.28,240.0,540.0
-verda,Verda,9,4,1,1.82,1.82,1.82,120.0,300.0
+verda,Verda,9,4,0,1.82,1.82,1.82,120.0,300.0
 lambdalabs,Lambda Labs,8,1,0,1.79,1.79,1.79,420.0,960.0
 excesssupply,Excess Supply?,3,1,0,1.63875,1.63875,1.63875,480.0,2280.0
 denvr,Denvr,2,2,2,1.4,1.4,1.4,360.0,750.0
