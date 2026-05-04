@@ -1,5 +1,5 @@
 cloud,cloud_display,n_skus,n_distinct_skus,n_available,median_per_gpu_dph,min_per_gpu_dph,max_per_gpu_dph,median_boot_min_seconds,median_boot_max_seconds
 massedcompute,Massed Compute,15,4,0,1.28,1.28,1.28,480.0,600.0
-crusoe,Crusoe,13,5,1,1.65,1.65,1.95,60.0,180.0
+crusoe,Crusoe,13,5,0,1.65,1.65,1.95,60.0,180.0
 hyperstack,Hyperstack,6,5,1,1.35,1.35,1.4,150.0,450.0
 vultr,Vultr,6,1,0,2.6,2.6,2.6,60.0,240.0
