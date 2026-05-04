@@ -13,6 +13,7 @@
 import csvText from './rates_daily.csv?raw';
 import shadowCsvText from './rates_shadow.csv?raw';
 import prevCsvText from './rates_daily_prev.csv?raw';
+import historyCsvText from './indices_history.csv?raw';
 import metaJson from './meta.json';
 import type {
   Rate, Tier, Confidence, PromotionStatus, Term, SnapshotMeta,
@@ -110,6 +111,41 @@ export const prevMedians: Map<string, number> = (() => {
   }
   return out;
 })();
+
+// Per-series price-median history bundled at sync time. Keyed by series_id;
+// each value is sorted ascending by date. Powers the Sparkline component on
+// the rates table and /tiers ladder.
+export interface HistoryPoint { date: string; median: number }
+
+const _seriesHistory: Map<string, HistoryPoint[]> = (() => {
+  const out = new Map<string, HistoryPoint[]>();
+  const text = historyCsvText.trim();
+  if (!text) return out;
+  const lines = text.split(/\r?\n/);
+  const headers = lines[0]!.split(',');
+  const idIdx = headers.indexOf('series_id');
+  const dateIdx = headers.indexOf('as_of_date');
+  const medIdx = headers.indexOf('price_median');
+  if (idIdx === -1 || dateIdx === -1 || medIdx === -1) return out;
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i]!.split(',');
+    const id = cells[idIdx];
+    const d = cells[dateIdx];
+    const med = Number(cells[medIdx]);
+    if (!id || !d || !Number.isFinite(med)) continue;
+    let arr = out.get(id);
+    if (!arr) { arr = []; out.set(id, arr); }
+    arr.push({ date: d, median: med });
+  }
+  for (const arr of out.values()) {
+    arr.sort((a, b) => a.date.localeCompare(b.date));
+  }
+  return out;
+})();
+
+export function seriesHistory(seriesId: string): HistoryPoint[] {
+  return _seriesHistory.get(seriesId) ?? [];
+}
 
 // Full series set — Published + Shadow. Already filtered to OnDemand only
 // by parseCsv above.

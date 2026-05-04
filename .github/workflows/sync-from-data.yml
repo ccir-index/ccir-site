@@ -241,6 +241,14 @@ jobs:
           PY
           rm -rf .sync
 
+      - name: Rebuild indices_history.csv (rolling N-day window)
+        if: steps.fetch.outputs.have_snapshot == 'true'
+        env:
+          CCIR_HISTORY_TODAY: ${{ steps.fetch.outputs.date }}
+        run: |
+          set -euo pipefail
+          python3 scripts/build_indices_history.py
+
       - name: Commit + push if changed
         if: steps.fetch.outputs.have_snapshot == 'true'
         env:
@@ -249,7 +257,7 @@ jobs:
           set -euo pipefail
           git config user.email "ccir-pipeline@ccir.io"
           git config user.name  "CCIR Pipeline"
-          git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/rates_daily_prev.csv src/data/meta.json
+          git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/rates_daily_prev.csv src/data/indices_history.csv src/data/meta.json
           # public/data/listings_history_*.csv only exists once the upstream
           # pipeline starts emitting these files; -A on a missing dir is fine.
           if [ -d public/data ]; then
