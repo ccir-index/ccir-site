@@ -21,10 +21,10 @@ const vastMeta = (meta as any).vast;
       Vast.ai is the only per-host order-book marketplace in the panel —
       every individual machine listing is exposed via the API, with hundreds
       to thousands of distinct host offers per chip, refreshed in real time.
-      This page surfaces what the median alone hides: distribution shape,
-      quality bands, $/perf frontier, supply structure, geography, hidden
-      costs, network quality, long-tail catalog, and the time-series of the
-      spread itself. <strong>Observatory data — not part of the CCIR rate
+      This page surfaces what the median alone omits: distribution shape,
+      quality bands, $/perf frontier, supply structure, geography, egress
+      and storage costs, network quality, long-tail catalog, and the
+      time-series of the spread itself. <strong>Observatory data — not part of the CCIR rate
       methodology.</strong> Vast is the reference marketplace, not a tier.
     </p>
 
@@ -173,11 +173,11 @@ const vastMeta = (meta as any).vast;
       </div>
     </section>
 
-    <!-- Section 6: Hidden costs -->
+    <!-- Section 6: Egress + storage -->
     <section class="vast-section">
       <header class="sec-head">
         <span class="sec-num">06</span>
-        <span class="sec-kicker-label">FRICTION</span>
+        <span class="sec-kicker-label">EGRESS &amp; STORAGE</span>
         <h2>Egress + storage costs</h2>
         <span class="sec-note">Per-offer distribution</span>
       </header>
@@ -193,8 +193,8 @@ const vastMeta = (meta as any).vast;
       </div>
       <p class="footnote">
         Egress cost ($/TB) and storage cost ($/GB-mo) distributions across
-        live offers. Egress ranges $0–$50/TB on Vast — most marketplaces
-        never surface this number per offer.
+        live offers, exposed per-offer in the Vast API. Egress ranges
+        $0–$50/TB across the panel.
       </p>
     </section>
 
