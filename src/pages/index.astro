@@ -55,10 +55,6 @@ function chipDisplay(token: string): string {
             {anchorRate && <Sparkline seriesId={anchorRate.series_id} median={anchorRate.price_median} width={140} height={36} />}
           </div>
           <div class="stat-meta">
-            {anchorRate
-              ? `Median · ${anchorRate.n_sources} sources · ${anchorRate.n_observations} observations`
-              : '—'}
-            <br/>
             Reference: <code>{ANCHOR}</code>
           </div>
         </div>
