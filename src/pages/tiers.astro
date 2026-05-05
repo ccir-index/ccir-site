@@ -29,19 +29,19 @@ function chipDisplay(token: string): string {
       <div class="kicker">Intelligence Factory Taxonomy · {meta.as_of_date}</div>
       <h1>Three Tiers of Intelligence Factory</h1>
       <p class="standfirst lede">
-        CCIR tier rates are <em>productivity-adjusted reference rates</em>.
-        There is no clean throughput number to settle the question —
-        usable compute per dollar depends on workload, framework, and
+        CCIR publishes a <em>graded reference rate</em> at each
+        Intelligence Factory tier. Throughput is hard to standardize —
+        usable compute per dollar varies with workload, framework, and
         scale efficiency — so CCIR does what commodity markets do when
         output is hard to measure: <strong>grade the inputs</strong>.
         Crude oil prices light sweet, medium, and heavy sour as distinct
         feedstock grades because refinery yield is hard to standardize
         but feedstock is observable. Compute is the same: fabric, host
-        topology, and operational bundle are observable; effective
-        throughput is not. MLPerf submissions on identical silicon
-        show realized throughput varies materially with system
-        configuration — fabric, host topology, and operational
-        scaffolding — which is what the tier construct grades.
+        topology, and operational bundle are observable. MLPerf
+        submissions on identical silicon show realized throughput varies
+        materially with system configuration — fabric, host topology,
+        and operational scaffolding — which is what the tier construct
+        grades.
       </p>
     </div>
 
@@ -121,9 +121,8 @@ function chipDisplay(token: string): string {
         Tier 1 hyperscale deployment, a Tier 2 dedicated cluster, and a
         Tier 3 marketplace listing all carry identical silicon at
         fundamentally different rate bands — because the deployment is the
-        product. A buyer can nominally pay less at T3IF and receive less
-        usable compute per dollar after interrupt risk, support gaps, and
-        operational overhead are priced in.
+        product. A lower nominal rate at a downstream tier reflects a
+        thinner capability bundle behind it.
       </p>
     </section>
 
