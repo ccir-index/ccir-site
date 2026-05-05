@@ -1,5 +1,5 @@
 as_of_date,collected_at,collection_window_id,shade_instance_type,cloud_instance_type,cloud,cloud_display,chip_slug,gpu_type,interconnect,nvlink,num_gpus,vram_per_gpu_in_gb,gpu_manufacturer,vcpus,memory_in_gb,storage_in_gb,hourly_price_dollars,per_gpu_dph,deployment_type,boot_min_seconds,boot_max_seconds,region,region_display,available
-2026-05-04,2026-05-04 21:45:29.789990,2026-05-04-1400,B300x8,8B300.240V,verda,Verda,b300,B300,sxm6,True,8,288,nvidia,240,2200,6000,57.56,7.195,vm,240,420,helsinki-finland-5,"FI, Central",False
-2026-05-04,2026-05-04 21:45:29.789990,2026-05-04-1400,B300x4,4B300.120V,verda,Verda,b300,B300,sxm6,True,4,288,nvidia,120,1100,4500,29.2,7.3,vm,180,420,helsinki-finland-5,"FI, Central",False
-2026-05-04,2026-05-04 21:45:29.789990,2026-05-04-1400,B300,1B300.30V,verda,Verda,b300,B300,sxm6,True,1,288,nvidia,30,275,1500,7.4,7.4,vm,120,180,helsinki-finland-5,"FI, Central",True
-2026-05-04,2026-05-04 21:45:29.789990,2026-05-04-1400,B300x2,2B300.60V,verda,Verda,b300,B300,sxm6,True,2,288,nvidia,60,550,3000,14.8,7.4,vm,120,240,helsinki-finland-5,"FI, Central",False
+2026-05-04,2026-05-05 00:45:27.706221,2026-05-04-1800,B300x8,8B300.240V,verda,Verda,b300,B300,sxm6,True,8,288,nvidia,240,2200,6000,57.56,7.195,vm,240,420,helsinki-finland-5,"FI, Central",False
+2026-05-04,2026-05-05 00:45:27.706221,2026-05-04-1800,B300x4,4B300.120V,verda,Verda,b300,B300,sxm6,True,4,288,nvidia,120,1100,4500,29.2,7.3,vm,180,420,helsinki-finland-5,"FI, Central",False
+2026-05-04,2026-05-05 00:45:27.706221,2026-05-04-1800,B300,1B300.30V,verda,Verda,b300,B300,sxm6,True,1,288,nvidia,30,275,1500,7.4,7.4,vm,120,180,helsinki-finland-5,"FI, Central",True
+2026-05-04,2026-05-05 00:45:27.706221,2026-05-04-1800,B300x2,2B300.60V,verda,Verda,b300,B300,sxm6,True,2,288,nvidia,60,550,3000,14.8,7.4,vm,120,240,helsinki-finland-5,"FI, Central",False
