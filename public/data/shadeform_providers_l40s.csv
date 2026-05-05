@@ -1,7 +1,7 @@
 cloud,cloud_display,n_skus,n_distinct_skus,n_available,median_per_gpu_dph,min_per_gpu_dph,max_per_gpu_dph,median_boot_min_seconds,median_boot_max_seconds
-massedcompute,Massed Compute,16,4,5,0.88,0.88,0.88,90.0,330.0
+massedcompute,Massed Compute,16,4,6,0.88,0.88,0.88,90.0,330.0
 crusoe,Crusoe,10,5,3,1.45,1.45,1.45,60.0,180.0
-scaleway,Scaleway,8,4,6,1.5662500000000001,1.54875,1.61,60.0,180.0
+scaleway,Scaleway,8,4,3,1.5662500000000001,1.54875,1.61,60.0,180.0
 latitude,Latitude,5,2,0,0.74,0.74,0.87125,120.0,480.0
 boostrun,BoostRun?,2,1,1,0.69,0.69,0.69,60.0,420.0
 digitalocean,DigitalOcean,1,1,0,1.57,1.57,1.57,120.0,360.0
