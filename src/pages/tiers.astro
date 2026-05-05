@@ -135,10 +135,15 @@ function chipDisplay(token: string): string {
       <p class="class-body">
         Tier assignment is per-SKU and grade-based — driven by the
         capability bundle each SKU exposes, not by which operator hosts it.
-        An interruptible SKU from any operator routes to T3IF; a
-        dedicated-host SKU with disclosed IB-class fabric and full
-        enterprise bundle routes to T1IF; everything in between routes to
-        T2IF. The same operator can therefore appear in two or three tiers
+        Fabric grade is scored bandwidth-first: a disclosed
+        per-node bandwidth maps to top grade at ≥ 3 Tbps, mid grade at
+        ≥ 400 Gbps, with the protocol name (IB-NDR / EFA / RoCE-v2 /
+        Ethernet) used as fallback when bandwidth isn't disclosed. An
+        interruptible SKU from any operator routes to T3IF; a
+        dedicated-host SKU with top-grade fabric and a full enterprise
+        bundle routes to T1IF; a dedicated-host SKU with mid-grade
+        disclosed fabric routes to T2IF; everything else routes to T3IF.
+        The same operator can therefore appear in two or three tiers
         across its SKU catalog, depending on what each SKU actually packages.
       </p>
     </section>

@@ -25,19 +25,19 @@ const tiers: Array<{
     code: 'T1IF',
     name: TIER_LABELS.T1IF,
     standfirst:
-      'Top-grade fabric, dedicated single-tenant bare-metal, full enterprise bundle — managed operations, tiered support, observability, egress allowance, regulated-workload compliance. The rate buys capability that translates directly into useful compute per dollar at production scale.',
+      'Top-grade fabric (≥ 3 Tbps/node disclosed RDMA — IB-NDR, EFAv2, or RoCE-v2 in non-blocking 8-rail builds), dedicated single-tenant bare-metal, full enterprise bundle — managed operations, tiered support, observability, egress allowance, regulated-workload compliance. The rate buys capability that translates directly into useful compute per dollar at production scale.',
   },
   {
     code: 'T2IF',
     name: TIER_LABELS.T2IF,
     standfirst:
-      'Dedicated single-tenant bare-metal with disclosed fabric, basic support, no managed-ops wrapper. Where most production training spend lands. The middle grade — the rate is lower, but each $/GPU-hr buys less of the bundle that turns silicon into output.',
+      'Dedicated single-tenant bare-metal with disclosed real fabric (IB-HDR, RoCE-v2 mid, or sub-3 Tbps IB-NDR variants), no requirement for full enterprise bundle. Where most production training spend lands. The middle grade — the rate is lower, but each $/GPU-hr buys less of the bundle that turns silicon into output.',
   },
   {
     code: 'T3IF',
     name: TIER_LABELS.T3IF,
     standfirst:
-      'Co-located or marketplace clearing on variable Ethernet fabric. Self-serve, no support tier, interruptibility common. The lowest rate band — and the lowest effective throughput per nominal $/GPU-hr once interrupt risk is priced in.',
+      'Co-located, shared, or marketplace clearing — plus dedicated hosts that don\'t disclose a real fabric. Variable Ethernet underlay, self-serve, no support tier, interruptibility common. The lowest rate band — and the lowest effective throughput per nominal $/GPU-hr once interrupt risk is priced in.',
   },
 ];
 
@@ -58,9 +58,9 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
     key: 'fabric',
     label: 'Fabric',
     cells: {
-      T1IF: 'IB-NDR or eq. (3.2 Tbps RDMA, 8×400 Gbps)',
-      T2IF: 'IB-HDR / RoCE-v2 / EFA / mixed disclosed',
-      T3IF: 'Ethernet / variable / undisclosed',
+      T1IF: '≥ 3 Tbps/node disclosed (8-rail IB-NDR / EFAv2 / RoCE-v2 non-blocking)',
+      T2IF: '≥ 400 Gbps/node disclosed (IB-HDR / RoCE / sub-3 Tbps IB-NDR)',
+      T3IF: 'Ethernet, undisclosed, or sub-400 Gbps trivial RDMA',
     },
   },
   {
@@ -68,7 +68,7 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
     label: 'Bundle depth',
     cells: {
       T1IF: 'Managed ops, tiered support, observability, egress allowance, compliance',
-      T2IF: 'Basic support, no managed ops',
+      T2IF: 'Bundle varies — not gated; observed mix of basic to richer disclosures',
       T3IF: 'Self-serve, no support tier',
     },
   },
@@ -76,9 +76,9 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
     key: 'operators',
     label: 'Typical operators',
     cells: {
-      T1IF: 'AWS · Azure · OCI · GCP · CoreWeave · Nebius',
-      T2IF: 'Lambda OD · RunPod Secure · Crusoe · Hyperstack',
-      T3IF: 'RunPod Community · Vast.ai · Together MoE',
+      T1IF: 'AWS · Azure · OCI · CoreWeave · Nebius',
+      T2IF: 'Crusoe · Denvr · Lambda Cluster · RunPod Cluster · RunPod Secure',
+      T3IF: 'Vast.ai · DigitalOcean · Hyperstack · Scaleway · DataCrunch · RunPod Community · Genesis Cloud · Massed Compute · TensorDock · Lambda OD',
     },
   },
   {
