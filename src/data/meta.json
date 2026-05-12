@@ -1,8 +1,8 @@
 {
-  "as_of_date": "2026-05-11",
-  "published_at_ct": "2026-05-11T05:06:57-05:00",
-  "published_at_utc": "2026-05-11T10:06:57+00:00",
-  "run_id": "export-20260511T100651Z-6bfffc8f",
+  "as_of_date": "2026-05-12",
+  "published_at_ct": "2026-05-12T05:06:53-05:00",
+  "published_at_utc": "2026-05-12T10:06:53+00:00",
+  "run_id": "export-20260512T100646Z-31aab546",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 26,
@@ -17,10 +17,10 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 3150,
+    "total_rows": 3273,
     "window_days": 90,
-    "window_end": "2026-05-11",
-    "window_start": "2026-02-11"
+    "window_end": "2026-05-12",
+    "window_start": "2026-02-12"
   },
   "marketplace_history": {
     "chips": [
@@ -39,55 +39,11 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 512,
+    "total_rows": 454,
     "window_days": 7,
-    "window_end": "2026-05-11",
-    "window_start": "2026-05-05"
+    "window_end": "2026-05-12",
+    "window_start": "2026-05-06"
   },
-  "vast": {
-    "chips_observed": [
-      "A100 PCIE",
-      "A100 SXM4",
-      "B200",
-      "H100 SXM",
-      "H200",
-      "L40",
-      "L40S",
-      "RTX 3090",
-      "RTX 4090",
-      "RTX 5090",
-      "RTX 6000Ada",
-      "RTX A6000"
-    ],
-    "latest_collected_at_utc": "2026-05-12 03:45:27.339212",
-    "n_chips": 12,
-    "n_offers_latest_cycle": 1803,
-    "status": "ok",
-    "summary_file": "vast_summary.csv",
-    "window_days": 30,
-    "window_end": "2026-05-11",
-    "window_start": "2026-04-12"
-  },
-  "availability": {
-    "chips_observed": [
-      "a100-pcie-80gb",
-      "a100-sxm-80gb",
-      "b300",
-      "gh200",
-      "h100-pcie",
-      "h100-sxm",
-      "h200-sxm",
-      "l40s",
-      "rtx-pro-6000"
-    ],
-    "latest_collected_at_utc": "2026-05-12 03:45:27.378142",
-    "n_available_latest_cycle": 40,
-    "n_chips": 9,
-    "n_sku_regions_latest_cycle": 292,
-    "status": "ok",
-    "summary_file": "shadeform_summary.csv",
-    "window_days": 30,
-    "window_end": "2026-05-11",
-    "window_start": "2026-04-12"
-  }
+  "vast": null,
+  "availability": null
 }
