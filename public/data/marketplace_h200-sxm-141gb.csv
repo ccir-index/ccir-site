@@ -1,21 +1,4 @@
 as_of_date,collected_at,collection_window_id,source_name,source_display_name,silicon_id,gpu_model,form_factor,commitment_term,interruptibility,region,cheapest_usd_hour,median_usd_hour,n_listings,methodology_version
-2026-05-06,2026-05-06 09:38:13.954299,2026-05-05-1800,runpod_cluster,RunPod · Cluster,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,4.7880,,,v2.0.0
-2026-05-06,2026-05-06 09:38:13.954299,2026-05-05-1800,runpod_community,RunPod · Community,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.5900,,,v2.0.0
-2026-05-06,2026-05-06 09:38:13.954299,2026-05-05-1800,runpod_secure,RunPod · Secure,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.9900,,,v2.0.0
-2026-05-06,2026-05-06 12:37:24.572544,2026-05-06-0600,runpod_cluster,RunPod · Cluster,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,4.7880,,,v2.0.0
-2026-05-06,2026-05-06 12:37:24.572544,2026-05-06-0600,runpod_community,RunPod · Community,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.5900,,,v2.0.0
-2026-05-06,2026-05-06 12:37:24.572544,2026-05-06-0600,runpod_secure,RunPod · Secure,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.9900,,,v2.0.0
-2026-05-06,2026-05-06 12:37:24.700687,2026-05-06-0600,vast_ai_verified,Vast.ai (verified),h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.8710,3.8710,1.0,v2.0.0
-2026-05-06,2026-05-06 18:36:56.666236,2026-05-06-1000,vast_ai_verified,Vast.ai (verified),h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,5.1613,5.1613,1.0,v2.0.0
-2026-05-06,2026-05-06 18:36:56.884151,2026-05-06-1000,runpod_cluster,RunPod · Cluster,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,4.7880,,,v2.0.0
-2026-05-06,2026-05-06 18:36:56.884151,2026-05-06-1000,runpod_community,RunPod · Community,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.5900,,,v2.0.0
-2026-05-06,2026-05-06 18:36:56.884151,2026-05-06-1000,runpod_secure,RunPod · Secure,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.9900,,,v2.0.0
-2026-05-06,2026-05-06 21:36:24.166844,2026-05-06-1400,runpod_cluster,RunPod · Cluster,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,4.7880,,,v2.0.0
-2026-05-06,2026-05-06 21:36:24.166844,2026-05-06-1400,runpod_community,RunPod · Community,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.5900,,,v2.0.0
-2026-05-06,2026-05-06 21:36:24.166844,2026-05-06-1400,runpod_secure,RunPod · Secure,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.9900,,,v2.0.0
-2026-05-06,2026-05-07 03:37:19.813081,2026-05-06-1800,runpod_cluster,RunPod · Cluster,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,4.7880,,,v2.0.0
-2026-05-06,2026-05-07 03:37:19.813081,2026-05-06-1800,runpod_community,RunPod · Community,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.5900,,,v2.0.0
-2026-05-06,2026-05-07 03:37:19.813081,2026-05-06-1800,runpod_secure,RunPod · Secure,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.9900,,,v2.0.0
 2026-05-07,2026-05-07 09:37:49.138995,2026-05-06-1800,vast_ai_verified,Vast.ai (verified),h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.4839,4.3226,2.0,v2.0.0
 2026-05-07,2026-05-07 09:37:49.277660,2026-05-06-1800,runpod_cluster,RunPod · Cluster,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,4.7880,,,v2.0.0
 2026-05-07,2026-05-07 09:37:49.277660,2026-05-06-1800,runpod_community,RunPod · Community,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.5900,,,v2.0.0
@@ -117,3 +100,6 @@ as_of_date,collected_at,collection_window_id,source_name,source_display_name,sil
 2026-05-12,2026-05-13 03:38:23.360934,2026-05-12-1800,runpod_cluster,RunPod · Cluster,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,4.7880,,,v2.0.0
 2026-05-12,2026-05-13 03:38:23.360934,2026-05-12-1800,runpod_community,RunPod · Community,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.5900,,,v2.0.0
 2026-05-12,2026-05-13 03:38:23.360934,2026-05-12-1800,runpod_secure,RunPod · Secure,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.9900,,,v2.0.0
+2026-05-13,2026-05-13 09:38:59.737972,2026-05-12-1800,runpod_cluster,RunPod · Cluster,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,4.7880,,,v2.0.0
+2026-05-13,2026-05-13 09:38:59.737972,2026-05-12-1800,runpod_community,RunPod · Community,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.5900,,,v2.0.0
+2026-05-13,2026-05-13 09:38:59.737972,2026-05-12-1800,runpod_secure,RunPod · Secure,h200-sxm-141gb,H200,SXM,OnDemand,NonInterruptible,Other,3.9900,,,v2.0.0
