@@ -249,6 +249,7 @@ const vastMeta = (meta as any).vast;
         <span class="sec-num">09</span>
         <span class="sec-kicker-label">SPREAD</span>
         <h2>Distribution evolution over 30 days</h2>
+        <span class="sec-note">Tracks the chip selected at the top of the page</span>
         <span class="sec-note" id="spread-summary">—</span>
       </header>
       <div class="chart-wrap chart-wrap-hero" style="height:380px;">
@@ -259,8 +260,7 @@ const vastMeta = (meta as any).vast;
         Five lines show how the per-GPU $/hr distribution shifts over time:
         p10 (cheapest 10%), p25, p50 (median), p75, p90 (most expensive 10%).
         When spread widens, supply is fragmenting; when it narrows, the market
-        is converging. <strong>This is the unique CCIR view</strong> — no other
-        public source publishes the spread of a marketplace over time.
+        is converging.
       </p>
     </section>
 
@@ -677,7 +677,16 @@ const vastMeta = (meta as any).vast;
             },
           },
           scales: {
-            x: { type: 'time', title: { display: true, text: 'Date', color: inkDim }, grid: { color: grid }, ticks: { color: inkDim } },
+            x: {
+              type: 'time',
+              // Pin to day-granularity so 30d of 3-hourly cycles render with
+              // dated tick labels — Chart.js auto-resolves to 'hour' once the
+              // density crosses a threshold and drops the date entirely.
+              time: { unit: 'day', displayFormats: { day: 'MMM d' }, tooltipFormat: 'MMM d, HH:mm' },
+              title: { display: true, text: 'Date (ET)', color: inkDim },
+              grid: { color: grid },
+              ticks: { color: inkDim, maxRotation: 0, autoSkip: true, autoSkipPadding: 32 },
+            },
             y: { type: 'linear', title: { display: true, text: 'Per-GPU $/hr', color: inkDim }, grid: { color: grid }, ticks: { color: inkDim } },
           },
         },
