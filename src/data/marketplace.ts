@@ -45,12 +45,15 @@ export interface MarketplaceRow {
 }
 
 function parseMs(iso: string): number {
-  // Accept either "2026-04-28 15:15:50.114132" or "2026-04-28T15:15:50.114Z".
-  // pandas to_csv emits the space-separated form; Date.parse handles ISO with
-  // T but not the space form on all browsers.
+  // Accept three shapes emitted across the pipeline's history:
+  //   "2026-04-28 15:15:50.114132"             (pandas naïve, pre-deltars)
+  //   "2026-04-28T15:15:50.114Z"               (ISO with Z)
+  //   "2026-05-19T20:13:48.283280+00:00"       (deltars/polars, post-cutover)
+  // Only append Z when no zone designator is present — appending it to the
+  // +00:00 form makes the string invalid and Date.parse returns NaN.
   const normalized = iso.replace(' ', 'T');
-  // Treat as UTC if no zone marker.
-  return Date.parse(normalized.endsWith('Z') ? normalized : normalized + 'Z');
+  const hasZone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(normalized);
+  return Date.parse(hasZone ? normalized : normalized + 'Z');
 }
 
 export function parseMarketplaceCsv(text: string): MarketplaceRow[] {

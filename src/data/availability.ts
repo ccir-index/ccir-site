@@ -139,8 +139,11 @@ function parseBoolOrNull(v: string): boolean | null {
 }
 
 function parseMs(iso: string): number {
+  // Don't append Z when the string already carries a zone (e.g. "+00:00"
+  // from the deltars/polars pipeline) — doubling the zone yields NaN.
   const normalized = iso.replace(' ', 'T');
-  return Date.parse(normalized.endsWith('Z') ? normalized : normalized + 'Z');
+  const hasZone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(normalized);
+  return Date.parse(hasZone ? normalized : normalized + 'Z');
 }
 
 function splitCsvLine(line: string): string[] {

@@ -138,10 +138,13 @@ function parseBoolOrNull(v: string): boolean | null {
   return null;
 }
 
-// pandas to_csv emits "2026-05-03 14:30:00.123456"; treat as UTC if no zone.
+// Three shapes seen across pipeline history: pandas naïve "2026-05-03 14:30:00.123456",
+// ISO with Z, and deltars/polars "...+00:00". Only append Z when no zone present —
+// appending to "+00:00" produces an invalid string and Date.parse returns NaN.
 function parseMs(iso: string): number {
   const normalized = iso.replace(' ', 'T');
-  return Date.parse(normalized.endsWith('Z') ? normalized : normalized + 'Z');
+  const hasZone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(normalized);
+  return Date.parse(hasZone ? normalized : normalized + 'Z');
 }
 
 function splitCsvLine(line: string): string[] {
