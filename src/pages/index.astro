@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import TierDefinitions from '../components/TierDefinitions.astro';
-import Sparkline from '../components/Sparkline.astro';
 import { headlineRates, meta, premiumChipsList, tierMatrix } from '../data/snapshot';
 import { TIERS } from '../data/types';
 
@@ -49,9 +48,6 @@ function chipDisplay(token: string): string {
         <div class="featured-stat">
           <div class="kicker">Today · T1IF · H100 SXM · On-demand</div>
           <div class="stat-number">${fmt(anchorMedian)}<span class="stat-unit">/GPU-hr</span></div>
-          <div class="stat-spark">
-            {anchorRate && <Sparkline seriesId={anchorRate.series_id} median={anchorRate.price_median} width={140} height={36} />}
-          </div>
           <div class="stat-meta">
             Reference: <code>{ANCHOR}</code>
           </div>
@@ -84,9 +80,6 @@ function chipDisplay(token: string): string {
                   </span>
                   <span class="ladder-prices">
                     <span class="ladder-price">${fmt(cell.price_median)}</span>
-                    <span class="ladder-spark">
-                      <Sparkline seriesId={cell.series_id} median={cell.price_median} width={48} height={14} />
-                    </span>
                   </span>
                 </li>
               );
@@ -157,7 +150,7 @@ function chipDisplay(token: string): string {
             <tr>
               <th rowspan="2" class="chip-col">Silicon</th>
               {TIERS.map((t) => (
-                <th colspan="3" class={`tier-col tier-col-${t.toLowerCase()}`}>
+                <th colspan="2" class={`tier-col tier-col-${t.toLowerCase()}`}>
                   <span class={`tier-badge tier-badge-${t.toLowerCase()}`}>{t}</span>
                 </th>
               ))}
@@ -166,7 +159,6 @@ function chipDisplay(token: string): string {
               {TIERS.map(() => (
                 <>
                   <th class="sub">Median $/hr</th>
-                  <th class="sub">Trend · 7d</th>
                   <th class="sub">n</th>
                 </>
               ))}
@@ -187,7 +179,6 @@ function chipDisplay(token: string): string {
                     return (
                       <>
                         <td class="num empty">—</td>
-                        <td class="num empty"></td>
                         <td class="num empty">—</td>
                       </>
                     );
@@ -198,9 +189,6 @@ function chipDisplay(token: string): string {
                       <td class={`num posted tier-pos-${t.toLowerCase()} ${isShadow ? 'shadow' : ''}`}
                           title={`Median ${fmt(c.price_median)} · Mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs${isShadow ? ' · Shadow (panel below 3-source / 5-obs gate)' : ''}`}>
                         ${fmt(c.price_median)}
-                      </td>
-                      <td class="num spark-cell">
-                        <Sparkline seriesId={c.series_id} median={c.price_median} width={56} height={16} />
                       </td>
                       <td class="num n">{c.n_sources}</td>
                     </>
@@ -328,7 +316,6 @@ function chipDisplay(token: string): string {
       margin-left: 6px;
       font-weight: var(--weight-body);
     }
-    .stat-spark { color: var(--accent); margin: 4px 0 6px; }
     .stat-meta {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
@@ -380,11 +367,10 @@ function chipDisplay(token: string): string {
     .fill-t3if { background: var(--tier-t3if); }
     .ladder-prices {
       display: inline-flex; align-items: center; gap: 8px;
-      min-width: 110px; justify-content: flex-end;
+      min-width: 70px; justify-content: flex-end;
     }
     .ladder-price { color: var(--ink); font-weight: var(--weight-strong); }
     .ladder-price.empty { color: var(--ink-faint); }
-    .ladder-spark { color: var(--accent); }
     .ladder-foot {
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 1px);
@@ -530,11 +516,6 @@ function chipDisplay(token: string): string {
     table.ladder-table td.tier-pos-t2if { color: var(--ink); }
     table.ladder-table td.tier-pos-t3if { color: var(--ink); }
     table.ladder-table td.empty { color: var(--ink-faint); }
-    table.ladder-table td.spark-cell {
-      text-align: center;
-      color: var(--accent);
-      padding: 4px 8px;
-    }
     table.ladder-table td.n { color: var(--ink-dim); }
 
     .methodology { margin: 32px 0 32px; }

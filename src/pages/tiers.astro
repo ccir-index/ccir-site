@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import TierDefinitions from '../components/TierDefinitions.astro';
-import Sparkline from '../components/Sparkline.astro';
 import { tierMatrix, premiumChipsList, meta } from '../data/snapshot';
 import {
   TIERS,
@@ -70,7 +69,7 @@ function chipDisplay(token: string): string {
             <tr>
               <th rowspan="2" class="chip-col">Silicon</th>
               {TIERS.map((t) => (
-                <th colspan="3" class={`tier-col tier-col-${t.toLowerCase()}`}>
+                <th colspan="2" class={`tier-col tier-col-${t.toLowerCase()}`}>
                   <span class="th-tier">{t}</span>
                   <span class="th-name">{TIER_LABELS_SHORT[t]}</span>
                 </th>
@@ -80,7 +79,6 @@ function chipDisplay(token: string): string {
               {TIERS.map(() => (
                 <>
                   <th class="sub">Median $/hr</th>
-                  <th class="sub">Trend · 7d</th>
                   <th class="sub">n</th>
                 </>
               ))}
@@ -96,7 +94,6 @@ function chipDisplay(token: string): string {
                     return (
                       <>
                         <td class="num empty">—</td>
-                        <td class="num empty"></td>
                         <td class="num empty">—</td>
                       </>
                     );
@@ -107,9 +104,6 @@ function chipDisplay(token: string): string {
                       <td class={`num posted tier-pos-${t.toLowerCase()} ${isShadow ? 'shadow' : ''}`}
                           title={`Median ${fmt(c.price_median)} · Mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs${isShadow ? ' · Shadow (panel below 3-source / 5-obs gate)' : ''}`}>
                         ${fmt(c.price_median)}
-                      </td>
-                      <td class="num spark-cell">
-                        <Sparkline seriesId={c.series_id} median={c.price_median} width={56} height={16} />
                       </td>
                       <td class="num n">{c.n_sources}</td>
                     </>
@@ -231,7 +225,6 @@ function chipDisplay(token: string): string {
     table.ladder-table td.tier-pos-t2if { color: var(--ink); }
     table.ladder-table td.tier-pos-t3if { color: var(--ink); }
     table.ladder-table td.empty { color: var(--ink-faint); }
-    table.ladder-table td.spark-cell { text-align: center; color: var(--accent); padding: 4px 8px; }
     table.ladder-table td.n { color: var(--ink-dim); }
 
     .defs-section { margin: 32px 0 32px; }
