@@ -14,6 +14,27 @@ const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
       <div class="kicker">Disc./Prem. vs Tier 1 IF · {meta.as_of_date}</div>
       <h1>Tier Spread Matrix</h1>
       <p class="standfirst lede">
+        The spread matrix gives a credit analyst two views that a
+        single published rate doesn't.
+      </p>
+      <p class="standfirst lede">
+        Reading <strong>across a row</strong> — same chip, varying
+        tier — shows what the market is charging for the capability
+        bundle: fabric, support, compliance, operational wrap. If
+        <em>T1IF</em> H100 is at $6.88 and <em>T3IF</em> is at $2.72,
+        the market is pricing the enterprise wrapper at roughly
+        $4/GPU-hr. A lender underwriting a T1IF facility needs to
+        know how much of the rate is silicon and how much is
+        infrastructure.
+      </p>
+      <p class="standfirst lede">
+        Reading <strong>down a column</strong> — same tier, varying
+        generation — shows the generation premium when the bundle is
+        held constant. What newer silicon commands over older silicon
+        at equivalent deployment grade, without the two signals
+        confounding each other.
+      </p>
+      <p class="standfirst lede">
         The matrix enables price-signal discovery in two dimensions.
         <strong>Across a row</strong> (same chip, varying tier): the
         deployment-environment spread — what the capability bundle costs

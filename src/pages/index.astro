@@ -36,7 +36,7 @@ function chipDisplay(token: string): string {
   <section class="wrap top">
     <div class="hero">
       <div class="kicker">CCIR · Decomposed Benchmark Rates · {meta.as_of_date}</div>
-      <h1>Reference Rates for GPU Compute Markets</h1>
+      <h1>Independent Reference Rates for GPU Compute</h1>
       <p class="standfirst lede">
         CCIR provides a reference rate for all levels of the GPU
         compute market — <em>Tier 1</em>, <em>Tier 2</em>,
@@ -96,6 +96,16 @@ function chipDisplay(token: string): string {
         </aside>
       </div>
     </section>
+
+    <aside class="independence-block" aria-label="Independence statement">
+      <p>
+        CCIR holds no positions in the markets it measures. No
+        marketplace operations, no swap desk, no trading
+        relationships. The rates are published by a party with
+        no financial interest in what they print.
+      </p>
+      <p class="ib-tag">Built for credit document citation.</p>
+    </aside>
 
     <ul class="hero-tagline" aria-label="Index principles">
       <li>Independent</li>
@@ -258,6 +268,13 @@ function chipDisplay(token: string): string {
           <strong>No positions.</strong> CCIR holds no positions in the
           markets it measures.
         </li>
+        <li>
+          <strong>Credit document citation.</strong> The
+          <a href="/applications">Applications</a> page contains worked
+          drafting examples — defined terms, covenant mechanics, fallback
+          waterfall — showing how a CCIR rate fits into a senior-secured
+          GPU-backed facility.
+        </li>
       </ul>
     </section>
   </section>
@@ -375,6 +392,31 @@ function chipDisplay(token: string): string {
       color: var(--ink-faint);
       text-transform: uppercase;
       letter-spacing: var(--tracking-eye);
+    }
+
+    .independence-block {
+      margin: 8px 0 14px;
+      padding: 16px 18px;
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      background: var(--surface);
+      max-width: 80ch;
+    }
+    .independence-block p {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    .independence-block .ib-tag {
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
     }
 
     .hero-tagline {

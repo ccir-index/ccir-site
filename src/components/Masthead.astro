@@ -6,13 +6,10 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const nav = [
   { href: '/', label: 'Rates' },
   { href: '/tiers', label: 'Tiers' },
-  { href: '/markets', label: 'Providers' },
-  { href: '/explorer', label: 'Explorer' },
   { href: '/spreads', label: 'Spreads' },
   { href: '/applications', label: 'Applications' },
-  { href: '/marketplace', label: 'Marketplace' },
-  { href: '/vast', label: 'Vast' },
-  { href: '/availability', label: 'Availability' },
+  { href: '/explorer', label: 'Explorer' },
+  { href: 'https://github.com/ccir-index/ccir-v2-data/blob/main/methodology/CCIR_Methodology_v2_0_0.md', label: 'Methodology', external: true },
   { href: '/contact', label: 'Contact' },
 ];
 
@@ -44,7 +41,12 @@ function dateline(iso: string): string {
     <div class="wrap nav-inner">
       <nav class="nav">
         {nav.map((n) => (
-          <a href={n.href} class:list={['nav-link', { on: path === n.href }]}>{n.label}</a>
+          <a
+            href={n.href}
+            target={n.external ? '_blank' : undefined}
+            rel={n.external ? 'noopener noreferrer' : undefined}
+            class:list={['nav-link', { on: path === n.href }]}
+          >{n.label}{n.external && <span class="ext-mark" aria-hidden="true">↗</span>}</a>
         ))}
       </nav>
       <span class="status">
@@ -133,6 +135,11 @@ function dateline(iso: string): string {
   }
   .nav-link:hover { color: var(--ink); text-decoration: none; }
   .nav-link.on { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-link .ext-mark {
+    margin-left: 3px;
+    font-size: 0.85em;
+    color: var(--ink-faint);
+  }
   .status {
     margin-left: auto;
     display: inline-flex;

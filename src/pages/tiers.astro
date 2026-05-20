@@ -29,19 +29,36 @@ function chipDisplay(token: string): string {
       <div class="kicker">Intelligence Factory Taxonomy · {meta.as_of_date}</div>
       <h1>Three Tiers of Intelligence Factory</h1>
       <p class="standfirst lede">
-        CCIR publishes a <em>graded reference rate</em> at each
-        Intelligence Factory tier. Throughput is hard to standardize —
-        usable compute per dollar varies with workload, framework, and
-        scale efficiency — so CCIR does what commodity markets do when
-        output is hard to measure: <strong>grade the inputs</strong>.
-        Crude oil prices light sweet, medium, and heavy sour as distinct
-        feedstock grades because refinery yield is hard to standardize
-        but feedstock is observable. Compute is the same: fabric, host
-        topology, and operational bundle are observable. MLPerf
-        submissions on identical silicon show realized throughput varies
-        materially with system configuration — fabric, host topology,
-        and operational scaffolding — which is what the tier construct
-        grades.
+        GPU-backed facilities don't hold a single deployment grade. A
+        collateral pool may include <em>Tier 1</em> hyperscale nodes
+        underwritten at full enterprise rates alongside
+        <em>Tier 3</em> marketplace hardware that is offered at a
+        substantial discount. Monitoring that pool against a single
+        published rate gives the lender a systematically distorted
+        read — stable rates at the top of the market can mask
+        deterioration in lower-tier collateral.
+      </p>
+      <p class="standfirst lede">
+        CCIR publishes one independent reference rate per tier so the
+        rate cited in a credit document matches the deployment grade
+        of the collateral being secured. A <em>T1IF</em> rate anchors
+        a hyperscale-collateralized facility. A <em>T3IF</em> rate
+        applies when the pool includes marketplace or co-located
+        hardware. The tier structure isn't a classification detail —
+        it's the mechanism that keeps the reference rate honest about
+        what it's measuring.
+      </p>
+      <p class="standfirst lede">
+        CCIR tier rates are productivity-adjusted reference rates.
+        There is no clean throughput number to settle the question —
+        usable compute per dollar depends on workload, framework, and
+        scale efficiency — so CCIR does what commodity markets do
+        when output is hard to measure: <strong>grade the inputs</strong>.
+        Crude oil prices light sweet, medium, and heavy sour as
+        distinct feedstock grades because refinery yield is hard to
+        standardize but feedstock is observable. Compute is the same:
+        fabric, host topology, and operational bundle are observable;
+        effective throughput is not.
       </p>
     </div>
 
@@ -146,6 +163,15 @@ function chipDisplay(token: string): string {
         across its SKU catalog, depending on what each SKU actually packages.
       </p>
     </section>
+
+    <p class="page-leadout">
+      The full rate history across tier, chip, and term is available in
+      the <a href="/explorer">Explorer</a>. The
+      <a href="/spreads">Spreads</a> page decomposes what's in the rate —
+      the wrapper premium across tiers and the generation premium across
+      chips — the two analytical views a credit team needs to understand
+      what they're underwriting.
+    </p>
 
     <nav class="cross-links">
       <a class="cl-card" href="/spreads">
@@ -259,8 +285,23 @@ function chipDisplay(token: string): string {
       margin: 0;
     }
 
+    .page-leadout {
+      margin: 32px 0 8px;
+      max-width: 80ch;
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+    .page-leadout a {
+      color: var(--accent);
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 1px;
+    }
+    .page-leadout a:hover { opacity: 0.8; }
+
     .cross-links {
-      margin: 36px 0 24px;
+      margin: 16px 0 24px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
