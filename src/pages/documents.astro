@@ -42,6 +42,19 @@ const docs = [
       '§2.4 — Section IV · Accountability (Principles 15–19)',
     ],
   },
+  {
+    title: 'Fallback Language Guidance',
+    slug: 'CCIR_Fallback_Language_Guidance_v2_0_0.md',
+    summary:
+      'Drafting guidance for structured-finance counsel citing CRI rates in credit agreements. Benchmark definition templates per series, disruption-event surface, replacement-rate waterfall, mandatory threshold-adjustment-spread mechanic, and conforming-changes authority. Adapted from ARRC hardwired-LIBOR conventions.',
+    sections: [
+      '§2 — Benchmark definition language + per-series templates',
+      '§3 — Trigger / disruption events (4)',
+      '§4 — Replacement-rate waterfall (5 steps)',
+      '§5 — Threshold-adjustment spread (mandatory)',
+      '§7 — Tier-class considerations (T1IF / T2IF / T3IF)',
+    ],
+  },
 ];
 
 const VERSION = 'v2.0.0';
@@ -162,7 +175,7 @@ const REPO_URL = 'https://github.com/ccir-index/ccir-v2-data';
       margin-bottom: 40px;
     }
     @media (min-width: 1024px) {
-      .doc-stack { grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+      .doc-stack { grid-template-columns: 1fr 1fr; gap: 18px; }
     }
 
     .doc-card {
