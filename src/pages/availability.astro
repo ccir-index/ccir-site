@@ -220,7 +220,7 @@ const availMeta = (meta as any).availability;
       <header class="sec-head">
         <span class="sec-num">07</span>
         <span class="sec-kicker-label">TIME SERIES</span>
-        <h2>Availability % over 30 days</h2>
+        <h2>Availability % over time</h2>
         <span class="sec-note" id="hist-summary">—</span>
       </header>
       <div class="chart-wrap chart-wrap-hero" style="height:340px;">
@@ -732,7 +732,13 @@ const availMeta = (meta as any).availability;
             tooltip: { callbacks: { label: (ctx) => `${(ctx.parsed.y as number).toFixed(0)}% available` } },
           },
           scales: {
-            x: { type: 'time', title: { display: true, text: 'Date', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid } },
+            x: {
+              type: 'time',
+              time: { unit: 'day', displayFormats: { day: 'MMM d' } },
+              title: { display: false },
+              ticks: { color: inkDim, font: monoFont, autoSkip: true, maxRotation: 0 },
+              grid: { color: grid },
+            },
             y: { title: { display: true, text: '% available', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid }, min: 0, max: 100 },
           },
         },
