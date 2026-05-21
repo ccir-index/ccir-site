@@ -1,0 +1,230 @@
+---
+import Base from '../layouts/Base.astro';
+
+const cards = [
+  {
+    href: '/markets',
+    kind: 'Panel input',
+    title: 'Providers',
+    cadence: 'Daily · 90d window · 25+ operators',
+    summary:
+      'Per-provider list-ask time-series across hyperscalers, neoclouds, and managed-Kubernetes operators that run their own datacenters. Solid lines mark guaranteed availability; dashed lines mark interruptible. Bundled offerings are flagged and can be toggled.',
+    inside: 'H100-SXM · H200-SXM · B200-SXM · GB200-NVL · A100-SXM',
+  },
+  {
+    href: '/marketplace',
+    kind: 'Panel input',
+    title: 'Marketplace',
+    cadence: 'Intraday · 3h cadence · 7d window',
+    summary:
+      'Least-expensive available rates from third-party-host marketplaces. Vast.ai restricted to verified hosts; RunPod split by sub-product (Secure / Community / Spot / Cluster). MIN is the headline; Vast median sits behind it as a faded backdrop.',
+    inside: 'Vast.ai Verified · RunPod Secure · Community · Spot · Cluster',
+  },
+  {
+    href: '/availability',
+    kind: 'Observatory',
+    title: 'Availability Observatory',
+    cadence: 'Intraday · 3h cadence · 30d window',
+    summary:
+      'Shadeform aggregates 19 GPU clouds into a single live view. Where each chip is procurable right now, per-provider price spread, boot-time tradeoffs, config availability, long-tail chip catalog. Observability data, not part of the CCIR rate methodology.',
+    inside: '19 providers · 11 headline chips · SKU × region grid',
+  },
+  {
+    href: '/vast',
+    kind: 'Observatory',
+    title: 'Vast.ai Observatory',
+    cadence: 'Intraday · 3h cadence · 30d window',
+    summary:
+      'The only per-host order-book marketplace in the panel — hundreds to thousands of distinct offers per chip, refreshed in real time. Distribution shape, quality bands, $/perf frontier, supply structure, geography, egress and storage. Observability data, not part of the CCIR rate methodology.',
+    inside: '9 sections · verified vs unverified · dedicated vs shared',
+  },
+];
+---
+<Base
+  title="Market Data · CCIR"
+  description="Underlying observability views for the GPU compute markets CCIR measures. Per-provider list-ask time-series, intraday marketplace history, and cross-provider availability observatories. The published reference rates live on the Rates and Tiers pages."
+>
+  <section class="wrap top">
+    <div class="kicker">Underlying data · Observability surface</div>
+    <h1>Market Data</h1>
+    <p class="dek">
+      Observability views for the GPU compute markets CCIR measures. Two
+      surfaces feed the CCIR rate panel; two are observatories adjacent to
+      the methodology. The published reference rates live on
+      <a href="/">Rates</a> and <a href="/tiers">Tiers</a>.
+    </p>
+
+    <div class="card-stack">
+      {cards.map((c) => (
+        <a class="md-card" href={c.href}>
+          <header class="md-head">
+            <span class:list={['md-kicker', c.kind === 'Observatory' ? 'kicker-obs' : 'kicker-panel']}>{c.kind}</span>
+            <h2>{c.title}</h2>
+            <span class="md-cadence">{c.cadence}</span>
+          </header>
+          <p class="md-summary">{c.summary}</p>
+          <div class="md-inside">
+            <span class="inside-label">Inside</span>
+            <span class="inside-line">{c.inside}</span>
+          </div>
+          <span class="md-cta">Open <span class="arrow" aria-hidden="true">→</span></span>
+        </a>
+      ))}
+    </div>
+
+    <p class="foot-note">
+      Panel inputs feed the operator-equal median that produces each published
+      CRI rate. Observatories are adjacent surfaces — Shadeform aggregation and
+      the Vast.ai order book — that CCIR exposes for visibility but does not
+      incorporate into the rate methodology. See the
+      <a href="/documents">Methodology document</a> for panel definition and
+      eligibility filters.
+    </p>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 0 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .dek {
+      font-family: var(--font-display);
+      max-width: 70ch;
+      color: var(--ink);
+      margin: 0 0 32px;
+      font-size: var(--fs-lg);
+      line-height: 1.5;
+    }
+    .dek a { color: var(--accent); text-decoration: none; font-weight: var(--weight-strong); }
+    .dek a:hover { text-decoration: underline; }
+    :global(html[data-theme="terminal"]) h1 { font-family: var(--font-mono); }
+    :global(html[data-theme="terminal"]) .dek {
+      font-family: var(--font-mono);
+      color: var(--ink-dim);
+      font-size: var(--fs-md);
+      line-height: 1.6;
+    }
+
+    .card-stack {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr;
+      margin-bottom: 40px;
+    }
+    @media (min-width: 1024px) {
+      .card-stack { grid-template-columns: 1fr 1fr; gap: 18px; }
+    }
+
+    .md-card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      padding: 20px 22px;
+      text-decoration: none;
+      color: inherit;
+      min-height: 260px;
+      transition: border-color 120ms ease;
+    }
+    .md-card:hover { border-color: var(--accent); text-decoration: none; }
+
+    .md-head { display: flex; flex-direction: column; gap: 6px; }
+    .md-kicker {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+    }
+    .kicker-panel { color: var(--accent); }
+    .kicker-obs { color: var(--ink-dim); }
+    .md-head h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      line-height: 1.2;
+      margin: 0;
+      color: var(--ink);
+    }
+    :global(html[data-theme="terminal"]) .md-head h2 { font-family: var(--font-mono); }
+    .md-cadence {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-faint);
+    }
+
+    .md-summary {
+      font-family: var(--font-display);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      line-height: 1.55;
+      margin: 0;
+    }
+    :global(html[data-theme="terminal"]) .md-summary {
+      font-family: var(--font-mono);
+      color: var(--ink-dim);
+    }
+
+    .md-inside {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      border-top: 1px dashed var(--rule-2);
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .inside-label {
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-size: calc(var(--fs-xs) - 1px);
+    }
+    .inside-line { line-height: 1.5; }
+
+    .md-cta {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+      padding-top: 12px;
+      border-top: 1px solid var(--rule);
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .md-cta .arrow { font-size: 1em; }
+
+    .foot-note {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      max-width: 80ch;
+      margin: 0 0 48px;
+      padding-top: 18px;
+      border-top: 1px solid var(--rule-2);
+      line-height: 1.6;
+    }
+    .foot-note a { color: var(--accent); text-decoration: none; font-weight: var(--weight-strong); }
+    .foot-note a:hover { text-decoration: underline; }
+  </style>
+</Base>
