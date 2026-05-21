@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base
+  title="Page not found · CCIR"
+  description="The page you requested does not exist on ccir.io."
+  showTape={false}
+  noindex={true}
+>
+  <section class="wrap top">
+    <div class="kicker">404 · Not found</div>
+    <h1>That page is not on ccir.io.</h1>
+    <p class="dek">
+      The URL you requested does not match any published page in this index.
+      The link may be out of date, or the page may have been renamed.
+    </p>
+
+    <div class="links">
+      <a href="/">Reference rates</a>
+      <a href="/tiers">Tier structure</a>
+      <a href="/documents">Documents</a>
+      <a href="/marketplace">Market data</a>
+    </div>
+  </section>
+
+  <style>
+    .top { padding-top: 36px; }
+    .kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      line-height: 1.15;
+      margin: 0 0 14px;
+      max-width: 28ch;
+    }
+    .dek {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      color: var(--ink);
+      line-height: 1.5;
+      max-width: 60ch;
+      margin: 0 0 28px;
+    }
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: var(--weight-strong);
+    }
+    .links a:hover { text-decoration: underline; }
+  </style>
+</Base>

@@ -8,7 +8,10 @@ const fmt = (n: number, dp = 2) => n.toFixed(dp);
 const pctAbs = (n: number) => `${(Math.abs(n) * 100).toFixed(1)}%`;
 const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
 ---
-<Base title="Tier spreads · CCIR">
+<Base
+  title="Tier spreads · CCIR"
+  description="Premium and discount spreads across Intelligence Factory tiers, measured against T1IF as the reference. Daily basis snapshot for credit-document drafting."
+>
   <section class="wrap top">
     <div class="hero-solo">
       <div class="kicker">Disc./Prem. vs Tier 1 IF · {meta.as_of_date}</div>

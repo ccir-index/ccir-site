@@ -9,13 +9,25 @@ interface Props {
   title?: string;
   description?: string;
   showTape?: boolean;
+  ogImage?: string;
+  noindex?: boolean;
 }
 
 const {
   title = 'CCIR · Compute Credit Index Research',
-  description = 'Reference rate for GPU compute capacity. Aggregated from publicly-observed posted prices.',
+  description = 'Independent reference rates for GPU compute. Aggregated from publicly-observed posted prices across the Intelligence Factory Taxonomy.',
   showTape = true,
+  ogImage,
+  noindex = false,
 } = Astro.props;
+
+const SITE = 'https://ccir.io';
+const canonicalPath = Astro.url.pathname
+  .replace(/\/index\.html$/, '/')
+  .replace(/\.html$/, '')
+  .replace(/\/$/, '') || '/';
+const canonical = new URL(canonicalPath, SITE).href;
+const ogImageUrl = ogImage ? new URL(ogImage, SITE).href : undefined;
 ---
 <!doctype html>
 <html lang="en" data-theme="editorial">
@@ -24,6 +36,18 @@ const {
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>{title}</title>
   <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex,follow" />}
+  {!noindex && <link rel="canonical" href={canonical} />}
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="CCIR" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+  <meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />

@@ -10,7 +10,10 @@ const nChips = mktMeta?.chips?.length ?? PREMIUM_CHIPS.length;
 const nSources = mktMeta?.sources?.length ?? 5;
 const windowEnd = mktMeta?.window_end ?? '—';
 ---
-<Base title="Marketplace · CCIR">
+<Base
+  title="Marketplace · CCIR"
+  description="Intraday least-expensive available rates from GPU compute marketplaces, refreshed every three hours. Seven-day window with per-cycle history."
+>
   <section class="wrap top vast-page marketplace-page">
     <div class="kicker">MARKETPLACES · INTRADAY LEAST-EXPENSIVE AVAILABLE</div>
     <h1>Marketplace</h1>

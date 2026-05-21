@@ -7,5 +7,10 @@ export default defineConfig({
   build: {
     format: 'file',
   },
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      lastmod: new Date(),
+      changefreq: 'daily',
+    }),
+  ],
 });

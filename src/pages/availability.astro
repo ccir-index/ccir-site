@@ -6,7 +6,10 @@ import { AVAILABILITY_HEADLINE_CHIPS, AVAILABILITY_LONGTAIL_CHIPS } from '../dat
 const DEFAULT_CHIP = 'h100-sxm';
 const availMeta = (meta as any).availability;
 ---
-<Base title="Availability Observatory · CCIR">
+<Base
+  title="Availability Observatory · CCIR"
+  description="Cross-provider availability and pricing grid for GPU compute, sourced from the Shadeform aggregator. Refreshed every three hours."
+>
   <!-- vast-page class brings the Bloomberg-terminal chrome (ticker strip,
        sec-num chips, chart-wrap panels, mono tables, pulse dot, etc.).
        availability-page adds /availability-specific overrides. -->

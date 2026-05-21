@@ -102,7 +102,10 @@ const indicativeClient = indicativeRates.map((r) => ({
   spark: buildSparkSvg(r.series_id, r.price_median),
 }));
 ---
-<Base title="Explorer · CCIR">
+<Base
+  title="Explorer · CCIR"
+  description="Series-by-series explorer for CCIR reference rates: filter by tier, chip, and form factor to compare medians, means, IQR, and observation counts."
+>
   <section class="wrap top">
     <div class="kicker">Series Explorer · {meta.as_of_date}</div>
     <h1>Compare Series</h1>
