@@ -1,8 +1,8 @@
 {
-  "as_of_date": "2026-05-23",
-  "published_at_ct": "2026-05-23T03:59:49-05:00",
-  "published_at_utc": "2026-05-23T08:59:49+00:00",
-  "run_id": "export-20260523T085947Z-250b6de7",
+  "as_of_date": "2026-05-24",
+  "published_at_ct": "2026-05-24T04:17:18-05:00",
+  "published_at_utc": "2026-05-24T09:17:18+00:00",
+  "run_id": "export-20260524T091716Z-2505c8ea",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 26,
@@ -17,10 +17,10 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 1371,
+    "total_rows": 1497,
     "window_days": 90,
-    "window_end": "2026-05-23",
-    "window_start": "2026-02-23"
+    "window_end": "2026-05-24",
+    "window_start": "2026-02-24"
   },
   "marketplace_history": {
     "chips": [
@@ -39,10 +39,10 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 415,
+    "total_rows": 364,
     "window_days": 7,
-    "window_end": "2026-05-23",
-    "window_start": "2026-05-17"
+    "window_end": "2026-05-24",
+    "window_start": "2026-05-18"
   },
   "vast": null,
   "availability": null
