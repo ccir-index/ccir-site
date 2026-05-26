@@ -74,11 +74,11 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
   },
   {
     key: 'operators',
-    label: 'Typical operators',
+    label: 'Operators at this grade',
     cells: {
       T1IF: 'AWS · Azure · OCI · CoreWeave · Nebius',
-      T2IF: 'Crusoe · Denvr · Lambda Cluster · RunPod Cluster · RunPod Secure',
-      T3IF: 'Vast.ai · DigitalOcean · Hyperstack · Scaleway · DataCrunch · RunPod Community · Genesis Cloud · Massed Compute · TensorDock · Lambda OD',
+      T2IF: 'Crusoe · Denvr · Genesis Cloud · Lambda (cluster) · RunPod (cluster / secure)',
+      T3IF: 'Vast.ai · DigitalOcean · Hyperstack · Scaleway · DataCrunch · RunPod (community) · Massed Compute · TensorDock · Lambda (on-demand)',
     },
   },
   {
@@ -144,7 +144,12 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
     <p class="cap-caption">
       Each tier is a capability bundle. The matrix describes what the
       rate at each tier actually packages — fabric, host, bundle depth,
-      typical operators, use case.
+      use case. Tiers are assigned <strong>per&#8209;SKU</strong>, not per
+      operator: the same provider appears at several grades as its products
+      differ. CoreWeave's H100/H200/B200/GB200 SXM clusters clear T1IF, its
+      A100 T2IF, its L40S T3IF; Lambda's IB cluster is T2IF while its
+      on&#8209;demand Ethernet H100 is T3IF. The operators row lists where
+      each provider's representative SKUs land — not a fixed label.
     </p>
   </div>
 </section>
