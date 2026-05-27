@@ -69,9 +69,12 @@ chip_y = H - PAD - 84
 f_chip_label = ImageFont.truetype(FONT_MONO, 14)
 f_chip       = ImageFont.truetype(FONT_SANS_B, 22)
 chips = [
-    ("T1IF", "Tier 1 · Integrated AI Factories"),
-    ("T2IF", "Tier 2 · Independent Neoclouds"),
-    ("T3IF", "Tier 3 · Marketplace"),
+    # Capability/deployment-grade descriptors — NOT operator classes. Tiers are
+    # assigned per-SKU from the fabric/host/bundle, so the same operator can span
+    # tiers (the card must not imply T2 == "neoclouds"). Mirrors TierDefinitions.
+    ("T1IF", "Tier 1 · Top fabric · full bundle"),
+    ("T2IF", "Tier 2 · Dedicated · real fabric"),
+    ("T3IF", "Tier 3 · Shared / marketplace"),
 ]
 col_w = (W - 2 * PAD) // 3
 for i, (code, label) in enumerate(chips):
