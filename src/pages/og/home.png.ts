@@ -18,6 +18,6 @@ export const GET: APIRoute = async () => {
     secondary: (c) => (c ? String(c.n_sources) : '—'),
   });
 
-  const png = await toPng(frame('Same chip — three rates.', 'Median USD / GPU-hour across the Intelligence Factory tiers.', table, meta.as_of_date));
+  const png = await toPng(frame('Independent reference rates for GPU compute.', 'Median USD / GPU-hour, priced by deployment grade — T1IF / T2IF / T3IF.', table, meta.as_of_date));
   return new Response(png as BodyInit, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=3600' } });
 };
