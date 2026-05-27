@@ -50,7 +50,7 @@ main { min-height: calc(100vh - 200px); }
   line-height: 1.55;
   color: var(--ink);
   margin: 0 0 8px;
-  max-width: 64ch;
+  max-width: var(--measure-prose, 64ch);
   font-weight: var(--weight-body);
 }
 .standfirst em { font-style: italic; color: var(--accent); }

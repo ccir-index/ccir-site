@@ -53,11 +53,15 @@ html[data-theme="terminal"] {
   --fs-md: 14px;
   --fs-lg: 17px;
   --fs-xl: 22px;
-  --fs-2xl: 28px;
-  --fs-hero: 48px;
+  --fs-2xl: clamp(24px, 4vw, 28px);
+  --fs-hero: clamp(30px, 6.5vw, 48px);
   --lh-base: 1.55;
   --lh-display: 1.15;
   --tracking-eye: 0.10em;
+
+  /* line-length measure — one prose width, one wide width, used everywhere */
+  --measure-prose: 68ch;
+  --measure-wide: 80ch;
 
   --rad: 0px;
   --pad-cell-y: 7px;
@@ -112,8 +116,8 @@ html[data-theme="editorial"] {
   --fs-md: 15px;
   --fs-lg: 17px;
   --fs-xl: 24px;
-  --fs-2xl: 32px;
-  --fs-hero: 56px;
+  --fs-2xl: clamp(26px, 4.5vw, 32px);
+  --fs-hero: clamp(34px, 6.5vw, 56px);
   --lh-base: 1.6;
   --lh-display: 1.18;
   --tracking-eye: 0.12em;
