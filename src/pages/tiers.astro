@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import TierDefinitions from '../components/TierDefinitions.astro';
+import SpreadMatrix from '../components/SpreadMatrix.astro';
 import { tierMatrix, premiumChipsList, meta } from '../data/snapshot';
 import {
   TIERS,
@@ -128,15 +129,27 @@ function chipDisplay(token: string): string {
       </p>
     </section>
 
+    <section class="defs-section">
+      <header class="sec-head">
+        <div class="kicker">Basis decomposition · Disc./Prem. vs T1IF</div>
+        <h2>What's in the rate.</h2>
+        <p class="standfirst">
+          Reading <strong>across a row</strong> (same chip, varying tier)
+          isolates the deployment premium — fabric, support, compliance,
+          operational wrap. Reading <strong>down a column</strong> (same
+          tier, varying generation) isolates the generation premium with the
+          bundle held constant. Every cell is anchored to T1IF.
+        </p>
+      </header>
+      <SpreadMatrix />
+    </section>
+
     <p class="page-leadout">
       Worked credit drafting examples — defined terms, covenant
       mechanics, fallback waterfall — live in
       <a href="/applications">Applications</a>. The full rate history
       across tier, chip, and term is in the
-      <a href="/explorer">Explorer</a>. The
-      <a href="/spreads">Spreads</a> page decomposes what's in the
-      rate: the wrapper premium across tiers and the generation
-      premium across chips.
+      <a href="/explorer">Explorer</a>.
     </p>
 
   </section>

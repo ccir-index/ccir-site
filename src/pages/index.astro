@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import TierDefinitions from '../components/TierDefinitions.astro';
 import { headlineRates, meta, premiumChipsList, tierMatrix } from '../data/snapshot';
 import { TIERS } from '../data/types';
 
@@ -137,75 +136,25 @@ function chipDisplay(token: string): string {
     <section class="ladder-section">
       <header class="sec-head">
         <div class="kicker">Section 02 · Tier Structure</div>
-        <h2>Same Chip — Three Rates</h2>
+        <h2>Same Chip — Three Products</h2>
         <p class="standfirst">
-          The same H100 silicon is deployed across all three tiers. A buyer
-          choosing among a Tier 1 hyperscale deployment, a Tier 2 dedicated
-          cluster, and a Tier 3 marketplace listing isn't choosing between
-          three prices of the same product — they're choosing between three
-          products that happen to share a chip.
+          The same H100 silicon is deployed across all three tiers. A Tier 1
+          hyperscale deployment, a Tier 2 dedicated cluster, and a Tier 3
+          marketplace listing aren't three prices of one product — they're
+          three products that happen to share a chip, differing in fabric,
+          tenancy, and the work they can run. CCIR prices each one, making the
+          full compute market visible — the rate at every grade the chip is
+          offered.
         </p>
       </header>
 
-      <div class="table-wrap">
-        <table class="data ladder-table">
-          <thead>
-            <tr>
-              <th rowspan="2" class="chip-col">Silicon</th>
-              {TIERS.map((t) => (
-                <th colspan="2" class={`tier-col tier-col-${t.toLowerCase()}`}>
-                  <span class={`tier-badge tier-badge-${t.toLowerCase()}`}>{t}</span>
-                </th>
-              ))}
-            </tr>
-            <tr class="sub-row">
-              {TIERS.map(() => (
-                <>
-                  <th class="sub">Median $/hr</th>
-                  <th class="sub">n</th>
-                </>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {chipLadder.map(({ chip, cells }) => {
-              const refSeries = cells.T1IF?.series_id ?? cells.T2IF?.series_id ?? cells.T3IF?.series_id;
-              return (
-              <tr>
-                <td class="chip-cell">
-                  <div class="chip-name">{chipDisplay(chip)}</div>
-                  {refSeries && <code class="chip-series">{refSeries}</code>}
-                </td>
-                {TIERS.map((t) => {
-                  const c = cells[t];
-                  if (!c) {
-                    return (
-                      <>
-                        <td class="num empty">—</td>
-                        <td class="num empty">—</td>
-                      </>
-                    );
-                  }
-                  const isShadow = c.promotion_status === 'Shadow';
-                  return (
-                    <>
-                      <td class={`num posted tier-pos-${t.toLowerCase()} ${isShadow ? 'shadow' : ''}`}
-                          title={`Median ${fmt(c.price_median)} · Mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs${isShadow ? ' · Shadow (panel below 3-source / 5-obs gate)' : ''}`}>
-                        ${fmt(c.price_median)}
-                      </td>
-                      <td class="num n">{c.n_sources}</td>
-                    </>
-                  );
-                })}
-              </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <a class="ladder-cta" href="/tiers">
+        <span class="lc-kicker">Full ladder</span>
+        <span class="lc-lead">Median $/hr for every premium silicon, across all three tiers.</span>
+        <span class="lc-sub">Plus what each tier packages and the basis decomposition — how much of the rate is silicon versus deployment grade.</span>
+        <span class="lc-go">Open Tiers <span class="arrow" aria-hidden="true">→</span></span>
+      </a>
     </section>
-
-    <TierDefinitions />
 
     <section class="methodology">
       <header class="sec-head">
@@ -231,9 +180,10 @@ function chipDisplay(token: string): string {
         </div>
       </div>
       <p class="meth-tail">
-        See <a href="/tiers">/tiers</a> for the editorial framing,
-        <a href="/spreads">/spreads</a> for the T1IF-anchored spread matrix,
-        and <a href="/applications">/applications</a> for worked credit-document examples.
+        See <a href="/tiers">/tiers</a> for tier definitions, the
+        T1IF-anchored spread matrix, and classification, and
+        <a href="/applications">/applications</a> for worked
+        credit-document examples.
       </p>
       <p class="meth-cta">
         <a href="https://github.com/ccir-index/ccir-v2-data/blob/main/methodology/CCIR_Methodology_v2_0_0.md">
@@ -283,6 +233,53 @@ function chipDisplay(token: string): string {
     .hero { margin-bottom: 24px; max-width: 80ch; }
     .lede { font-size: var(--fs-lg); }
     .lede em { font-style: italic; color: var(--accent); white-space: nowrap; }
+
+    .ladder-cta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      background: var(--surface);
+      padding: 18px 20px;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 120ms ease;
+    }
+    .ladder-cta:hover { border-color: var(--accent); text-decoration: none; }
+    .ladder-cta .lc-kicker {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+    .ladder-cta .lc-lead {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      color: var(--ink);
+      font-weight: var(--weight-display);
+      line-height: 1.3;
+    }
+    .ladder-cta .lc-sub {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+    .ladder-cta .lc-go {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
 
     .featured {
       border-top: 1px solid var(--rule-2);
