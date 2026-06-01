@@ -1,11 +1,11 @@
 {
-  "as_of_date": "2026-05-31",
-  "published_at_ct": "2026-05-31T04:46:25-05:00",
-  "published_at_utc": "2026-05-31T09:46:25+00:00",
-  "run_id": "export-20260531T094622Z-eb761658",
+  "as_of_date": "2026-06-01",
+  "published_at_ct": "2026-06-01T07:35:36-05:00",
+  "published_at_utc": "2026-06-01T12:35:36+00:00",
+  "run_id": "export-20260601T123526Z-75d00fff",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
-  "contributing_today": 28,
+  "contributing_today": 27,
   "listings_history": {
     "chips": [
       "h100-sxm-80gb",
@@ -20,8 +20,8 @@
     "status_detail": "read_table raised: ArrowInvalid: No match for FieldRef.Name(operator_tier) in as_of_date: date32[day] not null\nobservation_hash: string not null\nsource_name: string not null\nsilicon_id: string not null\ngpu_model: string not null\ngpu_variant: string\nform_factor: string not null\ninterconnect_substrate: string\ncommitment_term: string not null\ninterruptibility: string not null\ndeployment_class: string not null\nregion: string\nregion_country: string\nfactory_type: string not null\ntier_v3: string\nprice_usd_per_hour: decimal128(12, 4) not null\nbundled: bool not null\nbundled_inclusions: list<element: string>\navailability_state: string\nmethodology_version: string not null\npipeline_run_id: string not null\ncomputed_at: timestamp[us, tz=UTC] not null\n__fragment_index: int32\n__batch_index: int32\n__last_in_fragment: bool\n__filename: string",
     "total_rows": 0,
     "window_days": 90,
-    "window_end": "2026-05-31",
-    "window_start": "2026-03-03"
+    "window_end": "2026-06-01",
+    "window_start": "2026-03-04"
   },
   "marketplace_history": {
     "chips": [
@@ -40,10 +40,10 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 376,
+    "total_rows": 347,
     "window_days": 7,
-    "window_end": "2026-05-31",
-    "window_start": "2026-05-25"
+    "window_end": "2026-06-01",
+    "window_start": "2026-05-26"
   },
   "vast": null,
   "availability": null
