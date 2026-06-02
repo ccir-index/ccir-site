@@ -167,12 +167,15 @@ export const flagshipRates: Rate[] = headlineRates.filter(
 // Section 2 only.
 export const indicativeRates: Rate[] = rates.filter((r) => r.scope === 'indicative');
 
-// Native-product rule for the T-tier headline cells: T1IF/T2IF prefer
-// GTD-only on-demand; T3IF pools GTD + INT (genuine market signal at the
-// marketplace tier). Falls back to fully-pooled when the GTD-only series
-// doesn't exist.
-function preferredInterruptibility(tier: Tier): Interruptibility {
-  return tier === 'T3IF' ? 'ALL' : 'GTD';
+// Native-product rule for the T-tier headline cells: all three tiers
+// (T1IF/T2IF/T3IF) are GTD-only — apples-to-apples guaranteed-grade marks.
+// (T3IF used to pool GTD+INT for marketplace spot, but the one live/executable
+// venue, Vast, is now pulled from the rate panel and shown on /basis as the
+// clearing-vs-list overlay; the residual T3IF list-ask pool is GTD anyway.)
+// Falls back to the fully-pooled ('ALL') series if a GTD-only series is absent
+// (e.g. a transitional snapshot before the gold change lands).
+function preferredInterruptibility(_tier: Tier): Interruptibility {
+  return 'GTD';
 }
 
 function findHeadline(tier: Tier, chip: string, term: Term, pool: Rate[]): Rate | undefined {
@@ -304,11 +307,10 @@ export function chipMatrix(chip: string): ChipTierView[] {
       if (r.gpu_model !== chip) continue;
       if (isHeadline && r.tier !== tier) continue;
       if (r.form_factor !== 'ALL' || r.region !== 'ALL') continue;
-      // For non-T3IF prefer GTD; for T3IF prefer ALL (pooled). For
-      // indicative pool, prefer ALL.
-      const wantInt: Interruptibility = isHeadline
-        ? (tier === 'T3IF' ? 'ALL' : 'GTD')
-        : 'ALL';
+      // Headline tiers (T1IF/T2IF/T3IF) are all GTD-only now (Vast pulled to
+      // the /basis overlay). Indicative (long-tail) pool prefers ALL. Both fall
+      // back to whatever exists if the preferred grade is absent.
+      const wantInt: Interruptibility = isHeadline ? 'GTD' : 'ALL';
       if (r.interruptibility !== wantInt) {
         if (termMap[r.commitment_term]) continue;
       }
