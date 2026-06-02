@@ -1,0 +1,137 @@
+---
+import Base from '../layouts/Base.astro';
+import { vastBasis } from '../data/vast_basis';
+import { meta } from '../data/snapshot';
+
+const CHIP_ORDER = ['B200', 'H200', 'H100', 'A100', 'GB200'];
+const rows = [...vastBasis].sort(
+  (a, b) => CHIP_ORDER.indexOf(a.gpu_model) - CHIP_ORDER.indexOf(b.gpu_model),
+);
+
+const fmtUsd = (v: number | null) => (v == null ? '—' : `$${v.toFixed(2)}`);
+const fmtPct = (v: number | null) =>
+  v == null ? '—' : `${v >= 0 ? '+' : ''}${v.toFixed(1)}%`;
+const dir = (v: number | null) =>
+  v == null ? 'flat' : v > 0.5 ? 'up' : v < -0.5 ? 'down' : 'flat';
+const inputLabel = (s: string) =>
+  s === 'min_bid' ? 'bid · clearing floor' : 'on-demand · live ask';
+
+const asOf = rows[0]?.as_of_date ?? meta.as_of_date;
+const windowDays = rows[0]?.window_days ?? 7;
+---
+<Base
+  title="Clearing Basis · CCIR"
+  description="How the one live, executable marketplace venue (Vast) prices relative to the posted list-ask floor at matched tier. An overlay adjacent to the CCIR benchmark — not part of it."
+>
+  <section class="wrap top">
+    <div class="kicker">Overlay · Marketplace clearing vs list-ask</div>
+    <h1>Clearing Basis</h1>
+    <p class="dek">
+      The CCIR reference rate is a <strong>list-ask benchmark</strong> — every
+      panel source posts a rate card. One venue is different: Vast.ai is a live,
+      continuously-repriced, executable marketplace. It is pulled out of the
+      benchmark so the index stays a clean list-ask, and re-surfaced here as a
+      basis: how the live marketplace price sits relative to the ex-Vast
+      list-ask floor at matched tier (Tier 3). Positive = the live venue is
+      pricing <em>above</em> posted list-asks; negative = below.
+    </p>
+
+    <table class="basis">
+      <thead>
+        <tr>
+          <th>Chip</th>
+          <th class="num">List-ask floor</th>
+          <th class="num">Vast</th>
+          <th class="num">Basis · {windowDays}d</th>
+          <th class="num">Basis · 1d</th>
+          <th class="num">n (vast/list)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr>
+            <td class="chip">{r.gpu_model}</td>
+            <td class="num">{fmtUsd(r.listask_floor_7d)}</td>
+            <td class="num">
+              {fmtUsd(r.vast_price_7d)}
+              <span class="src">{inputLabel(r.vast_input)}</span>
+            </td>
+            <td class={`num basis-${dir(r.basis_pct_7d)}`}>{fmtPct(r.basis_pct_7d)}</td>
+            <td class={`num basis-${dir(r.basis_pct_1d)}`}>{fmtPct(r.basis_pct_1d)}</td>
+            <td class="num muted">{r.n_vast_src}/{r.n_listask_src}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <p class="note">
+      As of {asOf} · {windowDays}-day window · operator-equal medians, matched
+      tier (Tier 3). Input is the bid clearing floor where Vast exposes one,
+      otherwise the on-demand live ask (flagged per row). <strong>Single-venue
+      signal</strong> — Vast only; it is the lone executable marketplace in the
+      panel, not the whole market. Not a CCIR reference rate. {meta.methodology_version}.
+    </p>
+  </section>
+
+  <style>
+    .top { padding-top: 40px; padding-bottom: 56px; }
+    .kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    h1 { margin: 0 0 12px; }
+    .dek {
+      max-width: 760px;
+      font-size: var(--fs-md);
+      line-height: 1.6;
+      color: var(--ink);
+      margin-bottom: 28px;
+    }
+    table.basis {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+    }
+    table.basis th,
+    table.basis td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--rule);
+      text-align: left;
+      vertical-align: baseline;
+    }
+    table.basis th {
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      font-weight: var(--weight-strong);
+    }
+    table.basis .num { text-align: right; font-variant-numeric: tabular-nums; }
+    table.basis th.num { text-align: right; }
+    td.chip { font-weight: var(--weight-strong); color: var(--ink); }
+    .src {
+      display: block;
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+      margin-top: 2px;
+    }
+    .muted { color: var(--ink-faint); }
+    .basis-up { color: #c0392b; font-weight: var(--weight-strong); }
+    .basis-down { color: #1e7a52; font-weight: var(--weight-strong); }
+    .basis-flat { color: var(--ink-dim); }
+    .note {
+      max-width: 760px;
+      margin-top: 22px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      line-height: 1.6;
+      color: var(--ink-dim);
+    }
+  </style>
+</Base>
