@@ -1,8 +1,8 @@
 {
-  "as_of_date": "2026-06-08",
-  "published_at_ct": "2026-06-08T06:57:21-05:00",
-  "published_at_utc": "2026-06-08T11:57:21+00:00",
-  "run_id": "export-20260608T115704Z-929c406a",
+  "as_of_date": "2026-06-09",
+  "published_at_ct": "2026-06-09T05:37:41-05:00",
+  "published_at_utc": "2026-06-09T10:37:41+00:00",
+  "run_id": "export-20260609T103721Z-7d18ff10",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 27,
@@ -20,8 +20,8 @@
     "status_detail": "read_table raised: ArrowInvalid: No match for FieldRef.Name(operator_tier) in as_of_date: date32[day] not null\nobservation_hash: string not null\nsource_name: string not null\nsilicon_id: string not null\ngpu_model: string not null\ngpu_variant: string\nform_factor: string not null\ninterconnect_substrate: string\ncommitment_term: string not null\ninterruptibility: string not null\ndeployment_class: string not null\nregion: string\nregion_country: string\nfactory_type: string not null\ntier_v3: string\nprice_usd_per_hour: decimal128(12, 4) not null\nbundled: bool not null\nbundled_inclusions: list<element: string>\navailability_state: string\nmethodology_version: string not null\npipeline_run_id: string not null\ncomputed_at: timestamp[us, tz=UTC] not null\n__fragment_index: int32\n__batch_index: int32\n__last_in_fragment: bool\n__filename: string",
     "total_rows": 0,
     "window_days": 90,
-    "window_end": "2026-06-08",
-    "window_start": "2026-03-11"
+    "window_end": "2026-06-09",
+    "window_start": "2026-03-12"
   },
   "marketplace_history": {
     "chips": [
@@ -40,10 +40,10 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 445,
+    "total_rows": 397,
     "window_days": 7,
-    "window_end": "2026-06-08",
-    "window_start": "2026-06-02"
+    "window_end": "2026-06-09",
+    "window_start": "2026-06-03"
   },
   "vast": null,
   "availability": null
