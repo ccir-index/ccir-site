@@ -37,6 +37,26 @@ export const OCC_CHIPS = [
 
 export type OccChipId = typeof OCC_CHIPS[number]['id'];
 
+// ---------------------------------------------------------------------------
+// Pipeline-rendered PNG chart cards (published daily to the public data repo)
+// ---------------------------------------------------------------------------
+
+const CARD_BASE =
+  'https://raw.githubusercontent.com/ccir-index/ccir-v2-data/main/indices/snapshots';
+
+// Branded 1440x810 chart card for a (family, chip) pair, themed to match the
+// site's data-theme ('terminal' | 'editorial'). asOf is meta.as_of_date.
+// Occupancy cards may be absent for some chips on a given day (e.g. gb200);
+// callers handle the 404 via the <img> error event.
+export function cardUrl(
+  family: 'tightness' | 'inventory' | 'occupancy',
+  chip: string,
+  theme: string,
+  asOf: string,
+): string {
+  return `${CARD_BASE}/${asOf}/card_${family}_${chip}_${theme}.png`;
+}
+
 const OPERATOR_CLASS_LABEL: Record<string, string> = {
   T1: 'Tier 1 operators (hyperscaler)',
   T2: 'Tier 2 operators (neocloud)',
