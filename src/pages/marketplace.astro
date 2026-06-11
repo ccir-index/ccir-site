@@ -61,6 +61,10 @@ const windowEnd = mktMeta?.window_end ?? '—';
       </div>
     </div>
 
+    <header class="legend-head">
+      <span class="sec-kicker-label">LEAST-EXPENSIVE AVAILABLE · $/GPU-HR</span>
+      <span class="sec-note">trailing {windowDays}d · 3h cycles · times in ET</span>
+    </header>
     <div class="chart-wrap chart-wrap-hero">
       <div class="chart-status" id="chart-status">Loading…</div>
       <canvas id="chart" aria-label="Marketplace least-expensive available over time"></canvas>
@@ -88,12 +92,13 @@ const windowEnd = mktMeta?.window_end ?? '—';
     </section>
 
     <p class="footnote">
-      Refreshed roughly every three hours. The plotted price is the
-      lowest per-GPU rate available in each cycle. Vast.ai is restricted
-      to verified hosts at 90% reliability or better; its dashed line
-      shows where the typical verified listing sits relative to that
-      floor. History begins on the day this product launched —
-      earlier periods are not backfilled.
+      Trailing {windowDays}-day window, refreshed roughly every three
+      hours. The plotted price is the lowest per-GPU list-ask available
+      in each collection cycle. Vast.ai is restricted to verified hosts
+      at 90% reliability or better; its dashed line shows where the
+      typical verified listing sits relative to that floor. End-of-line
+      figures mark each line's latest value. History begins on the day
+      this product launched — earlier periods are not backfilled.
     </p>
   </section>
 
@@ -105,6 +110,9 @@ const windowEnd = mktMeta?.window_end ?? '—';
       colorForChip, shortLabelForChip,
       type ChipId, type MarketplaceSeries,
     } from '../data/marketplace';
+    import {
+      lastValueLabelPlugin, ccirTimeScaleDefaults, LAST_VALUE_GUTTER,
+    } from '../data/chartExtras';
 
     const DEFAULT_CHIP: ChipId = 'h100-sxm-80gb';
     const MAX_CHIPS = 3;
@@ -269,6 +277,9 @@ const windowEnd = mktMeta?.window_end ?? '—';
           tension: 0,
           spanGaps: true,
           order: s.variant === 'median' ? 2 : 1,
+          // The faded median backdrop tracks the same venue as its cheapest
+          // line — labelling both would double-print near-identical values.
+          ccirSkipLastValue: s.variant === 'median',
         };
       });
 
@@ -286,8 +297,15 @@ const windowEnd = mktMeta?.window_end ?? '—';
           responsive: true,
           maintainAspectRatio: false,
           interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          // Right gutter keeps end-of-line value labels from clipping.
+          layout: { padding: { right: LAST_VALUE_GUTTER } },
           plugins: {
             legend: { display: false },
+            ccirLastValueLabel: {
+              format: (v: number) => '$' + v.toFixed(2),
+              // Legend table below names the lines; values only.
+              datasetLabels: false,
+            },
             tooltip: {
               displayColors: true,
               callbacks: {
@@ -300,22 +318,16 @@ const windowEnd = mktMeta?.window_end ?? '—';
             },
           },
           scales: {
-            x: {
-              type: 'time',
-              ticks: {
-                color: inkDim,
-                font: monoFont,
-                maxRotation: 0,
-                autoSkipPadding: 32,
-                callback: (value) => {
-                  const ms = typeof value === 'number' ? value : Number(value);
-                  return isMidnightET(ms) ? fmtTickDayET.format(ms) : fmtTickET.format(ms);
-                },
+            x: ccirTimeScaleDefaults({
+              color: inkDim,
+              grid,
+              font: monoFont,
+              title: 'Time (ET)',
+              tickCallback: (value) => {
+                const ms = typeof value === 'number' ? value : Number(value);
+                return isMidnightET(ms) ? fmtTickDayET.format(ms) : fmtTickET.format(ms);
               },
-              title: { display: true, text: 'Time (ET)', color: inkDim, font: monoFont },
-              grid: { color: grid, drawOnChartArea: false },
-              border: { color: grid },
-            },
+            }) as any,
             y: {
               type: state.log_scale && multi ? 'logarithmic' : 'linear',
               title: { display: true, text: '$/GPU-hour', color: inkDim, font: monoFont },
@@ -325,6 +337,7 @@ const windowEnd = mktMeta?.window_end ?? '—';
             },
           },
         },
+        plugins: [lastValueLabelPlugin],
       });
     }
 

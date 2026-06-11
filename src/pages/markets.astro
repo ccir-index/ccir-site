@@ -62,9 +62,13 @@ const windowEnd = listingsMeta?.window_end ?? '—';
       </div>
     </div>
 
+    <header class="legend-head">
+      <span class="sec-kicker-label">POSTED LIST-ASK RATES · $/GPU-HR</span>
+      <span class="sec-note">trailing {windowDays}d · daily snapshots · dates in ET</span>
+    </header>
     <div class="chart-wrap chart-wrap-hero">
       <div class="chart-status" id="chart-status">Loading…</div>
-      <canvas id="chart" aria-label="Provider rack rates over time"></canvas>
+      <canvas id="chart" aria-label="Provider list-ask rates over time"></canvas>
     </div>
 
     <section class="legend-section">
@@ -91,8 +95,11 @@ const windowEnd = listingsMeta?.window_end ?? '—';
     </section>
 
     <p class="footnote">
-      Refreshed once daily at the morning publish. History begins on the
-      day this product launched — earlier periods are not backfilled.
+      Posted list-ask rate cards — one observation per provider per day,
+      drawn over the trailing {windowDays}-day window. Refreshed once daily
+      at the morning publish. End-of-line figures mark each line's latest
+      value. History begins on the day this product launched — earlier
+      periods are not backfilled.
     </p>
   </section>
 
@@ -104,6 +111,9 @@ const windowEnd = listingsMeta?.window_end ?? '—';
       colorForChip, shortLabelForChip,
       type ChipId, type ProviderSeries,
     } from '../data/listings_history';
+    import {
+      lastValueLabelPlugin, ccirTimeScaleDefaults, LAST_VALUE_GUTTER,
+    } from '../data/chartExtras';
 
     const DEFAULT_CHIP: ChipId = 'h100-sxm-80gb';
     const MAX_CHIPS = 3;
@@ -247,8 +257,15 @@ const windowEnd = listingsMeta?.window_end ?? '—';
           responsive: true,
           maintainAspectRatio: false,
           interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          // Right gutter keeps end-of-line value labels from clipping.
+          layout: { padding: { right: LAST_VALUE_GUTTER } },
           plugins: {
             legend: { display: false },
+            ccirLastValueLabel: {
+              format: (v: number) => '$' + v.toFixed(2),
+              // Legend table below names the lines; values only.
+              datasetLabels: false,
+            },
             tooltip: {
               displayColors: true,
               callbacks: {
@@ -261,23 +278,17 @@ const windowEnd = listingsMeta?.window_end ?? '—';
             },
           },
           scales: {
-            x: {
-              type: 'time',
-              time: { unit: 'day' },
-              ticks: {
-                color: inkDim,
-                font: monoFont,
-                maxRotation: 0,
-                autoSkipPadding: 24,
-                callback: (value) => {
-                  const ms = typeof value === 'number' ? value : Number(value);
-                  return fmtTickDayET.format(ms);
-                },
+            x: ccirTimeScaleDefaults({
+              color: inkDim,
+              grid,
+              font: monoFont,
+              unit: 'day',
+              title: 'Date (ET)',
+              tickCallback: (value) => {
+                const ms = typeof value === 'number' ? value : Number(value);
+                return fmtTickDayET.format(ms);
               },
-              title: { display: true, text: 'Date (ET)', color: inkDim, font: monoFont },
-              grid: { color: grid, drawOnChartArea: false },
-              border: { color: grid },
-            },
+            }) as any,
             y: {
               type: state.log_scale && multi ? 'logarithmic' : 'linear',
               title: { display: true, text: '$/GPU-hour', color: inkDim, font: monoFont },
@@ -287,6 +298,7 @@ const windowEnd = listingsMeta?.window_end ?? '—';
             },
           },
         },
+        plugins: [lastValueLabelPlugin],
       });
     }
 
