@@ -89,7 +89,12 @@ const windowDays = rows[0]?.window_days ?? 7;
       <div class="occ-pills" id="occ-pills" role="group" aria-label="Select a chip"></div>
       <div class="occ-chart-wrap">
         <div class="occ-status" id="occ-status">Loading…</div>
-        <canvas id="occ-chart" aria-label="Vast marketplace implied utilization over time"></canvas>
+        <img
+          id="occ-card"
+          class="card-img"
+          data-as-of={meta.as_of_date}
+          alt="Occupancy chart card: Vast marketplace implied utilization over time"
+        />
       </div>
       <p class="note" id="occ-note">
         Four snapshots daily. A machine with zero rentable chunks may be fully
@@ -102,136 +107,51 @@ const windowDays = rows[0]?.window_days ?? 7;
   </section>
 
   <script>
-    import Chart from 'chart.js/auto';
-    import 'chartjs-adapter-date-fns';
-    import { fetchOccupancy, OCC_CHIPS, type OccChipId, type OccupancyRow } from '../data/utilization';
-    import {
-      lastValueLabelPlugin, ccirTimeScaleDefaults, LAST_VALUE_GUTTER,
-    } from '../data/chartExtras';
+    import { OCC_CHIPS, cardUrl, type OccChipId } from '../data/utilization';
 
-    const occState = {
-      chip: 'h100-sxm' as OccChipId,
-      cache: new Map<OccChipId, OccupancyRow[] | null>(),
-    };
-    let occChart: Chart<'line'> | null = null;
+    const occState = { chip: 'h100-sxm' as OccChipId };
 
     const pillsEl = document.getElementById('occ-pills') as HTMLElement;
     const occStatus = document.getElementById('occ-status') as HTMLElement;
-    const occCanvas = document.getElementById('occ-chart') as HTMLCanvasElement;
+    const occImg = document.getElementById('occ-card') as HTMLImageElement;
+    const AS_OF = occImg.dataset.asOf ?? '';
 
     pillsEl.innerHTML = OCC_CHIPS.map((c) =>
       `<button type="button" class="occ-pill" data-chip="${c.id}">${c.label}</button>`).join('');
 
-    function token(name: string): string {
-      try {
-        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-      } catch { return ''; }
-    }
-    const fmtDay = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' });
-
-    function setOccStatus(msg: string | null) {
-      occStatus.style.display = msg === null ? 'none' : 'flex';
-      occStatus.textContent = msg ?? '';
+    function currentTheme(): string {
+      return document.documentElement.getAttribute('data-theme') || 'editorial';
     }
 
-    function renderOcc(rows: OccupancyRow[]) {
-      const accent = token('--accent') || '#d68a2a';
-      const ink = token('--ink') || '#e8e6e1';
-      const inkDim = token('--ink-dim') || '#9a9991';
-      const grid = token('--vast-grid') || 'rgba(128,128,128,0.2)';
-      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
+    occImg.addEventListener('load', () => {
+      occImg.style.visibility = 'visible';
+      occStatus.style.display = 'none';
+    });
+    // Occupancy cards can be absent for a chip on a given day (no GB200
+    // occupancy most days) — the 404 lands here.
+    occImg.addEventListener('error', () => {
+      occImg.style.visibility = 'hidden';
+      occStatus.style.display = 'flex';
+      occStatus.textContent =
+        'Card not yet published for this chip — falls back to tomorrow’s run.';
+    });
 
-      const util = rows.filter((r) => r.utilization !== null)
-        .map((r) => ({ x: r.cycle_ms, y: (r.utilization as number) * 100 }));
-      // Same direction as the capacity line: higher = tighter. The raw column
-      // is machines WITH a node free; plot its complement.
-      const wholeNode = rows.filter((r) => r.n_machines > 0)
-        .map((r) => ({
-          x: r.cycle_ms,
-          y: ((r.n_machines - r.n_machines_idle_ge_8) / r.n_machines) * 100,
-        }));
-
-      if (occChart) occChart.destroy();
-      occChart = new Chart(occCanvas, {
-        type: 'line',
-        data: {
-          datasets: [
-            {
-              label: 'Implied utilization · capacity',
-              data: util, borderColor: accent, backgroundColor: accent,
-              borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0, spanGaps: true,
-            },
-            {
-              label: 'Implied utilization · whole 8-GPU nodes',
-              data: wholeNode, borderColor: ink, backgroundColor: ink,
-              borderWidth: 1.5, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 4,
-              tension: 0, spanGaps: true,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'nearest', axis: 'x', intersect: false },
-          // Right gutter keeps end-of-line value labels from clipping.
-          layout: { padding: { right: LAST_VALUE_GUTTER } },
-          plugins: {
-            // Two lines: labelled directly at their end points (value +
-            // short name), so the legend is redundant chrome here.
-            legend: { display: false },
-            ccirLastValueLabel: {
-              format: (v: number) => v.toFixed(1) + '%',
-              datasetLabels: (ds: { label?: string }) =>
-                ds.label && ds.label.includes('whole') ? 'whole nodes' : 'capacity',
-            },
-            tooltip: {
-              callbacks: {
-                title: (items) => {
-                  const x = items[0]?.parsed?.x;
-                  return x ? fmtDay.format(x) : '';
-                },
-                label: (ctx) => `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(1)}%`,
-              },
-            },
-          },
-          scales: {
-            x: ccirTimeScaleDefaults({
-              color: inkDim, grid, font: monoFont, unit: 'day',
-            }) as any,
-            y: {
-              min: 0, max: 100,
-              title: { display: true, text: '%', color: inkDim, font: monoFont },
-              ticks: { color: inkDim, font: monoFont, callback: (v) => v + '%' },
-              grid: { color: grid },
-              border: { color: grid },
-            },
-          },
-        },
-        plugins: [lastValueLabelPlugin],
-      });
+    function refreshOcc() {
+      occStatus.style.display = 'flex';
+      occStatus.textContent = 'Loading…';
+      occImg.style.visibility = 'hidden';
+      occImg.src = cardUrl('occupancy', occState.chip, currentTheme(), AS_OF);
     }
+
+    // Re-fetch the matching theme variant when the site theme toggles.
+    new MutationObserver(() => refreshOcc()).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['data-theme'],
+    });
 
     function syncOccPills() {
       pillsEl.querySelectorAll<HTMLButtonElement>('.occ-pill').forEach((p) => {
         p.classList.toggle('on', p.dataset.chip === occState.chip);
       });
-    }
-
-    async function refreshOcc() {
-      setOccStatus('Loading…');
-      if (!occState.cache.has(occState.chip)) {
-        try {
-          occState.cache.set(occState.chip, await fetchOccupancy(occState.chip));
-        } catch { occState.cache.set(occState.chip, null); }
-      }
-      const rows = occState.cache.get(occState.chip) ?? [];
-      if (rows.length === 0) {
-        setOccStatus('No occupancy data yet — the series publishes with the next daily snapshot.');
-        if (occChart) { occChart.destroy(); occChart = null; }
-        return;
-      }
-      setOccStatus(null);
-      renderOcc(rows);
     }
 
     pillsEl.addEventListener('click', (ev) => {
@@ -335,7 +255,15 @@ const windowDays = rows[0]?.window_days ?? 7;
       border: 1px solid var(--rule);
       background: var(--vast-panel-bg, var(--surface));
       padding: 14px;
-      height: 380px;
+    }
+    /* Pipeline-rendered 1440x810 card: aspect-ratio reserves the panel
+       height before (or without) a loaded image, so the status overlay
+       has a box to center in. */
+    .card-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
     }
     .occ-status {
       position: absolute;
@@ -351,7 +279,7 @@ const windowDays = rows[0]?.window_days ?? 7;
       text-align: center;
     }
     @media (max-width: 720px) {
-      .occ-chart-wrap { height: 300px; padding: 10px; }
+      .occ-chart-wrap { padding: 10px; }
     }
   </style>
 </Base>
