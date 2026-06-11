@@ -178,12 +178,26 @@ function preferredInterruptibility(_tier: Tier): Interruptibility {
   return 'GTD';
 }
 
+// Variant-specific series (e.g. CRI-T2IF-A100-40GB-…) carry a NNGB token the
+// pooled headline lacks; they share gpu_model/form_factor with the pooled row
+// so a plain find() can grab them by CSV sort order (40GB < ALL — this put the
+// n=3 A100-40GB sub-series in the homepage A100 slot on 2026-06-11). Rank
+// variant rows after pooled, then prefer breadth.
+function variantRank(r: Rate): number {
+  return /-\d+GB-/.test(r.series_id) ? 1 : 0;
+}
+
 function findHeadline(tier: Tier, chip: string, term: Term, pool: Rate[]): Rate | undefined {
   const want = preferredInterruptibility(tier);
-  const match = (intCheck: Interruptibility) => pool.find(
-    (r) => r.tier === tier && r.gpu_model === chip && r.commitment_term === term &&
-           r.form_factor === 'ALL' && r.interruptibility === intCheck && r.region === 'ALL',
-  );
+  const match = (intCheck: Interruptibility) => {
+    const candidates = pool.filter(
+      (r) => r.tier === tier && r.gpu_model === chip && r.commitment_term === term &&
+             r.form_factor === 'ALL' && r.interruptibility === intCheck && r.region === 'ALL',
+    );
+    return candidates.sort(
+      (a, b) => variantRank(a) - variantRank(b) || (b.n_sources ?? 0) - (a.n_sources ?? 0),
+    )[0];
+  };
   return match(want) ?? (want === 'GTD' ? match('ALL') : undefined);
 }
 
@@ -404,18 +418,22 @@ export type TierMatrixView = Record<Tier, Rate | undefined>;
 
 export function tierMatrix(chip: string): TierMatrixView {
   const out: TierMatrixView = { T1IF: undefined, T2IF: undefined, T3IF: undefined };
-  for (const r of flagshipRates) {
-    if (!r.tier) continue;
-    if (r.gpu_model !== chip) continue;
-    if (r.commitment_term !== 'OnDemand') continue;
-    if (r.form_factor !== 'ALL' || r.region !== 'ALL') continue;
-    const wantInt: Interruptibility = r.tier === 'T3IF' ? 'ALL' : 'GTD';
-    if (r.interruptibility !== wantInt && out[r.tier]) continue;
-    const existing = out[r.tier];
-    if (!existing
-        || (existing.interruptibility !== wantInt && r.interruptibility === wantInt)) {
-      out[r.tier] = r;
-    }
+  for (const tier of ['T1IF', 'T2IF', 'T3IF'] as Tier[]) {
+    const wantInt: Interruptibility = tier === 'T3IF' ? 'ALL' : 'GTD';
+    const candidates = flagshipRates.filter(
+      (r) => r.tier === tier && r.gpu_model === chip && r.commitment_term === 'OnDemand' &&
+             r.form_factor === 'ALL' && r.region === 'ALL',
+    );
+    // Preference order: native interruptibility, then the variant-POOLED
+    // series over NNGB sub-variants (same first-match-by-sort bug as
+    // findHeadline — the A100-40GB n=3 row shadowed the pooled n=10 row on
+    // 2026-06-11), then breadth.
+    out[tier] = candidates.sort(
+      (a, b) =>
+        (a.interruptibility === wantInt ? 0 : 1) - (b.interruptibility === wantInt ? 0 : 1) ||
+        variantRank(a) - variantRank(b) ||
+        (b.n_sources ?? 0) - (a.n_sources ?? 0),
+    )[0];
   }
   return out;
 }
