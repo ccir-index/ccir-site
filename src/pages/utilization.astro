@@ -72,7 +72,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
 
     <header class="legend-head">
       <span class="sec-kicker-label">STOCKOUT BREADTH · DIFFUSION ACROSS THE PANEL</span>
-      <span class="sec-note">share of observed windows with zero posted availability · source-equal</span>
+      <span class="sec-note">trailing {windowDays}d · daily · share of observed windows with zero posted availability · source-equal</span>
     </header>
     <div class="chart-wrap chart-wrap-hero">
       <div class="chart-status" id="chart-status">Loading…</div>
@@ -164,6 +164,9 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       fetchImplied, fetchSources, fetchMacro, fetchIntraday, operatorClassLabel,
       type UtilChipId, type ImpliedRow, type SourceRow, type MacroRow, type IntradayRow,
     } from '../data/utilization';
+    import {
+      lastValueLabelPlugin, ccirTimeScaleDefaults, LAST_VALUE_GUTTER,
+    } from '../data/chartExtras';
 
     const DEFAULT_CHIP: UtilChipId = 'h100-sxm';
     const MIN_SOURCES = 2;
@@ -255,10 +258,22 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
           responsive: true,
           maintainAspectRatio: false,
           interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          // Right gutter keeps end-of-line value labels from clipping.
+          layout: { padding: { right: LAST_VALUE_GUTTER } },
           plugins: {
             legend: {
-              display: true, position: 'top',
+              // Two-line base view labels lines directly at their end points;
+              // the legend returns when operator-class breakouts are toggled.
+              display: datasets.length > 3, position: 'top',
               labels: { color: inkDim, font: monoFont, boxWidth: 18, boxHeight: 2 },
+            },
+            ccirLastValueLabel: {
+              format: (v: number) => v.toFixed(0) + '%',
+              datasetLabels: (ds: { label?: string }) => {
+                if (ds.label === 'Any configuration') return 'any config';
+                if (ds.label === 'Full 8-GPU node') return '8× node';
+                return ds.label ?? null;
+              },
             },
             tooltip: {
               displayColors: true,
@@ -272,14 +287,9 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
             },
           },
           scales: {
-            x: {
-              type: 'time',
-              time: { unit: 'day' },
-              ticks: { color: inkDim, font: monoFont, maxRotation: 0, autoSkipPadding: 32 },
-              title: { display: true, text: 'Date (UTC)', color: inkDim, font: monoFont },
-              grid: { color: grid, drawOnChartArea: false },
-              border: { color: grid },
-            },
+            x: ccirTimeScaleDefaults({
+              color: inkDim, grid, font: monoFont, unit: 'day', title: 'Date (UTC)',
+            }) as any,
             y: {
               min: 0, max: 100,
               title: { display: true, text: '% of observed windows stocked out', color: inkDim, font: monoFont },
@@ -289,6 +299,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
             },
           },
         },
+        plugins: [lastValueLabelPlugin],
       });
     }
 
@@ -319,6 +330,9 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
         return;
       }
       setInvStatus(null);
+      // No end-of-line value badges here: the right-hand shape-weighted axis
+      // (y2) occupies the gutter the badges would draw into. The top legend
+      // carries the line identities instead.
       invChart = new Chart(invCanvas, {
         type: 'line',
         data: {
@@ -355,13 +369,9 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
             },
           },
           scales: {
-            x: {
-              type: 'time', time: { unit: 'day' },
-              ticks: { color: inkDim, font: monoFont, maxRotation: 0, autoSkipPadding: 32 },
-              title: { display: true, text: 'Hour (UTC)', color: inkDim, font: monoFont },
-              grid: { color: grid, drawOnChartArea: false },
-              border: { color: grid },
-            },
+            x: ccirTimeScaleDefaults({
+              color: inkDim, grid, font: monoFont, unit: 'day', title: 'Hour (UTC)',
+            }) as any,
             y: {
               position: 'left', min: 0,
               title: { display: true, text: 'idle GPUs (level)', color: inkDim, font: monoFont },
