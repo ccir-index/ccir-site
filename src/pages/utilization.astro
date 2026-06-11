@@ -14,7 +14,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
   description="Implied GPU market utilization: how often each operator class shows zero posted availability for a chip, observed multiple times daily across named providers."
 >
   <section class="wrap top vast-page utilization-page">
-    <div class="kicker">IMPLIED MARKET UTILIZATION · PANEL STOCKOUT RATE</div>
+    <div class="kicker">IMPLIED MARKET UTILIZATION · BREADTH / DEPTH / LEVEL</div>
     <h1>Market Utilization</h1>
     <div class="ticker-strip" role="group" aria-label="Snapshot stats">
       <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{windowDays}d</span></div>
@@ -25,12 +25,15 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     </div>
     <p class="standfirst lede">
       The reference rates publish what operators <em>ask</em>. This page reads
-      demand through inventory: across named providers, how often does a chip
-      show <strong>zero posted availability</strong>? Two bounds are drawn —
-      <strong>any configuration</strong> (a single 1× instance counts) and
-      <strong>full 8-GPU node</strong> (what “sold out” means in practice).
-      The marketplace venue's own implied utilization (machine-reconstructed) lives on the
-      <a href="/basis">Vast overlay</a> — the two are never blended.
+      demand through inventory, with three instruments that answer different
+      questions. <strong>Stockout breadth</strong> (below): how widespread is
+      tightness — a diffusion-style read across named providers, drawn at two
+      bounds (any configuration vs full 8-GPU node, which is what “sold
+      out” means in practice). <strong>Observable idle inventory</strong>:
+      how deep is the available pool, counted in GPUs. The <strong>utilization
+      level</strong> itself is only honest where machine state is observable —
+      the machine-reconstructed series on the <a href="/basis">Vast
+      overlay</a>. Breadth, depth, level — never blended into one number.
     </p>
 
     <div class="controls">
@@ -67,6 +70,10 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       </div>
     </div>
 
+    <header class="legend-head">
+      <span class="sec-kicker-label">STOCKOUT BREADTH · DIFFUSION ACROSS THE PANEL</span>
+      <span class="sec-note">share of observed windows with zero posted availability · source-equal</span>
+    </header>
     <div class="chart-wrap chart-wrap-hero">
       <div class="chart-status" id="chart-status">Loading…</div>
       <canvas id="chart" aria-label="Share of observed windows with zero posted availability, over time"></canvas>
@@ -127,7 +134,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     </section>
 
     <p class="footnote">
-      <strong>Stockout rate</strong> = share of observed collection windows in
+      <strong>Stockout breadth</strong> is a diffusion-style read — like a purchasing-managers index, it measures how WIDESPREAD tightness is, not its level; the utilization level lives where machine state is observable (Vast overlay). The underlying stockout rate = share of observed collection windows in
       which a source showed zero posted availability for the chip; the
       denominator is windows actually observed (~7–10 per day), never
       wall-clock hours. Each named source contributes one vote per day
