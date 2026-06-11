@@ -141,7 +141,7 @@ export interface MacroRow {
   n_providers_stocked_out_8x: number;
   idle_gpus_observable: number | null;
   n_inventory_sources: number;
-  measured_marketplace_utilization: number | null;
+  marketplace_implied_utilization: number | null;
 }
 
 export function parseMacroCsv(text: string): MacroRow[] {
@@ -158,7 +158,7 @@ export function parseMacroCsv(text: string): MacroRow[] {
       n_providers_stocked_out_8x: num(c[i('n_providers_stocked_out_8x')]) ?? 0,
       idle_gpus_observable: num(c[i('idle_gpus_observable')]),
       n_inventory_sources: num(c[i('n_inventory_sources')]) ?? 0,
-      measured_marketplace_utilization: num(c[i('measured_marketplace_utilization')]),
+      marketplace_implied_utilization: num(c[i('marketplace_implied_utilization')]),
     }));
 }
 

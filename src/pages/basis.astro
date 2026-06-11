@@ -73,28 +73,28 @@ const windowDays = rows[0]?.window_days ?? 7;
     </p>
 
     <div class="occ-section">
-      <div class="kicker">Measured occupancy · same venue, quantity side</div>
-      <h2>Marketplace occupancy</h2>
+      <div class="kicker">Implied market utilization · same venue, quantity side</div>
+      <h2>Implied market utilization — Vast marketplace</h2>
       <p class="dek">
         The same venue's listings disclose how much of each machine is
         currently rentable — enough to reconstruct occupancy machine by
         machine, snapshot by snapshot. Both lines read the same direction —
-        higher means tighter: <strong>share of listed GPU capacity not
-        currently rentable</strong> (solid) and the share of machines with
-        <strong>no full 8-GPU node free</strong> (dashed).
-        Panel-wide <em>implied</em> utilization is a separate product —
+        higher means tighter. <strong>Capacity</strong> (solid): share of listed
+        GPU capacity not currently rentable. <strong>Whole nodes</strong>
+        (dashed): share of machines without a rentable 8-GPU block.
+        The panel-wide stockout view is a separate product —
         see <a href="/utilization">Market Utilization</a>; the two are never
         blended.
       </p>
       <div class="occ-pills" id="occ-pills" role="group" aria-label="Select a chip"></div>
       <div class="occ-chart-wrap">
         <div class="occ-status" id="occ-status">Loading…</div>
-        <canvas id="occ-chart" aria-label="Vast marketplace occupancy over time"></canvas>
+        <canvas id="occ-chart" aria-label="Vast marketplace implied utilization over time"></canvas>
       </div>
       <p class="note" id="occ-note">
         Four snapshots daily. A machine with zero rentable chunks may be fully
         rented <em>or</em> host-paused — the public feed cannot distinguish
-        them, so "occupancy" here means share of listed capacity not currently
+        them, so the utilization read is IMPLIED: share of listed capacity not currently
         rentable. Denominator is listed capacity only. History begins
         2026-05-13. Single-venue signal — not a CCIR reference rate.
       </p>
@@ -154,12 +154,12 @@ const windowDays = rows[0]?.window_days ?? 7;
         data: {
           datasets: [
             {
-              label: 'Capacity not currently rentable',
+              label: 'Implied utilization · capacity',
               data: util, borderColor: accent, backgroundColor: accent,
               borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0, spanGaps: true,
             },
             {
-              label: 'Machines with no full 8-GPU node free',
+              label: 'Implied utilization · whole 8-GPU nodes',
               data: wholeNode, borderColor: ink, backgroundColor: ink,
               borderWidth: 1.5, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 4,
               tension: 0, spanGaps: true,

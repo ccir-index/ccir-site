@@ -29,7 +29,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       show <strong>zero posted availability</strong>? Two bounds are drawn —
       <strong>any configuration</strong> (a single 1× instance counts) and
       <strong>full 8-GPU node</strong> (what “sold out” means in practice).
-      Measured marketplace occupancy is a separate product on the
+      The marketplace venue's own implied utilization (machine-reconstructed) lives on the
       <a href="/basis">Vast overlay</a> — the two are never blended.
     </p>
 
@@ -63,7 +63,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       </div>
       <div class="macro-cell">
         <span class="macro-val"><a href="/basis" id="macro-occ">—</a></span>
-        <span class="macro-lbl">measured marketplace occupancy → Vast overlay</span>
+        <span class="macro-lbl">marketplace implied utilization → Vast overlay</span>
       </div>
     </div>
 
@@ -392,8 +392,8 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
         idleEl.textContent = '—';
       }
       (document.getElementById('macro-occ') as HTMLElement).textContent =
-        latest.measured_marketplace_utilization !== null
-          ? pct(latest.measured_marketplace_utilization)
+        latest.marketplace_implied_utilization !== null
+          ? pct(latest.marketplace_implied_utilization)
           : 'view';
     }
 

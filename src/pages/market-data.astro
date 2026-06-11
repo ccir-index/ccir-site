@@ -26,7 +26,7 @@ const cards = [
     title: 'Market Utilization',
     cadence: 'Daily series · ~7–10 obs/day · 90d window',
     summary:
-      'The quantity side of the market: how often each operator class shows zero posted availability for a chip (stockout rate, two bounds — any configuration vs full 8-GPU node), plus the observable idle-GPU inventory level by the hour. Implied from posted availability; never blended with measured occupancy.',
+      'The quantity side of the market: how often each operator class shows zero posted availability for a chip (stockout rate, two bounds — any configuration vs full 8-GPU node), plus the observable idle-GPU inventory level by the hour. Implied from posted availability across the panel; the marketplace venue series lives on the Vast overlay.',
     inside: 'Stockout rate · idle-GPU inventory · operator-class breakouts · per-source signal disclosure',
   },
   {
@@ -35,8 +35,8 @@ const cards = [
     title: 'Vast Overlay — Basis & Occupancy',
     cadence: 'Daily basis · 4 occupancy snapshots/day',
     summary:
-      'Vast is the one live, executable marketplace in the panel, so it is pulled out of the list-ask benchmark and re-surfaced here on both axes: price (how the live venue sits vs the ex-Vast Tier-3 list-ask floor) and quantity (machine-reconstructed occupancy — share of listed capacity not currently rentable). Single-venue signal, adjacent to the methodology.',
-    inside: 'Clearing basis · measured occupancy since 2026-05-13 · whole-node share',
+      'Vast is the one live, executable marketplace in the panel, so it is pulled out of the list-ask benchmark and re-surfaced here on both axes: price (how the live venue sits vs the ex-Vast Tier-3 list-ask floor) and quantity (implied utilization — machine-reconstructed share of listed capacity not currently rentable). Single-venue signal, adjacent to the methodology.',
+    inside: 'Clearing basis · implied utilization since 2026-05-13 · whole-node share',
   },
   {
     href: '/availability',
