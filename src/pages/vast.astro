@@ -13,17 +13,21 @@ const vastMeta = (meta as any).vast;
   <section class="wrap top vast-page">
     <div class="kicker">VAST.AI · MARKETPLACE OBSERVATORY</div>
     <h1>Vast.ai Observatory</h1>
+    <div class="paused-banner" role="status">
+      Collection paused — showing the last published snapshot (2026-05-13).
+    </div>
     <div class="ticker-strip" role="group" aria-label="Snapshot stats">
       <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{vastMeta?.window_days ?? 30}d</span></div>
       <div class="tk-cell"><span class="tk-lbl">Chips</span><span class="tk-val">{vastMeta?.n_chips ?? 13}</span></div>
       <div class="tk-cell"><span class="tk-lbl">Offers / cycle</span><span class="tk-val">{vastMeta?.n_offers_latest_cycle ?? 0}</span></div>
       <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">3h</span></div>
-      <div class="tk-cell tk-status"><span class="tk-dot"></span><span class="tk-val">LIVE</span></div>
+      <div class="tk-cell tk-status tk-paused"><span class="tk-dot"></span><span class="tk-val">PAUSED</span></div>
     </div>
     <p class="standfirst lede">
       Vast.ai is the only per-host order-book marketplace in the panel —
       every individual machine listing is exposed via the API, with hundreds
-      to thousands of distinct host offers per chip, refreshed in real time.
+      to thousands of distinct host offers per chip, repriced continuously
+      by hosts.
       This page surfaces what the median alone omits: distribution shape,
       quality bands, $/perf frontier, supply structure, geography, egress
       and storage costs, network quality, long-tail catalog, and the
@@ -58,6 +62,7 @@ const vastMeta = (meta as any).vast;
         <span class="sec-kicker-label">DISTRIBUTION</span>
         <h2>Per-GPU $/hr histogram</h2>
         <span class="sec-chip-tag" data-chip-tag>—</span>
+        <span class="sec-note">last snapshot · 2026-05-13</span>
         <span class="sec-note" id="hist-summary">—</span>
       </header>
       <div class="chart-wrap chart-wrap-hero" style="height:360px;">
@@ -73,7 +78,7 @@ const vastMeta = (meta as any).vast;
         <div class="qs-cell"><span class="qs-lbl">SPREAD</span><span class="qs-val" id="qs-spread">—</span></div>
       </div>
       <p class="footnote">
-        Every live offer on Vast for the selected chip, binned by per-whole-GPU
+        Every offer live on Vast at the snapshot for the selected chip, binned by per-whole-GPU
         $/hr (log scale on x). The vertical amber line marks the median; the
         dashed grey marks the median interruptible-bid floor. Where the
         histogram has a long upper tail, that's the trust premium — buyers
@@ -89,6 +94,7 @@ const vastMeta = (meta as any).vast;
         <span class="sec-kicker-label">QUALITY</span>
         <h2>Verified vs deverified bands</h2>
         <span class="sec-chip-tag" data-chip-tag>—</span>
+        <span class="sec-note">last snapshot · 2026-05-13</span>
         <span class="sec-note" id="quality-summary">—</span>
       </header>
       <div class="chart-wrap" style="height:280px;">
@@ -145,6 +151,7 @@ const vastMeta = (meta as any).vast;
         <span class="sec-kicker-label">SUPPLY</span>
         <h2>Multi-GPU offer structure</h2>
         <span class="sec-chip-tag" data-chip-tag>—</span>
+        <span class="sec-note">last snapshot · 2026-05-13</span>
         <span class="sec-note" id="multi-summary">—</span>
       </header>
       <div class="chart-wrap" style="height:240px;">
@@ -187,7 +194,7 @@ const vastMeta = (meta as any).vast;
         <span class="sec-num">06</span>
         <span class="sec-kicker-label">EGRESS &amp; STORAGE</span>
         <h2>Egress + storage costs</h2>
-        <span class="sec-note">Per-offer distribution</span>
+        <span class="sec-note">Per-offer distribution · last snapshot · 2026-05-13</span>
       </header>
       <div class="grid-2">
         <div class="chart-wrap" style="height:220px;">
@@ -213,6 +220,7 @@ const vastMeta = (meta as any).vast;
         <span class="sec-kicker-label">NETWORK</span>
         <h2>Internet-down distribution</h2>
         <span class="sec-chip-tag" data-chip-tag>—</span>
+        <span class="sec-note">last snapshot · 2026-05-13</span>
         <span class="sec-note" id="net-summary">—</span>
       </header>
       <div class="chart-wrap" style="height:240px;">
@@ -275,7 +283,9 @@ const vastMeta = (meta as any).vast;
     </section>
 
     <p class="footnote-last">
-      Refreshed every three hours alongside <a href="/marketplace">/marketplace</a>.
+      Collected every three hours alongside <a href="/marketplace">/marketplace</a>
+      while live; collection has been paused since 2026-05-13 pending the pipeline
+      migration, and every figure on this page reflects the last published snapshot.
       Vast bundles API authenticated via CCIR research key — values are public list-asks
       as Vast publishes them. Distribution shape captured at the cycle Vast served the
       query; offers churn faster than this cadence so the histogram is a snapshot, not
@@ -293,6 +303,7 @@ const vastMeta = (meta as any).vast;
       type VastChipSlug, type VastOfferRow, type VastDistributionRow,
       type VastGeoRow, type VastSummaryRow,
     } from '../data/vast';
+    import { lastValueLabelPlugin, LAST_VALUE_GUTTER } from '../data/chartExtras';
 
     const DEFAULT_CHIP: VastChipSlug = 'h100-sxm';
 
@@ -680,11 +691,18 @@ const vastMeta = (meta as any).vast;
           responsive: true,
           maintainAspectRatio: false,
           interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          // Right gutter keeps end-of-line value labels from clipping.
+          layout: { padding: { right: LAST_VALUE_GUTTER } },
           plugins: {
             legend: {
               display: true,
               position: 'bottom',
               labels: { boxWidth: 12, color: inkDim, font: { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 } },
+            },
+            ccirLastValueLabel: {
+              format: (v: number) => fmtUsd(v),
+              // Five percentile lines — legend carries the names.
+              datasetLabels: false,
             },
             tooltip: {
               callbacks: {
@@ -700,12 +718,14 @@ const vastMeta = (meta as any).vast;
               // density crosses a threshold and drops the date entirely.
               time: { unit: 'day', displayFormats: { day: 'MMM d' }, tooltipFormat: 'MMM d, HH:mm' },
               title: { display: true, text: 'Date (ET)', color: inkDim },
-              grid: { color: grid },
+              grid: { color: grid, drawOnChartArea: false },
+              border: { color: grid },
               ticks: { color: inkDim, maxRotation: 0, autoSkip: true, autoSkipPadding: 32 },
             },
             y: { type: 'linear', title: { display: true, text: 'Per-GPU $/hr', color: inkDim }, grid: { color: grid }, ticks: { color: inkDim } },
           },
         },
+        plugins: [lastValueLabelPlugin],
       });
     }
 
@@ -794,7 +814,9 @@ const vastMeta = (meta as any).vast;
           x: {
             title: { display: true, text: opts.xTitle, color: inkDim, font: monoFont },
             ticks: { maxRotation: 45, autoSkipPadding: 16, color: inkDim, font: monoFont },
-            grid: { color: grid },
+            // No vertical gridlines — the axis border alone carries the x edge.
+            grid: { color: grid, drawOnChartArea: false },
+            border: { color: grid },
           },
           y: {
             title: { display: true, text: opts.yTitle, color: inkDim, font: monoFont },
@@ -919,6 +941,28 @@ const vastMeta = (meta as any).vast;
     @keyframes vast-pulse {
       0%, 100% { opacity: 1; }
       50%      { opacity: 0.35; }
+    }
+
+    /* Paused collection state — static dim dot replaces the pulsing LIVE dot,
+       and the banner line discloses the freeze before any data is read. */
+    .vast-page .tk-status.tk-paused .tk-val { color: var(--ink-dim); }
+    .vast-page .tk-status.tk-paused .tk-dot {
+      background: var(--ink-dim);
+      box-shadow: none;
+      animation: none;
+      opacity: 0.55;
+    }
+    .vast-page .paused-banner {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--vast-warn, var(--accent));
+      border: 1px solid color-mix(in srgb, var(--vast-warn, var(--accent)) 45%, transparent);
+      background: color-mix(in srgb, var(--vast-warn, var(--accent)) 8%, transparent);
+      padding: 7px 12px;
+      margin: 0 0 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: var(--weight-strong);
     }
 
     .vast-page .lede { max-width: 80ch; margin: 4px 0 22px; }

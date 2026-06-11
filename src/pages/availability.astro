@@ -8,7 +8,7 @@ const availMeta = (meta as any).availability;
 ---
 <Base
   title="Availability Observatory · CCIR"
-  description="Cross-provider availability and pricing grid for GPU compute, sourced from the Shadeform aggregator. Refreshed every three hours."
+  description="Cross-provider availability and pricing grid for GPU compute, sourced from the Shadeform aggregator. Collection paused — shows the last published snapshot (2026-05-13)."
 >
   <!-- vast-page class brings the Bloomberg-terminal chrome (ticker strip,
        sec-num chips, chart-wrap panels, mono tables, pulse dot, etc.).
@@ -16,18 +16,21 @@ const availMeta = (meta as any).availability;
   <section class="wrap top vast-page availability-page">
     <div class="kicker">SHADEFORM AGGREGATOR · CROSS-PROVIDER OBSERVATORY</div>
     <h1>Availability Observatory</h1>
+    <div class="paused-banner" role="status">
+      Collection paused — showing the last published snapshot (2026-05-13).
+    </div>
     <div class="ticker-strip" role="group" aria-label="Snapshot stats">
       <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{availMeta?.window_days ?? 30}d</span></div>
       <div class="tk-cell"><span class="tk-lbl">Chips</span><span class="tk-val">{availMeta?.n_chips ?? 11}</span></div>
       <div class="tk-cell"><span class="tk-lbl">SKU × region</span><span class="tk-val">{availMeta?.n_sku_regions_latest_cycle ?? 0}</span></div>
-      <div class="tk-cell"><span class="tk-lbl">Available now</span><span class="tk-val">{availMeta?.n_available_latest_cycle ?? 0}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Available</span><span class="tk-val">{availMeta?.n_available_latest_cycle ?? 0}</span></div>
       <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">3h</span></div>
-      <div class="tk-cell tk-status"><span class="tk-dot"></span><span class="tk-val">LIVE</span></div>
+      <div class="tk-cell tk-status tk-paused"><span class="tk-dot"></span><span class="tk-val">PAUSED</span></div>
     </div>
     <p class="standfirst lede">
-      <strong>Shadeform aggregates 19 GPU clouds' publicly observable list-asks into a single live view.</strong>
+      <strong>Shadeform aggregates 19 GPU clouds' publicly observable list-asks into a single view.</strong>
       This page surfaces the cross-provider view Shadeform aggregates:
-      where each chip is procurable right now, across providers and regions;
+      where each chip is procurable, across providers and regions;
       the per-provider price spread; boot-time tradeoffs; config availability;
       long-tail chip catalog. <strong>Observatory data — not part of the CCIR rate
       methodology.</strong> Shadeform-reported pricing is third-party-attributed.
@@ -59,6 +62,7 @@ const availMeta = (meta as any).availability;
         <span class="sec-num">01</span>
         <span class="sec-kicker-label">AVAILABILITY</span>
         <h2>Provider × region grid</h2>
+        <span class="sec-note">last snapshot · 2026-05-13</span>
         <span class="sec-note" id="grid-summary">—</span>
       </header>
       <div class="grid-wrap grid-wrap-hero">
@@ -75,7 +79,7 @@ const availMeta = (meta as any).availability;
       </div>
       <p class="footnote">
         Each cell is one (provider × region) pair for the selected chip. Green
-        = available now, red = offline. Hover for $/GPU/hr. Cells are sorted
+        = available in the snapshot, red = offline. Hover for $/GPU/hr. Cells are sorted
         by provider (rows) and region (columns), so chronic outages on a single
         provider show up as a row of red. <code>per_gpu_dph = hourly_price ÷ 100 ÷ num_gpus</code>.
       </p>
@@ -119,6 +123,7 @@ const availMeta = (meta as any).availability;
         <span class="sec-num">03</span>
         <span class="sec-kicker-label">SPREAD</span>
         <h2>Per-provider price spread</h2>
+        <span class="sec-note">last snapshot · 2026-05-13</span>
         <span class="sec-note" id="spread-summary">—</span>
       </header>
       <div class="chart-wrap" style="height:320px;">
@@ -128,8 +133,9 @@ const availMeta = (meta as any).availability;
       <p class="footnote">
         Each provider's min, median, and max per-GPU $/hr for the selected chip.
         Wide bars mean broad SKU coverage; narrow bars mean a single configuration.
-        Cross-provider gap = arbitrage signal. (Same chip can clear $1.95-$2.99/GPU/hr
-        across nine venues for H100 SXM.)
+        The cross-provider gap measures list-ask dispersion at matched chip —
+        the same chip has been listed at $1.95–$2.99/GPU/hr across nine venues
+        for H100 SXM.
       </p>
     </section>
 
@@ -172,6 +178,7 @@ const availMeta = (meta as any).availability;
         <span class="sec-num">05</span>
         <span class="sec-kicker-label">BOOT TIME</span>
         <h2>Provisioning seconds by provider</h2>
+        <span class="sec-note">last snapshot · 2026-05-13</span>
         <span class="sec-note" id="boot-summary">—</span>
       </header>
       <div class="chart-wrap" style="height:280px;">
@@ -221,6 +228,7 @@ const availMeta = (meta as any).availability;
         <span class="sec-num">07</span>
         <span class="sec-kicker-label">TIME SERIES</span>
         <h2>Availability % over time</h2>
+        <span class="sec-note">3h cycles · series ends 2026-05-13 (paused)</span>
         <span class="sec-note" id="hist-summary">—</span>
       </header>
       <div class="chart-wrap chart-wrap-hero" style="height:340px;">
@@ -229,10 +237,9 @@ const availMeta = (meta as any).availability;
       </div>
       <p class="footnote">
         Per-cycle <code>pct_available = n_available ÷ n_total_sku_region</code>
-        for the selected chip. Drops indicate fleet-wide outages or supply
-        cliffs; sustained climbs indicate new capacity onboarding. <strong>This
-        is the unique CCIR view</strong> — Shadeform exposes current state
-        only; CCIR persists the cycle-by-cycle history.
+        for the selected chip, at the 3-hour collection cadence. Shadeform
+        exposes current state only; CCIR persists the cycle-by-cycle history
+        drawn here. The series ends 2026-05-13, when collection was paused.
       </p>
     </section>
 
@@ -299,8 +306,9 @@ const availMeta = (meta as any).availability;
     </section>
 
     <p class="footnote-last">
-      Refreshed every three hours alongside <a href="/marketplace">/marketplace</a>
-      and <a href="/vast">/vast</a>. Shadeform aggregator API authenticated via
+      Collected every three hours while live; collection has been paused since
+      2026-05-13 pending the pipeline migration, and every figure on this page
+      reflects the last published snapshot. Shadeform aggregator API authenticated via
       CCIR research key — values are public list-asks as Shadeform reports them.
       Aggregator depth: 19 GPU clouds, 28 GPU types, 269 instance types,
       ~671 (type × region) availability cells per cycle.
@@ -319,6 +327,9 @@ const availMeta = (meta as any).availability;
       type AvailabilityHistoryRow, type AvailabilityProviderRow,
       type AvailabilitySummaryRow,
     } from '../data/availability';
+    import {
+      lastValueLabelPlugin, ccirTimeScaleDefaults, LAST_VALUE_GUTTER,
+    } from '../data/chartExtras';
 
     const DEFAULT_CHIP: AvailabilityChipSlug = 'h100-sxm';
 
@@ -541,7 +552,9 @@ const availMeta = (meta as any).availability;
             },
           },
           scales: {
-            x: { title: { display: true, text: 'Per-GPU $/hr', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid } },
+            // No vertical gridlines (x carries the value axis on this
+            // horizontal-bar chart; tooltips carry exact figures).
+            x: { title: { display: true, text: 'Per-GPU $/hr', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid, drawOnChartArea: false }, border: { color: grid } },
             y: { ticks: { color: inkDim, font: monoFont }, grid: { color: grid } },
           },
         },
@@ -639,7 +652,7 @@ const availMeta = (meta as any).availability;
             },
           },
           scales: {
-            x: { stacked: true, ticks: { color: inkDim, font: monoFont, maxRotation: 45 }, grid: { color: grid } },
+            x: { stacked: true, ticks: { color: inkDim, font: monoFont, maxRotation: 45 }, grid: { color: grid, drawOnChartArea: false }, border: { color: grid } },
             y: { stacked: true, title: { display: true, text: 'Seconds (median)', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid }, beginAtZero: true },
           },
         },
@@ -727,21 +740,26 @@ const availMeta = (meta as any).availability;
           responsive: true,
           maintainAspectRatio: false,
           interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          // Right gutter keeps the end-of-line value label from clipping.
+          layout: { padding: { right: LAST_VALUE_GUTTER } },
           plugins: {
             legend: { display: false },
+            ccirLastValueLabel: {
+              format: (v: number) => v.toFixed(0) + '%',
+              // Single series; the y-axis title already names it.
+              datasetLabels: false,
+            },
             tooltip: { callbacks: { label: (ctx) => `${(ctx.parsed.y as number).toFixed(0)}% available` } },
           },
           scales: {
             x: {
-              type: 'time',
+              ...ccirTimeScaleDefaults({ color: inkDim, grid, font: monoFont, unit: 'day' }),
               time: { unit: 'day', displayFormats: { day: 'MMM d' } },
-              title: { display: false },
-              ticks: { color: inkDim, font: monoFont, autoSkip: true, maxRotation: 0 },
-              grid: { color: grid },
-            },
+            } as any,
             y: { title: { display: true, text: '% available', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid }, min: 0, max: 100 },
           },
         },
+        plugins: [lastValueLabelPlugin],
       });
     }
 
@@ -933,6 +951,28 @@ const availMeta = (meta as any).availability;
     @keyframes vast-pulse {
       0%, 100% { opacity: 1; }
       50%      { opacity: 0.35; }
+    }
+
+    /* Paused collection state — static dim dot replaces the pulsing LIVE dot,
+       and the banner line discloses the freeze before any data is read. */
+    .vast-page .tk-status.tk-paused .tk-val { color: var(--ink-dim); }
+    .vast-page .tk-status.tk-paused .tk-dot {
+      background: var(--ink-dim);
+      box-shadow: none;
+      animation: none;
+      opacity: 0.55;
+    }
+    .vast-page .paused-banner {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--vast-warn, var(--accent));
+      border: 1px solid color-mix(in srgb, var(--vast-warn, var(--accent)) 45%, transparent);
+      background: color-mix(in srgb, var(--vast-warn, var(--accent)) 8%, transparent);
+      padding: 7px 12px;
+      margin: 0 0 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: var(--weight-strong);
     }
 
     .vast-page .lede { max-width: 80ch; margin: 4px 0 22px; }
