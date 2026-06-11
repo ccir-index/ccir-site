@@ -26,7 +26,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     <p class="standfirst lede">
       The reference rates publish what operators <em>ask</em>. This page reads
       demand through inventory, with three instruments that answer different
-      questions. <strong>Stockout breadth</strong> (below): how widespread is
+      questions. <strong>Supply tightness</strong> (below): how widespread is
       tightness — a diffusion-style read across named providers, drawn at two
       bounds (any configuration vs full 8-GPU node, which is what “sold
       out” means in practice). <strong>Observable idle inventory</strong>:
@@ -71,7 +71,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     </div>
 
     <header class="legend-head">
-      <span class="sec-kicker-label">STOCKOUT BREADTH · DIFFUSION ACROSS THE PANEL</span>
+      <span class="sec-kicker-label">SUPPLY TIGHTNESS · DIFFUSION ACROSS THE PANEL</span>
       <span class="sec-note">trailing {windowDays}d · daily · share of observed windows with zero posted availability · source-equal</span>
     </header>
     <div class="chart-wrap chart-wrap-hero">
@@ -82,7 +82,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     <section class="legend-section">
       <header class="legend-head">
         <span class="sec-kicker-label">INVENTORY · OBSERVABLE IDLE GPUS, BY THE HOUR</span>
-        <span class="sec-note">trailing 30d · count-disclosing sources only · level, not a share</span>
+        <span class="sec-note">30d window · history begins 2026-05-28 · count-disclosing sources only · level, not a share</span>
       </header>
       <div class="chart-wrap">
         <div class="chart-status" id="inv-status">Loading…</div>
@@ -101,8 +101,8 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
             <tr>
               <th>Scope</th>
               <th class="num">Sources</th>
-              <th class="num">Stocked out · any config</th>
-              <th class="num">Stocked out · 8× node</th>
+              <th class="num">Sold out · any config</th>
+              <th class="num">Sold out · 8× node</th>
             </tr>
           </thead>
           <tbody id="breakout-tbody"></tbody>
@@ -124,8 +124,8 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
               <th>Geo</th>
               <th>Signal</th>
               <th>Since</th>
-              <th class="num">Stocked out · any</th>
-              <th class="num">Stocked out · 8×</th>
+              <th class="num">Sold out · any</th>
+              <th class="num">Sold out · 8×</th>
             </tr>
           </thead>
           <tbody id="source-tbody"></tbody>
@@ -134,7 +134,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     </section>
 
     <p class="footnote">
-      <strong>Stockout breadth</strong> is a diffusion-style read — like a purchasing-managers index, it measures how WIDESPREAD tightness is, not its level; the utilization level lives where machine state is observable (Vast overlay). The underlying stockout rate = share of observed collection windows in
+      <strong>Supply tightness</strong> is a diffusion-style read — like a purchasing-managers index, it measures how WIDESPREAD tightness is, not its level; the utilization level lives where machine state is observable (Vast overlay). The underlying stockout rate = share of observed collection windows in
       which a source showed zero posted availability for the chip; the
       denominator is windows actually observed (~7–10 per day), never
       wall-clock hours. Each named source contributes one vote per day
@@ -282,7 +282,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
                   const x = items[0]?.parsed?.x;
                   return x ? fmtDay.format(x) : '';
                 },
-                label: (ctx) => `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(0)}% of observed windows stocked out`,
+                label: (ctx) => `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(0)}% of observed windows sold out`,
               },
             },
           },
@@ -292,7 +292,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
             }) as any,
             y: {
               min: 0, max: 100,
-              title: { display: true, text: '% of observed windows stocked out', color: inkDim, font: monoFont },
+              title: { display: true, text: '% of observed windows sold out', color: inkDim, font: monoFont },
               ticks: { color: ink, font: monoFont, callback: (v) => v + '%' },
               grid: { color: grid },
               border: { color: grid },
