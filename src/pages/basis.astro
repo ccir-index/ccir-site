@@ -78,9 +78,10 @@ const windowDays = rows[0]?.window_days ?? 7;
       <p class="dek">
         The same venue's listings disclose how much of each machine is
         currently rentable — enough to reconstruct occupancy machine by
-        machine, snapshot by snapshot. Plotted: <strong>share of listed GPU
-        capacity not currently rentable</strong> (solid) and the share of
-        machines with a <strong>full 8-GPU node free</strong> (dashed).
+        machine, snapshot by snapshot. Both lines read the same direction —
+        higher means tighter: <strong>share of listed GPU capacity not
+        currently rentable</strong> (solid) and the share of machines with
+        <strong>no full 8-GPU node free</strong> (dashed).
         Panel-wide <em>implied</em> utilization is a separate product —
         see <a href="/utilization">Market Utilization</a>; the two are never
         blended.
@@ -139,8 +140,13 @@ const windowDays = rows[0]?.window_days ?? 7;
 
       const util = rows.filter((r) => r.utilization !== null)
         .map((r) => ({ x: r.cycle_ms, y: (r.utilization as number) * 100 }));
+      // Same direction as the capacity line: higher = tighter. The raw column
+      // is machines WITH a node free; plot its complement.
       const wholeNode = rows.filter((r) => r.n_machines > 0)
-        .map((r) => ({ x: r.cycle_ms, y: (r.n_machines_idle_ge_8 / r.n_machines) * 100 }));
+        .map((r) => ({
+          x: r.cycle_ms,
+          y: ((r.n_machines - r.n_machines_idle_ge_8) / r.n_machines) * 100,
+        }));
 
       if (occChart) occChart.destroy();
       occChart = new Chart(occCanvas, {
@@ -153,7 +159,7 @@ const windowDays = rows[0]?.window_days ?? 7;
               borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0, spanGaps: true,
             },
             {
-              label: 'Machines with a full 8-GPU node free',
+              label: 'Machines with no full 8-GPU node free',
               data: wholeNode, borderColor: ink, backgroundColor: ink,
               borderWidth: 1.5, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 4,
               tension: 0, spanGaps: true,
