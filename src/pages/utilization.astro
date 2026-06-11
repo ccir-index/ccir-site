@@ -1,0 +1,577 @@
+---
+import Base from '../layouts/Base.astro';
+import { meta } from '../data/snapshot';
+import { UTIL_CHIPS } from '../data/utilization';
+
+const DEFAULT_CHIP = 'h100-sxm';
+const utilMeta = (meta as any).utilization;
+const windowDays = utilMeta?.window_days ?? 90;
+const nSources = utilMeta?.n_sources ?? '—';
+const seriesStart = utilMeta?.imu_series_start ?? '—';
+---
+<Base
+  title="Market Utilization · CCIR"
+  description="Implied GPU market utilization: how often each operator class shows zero posted availability for a chip, observed multiple times daily across named providers."
+>
+  <section class="wrap top vast-page utilization-page">
+    <div class="kicker">IMPLIED MARKET UTILIZATION · PANEL-WIDE BLOCKING RATE</div>
+    <h1>Market Utilization</h1>
+    <div class="ticker-strip" role="group" aria-label="Snapshot stats">
+      <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{windowDays}d</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Sources</span><span class="tk-val">{nSources}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Series start</span><span class="tk-val">{seriesStart}</span></div>
+      <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">~7–10 obs/day</span></div>
+      <div class="tk-cell tk-status"><span class="tk-dot"></span><span class="tk-val">LIVE</span></div>
+    </div>
+    <p class="standfirst lede">
+      The reference rates publish what operators <em>ask</em>. This page reads
+      demand through inventory: across named providers, how often does a chip
+      show <strong>zero posted availability</strong>? Two bounds are drawn —
+      <strong>any configuration</strong> (a single 1× instance counts) and
+      <strong>full 8-GPU node</strong> (what “sold out” means in practice).
+      Measured marketplace occupancy is a separate product on the
+      <a href="/basis">Vast overlay</a> — the two are never blended.
+    </p>
+
+    <div class="controls">
+      <div class="control-row chip-row">
+        <span class="control-label">Chip</span>
+        <div class="pill-group" id="chip-pills" role="group" aria-label="Select a chip">
+          {UTIL_CHIPS.map((c) => (
+            <button type="button" class="pill" data-chip={c.id} data-default={c.id === DEFAULT_CHIP}>
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div class="control-row toggles-row">
+        <label class="toggle">
+          <input type="checkbox" id="class-toggle" />
+          Show operator classes (any-config)
+        </label>
+      </div>
+    </div>
+
+    <div class="macro-strip" id="macro-strip" hidden>
+      <div class="macro-cell">
+        <span class="macro-val" id="macro-breadth">—</span>
+        <span class="macro-lbl">providers with no full 8-GPU node posted (latest day)</span>
+      </div>
+      <div class="macro-cell">
+        <span class="macro-val" id="macro-idle">—</span>
+        <span class="macro-lbl" id="macro-idle-lbl">observable idle supply</span>
+      </div>
+      <div class="macro-cell">
+        <span class="macro-val"><a href="/basis" id="macro-occ">—</a></span>
+        <span class="macro-lbl">measured marketplace occupancy → Vast overlay</span>
+      </div>
+    </div>
+
+    <div class="chart-wrap chart-wrap-hero">
+      <div class="chart-status" id="chart-status">Loading…</div>
+      <canvas id="chart" aria-label="Share of observed windows with zero posted availability, over time"></canvas>
+    </div>
+
+    <section class="legend-section">
+      <header class="legend-head">
+        <span class="sec-kicker-label">BREAKOUTS · LATEST DAY</span>
+        <span class="sec-note" id="breakout-note">cells with fewer than 2 sources are not drawn</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="breakout-table">
+          <thead>
+            <tr>
+              <th>Scope</th>
+              <th class="num">Sources</th>
+              <th class="num">Blocked · any config</th>
+              <th class="num">Blocked · 8× node</th>
+            </tr>
+          </thead>
+          <tbody id="breakout-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="legend-section">
+      <header class="legend-head">
+        <span class="sec-kicker-label">PANEL · PER-SOURCE DETAIL</span>
+        <span class="sec-note" id="source-note">—</span>
+      </header>
+      <div class="table-wrap">
+        <table class="data" id="source-table">
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>Operator class</th>
+              <th>Geo</th>
+              <th>Signal</th>
+              <th>Since</th>
+              <th class="num">Blocked · any</th>
+              <th class="num">Blocked · 8×</th>
+            </tr>
+          </thead>
+          <tbody id="source-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="footnote">
+      <strong>Blocking rate</strong> = share of observed collection windows in
+      which a source showed zero posted availability for the chip; the
+      denominator is windows actually observed (~7–10 per day), never
+      wall-clock hours. Each named source contributes one vote per day
+      (source-equal mean), mirroring the operator-equal discipline of the
+      reference rates. The <strong>8× node</strong> line counts only instance
+      shapes of 8 GPUs or more; sources whose APIs disclose no such shape are
+      excluded from it and ride the any-configuration line only. Utilization
+      here is stratified by <strong>operator class</strong>; the reference
+      rates are stratified per-SKU — an operator's class and a specific SKU's
+      tier can differ. AWS's signal is a capacity <em>score</em> (Spot
+      Placement Score), structurally more optimistic than bookable-stock
+      checks — see the signal column. History begins on the first day the
+      availability panel collected intraday cycles; earlier periods are not
+      backfilled.
+    </p>
+  </section>
+
+  <script>
+    import Chart from 'chart.js/auto';
+    import 'chartjs-adapter-date-fns';
+    import {
+      fetchImplied, fetchSources, fetchMacro, operatorClassLabel,
+      type UtilChipId, type ImpliedRow, type SourceRow, type MacroRow,
+    } from '../data/utilization';
+
+    const DEFAULT_CHIP: UtilChipId = 'h100-sxm';
+    const MIN_SOURCES = 2;
+
+    const state = {
+      chip: DEFAULT_CHIP as UtilChipId,
+      show_classes: false,
+      cache: new Map<UtilChipId, ImpliedRow[] | null>(),
+      sources: null as SourceRow[] | null,
+      macro: null as MacroRow[] | null,
+    };
+
+    const statusEl = document.getElementById('chart-status') as HTMLDivElement;
+    const canvas = document.getElementById('chart') as HTMLCanvasElement;
+    const classToggle = document.getElementById('class-toggle') as HTMLInputElement;
+    const macroStrip = document.getElementById('macro-strip') as HTMLElement;
+    const breakoutTbody = document.getElementById('breakout-tbody') as HTMLElement;
+    const sourceTbody = document.getElementById('source-tbody') as HTMLElement;
+    const sourceNote = document.getElementById('source-note') as HTMLElement;
+
+    let chart: Chart<'line'> | null = null;
+
+    function setStatus(msg: string | null) {
+      statusEl.style.display = msg === null ? 'none' : 'flex';
+      statusEl.textContent = msg ?? '';
+    }
+
+    function readToken(name: string): string {
+      try {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      } catch { return ''; }
+    }
+
+    const fmtDay = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'UTC', month: 'short', day: 'numeric',
+    });
+    const pct = (v: number | null) => (v === null ? '—' : (v * 100).toFixed(0) + '%');
+
+    const CLASS_COLORS: Record<string, string> = {
+      'tier:T1': '#a84040', 'tier:T2': '#2d6a94', 'tier:T3': '#2c8055', 'tier:T4': '#9467bd',
+    };
+
+    function renderChart(rows: ImpliedRow[]) {
+      const globalRows = rows.filter((r) => r.scope === 'global');
+      const accent = readToken('--accent') || '#d68a2a';
+      const inkDim = readToken('--ink-dim') || '#9a9991';
+      const ink = readToken('--ink') || '#e8e6e1';
+      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
+      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
+
+      const datasets: any[] = [
+        {
+          label: 'Any configuration',
+          data: globalRows.filter((r) => r.blocking_any_mean !== null)
+            .map((r) => ({ x: r.date_ms, y: (r.blocking_any_mean as number) * 100 })),
+          borderColor: accent, backgroundColor: accent,
+          borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 4, tension: 0, spanGaps: true,
+        },
+        {
+          label: 'Full 8-GPU node',
+          data: globalRows.filter((r) => r.blocking_8x_mean !== null)
+            .map((r) => ({ x: r.date_ms, y: (r.blocking_8x_mean as number) * 100 })),
+          borderColor: ink, backgroundColor: ink,
+          borderWidth: 2, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 4,
+          tension: 0, spanGaps: true,
+        },
+      ];
+
+      if (state.show_classes) {
+        for (const scope of ['tier:T1', 'tier:T2', 'tier:T3', 'tier:T4']) {
+          const sr = rows.filter((r) => r.scope === scope
+            && r.n_sources >= MIN_SOURCES && r.blocking_any_mean !== null);
+          if (sr.length === 0) continue;
+          datasets.push({
+            label: operatorClassLabel(scope.slice(5)),
+            data: sr.map((r) => ({ x: r.date_ms, y: (r.blocking_any_mean as number) * 100 })),
+            borderColor: CLASS_COLORS[scope], backgroundColor: CLASS_COLORS[scope],
+            borderWidth: 1, pointRadius: 0, pointHoverRadius: 3, tension: 0, spanGaps: true,
+          });
+        }
+      }
+
+      if (chart) chart.destroy();
+      chart = new Chart(canvas, {
+        type: 'line',
+        data: { datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          plugins: {
+            legend: {
+              display: true, position: 'top',
+              labels: { color: inkDim, font: monoFont, boxWidth: 18, boxHeight: 2 },
+            },
+            tooltip: {
+              displayColors: true,
+              callbacks: {
+                title: (items) => {
+                  const x = items[0]?.parsed?.x;
+                  return x ? fmtDay.format(x) : '';
+                },
+                label: (ctx) => `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(0)}% of observed windows blocked`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: { unit: 'day' },
+              ticks: { color: inkDim, font: monoFont, maxRotation: 0, autoSkipPadding: 32 },
+              title: { display: true, text: 'Date (UTC)', color: inkDim, font: monoFont },
+              grid: { color: grid, drawOnChartArea: false },
+              border: { color: grid },
+            },
+            y: {
+              min: 0, max: 100,
+              title: { display: true, text: '% of observed windows blocked', color: inkDim, font: monoFont },
+              ticks: { color: ink, font: monoFont, callback: (v) => v + '%' },
+              grid: { color: grid },
+              border: { color: grid },
+            },
+          },
+        },
+      });
+    }
+
+    function renderMacro() {
+      const m = (state.macro ?? []).filter((r) => r.chip_slug === state.chip);
+      if (m.length === 0) { macroStrip.hidden = true; return; }
+      const latest = m[m.length - 1];
+      macroStrip.hidden = false;
+      (document.getElementById('macro-breadth') as HTMLElement).textContent =
+        latest.n_providers_8x_pool > 0
+          ? `${latest.n_providers_blocked_8x} of ${latest.n_providers_8x_pool}`
+          : '—';
+      const idleEl = document.getElementById('macro-idle') as HTMLElement;
+      const idleLbl = document.getElementById('macro-idle-lbl') as HTMLElement;
+      if (latest.idle_gpus_observable !== null) {
+        idleEl.textContent = latest.idle_gpus_observable.toLocaleString('en-US') + ' GPUs';
+        idleLbl.textContent = `observable idle supply (${latest.n_inventory_sources} count-disclosing sources)`;
+      } else {
+        idleEl.textContent = '—';
+      }
+      (document.getElementById('macro-occ') as HTMLElement).textContent =
+        latest.measured_marketplace_utilization !== null
+          ? pct(latest.measured_marketplace_utilization)
+          : 'view';
+    }
+
+    function renderBreakouts(rows: ImpliedRow[]) {
+      const dates = rows.map((r) => r.as_of_date).sort();
+      const latest = dates[dates.length - 1];
+      const day = rows.filter((r) => r.as_of_date === latest && r.scope !== 'global');
+      const shown = day.filter((r) => r.n_sources >= MIN_SOURCES);
+      breakoutTbody.innerHTML = shown.map((r) => {
+        const label = r.scope.startsWith('tier:')
+          ? operatorClassLabel(r.scope.slice(5))
+          : r.scope.replace('geo:', 'Geography · ');
+        const e8 = r.n_sources_8x > 0 ? pct(r.blocking_8x_mean) : '<span class="dim">—</span>';
+        return '<tr>' +
+          `<td>${label}</td>` +
+          `<td class="num">${r.n_sources}</td>` +
+          `<td class="num">${pct(r.blocking_any_mean)}</td>` +
+          `<td class="num">${e8}</td>` +
+        '</tr>';
+      }).join('') || '<tr><td colspan="4" class="dim">No breakout cell reaches the 2-source floor yet.</td></tr>';
+    }
+
+    function renderSources() {
+      const rows = (state.sources ?? []).filter((r) => r.chip_slug === state.chip);
+      sourceNote.textContent = `${rows.length} sources · ${state.chip}`;
+      sourceTbody.innerHTML = rows.map((r) => {
+        const e8 = r.shape_disclosed
+          ? `<td class="num">${pct(r.blocking_8x)}</td>`
+          : '<td class="num dim">no shape ≥8 disclosed</td>';
+        const sig = r.signal_type === 'score'
+          ? '<span class="sig-warn">score</span>' : r.signal_type;
+        return '<tr>' +
+          `<td><code>${r.source}</code></td>` +
+          `<td>${r.operator_class}</td>` +
+          `<td>${r.geo_buckets}</td>` +
+          `<td>${sig}</td>` +
+          `<td>${r.series_start}</td>` +
+          `<td class="num">${pct(r.blocking_any)}</td>` +
+          e8 +
+        '</tr>';
+      }).join('');
+    }
+
+    async function refresh() {
+      setStatus('Loading…');
+      if (!state.cache.has(state.chip)) {
+        try {
+          state.cache.set(state.chip, await fetchImplied(state.chip));
+        } catch { state.cache.set(state.chip, null); }
+      }
+      if (state.sources === null) {
+        try { state.sources = await fetchSources(); } catch { state.sources = []; }
+      }
+      if (state.macro === null) {
+        try { state.macro = await fetchMacro(); } catch { state.macro = []; }
+      }
+
+      const rows = state.cache.get(state.chip) ?? [];
+      if (rows.length === 0) {
+        setStatus(`No data for ${state.chip} yet — history accrues as the daily pipeline runs.`);
+        if (chart) { chart.destroy(); chart = null; }
+        breakoutTbody.innerHTML = '';
+        sourceTbody.innerHTML = '';
+        macroStrip.hidden = true;
+        return;
+      }
+      setStatus(null);
+      renderChart(rows);
+      renderMacro();
+      renderBreakouts(rows);
+      renderSources();
+    }
+
+    function syncPills() {
+      document.querySelectorAll<HTMLButtonElement>('#chip-pills .pill').forEach((p) => {
+        p.classList.toggle('on', p.dataset.chip === state.chip);
+      });
+    }
+
+    document.getElementById('chip-pills')!.addEventListener('click', (ev) => {
+      const pill = (ev.target as HTMLElement).closest<HTMLButtonElement>('.pill');
+      if (!pill || !pill.dataset.chip) return;
+      state.chip = pill.dataset.chip as UtilChipId;
+      syncPills();
+      refresh();
+    });
+    classToggle.addEventListener('change', () => {
+      state.show_classes = classToggle.checked;
+      refresh();
+    });
+
+    syncPills();
+    refresh();
+  </script>
+
+  <style>
+    /* Reuses the .vast-page chrome (see marketplace.astro for the canonical
+       copy of this block — Astro styles are per-route, so the shared chrome
+       is inlined per page by convention). */
+    .vast-page.top { padding-top: 24px; }
+    .vast-page > .kicker { color: var(--accent); letter-spacing: 0.14em; margin-bottom: 4px; }
+    .vast-page h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 10px;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+    }
+    .vast-page .ticker-strip {
+      display: flex; flex-wrap: wrap; align-items: stretch;
+      border: 1px solid var(--rule-2); background: var(--vast-panel-bg);
+      margin: 0 0 18px; font-family: var(--font-mono);
+    }
+    .vast-page .tk-cell {
+      display: flex; align-items: baseline; gap: 8px;
+      padding: 7px 14px; border-right: 1px solid var(--rule); flex: 0 0 auto;
+    }
+    .vast-page .tk-cell:last-child { border-right: 0; }
+    .vast-page .tk-lbl {
+      font-size: calc(var(--fs-xs) - 1px); color: var(--ink-dim);
+      text-transform: uppercase; letter-spacing: 0.10em; font-weight: var(--weight-strong);
+    }
+    .vast-page .tk-val {
+      font-size: var(--fs-sm); color: var(--ink);
+      font-variant-numeric: tabular-nums; font-weight: var(--weight-strong);
+    }
+    .vast-page .tk-status { margin-left: auto; gap: 6px; }
+    .vast-page .tk-status .tk-val { color: var(--pos); letter-spacing: 0.10em; }
+    .vast-page .tk-dot {
+      width: 7px; height: 7px; background: var(--pos);
+      box-shadow: 0 0 6px var(--pos); display: inline-block;
+      border-radius: 50%; animation: vast-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes vast-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    .vast-page .lede { max-width: 80ch; margin: 4px 0 22px; }
+    .vast-page .lede a { color: var(--accent); }
+    .vast-page .controls {
+      background: var(--vast-panel-bg); border: 1px solid var(--rule);
+      padding: 12px 14px; margin-bottom: 18px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .vast-page .control-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .vast-page .control-label {
+      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
+      text-transform: uppercase; letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong); min-width: 56px;
+    }
+    .vast-page .pill-group { display: flex; flex-wrap: wrap; gap: 5px; }
+    .vast-page .pill {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: 0.04em; text-transform: uppercase;
+      background: var(--surface); color: var(--ink-dim);
+      border: 1px solid var(--rule-2); padding: 5px 10px;
+      cursor: pointer; border-radius: 0; font-weight: var(--weight-strong);
+    }
+    .vast-page .pill:hover { color: var(--ink); border-color: var(--accent); }
+    .vast-page .pill.on {
+      color: var(--accent); border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+    .vast-page .toggles-row { gap: 22px; }
+    .vast-page .toggle {
+      display: flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
+      letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
+    }
+
+    /* Macro trio strip */
+    .vast-page .macro-strip {
+      display: flex; flex-wrap: wrap; gap: 0;
+      border: 1px solid var(--rule-2); background: var(--vast-panel-bg);
+      margin-bottom: 18px;
+    }
+    .vast-page .macro-cell {
+      display: flex; flex-direction: column; gap: 2px;
+      padding: 10px 16px; border-right: 1px solid var(--rule);
+      flex: 1 1 200px; min-width: 180px;
+    }
+    .vast-page .macro-cell:last-child { border-right: 0; }
+    .vast-page .macro-val {
+      font-family: var(--font-mono); font-size: var(--fs-lg);
+      color: var(--ink); font-variant-numeric: tabular-nums;
+      font-weight: var(--weight-strong);
+    }
+    .vast-page .macro-val a { color: var(--accent); text-decoration: none; }
+    .vast-page .macro-lbl {
+      font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em;
+    }
+
+    .vast-page .chart-wrap {
+      position: relative; border: 1px solid var(--rule);
+      background: var(--vast-panel-bg); padding: 14px; height: 460px;
+      margin-bottom: 12px; border-radius: 0;
+    }
+    .vast-page .chart-wrap-hero {
+      background: var(--vast-panel-bg-hero); border-color: var(--rule-2);
+      border-left-width: 3px; border-left-color: var(--accent);
+    }
+    .vast-page .chart-status {
+      position: absolute; inset: 0; display: flex; align-items: center;
+      justify-content: center; font-family: var(--font-mono);
+      font-size: var(--fs-sm); color: var(--ink-dim);
+      background: color-mix(in srgb, var(--vast-panel-bg-hero) 80%, transparent);
+      pointer-events: none; padding: 0 24px; text-align: center;
+    }
+
+    .vast-page .legend-section { margin-top: 14px; }
+    .vast-page .legend-head {
+      display: flex; align-items: baseline; gap: 10px;
+      margin-bottom: 8px; flex-wrap: wrap;
+    }
+    .vast-page .sec-kicker-label {
+      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
+      text-transform: uppercase; letter-spacing: 0.14em;
+      font-weight: var(--weight-strong); padding-left: 4px;
+      border-left: 1px solid var(--rule-2); padding-right: 2px;
+    }
+    .vast-page .sec-note {
+      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
+      letter-spacing: 0.04em; margin-left: auto;
+    }
+    .vast-page .table-wrap {
+      border: 1px solid var(--rule); background: var(--vast-panel-bg);
+      overflow-x: auto;
+    }
+    .vast-page .data {
+      width: 100%; border-collapse: collapse;
+      font-family: var(--font-mono); font-size: var(--fs-sm);
+    }
+    .vast-page .data th, .vast-page .data td {
+      padding: var(--vast-cell-y) var(--vast-cell-x);
+      border-bottom: 1px solid var(--rule); text-align: left;
+      vertical-align: middle; height: var(--vast-row-h);
+      font-variant-numeric: tabular-nums;
+    }
+    .vast-page .data th + th, .vast-page .data td + td { border-left: 1px solid var(--rule); }
+    .vast-page .data th {
+      background: var(--surface-3); font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px); color: var(--ink-dim);
+      text-transform: uppercase; letter-spacing: 0.10em;
+      font-weight: var(--weight-strong); border-bottom: 1px solid var(--rule-2);
+      white-space: nowrap;
+    }
+    .vast-page .data td.num, .vast-page .data th.num { text-align: right; }
+    .vast-page .data td.dim, .vast-page .data .dim { color: var(--ink-dim); }
+    .vast-page .data tbody tr:nth-child(even) td { background: var(--vast-row-stripe); }
+    .vast-page .data tbody tr:hover td { background: var(--surface-3); }
+    .vast-page .data code {
+      font-family: var(--font-mono); font-size: var(--fs-sm);
+      color: var(--ink); letter-spacing: 0.02em;
+    }
+    .vast-page .sig-warn { color: var(--vast-warn, #d68a2a); }
+
+    .vast-page .footnote {
+      font-family: var(--font-body); font-size: var(--fs-xs); color: var(--ink-dim);
+      margin: 14px 0 0; padding: 10px 14px;
+      background: var(--vast-panel-bg); border-left: 2px solid var(--neutral);
+      max-width: 80ch; line-height: 1.55;
+    }
+
+    @media (max-width: 720px) {
+      .vast-page .control-row { gap: 8px; }
+      .vast-page .control-label { min-width: 0; }
+      .vast-page .chart-wrap { height: 360px; padding: 10px; }
+      .vast-page .ticker-strip {
+        flex-wrap: nowrap; overflow-x: auto;
+        scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+      }
+      .vast-page .tk-cell { scroll-snap-align: start; padding: 6px 10px; gap: 6px; }
+      .vast-page .tk-status {
+        position: sticky; right: 0; margin-left: auto;
+        background: var(--vast-panel-bg); border-left: 1px solid var(--rule-2);
+      }
+      .vast-page .legend-head { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .vast-page .legend-head .sec-note { margin-left: 0; font-size: calc(var(--fs-xs) - 1px); }
+      .vast-page h1 { font-size: calc(var(--fs-xl) - 2px); }
+      .vast-page .macro-cell { flex: 1 1 100%; border-right: 0; border-bottom: 1px solid var(--rule); }
+      .vast-page .macro-cell:last-child { border-bottom: 0; }
+    }
+    @media (max-width: 480px) {
+      .vast-page .chart-wrap { height: 300px; padding: 8px; }
+      .vast-page .data { font-size: calc(var(--fs-sm) - 1px); }
+      .vast-page .tk-cell { padding: 6px 8px; }
+    }
+  </style>
+</Base>

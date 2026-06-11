@@ -139,6 +139,35 @@ jobs:
             echo "no shadeform_summary.csv at $DATE — /availability summary will fall back"
             : > ".sync/shadeform_summary.csv"
           fi
+          # Utilization CSVs power /utilization (implied) + the /basis
+          # occupancy section. IMU chip slugs (h100-sxm form), not silicon_id.
+          for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
+            fname="utilization_implied_${chip}.csv"
+            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              echo "fetched $fname"
+            else
+              echo "no $fname at $DATE — /utilization will show empty for this chip"
+              : > ".sync/$fname"
+            fi
+          done
+          for fname in utilization_sources.csv utilization_macro.csv; do
+            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              echo "fetched $fname"
+            else
+              echo "no $fname at $DATE — /utilization tables will fall back"
+              : > ".sync/$fname"
+            fi
+          done
+          # Vast occupancy series (Vast variant grain + the all roll).
+          for chip in h100-sxm h100-pcie h200-sxm b200-sxm gb200 a100-sxm all; do
+            fname="vast_occupancy_${chip}.csv"
+            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              echo "fetched $fname"
+            else
+              echo "no $fname at $DATE — /basis occupancy will show empty for this chip"
+              : > ".sync/$fname"
+            fi
+          done
           echo "have_snapshot=true" >> "$GITHUB_OUTPUT"
 
       - name: Verify hashes against manifest
@@ -230,6 +259,31 @@ jobs:
             cp ".sync/shadeform_summary.csv" "public/data/shadeform_summary.csv"
             echo "staged public/data/shadeform_summary.csv"
           fi
+          # Stage utilization CSVs (implied per chip + sources + macro + occupancy).
+          for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
+            fname="utilization_implied_${chip}.csv"
+            if [ -s ".sync/$fname" ]; then
+              cp ".sync/$fname" "public/data/$fname"
+              echo "staged public/data/$fname"
+            else
+              echo "no $fname in this snapshot; leaving public/data unchanged"
+            fi
+          done
+          for fname in utilization_sources.csv utilization_macro.csv; do
+            if [ -s ".sync/$fname" ]; then
+              cp ".sync/$fname" "public/data/$fname"
+              echo "staged public/data/$fname"
+            fi
+          done
+          for chip in h100-sxm h100-pcie h200-sxm b200-sxm gb200 a100-sxm all; do
+            fname="vast_occupancy_${chip}.csv"
+            if [ -s ".sync/$fname" ]; then
+              cp ".sync/$fname" "public/data/$fname"
+              echo "staged public/data/$fname"
+            else
+              echo "no $fname in this snapshot; leaving public/data unchanged"
+            fi
+          done
           python3 - <<'PY'
           import json
           m = json.load(open('.sync/manifest.json'))
@@ -246,6 +300,7 @@ jobs:
               'marketplace_history': m.get('marketplace_history'),
               'vast': m.get('vast'),
               'availability': m.get('availability'),
+              'utilization': m.get('utilization'),
           }
           with open('src/data/meta.json', 'w') as f:
               json.dump(meta, f, indent=2)

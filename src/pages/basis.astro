@@ -71,7 +71,167 @@ const windowDays = rows[0]?.window_days ?? 7;
       signal</strong> — Vast only; it is the lone executable marketplace in the
       panel, not the whole market. Not a CCIR reference rate. {meta.methodology_version}.
     </p>
+
+    <div class="occ-section">
+      <div class="kicker">Measured occupancy · same venue, quantity side</div>
+      <h2>Marketplace occupancy</h2>
+      <p class="dek">
+        The same venue's listings disclose how much of each machine is
+        currently rentable — enough to reconstruct occupancy machine by
+        machine, snapshot by snapshot. Plotted: <strong>share of listed GPU
+        capacity not currently rentable</strong> (solid) and the share of
+        machines with a <strong>full 8-GPU node free</strong> (dashed).
+        Panel-wide <em>implied</em> utilization is a separate product —
+        see <a href="/utilization">Market Utilization</a>; the two are never
+        blended.
+      </p>
+      <div class="occ-pills" id="occ-pills" role="group" aria-label="Select a chip"></div>
+      <div class="occ-chart-wrap">
+        <div class="occ-status" id="occ-status">Loading…</div>
+        <canvas id="occ-chart" aria-label="Vast marketplace occupancy over time"></canvas>
+      </div>
+      <p class="note" id="occ-note">
+        Four snapshots daily. A machine with zero rentable chunks may be fully
+        rented <em>or</em> host-paused — the public feed cannot distinguish
+        them, so "occupancy" here means share of listed capacity not currently
+        rentable. Denominator is listed capacity only. History begins
+        2026-05-13. Single-venue signal — not a CCIR reference rate.
+      </p>
+    </div>
   </section>
+
+  <script>
+    import Chart from 'chart.js/auto';
+    import 'chartjs-adapter-date-fns';
+    import { fetchOccupancy, OCC_CHIPS, type OccChipId, type OccupancyRow } from '../data/utilization';
+
+    const occState = {
+      chip: 'h100-sxm' as OccChipId,
+      cache: new Map<OccChipId, OccupancyRow[] | null>(),
+    };
+    let occChart: Chart<'line'> | null = null;
+
+    const pillsEl = document.getElementById('occ-pills') as HTMLElement;
+    const occStatus = document.getElementById('occ-status') as HTMLElement;
+    const occCanvas = document.getElementById('occ-chart') as HTMLCanvasElement;
+
+    pillsEl.innerHTML = OCC_CHIPS.map((c) =>
+      `<button type="button" class="occ-pill" data-chip="${c.id}">${c.label}</button>`).join('');
+
+    function token(name: string): string {
+      try {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      } catch { return ''; }
+    }
+    const fmtDay = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' });
+
+    function setOccStatus(msg: string | null) {
+      occStatus.style.display = msg === null ? 'none' : 'flex';
+      occStatus.textContent = msg ?? '';
+    }
+
+    function renderOcc(rows: OccupancyRow[]) {
+      const accent = token('--accent') || '#d68a2a';
+      const ink = token('--ink') || '#e8e6e1';
+      const inkDim = token('--ink-dim') || '#9a9991';
+      const grid = token('--vast-grid') || 'rgba(128,128,128,0.2)';
+      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
+
+      const util = rows.filter((r) => r.utilization !== null)
+        .map((r) => ({ x: r.cycle_ms, y: (r.utilization as number) * 100 }));
+      const wholeNode = rows.filter((r) => r.n_machines > 0)
+        .map((r) => ({ x: r.cycle_ms, y: (r.n_machines_idle_ge_8 / r.n_machines) * 100 }));
+
+      if (occChart) occChart.destroy();
+      occChart = new Chart(occCanvas, {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              label: 'Capacity not currently rentable',
+              data: util, borderColor: accent, backgroundColor: accent,
+              borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0, spanGaps: true,
+            },
+            {
+              label: 'Machines with a full 8-GPU node free',
+              data: wholeNode, borderColor: ink, backgroundColor: ink,
+              borderWidth: 1.5, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 4,
+              tension: 0, spanGaps: true,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          plugins: {
+            legend: {
+              display: true, position: 'top',
+              labels: { color: inkDim, font: monoFont, boxWidth: 18, boxHeight: 2 },
+            },
+            tooltip: {
+              callbacks: {
+                title: (items) => {
+                  const x = items[0]?.parsed?.x;
+                  return x ? fmtDay.format(x) : '';
+                },
+                label: (ctx) => `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(1)}%`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              type: 'time', time: { unit: 'day' },
+              ticks: { color: inkDim, font: monoFont, maxRotation: 0, autoSkipPadding: 32 },
+              grid: { color: grid, drawOnChartArea: false },
+              border: { color: grid },
+            },
+            y: {
+              min: 0, max: 100,
+              title: { display: true, text: '%', color: inkDim, font: monoFont },
+              ticks: { color: inkDim, font: monoFont, callback: (v) => v + '%' },
+              grid: { color: grid },
+              border: { color: grid },
+            },
+          },
+        },
+      });
+    }
+
+    function syncOccPills() {
+      pillsEl.querySelectorAll<HTMLButtonElement>('.occ-pill').forEach((p) => {
+        p.classList.toggle('on', p.dataset.chip === occState.chip);
+      });
+    }
+
+    async function refreshOcc() {
+      setOccStatus('Loading…');
+      if (!occState.cache.has(occState.chip)) {
+        try {
+          occState.cache.set(occState.chip, await fetchOccupancy(occState.chip));
+        } catch { occState.cache.set(occState.chip, null); }
+      }
+      const rows = occState.cache.get(occState.chip) ?? [];
+      if (rows.length === 0) {
+        setOccStatus('No occupancy data yet — the series publishes with the next daily snapshot.');
+        if (occChart) { occChart.destroy(); occChart = null; }
+        return;
+      }
+      setOccStatus(null);
+      renderOcc(rows);
+    }
+
+    pillsEl.addEventListener('click', (ev) => {
+      const pill = (ev.target as HTMLElement).closest<HTMLButtonElement>('.occ-pill');
+      if (!pill || !pill.dataset.chip) return;
+      occState.chip = pill.dataset.chip as OccChipId;
+      syncOccPills();
+      refreshOcc();
+    });
+
+    syncOccPills();
+    refreshOcc();
+  </script>
 
   <style>
     .top { padding-top: 40px; padding-bottom: 56px; }
@@ -132,6 +292,53 @@ const windowDays = rows[0]?.window_days ?? 7;
       font-size: var(--fs-xs);
       line-height: 1.6;
       color: var(--ink-dim);
+    }
+
+    /* Measured-occupancy section */
+    .occ-section { margin-top: 48px; }
+    .occ-section h2 { margin: 0 0 12px; }
+    .occ-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+    .occ-section :global(.occ-pill) {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--surface);
+      color: var(--ink-dim);
+      border: 1px solid var(--rule-2);
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 0;
+      font-weight: var(--weight-strong);
+    }
+    .occ-section :global(.occ-pill:hover) { color: var(--ink); border-color: var(--accent); }
+    .occ-section :global(.occ-pill.on) {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+    .occ-chart-wrap {
+      position: relative;
+      border: 1px solid var(--rule);
+      background: var(--vast-panel-bg, var(--surface));
+      padding: 14px;
+      height: 380px;
+    }
+    .occ-status {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      pointer-events: none;
+      padding: 0 24px;
+      text-align: center;
+    }
+    @media (max-width: 720px) {
+      .occ-chart-wrap { height: 300px; padding: 10px; }
     }
   </style>
 </Base>
