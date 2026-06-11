@@ -657,6 +657,7 @@ const vastMeta = (meta as any).vast;
       const neg = readToken('--vast-neg') || '#c44a4a';
       const inkDim = readToken('--ink-dim') || '#888';
       const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
+      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
 
       const seriesDef: { label: string; key: string; color: string; w: number; fill?: any }[] = [
         { label: 'p10', key: 'p10', color: pos, w: 1 },
@@ -717,12 +718,12 @@ const vastMeta = (meta as any).vast;
               // dated tick labels — Chart.js auto-resolves to 'hour' once the
               // density crosses a threshold and drops the date entirely.
               time: { unit: 'day', displayFormats: { day: 'MMM d' }, tooltipFormat: 'MMM d, HH:mm' },
-              title: { display: true, text: 'Date (ET)', color: inkDim },
+              title: { display: true, text: 'Date (ET)', color: inkDim, font: monoFont },
               grid: { color: grid, drawOnChartArea: false },
               border: { color: grid },
-              ticks: { color: inkDim, maxRotation: 0, autoSkip: true, autoSkipPadding: 32 },
+              ticks: { color: inkDim, font: monoFont, maxRotation: 0, autoSkip: true, autoSkipPadding: 32 },
             },
-            y: { type: 'linear', title: { display: true, text: 'Per-GPU $/hr', color: inkDim }, grid: { color: grid }, ticks: { color: inkDim } },
+            y: { type: 'linear', title: { display: true, text: 'Per-GPU $/hr', color: inkDim, font: monoFont }, grid: { color: grid }, ticks: { color: inkDim, font: monoFont } },
           },
         },
         plugins: [lastValueLabelPlugin],
