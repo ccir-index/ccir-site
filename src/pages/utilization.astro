@@ -47,12 +47,6 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
           ))}
         </div>
       </div>
-      <div class="control-row toggles-row">
-        <label class="toggle">
-          <input type="checkbox" id="class-toggle" />
-          Show operator classes (any-config)
-        </label>
-      </div>
     </div>
 
     <div class="macro-strip" id="macro-strip" hidden>
@@ -71,22 +65,31 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     </div>
 
     <header class="legend-head">
-      <span class="sec-kicker-label">SUPPLY TIGHTNESS · DIFFUSION ACROSS THE PANEL</span>
-      <span class="sec-note">trailing {windowDays}d · daily · share of observed windows with zero posted availability · source-equal</span>
+      <span class="sec-kicker-label">DIFFUSION ACROSS THE PANEL</span>
+      <span class="sec-note">share of observed windows with zero posted availability · source-equal</span>
     </header>
     <div class="chart-wrap chart-wrap-hero">
       <div class="chart-status" id="chart-status">Loading…</div>
-      <canvas id="chart" aria-label="Share of observed windows with zero posted availability, over time"></canvas>
+      <img
+        id="tightness-card"
+        class="card-img"
+        data-as-of={meta.as_of_date}
+        alt="Supply tightness chart card: share of observed windows with zero posted availability, over time"
+      />
     </div>
 
     <section class="legend-section">
       <header class="legend-head">
-        <span class="sec-kicker-label">INVENTORY · OBSERVABLE IDLE GPUS, BY THE HOUR</span>
-        <span class="sec-note">30d window · history begins 2026-05-28 · count-disclosing sources only · level, not a share</span>
+        <span class="sec-kicker-label">BY THE HOUR</span>
+        <span class="sec-note">history begins 2026-05-28 · count-disclosing sources only · level, not a share</span>
       </header>
       <div class="chart-wrap">
         <div class="chart-status" id="inv-status">Loading…</div>
-        <canvas id="inv-chart" aria-label="Observable idle GPUs through the day, with shape-weighted availability share"></canvas>
+        <img
+          id="inventory-card"
+          class="card-img"
+          alt="Inventory chart card: observable idle GPUs through the day"
+        />
       </div>
     </section>
 
@@ -158,238 +161,75 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
   </section>
 
   <script>
-    import Chart from 'chart.js/auto';
-    import 'chartjs-adapter-date-fns';
     import {
-      fetchImplied, fetchSources, fetchMacro, fetchIntraday, operatorClassLabel,
-      type UtilChipId, type ImpliedRow, type SourceRow, type MacroRow, type IntradayRow,
+      fetchImplied, fetchSources, fetchMacro, operatorClassLabel, cardUrl,
+      type UtilChipId, type ImpliedRow, type SourceRow, type MacroRow,
     } from '../data/utilization';
-    import {
-      lastValueLabelPlugin, ccirTimeScaleDefaults, LAST_VALUE_GUTTER,
-    } from '../data/chartExtras';
 
     const DEFAULT_CHIP: UtilChipId = 'h100-sxm';
     const MIN_SOURCES = 2;
 
     const state = {
       chip: DEFAULT_CHIP as UtilChipId,
-      show_classes: false,
       cache: new Map<UtilChipId, ImpliedRow[] | null>(),
-      intradayCache: new Map<UtilChipId, IntradayRow[] | null>(),
       sources: null as SourceRow[] | null,
       macro: null as MacroRow[] | null,
     };
 
-    const statusEl = document.getElementById('chart-status') as HTMLDivElement;
-    const canvas = document.getElementById('chart') as HTMLCanvasElement;
-    const classToggle = document.getElementById('class-toggle') as HTMLInputElement;
+    const tightImg = document.getElementById('tightness-card') as HTMLImageElement;
+    const tightStatus = document.getElementById('chart-status') as HTMLDivElement;
+    const invImg = document.getElementById('inventory-card') as HTMLImageElement;
+    const invStatus = document.getElementById('inv-status') as HTMLDivElement;
     const macroStrip = document.getElementById('macro-strip') as HTMLElement;
     const breakoutTbody = document.getElementById('breakout-tbody') as HTMLElement;
     const sourceTbody = document.getElementById('source-tbody') as HTMLElement;
     const sourceNote = document.getElementById('source-note') as HTMLElement;
 
-    let chart: Chart<'line'> | null = null;
+    const AS_OF = tightImg.dataset.asOf ?? '';
 
-    function setStatus(msg: string | null) {
-      statusEl.style.display = msg === null ? 'none' : 'flex';
-      statusEl.textContent = msg ?? '';
-    }
-
-    function readToken(name: string): string {
-      try {
-        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-      } catch { return ''; }
-    }
-
-    const fmtDay = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'UTC', month: 'short', day: 'numeric',
-    });
     const pct = (v: number | null) => (v === null ? '—' : (v * 100).toFixed(0) + '%');
 
-    const CLASS_COLORS: Record<string, string> = {
-      'tier:T1': '#a84040', 'tier:T2': '#2d6a94', 'tier:T3': '#2c8055', 'tier:T4': '#9467bd',
-    };
+    // -----------------------------------------------------------------------
+    // Pipeline-rendered chart cards (themed PNGs; swap on chip + theme change)
+    // -----------------------------------------------------------------------
 
-    function renderChart(rows: ImpliedRow[]) {
-      const globalRows = rows.filter((r) => r.scope === 'global');
-      const accent = readToken('--accent') || '#d68a2a';
-      const inkDim = readToken('--ink-dim') || '#9a9991';
-      const ink = readToken('--ink') || '#e8e6e1';
-      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
-      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
+    function currentTheme(): string {
+      return document.documentElement.getAttribute('data-theme') || 'editorial';
+    }
 
-      const datasets: any[] = [
-        {
-          label: 'Any configuration',
-          data: globalRows.filter((r) => r.stockout_any_mean !== null)
-            .map((r) => ({ x: r.date_ms, y: (r.stockout_any_mean as number) * 100 })),
-          borderColor: accent, backgroundColor: accent,
-          borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 4, tension: 0, spanGaps: true,
-        },
-        {
-          label: 'Full 8-GPU node',
-          data: globalRows.filter((r) => r.stockout_8x_mean !== null)
-            .map((r) => ({ x: r.date_ms, y: (r.stockout_8x_mean as number) * 100 })),
-          borderColor: ink, backgroundColor: ink,
-          borderWidth: 2, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 4,
-          tension: 0, spanGaps: true,
-        },
+    function wireCard(img: HTMLImageElement, statusEl: HTMLElement) {
+      img.addEventListener('load', () => {
+        img.style.visibility = 'visible';
+        statusEl.style.display = 'none';
+      });
+      img.addEventListener('error', () => {
+        img.style.visibility = 'hidden';
+        statusEl.style.display = 'flex';
+        statusEl.textContent =
+          'Card not yet published for this chip — falls back to tomorrow’s run.';
+      });
+    }
+    wireCard(tightImg, tightStatus);
+    wireCard(invImg, invStatus);
+
+    function refreshCards() {
+      const theme = currentTheme();
+      const cards: Array<['tightness' | 'inventory', HTMLImageElement, HTMLElement]> = [
+        ['tightness', tightImg, tightStatus],
+        ['inventory', invImg, invStatus],
       ];
-
-      if (state.show_classes) {
-        for (const scope of ['tier:T1', 'tier:T2', 'tier:T3', 'tier:T4']) {
-          const sr = rows.filter((r) => r.scope === scope
-            && r.n_sources >= MIN_SOURCES && r.stockout_any_mean !== null);
-          if (sr.length === 0) continue;
-          datasets.push({
-            label: operatorClassLabel(scope.slice(5)),
-            data: sr.map((r) => ({ x: r.date_ms, y: (r.stockout_any_mean as number) * 100 })),
-            borderColor: CLASS_COLORS[scope], backgroundColor: CLASS_COLORS[scope],
-            borderWidth: 1, pointRadius: 0, pointHoverRadius: 3, tension: 0, spanGaps: true,
-          });
-        }
+      for (const [family, img, statusEl] of cards) {
+        statusEl.style.display = 'flex';
+        statusEl.textContent = 'Loading…';
+        img.style.visibility = 'hidden';
+        img.src = cardUrl(family, state.chip, theme, AS_OF);
       }
-
-      if (chart) chart.destroy();
-      chart = new Chart(canvas, {
-        type: 'line',
-        data: { datasets },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'nearest', axis: 'x', intersect: false },
-          // Right gutter keeps end-of-line value labels from clipping.
-          layout: { padding: { right: LAST_VALUE_GUTTER } },
-          plugins: {
-            legend: {
-              // Two-line base view labels lines directly at their end points;
-              // the legend returns when operator-class breakouts are toggled.
-              display: datasets.length > 3, position: 'top',
-              labels: { color: inkDim, font: monoFont, boxWidth: 18, boxHeight: 2 },
-            },
-            ccirLastValueLabel: {
-              format: (v: number) => v.toFixed(0) + '%',
-              datasetLabels: (ds: { label?: string }) => {
-                if (ds.label === 'Any configuration') return 'any config';
-                if (ds.label === 'Full 8-GPU node') return '8× node';
-                return ds.label ?? null;
-              },
-            },
-            tooltip: {
-              displayColors: true,
-              callbacks: {
-                title: (items) => {
-                  const x = items[0]?.parsed?.x;
-                  return x ? fmtDay.format(x) : '';
-                },
-                label: (ctx) => `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(0)}% of observed windows sold out`,
-              },
-            },
-          },
-          scales: {
-            x: ccirTimeScaleDefaults({
-              color: inkDim, grid, font: monoFont, unit: 'day', title: 'Date (UTC)',
-            }) as any,
-            y: {
-              min: 0, max: 100,
-              title: { display: true, text: '% of observed windows sold out', color: inkDim, font: monoFont },
-              ticks: { color: ink, font: monoFont, callback: (v) => v + '%' },
-              grid: { color: grid },
-              border: { color: grid },
-            },
-          },
-        },
-        plugins: [lastValueLabelPlugin],
-      });
     }
 
-    const invStatus = document.getElementById('inv-status') as HTMLElement;
-    const invCanvas = document.getElementById('inv-chart') as HTMLCanvasElement;
-    let invChart: Chart<'line'> | null = null;
-
-    function setInvStatus(msg: string | null) {
-      invStatus.style.display = msg === null ? 'none' : 'flex';
-      invStatus.textContent = msg ?? '';
-    }
-
-    function renderInventory(rows: IntradayRow[]) {
-      const accent = readToken('--accent') || '#d68a2a';
-      const ink = readToken('--ink') || '#e8e6e1';
-      const inkDim = readToken('--ink-dim') || '#9a9991';
-      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
-      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
-
-      const idle = rows.filter((r) => r.idle_gpus_observable !== null)
-        .map((r) => ({ x: r.hour_ms, y: r.idle_gpus_observable as number }));
-      const gpuw = rows.filter((r) => r.gpuw_pct_source_equal !== null)
-        .map((r) => ({ x: r.hour_ms, y: (r.gpuw_pct_source_equal as number) * 100 }));
-
-      if (invChart) invChart.destroy();
-      if (idle.length === 0 && gpuw.length === 0) {
-        setInvStatus('No intraday inventory yet — accrues as collection cycles land.');
-        return;
-      }
-      setInvStatus(null);
-      // No end-of-line value badges here: the right-hand shape-weighted axis
-      // (y2) occupies the gutter the badges would draw into. The top legend
-      // carries the line identities instead.
-      invChart = new Chart(invCanvas, {
-        type: 'line',
-        data: {
-          datasets: [
-            {
-              label: 'Observable idle GPUs (count-disclosing panel)',
-              data: idle, borderColor: accent, backgroundColor: accent,
-              borderWidth: 2, pointRadius: 0, pointHoverRadius: 4,
-              tension: 0, spanGaps: false, yAxisID: 'y',
-            },
-            {
-              label: 'Shape-weighted availability (listed SKU shapes)',
-              data: gpuw, borderColor: ink, backgroundColor: ink,
-              borderWidth: 1.5, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 4,
-              tension: 0, spanGaps: false, yAxisID: 'y2',
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'nearest', axis: 'x', intersect: false },
-          plugins: {
-            legend: {
-              display: true, position: 'top',
-              labels: { color: inkDim, font: monoFont, boxWidth: 18, boxHeight: 2 },
-            },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => ctx.dataset.yAxisID === 'y'
-                  ? `${ctx.dataset.label}: ${(ctx.parsed.y as number).toLocaleString('en-US')} GPUs`
-                  : `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(0)}%`,
-              },
-            },
-          },
-          scales: {
-            x: ccirTimeScaleDefaults({
-              color: inkDim, grid, font: monoFont, unit: 'day', title: 'Hour (UTC)',
-            }) as any,
-            y: {
-              position: 'left', min: 0,
-              title: { display: true, text: 'idle GPUs (level)', color: inkDim, font: monoFont },
-              ticks: { color: ink, font: monoFont },
-              grid: { color: grid },
-              border: { color: grid },
-            },
-            y2: {
-              position: 'right', min: 0, max: 100,
-              title: { display: true, text: 'shape-weighted available %', color: inkDim, font: monoFont },
-              ticks: { color: inkDim, font: monoFont, callback: (v) => v + '%' },
-              grid: { drawOnChartArea: false },
-              border: { color: grid },
-            },
-          },
-        },
-      });
-    }
+    // Re-fetch the matching theme variant when the site theme toggles.
+    new MutationObserver(() => refreshCards()).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['data-theme'],
+    });
 
     function renderMacro() {
       const m = (state.macro ?? []).filter((r) => r.chip_slug === state.chip);
@@ -455,16 +295,11 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     }
 
     async function refresh() {
-      setStatus('Loading…');
+      refreshCards();
       if (!state.cache.has(state.chip)) {
         try {
           state.cache.set(state.chip, await fetchImplied(state.chip));
         } catch { state.cache.set(state.chip, null); }
-      }
-      if (!state.intradayCache.has(state.chip)) {
-        try {
-          state.intradayCache.set(state.chip, await fetchIntraday(state.chip));
-        } catch { state.intradayCache.set(state.chip, null); }
       }
       if (state.sources === null) {
         try { state.sources = await fetchSources(); } catch { state.sources = []; }
@@ -475,16 +310,11 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
 
       const rows = state.cache.get(state.chip) ?? [];
       if (rows.length === 0) {
-        setStatus(`No data for ${state.chip} yet — history accrues as the daily pipeline runs.`);
-        if (chart) { chart.destroy(); chart = null; }
         breakoutTbody.innerHTML = '';
         sourceTbody.innerHTML = '';
         macroStrip.hidden = true;
         return;
       }
-      setStatus(null);
-      renderChart(rows);
-      renderInventory(state.intradayCache.get(state.chip) ?? []);
       renderMacro();
       renderBreakouts(rows);
       renderSources();
@@ -501,10 +331,6 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       if (!pill || !pill.dataset.chip) return;
       state.chip = pill.dataset.chip as UtilChipId;
       syncPills();
-      refresh();
-    });
-    classToggle.addEventListener('change', () => {
-      state.show_classes = classToggle.checked;
       refresh();
     });
 
@@ -577,13 +403,6 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       color: var(--accent); border-color: var(--accent);
       background: color-mix(in srgb, var(--accent) 8%, transparent);
     }
-    .vast-page .toggles-row { gap: 22px; }
-    .vast-page .toggle {
-      display: flex; align-items: center; gap: 6px;
-      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
-      letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer;
-    }
-
     /* Macro trio strip */
     .vast-page .macro-strip {
       display: flex; flex-wrap: wrap; gap: 0;
@@ -609,8 +428,14 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
 
     .vast-page .chart-wrap {
       position: relative; border: 1px solid var(--rule);
-      background: var(--vast-panel-bg); padding: 14px; height: 460px;
+      background: var(--vast-panel-bg); padding: 14px;
       margin-bottom: 12px; border-radius: 0;
+    }
+    /* Pipeline-rendered 1440x810 card: aspect-ratio reserves the panel
+       height before (or without) a loaded image, so the status overlay
+       has a box to center in. */
+    .vast-page .card-img {
+      display: block; width: 100%; height: auto; aspect-ratio: 16 / 9;
     }
     .vast-page .chart-wrap-hero {
       background: var(--vast-panel-bg-hero); border-color: var(--rule-2);
@@ -681,7 +506,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     @media (max-width: 720px) {
       .vast-page .control-row { gap: 8px; }
       .vast-page .control-label { min-width: 0; }
-      .vast-page .chart-wrap { height: 360px; padding: 10px; }
+      .vast-page .chart-wrap { padding: 10px; }
       .vast-page .ticker-strip {
         flex-wrap: nowrap; overflow-x: auto;
         scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
@@ -698,7 +523,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       .vast-page .macro-cell:last-child { border-bottom: 0; }
     }
     @media (max-width: 480px) {
-      .vast-page .chart-wrap { height: 300px; padding: 8px; }
+      .vast-page .chart-wrap { padding: 8px; }
       .vast-page .data { font-size: calc(var(--fs-sm) - 1px); }
       .vast-page .tk-cell { padding: 6px 8px; }
     }
