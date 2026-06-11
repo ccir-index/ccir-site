@@ -14,7 +14,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
   description="Implied GPU market utilization: how often each operator class shows zero posted availability for a chip, observed multiple times daily across named providers."
 >
   <section class="wrap top vast-page utilization-page">
-    <div class="kicker">IMPLIED MARKET UTILIZATION · PANEL-WIDE BLOCKING RATE</div>
+    <div class="kicker">IMPLIED MARKET UTILIZATION · PANEL STOCKOUT RATE</div>
     <h1>Market Utilization</h1>
     <div class="ticker-strip" role="group" aria-label="Snapshot stats">
       <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{windowDays}d</span></div>
@@ -74,6 +74,17 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
 
     <section class="legend-section">
       <header class="legend-head">
+        <span class="sec-kicker-label">INVENTORY · OBSERVABLE IDLE GPUS, BY THE HOUR</span>
+        <span class="sec-note">trailing 30d · count-disclosing sources only · level, not a share</span>
+      </header>
+      <div class="chart-wrap">
+        <div class="chart-status" id="inv-status">Loading…</div>
+        <canvas id="inv-chart" aria-label="Observable idle GPUs through the day, with shape-weighted availability share"></canvas>
+      </div>
+    </section>
+
+    <section class="legend-section">
+      <header class="legend-head">
         <span class="sec-kicker-label">BREAKOUTS · LATEST DAY</span>
         <span class="sec-note" id="breakout-note">cells with fewer than 2 sources are not drawn</span>
       </header>
@@ -83,8 +94,8 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
             <tr>
               <th>Scope</th>
               <th class="num">Sources</th>
-              <th class="num">Blocked · any config</th>
-              <th class="num">Blocked · 8× node</th>
+              <th class="num">Stocked out · any config</th>
+              <th class="num">Stocked out · 8× node</th>
             </tr>
           </thead>
           <tbody id="breakout-tbody"></tbody>
@@ -106,8 +117,8 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
               <th>Geo</th>
               <th>Signal</th>
               <th>Since</th>
-              <th class="num">Blocked · any</th>
-              <th class="num">Blocked · 8×</th>
+              <th class="num">Stocked out · any</th>
+              <th class="num">Stocked out · 8×</th>
             </tr>
           </thead>
           <tbody id="source-tbody"></tbody>
@@ -116,7 +127,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     </section>
 
     <p class="footnote">
-      <strong>Blocking rate</strong> = share of observed collection windows in
+      <strong>Stockout rate</strong> = share of observed collection windows in
       which a source showed zero posted availability for the chip; the
       denominator is windows actually observed (~7–10 per day), never
       wall-clock hours. Each named source contributes one vote per day
@@ -128,9 +139,14 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       rates are stratified per-SKU — an operator's class and a specific SKU's
       tier can differ. AWS's signal is a capacity <em>score</em> (Spot
       Placement Score), structurally more optimistic than bookable-stock
-      checks — see the signal column. History begins on the first day the
-      availability panel collected intraday cycles; earlier periods are not
-      backfilled.
+      checks — see the signal column. The <strong>inventory chart</strong> is a
+      level, not a share: the sum of integer idle-GPU counts over a fixed panel
+      of count-disclosing sources (most providers disclose no fleet total, so
+      no panel-wide percentage exists). Its dashed companion is the
+      shape-weighted availability share — an in-stock 8× listing counts eight
+      times a 1× — weighted by listed SKU shapes, not fleet. History begins on
+      the first day the availability panel collected intraday cycles; earlier
+      periods are not backfilled.
     </p>
   </section>
 
@@ -138,8 +154,8 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
     import Chart from 'chart.js/auto';
     import 'chartjs-adapter-date-fns';
     import {
-      fetchImplied, fetchSources, fetchMacro, operatorClassLabel,
-      type UtilChipId, type ImpliedRow, type SourceRow, type MacroRow,
+      fetchImplied, fetchSources, fetchMacro, fetchIntraday, operatorClassLabel,
+      type UtilChipId, type ImpliedRow, type SourceRow, type MacroRow, type IntradayRow,
     } from '../data/utilization';
 
     const DEFAULT_CHIP: UtilChipId = 'h100-sxm';
@@ -149,6 +165,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       chip: DEFAULT_CHIP as UtilChipId,
       show_classes: false,
       cache: new Map<UtilChipId, ImpliedRow[] | null>(),
+      intradayCache: new Map<UtilChipId, IntradayRow[] | null>(),
       sources: null as SourceRow[] | null,
       macro: null as MacroRow[] | null,
     };
@@ -194,15 +211,15 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       const datasets: any[] = [
         {
           label: 'Any configuration',
-          data: globalRows.filter((r) => r.blocking_any_mean !== null)
-            .map((r) => ({ x: r.date_ms, y: (r.blocking_any_mean as number) * 100 })),
+          data: globalRows.filter((r) => r.stockout_any_mean !== null)
+            .map((r) => ({ x: r.date_ms, y: (r.stockout_any_mean as number) * 100 })),
           borderColor: accent, backgroundColor: accent,
           borderWidth: 2, pointRadius: 1.5, pointHoverRadius: 4, tension: 0, spanGaps: true,
         },
         {
           label: 'Full 8-GPU node',
-          data: globalRows.filter((r) => r.blocking_8x_mean !== null)
-            .map((r) => ({ x: r.date_ms, y: (r.blocking_8x_mean as number) * 100 })),
+          data: globalRows.filter((r) => r.stockout_8x_mean !== null)
+            .map((r) => ({ x: r.date_ms, y: (r.stockout_8x_mean as number) * 100 })),
           borderColor: ink, backgroundColor: ink,
           borderWidth: 2, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 4,
           tension: 0, spanGaps: true,
@@ -212,11 +229,11 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       if (state.show_classes) {
         for (const scope of ['tier:T1', 'tier:T2', 'tier:T3', 'tier:T4']) {
           const sr = rows.filter((r) => r.scope === scope
-            && r.n_sources >= MIN_SOURCES && r.blocking_any_mean !== null);
+            && r.n_sources >= MIN_SOURCES && r.stockout_any_mean !== null);
           if (sr.length === 0) continue;
           datasets.push({
             label: operatorClassLabel(scope.slice(5)),
-            data: sr.map((r) => ({ x: r.date_ms, y: (r.blocking_any_mean as number) * 100 })),
+            data: sr.map((r) => ({ x: r.date_ms, y: (r.stockout_any_mean as number) * 100 })),
             borderColor: CLASS_COLORS[scope], backgroundColor: CLASS_COLORS[scope],
             borderWidth: 1, pointRadius: 0, pointHoverRadius: 3, tension: 0, spanGaps: true,
           });
@@ -243,7 +260,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
                   const x = items[0]?.parsed?.x;
                   return x ? fmtDay.format(x) : '';
                 },
-                label: (ctx) => `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(0)}% of observed windows blocked`,
+                label: (ctx) => `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(0)}% of observed windows stocked out`,
               },
             },
           },
@@ -258,9 +275,98 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
             },
             y: {
               min: 0, max: 100,
-              title: { display: true, text: '% of observed windows blocked', color: inkDim, font: monoFont },
+              title: { display: true, text: '% of observed windows stocked out', color: inkDim, font: monoFont },
               ticks: { color: ink, font: monoFont, callback: (v) => v + '%' },
               grid: { color: grid },
+              border: { color: grid },
+            },
+          },
+        },
+      });
+    }
+
+    const invStatus = document.getElementById('inv-status') as HTMLElement;
+    const invCanvas = document.getElementById('inv-chart') as HTMLCanvasElement;
+    let invChart: Chart<'line'> | null = null;
+
+    function setInvStatus(msg: string | null) {
+      invStatus.style.display = msg === null ? 'none' : 'flex';
+      invStatus.textContent = msg ?? '';
+    }
+
+    function renderInventory(rows: IntradayRow[]) {
+      const accent = readToken('--accent') || '#d68a2a';
+      const ink = readToken('--ink') || '#e8e6e1';
+      const inkDim = readToken('--ink-dim') || '#9a9991';
+      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
+      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
+
+      const idle = rows.filter((r) => r.idle_gpus_observable !== null)
+        .map((r) => ({ x: r.hour_ms, y: r.idle_gpus_observable as number }));
+      const gpuw = rows.filter((r) => r.gpuw_pct_source_equal !== null)
+        .map((r) => ({ x: r.hour_ms, y: (r.gpuw_pct_source_equal as number) * 100 }));
+
+      if (invChart) invChart.destroy();
+      if (idle.length === 0 && gpuw.length === 0) {
+        setInvStatus('No intraday inventory yet — accrues as collection cycles land.');
+        return;
+      }
+      setInvStatus(null);
+      invChart = new Chart(invCanvas, {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              label: 'Observable idle GPUs (count-disclosing panel)',
+              data: idle, borderColor: accent, backgroundColor: accent,
+              borderWidth: 2, pointRadius: 0, pointHoverRadius: 4,
+              tension: 0, spanGaps: false, yAxisID: 'y',
+            },
+            {
+              label: 'Shape-weighted availability (listed SKU shapes)',
+              data: gpuw, borderColor: ink, backgroundColor: ink,
+              borderWidth: 1.5, borderDash: [5, 4], pointRadius: 0, pointHoverRadius: 4,
+              tension: 0, spanGaps: false, yAxisID: 'y2',
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'nearest', axis: 'x', intersect: false },
+          plugins: {
+            legend: {
+              display: true, position: 'top',
+              labels: { color: inkDim, font: monoFont, boxWidth: 18, boxHeight: 2 },
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ctx.dataset.yAxisID === 'y'
+                  ? `${ctx.dataset.label}: ${(ctx.parsed.y as number).toLocaleString('en-US')} GPUs`
+                  : `${ctx.dataset.label}: ${(ctx.parsed.y as number).toFixed(0)}%`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              type: 'time', time: { unit: 'day' },
+              ticks: { color: inkDim, font: monoFont, maxRotation: 0, autoSkipPadding: 32 },
+              title: { display: true, text: 'Hour (UTC)', color: inkDim, font: monoFont },
+              grid: { color: grid, drawOnChartArea: false },
+              border: { color: grid },
+            },
+            y: {
+              position: 'left', min: 0,
+              title: { display: true, text: 'idle GPUs (level)', color: inkDim, font: monoFont },
+              ticks: { color: ink, font: monoFont },
+              grid: { color: grid },
+              border: { color: grid },
+            },
+            y2: {
+              position: 'right', min: 0, max: 100,
+              title: { display: true, text: 'shape-weighted available %', color: inkDim, font: monoFont },
+              ticks: { color: inkDim, font: monoFont, callback: (v) => v + '%' },
+              grid: { drawOnChartArea: false },
               border: { color: grid },
             },
           },
@@ -275,7 +381,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       macroStrip.hidden = false;
       (document.getElementById('macro-breadth') as HTMLElement).textContent =
         latest.n_providers_8x_pool > 0
-          ? `${latest.n_providers_blocked_8x} of ${latest.n_providers_8x_pool}`
+          ? `${latest.n_providers_stocked_out_8x} of ${latest.n_providers_8x_pool}`
           : '—';
       const idleEl = document.getElementById('macro-idle') as HTMLElement;
       const idleLbl = document.getElementById('macro-idle-lbl') as HTMLElement;
@@ -300,11 +406,11 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
         const label = r.scope.startsWith('tier:')
           ? operatorClassLabel(r.scope.slice(5))
           : r.scope.replace('geo:', 'Geography · ');
-        const e8 = r.n_sources_8x > 0 ? pct(r.blocking_8x_mean) : '<span class="dim">—</span>';
+        const e8 = r.n_sources_8x > 0 ? pct(r.stockout_8x_mean) : '<span class="dim">—</span>';
         return '<tr>' +
           `<td>${label}</td>` +
           `<td class="num">${r.n_sources}</td>` +
-          `<td class="num">${pct(r.blocking_any_mean)}</td>` +
+          `<td class="num">${pct(r.stockout_any_mean)}</td>` +
           `<td class="num">${e8}</td>` +
         '</tr>';
       }).join('') || '<tr><td colspan="4" class="dim">No breakout cell reaches the 2-source floor yet.</td></tr>';
@@ -315,7 +421,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       sourceNote.textContent = `${rows.length} sources · ${state.chip}`;
       sourceTbody.innerHTML = rows.map((r) => {
         const e8 = r.shape_disclosed
-          ? `<td class="num">${pct(r.blocking_8x)}</td>`
+          ? `<td class="num">${pct(r.stockout_8x)}</td>`
           : '<td class="num dim">no shape ≥8 disclosed</td>';
         const sig = r.signal_type === 'score'
           ? '<span class="sig-warn">score</span>' : r.signal_type;
@@ -325,7 +431,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
           `<td>${r.geo_buckets}</td>` +
           `<td>${sig}</td>` +
           `<td>${r.series_start}</td>` +
-          `<td class="num">${pct(r.blocking_any)}</td>` +
+          `<td class="num">${pct(r.stockout_any)}</td>` +
           e8 +
         '</tr>';
       }).join('');
@@ -337,6 +443,11 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
         try {
           state.cache.set(state.chip, await fetchImplied(state.chip));
         } catch { state.cache.set(state.chip, null); }
+      }
+      if (!state.intradayCache.has(state.chip)) {
+        try {
+          state.intradayCache.set(state.chip, await fetchIntraday(state.chip));
+        } catch { state.intradayCache.set(state.chip, null); }
       }
       if (state.sources === null) {
         try { state.sources = await fetchSources(); } catch { state.sources = []; }
@@ -356,6 +467,7 @@ const seriesStart = utilMeta?.imu_series_start ?? '—';
       }
       setStatus(null);
       renderChart(rows);
+      renderInventory(state.intradayCache.get(state.chip) ?? []);
       renderMacro();
       renderBreakouts(rows);
       renderSources();

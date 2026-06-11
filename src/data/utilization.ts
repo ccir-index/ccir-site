@@ -70,10 +70,10 @@ export interface ImpliedRow {
   scope: string;                  // 'global' | 'tier:T1'.. | 'geo:US' | 'geo:EU'
   n_sources: number;
   n_sources_8x: number;
-  blocking_any_mean: number | null;
-  blocking_any_min: number | null;
-  blocking_any_max: number | null;
-  blocking_8x_mean: number | null;
+  stockout_any_mean: number | null;
+  stockout_any_min: number | null;
+  stockout_any_max: number | null;
+  stockout_8x_mean: number | null;
   n_cycles_median: number | null;
 }
 
@@ -90,10 +90,10 @@ export function parseImpliedCsv(text: string): ImpliedRow[] {
       scope: c[i('scope')],
       n_sources: num(c[i('n_sources')]) ?? 0,
       n_sources_8x: num(c[i('n_sources_8x')]) ?? 0,
-      blocking_any_mean: num(c[i('blocking_any_mean')]),
-      blocking_any_min: num(c[i('blocking_any_min')]),
-      blocking_any_max: num(c[i('blocking_any_max')]),
-      blocking_8x_mean: num(c[i('blocking_8x_mean')]),
+      stockout_any_mean: num(c[i('stockout_any_mean')]),
+      stockout_any_min: num(c[i('stockout_any_min')]),
+      stockout_any_max: num(c[i('stockout_any_max')]),
+      stockout_8x_mean: num(c[i('stockout_8x_mean')]),
       n_cycles_median: num(c[i('n_cycles_median')]),
     });
   }
@@ -109,8 +109,8 @@ export interface SourceRow {
   shape_disclosed: boolean;
   series_start: string;
   n_days: number;
-  blocking_any: number | null;
-  blocking_8x: number | null;
+  stockout_any: number | null;
+  stockout_8x: number | null;
 }
 
 export function parseSourcesCsv(text: string): SourceRow[] {
@@ -127,8 +127,8 @@ export function parseSourcesCsv(text: string): SourceRow[] {
       shape_disclosed: c[i('shape_disclosed')] === 'True',
       series_start: c[i('series_start')],
       n_days: num(c[i('n_days')]) ?? 0,
-      blocking_any: num(c[i('blocking_any')]),
-      blocking_8x: num(c[i('blocking_8x')]),
+      stockout_any: num(c[i('stockout_any')]),
+      stockout_8x: num(c[i('stockout_8x')]),
     }));
 }
 
@@ -136,9 +136,9 @@ export interface MacroRow {
   as_of_date: string;
   chip_slug: string;
   n_providers_tracked: number;
-  n_providers_blocked_any: number;
+  n_providers_stocked_out_any: number;
   n_providers_8x_pool: number;
-  n_providers_blocked_8x: number;
+  n_providers_stocked_out_8x: number;
   idle_gpus_observable: number | null;
   n_inventory_sources: number;
   measured_marketplace_utilization: number | null;
@@ -153,12 +153,46 @@ export function parseMacroCsv(text: string): MacroRow[] {
       as_of_date: c[i('as_of_date')],
       chip_slug: c[i('chip_slug')],
       n_providers_tracked: num(c[i('n_providers_tracked')]) ?? 0,
-      n_providers_blocked_any: num(c[i('n_providers_blocked_any')]) ?? 0,
+      n_providers_stocked_out_any: num(c[i('n_providers_stocked_out_any')]) ?? 0,
       n_providers_8x_pool: num(c[i('n_providers_8x_pool')]) ?? 0,
-      n_providers_blocked_8x: num(c[i('n_providers_blocked_8x')]) ?? 0,
+      n_providers_stocked_out_8x: num(c[i('n_providers_stocked_out_8x')]) ?? 0,
       idle_gpus_observable: num(c[i('idle_gpus_observable')]),
       n_inventory_sources: num(c[i('n_inventory_sources')]) ?? 0,
       measured_marketplace_utilization: num(c[i('measured_marketplace_utilization')]),
+    }));
+}
+
+export interface IntradayRow {
+  as_of_date: string;
+  cycle_hour: string;
+  hour_ms: number;
+  n_sources: number;
+  n_count_sources: number;
+  idle_gpus_observable: number | null;
+  gpuw_pct_source_equal: number | null;
+}
+
+function tsMs(iso: string): number {
+  // Exports emit ISO with explicit zone (+00:00) post-deltars; only append Z
+  // when no zone designator is present (see parseMs in marketplace.ts).
+  const normalized = iso.replace(' ', 'T');
+  const hasZone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(normalized);
+  return Date.parse(hasZone ? normalized : normalized + 'Z');
+}
+
+export function parseIntradayCsv(text: string): IntradayRow[] {
+  const { header, lines } = rowsOf(text);
+  const i = (c: string) => header.indexOf(c);
+  return lines
+    .filter((c) => c[i('cycle_hour')])
+    .map((c) => ({
+      as_of_date: c[i('as_of_date')],
+      cycle_hour: c[i('cycle_hour')],
+      hour_ms: tsMs(c[i('cycle_hour')]),
+      n_sources: num(c[i('n_sources')]) ?? 0,
+      n_count_sources: num(c[i('n_count_sources')]) ?? 0,
+      idle_gpus_observable: num(c[i('idle_gpus_observable')]),
+      gpuw_pct_source_equal: num(c[i('gpuw_pct_source_equal')]),
     }));
 }
 
@@ -228,4 +262,8 @@ export function fetchMacro(): Promise<MacroRow[]> {
 export function fetchOccupancy(chip: OccChipId): Promise<OccupancyRow[]> {
   const name = chip === 'all' ? 'vast_occupancy_all.csv' : `vast_occupancy_${chip}.csv`;
   return fetchCsv(`/data/${name}`, parseOccupancyCsv);
+}
+
+export function fetchIntraday(chip: UtilChipId): Promise<IntradayRow[]> {
+  return fetchCsv(`/data/utilization_intraday_${chip}.csv`, parseIntradayCsv);
 }

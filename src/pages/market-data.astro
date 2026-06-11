@@ -21,31 +21,40 @@ const cards = [
     inside: 'Vast.ai Verified · RunPod Secure · Community · Spot · Cluster',
   },
   {
+    href: '/utilization',
+    kind: 'Demand side',
+    title: 'Market Utilization',
+    cadence: 'Daily series · ~7–10 obs/day · 90d window',
+    summary:
+      'The quantity side of the market: how often each operator class shows zero posted availability for a chip (stockout rate, two bounds — any configuration vs full 8-GPU node), plus the observable idle-GPU inventory level by the hour. Implied from posted availability; never blended with measured occupancy.',
+    inside: 'Stockout rate · idle-GPU inventory · operator-class breakouts · per-source signal disclosure',
+  },
+  {
+    href: '/basis',
+    kind: 'Overlay',
+    title: 'Vast Overlay — Basis & Occupancy',
+    cadence: 'Daily basis · 4 occupancy snapshots/day',
+    summary:
+      'Vast is the one live, executable marketplace in the panel, so it is pulled out of the list-ask benchmark and re-surfaced here on both axes: price (how the live venue sits vs the ex-Vast Tier-3 list-ask floor) and quantity (machine-reconstructed occupancy — share of listed capacity not currently rentable). Single-venue signal, adjacent to the methodology.',
+    inside: 'Clearing basis · measured occupancy since 2026-05-13 · whole-node share',
+  },
+  {
     href: '/availability',
     kind: 'Observatory',
     title: 'Availability Observatory',
-    cadence: 'Intraday · 3h cadence · 30d window',
+    cadence: 'Paused — data as of 2026-05-13',
     summary:
-      'Shadeform aggregates 19 GPU clouds into a single live view. Where each chip is procurable right now, per-provider price spread, boot-time tradeoffs, config availability, long-tail chip catalog. Observability data, not part of the CCIR rate methodology.',
+      'Shadeform aggregates 19 GPU clouds into a single view: where each chip is procurable, per-provider price spread, boot-time tradeoffs, config availability, long-tail catalog. Collection is paused pending the pipeline migration; the page shows the last published snapshot. Observability data, not part of the CCIR rate methodology.',
     inside: '19 providers · 11 headline chips · SKU × region grid',
   },
   {
     href: '/vast',
     kind: 'Observatory',
     title: 'Vast.ai Observatory',
-    cadence: 'Intraday · 3h cadence · 30d window',
+    cadence: 'Paused — data as of 2026-05-13',
     summary:
-      'The only per-host order-book marketplace in the panel — hundreds to thousands of distinct offers per chip, refreshed in real time. Distribution shape, quality bands, $/perf frontier, supply structure, geography, egress and storage. Observability data, not part of the CCIR rate methodology.',
+      'The per-host order-book deep dive — distribution shape, quality bands, $/perf frontier, supply structure, geography, egress and storage. Collection is paused pending the pipeline migration; the page shows the last published snapshot. For live Vast signals see the Vast Overlay. Observability data, not part of the CCIR rate methodology.',
     inside: '9 sections · verified vs unverified · dedicated vs shared',
-  },
-  {
-    href: '/basis',
-    kind: 'Overlay',
-    title: 'Clearing Basis',
-    cadence: 'Daily · 7d window · matched tier',
-    summary:
-      'Vast is the one live, executable marketplace in the panel, so it is pulled out of the list-ask benchmark and re-surfaced here: how the live marketplace price sits vs the ex-Vast Tier-3 list-ask floor. Positive = clearing above posted asks. Single-venue signal, adjacent to the methodology.',
-    inside: 'H100 · H200 · B200 · A100 · bid floor or live ask',
   },
 ];
 ---
@@ -57,9 +66,10 @@ const cards = [
     <div class="kicker">Underlying data · Observability surface</div>
     <h1>Market Data</h1>
     <p class="dek">
-      Observability views for the GPU compute markets CCIR measures. Two
-      surfaces feed the CCIR rate panel; two are observatories adjacent to
-      the methodology. The published reference rates live on
+      Observability views for the GPU compute markets CCIR measures: the
+      panel inputs that feed the reference rates, the demand side read
+      through posted inventory, the Vast overlay, and two paused
+      observatories. The published reference rates live on
       <a href="/">Rates</a> and <a href="/tiers">Tiers</a>.
     </p>
 
