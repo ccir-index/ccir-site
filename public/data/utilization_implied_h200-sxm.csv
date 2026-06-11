@@ -1,4 +1,4 @@
-as_of_date,scope,n_sources,n_sources_8x,blocking_any_mean,blocking_any_min,blocking_any_max,blocking_8x_mean,n_cycles_median,methodology_version
+as_of_date,scope,n_sources,n_sources_8x,stockout_any_mean,stockout_any_min,stockout_any_max,stockout_8x_mean,n_cycles_median,methodology_version
 2026-05-28,geo:EU,3,3,1.0,1.0,1.0,1.0,7,v2.0.0
 2026-05-28,geo:US,4,4,0.5,0.0,1.0,0.75,7,v2.0.0
 2026-05-28,global,6,4,0.381,0.0,1.0,0.75,7,v2.0.0
@@ -69,8 +69,8 @@ as_of_date,scope,n_sources,n_sources_8x,blocking_any_mean,blocking_any_min,block
 2026-06-10,global,6,4,0.5952,0.0,1.0,1.0,7,v2.0.0
 2026-06-10,tier:T1,3,3,1.0,1.0,1.0,1.0,7,v2.0.0
 2026-06-10,tier:T3,1,0,0.0,0.0,0.0,,7,v2.0.0
-2026-06-11,geo:EU,3,3,1.0,1.0,1.0,1.0,3,v2.0.0
-2026-06-11,geo:US,4,4,0.6667,0.0,1.0,0.9167,3,v2.0.0
-2026-06-11,global,6,4,0.5556,0.0,1.0,0.9167,3,v2.0.0
-2026-06-11,tier:T1,3,3,0.8889,0.6667,1.0,0.8889,3,v2.0.0
-2026-06-11,tier:T3,1,0,0.0,0.0,0.0,,3,v2.0.0
+2026-06-11,geo:EU,3,3,1.0,1.0,1.0,1.0,4,v2.0.0
+2026-06-11,geo:US,4,4,0.6875,0.0,1.0,0.9375,4,v2.0.0
+2026-06-11,global,6,4,0.5417,0.0,1.0,0.9375,4,v2.0.0
+2026-06-11,tier:T1,3,3,0.9167,0.75,1.0,0.9167,4,v2.0.0
+2026-06-11,tier:T3,1,0,0.0,0.0,0.0,,4,v2.0.0

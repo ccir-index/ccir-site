@@ -1,8 +1,8 @@
 {
   "as_of_date": "2026-06-11",
-  "published_at_ct": "2026-06-11T10:39:40-05:00",
-  "published_at_utc": "2026-06-11T15:39:40+00:00",
-  "run_id": "export-20260611T153936Z-3feada59",
+  "published_at_ct": "2026-06-11T12:16:30-05:00",
+  "published_at_utc": "2026-06-11T17:16:30+00:00",
+  "run_id": "export-20260611T171612Z-5bf78999",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 27,
@@ -57,6 +57,7 @@
       "a100-sxm-40gb"
     ],
     "imu_series_start": "2026-05-28",
+    "intraday_window_days": 30,
     "n_sources": 12,
     "occupancy_chips": [
       "h100-sxm",
@@ -67,7 +68,7 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 101,
+    "occupancy_cycles": 102,
     "occupancy_series_start": "2026-05-13",
     "status": "ok",
     "window_days": 90
