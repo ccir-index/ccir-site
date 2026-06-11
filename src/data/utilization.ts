@@ -1,8 +1,8 @@
-// Client-side helpers for /utilization (implied blocking) and the /basis
-// measured-occupancy section.
+// Client-side helpers for /utilization (stockout breadth + inventory) and
+// the /basis measured-occupancy section.
 //
 // CSVs under public/data/:
-//   utilization_implied_<chip>.csv  daily blocking series per scope
+//   utilization_implied_<chip>.csv  daily stockout series per scope
 //                                   (global / tier:T1..T4 / geo:US|EU),
 //                                   two bounds: any-configuration + 8x-node
 //   utilization_sources.csv         per (source x chip) coverage + signal type
