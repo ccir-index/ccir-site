@@ -1,0 +1,7 @@
+chip_slug,scope,window_days,as_of_date,n_sources,n_sources_8x,n_sources_thin,n_cycles,confidence,pct_available_median,pct_available_mean,pct_available_min,pct_available_max,pct_available_8x_median,pct_available_8x_mean,methodology_version
+h100-sxm,geo:EU,7,2026-06-15,4,2,0,133,ok,0.8743,0.6871,0.0,1.0,0.5,0.5,v2.0.0
+h100-sxm,geo:US,7,2026-06-15,7,4,0,297,ok,0.6905,0.5272,0.0,1.0,0.0,0.1,v2.0.0
+h100-sxm,global,7,2026-06-15,11,6,5,467,ok,0.8333,0.6294,0.0,1.0,0.2,0.3917,v2.0.0
+h100-sxm,tier:T1,7,2026-06-15,1,1,0,50,thin,0.0,0.0,0.0,0.0,0.0,0.0,v2.0.0
+h100-sxm,tier:T2,7,2026-06-15,5,4,0,205,ok,0.4,0.48,0.0,1.0,0.2,0.35,v2.0.0
+h100-sxm,tier:T3,7,2026-06-15,2,0,0,100,thin,0.91,0.91,0.82,1.0,,,v2.0.0

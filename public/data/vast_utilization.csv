@@ -1,0 +1,6 @@
+chip_slug,as_of_date,window_days,n_cycles,base_total_gpus,base_machines,rented_gpus_mean,utilization,utilization_naive,methodology_version
+a100-sxm,2026-06-15,7,19,365,71,295.8,0.7942,0.7829,v2.0.0
+b200-sxm,2026-06-15,7,20,281.0,36.0,143.8,0.5117,0.536,v2.0.0
+h100-pcie,2026-06-15,7,19,20,7,12.3,0.6158,0.6768,v2.0.0
+h100-sxm,2026-06-15,7,20,237.5,48.5,155.1,0.6531,0.7087,v2.0.0
+h200-sxm,2026-06-15,7,20,386.5,55.0,239.5,0.6197,0.6592,v2.0.0
