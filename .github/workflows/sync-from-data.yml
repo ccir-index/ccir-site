@@ -177,6 +177,38 @@ jobs:
               : > ".sync/$fname"
             fi
           done
+          # Availability Index (curated multi-source) — powers the new /utilization
+          # page: per-chip headline + 90d trend, plus the cross-chip headline +
+          # per-source panel. IMU chip slugs.
+          for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
+            for prefix in availability_index availability_index_trend; do
+              fname="${prefix}_${chip}.csv"
+              if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+                echo "fetched $fname"
+              else
+                echo "no $fname at $DATE — /utilization availability will fall back"
+                : > ".sync/$fname"
+              fi
+            done
+          done
+          for fname in availability_index_headline.csv availability_index_sources.csv vast_utilization.csv vast_utilization_weekly.csv; do
+            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              echo "fetched $fname"
+            else
+              echo "no $fname at $DATE — /utilization will fall back"
+              : > ".sync/$fname"
+            fi
+          done
+          # Denominator-fixed Vast utilization trend (Vast chip slugs).
+          for chip in h100-sxm h100-pcie h200-sxm b200-sxm gb200 a100-sxm; do
+            fname="vast_utilization_trend_${chip}.csv"
+            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              echo "fetched $fname"
+            else
+              echo "no $fname at $DATE — /utilization occupancy trend will fall back"
+              : > ".sync/$fname"
+            fi
+          done
           echo "have_snapshot=true" >> "$GITHUB_OUTPUT"
 
       - name: Verify hashes against manifest
@@ -293,6 +325,33 @@ jobs:
               echo "staged public/data/$fname"
             else
               echo "no $fname in this snapshot; leaving public/data unchanged"
+            fi
+          done
+          # Stage Availability Index + Vast utilization CSVs (the new /utilization).
+          for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
+            for prefix in availability_index availability_index_trend; do
+              fname="${prefix}_${chip}.csv"
+              if [ -s ".sync/$fname" ]; then
+                cp ".sync/$fname" "public/data/$fname"
+                echo "staged public/data/$fname"
+              else
+                echo "no $fname in this snapshot; leaving public/data unchanged"
+              fi
+            done
+          done
+          for chip in h100-sxm h100-pcie h200-sxm b200-sxm gb200 a100-sxm; do
+            fname="vast_utilization_trend_${chip}.csv"
+            if [ -s ".sync/$fname" ]; then
+              cp ".sync/$fname" "public/data/$fname"
+              echo "staged public/data/$fname"
+            else
+              echo "no $fname in this snapshot; leaving public/data unchanged"
+            fi
+          done
+          for fname in availability_index_headline.csv availability_index_sources.csv vast_utilization.csv vast_utilization_weekly.csv; do
+            if [ -s ".sync/$fname" ]; then
+              cp ".sync/$fname" "public/data/$fname"
+              echo "staged public/data/$fname"
             fi
           done
           python3 - <<'PY'
