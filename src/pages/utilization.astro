@@ -1,531 +1,417 @@
 ---
 import Base from '../layouts/Base.astro';
-import { meta } from '../data/snapshot';
-import { UTIL_CHIPS } from '../data/utilization';
 
+// Preview route for the reframed supply page (Availability Index + measured Vast
+// utilization). Final route/name TBD. Reads the export_availability_index CSVs
+// from /data/ client-side; degrades to a "warming up" state if absent.
+const CHIPS = [
+  { slug: 'h100-sxm',      label: 'H100',  vast: 'h100-sxm' },
+  { slug: 'h200-sxm',      label: 'H200',  vast: 'h200-sxm' },
+  { slug: 'b200-sxm',      label: 'B200',  vast: 'b200-sxm' },
+  { slug: 'a100-sxm-80gb', label: 'A100',  vast: 'a100-sxm' },
+  { slug: 'gb200',         label: 'GB200', vast: 'gb200' },
+];
 const DEFAULT_CHIP = 'h100-sxm';
-const utilMeta = (meta as any).utilization;
-const windowDays = utilMeta?.window_days ?? 90;
-const nSources = utilMeta?.n_sources ?? '—';
-const seriesStart = utilMeta?.imu_series_start ?? '—';
 ---
 <Base
-  title="Market Utilization · CCIR"
-  description="Implied GPU market utilization: how often each operator class shows zero posted availability for a chip, observed multiple times daily across named providers."
+  title="Availability & Utilization · CCIR"
+  description="CCIR Availability Index — the share of hourly capacity-probes across a fixed panel of genuine-capacity GPU sources that found launchable stock, with measured marketplace utilization."
 >
-  <section class="wrap top vast-page utilization-page">
-    <div class="kicker">IMPLIED MARKET UTILIZATION · BREADTH / DEPTH / LEVEL</div>
-    <h1>Market Utilization</h1>
-    <div class="ticker-strip" role="group" aria-label="Snapshot stats">
-      <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{windowDays}d</span></div>
-      <div class="tk-cell"><span class="tk-lbl">Sources</span><span class="tk-val">{nSources}</span></div>
-      <div class="tk-cell"><span class="tk-lbl">Series start</span><span class="tk-val">{seriesStart}</span></div>
-      <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">~7–10 obs/day</span></div>
-      <div class="tk-cell tk-status"><span class="tk-dot"></span><span class="tk-val">LIVE</span></div>
-    </div>
-    <p class="standfirst lede">
-      The reference rates publish what operators <em>ask</em>. This page reads
-      demand through inventory, with three instruments that answer different
-      questions. <strong>Supply tightness</strong> (below): how widespread is
-      tightness — a diffusion-style read across named providers, drawn at two
-      bounds (any configuration vs full 8-GPU node, which is what “sold
-      out” means in practice). <strong>Observable idle inventory</strong>:
-      how deep is the available pool, counted in GPUs. The <strong>utilization
-      level</strong> itself is only honest where machine state is observable —
-      the machine-reconstructed series on the <a href="/basis">Vast
-      overlay</a>. Breadth, depth, level — never blended into one number.
+  <section class="wrap ai-page">
+    <div class="kicker">CCIR · SUPPLY OBSERVATORY</div>
+    <h1>Availability &amp; Utilization</h1>
+    <p class="deck">
+      Two lenses on GPU supply. <strong>Availability</strong> — across a fixed,
+      disclosed panel of genuine-capacity sources, what share of probes found
+      launchable stock. <strong>Utilization</strong> — of the capacity the one
+      marketplace we can measure actually lists, how much is rented.
     </p>
 
-    <div class="controls">
-      <div class="control-row chip-row">
-        <span class="control-label">Chip</span>
-        <div class="pill-group" id="chip-pills" role="group" aria-label="Select a chip">
-          {UTIL_CHIPS.map((c) => (
-            <button type="button" class="pill" data-chip={c.id} data-default={c.id === DEFAULT_CHIP}>
-              {c.label}
-            </button>
-          ))}
+    <!-- chip selector -->
+    <div class="chips" role="tablist" aria-label="GPU model">
+      {CHIPS.map((c) => (
+        <button class="chip" role="tab" data-chip={c.slug} data-vast={c.vast}
+                aria-selected={c.slug === DEFAULT_CHIP ? 'true' : 'false'}>{c.label}</button>
+      ))}
+      <span class="chip-hint">select one or more to compare</span>
+    </div>
+
+    <!-- headline stat band -->
+    <div class="band" id="band">
+      <div class="stat stat-frac">
+        <span class="stat-lbl">Fractional availability</span>
+        <span class="stat-val" id="s-frac">—</span>
+        <span class="stat-sub">any launchable shape · 7d</span>
+      </div>
+      <div class="stat stat-clu">
+        <span class="stat-lbl">Cluster (8×) availability</span>
+        <span class="stat-val" id="s-clu">—</span>
+        <span class="stat-sub">full 8-GPU node · 7d</span>
+      </div>
+      <div class="stat">
+        <span class="stat-lbl">Panel sources</span>
+        <span class="stat-val" id="s-srcs">—</span>
+        <span class="stat-sub" id="s-srcs-sub">venues probed</span>
+      </div>
+    </div>
+
+    <!-- primary: availability over time -->
+    <div class="card chart-card">
+      <div class="card-head">
+        <div>
+          <h2>Availability over time</h2>
+          <p class="card-sub">Rolling 7-day source-equal median, last 90 days. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
+        </div>
+        <div class="confbadge" id="confbadge"></div>
+      </div>
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      <div class="empty" id="trend-empty" hidden>Series warming up — first publish lands on the next daily build.</div>
+    </div>
+
+    <!-- source panel (collapsed by default) -->
+    <details class="card panel-card">
+      <summary>
+        <span class="sum-main"><h2>The panel</h2><span class="sum-count" id="panel-count"></span></span>
+        <span class="sum-sub">Each genuine-capacity source, one vote · 7-day availability</span>
+        <span class="sum-chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel" id="panel"></div>
+      <p class="foot">Excludes catalog-eligibility (Azure) and probabilistic-score (AWS) sources from the headline. Resellers that duplicate a directly-probed operator are deduped. Sources below the minimum observed-cycle threshold are held out until they accumulate probes.</p>
+    </details>
+
+    <!-- measured utilization (Vast) -->
+    <div class="card util-card">
+      <div class="card-head">
+        <div>
+          <h2>Measured utilization <span class="tag">one marketplace source</span></h2>
+          <p class="card-sub">Vast.ai — the only marketplace that discloses rented / total. Rolling 7-day occupancy, denominator fixed to each window's median listed capacity.</p>
         </div>
       </div>
+      <div class="util-grid">
+        <div class="util-now">
+          <span class="util-big" id="u-now">—</span>
+          <span class="util-now-lbl" id="u-now-lbl">trailing 7-day occupancy</span>
+        </div>
+        <div class="chart-wrap util-wrap"><canvas id="utilChart"></canvas></div>
+      </div>
+      <div class="empty" id="util-empty" hidden>Vast occupancy warming up.</div>
     </div>
 
-    <div class="macro-strip" id="macro-strip" hidden>
-      <div class="macro-cell">
-        <span class="macro-val" id="macro-breadth">—</span>
-        <span class="macro-lbl">providers with no full 8-GPU node posted (latest day)</span>
-      </div>
-      <div class="macro-cell">
-        <span class="macro-val" id="macro-idle">—</span>
-        <span class="macro-lbl" id="macro-idle-lbl">observable idle supply</span>
-      </div>
-      <div class="macro-cell">
-        <span class="macro-val"><a href="/basis" id="macro-occ">—</a></span>
-        <span class="macro-lbl">marketplace implied utilization → Vast overlay</span>
-      </div>
-    </div>
-
-    <header class="legend-head">
-      <span class="sec-kicker-label">DIFFUSION ACROSS THE PANEL</span>
-      <span class="sec-note">share of observed windows with zero posted availability · source-equal</span>
-    </header>
-    <div class="chart-wrap chart-wrap-hero">
-      <div class="chart-status" id="chart-status">Loading…</div>
-      <img
-        id="tightness-card"
-        class="card-img"
-        data-as-of={meta.as_of_date}
-        alt="Supply tightness chart card: share of observed windows with zero posted availability, over time"
-      />
-    </div>
-
-    <section class="legend-section">
-      <header class="legend-head">
-        <span class="sec-kicker-label">BY THE HOUR</span>
-        <span class="sec-note">history begins 2026-05-28 · count-disclosing sources only · level, not a share</span>
-      </header>
-      <div class="chart-wrap">
-        <div class="chart-status" id="inv-status">Loading…</div>
-        <img
-          id="inventory-card"
-          class="card-img"
-          alt="Inventory chart card: observable idle GPUs through the day"
-        />
-      </div>
-    </section>
-
-    <section class="legend-section">
-      <header class="legend-head">
-        <span class="sec-kicker-label">BREAKOUTS · LATEST DAY</span>
-        <span class="sec-note" id="breakout-note">cells with fewer than 2 sources are not drawn</span>
-      </header>
-      <div class="table-wrap">
-        <table class="data" id="breakout-table">
-          <thead>
-            <tr>
-              <th>Scope</th>
-              <th class="num">Sources</th>
-              <th class="num">Sold out · any config</th>
-              <th class="num">Sold out · 8× node</th>
-            </tr>
-          </thead>
-          <tbody id="breakout-tbody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="legend-section">
-      <header class="legend-head">
-        <span class="sec-kicker-label">PANEL · PER-SOURCE DETAIL</span>
-        <span class="sec-note" id="source-note">—</span>
-      </header>
-      <div class="table-wrap">
-        <table class="data" id="source-table">
-          <thead>
-            <tr>
-              <th>Source</th>
-              <th>Operator class</th>
-              <th>Geo</th>
-              <th>Signal</th>
-              <th>Since</th>
-              <th class="num">Sold out · any</th>
-              <th class="num">Sold out · 8×</th>
-            </tr>
-          </thead>
-          <tbody id="source-tbody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <p class="footnote">
-      <strong>Supply tightness</strong> is a diffusion-style read — like a purchasing-managers index, it measures how WIDESPREAD tightness is, not its level; the utilization level lives where machine state is observable (Vast overlay). The underlying stockout rate = share of observed collection windows in
-      which a source showed zero posted availability for the chip; the
-      denominator is windows actually observed (~7–10 per day), never
-      wall-clock hours. Each named source contributes one vote per day
-      (source-equal mean), mirroring the operator-equal discipline of the
-      reference rates. The <strong>8× node</strong> line counts only instance
-      shapes of 8 GPUs or more; sources whose APIs disclose no such shape are
-      excluded from it and ride the any-configuration line only. Utilization
-      here is stratified by <strong>operator class</strong>; the reference
-      rates are stratified per-SKU — an operator's class and a specific SKU's
-      tier can differ. AWS's signal is a capacity <em>score</em> (Spot
-      Placement Score), structurally more optimistic than bookable-stock
-      checks — see the signal column. The <strong>inventory chart</strong> is a
-      level, not a share: the sum of integer idle-GPU counts over a fixed panel
-      of count-disclosing sources (most providers disclose no fleet total, so
-      no panel-wide percentage exists). Its dashed companion is the
-      shape-weighted availability share — an in-stock 8× listing counts eight
-      times a 1× — weighted by listed SKU shapes, not fleet. History begins on
-      the first day the availability panel collected intraday cycles; earlier
-      periods are not backfilled.
-    </p>
+    <details class="method-details">
+      <summary>Methodology</summary>
+      <p class="method">
+        Each source's window rate is its share of hourly capacity-probes that
+        found stock, count-weighted within source; the headline is the
+        source-equal <em>median</em> across the panel (manipulation-resistant),
+        shown as Fractional (any shape) and Cluster (full 8-GPU node). Utilization
+        is a separate measured depth metric — never blended into availability.
+      </p>
+    </details>
   </section>
 
   <script>
-    import {
-      fetchImplied, fetchSources, fetchMacro, operatorClassLabel, cardUrl,
-      type UtilChipId, type ImpliedRow, type SourceRow, type MacroRow,
-    } from '../data/utilization';
+    import Chart from 'chart.js/auto';
 
-    const DEFAULT_CHIP: UtilChipId = 'h100-sxm';
-    const MIN_SOURCES = 2;
+    const DEFAULT_CHIP = 'h100-sxm';
+    // Plain category x-axis with pre-formatted date labels — no time adapter, so
+    // nothing to break. autoSkip thins the labels as the range grows.
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const fmtDate = (iso) => { const p = String(iso).split('-'); return p.length === 3 ? `${MONTHS[+p[1]-1]} ${+p[2]}` : iso; };
+    const catAxis = (ink) => ({
+      ticks: { color: ink, autoSkip: true, maxTicksLimit: 7, maxRotation: 0,
+               font: { family: 'IBM Plex Mono', size: 10 } },
+      grid: { display: false },
+    });
+    const $ = (id) => document.getElementById(id);
+    const pct = (v) => (v == null || isNaN(v)) ? '—' : (v * 100).toFixed(0) + '%';
+    const ACCENT = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff9100';
+    const TEAL = '#4cc4b0';
+    const css = (n, f) => (getComputedStyle(document.documentElement).getPropertyValue(n).trim() || f);
 
-    const state = {
-      chip: DEFAULT_CHIP as UtilChipId,
-      cache: new Map<UtilChipId, ImpliedRow[] | null>(),
-      sources: null as SourceRow[] | null,
-      macro: null as MacroRow[] | null,
+    // tiny CSV parser (numeric/clean fields only)
+    async function loadCsv(path) {
+      try {
+        const r = await fetch(path, { cache: 'no-cache' });
+        if (!r.ok) return null;
+        const txt = (await r.text()).trim();
+        if (!txt) return null;
+        const [head, ...lines] = txt.split(/\r?\n/);
+        const cols = head.split(',');
+        return lines.map((ln) => {
+          const cells = ln.split(',');
+          const o = {};
+          cols.forEach((c, i) => (o[c] = cells[i]));
+          return o;
+        });
+      } catch { return null; }
+    }
+
+    const num = (x) => (x === '' || x == null ? null : Number(x));
+    let trendChart, utilChart;
+    const state = { headline: null, sources: null, util: null, trend: {}, vtrend: {} };
+    // fixed per-chip colors for the multi-chip overlays (readable on both themes).
+    const CHIP_COLORS = {
+      'h100-sxm': '#ff9100', 'a100-sxm-80gb': '#14b8a6', 'b200-sxm': '#8b5cf6',
+      'h200-sxm': '#3b82f6', 'gb200': '#ec4899',
     };
+    const colorFor = (slug) => CHIP_COLORS[slug] || ACCENT;
 
-    const tightImg = document.getElementById('tightness-card') as HTMLImageElement;
-    const tightStatus = document.getElementById('chart-status') as HTMLDivElement;
-    const invImg = document.getElementById('inventory-card') as HTMLImageElement;
-    const invStatus = document.getElementById('inv-status') as HTMLDivElement;
-    const macroStrip = document.getElementById('macro-strip') as HTMLElement;
-    const breakoutTbody = document.getElementById('breakout-tbody') as HTMLElement;
-    const sourceTbody = document.getElementById('source-tbody') as HTMLElement;
-    const sourceNote = document.getElementById('source-note') as HTMLElement;
-
-    const AS_OF = tightImg.dataset.asOf ?? '';
-
-    const pct = (v: number | null) => (v === null ? '—' : (v * 100).toFixed(0) + '%');
-
-    // -----------------------------------------------------------------------
-    // Pipeline-rendered chart cards (themed PNGs; swap on chip + theme change)
-    // -----------------------------------------------------------------------
-
-    function currentTheme(): string {
-      return document.documentElement.getAttribute('data-theme') || 'editorial';
+    function gradient(ctx, color) {
+      const g = ctx.createLinearGradient(0, 0, 0, 260);
+      g.addColorStop(0, color + '55');
+      g.addColorStop(1, color + '05');
+      return g;
     }
 
-    function wireCard(img: HTMLImageElement, statusEl: HTMLElement) {
-      img.addEventListener('load', () => {
-        img.style.visibility = 'visible';
-        statusEl.style.display = 'none';
-      });
-      img.addEventListener('error', () => {
-        img.style.visibility = 'hidden';
-        statusEl.style.display = 'flex';
-        statusEl.textContent =
-          'Card not yet published for this chip — falls back to tomorrow’s run.';
-      });
+    // lazy-load + cache a per-chip trend CSV
+    async function avTrend(chip) {
+      if (state.trend[chip] === undefined) state.trend[chip] = await loadCsv(`/data/availability_index_trend_${chip}.csv`);
+      return state.trend[chip] || [];
     }
-    wireCard(tightImg, tightStatus);
-    wireCard(invImg, invStatus);
-
-    function refreshCards() {
-      const theme = currentTheme();
-      const cards: Array<['tightness' | 'inventory', HTMLImageElement, HTMLElement]> = [
-        ['tightness', tightImg, tightStatus],
-        ['inventory', invImg, invStatus],
-      ];
-      for (const [family, img, statusEl] of cards) {
-        statusEl.style.display = 'flex';
-        statusEl.textContent = 'Loading…';
-        img.style.visibility = 'hidden';
-        img.src = cardUrl(family, state.chip, theme, AS_OF);
-      }
+    async function vuTrend(vast) {
+      if (state.vtrend[vast] === undefined) state.vtrend[vast] = await loadCsv(`/data/vast_utilization_trend_${vast}.csv`);
+      return state.vtrend[vast] || [];
     }
+    const mapByDate = (rows, key) => { const m = {}; (rows || []).forEach((r) => (m[r.as_of_date] = num(r[key]))); return m; };
+    const unionDates = (lists) => [...new Set(lists.flat().map((r) => r.as_of_date))].sort();
 
-    // Re-fetch the matching theme variant when the site theme toggles.
-    new MutationObserver(() => refreshCards()).observe(document.documentElement, {
-      attributes: true, attributeFilter: ['data-theme'],
+    const baseLineOpts = (ink, gridc) => ({
+      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      scales: {
+        y: { min: 0, max: 100, ticks: { color: ink, callback: (v) => v + '%', font: { family: 'IBM Plex Mono' } }, grid: { color: gridc } },
+        x: catAxis(ink),
+      },
+      plugins: {
+        legend: { display: true, position: 'top', align: 'end',
+          labels: { color: ink, boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'line', font: { family: 'IBM Plex Mono', size: 11 } } },
+        tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.parsed.y == null ? '—' : c.parsed.y.toFixed(0) + '%'}` } },
+      },
     });
 
-    function renderMacro() {
-      const m = (state.macro ?? []).filter((r) => r.chip_slug === state.chip);
-      if (m.length === 0) { macroStrip.hidden = true; return; }
-      const latest = m[m.length - 1];
-      macroStrip.hidden = false;
-      (document.getElementById('macro-breadth') as HTMLElement).textContent =
-        latest.n_providers_8x_pool > 0
-          ? `${latest.n_providers_stocked_out_8x} of ${latest.n_providers_8x_pool}`
-          : '—';
-      const idleEl = document.getElementById('macro-idle') as HTMLElement;
-      const idleLbl = document.getElementById('macro-idle-lbl') as HTMLElement;
-      if (latest.idle_gpus_observable !== null) {
-        idleEl.textContent = latest.idle_gpus_observable.toLocaleString('en-US') + ' GPUs';
-        idleLbl.textContent = `observable idle supply (${latest.n_inventory_sources} count-disclosing sources)`;
-      } else {
-        idleEl.textContent = '—';
-      }
-      (document.getElementById('macro-occ') as HTMLElement).textContent =
-        latest.marketplace_implied_utilization !== null
-          ? pct(latest.marketplace_implied_utilization)
-          : 'view';
+    function renderBand(chip) {
+      const h = (state.headline || []).find((r) => r.chip_slug === chip && r.scope === 'global');
+      $('s-frac').textContent = h ? pct(num(h.pct_available_median)) : '—';
+      $('s-clu').textContent = h ? pct(num(h.pct_available_8x_median)) : '—';
+      $('s-srcs').textContent = h ? h.n_sources : '—';
+      $('s-srcs-sub').textContent = h && Number(h.n_sources_thin) > 0
+        ? `${h.n_sources_thin} warming up` : 'venues probed';
+      const badge = $('confbadge');
+      if (h) { badge.textContent = h.confidence === 'thin' ? 'thin panel' : 'market read';
+               badge.className = 'confbadge ' + (h.confidence === 'thin' ? 'thin' : 'ok'); }
+      else badge.textContent = '';
     }
 
-    function renderBreakouts(rows: ImpliedRow[]) {
-      const dates = rows.map((r) => r.as_of_date).sort();
-      const latest = dates[dates.length - 1];
-      const day = rows.filter((r) => r.as_of_date === latest && r.scope !== 'global');
-      const shown = day.filter((r) => r.n_sources >= MIN_SOURCES);
-      breakoutTbody.innerHTML = shown.map((r) => {
-        const label = r.scope.startsWith('tier:')
-          ? operatorClassLabel(r.scope.slice(5))
-          : r.scope.replace('geo:', 'Geography · ');
-        const e8 = r.n_sources_8x > 0 ? pct(r.stockout_8x_mean) : '<span class="dim">—</span>';
-        return '<tr>' +
-          `<td>${label}</td>` +
-          `<td class="num">${r.n_sources}</td>` +
-          `<td class="num">${pct(r.stockout_any_mean)}</td>` +
-          `<td class="num">${e8}</td>` +
-        '</tr>';
-      }).join('') || '<tr><td colspan="4" class="dim">No breakout cell reaches the 2-source floor yet.</td></tr>';
-    }
-
-    function renderSources() {
-      const rows = (state.sources ?? []).filter((r) => r.chip_slug === state.chip);
-      sourceNote.textContent = `${rows.length} sources · ${state.chip}`;
-      sourceTbody.innerHTML = rows.map((r) => {
-        const e8 = r.shape_disclosed
-          ? `<td class="num">${pct(r.stockout_8x)}</td>`
-          : '<td class="num dim">no shape ≥8 disclosed</td>';
-        const sig = r.signal_type === 'score'
-          ? '<span class="sig-warn">score</span>' : r.signal_type;
-        return '<tr>' +
-          `<td><code>${r.source}</code></td>` +
-          `<td>${r.operator_class}</td>` +
-          `<td>${r.geo_buckets}</td>` +
-          `<td>${sig}</td>` +
-          `<td>${r.series_start}</td>` +
-          `<td class="num">${pct(r.stockout_any)}</td>` +
-          e8 +
-        '</tr>';
+    function renderPanel(chip) {
+      const rows = (state.sources || []).filter((r) => r.chip_slug === chip)
+        .sort((a, b) => num(b.pct_available) - num(a.pct_available));
+      const el = $('panel');
+      const cnt = $('panel-count'); if (cnt) cnt.textContent = rows.length ? `${rows.length} sources` : '';
+      if (!rows.length) { el.innerHTML = '<div class="empty">Panel warming up.</div>'; return; }
+      el.innerHTML = rows.map((r) => {
+        const p = num(r.pct_available) * 100;
+        const name = r.source.startsWith('shadeform:') ? r.source.slice(10) + ' ·sf' : r.source.replace(/_caps|_stocks/, '');
+        const c8 = r.pct_available_8x === '' || r.pct_available_8x == null ? '' : `<span class="bar-8x">8× ${(num(r.pct_available_8x)*100).toFixed(0)}%</span>`;
+        return `<div class="row">
+          <span class="row-name" title="${r.signal_type}">${name}</span>
+          <span class="row-bar"><span class="row-fill" style="width:${p.toFixed(0)}%"></span></span>
+          <span class="row-pct">${p.toFixed(0)}%</span>${c8}</div>`;
       }).join('');
     }
 
-    async function refresh() {
-      refreshCards();
-      if (!state.cache.has(state.chip)) {
-        try {
-          state.cache.set(state.chip, await fetchImplied(state.chip));
-        } catch { state.cache.set(state.chip, null); }
+    function renderTrend(selected, dates, trends) {
+      const empty = $('trend-empty');
+      const ctx = $('trendChart').getContext('2d');
+      if (!dates.length) { empty.hidden = false; if (trendChart) { trendChart.destroy(); trendChart = null; } return; }
+      empty.hidden = true;
+      const labels = dates.map(fmtDate);
+      const ink = css('--ink-dim', '#9a9991');
+      const grid = css('--rule', '#2a2a2a') + '44';
+      const series = (rows, key) => { const m = mapByDate(rows, key); return dates.map((d) => (m[d] == null ? null : m[d] * 100)); };
+      let datasets;
+      if (selected.length === 1) {
+        const c = colorFor(selected[0].slug);
+        datasets = [
+          { label: 'Fractional', data: series(trends[selected[0].slug], 'pct_available_median'), borderColor: css('--ink-faint', '#8e8a82'), borderWidth: 1.25, borderDash: [4, 3], fill: false, tension: 0.3, pointRadius: 0, pointHoverRadius: 3, order: 2 },
+          { label: 'Cluster (8×)', data: series(trends[selected[0].slug], 'pct_available_8x_median'), borderColor: c, backgroundColor: gradient(ctx, c), borderWidth: 2.75, fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 5, order: 1 },
+        ];
+        $('trend-mode').textContent = 'Cluster (8×) vs Fractional.';
+      } else {
+        datasets = selected.map((ch) => ({
+          label: ch.label, data: series(trends[ch.slug], 'pct_available_8x_median'),
+          borderColor: colorFor(ch.slug), borderWidth: 2.25, fill: false, tension: 0.3, pointRadius: 0, pointHoverRadius: 4,
+        }));
+        $('trend-mode').textContent = 'Cluster (8×) availability by chip.';
       }
-      if (state.sources === null) {
-        try { state.sources = await fetchSources(); } catch { state.sources = []; }
-      }
-      if (state.macro === null) {
-        try { state.macro = await fetchMacro(); } catch { state.macro = []; }
-      }
-
-      const rows = state.cache.get(state.chip) ?? [];
-      if (rows.length === 0) {
-        breakoutTbody.innerHTML = '';
-        sourceTbody.innerHTML = '';
-        macroStrip.hidden = true;
-        return;
-      }
-      renderMacro();
-      renderBreakouts(rows);
-      renderSources();
+      const cfg = { type: 'line', data: { labels, datasets }, options: baseLineOpts(ink, grid) };
+      try {
+        if (trendChart) { trendChart.data = cfg.data; trendChart.update(); }
+        else trendChart = new Chart(ctx, cfg);
+      } catch (err) { empty.hidden = false; empty.textContent = 'CHART ERR: ' + (err && err.message ? err.message : String(err)); }
     }
 
-    function syncPills() {
-      document.querySelectorAll<HTMLButtonElement>('#chip-pills .pill').forEach((p) => {
-        p.classList.toggle('on', p.dataset.chip === state.chip);
+    function renderUtil(selected, dates, vtrends) {
+      const primary = selected[0];
+      const u = (state.util || []).find((r) => r.chip_slug === primary.vast);
+      $('u-now').textContent = u ? pct(num(u.utilization)) : '—';
+      $('u-now-lbl').textContent = `${primary.label} · trailing 7-day occupancy`;
+      const empty = $('util-empty');
+      const ctx = $('utilChart').getContext('2d');
+      const anyData = selected.some((ch) => (vtrends[ch.vast] || []).length);
+      if (!anyData || !dates.length) { empty.hidden = false; if (utilChart) { utilChart.destroy(); utilChart = null; } return; }
+      empty.hidden = true;
+      const labels = dates.map(fmtDate);
+      const ink = css('--ink-dim', '#9a9991');
+      const single = selected.length === 1;
+      const datasets = selected.map((ch) => {
+        const m = mapByDate(vtrends[ch.vast], 'utilization');
+        const c = colorFor(ch.slug);
+        return { label: ch.label, data: dates.map((d) => (m[d] == null ? null : m[d] * 100)),
+          borderColor: c, backgroundColor: single ? gradient(ctx, c) : 'transparent', borderWidth: 2.5, fill: single, tension: 0.3, pointRadius: 0, pointHoverRadius: 5, spanGaps: false };
+      });
+      const cfg = { type: 'line', data: { labels, datasets }, options: baseLineOpts(ink, css('--rule', '#2a2a2a') + '33') };
+      try {
+        if (utilChart) { utilChart.data = cfg.data; utilChart.update(); }
+        else utilChart = new Chart(ctx, cfg);
+      } catch (err) { empty.hidden = false; empty.textContent = 'CHART ERR: ' + (err && err.message ? err.message : String(err)); }
+    }
+
+    async function renderAll(selected) {
+      const primary = selected[0];
+      renderBand(primary.slug);
+      renderPanel(primary.slug);
+      const trends = {}, vtrends = {};
+      await Promise.all(selected.map(async (ch) => {
+        trends[ch.slug] = await avTrend(ch.slug);
+        vtrends[ch.vast] = await vuTrend(ch.vast);
+      }));
+      let dates = unionDates([...Object.values(trends), ...Object.values(vtrends)]);
+      // Trim the left edge to the first day where every displayed series has data
+      // ("full data"), so there's no empty/partial leading region. Both charts
+      // share this start, so they stay vertically aligned.
+      const maps = [];
+      selected.forEach((ch) => {
+        maps.push(mapByDate(trends[ch.slug], 'pct_available_8x_median'));
+        if (selected.length === 1) maps.push(mapByDate(trends[ch.slug], 'pct_available_median'));
+        maps.push(mapByDate(vtrends[ch.vast], 'utilization'));
+      });
+      const firsts = maps.map((m) => dates.find((d) => m[d] != null)).filter(Boolean);
+      if (firsts.length) { const start = firsts.reduce((a, b) => (a > b ? a : b)); dates = dates.filter((d) => d >= start); }
+      renderTrend(selected, dates, trends);
+      renderUtil(selected, dates, vtrends);
+    }
+
+    function init() {
+      Promise.all([
+        loadCsv('/data/availability_index_headline.csv'),
+        loadCsv('/data/availability_index_sources.csv'),
+        loadCsv('/data/vast_utilization.csv'),
+      ]).then(([h, s, u]) => {
+        state.headline = h; state.sources = s; state.util = u;
+        const tabs = Array.from(document.querySelectorAll('.chip'));
+        const meta = (slug) => { const t = tabs.find((x) => x.dataset.chip === slug); return t ? { slug, vast: t.dataset.vast, label: t.textContent.trim() } : null; };
+        let selected = [DEFAULT_CHIP];
+        const apply = () => {
+          tabs.forEach((t) => {
+            const on = selected.includes(t.dataset.chip);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+            const c = on ? (CHIP_COLORS[t.dataset.chip] || '') : '';
+            t.style.background = c; t.style.borderColor = c; t.style.color = on ? '#0b0c0e' : '';
+          });
+          renderAll(selected.map(meta).filter(Boolean));
+        };
+        tabs.forEach((t) => t.addEventListener('click', () => {
+          const slug = t.dataset.chip;
+          if (selected.includes(slug)) { if (selected.length > 1) selected = selected.filter((s2) => s2 !== slug); }
+          else selected = [...selected, slug];
+          apply();
+        }));
+        apply();
       });
     }
-
-    document.getElementById('chip-pills')!.addEventListener('click', (ev) => {
-      const pill = (ev.target as HTMLElement).closest<HTMLButtonElement>('.pill');
-      if (!pill || !pill.dataset.chip) return;
-      state.chip = pill.dataset.chip as UtilChipId;
-      syncPills();
-      refresh();
-    });
-
-    syncPills();
-    refresh();
+    init();
   </script>
 
   <style>
-    /* Reuses the .vast-page chrome (see marketplace.astro for the canonical
-       copy of this block — Astro styles are per-route, so the shared chrome
-       is inlined per page by convention). */
-    .vast-page.top { padding-top: 24px; }
-    .vast-page > .kicker { color: var(--accent); letter-spacing: 0.14em; margin-bottom: 4px; }
-    .vast-page h1 {
-      font-family: var(--font-display);
-      font-size: var(--fs-xl);
-      margin: 0 0 10px;
-      letter-spacing: -0.01em;
-      line-height: 1.1;
-    }
-    .vast-page .ticker-strip {
-      display: flex; flex-wrap: wrap; align-items: stretch;
-      border: 1px solid var(--rule-2); background: var(--vast-panel-bg);
-      margin: 0 0 18px; font-family: var(--font-mono);
-    }
-    .vast-page .tk-cell {
-      display: flex; align-items: baseline; gap: 8px;
-      padding: 7px 14px; border-right: 1px solid var(--rule); flex: 0 0 auto;
-    }
-    .vast-page .tk-cell:last-child { border-right: 0; }
-    .vast-page .tk-lbl {
-      font-size: calc(var(--fs-xs) - 1px); color: var(--ink-dim);
-      text-transform: uppercase; letter-spacing: 0.10em; font-weight: var(--weight-strong);
-    }
-    .vast-page .tk-val {
-      font-size: var(--fs-sm); color: var(--ink);
-      font-variant-numeric: tabular-nums; font-weight: var(--weight-strong);
-    }
-    .vast-page .tk-status { margin-left: auto; gap: 6px; }
-    .vast-page .tk-status .tk-val { color: var(--pos); letter-spacing: 0.10em; }
-    .vast-page .tk-dot {
-      width: 7px; height: 7px; background: var(--pos);
-      box-shadow: 0 0 6px var(--pos); display: inline-block;
-      border-radius: 50%; animation: vast-pulse 2.4s ease-in-out infinite;
-    }
-    @keyframes vast-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-    .vast-page .lede { max-width: 80ch; margin: 4px 0 22px; }
-    .vast-page .lede a { color: var(--accent); }
-    .vast-page .controls {
-      background: var(--vast-panel-bg); border: 1px solid var(--rule);
-      padding: 12px 14px; margin-bottom: 18px;
-      display: flex; flex-direction: column; gap: 10px;
-    }
-    .vast-page .control-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-    .vast-page .control-label {
-      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
-      text-transform: uppercase; letter-spacing: var(--tracking-eye);
-      font-weight: var(--weight-strong); min-width: 56px;
-    }
-    .vast-page .pill-group { display: flex; flex-wrap: wrap; gap: 5px; }
-    .vast-page .pill {
-      font-family: var(--font-mono); font-size: var(--fs-xs);
-      letter-spacing: 0.04em; text-transform: uppercase;
-      background: var(--surface); color: var(--ink-dim);
-      border: 1px solid var(--rule-2); padding: 5px 10px;
-      cursor: pointer; border-radius: 0; font-weight: var(--weight-strong);
-    }
-    .vast-page .pill:hover { color: var(--ink); border-color: var(--accent); }
-    .vast-page .pill.on {
-      color: var(--accent); border-color: var(--accent);
-      background: color-mix(in srgb, var(--accent) 8%, transparent);
-    }
-    /* Macro trio strip */
-    .vast-page .macro-strip {
-      display: flex; flex-wrap: wrap; gap: 0;
-      border: 1px solid var(--rule-2); background: var(--vast-panel-bg);
-      margin-bottom: 18px;
-    }
-    .vast-page .macro-cell {
-      display: flex; flex-direction: column; gap: 2px;
-      padding: 10px 16px; border-right: 1px solid var(--rule);
-      flex: 1 1 200px; min-width: 180px;
-    }
-    .vast-page .macro-cell:last-child { border-right: 0; }
-    .vast-page .macro-val {
-      font-family: var(--font-mono); font-size: var(--fs-lg);
-      color: var(--ink); font-variant-numeric: tabular-nums;
-      font-weight: var(--weight-strong);
-    }
-    .vast-page .macro-val a { color: var(--accent); text-decoration: none; }
-    .vast-page .macro-lbl {
-      font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.08em;
-    }
+    .ai-page { max-width: 1040px; }
+    .kicker { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .18em; color: var(--accent); margin-bottom: .4rem; }
+    .ai-page h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; margin: 0 0 .6rem; }
+    .deck { max-width: 64ch; color: var(--ink-dim); line-height: 1.6; margin: 0 0 1.8rem; }
+    .deck strong { color: var(--ink); font-weight: 600; }
 
-    .vast-page .chart-wrap {
-      position: relative; border: 1px solid var(--rule);
-      background: var(--vast-panel-bg); padding: 14px;
-      margin-bottom: 12px; border-radius: 0;
-    }
-    /* Pipeline-rendered 1440x810 card: aspect-ratio reserves the panel
-       height before (or without) a loaded image, so the status overlay
-       has a box to center in. */
-    .vast-page .card-img {
-      display: block; width: 100%; height: auto; aspect-ratio: 16 / 9;
-    }
-    .vast-page .chart-wrap-hero {
-      background: var(--vast-panel-bg-hero); border-color: var(--rule-2);
-      border-left-width: 3px; border-left-color: var(--accent);
-    }
-    .vast-page .chart-status {
-      position: absolute; inset: 0; display: flex; align-items: center;
-      justify-content: center; font-family: var(--font-mono);
-      font-size: var(--fs-sm); color: var(--ink-dim);
-      background: color-mix(in srgb, var(--vast-panel-bg-hero) 80%, transparent);
-      pointer-events: none; padding: 0 24px; text-align: center;
-    }
+    .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
+    .chip { font-family: var(--font-mono); font-size: .8rem; padding: .4rem .9rem; border: 1px solid var(--rule); background: transparent; color: var(--ink-dim); border-radius: 999px; cursor: pointer; transition: all .15s; }
+    .chip:hover { color: var(--ink); border-color: var(--ink-faint); }
+    .chip[aria-selected='true'] { background: var(--accent); color: #0b0c0e; border-color: var(--accent); font-weight: 600; }
+    .chip-hint { font-family: var(--font-mono); font-size: .68rem; color: var(--ink-faint); align-self: center; margin-left: .3rem; }
 
-    .vast-page .legend-section { margin-top: 14px; }
-    .vast-page .legend-head {
-      display: flex; align-items: baseline; gap: 10px;
-      margin-bottom: 8px; flex-wrap: wrap;
-    }
-    .vast-page .sec-kicker-label {
-      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
-      text-transform: uppercase; letter-spacing: 0.14em;
-      font-weight: var(--weight-strong); padding-left: 4px;
-      border-left: 1px solid var(--rule-2); padding-right: 2px;
-    }
-    .vast-page .sec-note {
-      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
-      letter-spacing: 0.04em; margin-left: auto;
-    }
-    .vast-page .table-wrap {
-      border: 1px solid var(--rule); background: var(--vast-panel-bg);
-      overflow-x: auto;
-    }
-    .vast-page .data {
-      width: 100%; border-collapse: collapse;
-      font-family: var(--font-mono); font-size: var(--fs-sm);
-    }
-    .vast-page .data th, .vast-page .data td {
-      padding: var(--vast-cell-y) var(--vast-cell-x);
-      border-bottom: 1px solid var(--rule); text-align: left;
-      vertical-align: middle; height: var(--vast-row-h);
-      font-variant-numeric: tabular-nums;
-    }
-    .vast-page .data th + th, .vast-page .data td + td { border-left: 1px solid var(--rule); }
-    .vast-page .data th {
-      background: var(--surface-3); font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px); color: var(--ink-dim);
-      text-transform: uppercase; letter-spacing: 0.10em;
-      font-weight: var(--weight-strong); border-bottom: 1px solid var(--rule-2);
-      white-space: nowrap;
-    }
-    .vast-page .data td.num, .vast-page .data th.num { text-align: right; }
-    .vast-page .data td.dim, .vast-page .data .dim { color: var(--ink-dim); }
-    .vast-page .data tbody tr:nth-child(even) td { background: var(--vast-row-stripe); }
-    .vast-page .data tbody tr:hover td { background: var(--surface-3); }
-    .vast-page .data code {
-      font-family: var(--font-mono); font-size: var(--fs-sm);
-      color: var(--ink); letter-spacing: 0.02em;
-    }
-    .vast-page .sig-warn { color: var(--vast-warn, #d68a2a); }
+    .band { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 1.6rem; }
+    .stat { background: var(--bg); padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: .25rem; }
+    .stat-lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-faint); }
+    .stat-val { font-family: var(--font-mono); font-size: 2rem; font-weight: 600; line-height: 1; color: var(--ink); }
+    .stat-clu .stat-val { color: var(--accent); }
+    .stat-frac .stat-val { color: var(--ink-dim); }
+    .stat-clu { background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
+    .stat-sub { font-size: .68rem; color: var(--ink-faint); }
 
-    .vast-page .footnote {
-      font-family: var(--font-body); font-size: var(--fs-xs); color: var(--ink-dim);
-      margin: 14px 0 0; padding: 10px 14px;
-      background: var(--vast-panel-bg); border-left: 2px solid var(--neutral);
-      max-width: 80ch; line-height: 1.55;
-    }
+    .card { border: 1px solid var(--rule); border-radius: 12px; padding: 1.4rem; margin-bottom: 1.6rem; background: color-mix(in srgb, var(--ink) 2%, transparent); }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+    .card h2 { font-family: var(--font-display); font-size: 1.3rem; margin: 0 0 .2rem; }
+    .card-sub { font-size: .82rem; color: var(--ink-dim); margin: 0; }
+    .tag { font-family: var(--font-mono); font-size: .6rem; text-transform: uppercase; letter-spacing: .1em; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); padding: .15rem .5rem; border-radius: 4px; vertical-align: middle; margin-left: .4rem; }
+    .lg { font-family: var(--font-mono); font-size: .78rem; padding-left: 1.1rem; position: relative; }
+    .lg::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: .7rem; height: .2rem; border-radius: 2px; }
+    .lg-clu::before { background: var(--accent); width: .9rem; height: .26rem; }
+    .lg-frac::before { background: var(--ink-faint); }
+    .lg-fix::before { background: var(--accent); width: .9rem; height: .26rem; }
+    .lg-naive::before { background: var(--ink-faint); }
+
+    .chart-wrap { position: relative; height: 300px; }
+    .util-wrap { height: 240px; }
+    .empty { text-align: center; color: var(--ink-faint); font-size: .85rem; padding: 2rem 0; }
+
+    .confbadge { font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; padding: .25rem .6rem; border-radius: 999px; white-space: nowrap; }
+    .confbadge.ok { background: color-mix(in srgb, #4cc4b0 18%, transparent); color: #4cc4b0; }
+    .confbadge.thin { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+
+    .panel-card { padding: 0; }
+    .panel-card > summary { list-style: none; cursor: pointer; padding: 1.2rem 1.4rem; display: grid; grid-template-columns: 1fr auto; grid-template-areas: 'main chev' 'sub chev'; align-items: center; gap: .15rem .8rem; }
+    .panel-card > summary::-webkit-details-marker { display: none; }
+    .sum-main { grid-area: main; display: flex; align-items: baseline; gap: .6rem; }
+    .sum-main h2 { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
+    .sum-count { font-family: var(--font-mono); font-size: .78rem; color: var(--accent); }
+    .sum-sub { grid-area: sub; font-size: .82rem; color: var(--ink-dim); }
+    .sum-chev { grid-area: chev; color: var(--ink-faint); font-size: 1rem; transition: transform .2s; }
+    .panel-card[open] .sum-chev { transform: rotate(180deg); }
+    .panel-card[open] > summary { border-bottom: 1px solid var(--rule); }
+    .panel { display: flex; flex-direction: column; gap: .35rem; padding: 1.2rem 1.4rem; }
+    .row { display: grid; grid-template-columns: 9rem 1fr 2.6rem auto; align-items: center; gap: .7rem; font-family: var(--font-mono); font-size: .78rem; }
+    .row-name { color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-bar { height: .55rem; background: color-mix(in srgb, var(--ink) 8%, transparent); border-radius: 3px; overflow: hidden; }
+    .row-fill { display: block; height: 100%; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 55%, transparent), var(--accent)); border-radius: 3px; }
+    .row-pct { text-align: right; color: var(--ink); }
+    .bar-8x { font-size: .64rem; color: var(--ink-faint); }
+    .foot { font-size: .72rem; color: var(--ink-faint); line-height: 1.5; margin: 1rem 0 0; }
+    .panel-card .foot { padding: 0 1.4rem 1.3rem; margin-top: .2rem; }
+
+    .util-grid { display: grid; grid-template-columns: 200px 1fr; gap: 1.5rem; align-items: center; }
+    .util-now { display: flex; flex-direction: column; gap: .2rem; }
+    .util-big { font-family: var(--font-mono); font-size: 3rem; font-weight: 600; line-height: 1; color: var(--accent); }
+    .util-now-lbl { font-size: .72rem; color: var(--ink-dim); }
+    .util-naive { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-faint); margin-top: .3rem; }
+
+    .method-details { border-top: 1px solid var(--rule); padding-top: 1rem; }
+    .method-details > summary { list-style: none; cursor: pointer; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+    .method-details > summary::-webkit-details-marker { display: none; }
+    .method-details > summary::before { content: '▸ '; }
+    .method-details[open] > summary::before { content: '▾ '; }
+    .method { font-size: .76rem; color: var(--ink-faint); line-height: 1.65; max-width: 70ch; margin: .8rem 0 0; }
+    .method em { color: var(--ink-dim); font-style: italic; }
 
     @media (max-width: 720px) {
-      .vast-page .control-row { gap: 8px; }
-      .vast-page .control-label { min-width: 0; }
-      .vast-page .chart-wrap { padding: 10px; }
-      .vast-page .ticker-strip {
-        flex-wrap: nowrap; overflow-x: auto;
-        scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
-      }
-      .vast-page .tk-cell { scroll-snap-align: start; padding: 6px 10px; gap: 6px; }
-      .vast-page .tk-status {
-        position: sticky; right: 0; margin-left: auto;
-        background: var(--vast-panel-bg); border-left: 1px solid var(--rule-2);
-      }
-      .vast-page .legend-head { flex-direction: column; align-items: flex-start; gap: 6px; }
-      .vast-page .legend-head .sec-note { margin-left: 0; font-size: calc(var(--fs-xs) - 1px); }
-      .vast-page h1 { font-size: calc(var(--fs-xl) - 2px); }
-      .vast-page .macro-cell { flex: 1 1 100%; border-right: 0; border-bottom: 1px solid var(--rule); }
-      .vast-page .macro-cell:last-child { border-bottom: 0; }
-    }
-    @media (max-width: 480px) {
-      .vast-page .chart-wrap { padding: 8px; }
-      .vast-page .data { font-size: calc(var(--fs-sm) - 1px); }
-      .vast-page .tk-cell { padding: 6px 8px; }
+      .band { grid-template-columns: repeat(2, 1fr); }
+      .util-grid { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 7rem 1fr 2.4rem; }
+      .bar-8x { display: none; }
     }
   </style>
 </Base>
