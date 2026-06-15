@@ -1,8 +1,8 @@
 {
   "as_of_date": "2026-06-15",
-  "published_at_ct": "2026-06-15T09:54:54-05:00",
-  "published_at_utc": "2026-06-15T14:54:54+00:00",
-  "run_id": "export-20260615T145448Z-0ce59b04",
+  "published_at_ct": "2026-06-15T16:27:43-05:00",
+  "published_at_utc": "2026-06-15T21:27:43+00:00",
+  "run_id": "export-20260615T212720Z-daeeb00f",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 25,
@@ -17,7 +17,7 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 5342,
+    "total_rows": 5354,
     "window_days": 90,
     "window_end": "2026-06-15",
     "window_start": "2026-03-18"
@@ -101,7 +101,7 @@
     ],
     "imu_series_start": "2026-05-28",
     "intraday_window_days": 30,
-    "n_sources": 12,
+    "n_sources": 13,
     "occupancy_chips": [
       "h100-sxm",
       "h100-pcie",
@@ -111,8 +111,11 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 113,
+    "occupancy_cycles": 114,
     "occupancy_series_start": "2026-05-13",
+    "runpod_occupancy_chips": [],
+    "runpod_occupancy_cycles": 0,
+    "runpod_occupancy_series_start": null,
     "status": "ok",
     "window_days": 90
   }
