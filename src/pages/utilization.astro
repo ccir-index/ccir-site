@@ -60,7 +60,7 @@ const DEFAULT_CHIP = 'h100-sxm';
       <div class="card-head">
         <div>
           <h2>Availability over time</h2>
-          <p class="card-sub">Rolling 7-day source-equal median, last 90 days. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
+          <p class="card-sub">Rolling 7-day source-equal median, from the first market-read day (panel ≥ 3 sources). <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
         </div>
         <div class="confbadge" id="confbadge"></div>
       </div>
@@ -281,7 +281,10 @@ const DEFAULT_CHIP = 'h100-sxm';
       renderPanel(primary.slug);
       const trends = {}, vtrends = {};
       await Promise.all(selected.map(async (ch) => {
-        trends[ch.slug] = await avTrend(ch.slug);
+        // Only plot days the panel is a market read (confidence=ok, ≥3 sources).
+        // The early cold-start days are single-source and whipsaw — the data
+        // flags them thin; we suppress them rather than draw an unreliable line.
+        trends[ch.slug] = (await avTrend(ch.slug)).filter((r) => r.confidence === 'ok');
         vtrends[ch.vast] = await vuTrend(ch.vast);
       }));
       let dates = unionDates([...Object.values(trends), ...Object.values(vtrends)]);
