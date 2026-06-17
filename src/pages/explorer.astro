@@ -168,7 +168,7 @@ const indicativeClient = indicativeRates.map((r) => ({
             <select id="hf-status" data-filter="status">
               <option value="">All statuses</option>
               <option value="Published">Published only</option>
-              <option value="Indicative">Indicative only</option>
+              <option value="Provisional">Provisional only</option>
               <option value="Shadow">Shadow only</option>
             </select>
           </div>
@@ -301,11 +301,11 @@ const indicativeClient = indicativeRates.map((r) => ({
         var rows = HEADLINE.filter(hMatches);
         hMatch.textContent = rows.length;
         hTbody.innerHTML = rows.map(function (r) {
-          var rowCls = r.status === 'Shadow' ? 'shadow' : (r.status === 'Indicative' ? 'indicative' : '');
+          var rowCls = r.status === 'Shadow' ? 'shadow' : (r.status === 'Provisional' ? 'provisional' : '');
           var statusBadge = r.status === 'Shadow'
             ? '<span class="status-badge status-shadow" title="Below 3-source / 5-obs gate">SHD</span>'
-            : (r.status === 'Indicative'
-              ? '<span class="status-badge status-indicative" title="Emerging geo cell — 2 sources; auto-promotes to Published at a 3rd">IND</span>'
+            : (r.status === 'Provisional'
+              ? '<span class="status-badge status-provisional" title="Emerging geo cell — 2 sources; auto-promotes to Published at a 3rd">PROV</span>'
               : '');
           return '<tr class="' + rowCls + '">' +
             '<td class="sid"><code>' + r.id + '</code>' + statusBadge + '</td>' +
@@ -520,7 +520,7 @@ const indicativeClient = indicativeRates.map((r) => ({
     #headline-table td.chip { color: var(--ink); font-weight: var(--weight-strong); }
     #headline-table td.posted { color: var(--ink); font-weight: var(--weight-strong); }
     #headline-table tr.shadow td { opacity: 0.7; }
-    #headline-table tr.indicative td { opacity: 0.9; }
+    #headline-table tr.provisional td { opacity: 0.9; }
 
     .status-badge {
       display: inline-block;
@@ -539,7 +539,7 @@ const indicativeClient = indicativeRates.map((r) => ({
       border-color: color-mix(in srgb, var(--warn) 50%, transparent);
       background: color-mix(in srgb, var(--warn) 12%, transparent);
     }
-    .status-indicative {
+    .status-provisional {
       color: var(--accent);
       border-color: color-mix(in srgb, var(--accent) 50%, transparent);
       background: color-mix(in srgb, var(--accent) 12%, transparent);
