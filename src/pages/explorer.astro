@@ -166,8 +166,9 @@ const indicativeClient = indicativeRates.map((r) => ({
           <div class="fgroup">
             <label for="hf-status">Status</label>
             <select id="hf-status" data-filter="status">
-              <option value="">Published + Shadow</option>
+              <option value="">All statuses</option>
               <option value="Published">Published only</option>
+              <option value="Indicative">Indicative only</option>
               <option value="Shadow">Shadow only</option>
             </select>
           </div>
@@ -300,9 +301,12 @@ const indicativeClient = indicativeRates.map((r) => ({
         var rows = HEADLINE.filter(hMatches);
         hMatch.textContent = rows.length;
         hTbody.innerHTML = rows.map(function (r) {
-          var rowCls = r.status === 'Shadow' ? 'shadow' : '';
+          var rowCls = r.status === 'Shadow' ? 'shadow' : (r.status === 'Indicative' ? 'indicative' : '');
           var statusBadge = r.status === 'Shadow'
-            ? '<span class="status-badge status-shadow" title="Below 3-source / 5-obs gate">SHD</span>' : '';
+            ? '<span class="status-badge status-shadow" title="Below 3-source / 5-obs gate">SHD</span>'
+            : (r.status === 'Indicative'
+              ? '<span class="status-badge status-indicative" title="Emerging geo cell — 2 sources; auto-promotes to Published at a 3rd">IND</span>'
+              : '');
           return '<tr class="' + rowCls + '">' +
             '<td class="sid"><code>' + r.id + '</code>' + statusBadge + '</td>' +
             '<td><span class="tier-badge tier-badge-' + r.tier.toLowerCase() + '">' + r.tier + '</span></td>' +
@@ -516,6 +520,7 @@ const indicativeClient = indicativeRates.map((r) => ({
     #headline-table td.chip { color: var(--ink); font-weight: var(--weight-strong); }
     #headline-table td.posted { color: var(--ink); font-weight: var(--weight-strong); }
     #headline-table tr.shadow td { opacity: 0.7; }
+    #headline-table tr.indicative td { opacity: 0.9; }
 
     .status-badge {
       display: inline-block;
@@ -533,6 +538,11 @@ const indicativeClient = indicativeRates.map((r) => ({
       color: var(--warn);
       border-color: color-mix(in srgb, var(--warn) 50%, transparent);
       background: color-mix(in srgb, var(--warn) 12%, transparent);
+    }
+    .status-indicative {
+      color: var(--accent);
+      border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
     }
 
     td.spark { color: var(--accent); padding: 4px 8px; }
