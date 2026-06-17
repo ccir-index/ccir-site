@@ -136,7 +136,11 @@ export const INT_LABELS: Record<Interruptibility, string> = {
 export const REGION_LABELS: Record<Region, string> = {
   US: 'US',
   EU: 'EU',
-  APAC: 'APAC',
+  // APAC is currently 100% India (E2E/Neysa/Jarvislabs/Cyfuture). Display
+  // annotation only — the region key stays APAC so future non-India APAC
+  // sources (Singapore/Tokyo/…) pool into the same cell. Revert to 'APAC'
+  // when a non-India APAC source lands.
+  APAC: 'APAC · India',
   Other: 'RoW',
   ALL: 'Pooled',
 };
