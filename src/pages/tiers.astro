@@ -32,23 +32,29 @@ function chipDisplay(token: string): string {
     <div class="hero-solo">
       <div class="kicker">Intelligence Factory Taxonomy · {meta.as_of_date}</div>
       <h1>Three Tiers of Intelligence Factory</h1>
-      <p class="standfirst lede">
-        CCIR publishes one independent reference rate per tier so the
-        rate cited in a credit document matches the deployment grade
-        of the collateral pledged.
-      </p>
+      <details class="def-disclosure">
+        <summary>How to read this</summary>
+        <p class="standfirst lede">
+          CCIR publishes one independent reference rate per tier so the
+          rate cited in a credit document matches the deployment grade
+          of the collateral pledged.
+        </p>
+      </details>
     </div>
 
     <section class="ladder-section">
       <header class="lh-head">
         <div class="kicker">Per-Silicon Ladder · On-Demand · {meta.as_of_date}</div>
         <h2>Same chip, three tiers.</h2>
-        <p class="standfirst">
-          Median rate per chip across each Intelligence Factory tier.
-          <em>n</em> is the number of independent operators contributing to
-          that median. An em-dash means the cell has no Published row in
-          today's snapshot.
-        </p>
+        <details class="def-disclosure">
+          <summary>Definitions &amp; methodology</summary>
+          <p class="standfirst">
+            Median rate per chip across each Intelligence Factory tier.
+            <em>n</em> is the number of independent operators contributing to
+            that median. An em-dash means the cell has no Published row in
+            today's snapshot.
+          </p>
+        </details>
       </header>
 
       <div class="table-wrap">
@@ -117,30 +123,36 @@ function chipDisplay(token: string): string {
         <div class="kicker">Classification</div>
         <h2>How the algorithm assigns a tier.</h2>
       </header>
-      <p class="class-body">
-        Tier assignment is per-SKU and grade-based — driven by the
-        capability bundle each SKU exposes, not by which operator hosts
-        it. An interruptible SKU from any operator routes to T3IF; a
-        dedicated-host SKU with top-grade fabric and a full enterprise
-        bundle routes to T1IF; a dedicated-host SKU with mid-grade
-        disclosed fabric routes to T2IF; everything else routes to T3IF.
-        The same operator can therefore appear in two or three tiers
-        across its SKU catalog, depending on what each SKU actually
-        packages.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="class-body">
+          Tier assignment is per-SKU and grade-based — driven by the
+          capability bundle each SKU exposes, not by which operator hosts
+          it. An interruptible SKU from any operator routes to T3IF; a
+          dedicated-host SKU with top-grade fabric and a full enterprise
+          bundle routes to T1IF; a dedicated-host SKU with mid-grade
+          disclosed fabric routes to T2IF; everything else routes to T3IF.
+          The same operator can therefore appear in two or three tiers
+          across its SKU catalog, depending on what each SKU actually
+          packages.
+        </p>
+      </details>
     </section>
 
     <section class="defs-section">
       <header class="sec-head">
         <div class="kicker">Basis decomposition · Disc./Prem. vs T1IF</div>
         <h2>What's in the rate.</h2>
-        <p class="standfirst">
-          Reading <strong>across a row</strong> (same chip, varying tier)
-          isolates the deployment premium — fabric, support, compliance,
-          operational wrap. Reading <strong>down a column</strong> (same
-          tier, varying generation) isolates the generation premium with the
-          bundle held constant. Every cell is anchored to T1IF.
-        </p>
+        <details class="def-disclosure">
+          <summary>Definitions &amp; methodology</summary>
+          <p class="standfirst">
+            Reading <strong>across a row</strong> (same chip, varying tier)
+            isolates the deployment premium — fabric, support, compliance,
+            operational wrap. Reading <strong>down a column</strong> (same
+            tier, varying generation) isolates the generation premium with the
+            bundle held constant. Every cell is anchored to T1IF.
+          </p>
+        </details>
       </header>
       <SpreadMatrix />
     </section>
@@ -156,6 +168,20 @@ function chipDisplay(token: string): string {
   </section>
 
   <style>
+    /* Collapsible chart definitions — collapsed by default, expandable. */
+    .def-disclosure { margin: 4px 0 18px; }
+    .def-disclosure > summary {
+      list-style: none; cursor: pointer;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: var(--tracking-eye); text-transform: uppercase;
+      color: var(--ink-dim); font-weight: var(--weight-strong);
+      padding: 6px 0;
+    }
+    .def-disclosure > summary::-webkit-details-marker { display: none; }
+    .def-disclosure > summary::before { content: '▸ '; color: var(--accent); }
+    .def-disclosure[open] > summary::before { content: '▾ '; }
+    .def-disclosure[open] > summary { margin-bottom: 4px; }
+
     .top { padding-top: 28px; }
     h1 {
       font-family: var(--font-display);

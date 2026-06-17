@@ -25,13 +25,16 @@ const windowEnd = listingsMeta?.window_end ?? '—';
       <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">1d</span></div>
       <div class="tk-cell tk-status"><span class="tk-dot"></span><span class="tk-val">LIVE</span></div>
     </div>
-    <p class="standfirst lede">
-      Each operator's posted rack rate for the chosen chip, plotted over
-      time. Solid lines are guaranteed (non-interruptible) availability;
-      dashed lines are interruptible. Bundled offerings (managed storage,
-      premium support, fabric) are flagged in the legend and can be
-      toggled off.
-    </p>
+    <details class="def-disclosure">
+      <summary>How to read this</summary>
+      <p class="standfirst lede">
+        Each operator's posted rack rate for the chosen chip, plotted over
+        time. Solid lines are guaranteed (non-interruptible) availability;
+        dashed lines are interruptible. Bundled offerings (managed storage,
+        premium support, fabric) are flagged in the legend and can be
+        toggled off.
+      </p>
+    </details>
 
     <div class="controls">
       <div class="control-row chip-row">
@@ -94,13 +97,16 @@ const windowEnd = listingsMeta?.window_end ?? '—';
       </div>
     </section>
 
-    <p class="footnote">
-      Posted list-ask rate cards — one observation per provider per day,
-      drawn over the trailing {windowDays}-day window. Refreshed once daily
-      at the morning publish. End-of-line figures mark each line's latest
-      value. History begins on the day this product launched — earlier
-      periods are not backfilled.
-    </p>
+    <details class="def-disclosure">
+      <summary>Definitions &amp; methodology</summary>
+      <p class="footnote">
+        Posted list-ask rate cards — one observation per provider per day,
+        drawn over the trailing {windowDays}-day window. Refreshed once daily
+        at the morning publish. End-of-line figures mark each line's latest
+        value. History begins on the day this product launched — earlier
+        periods are not backfilled.
+      </p>
+    </details>
   </section>
 
   <script>
@@ -382,6 +388,20 @@ const windowEnd = listingsMeta?.window_end ?? '—';
        group at the bottom of tokens.css. Page-specific `.markets-page` is
        reserved for any one-off tweaks; today it just signals scope. */
     .vast-page.top { padding-top: 24px; }
+
+    /* Collapsible chart definitions — collapsed by default, expandable. */
+    .def-disclosure { margin: 4px 0 18px; }
+    .def-disclosure > summary {
+      list-style: none; cursor: pointer;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: var(--tracking-eye); text-transform: uppercase;
+      color: var(--ink-dim); font-weight: var(--weight-strong);
+      padding: 6px 0;
+    }
+    .def-disclosure > summary::-webkit-details-marker { display: none; }
+    .def-disclosure > summary::before { content: '▸ '; color: var(--accent); }
+    .def-disclosure[open] > summary::before { content: '▾ '; }
+    .def-disclosure[open] > summary { margin-bottom: 4px; }
 
     .vast-page > .kicker {
       color: var(--accent);

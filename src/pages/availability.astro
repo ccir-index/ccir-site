@@ -27,14 +27,17 @@ const availMeta = (meta as any).availability;
       <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">3h</span></div>
       <div class="tk-cell tk-status tk-paused"><span class="tk-dot"></span><span class="tk-val">PAUSED</span></div>
     </div>
-    <p class="standfirst lede">
-      <strong>Shadeform aggregates 19 GPU clouds' publicly observable list-asks into a single view.</strong>
-      This page surfaces the cross-provider view Shadeform aggregates:
-      where each chip is procurable, across providers and regions;
-      the per-provider price spread; boot-time tradeoffs; config availability;
-      long-tail chip catalog. <strong>Observatory data — not part of the CCIR rate
-      methodology.</strong> Shadeform-reported pricing is third-party-attributed.
-    </p>
+    <details class="def-disclosure">
+      <summary>How to read this</summary>
+      <p class="standfirst lede">
+        <strong>Shadeform aggregates 19 GPU clouds' publicly observable list-asks into a single view.</strong>
+        This page surfaces the cross-provider view Shadeform aggregates:
+        where each chip is procurable, across providers and regions;
+        the per-provider price spread; boot-time tradeoffs; config availability;
+        long-tail chip catalog. <strong>Observatory data — not part of the CCIR rate
+        methodology.</strong> Shadeform-reported pricing is third-party-attributed.
+      </p>
+    </details>
 
     <div class="controls">
       <div class="control-row chip-row">
@@ -77,12 +80,15 @@ const availMeta = (meta as any).availability;
         <div class="qs-cell"><span class="qs-lbl">CHEAPEST</span><span class="qs-val" id="qs-cheapest">—</span></div>
         <div class="qs-cell"><span class="qs-lbl">MEDIAN $/GPU</span><span class="qs-val" id="qs-median">—</span></div>
       </div>
-      <p class="footnote">
-        Each cell is one (provider × region) pair for the selected chip. Green
-        = available in the snapshot, red = offline. Hover for $/GPU/hr. Cells are sorted
-        by provider (rows) and region (columns), so chronic outages on a single
-        provider show up as a row of red. <code>per_gpu_dph = hourly_price ÷ 100 ÷ num_gpus</code>.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Each cell is one (provider × region) pair for the selected chip. Green
+          = available in the snapshot, red = offline. Hover for $/GPU/hr. Cells are sorted
+          by provider (rows) and region (columns), so chronic outages on a single
+          provider show up as a row of red. <code>per_gpu_dph = hourly_price ÷ 100 ÷ num_gpus</code>.
+        </p>
+      </details>
     </section>
 
     <!-- Section 2: Providers ranking -->
@@ -110,11 +116,14 @@ const availMeta = (meta as any).availability;
           <tbody id="providersTbody"></tbody>
         </table>
       </div>
-      <p class="footnote">
-        Shadeform tracks 19 GPU clouds; not all carry the selected chip. Boot
-        times are minimum/maximum provisioning seconds reported by the provider.
-        Latitude commits to ~60s; some hyperscale-scale fleets need 180-240s.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Shadeform tracks 19 GPU clouds; not all carry the selected chip. Boot
+          times are minimum/maximum provisioning seconds reported by the provider.
+          Latitude commits to ~60s; some hyperscale-scale fleets need 180-240s.
+        </p>
+      </details>
     </section>
 
     <!-- Section 3: Spread (per-provider $/GPU strip) -->
@@ -130,13 +139,16 @@ const availMeta = (meta as any).availability;
         <div class="chart-status" id="spread-status">Loading…</div>
         <canvas id="spreadChart"></canvas>
       </div>
-      <p class="footnote">
-        Each provider's min, median, and max per-GPU $/hr for the selected chip.
-        Wide bars mean broad SKU coverage; narrow bars mean a single configuration.
-        The cross-provider gap measures list-ask dispersion at matched chip —
-        the same chip has been listed at $1.95–$2.99/GPU/hr across nine venues
-        for H100 SXM.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Each provider's min, median, and max per-GPU $/hr for the selected chip.
+          Wide bars mean broad SKU coverage; narrow bars mean a single configuration.
+          The cross-provider gap measures list-ask dispersion at matched chip —
+          the same chip has been listed at $1.95–$2.99/GPU/hr across nine venues
+          for H100 SXM.
+        </p>
+      </details>
     </section>
 
     <!-- Section 4: Configs (interconnect / NVLink / num_gpus) -->
@@ -164,12 +176,15 @@ const availMeta = (meta as any).availability;
           <tbody id="configsTbody"></tbody>
         </table>
       </div>
-      <p class="footnote">
-        Per-SKU configuration matrix. NVLink ✓ means the provider exposes
-        explicit NVLink topology — not just SXM form. Empty cells reflect
-        Shadeform's reporting; the underlying provider may have richer
-        config detail in their own API.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Per-SKU configuration matrix. NVLink ✓ means the provider exposes
+          explicit NVLink topology — not just SXM form. Empty cells reflect
+          Shadeform's reporting; the underlying provider may have richer
+          config detail in their own API.
+        </p>
+      </details>
     </section>
 
     <!-- Section 5: Boot time -->
@@ -185,11 +200,14 @@ const availMeta = (meta as any).availability;
         <div class="chart-status" id="boot-status">Loading…</div>
         <canvas id="bootChart"></canvas>
       </div>
-      <p class="footnote">
-        Min / max provisioning seconds per provider. Matters for elasticity-
-        sensitive workloads — a 4× boot-time gap between providers can be
-        more material than a $0.10/GPU/hr price gap on short-duration jobs.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Min / max provisioning seconds per provider. Matters for elasticity-
+          sensitive workloads — a 4× boot-time gap between providers can be
+          more material than a $0.10/GPU/hr price gap on short-duration jobs.
+        </p>
+      </details>
     </section>
 
     <!-- Section 6: Geography -->
@@ -215,11 +233,14 @@ const availMeta = (meta as any).availability;
           <tbody id="geoTbody"></tbody>
         </table>
       </div>
-      <p class="footnote">
-        Where on earth is the selected chip procurable. The same chip can
-        be online in Iceland but offline in Virginia, and price-anchored to
-        the cheapest available cell across all regions.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Where on earth is the selected chip procurable. The same chip can
+          be online in Iceland but offline in Virginia, and price-anchored to
+          the cheapest available cell across all regions.
+        </p>
+      </details>
     </section>
 
     <!-- Section 7: Availability over time -->
@@ -235,12 +256,15 @@ const availMeta = (meta as any).availability;
         <div class="chart-status" id="hist-status">Loading…</div>
         <canvas id="histChart"></canvas>
       </div>
-      <p class="footnote">
-        Per-cycle <code>pct_available = n_available ÷ n_total_sku_region</code>
-        for the selected chip, at the 3-hour collection cadence. Shadeform
-        exposes current state only; CCIR persists the cycle-by-cycle history
-        drawn here. The series ends 2026-05-13, when collection was paused.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Per-cycle <code>pct_available = n_available ÷ n_total_sku_region</code>
+          for the selected chip, at the 3-hour collection cadence. Shadeform
+          exposes current state only; CCIR persists the cycle-by-cycle history
+          drawn here. The series ends 2026-05-13, when collection was paused.
+        </p>
+      </details>
     </section>
 
     <!-- Section 8: Provider overlap -->
@@ -265,12 +289,15 @@ const availMeta = (meta as any).availability;
           <tbody id="overlapTbody"></tbody>
         </table>
       </div>
-      <p class="footnote">
-        For each (interconnect × num_GPUs) configuration, how many providers
-        carry it. Single-provider rows mean concentration risk — capacity
-        loss has nowhere to fail over to. Multi-provider rows mean cross-
-        venue arbitrage is possible.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          For each (interconnect × num_GPUs) configuration, how many providers
+          carry it. Single-provider rows mean concentration risk — capacity
+          loss has nowhere to fail over to. Multi-provider rows mean cross-
+          venue arbitrage is possible.
+        </p>
+      </details>
     </section>
 
     <!-- Section 9: Long-tail catalog -->
@@ -298,11 +325,14 @@ const availMeta = (meta as any).availability;
           <tbody id="summaryTbody"></tbody>
         </table>
       </div>
-      <p class="footnote">
-        Every chip Shadeform reports across the headline + long-tail panel.
-        B300, GH200, and RTX Pro 6000 give early visibility into chips before
-        they hit the CCIR rate panel.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Every chip Shadeform reports across the headline + long-tail panel.
+          B300, GH200, and RTX Pro 6000 give early visibility into chips before
+          they hit the CCIR rate panel.
+        </p>
+      </details>
     </section>
 
     <p class="footnote-last">
@@ -978,6 +1008,22 @@ const availMeta = (meta as any).availability;
     .vast-page .lede { max-width: 80ch; margin: 4px 0 22px; }
     .vast-page .lede a { color: var(--accent); }
     .vast-page .lede strong { color: var(--ink); font-weight: var(--weight-strong); }
+
+    /* Collapsible chart definitions — collapsed by default, expandable.
+       Prefixed with .availability-page because this is an is:global block —
+       an unprefixed rule would leak the selector site-wide. */
+    .availability-page .def-disclosure { margin: 4px 0 18px; }
+    .availability-page .def-disclosure > summary {
+      list-style: none; cursor: pointer;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: var(--tracking-eye); text-transform: uppercase;
+      color: var(--ink-dim); font-weight: var(--weight-strong);
+      padding: 6px 0;
+    }
+    .availability-page .def-disclosure > summary::-webkit-details-marker { display: none; }
+    .availability-page .def-disclosure > summary::before { content: '▸ '; color: var(--accent); }
+    .availability-page .def-disclosure[open] > summary::before { content: '▾ '; }
+    .availability-page .def-disclosure[open] > summary { margin-bottom: 4px; }
 
     .vast-page .controls {
       background: var(--vast-panel-bg);

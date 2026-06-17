@@ -23,17 +23,20 @@ const vastMeta = (meta as any).vast;
       <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">3h</span></div>
       <div class="tk-cell tk-status tk-paused"><span class="tk-dot"></span><span class="tk-val">PAUSED</span></div>
     </div>
-    <p class="standfirst lede">
-      Vast.ai is the only per-host order-book marketplace in the panel —
-      every individual machine listing is exposed via the API, with hundreds
-      to thousands of distinct host offers per chip, repriced continuously
-      by hosts.
-      This page surfaces what the median alone omits: distribution shape,
-      quality bands, $/perf frontier, supply structure, geography, egress
-      and storage costs, network quality, long-tail catalog, and the
-      time-series of the spread itself. <strong>Observatory data — not part of the CCIR rate
-      methodology.</strong> Vast is the reference marketplace, not a tier.
-    </p>
+    <details class="def-disclosure">
+      <summary>How to read this</summary>
+      <p class="standfirst lede">
+        Vast.ai is the only per-host order-book marketplace in the panel —
+        every individual machine listing is exposed via the API, with hundreds
+        to thousands of distinct host offers per chip, repriced continuously
+        by hosts.
+        This page surfaces what the median alone omits: distribution shape,
+        quality bands, $/perf frontier, supply structure, geography, egress
+        and storage costs, network quality, long-tail catalog, and the
+        time-series of the spread itself. <strong>Observatory data — not part of the CCIR rate
+        methodology.</strong> Vast is the reference marketplace, not a tier.
+      </p>
+    </details>
 
     <div class="controls">
       <div class="control-row chip-row">
@@ -77,14 +80,17 @@ const vastMeta = (meta as any).vast;
         <div class="qs-cell"><span class="qs-lbl">MAX</span><span class="qs-val" id="qs-max">—</span></div>
         <div class="qs-cell"><span class="qs-lbl">SPREAD</span><span class="qs-val" id="qs-spread">—</span></div>
       </div>
-      <p class="footnote">
-        Every offer live on Vast at the snapshot for the selected chip, binned by per-whole-GPU
-        $/hr (log scale on x). The vertical amber line marks the median; the
-        dashed grey marks the median interruptible-bid floor. Where the
-        histogram has a long upper tail, that's the trust premium — buyers
-        pay 5-50× the floor for verified datacenter offers vs deverified
-        hosts. <code>per_gpu_dph = dph_total / num_gpus / gpu_frac</code>.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Every offer live on Vast at the snapshot for the selected chip, binned by per-whole-GPU
+          $/hr (log scale on x). The vertical amber line marks the median; the
+          dashed grey marks the median interruptible-bid floor. Where the
+          histogram has a long upper tail, that's the trust premium — buyers
+          pay 5-50× the floor for verified datacenter offers vs deverified
+          hosts. <code>per_gpu_dph = dph_total / num_gpus / gpu_frac</code>.
+        </p>
+      </details>
     </section>
 
     <!-- Section 2: Quality bands -->
@@ -101,12 +107,15 @@ const vastMeta = (meta as any).vast;
         <div class="chart-status" id="quality-status">Loading…</div>
         <canvas id="qualityChart"></canvas>
       </div>
-      <p class="footnote">
-        Median per-GPU $/hr for offers tagged <code>verified</code> (audited
-        datacenter hosts) vs <code>deverified</code> (hosted, unverified).
-        The premium varies sharply by chip — RTX 4090 verified is ~2× deverified
-        but H100 SXM verified can be <em>cheaper</em> than deverified.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Median per-GPU $/hr for offers tagged <code>verified</code> (audited
+          datacenter hosts) vs <code>deverified</code> (hosted, unverified).
+          The premium varies sharply by chip — RTX 4090 verified is ~2× deverified
+          but H100 SXM verified can be <em>cheaper</em> than deverified.
+        </p>
+      </details>
     </section>
 
     <!-- Section 3: $/perf frontier -->
@@ -134,14 +143,17 @@ const vastMeta = (meta as any).vast;
           <tbody id="frontierTbody"></tbody>
         </table>
       </div>
-      <p class="footnote">
-        <strong>DLPerf</strong> is Vast.ai's composite deep-learning benchmark — a
-        synthetic mixed-precision matmul/conv score that proxies training
-        throughput. Shown <em>per GPU</em> here so it lines up with the per-GPU
-        $/hr column. <strong>DLPerf/$/h</strong> is bundle perf-per-dollar; higher
-        is more performance per dollar of total spend on the offer (independent
-        of unit choice — same ratio whether you compute per-GPU or per-bundle).
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          <strong>DLPerf</strong> is Vast.ai's composite deep-learning benchmark — a
+          synthetic mixed-precision matmul/conv score that proxies training
+          throughput. Shown <em>per GPU</em> here so it lines up with the per-GPU
+          $/hr column. <strong>DLPerf/$/h</strong> is bundle perf-per-dollar; higher
+          is more performance per dollar of total spend on the offer (independent
+          of unit choice — same ratio whether you compute per-GPU or per-bundle).
+        </p>
+      </details>
     </section>
 
     <!-- Section 4: Multi-GPU supply -->
@@ -158,11 +170,14 @@ const vastMeta = (meta as any).vast;
         <div class="chart-status" id="multi-status">Loading…</div>
         <canvas id="multiChart"></canvas>
       </div>
-      <p class="footnote">
-        Count of live offers by GPU count (1×, 2×, 4×, 8×, other) for the
-        selected chip. Reveals whether the chip has scale-up supply or only
-        single-GPU rentals — material for buyers planning multi-node training.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Count of live offers by GPU count (1×, 2×, 4×, 8×, other) for the
+          selected chip. Reveals whether the chip has scale-up supply or only
+          single-GPU rentals — material for buyers planning multi-node training.
+        </p>
+      </details>
     </section>
 
     <!-- Section 5: Geography -->
@@ -206,11 +221,14 @@ const vastMeta = (meta as any).vast;
           <canvas id="storageChart"></canvas>
         </div>
       </div>
-      <p class="footnote">
-        Egress cost ($/TB) and storage cost ($/GB-mo) distributions across
-        live offers, exposed per-offer in the Vast API. Egress ranges
-        $0–$50/TB across the panel.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Egress cost ($/TB) and storage cost ($/GB-mo) distributions across
+          live offers, exposed per-offer in the Vast API. Egress ranges
+          $0–$50/TB across the panel.
+        </p>
+      </details>
     </section>
 
     <!-- Section 7: Network -->
@@ -227,11 +245,14 @@ const vastMeta = (meta as any).vast;
         <div class="chart-status" id="net-status">Loading…</div>
         <canvas id="netChart"></canvas>
       </div>
-      <p class="footnote">
-        Bandwidth distribution is bimodal: consumer-hosted GPUs at gigabit-class,
-        proper datacenter offers at multi-Gbps. Same chip, very different
-        connectivity — matters for training jobs that pull from cloud storage.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Bandwidth distribution is bimodal: consumer-hosted GPUs at gigabit-class,
+          proper datacenter offers at multi-Gbps. Same chip, very different
+          connectivity — matters for training jobs that pull from cloud storage.
+        </p>
+      </details>
     </section>
 
     <!-- Section 8: Long-tail catalog -->
@@ -274,12 +295,15 @@ const vastMeta = (meta as any).vast;
         <div class="chart-status" id="spread-status">Loading…</div>
         <canvas id="spreadChart"></canvas>
       </div>
-      <p class="footnote">
-        Five lines show how the per-GPU $/hr distribution shifts over time:
-        p10 (cheapest 10%), p25, p50 (median), p75, p90 (most expensive 10%).
-        When spread widens, supply is fragmenting; when it narrows, the market
-        is converging.
-      </p>
+      <details class="def-disclosure">
+        <summary>Definitions &amp; methodology</summary>
+        <p class="footnote">
+          Five lines show how the per-GPU $/hr distribution shifts over time:
+          p10 (cheapest 10%), p25, p50 (median), p75, p90 (most expensive 10%).
+          When spread widens, supply is fragmenting; when it narrows, the market
+          is converging.
+        </p>
+      </details>
     </section>
 
     <p class="footnote-last">
@@ -1263,6 +1287,20 @@ const vastMeta = (meta as any).vast;
       max-width: 80ch;
     }
     .vast-page .footnote-last a { color: var(--accent); }
+
+    /* Collapsible chart definitions — collapsed by default, expandable. */
+    .vast-page .def-disclosure { margin: 4px 0 18px; }
+    .vast-page .def-disclosure > summary {
+      list-style: none; cursor: pointer;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: var(--tracking-eye); text-transform: uppercase;
+      color: var(--ink-dim); font-weight: var(--weight-strong);
+      padding: 6px 0;
+    }
+    .vast-page .def-disclosure > summary::-webkit-details-marker { display: none; }
+    .vast-page .def-disclosure > summary::before { content: '▸ '; color: var(--accent); }
+    .vast-page .def-disclosure[open] > summary::before { content: '▾ '; }
+    .vast-page .def-disclosure[open] > summary { margin-bottom: 4px; }
 
     /* ----------------------------------------------------------------------
        MOBILE RESPONSIVE

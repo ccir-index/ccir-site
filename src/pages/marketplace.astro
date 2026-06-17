@@ -25,12 +25,15 @@ const windowEnd = mktMeta?.window_end ?? '—';
       <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">3h</span></div>
       <div class="tk-cell tk-status"><span class="tk-dot"></span><span class="tk-val">LIVE</span></div>
     </div>
-    <p class="standfirst lede">
-      Intraday least-expensive available rates from third-party-host marketplaces.
-      Vast.ai is restricted to verified hosts; RunPod is split by sub-product
-      (Secure / Community / Spot / Cluster). Distinct from <a href="/markets">Providers</a>,
-      which tracks operators that run their own datacenters.
-    </p>
+    <details class="def-disclosure">
+      <summary>How to read this</summary>
+      <p class="standfirst lede">
+        Intraday least-expensive available rates from third-party-host marketplaces.
+        Vast.ai is restricted to verified hosts; RunPod is split by sub-product
+        (Secure / Community / Spot / Cluster). Distinct from <a href="/markets">Providers</a>,
+        which tracks operators that run their own datacenters.
+      </p>
+    </details>
 
     <div class="controls">
       <div class="control-row chip-row">
@@ -91,15 +94,18 @@ const windowEnd = mktMeta?.window_end ?? '—';
       </div>
     </section>
 
-    <p class="footnote">
-      Trailing {windowDays}-day window, refreshed roughly every three
-      hours. The plotted price is the lowest per-GPU list-ask available
-      in each collection cycle. Vast.ai is restricted to verified hosts
-      at 90% reliability or better; its dashed line shows where the
-      typical verified listing sits relative to that floor. End-of-line
-      figures mark each line's latest value. History begins on the day
-      this product launched — earlier periods are not backfilled.
-    </p>
+    <details class="def-disclosure">
+      <summary>Definitions &amp; methodology</summary>
+      <p class="footnote">
+        Trailing {windowDays}-day window, refreshed roughly every three
+        hours. The plotted price is the lowest per-GPU list-ask available
+        in each collection cycle. Vast.ai is restricted to verified hosts
+        at 90% reliability or better; its dashed line shows where the
+        typical verified listing sits relative to that floor. End-of-line
+        figures mark each line's latest value. History begins on the day
+        this product launched — earlier periods are not backfilled.
+      </p>
+    </details>
   </section>
 
   <script>
@@ -422,6 +428,20 @@ const windowEnd = mktMeta?.window_end ?? '—';
        the bottom of tokens.css. The page-specific `.marketplace-page` class
        is reserved for any one-off tweaks; today it just signals scope. */
     .vast-page.top { padding-top: 24px; }
+
+    /* Collapsible chart definitions — collapsed by default, expandable. */
+    .def-disclosure { margin: 4px 0 18px; }
+    .def-disclosure > summary {
+      list-style: none; cursor: pointer;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: var(--tracking-eye); text-transform: uppercase;
+      color: var(--ink-dim); font-weight: var(--weight-strong);
+      padding: 6px 0;
+    }
+    .def-disclosure > summary::-webkit-details-marker { display: none; }
+    .def-disclosure > summary::before { content: '▸ '; color: var(--accent); }
+    .def-disclosure[open] > summary::before { content: '▾ '; }
+    .def-disclosure[open] > summary { margin-bottom: 4px; }
 
     .vast-page > .kicker {
       color: var(--accent);

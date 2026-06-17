@@ -12,24 +12,27 @@ import { meta } from '../data/snapshot';
     <div class="hero-solo">
       <div class="kicker">Disc./Prem. vs Tier 1 IF · {meta.as_of_date}</div>
       <h1>Tier Spread Matrix</h1>
-      <p class="standfirst lede">
-        The spread matrix gives a credit analyst two views that a
-        single published rate doesn't.
-      </p>
-      <p class="standfirst lede">
-        Reading <strong>across a row</strong> — same chip, varying
-        tier — shows what the market is charging for the capability
-        bundle: fabric, support, compliance, operational wrap. A lender
-        underwriting a T1IF facility needs to know how much of the rate
-        is silicon and how much is infrastructure.
-      </p>
-      <p class="standfirst lede">
-        Reading <strong>down a column</strong> — same tier, varying
-        generation — shows the generation premium when the bundle is
-        held constant: what newer silicon commands over older silicon
-        at equivalent deployment grade, without the two signals
-        confounding each other.
-      </p>
+      <details class="def-disclosure">
+        <summary>How to read this</summary>
+        <p class="standfirst lede">
+          The spread matrix gives a credit analyst two views that a
+          single published rate doesn't.
+        </p>
+        <p class="standfirst lede">
+          Reading <strong>across a row</strong> — same chip, varying
+          tier — shows what the market is charging for the capability
+          bundle: fabric, support, compliance, operational wrap. A lender
+          underwriting a T1IF facility needs to know how much of the rate
+          is silicon and how much is infrastructure.
+        </p>
+        <p class="standfirst lede">
+          Reading <strong>down a column</strong> — same tier, varying
+          generation — shows the generation premium when the bundle is
+          held constant: what newer silicon commands over older silicon
+          at equivalent deployment grade, without the two signals
+          confounding each other.
+        </p>
+      </details>
     </div>
 
     <SpreadMatrix />
@@ -48,5 +51,19 @@ import { meta } from '../data/snapshot';
     .lede { font-size: var(--fs-lg); }
     .lede em { font-style: italic; color: var(--accent); }
     .hero-solo { margin-bottom: 28px; max-width: 80ch; }
+
+    /* Collapsible chart definitions — collapsed by default, expandable. */
+    .def-disclosure { margin: 4px 0 18px; }
+    .def-disclosure > summary {
+      list-style: none; cursor: pointer;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: var(--tracking-eye); text-transform: uppercase;
+      color: var(--ink-dim); font-weight: var(--weight-strong);
+      padding: 6px 0;
+    }
+    .def-disclosure > summary::-webkit-details-marker { display: none; }
+    .def-disclosure > summary::before { content: '▸ '; color: var(--accent); }
+    .def-disclosure[open] > summary::before { content: '▾ '; }
+    .def-disclosure[open] > summary { margin-bottom: 4px; }
   </style>
 </Base>
