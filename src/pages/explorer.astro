@@ -1,11 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import {
-  explorerHeadlineRates as headlineRates,
-  explorerIndicativeRates as indicativeRates,
-  meta, premiumChipsList, indicativeChipsList, seriesHistory,
+  headlineRates, indicativeRates, meta,
+  premiumChipsList, indicativeChipsList, seriesHistory,
 } from '../data/snapshot';
-import { TIERS, TIER_LABELS, REGION_LABELS, TERM_DISPLAY } from '../data/types';
+import { TIERS, TIER_LABELS, REGION_LABELS } from '../data/types';
 
 // Inline-SVG sparkline string. Mirrors components/Sparkline.astro so the
 // explorer's client-rendered tables get the same trailing-7d trend the
@@ -53,7 +52,6 @@ function buildSparkSvg(
 
 const FORM_ORDER = ['SXM', 'PCIe', 'NVL', 'ALL'];
 const REGION_ORDER = ['US', 'EU', 'APAC', 'Other', 'ALL'];
-const TERM_ORDER = ['OnDemand', '1M', '3M', '6M', '1Y', '2Y', '3Y', '5Y'];
 
 const headlineForms = Array.from(new Set(headlineRates.map((r) => r.form_factor))).sort(
   (a, b) => FORM_ORDER.indexOf(a) - FORM_ORDER.indexOf(b),
@@ -61,21 +59,12 @@ const headlineForms = Array.from(new Set(headlineRates.map((r) => r.form_factor)
 const headlineRegions = Array.from(new Set(headlineRates.map((r) => r.region))).sort(
   (a, b) => REGION_ORDER.indexOf(a) - REGION_ORDER.indexOf(b),
 );
-// Terms present in each pool, OD first, then ascending tenor. Drives the Term
-// toggle — on-demand sits alongside its reserved forward curve (1Y/3Y, …).
-const headlineTerms = Array.from(new Set(headlineRates.map((r) => r.commitment_term))).sort(
-  (a, b) => TERM_ORDER.indexOf(a) - TERM_ORDER.indexOf(b),
-);
-const indicativeTerms = Array.from(new Set(indicativeRates.map((r) => r.commitment_term))).sort(
-  (a, b) => TERM_ORDER.indexOf(a) - TERM_ORDER.indexOf(b),
-);
 const headlineChips = premiumChipsList();
 const indChips = indicativeChipsList();
 
 // Map both pools into a slim shape for client-side rendering. Keep the
 // scope tag on each row so the client can route them into the right table.
-// Term is carried so the explorer can surface the reserved forward curve
-// (OD → 1Y → 3Y) behind the Term toggle.
+// On-demand only — the loader drops committed-term rows.
 const headlineClient = headlineRates.map((r) => ({
   id: r.series_id,
   scope: 'headline' as const,
@@ -85,8 +74,6 @@ const headlineClient = headlineRates.map((r) => ({
   region: r.region,
   region_label: REGION_LABELS[r.region],
   interrupt: r.interruptibility,
-  term: r.commitment_term,
-  term_label: TERM_DISPLAY[r.commitment_term] ?? r.commitment_term,
   mean: r.price_mean,
   median: r.price_median,
   p25: r.price_p25,
@@ -104,8 +91,6 @@ const indicativeClient = indicativeRates.map((r) => ({
   region: r.region,
   region_label: REGION_LABELS[r.region],
   interrupt: r.interruptibility,
-  term: r.commitment_term,
-  term_label: TERM_DISPLAY[r.commitment_term] ?? r.commitment_term,
   mean: r.price_mean,
   median: r.price_median,
   p25: r.price_p25,
@@ -125,16 +110,14 @@ const indicativeClient = indicativeRates.map((r) => ({
     <div class="kicker">Series Explorer · {meta.as_of_date}</div>
     <h1>Compare Series</h1>
     <p class="standfirst lede">
-      Two axes here. <strong>By chip:</strong> <strong>Tiered</strong> series
+      Two sections, split by chip coverage. <strong>Tiered</strong> series
       cover the premium silicons — H100, H200, B200, GB200, A100 — with full
       T1IF/T2IF/T3IF classification; <strong>Untiered</strong> chips are
       long-tail silicon outside the v2.0 tier scope, shown as plain panel
-      medians for breadth (no tier applied). <strong>By contract:</strong> the
-      <strong>Term</strong> filter steps from on-demand to the reserved forward
-      curve (1Y / 3Y). Cutting across both, every series carries a publication
+      medians for breadth (no tier applied). Every series carries a publication
       <strong>status</strong> — <code class="prov-inline">PUB</code> /
       <code class="prov-inline">PROV</code> /
-      <code class="shd-inline">SHD</code> — defined below.
+      <code class="shd-inline">SHD</code> — defined below. Rates are on-demand.
     </p>
 
     <!-- Status legend — the explorer is the one view that shows every series,
@@ -147,7 +130,7 @@ const indicativeClient = indicativeRates.map((r) => ({
       </div>
       <div class="leg-item">
         <dt><span class="status-badge status-provisional">PROV</span></dt>
-        <dd><strong>Provisional</strong> — an emerging breakout (regional cell, or the hyperscaler reserved curve) at 2 sources. <em>Surfaced as intelligence, not citable</em>; auto-promotes to Published when a 3rd source lands.</dd>
+        <dd><strong>Provisional</strong> — an emerging regional breakout cell at 2 sources. <em>Surfaced as intelligence, not citable</em>; auto-promotes to Published when a 3rd source lands.</dd>
       </div>
       <div class="leg-item">
         <dt><span class="status-badge status-shadow">SHD</span></dt>
@@ -183,13 +166,6 @@ const indicativeClient = indicativeRates.map((r) => ({
             <select id="hf-form" data-filter="form">
               <option value="">All</option>
               {headlineForms.map((f) => <option value={f}>{f === 'ALL' ? 'Pooled' : f}</option>)}
-            </select>
-          </div>
-          <div class="fgroup">
-            <label for="hf-term">Term</label>
-            <select id="hf-term" data-filter="term">
-              <option value="">All terms</option>
-              {headlineTerms.map((t) => <option value={t}>{t === 'OnDemand' ? 'On-demand' : TERM_DISPLAY[t] ?? t}</option>)}
             </select>
           </div>
           <div class="fgroup">
@@ -236,7 +212,6 @@ const indicativeClient = indicativeRates.map((r) => ({
               <th>Tier</th>
               <th>Chip</th>
               <th>Form</th>
-              <th>Term</th>
               <th>Int</th>
               <th>Region</th>
               <th>Median</th>
@@ -275,13 +250,6 @@ const indicativeClient = indicativeRates.map((r) => ({
             </select>
           </div>
           <div class="fgroup">
-            <label for="if-term">Term</label>
-            <select id="if-term" data-filter="term">
-              <option value="">All terms</option>
-              {indicativeTerms.map((t) => <option value={t}>{t === 'OnDemand' ? 'On-demand' : TERM_DISPLAY[t] ?? t}</option>)}
-            </select>
-          </div>
-          <div class="fgroup">
             <label for="if-int">Interrupt</label>
             <select id="if-int" data-filter="interrupt">
               <option value="">All</option>
@@ -315,7 +283,6 @@ const indicativeClient = indicativeRates.map((r) => ({
               <th>Series</th>
               <th>Chip</th>
               <th>Form</th>
-              <th>Term</th>
               <th>Int</th>
               <th>Region</th>
               <th>Median</th>
@@ -338,14 +305,13 @@ const indicativeClient = indicativeRates.map((r) => ({
       // the homepage rates table and /tiers ladder.
 
       // -------- HEADLINE table --------
-      var H_FILTERS = { tier: '', chip: '', form: '', term: '', interrupt: '', region: '', status: '', search: '' };
+      var H_FILTERS = { tier: '', chip: '', form: '', interrupt: '', region: '', status: '', search: '' };
       var hTbody = document.getElementById('headline-tbody');
       var hMatch = document.getElementById('match-headline');
       function hMatches(r) {
         if (H_FILTERS.tier && r.tier !== H_FILTERS.tier) return false;
         if (H_FILTERS.chip && r.chip !== H_FILTERS.chip) return false;
         if (H_FILTERS.form && r.form !== H_FILTERS.form) return false;
-        if (H_FILTERS.term && r.term !== H_FILTERS.term) return false;
         if (H_FILTERS.interrupt && r.interrupt !== H_FILTERS.interrupt) return false;
         if (H_FILTERS.region && r.region !== H_FILTERS.region) return false;
         if (H_FILTERS.status && r.status !== H_FILTERS.status) return false;
@@ -360,15 +326,13 @@ const indicativeClient = indicativeRates.map((r) => ({
           var statusBadge = r.status === 'Shadow'
             ? '<span class="status-badge status-shadow" title="Shadow — below the publication floor (single-source, or a core cell held to the strict gate). Shown in the explorer for transparency only; never surfaced on a headline page.">SHD</span>'
             : (r.status === 'Provisional'
-              ? '<span class="status-badge status-provisional" title="Provisional — emerging breakout (regional cell, or hyperscaler reserved curve) at 2 sources. Surfaced as intelligence, not citable; auto-promotes to Published when a 3rd source lands.">PROV</span>'
+              ? '<span class="status-badge status-provisional" title="Provisional — emerging regional breakout cell at 2 sources. Surfaced as intelligence, not citable; auto-promotes to Published when a 3rd source lands.">PROV</span>'
               : '');
-          var termCls = r.term === 'OnDemand' ? 'dim' : 'dim term-reserved';
           return '<tr class="' + rowCls + '">' +
             '<td class="sid"><code>' + r.id + '</code>' + statusBadge + '</td>' +
             '<td><span class="tier-badge tier-badge-' + r.tier.toLowerCase() + '">' + r.tier + '</span></td>' +
             '<td class="chip">' + r.chip + '</td>' +
             '<td class="dim">' + r.form + '</td>' +
-            '<td class="' + termCls + '">' + r.term_label + '</td>' +
             '<td class="dim">' + r.interrupt + '</td>' +
             '<td class="dim">' + r.region_label + '</td>' +
             '<td class="num posted">$' + fmt(r.median) + '</td>' +
@@ -388,18 +352,17 @@ const indicativeClient = indicativeRates.map((r) => ({
       document.getElementById('reset-headline').addEventListener('click', function () {
         document.querySelectorAll('#filters-headline select').forEach(function (s) { s.value = ''; });
         document.getElementById('hf-search').value = '';
-        H_FILTERS = { tier: '', chip: '', form: '', term: '', interrupt: '', region: '', status: '', search: '' };
+        H_FILTERS = { tier: '', chip: '', form: '', interrupt: '', region: '', status: '', search: '' };
         renderHeadline();
       });
       renderHeadline();
 
       // -------- INDICATIVE table --------
-      var I_FILTERS = { chip: '', term: '', interrupt: '', region: '', search: '' };
+      var I_FILTERS = { chip: '', interrupt: '', region: '', search: '' };
       var iTbody = document.getElementById('indicative-tbody');
       var iMatch = document.getElementById('match-indicative');
       function iMatches(r) {
         if (I_FILTERS.chip && r.chip !== I_FILTERS.chip) return false;
-        if (I_FILTERS.term && r.term !== I_FILTERS.term) return false;
         if (I_FILTERS.interrupt && r.interrupt !== I_FILTERS.interrupt) return false;
         if (I_FILTERS.region && r.region !== I_FILTERS.region) return false;
         if (I_FILTERS.search && r.id.toLowerCase().indexOf(I_FILTERS.search.toLowerCase()) === -1) return false;
@@ -409,12 +372,10 @@ const indicativeClient = indicativeRates.map((r) => ({
         var rows = INDICATIVE.filter(iMatches);
         iMatch.textContent = rows.length;
         iTbody.innerHTML = rows.map(function (r) {
-          var termCls = r.term === 'OnDemand' ? 'dim' : 'dim term-reserved';
           return '<tr>' +
             '<td class="sid"><code>' + r.id + '</code></td>' +
             '<td class="chip">' + r.chip + '</td>' +
             '<td class="dim">' + r.form + '</td>' +
-            '<td class="' + termCls + '">' + r.term_label + '</td>' +
             '<td class="dim">' + r.interrupt + '</td>' +
             '<td class="dim">' + r.region_label + '</td>' +
             '<td class="num posted">$' + fmt(r.median) + '</td>' +
@@ -432,7 +393,7 @@ const indicativeClient = indicativeRates.map((r) => ({
       document.getElementById('reset-indicative').addEventListener('click', function () {
         document.querySelectorAll('#filters-indicative select').forEach(function (s) { s.value = ''; });
         document.getElementById('if-search').value = '';
-        I_FILTERS = { chip: '', term: '', interrupt: '', region: '', search: '' };
+        I_FILTERS = { chip: '', interrupt: '', region: '', search: '' };
         renderIndicative();
       });
       renderIndicative();
@@ -656,12 +617,6 @@ const indicativeClient = indicativeRates.map((r) => ({
     .indicative-wrap td.spark { color: var(--neutral); opacity: 0.7; }
     .sparkline { opacity: 0.5; vertical-align: middle; }
 
-    /* Reserved (committed-term) cell — distinguish the forward curve from the
-       on-demand spot rows in the same table. */
-    #headline-table td.term-reserved, #indicative-table td.term-reserved {
-      color: var(--accent);
-      font-weight: var(--weight-strong);
-    }
     .prov-inline {
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 1px);

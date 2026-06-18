@@ -71,30 +71,22 @@ function parseRow(line: string, headers: string[]): Rate {
   };
 }
 
-// Parse every row, all commitment terms. The OD-only restriction that
-// governs the headline pages is applied downstream (see `rates` below), not
-// here, so the explorer can opt into the full term structure.
 function parseCsv(text: string): Rate[] {
   const lines = text.trim().split(/\r?\n/);
   const headers = lines[0]!.split(',');
   return lines.slice(1)
     .filter((l) => l.trim().length > 0)
     .map((line) => parseRow(line, headers))
-    .filter((r) => r.series_id && r.factory_type && r.gpu_model);
+    .filter((r) => r.series_id && r.factory_type && r.gpu_model)
+    // OD-only site: drop every committed-term row at the loader so no
+    // 1M / 3M / 6M / 1Y / 2Y / 3Y / 5Y series can leak into any page or
+    // explorer table. The CSVs still carry them (committed-term cells are a
+    // hyperscaler reserved-pricing schedule, not a market signal we surface).
+    .filter((r) => r.commitment_term === 'OnDemand');
 }
 
-// All-terms pools (OnDemand + committed-term 1M…5Y). Only the explorer reads
-// these; every headline page reads the OD-only `rates` derived below.
-const publishedRatesAll: Rate[] = parseCsv(csvText);
-const shadowRatesAll: Rate[] = parseCsv(shadowCsvText);
-const ratesAll: Rate[] = [...publishedRatesAll, ...shadowRatesAll];
-
-// OD-only pools drive the headline grammar. Keeping the committed-term split
-// out of `publishedRates`/`shadowRates` preserves the OD-only contract for the
-// homepage, /tiers, /spreads, and /applications — only the explorer surfaces
-// terms, behind its own toggle.
-const publishedRates: Rate[] = publishedRatesAll.filter((r) => r.commitment_term === 'OnDemand');
-const shadowRates: Rate[] = shadowRatesAll.filter((r) => r.commitment_term === 'OnDemand');
+const publishedRates: Rate[] = parseCsv(csvText);
+const shadowRates: Rate[] = parseCsv(shadowCsvText);
 
 // Previous-day medians per series_id. Drives the ticker arrows: today's
 // price_median vs prior-day price_median. Empty map on bootstrap days when
@@ -102,8 +94,9 @@ const shadowRates: Rate[] = shadowRatesAll.filter((r) => r.commitment_term === '
 // which surfaces as the flat glyph).
 export const prevMedians: Map<string, number> = (() => {
   const out = new Map<string, number>();
-  // Re-parse the previous CSV minimally (id + median only) so the lookup
-  // covers every series — including committed-term rows the explorer shows.
+  // parseCsv filters to OnDemand only, but the previous CSV also has
+  // committed terms — re-parse minimally without that filter so the lookup
+  // covers every series the current snapshot might reference.
   const text = prevCsvText.trim();
   if (!text) return out;
   const lines = text.split(/\r?\n/);
@@ -155,21 +148,13 @@ export function seriesHistory(seriesId: string): HistoryPoint[] {
   return _seriesHistory.get(seriesId) ?? [];
 }
 
-// Full series set — Published + Shadow, OnDemand only. Drives every headline
-// page; the committed-term rows are held in `ratesAll` for the explorer.
+// Full series set — Published + Shadow. Already filtered to OnDemand only
+// by parseCsv above.
 export const rates: Rate[] = [...publishedRates, ...shadowRates];
 
-// HEADLINE rows: premium-chip T1IF/T2IF/T3IF taxonomy, OnDemand only. Drives
-// /explorer Section 1's OD view, plus the flagship/baseline derivations below.
+// HEADLINE rows: premium-chip T1IF/T2IF/T3IF taxonomy. Drives /explorer
+// Section 1 (Published + Shadow visible there with Shadow flagged in UI).
 export const headlineRates: Rate[] = rates.filter((r) => r.scope === 'headline');
-
-// Explorer-only all-terms pools (OnDemand + committed-term). The explorer adds
-// a Term toggle so the on-demand headline sits alongside its reserved forward
-// curve (1Y/3Y, Provisional). Reserved cells at region=ALL carry
-// promotion_status = Provisional (gold gate, METHODOLOGY Part 8); the explorer
-// reuses the PROV badge to flag them as surfaced-not-citable.
-export const explorerHeadlineRates: Rate[] = ratesAll.filter((r) => r.scope === 'headline');
-export const explorerIndicativeRates: Rate[] = ratesAll.filter((r) => r.scope === 'indicative');
 
 // FLAGSHIP rows: Published-only subset of headline. Drives the homepage
 // chip ladder, /tiers per-silicon table, and /spreads matrix. Below-gate
