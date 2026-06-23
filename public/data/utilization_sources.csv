@@ -9,11 +9,11 @@ azure_skus,a100-sxm-80gb,T1,EU|US,categorical,True,2026-05-28,27,0.0,0.0,v2.0.0
 oci_caps,a100-sxm-80gb,T1,US,count,True,2026-05-28,27,1.0,1.0,v2.0.0
 crusoe_caps,a100-sxm-80gb,T2,US,binary,True,2026-06-15,9,0.9722,0.9722,v2.0.0
 hyperstack_stocks,a100-sxm-80gb,T2,US,count,True,2026-05-28,27,0.0087,0.0087,v2.0.0
-lambda_caps,a100-sxm-80gb,T2,Other|US,binary,True,2026-05-28,27,0.0471,0.6396,v2.0.0
+lambda_caps,a100-sxm-80gb,T2,Other|US,binary,True,2026-05-28,27,0.0842,0.6396,v2.0.0
 massed_compute,a100-sxm-80gb,T3,US,count,False,2026-05-28,27,0.5195,,v2.0.0
 runpod,a100-sxm-80gb,T3,Other,categorical,False,2026-05-28,27,0.0143,,v2.0.0
 tensordock,a100-sxm-80gb,T3,Other,count,False,2026-05-28,15,0.019,,v2.0.0
-prime_intellect,b200-sxm,,EU|US,categorical,False,2026-05-28,19,0.1676,,v2.0.0
+prime_intellect,b200-sxm,,EU|US,categorical,False,2026-05-28,18,0.1769,,v2.0.0
 aws_caps,b200-sxm,T1,Other|US,score,True,2026-05-28,27,0.2695,0.2695,v2.0.0
 oci_caps,b200-sxm,T1,US,count,True,2026-05-28,27,1.0,1.0,v2.0.0
 lambda_caps,b200-sxm,T2,Other,binary,True,2026-05-28,27,1.0,1.0,v2.0.0
@@ -21,7 +21,7 @@ runpod,b200-sxm,T3,Other,categorical,False,2026-05-28,27,0.036,,v2.0.0
 oci_caps,gb200,T1,US,count,True,2026-05-28,27,1.0,1.0,v2.0.0
 akash_console,h100-sxm,,EU|Other|US,count,False,2026-05-28,25,0.1955,,v2.0.0
 prime_intellect,h100-sxm,,EU|US,categorical,False,2026-05-29,25,0.174,,v2.0.0
-aws_caps,h100-sxm,T1,EU|Other|US,score,True,2026-05-28,27,0.1479,0.1479,v2.0.0
+aws_caps,h100-sxm,T1,EU|Other|US,score,True,2026-05-28,27,0.1294,0.1294,v2.0.0
 azure_skus,h100-sxm,T1,EU|Other|US,categorical,True,2026-05-28,27,0.0,0.0,v2.0.0
 oci_caps,h100-sxm,T1,US,count,True,2026-05-28,27,1.0,1.0,v2.0.0
 crusoe_caps,h100-sxm,T2,EU|US,binary,True,2026-06-15,9,1.0,1.0,v2.0.0
@@ -33,7 +33,7 @@ massed_compute,h100-sxm,T3,US,count,False,2026-05-28,27,0.2032,,v2.0.0
 runpod,h100-sxm,T3,Other,categorical,False,2026-05-28,27,0.0,,v2.0.0
 akash_console,h200-sxm,,EU|Other|US,count,False,2026-05-28,25,0.005,,v2.0.0
 prime_intellect,h200-sxm,,EU|US,categorical,False,2026-05-28,22,0.146,,v2.0.0
-aws_caps,h200-sxm,T1,EU|Other|US,score,True,2026-05-28,27,0.3804,0.3804,v2.0.0
+aws_caps,h200-sxm,T1,EU|Other|US,score,True,2026-05-28,27,0.3619,0.3619,v2.0.0
 azure_skus,h200-sxm,T1,EU|Other|US,categorical,True,2026-05-28,27,1.0,1.0,v2.0.0
 oci_caps,h200-sxm,T1,US,count,True,2026-05-28,27,1.0,1.0,v2.0.0
 runpod,h200-sxm,T3,Other,categorical,False,2026-05-28,27,0.0,,v2.0.0

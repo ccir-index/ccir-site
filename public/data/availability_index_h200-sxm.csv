@@ -1,6 +1,5 @@
-chip_slug,scope,window_days,as_of_date,n_sources,n_sources_8x,n_sources_thin,n_cycles,confidence,pct_available_median,pct_available_mean,pct_available_min,pct_available_max,pct_available_8x_median,pct_available_8x_mean,methodology_version
-h200-sxm,geo:EU,7,2026-06-23,2,0,0,45,thin,0.475,0.475,0.0,0.95,,,v2.0.0
-h200-sxm,geo:US,7,2026-06-23,3,1,0,65,ok,0.8,0.6,0.0,1.0,0.0,0.0,v2.0.0
-h200-sxm,global,7,2026-06-23,11,8,0,256,ok,0.0,0.4409,0.0,1.0,0.0,0.1602,v2.0.0
-h200-sxm,tier:T1,7,2026-06-23,1,1,0,25,thin,0.0,0.0,0.0,0.0,0.0,0.0,v2.0.0
-h200-sxm,tier:T3,7,2026-06-23,1,0,0,25,thin,1.0,1.0,1.0,1.0,,,v2.0.0
+chip_slug,scope,window_days,as_of_date,n_sources,n_sources_8x,n_sources_thin,n_cycles,confidence,n_available,breadth,n_available_8x,breadth_8x,panel_signature,pct_available_median,pct_available_mean,pct_available_min,pct_available_max,pct_available_8x_median,pct_available_8x_mean,methodology_version
+h200-sxm,geo:EU,7,2026-06-23,2,0,0,47,thin,1,0.5,0,,c4b2d406,0.4762,0.4762,0.0,0.9524,,,v2.0.0
+h200-sxm,geo:US,7,2026-06-23,2,0,0,41,thin,2,1.0,0,,c4b2d406,0.9,0.9,0.8,1.0,,,v2.0.0
+h200-sxm,global,7,2026-06-23,10,7,0,235,ok,5,0.5,2,0.2857,16875002,0.4722,0.4855,0.0,1.0,0.0,0.1766,v2.0.0
+h200-sxm,tier:T3,7,2026-06-23,1,0,0,26,thin,1,1.0,0,,1d24640c,1.0,1.0,1.0,1.0,,,v2.0.0
