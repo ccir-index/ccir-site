@@ -21,13 +21,13 @@ const cards = [
     inside: 'Vast.ai Verified · RunPod Secure · Community · Spot · Cluster',
   },
   {
-    href: '/utilization',
+    href: '/availability',
     kind: 'Demand side',
-    title: 'Market Utilization',
-    cadence: 'Daily series · ~7–10 obs/day · 90d window',
+    title: 'Availability',
+    cadence: 'Daily series · ~4 probes/day · 90d window',
     summary:
-      'The quantity side of the market: supply tightness (a diffusion-style read of how widespread tightness is, two bounds — any configuration vs full 8-GPU node), the observable idle-GPU inventory level by the hour, and the utilization level on the Vast overlay. Implied from posted availability across the panel; the marketplace venue series lives on the Vast overlay.',
-    inside: 'Supply tightness · idle-GPU inventory · operator-class breakouts · per-source signal disclosure',
+      'The quantity side of the market: a diffusion read of how many genuine-capacity venues show launchable stock — breadth (X of Y venues), two bounds (any configuration vs full 8-GPU node), charted over time so the slope reads demand tightening or easing. Measured Vast utilization (denominator-fixed rented/total) rides alongside as the depth card.',
+    inside: 'Breadth (X of Y venues) · any-config vs cluster (8×) · measured Vast utilization · per-source disclosure',
   },
   {
     href: '/basis',

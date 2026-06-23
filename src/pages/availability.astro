@@ -1,1453 +1,464 @@
 ---
 import Base from '../layouts/Base.astro';
-import { meta } from '../data/snapshot';
-import { AVAILABILITY_HEADLINE_CHIPS, AVAILABILITY_LONGTAIL_CHIPS } from '../data/availability';
 
+// /availability — the supply page: the Availability Index (breadth of genuine-
+// capacity venues showing launchable stock) + measured Vast utilization. Reads
+// the export_availability_index CSVs from /data/ client-side; degrades to a
+// "warming up" state if absent. (Superseded the old implied-blend /utilization.)
+const CHIPS = [
+  { slug: 'h100-sxm',      label: 'H100',  vast: 'h100-sxm' },
+  { slug: 'h200-sxm',      label: 'H200',  vast: 'h200-sxm' },
+  { slug: 'b200-sxm',      label: 'B200',  vast: 'b200-sxm' },
+  { slug: 'a100-sxm-80gb', label: 'A100',  vast: 'a100-sxm' },
+  { slug: 'gb200',         label: 'GB200', vast: 'gb200' },
+];
 const DEFAULT_CHIP = 'h100-sxm';
-const availMeta = (meta as any).availability;
 ---
 <Base
-  title="Availability Observatory · CCIR"
-  description="Cross-provider availability and pricing grid for GPU compute, sourced from the Shadeform aggregator. Collection paused — shows the last published snapshot (2026-05-13)."
+  title="Availability & Utilization · CCIR"
+  description="CCIR Availability Index — a diffusion read of how many genuine-capacity GPU venues (X of Y) show launchable stock, charted over time, with measured marketplace utilization."
 >
-  <!-- vast-page class brings the Bloomberg-terminal chrome (ticker strip,
-       sec-num chips, chart-wrap panels, mono tables, pulse dot, etc.).
-       availability-page adds /availability-specific overrides. -->
-  <section class="wrap top vast-page availability-page">
-    <div class="kicker">SHADEFORM AGGREGATOR · CROSS-PROVIDER OBSERVATORY</div>
-    <h1>Availability Observatory</h1>
-    <div class="paused-banner" role="status">
-      Collection paused — showing the last published snapshot (2026-05-13).
+  <section class="wrap ai-page">
+    <div class="kicker">CCIR · SUPPLY OBSERVATORY</div>
+    <h1>Availability &amp; Utilization</h1>
+    <p class="deck">
+      Two lenses on GPU supply. <strong>Availability</strong> — of the
+      genuine-capacity venues we probe, how many show launchable stock
+      (<strong>X of Y</strong>), tracked over time so the slope reads demand
+      tightening or easing. <strong>Utilization</strong> — of the capacity the one
+      marketplace we can measure actually lists, how much is rented.
+    </p>
+
+    <!-- chip selector -->
+    <div class="chips" role="tablist" aria-label="GPU model">
+      {CHIPS.map((c) => (
+        <button class="chip" role="tab" data-chip={c.slug} data-vast={c.vast}
+                aria-selected={c.slug === DEFAULT_CHIP ? 'true' : 'false'}>{c.label}</button>
+      ))}
+      <span class="chip-hint">select one or more to compare</span>
     </div>
-    <div class="ticker-strip" role="group" aria-label="Snapshot stats">
-      <div class="tk-cell"><span class="tk-lbl">Window</span><span class="tk-val">{availMeta?.window_days ?? 30}d</span></div>
-      <div class="tk-cell"><span class="tk-lbl">Chips</span><span class="tk-val">{availMeta?.n_chips ?? 11}</span></div>
-      <div class="tk-cell"><span class="tk-lbl">SKU × region</span><span class="tk-val">{availMeta?.n_sku_regions_latest_cycle ?? 0}</span></div>
-      <div class="tk-cell"><span class="tk-lbl">Available</span><span class="tk-val">{availMeta?.n_available_latest_cycle ?? 0}</span></div>
-      <div class="tk-cell"><span class="tk-lbl">Cadence</span><span class="tk-val">3h</span></div>
-      <div class="tk-cell tk-status tk-paused"><span class="tk-dot"></span><span class="tk-val">PAUSED</span></div>
+
+    <!-- headline stat band -->
+    <div class="band" id="band">
+      <div class="stat stat-frac">
+        <span class="stat-lbl">Fractional — venues available</span>
+        <span class="stat-val" id="s-frac">—</span>
+        <span class="stat-sub" id="s-frac-sub">any launchable shape · 7d</span>
+      </div>
+      <div class="stat stat-clu">
+        <span class="stat-lbl">Cluster (8×) — venues available</span>
+        <span class="stat-val" id="s-clu">—</span>
+        <span class="stat-sub" id="s-clu-sub">full 8-GPU node · 7d</span>
+      </div>
+      <div class="stat">
+        <span class="stat-lbl">Panel sources</span>
+        <span class="stat-val" id="s-srcs">—</span>
+        <span class="stat-sub" id="s-srcs-sub">venues probed</span>
+      </div>
     </div>
-    <details class="def-disclosure">
-      <summary>How to read this</summary>
-      <p class="standfirst lede">
-        <strong>Shadeform aggregates 19 GPU clouds' publicly observable list-asks into a single view.</strong>
-        This page surfaces the cross-provider view Shadeform aggregates:
-        where each chip is procurable, across providers and regions;
-        the per-provider price spread; boot-time tradeoffs; config availability;
-        long-tail chip catalog. <strong>Observatory data — not part of the CCIR rate
-        methodology.</strong> Shadeform-reported pricing is third-party-attributed.
-      </p>
+
+    <!-- primary: availability over time -->
+    <div class="card chart-card">
+      <div class="card-head">
+        <div>
+          <h2>Availability over time</h2>
+          <p class="card-sub">Rolling 7-day breadth — the share of genuine-capacity venues (X of Y) showing stock; falling = venues selling out. Dashed verticals mark a change in the venue panel. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
+        </div>
+        <div class="confbadge" id="confbadge"></div>
+      </div>
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      <div class="empty" id="trend-empty" hidden>Series warming up — first publish lands on the next daily build.</div>
+    </div>
+
+    <!-- source panel (collapsed by default) -->
+    <details class="card panel-card">
+      <summary>
+        <span class="sum-main"><h2>The panel</h2><span class="sum-count" id="panel-count"></span></span>
+        <span class="sum-sub">Each genuine-capacity source, one vote · 7-day availability</span>
+        <span class="sum-chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel" id="panel"></div>
+      <p class="foot">Excludes catalog-eligibility (Azure) and probabilistic-score (AWS) sources from the headline. Resellers that duplicate a directly-probed operator are deduped. Sources below the minimum observed-cycle threshold are held out until they accumulate probes.</p>
     </details>
 
-    <div class="controls">
-      <div class="control-row chip-row">
-        <span class="control-label">Chip</span>
-        <div class="pill-group" id="chip-pills" role="group" aria-label="Select chip">
-          <span class="chip-group-label">Headline</span>
-          {AVAILABILITY_HEADLINE_CHIPS.map((c) => (
-            <button type="button" class="pill" data-chip={c.slug} data-default={c.slug === DEFAULT_CHIP}>
-              {c.short}
-            </button>
-          ))}
-          <span class="chip-group-label">Long-tail</span>
-          {AVAILABILITY_LONGTAIL_CHIPS.map((c) => (
-            <button type="button" class="pill" data-chip={c.slug}>
-              {c.short}
-            </button>
-          ))}
+    <!-- measured utilization (Vast) -->
+    <div class="card util-card">
+      <div class="card-head">
+        <div>
+          <h2>Measured utilization <span class="tag">one marketplace source</span></h2>
+          <p class="card-sub">Vast.ai — the only marketplace that discloses rented / total. Rolling 7-day occupancy, denominator fixed to each window's median listed capacity.</p>
         </div>
       </div>
+      <div class="util-grid">
+        <div class="util-now">
+          <span class="util-big" id="u-now">—</span>
+          <span class="util-now-lbl" id="u-now-lbl">trailing 7-day occupancy</span>
+        </div>
+        <div class="chart-wrap util-wrap"><canvas id="utilChart"></canvas></div>
+      </div>
+      <div class="empty" id="util-empty" hidden>Vast occupancy warming up.</div>
     </div>
 
-    <!-- Section 1: Hero — provider × region availability grid -->
-    <section class="vast-section vast-section-hero">
-      <header class="sec-head">
-        <span class="sec-num">01</span>
-        <span class="sec-kicker-label">AVAILABILITY</span>
-        <h2>Provider × region grid</h2>
-        <span class="sec-note">last snapshot · 2026-05-13</span>
-        <span class="sec-note" id="grid-summary">—</span>
-      </header>
-      <div class="grid-wrap grid-wrap-hero">
-        <div class="chart-status" id="grid-status">Loading…</div>
-        <div id="gridContainer" class="grid-container"></div>
-      </div>
-      <div class="quant-strip" id="grid-quant-strip" aria-label="Headline stats">
-        <div class="qs-cell"><span class="qs-lbl">SKU × REGION</span><span class="qs-val" id="qs-total">—</span></div>
-        <div class="qs-cell"><span class="qs-lbl">AVAILABLE</span><span class="qs-val" id="qs-avail">—</span></div>
-        <div class="qs-cell qs-cell-hero"><span class="qs-lbl">% AVAIL</span><span class="qs-val" id="qs-pct">—</span></div>
-        <div class="qs-cell"><span class="qs-lbl">PROVIDERS</span><span class="qs-val" id="qs-providers">—</span></div>
-        <div class="qs-cell"><span class="qs-lbl">CHEAPEST</span><span class="qs-val" id="qs-cheapest">—</span></div>
-        <div class="qs-cell"><span class="qs-lbl">MEDIAN $/GPU</span><span class="qs-val" id="qs-median">—</span></div>
-      </div>
-      <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
-        <p class="footnote">
-          Each cell is one (provider × region) pair for the selected chip. Green
-          = available in the snapshot, red = offline. Hover for $/GPU/hr. Cells are sorted
-          by provider (rows) and region (columns), so chronic outages on a single
-          provider show up as a row of red. <code>per_gpu_dph = hourly_price ÷ 100 ÷ num_gpus</code>.
-        </p>
-      </details>
-    </section>
-
-    <!-- Section 2: Providers ranking -->
-    <section class="vast-section">
-      <header class="sec-head">
-        <span class="sec-num">02</span>
-        <span class="sec-kicker-label">PROVIDERS</span>
-        <h2>Per-provider summary</h2>
-        <span class="sec-note" id="providers-summary">—</span>
-      </header>
-      <div class="table-wrap">
-        <table class="data" id="providersTable">
-          <thead>
-            <tr>
-              <th>Provider</th>
-              <th class="num">SKUs</th>
-              <th class="num">Distinct</th>
-              <th class="num">Available</th>
-              <th class="num">Median $/GPU</th>
-              <th class="num">Min $/GPU</th>
-              <th class="num">Boot min (s)</th>
-              <th class="num">Boot max (s)</th>
-            </tr>
-          </thead>
-          <tbody id="providersTbody"></tbody>
-        </table>
-      </div>
-      <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
-        <p class="footnote">
-          Shadeform tracks 19 GPU clouds; not all carry the selected chip. Boot
-          times are minimum/maximum provisioning seconds reported by the provider.
-          Latitude commits to ~60s; some hyperscale-scale fleets need 180-240s.
-        </p>
-      </details>
-    </section>
-
-    <!-- Section 3: Spread (per-provider $/GPU strip) -->
-    <section class="vast-section">
-      <header class="sec-head">
-        <span class="sec-num">03</span>
-        <span class="sec-kicker-label">SPREAD</span>
-        <h2>Per-provider price spread</h2>
-        <span class="sec-note">last snapshot · 2026-05-13</span>
-        <span class="sec-note" id="spread-summary">—</span>
-      </header>
-      <div class="chart-wrap" style="height:320px;">
-        <div class="chart-status" id="spread-status">Loading…</div>
-        <canvas id="spreadChart"></canvas>
-      </div>
-      <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
-        <p class="footnote">
-          Each provider's min, median, and max per-GPU $/hr for the selected chip.
-          Wide bars mean broad SKU coverage; narrow bars mean a single configuration.
-          The cross-provider gap measures list-ask dispersion at matched chip —
-          the same chip has been listed at $1.95–$2.99/GPU/hr across nine venues
-          for H100 SXM.
-        </p>
-      </details>
-    </section>
-
-    <!-- Section 4: Configs (interconnect / NVLink / num_gpus) -->
-    <section class="vast-section">
-      <header class="sec-head">
-        <span class="sec-num">04</span>
-        <span class="sec-kicker-label">CONFIGS</span>
-        <h2>Available configurations</h2>
-        <span class="sec-note" id="configs-summary">—</span>
-      </header>
-      <div class="table-wrap">
-        <table class="data" id="configsTable">
-          <thead>
-            <tr>
-              <th>Provider</th>
-              <th>Interconnect</th>
-              <th>NVLink</th>
-              <th class="num">GPUs</th>
-              <th class="num">vCPU envelope</th>
-              <th class="num">RAM (GB)</th>
-              <th class="num">$/GPU/hr</th>
-              <th>Available</th>
-            </tr>
-          </thead>
-          <tbody id="configsTbody"></tbody>
-        </table>
-      </div>
-      <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
-        <p class="footnote">
-          Per-SKU configuration matrix. NVLink ✓ means the provider exposes
-          explicit NVLink topology — not just SXM form. Empty cells reflect
-          Shadeform's reporting; the underlying provider may have richer
-          config detail in their own API.
-        </p>
-      </details>
-    </section>
-
-    <!-- Section 5: Boot time -->
-    <section class="vast-section">
-      <header class="sec-head">
-        <span class="sec-num">05</span>
-        <span class="sec-kicker-label">BOOT TIME</span>
-        <h2>Provisioning seconds by provider</h2>
-        <span class="sec-note">last snapshot · 2026-05-13</span>
-        <span class="sec-note" id="boot-summary">—</span>
-      </header>
-      <div class="chart-wrap" style="height:280px;">
-        <div class="chart-status" id="boot-status">Loading…</div>
-        <canvas id="bootChart"></canvas>
-      </div>
-      <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
-        <p class="footnote">
-          Min / max provisioning seconds per provider. Matters for elasticity-
-          sensitive workloads — a 4× boot-time gap between providers can be
-          more material than a $0.10/GPU/hr price gap on short-duration jobs.
-        </p>
-      </details>
-    </section>
-
-    <!-- Section 6: Geography -->
-    <section class="vast-section">
-      <header class="sec-head">
-        <span class="sec-num">06</span>
-        <span class="sec-kicker-label">GEOGRAPHY</span>
-        <h2>Region distribution</h2>
-        <span class="sec-note" id="geo-summary">—</span>
-      </header>
-      <div class="table-wrap">
-        <table class="data" id="geoTable">
-          <thead>
-            <tr>
-              <th>Region</th>
-              <th class="num">SKUs</th>
-              <th class="num">Available</th>
-              <th class="num">% Avail</th>
-              <th class="num">Providers</th>
-              <th class="num">Min $/GPU</th>
-            </tr>
-          </thead>
-          <tbody id="geoTbody"></tbody>
-        </table>
-      </div>
-      <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
-        <p class="footnote">
-          Where on earth is the selected chip procurable. The same chip can
-          be online in Iceland but offline in Virginia, and price-anchored to
-          the cheapest available cell across all regions.
-        </p>
-      </details>
-    </section>
-
-    <!-- Section 7: Availability over time -->
-    <section class="vast-section vast-section-hero">
-      <header class="sec-head">
-        <span class="sec-num">07</span>
-        <span class="sec-kicker-label">TIME SERIES</span>
-        <h2>Availability % over time</h2>
-        <span class="sec-note">3h cycles · series ends 2026-05-13 (paused)</span>
-        <span class="sec-note" id="hist-summary">—</span>
-      </header>
-      <div class="chart-wrap chart-wrap-hero" style="height:340px;">
-        <div class="chart-status" id="hist-status">Loading…</div>
-        <canvas id="histChart"></canvas>
-      </div>
-      <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
-        <p class="footnote">
-          Per-cycle <code>pct_available = n_available ÷ n_total_sku_region</code>
-          for the selected chip, at the 3-hour collection cadence. Shadeform
-          exposes current state only; CCIR persists the cycle-by-cycle history
-          drawn here. The series ends 2026-05-13, when collection was paused.
-        </p>
-      </details>
-    </section>
-
-    <!-- Section 8: Provider overlap -->
-    <section class="vast-section">
-      <header class="sec-head">
-        <span class="sec-num">08</span>
-        <span class="sec-kicker-label">OVERLAP</span>
-        <h2>Cross-provider redundancy</h2>
-        <span class="sec-note" id="overlap-summary">—</span>
-      </header>
-      <div class="table-wrap">
-        <table class="data" id="overlapTable">
-          <thead>
-            <tr>
-              <th>Interconnect × num_GPUs</th>
-              <th class="num">Providers</th>
-              <th class="num">SKUs</th>
-              <th class="num">Available</th>
-              <th>Carriers</th>
-            </tr>
-          </thead>
-          <tbody id="overlapTbody"></tbody>
-        </table>
-      </div>
-      <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
-        <p class="footnote">
-          For each (interconnect × num_GPUs) configuration, how many providers
-          carry it. Single-provider rows mean concentration risk — capacity
-          loss has nowhere to fail over to. Multi-provider rows mean cross-
-          venue arbitrage is possible.
-        </p>
-      </details>
-    </section>
-
-    <!-- Section 9: Long-tail catalog -->
-    <section class="vast-section">
-      <header class="sec-head">
-        <span class="sec-num">09</span>
-        <span class="sec-kicker-label">CATALOG</span>
-        <h2>Cross-chip headline</h2>
-        <span class="sec-note" id="summary-summary">—</span>
-      </header>
-      <div class="table-wrap">
-        <table class="data" id="summaryTable">
-          <thead>
-            <tr>
-              <th>Chip</th>
-              <th class="num">SKU × region</th>
-              <th class="num">Available</th>
-              <th class="num">% Avail</th>
-              <th class="num">Providers</th>
-              <th class="num">Min $/GPU</th>
-              <th class="num">Median $/GPU</th>
-              <th>Cheapest provider</th>
-            </tr>
-          </thead>
-          <tbody id="summaryTbody"></tbody>
-        </table>
-      </div>
-      <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
-        <p class="footnote">
-          Every chip Shadeform reports across the headline + long-tail panel.
-          B300, GH200, and RTX Pro 6000 give early visibility into chips before
-          they hit the CCIR rate panel.
-        </p>
-      </details>
-    </section>
-
-    <p class="footnote-last">
-      Collected every three hours while live; collection has been paused since
-      2026-05-13 pending the pipeline migration, and every figure on this page
-      reflects the last published snapshot. Shadeform aggregator API authenticated via
-      CCIR research key — values are public list-asks as Shadeform reports them.
-      Aggregator depth: 19 GPU clouds, 28 GPU types, 269 instance types,
-      ~671 (type × region) availability cells per cycle.
-    </p>
+    <details class="method-details">
+      <summary>Methodology</summary>
+      <p class="method">
+        Each source's window rate is its share of capacity-probes that found
+        stock, count-weighted within source. The headline is <em>breadth</em> —
+        of the Y genuine-capacity venues that disclosed a signal, the share X/Y
+        that found any stock — shown as Fractional (any shape) and Cluster (full
+        8-GPU node). Breadth, not a median, because availability is bimodal
+        (venues clump dry or flush) and a median collapses to 0 or 1 on a bare
+        majority; its slope over time is the demand read. Each rolling point uses
+        the venues present in that window, and dashed verticals flag where the
+        panel set changed, so added venues don't read as a demand move. Utilization
+        is a separate measured depth metric — never blended into availability.
+      </p>
+    </details>
   </section>
 
   <script>
     import Chart from 'chart.js/auto';
-    import 'chartjs-adapter-date-fns';
-    import {
-      fetchAvailabilityOffers, fetchAvailabilityHistory,
-      fetchAvailabilityProviders, fetchAvailabilitySummary,
-      colorForAvailabilityChip, shortLabelForAvailabilityChip,
-      AVAILABLE_COLOR, UNAVAILABLE_COLOR,
-      type AvailabilityChipSlug, type AvailabilityOfferRow,
-      type AvailabilityHistoryRow, type AvailabilityProviderRow,
-      type AvailabilitySummaryRow,
-    } from '../data/availability';
-    import {
-      lastValueLabelPlugin, ccirTimeScaleDefaults, LAST_VALUE_GUTTER,
-    } from '../data/chartExtras';
 
-    const DEFAULT_CHIP: AvailabilityChipSlug = 'h100-sxm';
+    const DEFAULT_CHIP = 'h100-sxm';
+    // Series start — the panel only reaches a stable multi-source read here, so
+    // the published trend begins on this date (no May single-source cold start).
+    const SERIES_START = '2026-06-15';
+    // Plain category x-axis with pre-formatted date labels — no time adapter, so
+    // nothing to break. autoSkip thins the labels as the range grows.
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const fmtDate = (iso) => { const p = String(iso).split('-'); return p.length === 3 ? `${MONTHS[+p[1]-1]} ${+p[2]}` : iso; };
+    const catAxis = (ink) => ({
+      ticks: { color: ink, autoSkip: true, maxTicksLimit: 7, maxRotation: 0,
+               font: { family: 'IBM Plex Mono', size: 10 } },
+      grid: { display: false },
+    });
+    const $ = (id) => document.getElementById(id);
+    const pct = (v) => (v == null || isNaN(v)) ? '—' : (v * 100).toFixed(0) + '%';
+    const ACCENT = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff9100';
+    const TEAL = '#4cc4b0';
+    const css = (n, f) => (getComputedStyle(document.documentElement).getPropertyValue(n).trim() || f);
 
-    const state = {
-      chip: DEFAULT_CHIP as AvailabilityChipSlug,
-      offers: [] as AvailabilityOfferRow[],
-      history: [] as AvailabilityHistoryRow[],
-      providers: [] as AvailabilityProviderRow[],
-      summary: [] as AvailabilitySummaryRow[],
-    };
-
-    const charts: Record<string, Chart | null> = {
-      spread: null, boot: null, hist: null,
-    };
-
-    function setStatus(id: string, msg: string | null) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      if (msg === null) { (el as HTMLElement).style.display = 'none'; el.textContent = ''; }
-      else { (el as HTMLElement).style.display = 'flex'; el.textContent = msg; }
-    }
-
-    function fmtUsd(n: number | null | undefined, decimals = 2): string {
-      if (n === null || n === undefined || !Number.isFinite(n)) return '—';
-      return '$' + n.toFixed(decimals);
-    }
-    function fmtNum(n: number | null | undefined, decimals = 0): string {
-      if (n === null || n === undefined || !Number.isFinite(n)) return '—';
-      return n.toFixed(decimals);
-    }
-    function fmtPct(n: number | null | undefined): string {
-      if (n === null || n === undefined || !Number.isFinite(n)) return '—';
-      return (n * 100).toFixed(0) + '%';
-    }
-
-    function setQs(id: string, v: string) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = v;
-    }
-
-    function syncPills() {
-      document.querySelectorAll<HTMLButtonElement>('#chip-pills .pill').forEach((p) => {
-        p.classList.toggle('on', p.dataset.chip === state.chip);
-      });
-    }
-
-    function readToken(name: string): string {
+    // tiny CSV parser (numeric/clean fields only)
+    async function loadCsv(path) {
       try {
-        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-      } catch { return ''; }
+        const r = await fetch(path, { cache: 'no-cache' });
+        if (!r.ok) return null;
+        const txt = (await r.text()).trim();
+        if (!txt) return null;
+        const [head, ...lines] = txt.split(/\r?\n/);
+        const cols = head.split(',');
+        return lines.map((ln) => {
+          const cells = ln.split(',');
+          const o = {};
+          cols.forEach((c, i) => (o[c] = cells[i]));
+          return o;
+        });
+      } catch { return null; }
     }
 
-    // ---- Renderers ---------------------------------------------------------
+    const num = (x) => (x === '' || x == null ? null : Number(x));
+    let trendChart, utilChart;
+    const state = { headline: null, sources: null, util: null, trend: {}, vtrend: {} };
+    // fixed per-chip colors for the multi-chip overlays (readable on both themes).
+    const CHIP_COLORS = {
+      'h100-sxm': '#ff9100', 'a100-sxm-80gb': '#14b8a6', 'b200-sxm': '#8b5cf6',
+      'h200-sxm': '#3b82f6', 'gb200': '#ec4899',
+    };
+    const colorFor = (slug) => CHIP_COLORS[slug] || ACCENT;
 
-    function renderHeadline() {
-      const offers = state.offers;
-      if (offers.length === 0) {
-        setStatus('grid-status', `No SKUs reported by Shadeform for ${shortLabelForAvailabilityChip(state.chip)} this cycle.`);
-        ['qs-total', 'qs-avail', 'qs-pct', 'qs-providers', 'qs-cheapest', 'qs-median'].forEach((id) => setQs(id, '—'));
-        document.getElementById('grid-summary')!.textContent = '0 cells';
-        document.getElementById('gridContainer')!.innerHTML = '';
-        return;
-      }
-      setStatus('grid-status', null);
-      const total = offers.length;
-      const avail = offers.filter((o) => o.available).length;
-      const pct = total > 0 ? avail / total : 0;
-      const providers = new Set(offers.map((o) => o.cloud)).size;
-      const availOffers = offers.filter((o) => o.available && o.per_gpu_dph !== null);
-      let cheapest: AvailabilityOfferRow | null = null;
-      for (const o of availOffers) {
-        if (cheapest === null || (o.per_gpu_dph! < (cheapest.per_gpu_dph ?? Infinity))) cheapest = o;
-      }
-      const dphs = offers.map((o) => o.per_gpu_dph).filter((v): v is number => v !== null && Number.isFinite(v));
-      const median = dphs.length ? quantile(dphs, 0.5) : null;
-
-      setQs('qs-total', String(total));
-      setQs('qs-avail', String(avail));
-      setQs('qs-pct', fmtPct(pct));
-      setQs('qs-providers', String(providers));
-      setQs('qs-cheapest', cheapest ? `${fmtUsd(cheapest.per_gpu_dph)} ${cheapest.cloud_display}` : '—');
-      setQs('qs-median', fmtUsd(median));
-
-      document.getElementById('grid-summary')!.textContent =
-        `${total} cells · ${avail} available across ${providers} providers`;
-
-      // Build grid: rows = providers, columns = regions
-      const providerOrder = Array.from(new Set(offers.map((o) => o.cloud_display))).sort();
-      const regionOrder = Array.from(new Set(offers.map((o) => o.region_display ?? o.region))).sort();
-      // Aggregate by (provider, region) — pick the cheapest available, fallback to any
-      const cellMap = new Map<string, AvailabilityOfferRow>();
-      for (const o of offers) {
-        const key = `${o.cloud_display}|${o.region_display ?? o.region}`;
-        const prev = cellMap.get(key);
-        if (!prev) { cellMap.set(key, o); continue; }
-        if (o.available && !prev.available) { cellMap.set(key, o); continue; }
-        if (o.available === prev.available
-            && (o.per_gpu_dph ?? Infinity) < (prev.per_gpu_dph ?? Infinity)) {
-          cellMap.set(key, o);
-        }
-      }
-
-      const cellHtml: string[] = [];
-      // Header row
-      cellHtml.push(`<div class="grid-cell grid-cell-corner"></div>`);
-      for (const r of regionOrder) {
-        cellHtml.push(`<div class="grid-cell grid-cell-col-head" title="${escapeHtml(r)}">${escapeHtml(truncate(r, 18))}</div>`);
-      }
-      // Provider rows
-      for (const p of providerOrder) {
-        cellHtml.push(`<div class="grid-cell grid-cell-row-head" title="${escapeHtml(p)}">${escapeHtml(truncate(p, 22))}</div>`);
-        for (const r of regionOrder) {
-          const o = cellMap.get(`${p}|${r}`);
-          if (!o) {
-            cellHtml.push(`<div class="grid-cell grid-cell-empty"></div>`);
-          } else {
-            const cls = o.available ? 'grid-cell-on' : 'grid-cell-off';
-            const tooltip = `${p} / ${r}\\n${o.shade_instance_type}\\n${o.num_gpus}× ${o.gpu_type} ${o.interconnect ?? ''}\\n${fmtUsd(o.per_gpu_dph)}/GPU/hr · ${o.available ? 'available' : 'offline'}`;
-            cellHtml.push(`<div class="grid-cell ${cls}" title="${escapeHtml(tooltip)}">${fmtUsd(o.per_gpu_dph, 2)}</div>`);
-          }
-        }
-      }
-      const container = document.getElementById('gridContainer')!;
-      container.style.gridTemplateColumns = `170px repeat(${regionOrder.length}, minmax(72px, 1fr))`;
-      container.innerHTML = cellHtml.join('');
+    function gradient(ctx, color) {
+      const g = ctx.createLinearGradient(0, 0, 0, 260);
+      g.addColorStop(0, color + '55');
+      g.addColorStop(1, color + '05');
+      return g;
     }
 
-    function renderProvidersTable() {
-      const tbody = document.getElementById('providersTbody')!;
-      const rows = state.providers;
-      document.getElementById('providers-summary')!.textContent =
-        rows.length ? `${rows.length} providers` : '—';
-      tbody.innerHTML = rows.map((p, i) => {
-        const cls = i === 0 ? ' class="row-top"' : '';
-        return `<tr${cls}>
-          <td>${escapeHtml(p.cloud_display)}</td>
-          <td class="num">${p.n_skus}</td>
-          <td class="num">${p.n_distinct_skus}</td>
-          <td class="num">${p.n_available}</td>
-          <td class="num">${fmtUsd(p.median_per_gpu_dph)}</td>
-          <td class="num">${fmtUsd(p.min_per_gpu_dph)}</td>
-          <td class="num">${fmtNum(p.median_boot_min_seconds, 0)}</td>
-          <td class="num">${fmtNum(p.median_boot_max_seconds, 0)}</td>
-        </tr>`;
-      }).join('') || '<tr><td colspan="8" class="dim">No provider data.</td></tr>';
+    // Draw dashed verticals where the voting venue panel changed (chart.$markers
+    // holds the x-indices), so a composition shift reads as an added-venue event,
+    // not a demand move.
+    const markerPlugin = {
+      id: 'changeMarkers',
+      afterDraw(chart) {
+        const marks = chart.$markers;
+        if (!marks || !marks.length) return;
+        const { ctx, chartArea, scales } = chart;
+        if (!chartArea || !scales.x) return;
+        ctx.save();
+        ctx.strokeStyle = (css('--ink-faint', '#8e8a82')) + 'aa';
+        ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+        marks.forEach((i) => {
+          const xp = scales.x.getPixelForValue(i);
+          ctx.beginPath(); ctx.moveTo(xp, chartArea.top); ctx.lineTo(xp, chartArea.bottom); ctx.stroke();
+        });
+        ctx.restore();
+      },
+    };
+
+    // lazy-load + cache a per-chip trend CSV
+    async function avTrend(chip) {
+      if (state.trend[chip] === undefined) state.trend[chip] = await loadCsv(`/data/availability_index_trend_${chip}.csv`);
+      return state.trend[chip] || [];
     }
-
-    function renderSpread() {
-      const offers = state.offers.filter((o) => o.per_gpu_dph !== null);
-      if (offers.length === 0) {
-        setStatus('spread-status', 'No price data.');
-        if (charts.spread) { charts.spread.destroy(); charts.spread = null; }
-        document.getElementById('spread-summary')!.textContent = '—';
-        return;
-      }
-      setStatus('spread-status', null);
-      const byProvider = new Map<string, number[]>();
-      for (const o of offers) {
-        const arr = byProvider.get(o.cloud_display) ?? [];
-        arr.push(o.per_gpu_dph!);
-        byProvider.set(o.cloud_display, arr);
-      }
-      const providers = Array.from(byProvider.entries())
-        .map(([name, vals]) => ({
-          name,
-          min: Math.min(...vals),
-          med: quantile(vals, 0.5),
-          max: Math.max(...vals),
-          n: vals.length,
-        }))
-        .sort((a, b) => a.med - b.med);
-      document.getElementById('spread-summary')!.textContent =
-        `${providers.length} providers · gap ${fmtUsd(providers[0].min)} → ${fmtUsd(providers[providers.length - 1].max)}`;
-
-      const accent = readToken('--vast-accent') || readToken('--accent') || '#ff9100';
-      const inkDim = readToken('--ink-dim') || '#888';
-      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
-      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
-
-      if (charts.spread) charts.spread.destroy();
-      charts.spread = new Chart(document.getElementById('spreadChart') as HTMLCanvasElement, {
-        type: 'bar',
-        data: {
-          labels: providers.map((p) => p.name),
-          datasets: [
-            {
-              label: 'min → max',
-              data: providers.map((p) => [p.min, p.max] as any),
-              backgroundColor: colorForAvailabilityChip(state.chip) + '88',
-              borderColor: colorForAvailabilityChip(state.chip),
-              borderWidth: 1,
-              borderSkipped: false,
-            },
-            {
-              label: 'median',
-              type: 'line' as any,
-              data: providers.map((p) => p.med),
-              borderColor: accent,
-              backgroundColor: accent,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              showLine: false,
-            } as any,
-          ],
-        },
-        options: {
-          indexAxis: 'y' as const,
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => {
-                  const p = providers[ctx.dataIndex];
-                  if (ctx.dataset.label === 'median') return `${p.name} median ${fmtUsd(p.med)}`;
-                  return `${p.name}: ${fmtUsd(p.min)} – ${fmtUsd(p.max)} (n=${p.n})`;
-                },
-              },
-            },
-          },
-          scales: {
-            // No vertical gridlines (x carries the value axis on this
-            // horizontal-bar chart; tooltips carry exact figures).
-            x: { title: { display: true, text: 'Per-GPU $/hr', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid, drawOnChartArea: false }, border: { color: grid } },
-            y: { ticks: { color: inkDim, font: monoFont }, grid: { color: grid } },
-          },
-        },
-      });
+    async function vuTrend(vast) {
+      if (state.vtrend[vast] === undefined) state.vtrend[vast] = await loadCsv(`/data/vast_utilization_trend_${vast}.csv`);
+      return state.vtrend[vast] || [];
     }
+    const mapByDate = (rows, key) => { const m = {}; (rows || []).forEach((r) => (m[r.as_of_date] = num(r[key]))); return m; };
+    const unionDates = (lists) => [...new Set(lists.flat().map((r) => r.as_of_date))].sort();
 
-    function renderConfigsTable() {
-      const tbody = document.getElementById('configsTbody')!;
-      // Distinct (provider, interconnect, nvlink, num_gpus) rows, sorted by provider then num_gpus
-      const seen = new Map<string, AvailabilityOfferRow>();
-      for (const o of state.offers) {
-        const key = `${o.cloud_display}|${o.interconnect ?? ''}|${o.nvlink}|${o.num_gpus}`;
-        const prev = seen.get(key);
-        if (!prev) { seen.set(key, o); continue; }
-        if (o.available && !prev.available) seen.set(key, o);
-      }
-      const rows = Array.from(seen.values()).sort((a, b) => {
-        if (a.cloud_display !== b.cloud_display) return a.cloud_display.localeCompare(b.cloud_display);
-        return a.num_gpus - b.num_gpus;
-      });
-      document.getElementById('configs-summary')!.textContent =
-        rows.length ? `${rows.length} configurations` : '—';
-      tbody.innerHTML = rows.map((c) => {
-        const cpu = c.vcpus !== null ? String(c.vcpus) : '—';
-        const ram = c.memory_in_gb !== null ? String(c.memory_in_gb) : '—';
-        const tag = c.available
-          ? '<span class="tag verified">available</span>'
-          : '<span class="tag deverified">offline</span>';
-        return `<tr>
-          <td>${escapeHtml(c.cloud_display)}</td>
-          <td>${escapeHtml(c.interconnect ?? '—')}</td>
-          <td>${c.nvlink === true ? '✓' : (c.nvlink === false ? '—' : '?')}</td>
-          <td class="num">${c.num_gpus}</td>
-          <td class="num">${cpu}</td>
-          <td class="num">${ram}</td>
-          <td class="num">${fmtUsd(c.per_gpu_dph)}</td>
-          <td>${tag}</td>
-        </tr>`;
-      }).join('') || '<tr><td colspan="8" class="dim">No configurations reported.</td></tr>';
-    }
-
-    function renderBootTime() {
-      const providers = state.providers.filter((p) =>
-        p.median_boot_min_seconds !== null || p.median_boot_max_seconds !== null);
-      if (providers.length === 0) {
-        setStatus('boot-status', 'No boot-time data.');
-        if (charts.boot) { charts.boot.destroy(); charts.boot = null; }
-        document.getElementById('boot-summary')!.textContent = '—';
-        return;
-      }
-      setStatus('boot-status', null);
-      const sorted = [...providers].sort((a, b) =>
-        (a.median_boot_min_seconds ?? Infinity) - (b.median_boot_min_seconds ?? Infinity));
-      document.getElementById('boot-summary')!.textContent =
-        `${sorted.length} providers · fastest ${fmtNum(sorted[0].median_boot_min_seconds, 0)}s`;
-
-      const accent = readToken('--vast-accent') || readToken('--accent') || '#ff9100';
-      const inkDim = readToken('--ink-dim') || '#888';
-      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
-      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
-      const chipColor = colorForAvailabilityChip(state.chip);
-
-      if (charts.boot) charts.boot.destroy();
-      charts.boot = new Chart(document.getElementById('bootChart') as HTMLCanvasElement, {
-        type: 'bar',
-        data: {
-          labels: sorted.map((p) => p.cloud_display),
-          datasets: [
-            {
-              label: 'min boot (s)',
-              data: sorted.map((p) => p.median_boot_min_seconds ?? 0),
-              backgroundColor: chipColor,
-              borderWidth: 0,
-            },
-            {
-              label: 'max boot (s)',
-              data: sorted.map((p) => (p.median_boot_max_seconds ?? 0) - (p.median_boot_min_seconds ?? 0)),
-              backgroundColor: accent,
-              borderWidth: 0,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => {
-                  const p = sorted[ctx.dataIndex];
-                  return `${p.cloud_display}: ${fmtNum(p.median_boot_min_seconds, 0)}s – ${fmtNum(p.median_boot_max_seconds, 0)}s`;
-                },
-              },
-            },
-          },
-          scales: {
-            x: { stacked: true, ticks: { color: inkDim, font: monoFont, maxRotation: 45 }, grid: { color: grid, drawOnChartArea: false }, border: { color: grid } },
-            y: { stacked: true, title: { display: true, text: 'Seconds (median)', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid }, beginAtZero: true },
-          },
-        },
-      });
-    }
-
-    function renderGeo() {
-      const tbody = document.getElementById('geoTbody')!;
-      const offers = state.offers;
-      if (offers.length === 0) {
-        document.getElementById('geo-summary')!.textContent = '—';
-        tbody.innerHTML = '<tr><td colspan="6" class="dim">No region data.</td></tr>';
-        return;
-      }
-      const byRegion = new Map<string, { skus: number; avail: number; providers: Set<string>; minPrice: number | null }>();
-      for (const o of offers) {
-        const k = o.region_display ?? o.region;
-        const cur = byRegion.get(k) ?? { skus: 0, avail: 0, providers: new Set(), minPrice: null };
-        cur.skus += 1;
-        if (o.available) cur.avail += 1;
-        cur.providers.add(o.cloud);
-        if (o.per_gpu_dph !== null && (cur.minPrice === null || o.per_gpu_dph < cur.minPrice)) {
-          cur.minPrice = o.per_gpu_dph;
-        }
-        byRegion.set(k, cur);
-      }
-      const rows = Array.from(byRegion.entries())
-        .map(([region, v]) => ({
-          region,
-          skus: v.skus,
-          avail: v.avail,
-          pct: v.skus > 0 ? v.avail / v.skus : 0,
-          providers: v.providers.size,
-          minPrice: v.minPrice,
-        }))
-        .sort((a, b) => b.skus - a.skus);
-      document.getElementById('geo-summary')!.textContent =
-        `${rows.length} regions · top ${Math.min(rows.length, 25)}`;
-      tbody.innerHTML = rows.slice(0, 25).map((r) => `<tr>
-        <td>${escapeHtml(r.region)}</td>
-        <td class="num">${r.skus}</td>
-        <td class="num">${r.avail}</td>
-        <td class="num">${fmtPct(r.pct)}</td>
-        <td class="num">${r.providers}</td>
-        <td class="num">${fmtUsd(r.minPrice)}</td>
-      </tr>`).join('');
-    }
-
-    function renderHistory() {
-      const dist = state.history;
-      if (dist.length === 0) {
-        setStatus('hist-status',
-          `No history yet for ${shortLabelForAvailabilityChip(state.chip)} — accrues every 3 hours.`);
-        if (charts.hist) { charts.hist.destroy(); charts.hist = null; }
-        document.getElementById('hist-summary')!.textContent = '—';
-        return;
-      }
-      setStatus('hist-status', null);
-      document.getElementById('hist-summary')!.textContent =
-        `${dist.length} cycles · ${dist[0].collected_at.slice(0, 10)} → ${dist[dist.length - 1].collected_at.slice(0, 10)}`;
-
-      const accent = readToken('--vast-accent') || readToken('--accent') || '#ff9100';
-      const inkDim = readToken('--ink-dim') || '#888';
-      const grid = readToken('--vast-grid') || 'rgba(128,128,128,0.2)';
-      const monoFont = { family: 'IBM Plex Mono, ui-monospace, Menlo, monospace', size: 11 };
-
-      if (charts.hist) charts.hist.destroy();
-      charts.hist = new Chart(document.getElementById('histChart') as HTMLCanvasElement, {
-        type: 'line',
-        data: {
-          datasets: [
-            {
-              label: '% available',
-              data: dist.map((r) => ({ x: r.collected_ms, y: (r.pct_available ?? 0) * 100 })),
-              borderColor: accent,
-              backgroundColor: accent + '22',
-              borderWidth: 2.4,
-              pointRadius: 0,
-              tension: 0,
-              fill: true,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'nearest', axis: 'x', intersect: false },
-          // Right gutter keeps the end-of-line value label from clipping.
-          layout: { padding: { right: LAST_VALUE_GUTTER } },
-          plugins: {
-            legend: { display: false },
-            ccirLastValueLabel: {
-              format: (v: number) => v.toFixed(0) + '%',
-              // Single series; the y-axis title already names it.
-              datasetLabels: false,
-            },
-            tooltip: { callbacks: { label: (ctx) => `${(ctx.parsed.y as number).toFixed(0)}% available` } },
-          },
-          scales: {
-            x: {
-              ...ccirTimeScaleDefaults({ color: inkDim, grid, font: monoFont, unit: 'day' }),
-              time: { unit: 'day', displayFormats: { day: 'MMM d' } },
-            } as any,
-            y: { title: { display: true, text: '% available', color: inkDim, font: monoFont }, ticks: { color: inkDim, font: monoFont }, grid: { color: grid }, min: 0, max: 100 },
-          },
-        },
-        plugins: [lastValueLabelPlugin],
-      });
-    }
-
-    function renderOverlap() {
-      const tbody = document.getElementById('overlapTbody')!;
-      const offers = state.offers;
-      if (offers.length === 0) {
-        document.getElementById('overlap-summary')!.textContent = '—';
-        tbody.innerHTML = '<tr><td colspan="5" class="dim">No data.</td></tr>';
-        return;
-      }
-      const byConfig = new Map<string, { providers: Set<string>; skus: number; avail: number; carriers: Set<string> }>();
-      for (const o of offers) {
-        const k = `${o.interconnect ?? '?'} × ${o.num_gpus}`;
-        const cur = byConfig.get(k) ?? { providers: new Set(), skus: 0, avail: 0, carriers: new Set() };
-        cur.providers.add(o.cloud);
-        cur.skus += 1;
-        if (o.available) cur.avail += 1;
-        cur.carriers.add(o.cloud_display);
-        byConfig.set(k, cur);
-      }
-      const rows = Array.from(byConfig.entries())
-        .map(([key, v]) => ({
-          key,
-          providers: v.providers.size,
-          skus: v.skus,
-          avail: v.avail,
-          carriers: Array.from(v.carriers).sort().join(', '),
-        }))
-        .sort((a, b) => b.providers - a.providers);
-      document.getElementById('overlap-summary')!.textContent =
-        `${rows.length} configs · ${rows.filter((r) => r.providers >= 2).length} multi-provider`;
-      tbody.innerHTML = rows.map((r) => `<tr>
-        <td><code>${escapeHtml(r.key)}</code></td>
-        <td class="num">${r.providers}</td>
-        <td class="num">${r.skus}</td>
-        <td class="num">${r.avail}</td>
-        <td class="dim">${escapeHtml(r.carriers)}</td>
-      </tr>`).join('');
-    }
-
-    function renderSummaryTable() {
-      const tbody = document.getElementById('summaryTbody')!;
-      const rows = state.summary;
-      document.getElementById('summary-summary')!.textContent =
-        rows.length ? `${rows.length} chips observed` : '—';
-      tbody.innerHTML = rows.map((s) => `<tr>
-        <td>${escapeHtml(shortLabelForAvailabilityChip(s.chip_slug))}</td>
-        <td class="num">${s.n_sku_regions}</td>
-        <td class="num">${s.n_available_now}</td>
-        <td class="num">${fmtPct(s.pct_available)}</td>
-        <td class="num">${s.n_providers_carrying}</td>
-        <td class="num">${fmtUsd(s.per_gpu_dph_min)}</td>
-        <td class="num">${fmtUsd(s.per_gpu_dph_median)}</td>
-        <td>${escapeHtml(s.cheapest_available_provider ?? '—')}</td>
-      </tr>`).join('') || '<tr><td colspan="8" class="dim">No summary yet.</td></tr>';
-    }
-
-    // ---- Helpers -----------------------------------------------------------
-
-    function quantile(values: number[], q: number): number {
-      const sorted = [...values].sort((a, b) => a - b);
-      const idx = q * (sorted.length - 1);
-      const lo = Math.floor(idx);
-      const hi = Math.ceil(idx);
-      if (lo === hi) return sorted[lo];
-      return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
-    }
-
-    function escapeHtml(s: string | null | undefined): string {
-      if (!s) return '';
-      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-              .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
-
-    function truncate(s: string, n: number): string {
-      if (s.length <= n) return s;
-      return s.slice(0, n - 1) + '…';
-    }
-
-    // ---- Refresh + boot ----------------------------------------------------
-
-    async function refreshChip() {
-      ['grid-status', 'spread-status', 'boot-status', 'hist-status'].forEach((id) =>
-        setStatus(id, 'Loading…')
-      );
-      const [offers, history, providers] = await Promise.all([
-        fetchAvailabilityOffers(state.chip),
-        fetchAvailabilityHistory(state.chip),
-        fetchAvailabilityProviders(state.chip),
-      ]);
-      state.offers = offers;
-      state.history = history;
-      state.providers = providers;
-      renderHeadline();
-      renderProvidersTable();
-      renderSpread();
-      renderConfigsTable();
-      renderBootTime();
-      renderGeo();
-      renderHistory();
-      renderOverlap();
-    }
-
-    document.getElementById('chip-pills')!.addEventListener('click', (ev) => {
-      const t = ev.target as HTMLElement;
-      const pill = t.closest<HTMLButtonElement>('.pill');
-      if (!pill || !pill.dataset.chip) return;
-      state.chip = pill.dataset.chip as AvailabilityChipSlug;
-      syncPills();
-      refreshChip();
+    const baseLineOpts = (ink, gridc) => ({
+      responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+      scales: {
+        y: { min: 0, max: 100, ticks: { color: ink, callback: (v) => v + '%', font: { family: 'IBM Plex Mono' } }, grid: { color: gridc } },
+        x: catAxis(ink),
+      },
+      plugins: {
+        legend: { display: true, position: 'top', align: 'end',
+          labels: { color: ink, boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'line', font: { family: 'IBM Plex Mono', size: 11 } } },
+        tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.parsed.y == null ? '—' : c.parsed.y.toFixed(0) + '%'}` } },
+      },
     });
 
-    (async function boot() {
-      const summary = await fetchAvailabilitySummary();
-      state.summary = summary;
-      renderSummaryTable();
-      syncPills();
-      await refreshChip();
-    })();
+    function renderBand(chip) {
+      const h = (state.headline || []).find((r) => r.chip_slug === chip && r.scope === 'global');
+      const has = (v) => v !== '' && v != null;
+      $('s-frac').textContent = (h && has(h.n_available)) ? `${h.n_available} / ${h.n_sources}` : '—';
+      $('s-frac-sub').textContent = (h && has(h.breadth)) ? `${pct(num(h.breadth))} of venues · any shape · 7d` : 'any launchable shape · 7d';
+      $('s-clu').textContent = (h && has(h.n_available_8x)) ? `${h.n_available_8x} / ${h.n_sources_8x}` : '—';
+      $('s-clu-sub').textContent = (h && has(h.breadth_8x)) ? `${pct(num(h.breadth_8x))} of venues · full node · 7d` : 'full 8-GPU node · 7d';
+      $('s-srcs').textContent = h ? h.n_sources : '—';
+      $('s-srcs-sub').textContent = h && Number(h.n_sources_thin) > 0
+        ? `${h.n_sources_thin} warming up` : 'venues probed';
+      const badge = $('confbadge');
+      if (h) { badge.textContent = h.confidence === 'thin' ? 'thin panel' : 'market read';
+               badge.className = 'confbadge ' + (h.confidence === 'thin' ? 'thin' : 'ok'); }
+      else badge.textContent = '';
+    }
+
+    function renderPanel(chip) {
+      const rows = (state.sources || []).filter((r) => r.chip_slug === chip)
+        .sort((a, b) => num(b.pct_available) - num(a.pct_available));
+      const el = $('panel');
+      const cnt = $('panel-count'); if (cnt) cnt.textContent = rows.length ? `${rows.length} sources` : '';
+      if (!rows.length) { el.innerHTML = '<div class="empty">Panel warming up.</div>'; return; }
+      el.innerHTML = rows.map((r) => {
+        const p = num(r.pct_available) * 100;
+        const name = r.source.startsWith('shadeform:') ? r.source.slice(10) + ' ·sf' : r.source.replace(/_caps|_stocks/, '');
+        const c8 = r.pct_available_8x === '' || r.pct_available_8x == null ? '' : `<span class="bar-8x">8× ${(num(r.pct_available_8x)*100).toFixed(0)}%</span>`;
+        return `<div class="row">
+          <span class="row-name" title="${r.signal_type}">${name}</span>
+          <span class="row-bar"><span class="row-fill" style="width:${p.toFixed(0)}%"></span></span>
+          <span class="row-pct">${p.toFixed(0)}%</span>${c8}</div>`;
+      }).join('');
+    }
+
+    function renderTrend(selected, dates, trends) {
+      const empty = $('trend-empty');
+      const ctx = $('trendChart').getContext('2d');
+      if (!dates.length) { empty.hidden = false; if (trendChart) { trendChart.destroy(); trendChart = null; } return; }
+      empty.hidden = true;
+      const labels = dates.map(fmtDate);
+      const ink = css('--ink-dim', '#9a9991');
+      const grid = css('--rule', '#2a2a2a') + '44';
+      const series = (rows, key) => { const m = mapByDate(rows, key); return dates.map((d) => (m[d] == null ? null : m[d] * 100)); };
+      // change markers: x-indices where the venue panel set shifts (single-chip
+      // only — on a multi-chip axis each chip's panel changes would collide).
+      let markers = [];
+      if (selected.length === 1) {
+        const sig = {}; (trends[selected[0].slug] || []).forEach((r) => (sig[r.as_of_date] = r.panel_signature));
+        for (let i = 1; i < dates.length; i++) {
+          const a = sig[dates[i - 1]], b = sig[dates[i]];
+          if (a && b && a !== b) markers.push(i);
+        }
+      }
+      let datasets;
+      if (selected.length === 1) {
+        const c = colorFor(selected[0].slug);
+        datasets = [
+          { label: 'Fractional', data: series(trends[selected[0].slug], 'breadth'), borderColor: css('--ink-faint', '#8e8a82'), borderWidth: 1.25, borderDash: [4, 3], fill: false, tension: 0.3, pointRadius: 0, pointHoverRadius: 3, order: 2 },
+          { label: 'Cluster (8×)', data: series(trends[selected[0].slug], 'breadth_8x'), borderColor: c, backgroundColor: gradient(ctx, c), borderWidth: 2.75, fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 5, order: 1 },
+        ];
+        $('trend-mode').textContent = 'Cluster (8×) vs Fractional.';
+      } else {
+        datasets = selected.map((ch) => ({
+          label: ch.label, data: series(trends[ch.slug], 'breadth_8x'),
+          borderColor: colorFor(ch.slug), borderWidth: 2.25, fill: false, tension: 0.3, pointRadius: 0, pointHoverRadius: 4,
+        }));
+        $('trend-mode').textContent = 'Cluster (8×) availability by chip.';
+      }
+      const cfg = { type: 'line', data: { labels, datasets }, options: baseLineOpts(ink, grid) };
+      try {
+        if (trendChart) { trendChart.$markers = markers; trendChart.data = cfg.data; trendChart.update(); }
+        else { trendChart = new Chart(ctx, { ...cfg, plugins: [markerPlugin] }); trendChart.$markers = markers; trendChart.update(); }
+      } catch (err) { empty.hidden = false; empty.textContent = 'CHART ERR: ' + (err && err.message ? err.message : String(err)); }
+    }
+
+    function renderUtil(selected, dates, vtrends) {
+      const primary = selected[0];
+      const u = (state.util || []).find((r) => r.chip_slug === primary.vast);
+      $('u-now').textContent = u ? pct(num(u.utilization)) : '—';
+      $('u-now-lbl').textContent = `${primary.label} · trailing 7-day occupancy`;
+      const empty = $('util-empty');
+      const ctx = $('utilChart').getContext('2d');
+      const anyData = selected.some((ch) => (vtrends[ch.vast] || []).length);
+      if (!anyData || !dates.length) { empty.hidden = false; if (utilChart) { utilChart.destroy(); utilChart = null; } return; }
+      empty.hidden = true;
+      const labels = dates.map(fmtDate);
+      const ink = css('--ink-dim', '#9a9991');
+      const single = selected.length === 1;
+      const datasets = selected.map((ch) => {
+        const m = mapByDate(vtrends[ch.vast], 'utilization');
+        const c = colorFor(ch.slug);
+        return { label: ch.label, data: dates.map((d) => (m[d] == null ? null : m[d] * 100)),
+          borderColor: c, backgroundColor: single ? gradient(ctx, c) : 'transparent', borderWidth: 2.5, fill: single, tension: 0.3, pointRadius: 0, pointHoverRadius: 5, spanGaps: false };
+      });
+      const cfg = { type: 'line', data: { labels, datasets }, options: baseLineOpts(ink, css('--rule', '#2a2a2a') + '33') };
+      try {
+        if (utilChart) { utilChart.data = cfg.data; utilChart.update(); }
+        else utilChart = new Chart(ctx, cfg);
+      } catch (err) { empty.hidden = false; empty.textContent = 'CHART ERR: ' + (err && err.message ? err.message : String(err)); }
+    }
+
+    async function renderAll(selected) {
+      const primary = selected[0];
+      renderBand(primary.slug);
+      renderPanel(primary.slug);
+      const trends = {}, vtrends = {};
+      await Promise.all(selected.map(async (ch) => {
+        // Only plot days the panel is a market read (confidence=ok, ≥3 sources).
+        // The early cold-start days are single-source and whipsaw — the data
+        // flags them thin; we suppress them rather than draw an unreliable line.
+        trends[ch.slug] = (await avTrend(ch.slug)).filter((r) => r.confidence === 'ok' && r.as_of_date >= SERIES_START);
+        vtrends[ch.vast] = (await vuTrend(ch.vast)).filter((r) => r.as_of_date >= SERIES_START);
+      }));
+      let dates = unionDates([...Object.values(trends), ...Object.values(vtrends)]);
+      // Trim the left edge to the first day where every displayed series has data
+      // ("full data"), so there's no empty/partial leading region. Both charts
+      // share this start, so they stay vertically aligned.
+      const maps = [];
+      selected.forEach((ch) => {
+        maps.push(mapByDate(trends[ch.slug], 'breadth_8x'));
+        if (selected.length === 1) maps.push(mapByDate(trends[ch.slug], 'breadth'));
+        maps.push(mapByDate(vtrends[ch.vast], 'utilization'));
+      });
+      const firsts = maps.map((m) => dates.find((d) => m[d] != null)).filter(Boolean);
+      if (firsts.length) { const start = firsts.reduce((a, b) => (a > b ? a : b)); dates = dates.filter((d) => d >= start); }
+      renderTrend(selected, dates, trends);
+      renderUtil(selected, dates, vtrends);
+    }
+
+    function init() {
+      Promise.all([
+        loadCsv('/data/availability_index_headline.csv'),
+        loadCsv('/data/availability_index_sources.csv'),
+        loadCsv('/data/vast_utilization.csv'),
+      ]).then(([h, s, u]) => {
+        state.headline = h; state.sources = s; state.util = u;
+        const tabs = Array.from(document.querySelectorAll('.chip'));
+        const meta = (slug) => { const t = tabs.find((x) => x.dataset.chip === slug); return t ? { slug, vast: t.dataset.vast, label: t.textContent.trim() } : null; };
+        let selected = [DEFAULT_CHIP];
+        const apply = () => {
+          tabs.forEach((t) => {
+            const on = selected.includes(t.dataset.chip);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+            const c = on ? (CHIP_COLORS[t.dataset.chip] || '') : '';
+            t.style.background = c; t.style.borderColor = c; t.style.color = on ? '#0b0c0e' : '';
+          });
+          renderAll(selected.map(meta).filter(Boolean));
+        };
+        tabs.forEach((t) => t.addEventListener('click', () => {
+          const slug = t.dataset.chip;
+          if (selected.includes(slug)) { if (selected.length > 1) selected = selected.filter((s2) => s2 !== slug); }
+          else selected = [...selected, slug];
+          apply();
+        }));
+        apply();
+      });
+    }
+    init();
   </script>
 
-  <style is:global>
-    /* /availability needs the .vast-page Bloomberg chrome inlined here.
-       Astro emits each page's <style> block per-page entry — even with
-       is:global, vast.astro's rules don't cross route boundaries. So the
-       ticker strip, lede, controls, chart-wrap, sec-head, mono tables, etc.
-       are duplicated here verbatim from vast.astro / marketplace.astro to
-       keep /availability visually consistent. The page-specific provider ×
-       region grid styles follow at the bottom. */
-    .vast-page.top { padding-top: 24px; }
+  <style>
+    .ai-page { max-width: 1040px; }
+    .kicker { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .18em; color: var(--accent); margin-bottom: .4rem; }
+    .ai-page h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; margin: 0 0 .6rem; }
+    .deck { max-width: 64ch; color: var(--ink-dim); line-height: 1.6; margin: 0 0 1.8rem; }
+    .deck strong { color: var(--ink); font-weight: 600; }
 
-    .vast-page > .kicker {
-      color: var(--accent);
-      letter-spacing: 0.14em;
-      margin-bottom: 4px;
-    }
-    .vast-page h1 {
-      font-family: var(--font-display);
-      font-size: var(--fs-xl);
-      margin: 0 0 10px;
-      letter-spacing: -0.01em;
-      line-height: 1.1;
-    }
+    .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
+    .chip { font-family: var(--font-mono); font-size: .8rem; padding: .4rem .9rem; border: 1px solid var(--rule); background: transparent; color: var(--ink-dim); border-radius: 999px; cursor: pointer; transition: all .15s; }
+    .chip:hover { color: var(--ink); border-color: var(--ink-faint); }
+    .chip[aria-selected='true'] { background: var(--accent); color: #0b0c0e; border-color: var(--accent); font-weight: 600; }
+    .chip-hint { font-family: var(--font-mono); font-size: .68rem; color: var(--ink-faint); align-self: center; margin-left: .3rem; }
 
-    /* Ticker strip — Bloomberg-style horizontal stat band */
-    .vast-page .ticker-strip {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: stretch;
-      border: 1px solid var(--rule-2);
-      background: var(--vast-panel-bg);
-      margin: 0 0 18px;
-      font-family: var(--font-mono);
-    }
-    .vast-page .tk-cell {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      padding: 7px 14px;
-      border-right: 1px solid var(--rule);
-      flex: 0 0 auto;
-    }
-    .vast-page .tk-cell:last-child { border-right: 0; }
-    .vast-page .tk-lbl {
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.10em;
-      font-weight: var(--weight-strong);
-    }
-    .vast-page .tk-val {
-      font-size: var(--fs-sm);
-      color: var(--ink);
-      font-variant-numeric: tabular-nums;
-      font-weight: var(--weight-strong);
-    }
-    .vast-page .tk-status { margin-left: auto; gap: 6px; }
-    .vast-page .tk-status .tk-val { color: var(--pos); letter-spacing: 0.10em; }
-    .vast-page .tk-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--pos);
-      box-shadow: 0 0 6px var(--pos);
-      display: inline-block;
-      border-radius: 50%;
-      animation: vast-pulse 2.4s ease-in-out infinite;
-    }
-    @keyframes vast-pulse {
-      0%, 100% { opacity: 1; }
-      50%      { opacity: 0.35; }
-    }
+    .band { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 1.6rem; }
+    .stat { background: var(--bg); padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: .25rem; }
+    .stat-lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-faint); }
+    .stat-val { font-family: var(--font-mono); font-size: 2rem; font-weight: 600; line-height: 1; color: var(--ink); }
+    .stat-clu .stat-val { color: var(--accent); }
+    .stat-frac .stat-val { color: var(--ink-dim); }
+    .stat-clu { background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
+    .stat-sub { font-size: .68rem; color: var(--ink-faint); }
 
-    /* Paused collection state — static dim dot replaces the pulsing LIVE dot,
-       and the banner line discloses the freeze before any data is read. */
-    .vast-page .tk-status.tk-paused .tk-val { color: var(--ink-dim); }
-    .vast-page .tk-status.tk-paused .tk-dot {
-      background: var(--ink-dim);
-      box-shadow: none;
-      animation: none;
-      opacity: 0.55;
-    }
-    .vast-page .paused-banner {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      color: var(--vast-warn, var(--accent));
-      border: 1px solid color-mix(in srgb, var(--vast-warn, var(--accent)) 45%, transparent);
-      background: color-mix(in srgb, var(--vast-warn, var(--accent)) 8%, transparent);
-      padding: 7px 12px;
-      margin: 0 0 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      font-weight: var(--weight-strong);
-    }
+    .card { border: 1px solid var(--rule); border-radius: 12px; padding: 1.4rem; margin-bottom: 1.6rem; background: color-mix(in srgb, var(--ink) 2%, transparent); }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+    .card h2 { font-family: var(--font-display); font-size: 1.3rem; margin: 0 0 .2rem; }
+    .card-sub { font-size: .82rem; color: var(--ink-dim); margin: 0; }
+    .tag { font-family: var(--font-mono); font-size: .6rem; text-transform: uppercase; letter-spacing: .1em; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); padding: .15rem .5rem; border-radius: 4px; vertical-align: middle; margin-left: .4rem; }
+    .lg { font-family: var(--font-mono); font-size: .78rem; padding-left: 1.1rem; position: relative; }
+    .lg::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: .7rem; height: .2rem; border-radius: 2px; }
+    .lg-clu::before { background: var(--accent); width: .9rem; height: .26rem; }
+    .lg-frac::before { background: var(--ink-faint); }
+    .lg-fix::before { background: var(--accent); width: .9rem; height: .26rem; }
+    .lg-naive::before { background: var(--ink-faint); }
 
-    .vast-page .lede { max-width: 80ch; margin: 4px 0 22px; }
-    .vast-page .lede a { color: var(--accent); }
-    .vast-page .lede strong { color: var(--ink); font-weight: var(--weight-strong); }
+    .chart-wrap { position: relative; height: 300px; }
+    .util-wrap { height: 240px; }
+    .empty { text-align: center; color: var(--ink-faint); font-size: .85rem; padding: 2rem 0; }
 
-    /* Collapsible chart definitions — collapsed by default, expandable.
-       Prefixed with .availability-page because this is an is:global block —
-       an unprefixed rule would leak the selector site-wide. */
-    .availability-page .def-disclosure { margin: 4px 0 18px; }
-    .availability-page .def-disclosure > summary {
-      list-style: none; cursor: pointer;
-      font-family: var(--font-mono); font-size: var(--fs-xs);
-      letter-spacing: var(--tracking-eye); text-transform: uppercase;
-      color: var(--ink-dim); font-weight: var(--weight-strong);
-      padding: 6px 0;
-    }
-    .availability-page .def-disclosure > summary::-webkit-details-marker { display: none; }
-    .availability-page .def-disclosure > summary::before { content: '▸ '; color: var(--accent); }
-    .availability-page .def-disclosure[open] > summary::before { content: '▾ '; }
-    .availability-page .def-disclosure[open] > summary { margin-bottom: 4px; }
+    .confbadge { font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; padding: .25rem .6rem; border-radius: 999px; white-space: nowrap; }
+    .confbadge.ok { background: color-mix(in srgb, #4cc4b0 18%, transparent); color: #4cc4b0; }
+    .confbadge.thin { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
 
-    .vast-page .controls {
-      background: var(--vast-panel-bg);
-      border: 1px solid var(--rule);
-      padding: 12px 14px;
-      margin-bottom: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .vast-page .control-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .vast-page .control-label {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      color: var(--ink-dim);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-eye);
-      font-weight: var(--weight-strong);
-      min-width: 56px;
-    }
-    .vast-page .pill-group {
-      display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
-    }
-    .vast-page .chip-group-label {
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 0 6px;
-      opacity: 0.75;
-    }
-    .vast-page .chip-group-label:not(:first-child) { border-left: 1px solid var(--rule-2); }
-    .vast-page .pill {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      background: var(--surface);
-      color: var(--ink-dim);
-      border: 1px solid var(--rule-2);
-      padding: 5px 10px;
-      cursor: pointer;
-      border-radius: 0;
-      font-weight: var(--weight-strong);
-    }
-    .vast-page .pill:hover { color: var(--ink); border-color: var(--accent); }
-    .vast-page .pill.on {
-      color: var(--accent);
-      border-color: var(--accent);
-      background: color-mix(in srgb, var(--accent) 8%, transparent);
-    }
+    .panel-card { padding: 0; }
+    .panel-card > summary { list-style: none; cursor: pointer; padding: 1.2rem 1.4rem; display: grid; grid-template-columns: 1fr auto; grid-template-areas: 'main chev' 'sub chev'; align-items: center; gap: .15rem .8rem; }
+    .panel-card > summary::-webkit-details-marker { display: none; }
+    .sum-main { grid-area: main; display: flex; align-items: baseline; gap: .6rem; }
+    .sum-main h2 { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
+    .sum-count { font-family: var(--font-mono); font-size: .78rem; color: var(--accent); }
+    .sum-sub { grid-area: sub; font-size: .82rem; color: var(--ink-dim); }
+    .sum-chev { grid-area: chev; color: var(--ink-faint); font-size: 1rem; transition: transform .2s; }
+    .panel-card[open] .sum-chev { transform: rotate(180deg); }
+    .panel-card[open] > summary { border-bottom: 1px solid var(--rule); }
+    .panel { display: flex; flex-direction: column; gap: .35rem; padding: 1.2rem 1.4rem; }
+    .row { display: grid; grid-template-columns: 9rem 1fr 2.6rem auto; align-items: center; gap: .7rem; font-family: var(--font-mono); font-size: .78rem; }
+    .row-name { color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-bar { height: .55rem; background: color-mix(in srgb, var(--ink) 8%, transparent); border-radius: 3px; overflow: hidden; }
+    .row-fill { display: block; height: 100%; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 55%, transparent), var(--accent)); border-radius: 3px; }
+    .row-pct { text-align: right; color: var(--ink); }
+    .bar-8x { font-size: .64rem; color: var(--ink-faint); }
+    .foot { font-size: .72rem; color: var(--ink-faint); line-height: 1.5; margin: 1rem 0 0; }
+    .panel-card .foot { padding: 0 1.4rem 1.3rem; margin-top: .2rem; }
 
-    .vast-page .vast-section {
-      margin-top: 28px;
-      padding-top: 14px;
-      border-top: 1px solid var(--rule);
-    }
-    .vast-page .sec-head {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-    .vast-page .sec-num {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      color: var(--bg);
-      background: var(--accent);
-      font-weight: var(--weight-strong);
-      letter-spacing: 0.06em;
-      padding: 2px 6px;
-      line-height: 1;
-    }
-    .vast-page .sec-kicker-label {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      color: var(--ink-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      font-weight: var(--weight-strong);
-      padding-left: 4px;
-      border-left: 1px solid var(--rule-2);
-      padding-right: 2px;
-    }
-    .vast-page .sec-head h2 {
-      font-family: var(--font-display);
-      font-size: var(--fs-lg);
-      margin: 0;
-      font-weight: var(--weight-display);
-      letter-spacing: -0.005em;
-    }
-    .vast-page .sec-note {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      color: var(--ink-dim);
-      letter-spacing: 0.04em;
-      margin-left: auto;
-    }
+    .util-grid { display: grid; grid-template-columns: 200px 1fr; gap: 1.5rem; align-items: center; }
+    .util-now { display: flex; flex-direction: column; gap: .2rem; }
+    .util-big { font-family: var(--font-mono); font-size: 3rem; font-weight: 600; line-height: 1; color: var(--accent); }
+    .util-now-lbl { font-size: .72rem; color: var(--ink-dim); }
+    .util-naive { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-faint); margin-top: .3rem; }
 
-    .vast-page .chart-wrap {
-      position: relative;
-      border: 1px solid var(--rule);
-      background: var(--vast-panel-bg);
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 0;
-    }
-    .vast-page .chart-wrap-hero {
-      background: var(--vast-panel-bg-hero);
-      border-color: var(--rule-2);
-    }
-    .vast-page .chart-status {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-mono);
-      font-size: var(--fs-sm);
-      color: var(--ink-dim);
-      background: color-mix(in srgb, var(--vast-panel-bg) 80%, transparent);
-      pointer-events: none;
-      padding: 0 24px;
-      text-align: center;
-    }
-    .vast-page .chart-wrap-hero .chart-status {
-      background: color-mix(in srgb, var(--vast-panel-bg-hero) 80%, transparent);
-    }
+    .method-details { border-top: 1px solid var(--rule); padding-top: 1rem; }
+    .method-details > summary { list-style: none; cursor: pointer; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+    .method-details > summary::-webkit-details-marker { display: none; }
+    .method-details > summary::before { content: '▸ '; }
+    .method-details[open] > summary::before { content: '▾ '; }
+    .method { font-size: .76rem; color: var(--ink-faint); line-height: 1.65; max-width: 70ch; margin: .8rem 0 0; }
+    .method em { color: var(--ink-dim); font-style: italic; }
 
-    /* Hero quant strip — sits directly under the §1 hero panel */
-    .vast-page .quant-strip {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      border: 1px solid var(--rule-2);
-      border-top: 0;
-      background: var(--vast-panel-bg);
-      font-family: var(--font-mono);
-      margin-bottom: 8px;
-    }
-    .vast-page .qs-cell {
-      padding: 6px 12px;
-      border-right: 1px solid var(--rule);
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-    .vast-page .qs-cell:last-child { border-right: 0; }
-    .vast-page .qs-cell-hero { background: color-mix(in srgb, var(--accent) 8%, transparent); }
-    .vast-page .qs-lbl {
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-dim);
-      letter-spacing: 0.10em;
-      font-weight: var(--weight-strong);
-    }
-    .vast-page .qs-val {
-      font-size: var(--fs-md);
-      color: var(--ink);
-      font-variant-numeric: tabular-nums;
-      font-weight: var(--weight-strong);
-    }
-    .vast-page .qs-cell-hero .qs-val { color: var(--accent); }
-
-    .vast-page .table-wrap {
-      border: 1px solid var(--rule);
-      background: var(--vast-panel-bg);
-      overflow-x: auto;
-    }
-    .vast-page .data {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: var(--font-mono);
-      font-size: var(--fs-sm);
-    }
-    .vast-page .data th,
-    .vast-page .data td {
-      padding: var(--vast-cell-y) var(--vast-cell-x);
-      border-bottom: 1px solid var(--rule);
-      text-align: left;
-      vertical-align: middle;
-      height: var(--vast-row-h);
-      font-variant-numeric: tabular-nums;
-    }
-    .vast-page .data th + th,
-    .vast-page .data td + td {
-      border-left: 1px solid var(--rule);
-    }
-    .vast-page .data th {
-      background: var(--surface-3);
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.10em;
-      font-weight: var(--weight-strong);
-      border-bottom: 1px solid var(--rule-2);
-      white-space: nowrap;
-    }
-    .vast-page .data td.num,
-    .vast-page .data th.num {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    .vast-page .data td.dim { color: var(--ink-dim); }
-    .vast-page .data tbody tr:nth-child(even) td {
-      background: var(--vast-row-stripe);
-    }
-    .vast-page .data tbody tr:hover td { background: var(--surface-3); }
-
-    .vast-page .tag {
-      display: inline-block;
-      padding: 1px 6px;
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      border-radius: 0;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      font-weight: var(--weight-strong);
-    }
-    .vast-page .tag.verified {
-      background: color-mix(in srgb, var(--vast-pos) 16%, transparent);
-      color: var(--vast-pos);
-      border: 1px solid color-mix(in srgb, var(--vast-pos) 40%, transparent);
-    }
-    .vast-page .tag.deverified {
-      background: color-mix(in srgb, var(--vast-neg) 16%, transparent);
-      color: var(--vast-neg);
-      border: 1px solid color-mix(in srgb, var(--vast-neg) 40%, transparent);
-    }
-
-    .vast-page .footnote {
-      font-family: var(--font-body);
-      font-size: var(--fs-xs);
-      color: var(--ink-dim);
-      margin: 10px 0 0;
-      padding: 9px 12px;
-      background: var(--vast-panel-bg);
-      border-left: 2px solid var(--neutral);
-      max-width: 80ch;
-      line-height: 1.55;
-    }
-    .vast-page .footnote code,
-    .vast-page .footnote em {
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs));
-      color: var(--accent);
-      font-style: normal;
-    }
-    .vast-page .footnote-last {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
-      color: var(--ink-dim);
-      margin: 28px 0 0;
-      padding: 12px 16px;
-      background: var(--vast-panel-bg);
-      border-left: 2px solid var(--accent);
-      max-width: 80ch;
-    }
-    .vast-page .footnote-last a { color: var(--accent); }
-
-    /* Mobile — ticker scrolls horizontally with sticky LIVE pill, sec-head
-       stacks, quant strip wraps from 6→3→2 cols. Mirrors /vast scaffolding. */
     @media (max-width: 720px) {
-      .vast-page .ticker-strip {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        scroll-snap-type: x proximity;
-        -webkit-overflow-scrolling: touch;
-      }
-      .vast-page .tk-cell {
-        scroll-snap-align: start;
-        padding: 6px 10px;
-        gap: 6px;
-      }
-      .vast-page .tk-status {
-        position: sticky;
-        right: 0;
-        margin-left: auto;
-        background: var(--vast-panel-bg);
-        border-left: 1px solid var(--rule-2);
-      }
-
-      .vast-page .quant-strip { grid-template-columns: repeat(3, 1fr); }
-      .vast-page .qs-cell:nth-child(3) { border-right: 0; }
-      .vast-page .qs-cell:nth-child(-n+3) { border-bottom: 1px solid var(--rule); }
-
-      .vast-page .sec-head {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-      .vast-page .sec-head h2 { line-height: 1.2; }
-      .vast-page .sec-note {
-        margin-left: 0;
-        font-size: calc(var(--fs-xs) - 1px);
-      }
-      .vast-page .sec-num,
-      .vast-page .sec-kicker-label { display: inline-block; }
-
-      .vast-page .chip-group-label:not(:first-child) { border-left: 0; }
-      .vast-page .chip-group-label {
-        display: block;
-        width: 100%;
-        padding: 4px 0 2px;
-        opacity: 0.85;
-      }
-
-      .vast-page h1 { font-size: calc(var(--fs-xl) - 2px); }
-      .vast-page .footnote { padding: 8px 10px; }
-      .vast-page .footnote-last { padding: 10px 12px; }
-    }
-
-    @media (max-width: 480px) {
-      .vast-page .quant-strip { grid-template-columns: repeat(2, 1fr); }
-      .vast-page .qs-cell { border-right: 1px solid var(--rule); }
-      .vast-page .qs-cell:nth-child(2n) { border-right: 0; }
-      .vast-page .qs-cell:not(:last-child) { border-bottom: 1px solid var(--rule); }
-      .vast-page .qs-cell-hero {
-        grid-column: 1 / -1;
-        border-right: 0;
-      }
-
-      .vast-page .chart-wrap-hero { height: 300px !important; }
-      .vast-page .chart-wrap:not(.chart-wrap-hero) { padding: 8px; }
-
-      .vast-page .data { font-size: calc(var(--fs-sm) - 1px); }
-
-      .vast-page .tk-cell { padding: 6px 8px; }
-      .vast-page .tk-lbl { font-size: calc(var(--fs-xs) - 2px); }
-    }
-
-    /* ----------------------------------------------------------------------
-       Page-specific: provider × region availability grid (§1 hero)
-    ---------------------------------------------------------------------- */
-
-    .availability-page .grid-wrap {
-      position: relative;
-      border: 1px solid var(--rule);
-      background: var(--vast-panel-bg);
-      padding: 10px;
-      margin-bottom: 8px;
-      overflow-x: auto;
-    }
-    .availability-page .grid-wrap-hero {
-      background: var(--vast-panel-bg-hero, var(--vast-panel-bg));
-      border-color: var(--rule-2);
-      padding: 14px;
-    }
-    .availability-page .grid-container {
-      display: grid;
-      gap: 1px;
-      min-width: 100%;
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      font-variant-numeric: tabular-nums;
-    }
-    .availability-page .grid-cell {
-      padding: 5px 6px;
-      background: var(--surface);
-      color: var(--ink-dim);
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      border: 1px solid var(--rule-2);
-    }
-    .availability-page .grid-cell-corner {
-      background: var(--bg);
-      border: 0;
-    }
-    .availability-page .grid-cell-col-head {
-      font-weight: var(--weight-strong);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      font-size: calc(var(--fs-xs) - 2px);
-      background: var(--bg);
-      color: var(--ink-dim);
-    }
-    .availability-page .grid-cell-row-head {
-      font-weight: var(--weight-strong);
-      text-align: left;
-      background: var(--bg);
-      color: var(--ink);
-    }
-    .availability-page .grid-cell-empty {
-      background: transparent;
-      border: 1px dashed var(--rule-2);
-      color: transparent;
-    }
-    .availability-page .grid-cell-on {
-      background: color-mix(in srgb, var(--vast-pos, #2c8055) 22%, var(--surface));
-      color: var(--ink);
-      font-weight: var(--weight-strong);
-      border-color: var(--vast-pos, #2c8055);
-    }
-    .availability-page .grid-cell-off {
-      background: color-mix(in srgb, var(--vast-neg, #a84040) 18%, var(--surface));
-      color: var(--ink-dim);
-      border-color: color-mix(in srgb, var(--vast-neg, #a84040) 50%, transparent);
-      text-decoration: line-through;
-    }
-
-    /* Top-row highlight on per-provider summary tables (mirrors /vast row-top) */
-    .availability-page .data tr.row-top td {
-      background: color-mix(in srgb, var(--vast-accent, var(--accent)) 8%, transparent);
-      border-top: 1px solid var(--vast-accent, var(--accent));
-      border-bottom: 1px solid var(--vast-accent, var(--accent));
-      font-weight: var(--weight-strong);
-    }
-
-    /* (Removed override on .data code — global .vast-page .footnote code already
-       styles inline mono correctly; the prior pill background diverged from /vast.) */
-
-    /* Mobile — keep grid horizontally scrollable */
-    @media (max-width: 720px) {
-      .availability-page .grid-container { font-size: calc(var(--fs-xs) - 2px); }
-      .availability-page .grid-cell { padding: 3px 4px; }
+      .band { grid-template-columns: repeat(2, 1fr); }
+      .util-grid { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 7rem 1fr 2.4rem; }
+      .bar-8x { display: none; }
     }
   </style>
 </Base>
