@@ -120,9 +120,14 @@ const DEFAULT_CHIP = 'h100-sxm';
     import Chart from 'chart.js/auto';
 
     const DEFAULT_CHIP = 'h100-sxm';
-    // Series start — the panel only reaches a stable multi-source read here, so
-    // the published trend begins on this date (no May single-source cold start).
-    const SERIES_START = '2026-06-15';
+    // The two charts run on independent timelines (decoupled below in renderAll).
+    // Availability begins where the full venue panel is live — the panel steps up
+    // to its full source set on this date, so the breadth trend starts clean with
+    // no composition jumps. Utilization runs much further back: Vast discloses
+    // rented/total continuously, so its only floor is the first full 7-day window
+    // (raw data begins 2026-05-13, but the first ~6 days are partial-window ramp).
+    const AVAIL_START = '2026-06-16';
+    const UTIL_START  = '2026-05-19';
     // Plain category x-axis with pre-formatted date labels — no time adapter, so
     // nothing to break. autoSkip thins the labels as the range grows.
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -325,26 +330,33 @@ const DEFAULT_CHIP = 'h100-sxm';
       renderPanel(primary.slug);
       const trends = {}, vtrends = {};
       await Promise.all(selected.map(async (ch) => {
-        // Only plot days the panel is a market read (confidence=ok, ≥3 sources).
-        // The early cold-start days are single-source and whipsaw — the data
-        // flags them thin; we suppress them rather than draw an unreliable line.
-        trends[ch.slug] = (await avTrend(ch.slug)).filter((r) => r.confidence === 'ok' && r.as_of_date >= SERIES_START);
-        vtrends[ch.vast] = (await vuTrend(ch.vast)).filter((r) => r.as_of_date >= SERIES_START);
+        // Availability: only plot days the panel is a market read (confidence=ok,
+        // ≥3 sources) from the full-panel start. The early cold-start days are
+        // single-source and whipsaw — the data flags them thin; we suppress them.
+        trends[ch.slug] = (await avTrend(ch.slug)).filter((r) => r.confidence === 'ok' && r.as_of_date >= AVAIL_START);
+        // Utilization: independent, longer history back to the first full window.
+        vtrends[ch.vast] = (await vuTrend(ch.vast)).filter((r) => r.as_of_date >= UTIL_START);
       }));
-      let dates = unionDates([...Object.values(trends), ...Object.values(vtrends)]);
-      // Trim the left edge to the first day where every displayed series has data
-      // ("full data"), so there's no empty/partial leading region. Both charts
-      // share this start, so they stay vertically aligned.
-      const maps = [];
+      // Each chart trims its own left edge to the first day where every displayed
+      // series has data, so there's no partial leading region. The two axes are
+      // independent — availability is the short full-panel window, utilization the
+      // longer Vast record — so they no longer share a start.
+      const trimStart = (dates, maps) => {
+        const firsts = maps.map((m) => dates.find((d) => m[d] != null)).filter(Boolean);
+        if (!firsts.length) return dates;
+        const start = firsts.reduce((a, b) => (a > b ? a : b));
+        return dates.filter((d) => d >= start);
+      };
+      const aMaps = [];
       selected.forEach((ch) => {
-        maps.push(mapByDate(trends[ch.slug], 'breadth_8x'));
-        if (selected.length === 1) maps.push(mapByDate(trends[ch.slug], 'breadth'));
-        maps.push(mapByDate(vtrends[ch.vast], 'utilization'));
+        aMaps.push(mapByDate(trends[ch.slug], 'breadth_8x'));
+        if (selected.length === 1) aMaps.push(mapByDate(trends[ch.slug], 'breadth'));
       });
-      const firsts = maps.map((m) => dates.find((d) => m[d] != null)).filter(Boolean);
-      if (firsts.length) { const start = firsts.reduce((a, b) => (a > b ? a : b)); dates = dates.filter((d) => d >= start); }
-      renderTrend(selected, dates, trends);
-      renderUtil(selected, dates, vtrends);
+      const aDates = trimStart(unionDates(Object.values(trends)), aMaps);
+      const uMaps = selected.map((ch) => mapByDate(vtrends[ch.vast], 'utilization'));
+      const uDates = trimStart(unionDates(Object.values(vtrends)), uMaps);
+      renderTrend(selected, aDates, trends);
+      renderUtil(selected, uDates, vtrends);
     }
 
     function init() {
