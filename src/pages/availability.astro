@@ -90,7 +90,7 @@ const DEFAULT_CHIP = 'h100-sxm';
         </div>
       </div>
       <div class="util-grid">
-        <div class="util-now">
+        <div class="util-now" id="util-now">
           <span class="util-big" id="u-now">—</span>
           <span class="util-now-lbl" id="u-now-lbl">trailing 7-day occupancy</span>
         </div>
@@ -299,10 +299,21 @@ const DEFAULT_CHIP = 'h100-sxm';
     }
 
     function renderUtil(selected, dates, vtrends) {
-      const primary = selected[0];
-      const u = (state.util || []).find((r) => r.chip_slug === primary.vast);
-      $('u-now').textContent = u ? pct(num(u.utilization)) : '—';
-      $('u-now-lbl').textContent = `${primary.label} · trailing 7-day occupancy`;
+      const single = selected.length === 1;
+      const nowEl = $('util-now');
+      const latestFor = (ch) => { const u = (state.util || []).find((r) => r.chip_slug === ch.vast); return u ? num(u.utilization) : null; };
+      // Single chip: one big number. Multi: a color-keyed per-chip list so the
+      // headline matches every line on the chart instead of just selected[0].
+      if (single) {
+        nowEl.innerHTML =
+          `<span class="util-big">${pct(latestFor(selected[0]))}</span>` +
+          `<span class="util-now-lbl">${selected[0].label} · trailing 7-day occupancy</span>`;
+      } else {
+        const rows = selected.map((ch) =>
+          `<span class="util-row"><span class="util-row-chip" style="color:${colorFor(ch.slug)}">${ch.label}</span>` +
+          `<span class="util-row-val">${pct(latestFor(ch))}</span></span>`).join('');
+        nowEl.innerHTML = `<div class="util-list">${rows}</div><span class="util-now-lbl">trailing 7-day occupancy</span>`;
+      }
       const empty = $('util-empty');
       const ctx = $('utilChart').getContext('2d');
       const anyData = selected.some((ch) => (vtrends[ch.vast] || []).length);
@@ -310,7 +321,6 @@ const DEFAULT_CHIP = 'h100-sxm';
       empty.hidden = true;
       const labels = dates.map(fmtDate);
       const ink = css('--ink-dim', '#9a9991');
-      const single = selected.length === 1;
       const datasets = selected.map((ch) => {
         const m = mapByDate(vtrends[ch.vast], 'utilization');
         const c = colorFor(ch.slug);
@@ -457,6 +467,10 @@ const DEFAULT_CHIP = 'h100-sxm';
     .util-big { font-family: var(--font-mono); font-size: 3rem; font-weight: 600; line-height: 1; color: var(--accent); }
     .util-now-lbl { font-size: .72rem; color: var(--ink-dim); }
     .util-naive { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-faint); margin-top: .3rem; }
+    .util-list { display: flex; flex-direction: column; gap: .45rem; margin-bottom: .5rem; }
+    .util-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; font-family: var(--font-mono); }
+    .util-row-chip { font-size: .82rem; font-weight: 600; }
+    .util-row-val { font-size: 1.6rem; font-weight: 600; color: var(--ink); line-height: 1; }
 
     .method-details { border-top: 1px solid var(--rule); padding-top: 1rem; }
     .method-details > summary { list-style: none; cursor: pointer; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
