@@ -402,6 +402,9 @@ jobs:
         if: steps.fetch.outputs.have_snapshot == 'true'
         env:
           CCIR_HISTORY_TODAY: ${{ steps.fetch.outputs.date }}
+          # ccir-v2-data is private; the rebuild fetches per-day snapshots over
+          # raw.githubusercontent and needs the read PAT or it rebuilds empty.
+          GH_PAT: ${{ secrets.CCIR_V2_DATA_READ_PAT }}
         run: |
           set -euo pipefail
           python3 scripts/build_indices_history.py

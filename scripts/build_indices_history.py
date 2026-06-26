@@ -16,6 +16,7 @@ import csv
 import io
 import os
 import sys
+import urllib.error
 import urllib.request
 from datetime import date, datetime, timedelta
 
@@ -27,15 +28,39 @@ OUT_PATH = os.environ.get(
 )
 FILES = ("rates_daily.csv", "rates_shadow.csv")
 
+# ccir-v2-data went private — unauthenticated raw.githubusercontent fetches now
+# 404 and the rolling history would silently rebuild empty (header-only file →
+# dead sparklines). Send the same read PAT the rest of the sync workflow uses.
+TOKEN = os.environ.get("GH_PAT") or os.environ.get("GITHUB_TOKEN")
+# Optional bootstrap path: point at a local clone's indices/snapshots dir to
+# rebuild from disk without hitting the network (e.g. CCIR_HISTORY_LOCAL_BASE=
+# ../ccir-v2-data/indices/snapshots).
+LOCAL_BASE = os.environ.get("CCIR_HISTORY_LOCAL_BASE")
+
 
 def fetch(url: str) -> str | None:
+    req = urllib.request.Request(url)
+    if TOKEN:
+        req.add_header("Authorization", f"token {TOKEN}")
     try:
-        with urllib.request.urlopen(url, timeout=30) as r:
+        with urllib.request.urlopen(req, timeout=30) as r:
             return r.read().decode("utf-8")
     except urllib.error.HTTPError as e:
         if e.code == 404:
             return None
         raise
+
+
+def load(d: str, fname: str) -> str | None:
+    """Read one snapshot CSV — from a local clone if CCIR_HISTORY_LOCAL_BASE is
+    set, otherwise over authenticated HTTP."""
+    if LOCAL_BASE:
+        path = os.path.join(LOCAL_BASE, d, fname)
+        if not os.path.exists(path):
+            return None
+        with open(path, encoding="utf-8") as f:
+            return f.read()
+    return fetch(f"{REPO_BASE}/{d}/{fname}")
 
 
 def extract_rows(csv_text: str):
@@ -66,7 +91,7 @@ def main() -> int:
         cur += timedelta(days=1)
         any_for_date = False
         for fname in FILES:
-            text = fetch(f"{REPO_BASE}/{d}/{fname}")
+            text = load(d, fname)
             if text is None:
                 continue
             any_for_date = True
