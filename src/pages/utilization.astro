@@ -129,6 +129,13 @@ const DEFAULT_CHIP = 'h100-sxm';
     // (raw data begins 2026-05-13, but the first ~6 days are partial-window ramp).
     const AVAIL_START = '2026-06-16';
     const UTIL_START  = '2026-05-19';
+    // TEMP STOPGAP (remove after collection fix): the Vast /bundles/ feed
+    // truncated ~98% on 2026-06-22-1800 (whole-marketplace scrape regression),
+    // so the trailing-7d utilization is flushing toward a ~100%-rented remnant
+    // and over-reads. Cap the displayed series at the last day before today's
+    // spike. NOT a rolling "yesterday" — a fixed date so it stops hiding the
+    // latest day once collection is restored.
+    const UTIL_END = '2026-06-25';
     // Plain category x-axis with pre-formatted date labels — no time adapter, so
     // nothing to break. autoSkip thins the labels as the range grows.
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -302,18 +309,26 @@ const DEFAULT_CHIP = 'h100-sxm';
     function renderUtil(selected, dates, vtrends) {
       const single = selected.length === 1;
       const nowEl = $('util-now');
-      const latestFor = (ch) => { const u = (state.util || []).find((r) => r.chip_slug === ch.vast); return u ? num(u.utilization) : null; };
+      // Read the headline off the last VISIBLE (capped) trend point so the big
+      // number matches the chart — not state.util, which is today's uncapped snapshot.
+      const latestFor = (ch) => {
+        let best = null;
+        for (const r of (vtrends[ch.vast] || [])) {
+          if (best == null || r.as_of_date > best.as_of_date) best = r;
+        }
+        return best ? num(best.utilization) : null;
+      };
       // Single chip: one big number. Multi: a color-keyed per-chip list so the
       // headline matches every line on the chart instead of just selected[0].
       if (single) {
         nowEl.innerHTML =
           `<span class="util-big">${pct(latestFor(selected[0]))}</span>` +
-          `<span class="util-now-lbl">${selected[0].label} · trailing 7-day utilization</span>`;
+          `<span class="util-now-lbl">${selected[0].label} · trailing 7-day utilization · through Jun 25</span>`;
       } else {
         const rows = selected.map((ch) =>
           `<span class="util-row"><span class="util-row-chip" style="color:${colorFor(ch.slug)}">${ch.label}</span>` +
           `<span class="util-row-val">${pct(latestFor(ch))}</span></span>`).join('');
-        nowEl.innerHTML = `<div class="util-list">${rows}</div><span class="util-now-lbl">trailing 7-day utilization</span>`;
+        nowEl.innerHTML = `<div class="util-list">${rows}</div><span class="util-now-lbl">trailing 7-day utilization · through Jun 25</span>`;
       }
       const empty = $('util-empty');
       const ctx = $('utilChart').getContext('2d');
@@ -346,7 +361,7 @@ const DEFAULT_CHIP = 'h100-sxm';
         // single-source and whipsaw — the data flags them thin; we suppress them.
         trends[ch.slug] = (await avTrend(ch.slug)).filter((r) => r.confidence === 'ok' && r.as_of_date >= AVAIL_START);
         // Utilization: independent, longer history back to the first full window.
-        vtrends[ch.vast] = (await vuTrend(ch.vast)).filter((r) => r.as_of_date >= UTIL_START);
+        vtrends[ch.vast] = (await vuTrend(ch.vast)).filter((r) => r.as_of_date >= UTIL_START && r.as_of_date <= UTIL_END);
       }));
       // Each chart trims its own left edge to the first day where every displayed
       // series has data, so there's no partial leading region. The two axes are
