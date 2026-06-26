@@ -33,6 +33,8 @@ jobs:
 
       - name: Resolve today's CT date and fetch snapshot
         id: fetch
+        env:
+          GH_PAT: ${{ secrets.CCIR_V2_DATA_READ_PAT }}
         run: |
           set -euo pipefail
           DATE=$(TZ=America/Chicago date +%F)
@@ -44,17 +46,17 @@ jobs:
           mkdir -p .sync
           # Manifest is the gate. 404 on either run-of-the-day cron tick = pipeline
           # hasn't published yet (typical during the wrong-DST half of the year).
-          status=$(curl -sS -o .sync/manifest.json -w "%{http_code}" "$BASE/manifest.json")
+          status=$(curl -sS -H "Authorization: token $GH_PAT" -o .sync/manifest.json -w "%{http_code}" "$BASE/manifest.json")
           if [ "$status" != "200" ]; then
             echo "no snapshot at $DATE yet (HTTP $status) — exiting cleanly"
             echo "have_snapshot=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          curl -fsSL -o .sync/rates_daily.csv "$BASE/rates_daily.csv"
-          curl -fsSL -o .sync/rates_shadow.csv "$BASE/rates_shadow.csv"
+          curl -fsSL -H "Authorization: token $GH_PAT" -o .sync/rates_daily.csv "$BASE/rates_daily.csv"
+          curl -fsSL -H "Authorization: token $GH_PAT" -o .sync/rates_shadow.csv "$BASE/rates_shadow.csv"
           # Vast clearing-vs-list basis overlay (small; bundled into src/data).
           # Graceful: snapshots predating the overlay won't carry it.
-          if curl -fsSL -o .sync/vast_basis.csv "$BASE/vast_basis.csv"; then
+          if curl -fsSL -H "Authorization: token $GH_PAT" -o .sync/vast_basis.csv "$BASE/vast_basis.csv"; then
             echo "fetched vast_basis.csv"
           else
             echo "no vast_basis.csv at $DATE — /basis keeps previous"
@@ -62,7 +64,7 @@ jobs:
           fi
           # Prior-day CSV powers the ticker's day-over-day arrows. Graceful
           # skip if the prior date isn't published (e.g. holidays, gaps).
-          if curl -fsSL -o .sync/rates_daily_prev.csv "$PREV_BASE/rates_daily.csv"; then
+          if curl -fsSL -H "Authorization: token $GH_PAT" -o .sync/rates_daily_prev.csv "$PREV_BASE/rates_daily.csv"; then
             echo "fetched prior-day CSV ($PREV)"
           else
             echo "no prior-day CSV at $PREV — ticker will show flat arrows for today"
@@ -73,7 +75,7 @@ jobs:
           # and won't have the files; the site falls back to "no data yet" UI.
           for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb gb200-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
             fname="listings_history_${chip}.csv"
-            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
             else
               echo "no $fname at $DATE — /markets will show empty for this chip"
@@ -84,7 +86,7 @@ jobs:
           # view. Same graceful per-file skip pattern.
           for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb gb200-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
             fname="marketplace_${chip}.csv"
-            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
             else
               echo "no $fname at $DATE — /marketplace will show empty for this chip"
@@ -99,7 +101,7 @@ jobs:
                       rtx-4090 rtx-5090 rtx-3090 l40 l40s rtx-6000ada rtx-a6000; do
             for prefix in vast_offers vast_distribution_history vast_geographic; do
               fname="${prefix}_${chip}.csv"
-              if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
                 echo "fetched $fname"
               else
                 echo "no $fname at $DATE — /vast will show empty for this chip section"
@@ -108,7 +110,7 @@ jobs:
             done
           done
           # Cross-chip summary file
-          if curl -fsSL -o ".sync/vast_summary.csv" "$BASE/vast_summary.csv"; then
+          if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/vast_summary.csv" "$BASE/vast_summary.csv"; then
             echo "fetched vast_summary.csv"
           else
             echo "no vast_summary.csv at $DATE — /vast hero will fall back"
@@ -124,7 +126,7 @@ jobs:
                       b300 gh200 rtx-pro-6000 l40s; do
             for prefix in availability_offers shadeform_availability_history shadeform_providers; do
               fname="${prefix}_${chip}.csv"
-              if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
                 echo "fetched $fname"
               else
                 echo "no $fname at $DATE — /availability will show empty for this chip section"
@@ -133,7 +135,7 @@ jobs:
             done
           done
           # Cross-chip Shadeform summary
-          if curl -fsSL -o ".sync/shadeform_summary.csv" "$BASE/shadeform_summary.csv"; then
+          if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/shadeform_summary.csv" "$BASE/shadeform_summary.csv"; then
             echo "fetched shadeform_summary.csv"
           else
             echo "no shadeform_summary.csv at $DATE — /availability summary will fall back"
@@ -143,7 +145,7 @@ jobs:
           # occupancy section. IMU chip slugs (h100-sxm form), not silicon_id.
           for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
             fname="utilization_implied_${chip}.csv"
-            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
             else
               echo "no $fname at $DATE — /utilization will show empty for this chip"
@@ -151,7 +153,7 @@ jobs:
             fi
           done
           for fname in utilization_sources.csv utilization_macro.csv; do
-            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
             else
               echo "no $fname at $DATE — /utilization tables will fall back"
@@ -160,7 +162,7 @@ jobs:
           done
           for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
             fname="utilization_intraday_${chip}.csv"
-            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
             else
               echo "no $fname at $DATE — /utilization inventory chart will fall back"
@@ -170,7 +172,7 @@ jobs:
           # Vast occupancy series (Vast variant grain + the all roll).
           for chip in h100-sxm h100-pcie h200-sxm b200-sxm gb200 a100-sxm all; do
             fname="vast_occupancy_${chip}.csv"
-            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
             else
               echo "no $fname at $DATE — /basis occupancy will show empty for this chip"
@@ -183,7 +185,7 @@ jobs:
           for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
             for prefix in availability_index availability_index_trend; do
               fname="${prefix}_${chip}.csv"
-              if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+              if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
                 echo "fetched $fname"
               else
                 echo "no $fname at $DATE — /utilization availability will fall back"
@@ -192,7 +194,7 @@ jobs:
             done
           done
           for fname in availability_index_headline.csv availability_index_sources.csv vast_utilization.csv vast_utilization_weekly.csv; do
-            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
             else
               echo "no $fname at $DATE — /utilization will fall back"
@@ -202,7 +204,7 @@ jobs:
           # Denominator-fixed Vast utilization trend (Vast chip slugs).
           for chip in h100-sxm h100-pcie h200-sxm b200-sxm gb200 a100-sxm; do
             fname="vast_utilization_trend_${chip}.csv"
-            if curl -fsSL -o ".sync/$fname" "$BASE/$fname"; then
+            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
             else
               echo "no $fname at $DATE — /utilization occupancy trend will fall back"
