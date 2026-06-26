@@ -1,11 +1,11 @@
 {
   "as_of_date": "2026-06-25",
-  "published_at_ct": "2026-06-25T05:14:42-05:00",
-  "published_at_utc": "2026-06-25T10:14:42+00:00",
-  "run_id": "export-20260625T101437Z-e4e8dce6",
+  "published_at_ct": "2026-06-25T21:03:59-05:00",
+  "published_at_utc": "2026-06-26T02:03:59+00:00",
+  "run_id": "export-20260626T020352Z-839b72d5",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
-  "contributing_today": 28,
+  "contributing_today": 29,
   "listings_history": {
     "chips": [
       "h100-sxm-80gb",
@@ -17,7 +17,7 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 6938,
+    "total_rows": 7074,
     "window_days": 90,
     "window_end": "2026-06-25",
     "window_start": "2026-03-28"
@@ -111,7 +111,7 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 139,
+    "occupancy_cycles": 141,
     "occupancy_series_start": "2026-05-13",
     "runpod_occupancy_chips": [],
     "runpod_occupancy_cycles": 0,
