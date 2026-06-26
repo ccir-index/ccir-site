@@ -41,8 +41,7 @@ export type OccChipId = typeof OCC_CHIPS[number]['id'];
 // Pipeline-rendered PNG chart cards (published daily to the public data repo)
 // ---------------------------------------------------------------------------
 
-const CARD_BASE =
-  'https://raw.githubusercontent.com/ccir-index/ccir-v2-data/main/indices/snapshots';
+const CARD_BASE = '/data';  // cards baked into the site by the sync workflow
 
 // Branded 1440x810 chart card for a (family, chip) pair, themed to match the
 // site's data-theme ('terminal' | 'editorial'). asOf is meta.as_of_date.
@@ -54,7 +53,10 @@ export function cardUrl(
   theme: string,
   asOf: string,
 ): string {
-  return `${CARD_BASE}/${asOf}/card_${family}_${chip}_${theme}.png`;
+  // Cards are staged into public/data by the sync workflow; asOf unused
+  // (the baked cards are always the current snapshot).
+  void asOf;
+  return `${CARD_BASE}/card_${family}_${chip}_${theme}.png`;
 }
 
 const OPERATOR_CLASS_LABEL: Record<string, string> = {

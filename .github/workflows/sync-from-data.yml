@@ -380,6 +380,24 @@ jobs:
           PY
           rm -rf .sync
 
+      - name: Fetch + stage chart cards
+        if: steps.fetch.outputs.have_snapshot == 'true'
+        env:
+          GH_PAT: ${{ secrets.CCIR_V2_DATA_READ_PAT }}
+        run: |
+          set -euo pipefail
+          DATE="${{ steps.fetch.outputs.date }}"
+          BASE="https://raw.githubusercontent.com/ccir-index/ccir-v2-data/main/indices/snapshots/$DATE"
+          mkdir -p public/data
+          # Chart-card PNGs are baked into the site (they were fetched client-side
+          # from the data repo, which is now private). List + download every card
+          # for today's snapshot into public/data so /utilization serves them locally.
+          GH_TOKEN="$GH_PAT" gh api "repos/ccir-index/ccir-v2-data/contents/indices/snapshots/$DATE" --jq '.[].name'             | grep -E '^card_.*\.png$' | while read -r f; do
+              if curl -fsSL -H "Authorization: token $GH_PAT" -o "public/data/$f" "$BASE/$f"; then
+                echo "staged public/data/$f"
+              fi
+            done
+
       - name: Rebuild indices_history.csv (rolling N-day window)
         if: steps.fetch.outputs.have_snapshot == 'true'
         env:
