@@ -71,7 +71,7 @@
 </style>
 </head>
 <body>
-<h1>Realized vs. Rate Card: GPU Cloud Economics <span class="pill" id="asofpill">Anchors: CRI</span></h1>
+<h1>Realized vs. Rate Card: GPU Cloud Economics</h1>
 <div class="sub">We research and analyze each operator's true $/GPU-hr from audited SEC filings and compare it to its own published
 on-demand and committed-term pricing. Set how the capex was split across chips to derive the implied fleet — and what each chip earns. Opens on the CCIR estimate.
 <span style="opacity:.65">CRI = CCIR Reference Index.</span></div>
@@ -90,7 +90,6 @@ function boot(){
   if(typeof EXPLORER_DATA==="undefined"){document.getElementById("app").innerHTML=
     '<div class="err">explorer_data.js not found — run quarterly_tracker/tracker.py and keep it beside this file.</div>';return;}
   D=EXPLORER_DATA;SCN=D.scenarios;
-  document.getElementById("asofpill").textContent="Anchors: CRI "+D.asof;
   document.getElementById("app").innerHTML=`
    <div class="card controls">
      <label>Operator / quarter</label>
@@ -182,13 +181,7 @@ function render(){
   const present=CHIPS.filter(ch=>L[ch]!=null&&mix[ch]>0.001);
   const own=(s.op==="CoreWeave"||s.op==="Nebius");           // operators that publish their own OD list
   const B=(D.anchor_basis||{})[s.op]||{};                    // per-chip OD provenance: own / market / t3proxy
-  const assumedOD=ch=> own ? (B[ch]&&B[ch]!=="own") : false; // CW/Nebius: market-filled chip; IREN/APLD: pill covers it
-  // dynamic pill: say where THIS operator's OD anchors come from
-  const presB=present.map(ch=>B[ch]||(own?"own":"t3proxy"));
-  const pillTxt = own
-    ? (presB.every(b=>b==="own") ? "OD: own published list" : "OD: own list + mkt fill")
-    : "OD: CRI market-T3 proxy";
-  const pe=document.getElementById("asofpill"); if(pe)pe.textContent=pillTxt+" · CRI "+D.asof;
+  const assumedOD=ch=> own ? (B[ch]&&B[ch]!=="own") : false; // CW/Nebius: mark market-filled chips; IREN/APLD basis is in the note
   const tot=CHIPS.reduce((a,ch)=>a+mix[ch],0)||1;
   const w={};CHIPS.forEach(ch=>w[ch]=mix[ch]/tot);
   // DERIVED: count = PP&E ÷ mix-weighted cost; realized = revenue ÷ (avg count × hrs) — both move with the mix.
