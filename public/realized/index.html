@@ -276,9 +276,11 @@ function scnPct(s){
   else R=s.R;
   const actOf=c => s.act_default!=null ? s.act_default/100 : ((ACT_DEFAULT[c]!=null?ACT_DEFAULT[c]:100)/100);
   const aw=present.reduce((a,c)=>a+w[c]*actOf(c),0)||1e-9;
-  const priceActive=R/aw;                          // earning basis — matches the landing panel
+  const priceActive=R/aw;
+  const airpocket=(s.act_default!=null&&s.act_default<80);   // mid-commissioning (e.g. IREN FY26): show whole-fleet (deployed) so the air-pocket is visible
+  const rate=airpocket?R:priceActive;                        // CoreWeave/Nebius -> earning (matches landing); air-pocket -> deployed
   const wlist=present.reduce((a,c)=>a+w[c]*L[c],0);
-  return wlist>0?priceActive/wlist*100:null;
+  return wlist>0?rate/wlist*100:null;
 }
 const OPCOL={"CoreWeave":"#4a86d6","Nebius":"#e08a2e","IREN":"#9b6ad6","Applied Digital":"#9a9a3d"};
 const QLAB=["Sep'24","Dec'24","Mar'25","Jun'25","Sep'25","Dec'25","Mar'26"];
@@ -302,7 +304,7 @@ function drawTrend(){
   svg+=`</svg>`;
   const leg=Object.keys(OPCOL).map(op=>`<span style="color:${OPCOL[op]};margin-right:12px">● ${op}</span>`).join("");
   host.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:2px">Discount to published on-demand list — by provider, over time</div>
-    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">How far below each operator's own published OD list it actually executes (1 − executed $/GPU-hr ÷ mix-weighted OD). CoreWeave/Nebius vs their <b>own</b> OD; IREN/Applied Digital vs CRI market-T3 (they post no retail OD). Higher = deeper discount. Hollow dot = interpolated/frozen quarter; ringed dot = current selection.</div>
+    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">How far below each operator's own published OD list it actually executes (1 − executed $/GPU-hr ÷ mix-weighted OD). CoreWeave/Nebius vs their <b>own</b> OD; IREN/Applied Digital vs CRI market-T3 (they post no retail OD). Higher = deeper discount; mid-commissioning quarters (IREN FY26) shown whole-fleet to surface the air-pocket. Hollow dot = interpolated/frozen quarter; ringed dot = current selection.</div>
     ${svg}<div class="legend" style="margin-top:4px">${leg}</div>`;
 }
 boot();
