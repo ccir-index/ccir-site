@@ -12,7 +12,7 @@
 <meta property="og:type" content="website"/>
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Realized vs. Rate Card: GPU Cloud Economics"/>
-<meta name="twitter:description" content="What the clouds actually clear vs their list — from the filings. Set the assumptions yourself."/>
+<meta name="twitter:description" content="What the clouds actually execute vs their list — from the filings. Set the assumptions yourself."/>
 <meta name="twitter:image" content="https://ccir.io/realized/og.png"/>
 <style>
   :root{--bg:#11151c;--panel:#1a212c;--ink:#e8eef5;--mut:#a3b1c2;--line:#2c3947;
@@ -252,7 +252,7 @@ function render(){
     `<b>Reading this:</b> ${s.op} ${s.q} realizes <b>$${priceActive.toFixed(2)}/GPU-hr</b> on its active fleet
      ($${R.toFixed(2)} across all deployed GPUs), a <b>${fmt(dBook)}</b> ${dBook>=0?'discount':'premium'}
      vs a book-weighted benchmark (or ${fmt(dOD)} vs pure OD, ${fmt(dTerm)} vs committed).
-     ${(R>0&&priceActive/R>1.4)?`<b style="color:var(--amber)">Commissioning wedge:</b> only ~${(aw*100).toFixed(0)}% of capitalized GPUs are billing — capital ran ahead of revenue, so deployed-basis realized is just <b>$${R.toFixed(2)}</b> while the billing subset clears <b>$${priceActive.toFixed(2)}</b>. The in-service % is the load-bearing assumption here; slide it to test other billing-fleet sizes. `:''}
+     ${(R>0&&priceActive/R>1.4)?`<b style="color:var(--amber)">Commissioning wedge:</b> only ~${(aw*100).toFixed(0)}% of capitalized GPUs are billing — capital ran ahead of revenue, so deployed-basis realized is just <b>$${R.toFixed(2)}</b> while the billing subset executes at <b>$${priceActive.toFixed(2)}</b>. The in-service % is the load-bearing assumption here; slide it to test other billing-fleet sizes. `:''}
      OD anchor = ${own?"operator's <b>own</b> published list"+(nMkt?` (<span style="color:var(--amber)">ᵐ</span> ${nMkt} chip${nMkt>1?'s':''} market-filled — operator doesn't post them)`:""):"<b>CRI market-T3</b> (operator publishes no retail OD)"}.
      Committed leg is <b>always imputed</b> here (${tier==='premium'?'own OD −~50% schedule':'wholesale-T3 −~15%'}): no neocloud posts term rates in the panel — only AWS/Azure/GCP do, so the published-term path stays empty until they do.
      Per-chip mix/activation/committed and the discount-shape are <b>analyst assumptions</b>; blended R is reconstructed
@@ -281,22 +281,22 @@ function drawTrend(){
   const pts=SCN.map((s,i)=>({i,op:s.op,idx:s.idx,q:s.q,pct:scnPct(s),stale:s.stale,prov:s.prov})).filter(p=>p.pct!=null);
   if(!pts.length){host.innerHTML="";return;}
   const W=720,H=240,pl=44,pr=12,pt=28,pb=42, iw=W-pl-pr, ih=H-pt-pb;
-  const xmin=0,xmax=6, ymax=Math.max(40,Math.ceil(Math.max(...pts.map(p=>p.pct))/10)*10);
+  const xmin=0,xmax=6, ymax=100;                    // y = discount to OD (1 − realized/OD)
   const X=idx=>pl+(idx-xmin)/(xmax-xmin)*iw, Y=v=>pt+ih-(v/ymax)*ih;
   let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:760px">`;
-  for(let v=0;v<=ymax;v+=10){const y=Y(v);
+  for(let v=0;v<=ymax;v+=20){const y=Y(v);
     svg+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#2c3947"/>`+
          `<text x="${pl-6}" y="${y+3}" fill="#a3b1c2" font-size="9" text-anchor="end">${v}%</text>`;}
   QLAB.forEach((lb,k)=>{svg+=`<text x="${X(k)}" y="${H-pb+16}" fill="#a3b1c2" font-size="9" text-anchor="middle">${lb}</text>`;});
   Object.keys(OPCOL).forEach(op=>{const ps=pts.filter(p=>p.op===op).sort((a,b)=>a.idx-b.idx);
     if(!ps.length)return; const col=OPCOL[op];
-    if(ps.length>1)svg+=`<polyline points="${ps.map(p=>X(p.idx)+','+Y(p.pct)).join(' ')}" fill="none" stroke="${col}" stroke-width="2"/>`;
+    if(ps.length>1)svg+=`<polyline points="${ps.map(p=>X(p.idx)+','+Y(100-p.pct)).join(' ')}" fill="none" stroke="${col}" stroke-width="2"/>`;
     ps.forEach(p=>{const sel=p.i===cur, hollow=p.stale||p.prov;
-      svg+=`<circle cx="${X(p.idx)}" cy="${Y(p.pct)}" r="${sel?5.5:3.5}" fill="${hollow?'#11151c':col}" stroke="${col}" stroke-width="${sel?2.5:hollow?1.5:0}"${sel?' stroke="#e8eef5"':''}><title>${op} ${p.q}: ${p.pct.toFixed(0)}% of OD${p.stale?' (frozen — last reconstructable)':p.prov?' (interpolated — net-only quarter)':''}</title></circle>`;});});
+      svg+=`<circle cx="${X(p.idx)}" cy="${Y(100-p.pct)}" r="${sel?5.5:3.5}" fill="${hollow?'#11151c':col}" stroke="${col}" stroke-width="${sel?2.5:hollow?1.5:0}"${sel?' stroke="#e8eef5"':''}><title>${op} ${p.q}: ${(100-p.pct).toFixed(0)}% below OD${p.stale?' (frozen — last reconstructable)':p.prov?' (interpolated — net-only quarter)':''}</title></circle>`;});});
   svg+=`</svg>`;
   const leg=Object.keys(OPCOL).map(op=>`<span style="color:${OPCOL[op]};margin-right:12px">● ${op}</span>`).join("");
-  host.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:2px">Realized as % of published OD list — by provider, over time</div>
-    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">Realized $/GPU-hr ÷ mix-weighted OD list — the cleanest cross-provider metric (OD is the one rate operators actually publish). CoreWeave/Nebius vs their <b>own</b> OD; IREN/Applied Digital vs CRI market-T3 (they post no retail OD). Hollow dot = frozen/stale quarter; ringed dot = current selection.</div>
+  host.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:2px">Discount to published on-demand list — by provider, over time</div>
+    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">How far below each operator's own published OD list it actually executes (1 − executed $/GPU-hr ÷ mix-weighted OD). CoreWeave/Nebius vs their <b>own</b> OD; IREN/Applied Digital vs CRI market-T3 (they post no retail OD). Higher = deeper discount. Hollow dot = interpolated/frozen quarter; ringed dot = current selection.</div>
     ${svg}<div class="legend" style="margin-top:4px">${leg}</div>`;
 }
 boot();
