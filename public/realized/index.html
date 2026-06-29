@@ -78,6 +78,7 @@ on-demand and committed-term pricing. Set how the capex was split across chips t
 
 <div id="app" class="row"></div>
 <div class="card" id="trendcard" style="margin-top:16px"></div>
+<div class="card" id="levelcard" style="margin-top:14px"></div>
 <div class="note" id="note"></div>
 
 <script src="explorer_data.js"></script>
@@ -261,7 +262,7 @@ function render(){
      Per-chip mix/activation/committed and the discount-shape are <b>analyst assumptions</b>; blended R is reconstructed
      from SEC filings (±~15%); OD anchors are live from CRI ${D.asof}. Borrows CRI's chip price shape and re-levels it
      — a cross-check on the level, not an independent chip measurement.`;
-  drawTrend();
+  drawTrend(); drawLevels();
 }
 // ---- realized-vs-OD trend (cleanest metric: only OD is operator-published) ----
 function scnPct(s){
@@ -305,6 +306,45 @@ function drawTrend(){
   const leg=Object.keys(OPCOL).map(op=>`<span style="color:${OPCOL[op]};margin-right:12px">● ${op}</span>`).join("");
   host.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:2px">Discount to published on-demand list — by provider, over time</div>
     <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">How far below each operator's own published OD list it actually executes (1 − executed $/GPU-hr ÷ mix-weighted OD). CoreWeave/Nebius vs their <b>own</b> OD; IREN/Applied Digital vs CRI market-T3 (they post no retail OD). Higher = deeper discount; mid-commissioning quarters (IREN FY26) shown whole-fleet to surface the air-pocket. Hollow dot = interpolated/frozen quarter; ringed dot = current selection.</div>
+    ${svg}<div class="legend" style="margin-top:4px">${leg}</div>`;
+}
+// ---- executed $/GPU-hr level (absolute mark) — same per-provider basis as the discount chart ----
+function scnRate(s){
+  const L=A(s.op),mix=s.mix,tot=CHIPS.reduce((a,c)=>a+(mix[c]||0),0)||1,w={};
+  CHIPS.forEach(c=>w[c]=(mix[c]||0)/tot);
+  const present=CHIPS.filter(c=>L[c]!=null&&mix[c]>0);
+  if(!present.length)return null;
+  const derive=(s.ppe!=null&&s.ppe_begin!=null&&s.rev!=null&&D.cost);
+  let R;
+  if(derive){const mc=present.reduce((a,c)=>a+w[c]*((D.cost&&D.cost[c])||0),0);
+    const endk=s.ppe*1000/mc,begk=s.ppe_begin*1000/mc; R=s.rev*1000/(((endk+begk)/2)*(D.hours||2190));}
+  else R=s.R;
+  const actOf=c => s.act_default!=null ? s.act_default/100 : ((ACT_DEFAULT[c]!=null?ACT_DEFAULT[c]:100)/100);
+  const aw=present.reduce((a,c)=>a+w[c]*actOf(c),0)||1e-9;
+  const airpocket=(s.act_default!=null&&s.act_default<80);
+  return airpocket ? R : R/aw;
+}
+function drawLevels(){
+  const host=document.getElementById("levelcard"); if(!host)return;
+  const pts=SCN.map((s,i)=>({i,op:s.op,idx:s.idx,q:s.q,rate:scnRate(s),stale:s.stale,prov:s.prov})).filter(p=>p.rate!=null);
+  if(!pts.length){host.innerHTML="";return;}
+  const W=720,H=168,pl=42,pr=12,pt=14,pb=30, iw=W-pl-pr, ih=H-pt-pb;     // compact companion to the discount chart
+  const xmin=0,xmax=6, ymax=Math.max(2,Math.ceil(Math.max(...pts.map(p=>p.rate))*2)/2);
+  const X=idx=>pl+(idx-xmin)/(xmax-xmin)*iw, Y=v=>pt+ih-(v/ymax)*ih;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:760px">`;
+  for(let v=0;v<=ymax+1e-9;v+=0.5){const y=Y(v);
+    svg+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#2c3947"/>`+
+         `<text x="${pl-6}" y="${y+3}" fill="#a3b1c2" font-size="9" text-anchor="end">$${v.toFixed(1)}</text>`;}
+  QLAB.forEach((lb,k)=>{svg+=`<text x="${X(k)}" y="${H-pb+15}" fill="#a3b1c2" font-size="9" text-anchor="middle">${lb}</text>`;});
+  Object.keys(OPCOL).forEach(op=>{const ps=pts.filter(p=>p.op===op).sort((a,b)=>a.idx-b.idx);
+    if(!ps.length)return; const col=OPCOL[op];
+    if(ps.length>1)svg+=`<polyline points="${ps.map(p=>X(p.idx)+','+Y(p.rate)).join(' ')}" fill="none" stroke="${col}" stroke-width="2"/>`;
+    ps.forEach(p=>{const sel=p.i===cur, hollow=p.stale||p.prov;
+      svg+=`<circle cx="${X(p.idx)}" cy="${Y(p.rate)}" r="${sel?5:3}" fill="${hollow?'#11151c':col}" stroke="${col}" stroke-width="${sel?2.5:hollow?1.5:0}"${sel?' stroke="#e8eef5"':''}><title>${op} ${p.q}: $${p.rate.toFixed(2)}/GPU-hr${p.prov?' (interpolated)':''}</title></circle>`;});});
+  svg+=`</svg>`;
+  const leg=Object.keys(OPCOL).map(op=>`<span style="color:${OPCOL[op]};margin-right:12px">● ${op}</span>`).join("");
+  host.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:2px">Executed $/GPU-hr — by provider, over time</div>
+    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">The absolute rate the compute marks at (companion to the discount chart above). CoreWeave/Nebius earning rate; IREN whole-fleet (air-pocket). Ringed dot = current selection.</div>
     ${svg}<div class="legend" style="margin-top:4px">${leg}</div>`;
 }
 boot();
