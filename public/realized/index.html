@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Realized vs. Rate Card — CCIR</title>
+<meta name="description" content="What GPU clouds actually realize per GPU-hour, reconstructed from audited SEC filings, vs their own published rate cards. Set your own fleet assumptions."/>
+<meta property="og:title" content="Realized vs. Rate Card: GPU Cloud Economics"/>
+<meta property="og:description" content="Executed $/GPU-hr reconstructed from audited filings vs published list — CoreWeave, Nebius, IREN, Applied Digital. Interactive."/>
+<meta property="og:image" content="https://ccir.io/realized/og.png"/>
+<meta property="og:url" content="https://ccir.io/realized"/>
+<meta property="og:type" content="website"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Realized vs. Rate Card: GPU Cloud Economics"/>
+<meta name="twitter:description" content="What the clouds actually clear vs their list — from the filings. Set the assumptions yourself."/>
+<meta name="twitter:image" content="https://ccir.io/realized/og.png"/>
+<style>
+  :root{--bg:#11151c;--panel:#1a212c;--ink:#e8eef5;--mut:#a3b1c2;--line:#2c3947;
+        --cw:#4a86d6;--ir:#9b6ad6;--nb:#e08a2e;--good:#3a9b6e;--list:#5a6b7d;--warn:#d96a6a;--amber:#d6a93a;}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);
+    font:14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif;padding:22px;max-width:1100px;margin:auto}
+  h1{font-size:20px;margin:0 0 4px} .sub{color:var(--mut);font-size:13px;margin-bottom:16px}
+  .row{display:flex;gap:18px;flex-wrap:nowrap;align-items:flex-start} .card{background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:16px} .controls{flex:1 1 440px;min-width:0}
+  .out{flex:1 1 360px;min-width:300px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto}
+  @media(max-width:700px){.row{flex-wrap:wrap}.out{position:static;max-height:none;overflow:visible;order:-1}}
+  label{display:block;color:var(--mut);font-size:12px;margin:10px 0 3px;text-transform:uppercase;letter-spacing:.04em}
+  select,button{background:#222c38;color:var(--ink);border:1px solid var(--line);border-radius:7px;
+    padding:7px 10px;font-size:13px} button{cursor:pointer} button:hover{border-color:#4a86d6}
+  /* per-chip grid */
+  .grid{display:grid;grid-template-columns:46px 1fr 1fr 1fr;gap:7px 9px;align-items:center;margin-top:6px}
+  .grid>*{min-width:0}
+  .gh{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.03em;text-align:center}
+  .gh:first-child,.gh:last-child{text-align:left}
+  .cn{font-weight:600;font-size:13px} .lst{font-size:11px;color:var(--list);text-align:right;font-variant-numeric:tabular-nums}
+  .cell{display:flex;align-items:center;gap:5px} .cell input[type=range]{flex:1;min-width:0}
+  .cell .v{width:30px;font-size:11px;color:var(--mut);text-align:right;font-variant-numeric:tabular-nums}
+  .mixr{accent-color:var(--cw)} .actr{accent-color:var(--good)} .comr{accent-color:var(--nb)}
+  .grid .off{opacity:.3} .grid .off input{cursor:not-allowed}
+  .crow{display:flex;align-items:center;gap:10px;margin-top:12px}
+  .crow .lbl{width:92px;font-size:12px;color:var(--mut)} .crow input[type=range]{flex:1;accent-color:var(--ir)}
+  .crow .val{width:64px;text-align:right;color:var(--mut);font-size:12px}
+  details.defs{margin-top:12px} details.defs summary{cursor:pointer;color:var(--mut);font-size:12px}
+  details.defs ul{margin:8px 0 0;padding-left:17px;font-size:11.5px;color:var(--mut);line-height:1.55}
+  details.defs li{margin:4px 0} details.defs b{color:var(--ink)}
+  .costrow{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:8px}
+  .costrow .ci{font-size:11.5px;color:var(--mut);display:flex;align-items:center;gap:3px}
+  .costrow input{width:36px;background:#222c38;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:1px 3px;font-size:11px;text-align:right}
+  .big{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1} .big.warn{color:var(--warn)}
+  .kpis{display:flex;gap:20px;margin:4px 0 14px;flex-wrap:wrap}
+  .kpi .lab{color:var(--mut);font-size:11px;text-transform:uppercase} .kpi .v{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+  .bar{margin:9px 0} .bar .top{display:flex;justify-content:space-between;font-size:12px}
+  .track{position:relative;height:20px;background:#0e131a;border-radius:5px;margin-top:3px;overflow:hidden}
+  .fill{position:absolute;left:0;top:0;bottom:0;border-radius:5px;opacity:.92}
+  .listmark{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--list)}
+  .commitmark{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--warn);opacity:.7}
+  .subpct{font-size:11px;color:var(--mut);margin-top:3px;font-variant-numeric:tabular-nums}
+  .subpct b{color:var(--ink);font-weight:600} .subpct .c{color:var(--warn)}
+  .note{color:var(--mut);font-size:11.5px;margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+  .pill{display:inline-block;padding:1px 7px;border-radius:20px;font-size:11px;border:1px solid var(--line);color:var(--mut)}
+  .legend{font-size:11px;color:var(--mut);margin-top:8px} .err{color:var(--warn);padding:20px}
+  .fleet{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;font-size:11.5px;color:var(--mut);line-height:1.65}
+  .fleet b{color:var(--ink)} .fleet .big2{font-size:16px;font-weight:700;color:var(--ink)}
+  .fleet .hd{text-transform:uppercase;letter-spacing:.04em;font-size:10px;margin-bottom:3px}
+  .fleet .ftab{display:grid;grid-template-columns:1fr auto auto;gap:1px 16px;margin-top:5px}
+  .fleet .ftab .c{font-weight:600} .fleet .ftab .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .fleet .ftab .k{text-align:right;font-variant-numeric:tabular-nums}
+  .fleet .ftab .r{text-align:right;font-variant-numeric:tabular-nums;color:var(--good)}
+  .fleet .ftab .hdr{font-size:9px;text-transform:uppercase;letter-spacing:.04em;opacity:.7}
+  .fleet .ftab .tot{border-top:1px solid var(--line);margin-top:3px;padding-top:3px;font-weight:600;color:var(--ink)}
+</style>
+</head>
+<body>
+<h1>Realized vs. Rate Card: GPU Cloud Economics <span class="pill" id="asofpill">Anchors: CRI</span></h1>
+<div class="sub">We research and analyze each operator's true $/GPU-hr from audited SEC filings and compare it to its own published
+on-demand and committed-term pricing. Set how the capex was split across chips to derive the implied fleet — and what each chip earns. Opens on the CCIR estimate.
+<span style="opacity:.65">CRI = CCIR Reference Index.</span></div>
+
+<div id="app" class="row"></div>
+<div class="note" id="note"></div>
+
+<script src="explorer_data.js"></script>
+<script>
+const CHIPS=["A100","H100","H200","GB200","GB300"];
+const COL={A100:"#3fa3a3",H100:"#4a86d6",H200:"#3a9b6e",GB200:"#e08a2e",GB300:"#c46ad6"};
+let D,SCN,cur=0,mix={},act={},com={},cost={},tilt=0;
+
+function boot(){
+  if(typeof EXPLORER_DATA==="undefined"){document.getElementById("app").innerHTML=
+    '<div class="err">explorer_data.js not found — run quarterly_tracker/tracker.py and keep it beside this file.</div>';return;}
+  D=EXPLORER_DATA;SCN=D.scenarios;
+  document.getElementById("asofpill").textContent="Anchors: CRI "+D.asof;
+  document.getElementById("app").innerHTML=`
+   <div class="card controls">
+     <label>Operator / quarter</label>
+     <select id="scn"></select>
+     <button id="reset" style="margin-left:8px" title="restore CCIR's estimated fleet mix (operators don't disclose chip-level mix)">↺ Reset to CCIR Estimate</button>
+     <label style="margin-top:16px">Per-chip assumptions <span id="sumwarn"></span></label>
+     <div class="grid" id="grid">
+       <div class="gh">Chip</div><div class="gh">Mix %</div><div class="gh">In Service %</div><div class="gh">Committed %</div>
+     </div>
+     <div class="crow"><span class="lbl">Curve: flat ↔ scarcity</span>
+       <input type="range" id="tilt" min="0" max="100" value="0"/><span class="val" id="tiltv">flat</span></div>
+     <details class="defs"><summary>ⓘ what the controls mean &amp; methodology</summary><ul>
+       <li><b>Method</b> — realized $/GPU-hr = compute revenue ÷ deployed GPU-hours (from audited filings); each chip's rate is solved so Σ(in-service GPU-hours × rate) ties back to reported revenue, then compared to published list &amp; committed pricing.</li>
+       <li><b>Mix</b> — share of GPU-hours by chip (CCIR estimate; not operator-disclosed). Weights the blended denominator.</li>
+       <li><b>In Service</b> — % of that chip's balance-sheet GPUs actually earning revenue (vs deployed-but-not-yet-billing). Below 100% lifts the realized price per earning GPU. Lets you say e.g. H100 100% but GB200 40%.</li>
+       <li><b>Committed</b> — % of that chip's book on take-or-pay vs on-demand. Sets the benchmark per chip: committed leg = published term rate (or own OD −36/56% schedule if unpublished), OD leg = full OD list. Lets you say A100 mostly OD, GB200 all committed.</li>
+       <li><b>Curve</b> — flat (same % discount off every chip) ↔ scarcity-tilted (newer chips tighter to list, older deeper, reflecting unsourceable Blackwell). Redistributes across chips; conserves the blended total.</li>
+     </ul></details>
+     <div id="fleet" class="fleet"></div>
+     <details class="defs"><summary>ⓘ per-chip cost ($k/GPU all-in)</summary>
+       <div class="costrow" id="costgrid"></div>
+       <div style="font-size:10.5px;color:var(--mut);margin-top:5px;opacity:.8">All-in incl networking + servers; CoreWeave-discounted. Drives the implied fleet size from the $26.6B spend.</div></details>
+   </div>
+   <div class="card out">
+     <div style="margin:0 0 8px"><div class="lab" style="color:var(--mut);font-size:11px;text-transform:uppercase">Realized $/GPU-hr · active (earning)</div>
+       <div class="big" id="kR">—</div></div>
+     <div class="kpi" style="margin-bottom:10px"><div class="lab" id="kDiscLab">Discount vs blended rate card</div>
+       <div style="display:flex;align-items:baseline;gap:12px">
+         <div class="v" id="kDisc" style="font-size:23px;color:var(--amber)">—</div>
+         <div id="kODTerm" style="font-size:11.5px;color:var(--mut);font-variant-numeric:tabular-nums"></div></div>
+       <div class="lab" id="kSub" style="font-size:11px;text-transform:none;letter-spacing:0"></div></div>
+     <label>Implied realized $/GPU-hr by chip</label>
+     <div id="bars"></div>
+     <div class="legend">▎implied realized · <span style="color:var(--list)">│</span> OD list · <span style="color:var(--warn)">│</span> committed (term)</div>
+   </div>`;
+  const sel=document.getElementById("scn");
+  SCN.forEach((s,i)=>{let o=document.createElement("option");o.value=i;o.textContent=`${s.op} — ${s.q}`;sel.appendChild(o);});
+  sel.onchange=e=>load(e.target.value);
+  document.getElementById("reset").onclick=()=>load(cur);
+  document.getElementById("tilt").oninput=e=>{tilt=+e.target.value/100;render();};
+  let def=0; SCN.forEach((s,i)=>{if(s.op==='CoreWeave')def=i;}); // default = CoreWeave, most recent quarter
+  load(def);
+}
+const A=op=>D.anchors[op]||{};
+function buildGrid(){
+  const g=document.getElementById("grid"); g.querySelectorAll(".gdrow").forEach(n=>n.remove());
+  const L=A(SCN[cur].op), base=SCN[cur].mix;
+  CHIPS.forEach(ch=>{
+    const inFleet=(base[ch]>0)&&L[ch]!=null;       // only chips the provider had that quarter are selectable
+    const off=inFleet?"":" off";
+    const cell=(cls,id,val,mn)=>`<div class="cell gdrow${off}">
+        <input type="range" class="${cls}" data-k="${id}" data-ch="${ch}" min="${mn||0}" max="100" value="${val}" ${inFleet?"":"disabled"}>
+        <span class="v" id="${id}-${ch}"></span></div>`;
+    g.insertAdjacentHTML("beforeend",
+      `<div class="cn gdrow${off}" style="color:${COL[ch]}" title="${inFleet?'':'not in fleet this quarter'}">${ch}</div>`+
+      cell("mixr","mix",mix[ch],0)+cell("actr","act",act[ch],20)+cell("comr","com",com[ch],0));
+  });
+  g.querySelectorAll("input[type=range]:not([disabled])").forEach(inp=>inp.oninput=e=>{
+    const k=e.target.dataset.k, ch=e.target.dataset.ch, val=+e.target.value;
+    if(k==="mix"){                              // keep total mix = 100%: redistribute the remainder across the other in-fleet chips
+      mix[ch]=val;
+      const others=[...g.querySelectorAll("input.mixr:not([disabled])")].map(x=>x.dataset.ch).filter(c=>c!==ch);
+      if(!others.length){mix[ch]=100; e.target.value=100;}
+      else{const rem=100-val, osum=others.reduce((a,c)=>a+mix[c],0);
+        others.forEach(c=>mix[c]= osum>0 ? mix[c]*rem/osum : rem/others.length);
+        g.querySelectorAll("input.mixr:not([disabled])").forEach(o=>{if(o.dataset.ch!==ch)o.value=Math.round(mix[o.dataset.ch]);});}
+    } else { ({act,com})[k][ch]=val; }
+    render();});
+}
+const ACT_DEFAULT={A100:100,H100:100,H200:100,GB200:90,GB300:85}; // in-service line excludes CIP ramp; take-or-pay demand → placed chips ~all billing (small lag on newest Blackwell)
+function load(i){cur=+i;const s=SCN[i];mix={...s.mix};act={};com={};
+  const sc=document.getElementById("scn"); if(sc)sc.value=i;   // keep dropdown in sync with loaded scenario
+  CHIPS.forEach(ch=>{act[ch]=ACT_DEFAULT[ch]!=null?ACT_DEFAULT[ch]:100;com[ch]=Math.round(s.bookc||100);cost[ch]=(D.cost&&D.cost[ch])||0;});
+  tilt=1;document.getElementById("tilt").value=100;buildGrid();buildCosts();render();} // default = scarcity (newer chips unsourceable → priced to list)
+function buildCosts(){
+  const cg=document.getElementById("costgrid"); if(!cg)return; cg.innerHTML="";
+  const base=SCN[cur].mix, L=A(SCN[cur].op);
+  CHIPS.forEach(ch=>{ if(!((base[ch]>0)&&L[ch]!=null))return;
+    cg.insertAdjacentHTML("beforeend",`<span class="ci"><span style="color:${COL[ch]}">${ch}</span> $<input type="number" data-ch="${ch}" value="${Math.round(cost[ch]/1000)}" min="5" max="120" step="1">k</span>`);});
+  cg.querySelectorAll("input").forEach(inp=>inp.oninput=e=>{cost[e.target.dataset.ch]=(+e.target.value)*1000; render();});
+}
+const dfac=ch=>(1-tilt)+tilt*D.dtilt[ch];
+function cterm(op,ch,L,tier){const tr=(D.termrates||{})[op]||{};const t=tr[ch]&&(tr[ch].y3!=null?tr[ch].y3:tr[ch].y1);
+  return t!=null?{v:t,real:true}:{v:L[ch]*(1-D.termdisc[tier].repr),real:false};}
+
+function render(){
+  const s=SCN[cur],L=A(s.op),tier=s.term_tier||"premium";
+  const present=CHIPS.filter(ch=>L[ch]!=null&&mix[ch]>0.001);
+  const tot=CHIPS.reduce((a,ch)=>a+mix[ch],0)||1;
+  const w={};CHIPS.forEach(ch=>w[ch]=mix[ch]/tot);
+  // DERIVED: count = PP&E ÷ mix-weighted cost; realized = revenue ÷ (avg count × hrs) — both move with the mix.
+  const HRS=D.hours||2190, derive=(s.ppe!=null&&s.ppe_begin!=null&&s.rev!=null&&D.cost);
+  let R, totalk;
+  if(derive){const mc=present.reduce((a,ch)=>a+w[ch]*cost[ch],0);
+    const endk=s.ppe*1000/mc, begk=s.ppe_begin*1000/mc, avgk=(endk+begk)/2;
+    totalk=endk; R=s.rev*1000/(avgk*HRS);
+  } else { R=s.R; totalk=s.deployed; }
+  // solve: R = Σ w_c · act_c · r_c , r_c = k·dfac·L_c
+  const denom=present.reduce((a,ch)=>a+w[ch]*(act[ch]/100)*dfac(ch)*L[ch],0);
+  const k=denom>0?R/denom:0;
+  const r={};present.forEach(ch=>r[ch]=k*dfac(ch)*L[ch]);
+  // active-weighted aggregates
+  const aw=present.reduce((a,ch)=>a+w[ch]*(act[ch]/100),0)||1e-9;
+  let sOD=0,sTerm=0,sBench=0,anyImp=false;
+  present.forEach(ch=>{const ct=cterm(s.op,ch,L,tier);if(!ct.real)anyImp=true;
+    const bench=(com[ch]/100)*ct.v+(1-com[ch]/100)*L[ch];
+    const a=w[ch]*(act[ch]/100); sOD+=a*L[ch];sTerm+=a*ct.v;sBench+=a*bench;});
+  const dOD=sOD>0?(1-R/sOD)*100:0,dTerm=sTerm>0?(1-R/sTerm)*100:0,dBook=sBench>0?(1-R/sBench)*100:0;
+  const priceActive=R/aw, benchActive=sBench/aw;
+  // KPIs
+  const fmt=d=>d>=0?"−"+d.toFixed(0)+"%":"+"+(-d).toFixed(0)+"%"; // −discount / +premium
+  document.getElementById("kR").textContent="$"+priceActive.toFixed(2);
+  document.getElementById("kDiscLab").textContent=(dBook>=0?"Discount":"Premium")+" vs blended rate card";
+  document.getElementById("kDisc").textContent=fmt(dBook);
+  document.getElementById("kSub").textContent=`vs benchmark $${benchActive.toFixed(2)}`;
+  document.getElementById("kODTerm").innerHTML=`${fmt(dOD)} vs OD · ${fmt(dTerm)} vs committed`;
+  document.getElementById("tiltv").textContent= tilt===0?"flat":tilt===1?"scarcity":Math.round(tilt*100)+"% scarcity";
+  document.getElementById("sumwarn").innerHTML=Math.abs(tot-100)<0.5?"":`<span style="color:var(--warn)">(mix ${tot}→norm.)</span>`;
+  CHIPS.forEach(ch=>{["mix","act","com"].forEach(k=>{const e=document.getElementById(k+"-"+ch);
+    if(e)e.textContent=Math.round(({mix,act,com})[k][ch])+"%";});});
+  // bars
+  const maxv=Math.max(...present.map(ch=>L[ch]),1);
+  const b=document.getElementById("bars");b.innerHTML= present.length?"":'<div class="legend">set a mix above 0</div>';
+  present.forEach(ch=>{const ct=cterm(s.op,ch,L,tier),Cch=ct.v;
+    const f=r[ch]/maxv*100,lp=L[ch]/maxv*100,cm=Cch/maxv*100;
+    const dod=(1-r[ch]/L[ch])*100,dt=(1-r[ch]/Cch)*100;
+    b.insertAdjacentHTML("beforeend",`<div class="bar"><div class="top"><span style="color:${COL[ch]}">${ch}
+      <span style="color:var(--mut);font-weight:400">· ${act[ch]}% svc · ${com[ch]}% com</span></span>
+      <span>$${r[ch].toFixed(2)} <span style="color:var(--list)">/ OD $${(+L[ch]).toFixed(2)}</span></span></div>
+      <div class="track"><div class="fill" style="width:${f}%;background:${COL[ch]}"></div>
+        <div class="listmark" style="left:${lp}%"></div><div class="commitmark" style="left:${cm}%"></div></div>
+      <div class="subpct"><b>−${dod.toFixed(0)}%</b> vs OD · <b class="c">−${dt.toFixed(0)}%</b> vs term${ct.real?"":"<sup>*</sup>"} ($${Cch.toFixed(2)})</div></div>`);
+  });
+  // fleet economics readout (lower-left) — implied GPU count from mix x per-chip cost
+  const fl=document.getElementById("fleet");
+  if(totalk&&D.cost){
+    const activek=present.reduce((a,ch)=>a+w[ch]*totalk*(act[ch]/100),0); // ACTIVE = derived count x per-chip activation
+    const haveRev=s.rev!=null, havePPE=s.ppe!=null;
+    const cm=n=>Math.round(n).toLocaleString('en-US');
+    const mixcost=present.reduce((a,ch)=>a+w[ch]*cost[ch],0);       // mix-weighted $/GPU (analyst-editable)
+    const avgk=havePPE ? s.ppe/totalk : mixcost/1000;               // = mix-weighted cost (count derived from it)
+    const rw={}; let trw=0; present.forEach(ch=>{rw[ch]=w[ch]*(act[ch]/100)*r[ch]; trw+=rw[ch];}); // revenue weight = in-service × rate
+    const cols=haveRev?'1fr auto auto auto':'1fr auto auto';
+    const rows=present.map(ch=>`<div class="c" style="color:${COL[ch]}">${ch}</div>`+
+      `<div class="n">${(w[ch]*totalk).toFixed(0)}k</div><div class="k">$${(cost[ch]/1000).toFixed(0)}k</div>`+
+      (haveRev?`<div class="r">$${cm(s.rev*rw[ch]/trw)}M</div>`:"")).join("");
+    fl.innerHTML=`<div class="hd">Implied fleet · ~${totalk.toFixed(0)}k deployed → <span style="color:var(--good)">~${activek.toFixed(0)}k in service</span></div>
+      <div class="ftab" style="grid-template-columns:${cols}">
+        <div class="hdr">chip</div><div class="hdr n">GPUs</div><div class="hdr k">$/GPU</div>${haveRev?'<div class="hdr r">rev/q</div>':''}
+        ${rows}
+        <div class="c tot">total</div><div class="n tot">${totalk.toFixed(0)}k</div><div class="k tot">$${avgk.toFixed(0)}k</div>${haveRev?`<div class="r tot">$${cm(s.rev)}M</div>`:''}</div>
+      <div style="opacity:.65;margin-top:5px;font-size:10px">${havePPE?`$${(s.ppe/1000).toFixed(1)}B GPU systems (incl networking, not bare chips); `:''}${haveRev?`per-chip rev = share of reported $${cm(s.rev)}M — ties to filings`:'cost-weighted count'}</div>`;
+  } else fl.innerHTML="";
+  const own=(s.op==="CoreWeave"||s.op==="Nebius");
+  document.getElementById("note").innerHTML=
+    `<b>Reading this:</b> ${s.op} ${s.q} realizes <b>$${priceActive.toFixed(2)}/GPU-hr</b> on its active fleet
+     ($${R.toFixed(2)} across all deployed GPUs), a <b>${fmt(dBook)}</b> ${dBook>=0?'discount':'premium'}
+     vs a book-weighted benchmark (or ${fmt(dOD)} vs pure OD, ${fmt(dTerm)} vs committed).
+     OD anchor = ${own?"operator's <b>own</b> published list":"CRI market T3 (not in panel)"}.
+     ${anyImp?`<b style="color:var(--warn)">*</b> committed leg imputed (${tier==='premium'?'own OD −~50% schedule':'wholesale-T3 −~15%, already near cost'}) where no published term rate. `:''}
+     Per-chip mix/activation/committed and the discount-shape are <b>analyst assumptions</b>; blended R is reconstructed
+     from SEC filings (±~15%); list/term anchors live from CRI ${D.asof}. Borrows CRI's chip price shape and re-levels it
+     — a cross-check on the level, not an independent chip measurement.`;
+}
+boot();
+</script>
+</body>
+</html>
