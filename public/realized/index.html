@@ -114,8 +114,8 @@ function boot(){
        <div style="font-size:10.5px;color:var(--mut);margin-top:5px;opacity:.8">All-in incl networking + servers; CoreWeave-discounted. Drives the implied fleet size from the $26.6B spend.</div></details>
    </div>
    <div class="card out">
-     <div style="margin:0 0 8px"><div class="lab" style="color:var(--mut);font-size:11px;text-transform:uppercase">Realized $/GPU-hr · active (earning)</div>
-       <div class="big" id="kR">—</div></div>
+     <div style="margin:0 0 8px"><div class="lab" style="color:var(--mut);font-size:11px;text-transform:uppercase">Executed $/GPU-hr · across deployed fleet</div>
+       <div class="big" id="kR">—</div><div id="kRsub" style="font-size:12px;color:var(--mut);margin-top:1px"></div></div>
      <div class="kpi" style="margin-bottom:10px"><div class="lab" id="kDiscLab">Discount vs blended rate card</div>
        <div style="display:flex;align-items:baseline;gap:12px">
          <div class="v" id="kDisc" style="font-size:23px;color:var(--amber)">—</div>
@@ -197,15 +197,16 @@ function render(){
   const r={};present.forEach(ch=>r[ch]=k*dfac(ch)*L[ch]);
   // active-weighted aggregates
   const aw=present.reduce((a,ch)=>a+w[ch]*(act[ch]/100),0)||1e-9;
-  let sOD=0,sTerm=0,sBench=0,anyImp=false;
+  let odF=0,termF=0,benchF=0,anyImp=false;
   present.forEach(ch=>{const ct=cterm(s.op,ch,L,tier);if(!ct.real)anyImp=true;
     const bench=(com[ch]/100)*ct.v+(1-com[ch]/100)*L[ch];
-    const a=w[ch]*(act[ch]/100); sOD+=a*L[ch];sTerm+=a*ct.v;sBench+=a*bench;});
-  const dOD=sOD>0?(1-R/sOD)*100:0,dTerm=sTerm>0?(1-R/sTerm)*100:0,dBook=sBench>0?(1-R/sBench)*100:0;
-  const priceActive=R/aw, benchActive=sBench/aw;
+    odF+=w[ch]*L[ch];termF+=w[ch]*ct.v;benchF+=w[ch]*bench;});   // full mix-weighted (deployed basis) — matches the trend chart
+  const dOD=odF>0?(1-R/odF)*100:0,dTerm=termF>0?(1-R/termF)*100:0,dBook=benchF>0?(1-R/benchF)*100:0;
+  const priceActive=R/aw, benchActive=benchF;
   // KPIs
   const fmt=d=>d>=0?"−"+d.toFixed(0)+"%":"+"+(-d).toFixed(0)+"%"; // −discount / +premium
-  document.getElementById("kR").textContent="$"+priceActive.toFixed(2);
+  document.getElementById("kR").textContent="$"+R.toFixed(2);
+  {const e=document.getElementById("kRsub"); if(e)e.textContent=Math.abs(priceActive-R)>=0.01?`· $${priceActive.toFixed(2)} on earning GPUs`:"";}
   document.getElementById("kDiscLab").textContent=(dBook>=0?"Discount":"Premium")+" vs blended rate card";
   document.getElementById("kDisc").textContent=fmt(dBook);
   document.getElementById("kSub").textContent=`vs benchmark $${benchActive.toFixed(2)}`;
