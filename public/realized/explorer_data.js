@@ -121,6 +121,7 @@ const EXPLORER_DATA={
    "deployed": 295.0,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "premium",
    "mix": {
     "A100": 12,
@@ -143,6 +144,7 @@ const EXPLORER_DATA={
    "deployed": 358.0,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "premium",
    "mix": {
     "A100": 10,
@@ -165,6 +167,7 @@ const EXPLORER_DATA={
    "deployed": 440.0,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "premium",
    "mix": {
     "A100": 8,
@@ -187,6 +190,7 @@ const EXPLORER_DATA={
    "deployed": 530.0,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "premium",
    "mix": {
     "A100": 6,
@@ -209,6 +213,7 @@ const EXPLORER_DATA={
    "deployed": 637.0,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "premium",
    "mix": {
     "A100": 5,
@@ -231,6 +236,7 @@ const EXPLORER_DATA={
    "deployed": 0.9,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -253,6 +259,7 @@ const EXPLORER_DATA={
    "deployed": 1.1,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -275,6 +282,7 @@ const EXPLORER_DATA={
    "deployed": 1.4,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -297,6 +305,7 @@ const EXPLORER_DATA={
    "deployed": 1.9,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -319,6 +328,7 @@ const EXPLORER_DATA={
    "deployed": 17.0,
    "act_default": 44.0,
    "stale": false,
+   "prov": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -341,12 +351,105 @@ const EXPLORER_DATA={
    "deployed": 27.0,
    "act_default": 37.0,
    "stale": false,
+   "prov": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
     "H100": 78,
     "H200": 22,
     "GB200": 0,
+    "GB300": 0
+   }
+  },
+  {
+   "op": "Nebius",
+   "q": "Dec'24",
+   "idx": 1.0,
+   "R": 0.5,
+   "ramp": 1.0,
+   "bookc": 90.0,
+   "ppe": null,
+   "ppe_begin": null,
+   "rev": 23.8,
+   "deployed": 27.0,
+   "act_default": null,
+   "stale": false,
+   "prov": false,
+   "term_tier": "premium",
+   "mix": {
+    "A100": 0,
+    "H100": 70,
+    "H200": 30,
+    "GB200": 0,
+    "GB300": 0
+   }
+  },
+  {
+   "op": "Nebius",
+   "q": "Mar'25",
+   "idx": 2.0,
+   "R": 0.6,
+   "ramp": 1.0,
+   "bookc": 90.0,
+   "ppe": null,
+   "ppe_begin": null,
+   "rev": 41.0,
+   "deployed": 36.0,
+   "act_default": null,
+   "stale": false,
+   "prov": true,
+   "term_tier": "premium",
+   "mix": {
+    "A100": 0,
+    "H100": 55,
+    "H200": 45,
+    "GB200": 0,
+    "GB300": 0
+   }
+  },
+  {
+   "op": "Nebius",
+   "q": "Jun'25",
+   "idx": 3.0,
+   "R": 1.07,
+   "ramp": 1.0,
+   "bookc": 90.0,
+   "ppe": null,
+   "ppe_begin": null,
+   "rev": 94.0,
+   "deployed": 45.0,
+   "act_default": null,
+   "stale": false,
+   "prov": true,
+   "term_tier": "premium",
+   "mix": {
+    "A100": 0,
+    "H100": 45,
+    "H200": 55,
+    "GB200": 0,
+    "GB300": 0
+   }
+  },
+  {
+   "op": "Nebius",
+   "q": "Sep'25",
+   "idx": 4.0,
+   "R": 1.21,
+   "ramp": 1.0,
+   "bookc": 90.0,
+   "ppe": null,
+   "ppe_begin": null,
+   "rev": 131.1,
+   "deployed": 54.0,
+   "act_default": null,
+   "stale": false,
+   "prov": false,
+   "term_tier": "premium",
+   "mix": {
+    "A100": 0,
+    "H100": 35,
+    "H200": 60,
+    "GB200": 5,
     "GB300": 0
    }
   },
@@ -363,6 +466,7 @@ const EXPLORER_DATA={
    "deployed": 120.0,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "premium",
    "mix": {
     "A100": 0,
@@ -385,6 +489,7 @@ const EXPLORER_DATA={
    "deployed": 160.0,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "premium",
    "mix": {
     "A100": 0,
@@ -407,6 +512,7 @@ const EXPLORER_DATA={
    "deployed": 6.0,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -429,6 +535,7 @@ const EXPLORER_DATA={
    "deployed": 6.0,
    "act_default": null,
    "stale": false,
+   "prov": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,

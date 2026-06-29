@@ -127,7 +127,7 @@ function boot(){
      <div class="legend">▎implied realized · <span style="color:var(--list)">│</span> OD list · <span style="color:var(--warn)">│</span> committed (term) · <span style="color:var(--amber)">ᵐ</span> OD market-filled (operator doesn't post chip) · <sup>*</sup> committed imputed</div>
    </div>`;
   const sel=document.getElementById("scn");
-  SCN.forEach((s,i)=>{let o=document.createElement("option");o.value=i;o.textContent=`${s.op} — ${s.q}`;sel.appendChild(o);});
+  SCN.forEach((s,i)=>{let o=document.createElement("option");o.value=i;o.textContent=`${s.op} — ${s.q}`+(s.prov?" (interp.)":"");sel.appendChild(o);});
   sel.onchange=e=>load(e.target.value);
   document.getElementById("reset").onclick=()=>load(cur);
   document.getElementById("tilt").oninput=e=>{tilt=+e.target.value/100;render();};
@@ -285,7 +285,7 @@ const OPCOL={"CoreWeave":"#4a86d6","Nebius":"#e08a2e","IREN":"#9b6ad6","Applied 
 const QLAB=["Sep'24","Dec'24","Mar'25","Jun'25","Sep'25","Dec'25","Mar'26"];
 function drawTrend(){
   const host=document.getElementById("trendcard"); if(!host)return;
-  const pts=SCN.map((s,i)=>({i,op:s.op,idx:s.idx,q:s.q,pct:scnPct(s),stale:s.stale})).filter(p=>p.pct!=null);
+  const pts=SCN.map((s,i)=>({i,op:s.op,idx:s.idx,q:s.q,pct:scnPct(s),stale:s.stale,prov:s.prov})).filter(p=>p.pct!=null);
   if(!pts.length){host.innerHTML="";return;}
   const W=720,H=240,pl=44,pr=12,pt=28,pb=42, iw=W-pl-pr, ih=H-pt-pb;
   const xmin=0,xmax=6, ymax=Math.max(40,Math.ceil(Math.max(...pts.map(p=>p.pct))/10)*10);
@@ -298,8 +298,8 @@ function drawTrend(){
   Object.keys(OPCOL).forEach(op=>{const ps=pts.filter(p=>p.op===op).sort((a,b)=>a.idx-b.idx);
     if(!ps.length)return; const col=OPCOL[op];
     if(ps.length>1)svg+=`<polyline points="${ps.map(p=>X(p.idx)+','+Y(p.pct)).join(' ')}" fill="none" stroke="${col}" stroke-width="2"/>`;
-    ps.forEach(p=>{const sel=p.i===cur;
-      svg+=`<circle cx="${X(p.idx)}" cy="${Y(p.pct)}" r="${sel?5.5:3.5}" fill="${p.stale?'#11151c':col}" stroke="${col}" stroke-width="${sel?2.5:p.stale?1.5:0}"${sel?' stroke="#e8eef5"':''}><title>${op} ${p.q}: ${p.pct.toFixed(0)}% of OD${p.stale?' (frozen — last reconstructable)':''}</title></circle>`;});});
+    ps.forEach(p=>{const sel=p.i===cur, hollow=p.stale||p.prov;
+      svg+=`<circle cx="${X(p.idx)}" cy="${Y(p.pct)}" r="${sel?5.5:3.5}" fill="${hollow?'#11151c':col}" stroke="${col}" stroke-width="${sel?2.5:hollow?1.5:0}"${sel?' stroke="#e8eef5"':''}><title>${op} ${p.q}: ${p.pct.toFixed(0)}% of OD${p.stale?' (frozen — last reconstructable)':p.prov?' (interpolated — net-only quarter)':''}</title></circle>`;});});
   svg+=`</svg>`;
   const leg=Object.keys(OPCOL).map(op=>`<span style="color:${OPCOL[op]};margin-right:12px">● ${op}</span>`).join("");
   host.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:2px">Realized as % of published OD list — by provider, over time</div>
