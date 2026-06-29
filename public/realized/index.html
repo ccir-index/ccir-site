@@ -83,8 +83,8 @@ on-demand and committed-term pricing. Set how the capex was split across chips t
 
 <script src="explorer_data.js"></script>
 <script>
-const CHIPS=["A100","H100","H200","GB200","GB300"];
-const COL={A100:"#3fa3a3",H100:"#4a86d6",H200:"#3a9b6e",GB200:"#e08a2e",GB300:"#c46ad6"};
+const CHIPS=["A100","H100","H200","B200","GB200","GB300"];
+const COL={A100:"#3fa3a3",H100:"#4a86d6",H200:"#3a9b6e",B200:"#d6b84a",GB200:"#e08a2e",GB300:"#c46ad6"};
 let D,SCN,cur=0,mix={},act={},com={},cost={},tilt=0;
 
 function boot(){
@@ -160,12 +160,12 @@ function buildGrid(){
     } else { ({act,com})[k][ch]=val; }
     render();});
 }
-const ACT_DEFAULT={A100:100,H100:100,H200:100,GB200:90,GB300:85}; // in-service line excludes CIP ramp; take-or-pay demand → placed chips ~all billing (small lag on newest Blackwell)
+const ACT_DEFAULT={A100:100,H100:100,H200:100,B200:90,GB200:90,GB300:85}; // in-service line excludes CIP ramp; take-or-pay demand → placed chips ~all billing (small lag on newest Blackwell)
 function load(i){cur=+i;const s=SCN[i];mix={...s.mix};act={};com={};
   const sc=document.getElementById("scn"); if(sc)sc.value=i;   // keep dropdown in sync with loaded scenario
   const ad=(s.act_default!=null)?s.act_default:null;           // per-scenario in-service default (low for mid-commissioning fleets, e.g. IREN FY26)
   CHIPS.forEach(ch=>{act[ch]=ad!=null?ad:(ACT_DEFAULT[ch]!=null?ACT_DEFAULT[ch]:100);com[ch]=Math.round(s.bookc||100);cost[ch]=(D.cost&&D.cost[ch])||0;});
-  tilt=1;document.getElementById("tilt").value=100;buildGrid();buildCosts();render();} // default = scarcity (newer chips unsourceable → priced to list)
+  tilt=0.5;document.getElementById("tilt").value=50;buildGrid();buildCosts();render();} // default = 50% scarcity (half the dispersion; keeps H100 above all-in cost)
 function buildCosts(){
   const cg=document.getElementById("costgrid"); if(!cg)return; cg.innerHTML="";
   const base=SCN[cur].mix, L=A(SCN[cur].op);
