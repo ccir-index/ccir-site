@@ -30,6 +30,36 @@ const EXPLORER_DATA={
    "GB300": 12.0
   }
  },
+ "anchor_basis": {
+  "CoreWeave": {
+   "A100": "own",
+   "H100": "own",
+   "H200": "own",
+   "GB200": "own",
+   "GB300": "proxy"
+  },
+  "Nebius": {
+   "A100": "market",
+   "H100": "own",
+   "H200": "own",
+   "GB200": "market",
+   "GB300": "proxy"
+  },
+  "IREN": {
+   "A100": "t3proxy",
+   "H100": "t3proxy",
+   "H200": "t3proxy",
+   "GB200": "market",
+   "GB300": "proxy"
+  },
+  "Applied Digital": {
+   "A100": "t3proxy",
+   "H100": "t3proxy",
+   "H200": "t3proxy",
+   "GB200": "market",
+   "GB300": "proxy"
+  }
+ },
  "commit3y": {
   "A100": 1.71,
   "H100": 5.48,
@@ -81,6 +111,7 @@ const EXPLORER_DATA={
   {
    "op": "CoreWeave",
    "q": "Mar'25",
+   "idx": 2.0,
    "R": 1.65,
    "ramp": 1.0,
    "bookc": 98.0,
@@ -88,6 +119,8 @@ const EXPLORER_DATA={
    "ppe_begin": 9147.0,
    "rev": 981.6,
    "deployed": 295.0,
+   "act_default": null,
+   "stale": false,
    "term_tier": "premium",
    "mix": {
     "A100": 12,
@@ -100,6 +133,7 @@ const EXPLORER_DATA={
   {
    "op": "CoreWeave",
    "q": "Jun'25",
+   "idx": 3.0,
    "R": 1.7,
    "ramp": 1.0,
    "bookc": 98.0,
@@ -107,6 +141,8 @@ const EXPLORER_DATA={
    "ppe_begin": 10746.0,
    "rev": 1212.8,
    "deployed": 358.0,
+   "act_default": null,
+   "stale": false,
    "term_tier": "premium",
    "mix": {
     "A100": 10,
@@ -119,6 +155,7 @@ const EXPLORER_DATA={
   {
    "op": "CoreWeave",
    "q": "Sep'25",
+   "idx": 4.0,
    "R": 1.56,
    "ramp": 1.0,
    "bookc": 98.0,
@@ -126,6 +163,8 @@ const EXPLORER_DATA={
    "ppe_begin": 13170.0,
    "rev": 1364.7,
    "deployed": 440.0,
+   "act_default": null,
+   "stale": false,
    "term_tier": "premium",
    "mix": {
     "A100": 8,
@@ -138,6 +177,7 @@ const EXPLORER_DATA={
   {
    "op": "CoreWeave",
    "q": "Dec'25",
+   "idx": 5.0,
    "R": 1.48,
    "ramp": 1.0,
    "bookc": 98.0,
@@ -145,6 +185,8 @@ const EXPLORER_DATA={
    "ppe_begin": 16500.0,
    "rev": 1572.0,
    "deployed": 530.0,
+   "act_default": null,
+   "stale": false,
    "term_tier": "premium",
    "mix": {
     "A100": 6,
@@ -157,6 +199,7 @@ const EXPLORER_DATA={
   {
    "op": "CoreWeave",
    "q": "Mar'26",
+   "idx": 6.0,
    "R": 1.63,
    "ramp": 1.0,
    "bookc": 98.0,
@@ -164,6 +207,8 @@ const EXPLORER_DATA={
    "ppe_begin": 20903.0,
    "rev": 2078.0,
    "deployed": 637.0,
+   "act_default": null,
+   "stale": false,
    "term_tier": "premium",
    "mix": {
     "A100": 5,
@@ -176,6 +221,7 @@ const EXPLORER_DATA={
   {
    "op": "IREN",
    "q": "Sep'24",
+   "idx": 0.0,
    "R": 1.7,
    "ramp": 1.0,
    "bookc": 80.0,
@@ -183,6 +229,8 @@ const EXPLORER_DATA={
    "ppe_begin": null,
    "rev": 3.2,
    "deployed": 0.9,
+   "act_default": null,
+   "stale": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -195,6 +243,7 @@ const EXPLORER_DATA={
   {
    "op": "IREN",
    "q": "Dec'24",
+   "idx": 1.0,
    "R": 1.15,
    "ramp": 1.0,
    "bookc": 80.0,
@@ -202,6 +251,8 @@ const EXPLORER_DATA={
    "ppe_begin": null,
    "rev": 2.7,
    "deployed": 1.1,
+   "act_default": null,
+   "stale": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -214,6 +265,7 @@ const EXPLORER_DATA={
   {
    "op": "IREN",
    "q": "Mar'25",
+   "idx": 2.0,
    "R": 1.18,
    "ramp": 1.0,
    "bookc": 80.0,
@@ -221,6 +273,8 @@ const EXPLORER_DATA={
    "ppe_begin": null,
    "rev": 3.6,
    "deployed": 1.4,
+   "act_default": null,
+   "stale": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -233,6 +287,7 @@ const EXPLORER_DATA={
   {
    "op": "IREN",
    "q": "Jun'25",
+   "idx": 3.0,
    "R": 1.68,
    "ramp": 1.0,
    "bookc": 80.0,
@@ -240,6 +295,52 @@ const EXPLORER_DATA={
    "ppe_begin": null,
    "rev": 7.0,
    "deployed": 1.9,
+   "act_default": null,
+   "stale": false,
+   "term_tier": "wholesale",
+   "mix": {
+    "A100": 0,
+    "H100": 78,
+    "H200": 22,
+    "GB200": 0,
+    "GB300": 0
+   }
+  },
+  {
+   "op": "IREN",
+   "q": "Dec'25",
+   "idx": 5.0,
+   "R": 0.83,
+   "ramp": 1.0,
+   "bookc": 80.0,
+   "ppe": 710.7,
+   "ppe_begin": 76.0,
+   "rev": 17.298,
+   "deployed": 17.0,
+   "act_default": 44.0,
+   "stale": false,
+   "term_tier": "wholesale",
+   "mix": {
+    "A100": 0,
+    "H100": 78,
+    "H200": 22,
+    "GB200": 0,
+    "GB300": 0
+   }
+  },
+  {
+   "op": "IREN",
+   "q": "Mar'26",
+   "idx": 6.0,
+   "R": 0.7,
+   "ramp": 1.0,
+   "bookc": 80.0,
+   "ppe": 1113.2,
+   "ppe_begin": 710.7,
+   "rev": 33.635,
+   "deployed": 27.0,
+   "act_default": 37.0,
+   "stale": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -252,6 +353,7 @@ const EXPLORER_DATA={
   {
    "op": "Nebius",
    "q": "Dec'25",
+   "idx": 5.0,
    "R": 1.25,
    "ramp": 1.0,
    "bookc": 90.0,
@@ -259,6 +361,8 @@ const EXPLORER_DATA={
    "ppe_begin": null,
    "rev": 214.0,
    "deployed": 120.0,
+   "act_default": null,
+   "stale": false,
    "term_tier": "premium",
    "mix": {
     "A100": 0,
@@ -271,6 +375,7 @@ const EXPLORER_DATA={
   {
    "op": "Nebius",
    "q": "Mar'26",
+   "idx": 6.0,
    "R": 1.4,
    "ramp": 1.0,
    "bookc": 90.0,
@@ -278,6 +383,8 @@ const EXPLORER_DATA={
    "ppe_begin": null,
    "rev": 390.0,
    "deployed": 160.0,
+   "act_default": null,
+   "stale": false,
    "term_tier": "premium",
    "mix": {
     "A100": 0,
@@ -290,6 +397,7 @@ const EXPLORER_DATA={
   {
    "op": "Applied Digital",
    "q": "FY25",
+   "idx": 2.5,
    "R": 1.25,
    "ramp": 1.0,
    "bookc": 70.0,
@@ -297,6 +405,8 @@ const EXPLORER_DATA={
    "ppe_begin": null,
    "rev": null,
    "deployed": 6.0,
+   "act_default": null,
+   "stale": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,
@@ -309,6 +419,7 @@ const EXPLORER_DATA={
   {
    "op": "Applied Digital",
    "q": "Mar'26",
+   "idx": 6.0,
    "R": 1.1,
    "ramp": 1.0,
    "bookc": 70.0,
@@ -316,6 +427,8 @@ const EXPLORER_DATA={
    "ppe_begin": null,
    "rev": 18.0,
    "deployed": 6.0,
+   "act_default": null,
+   "stale": false,
    "term_tier": "wholesale",
    "mix": {
     "A100": 0,

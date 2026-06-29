@@ -77,6 +77,7 @@ on-demand and committed-term pricing. Set how the capex was split across chips t
 <span style="opacity:.65">CRI = CCIR Reference Index.</span></div>
 
 <div id="app" class="row"></div>
+<div class="card" id="trendcard" style="margin-top:16px"></div>
 <div class="note" id="note"></div>
 
 <script src="explorer_data.js"></script>
@@ -123,7 +124,7 @@ function boot(){
        <div class="lab" id="kSub" style="font-size:11px;text-transform:none;letter-spacing:0"></div></div>
      <label>Implied realized $/GPU-hr by chip</label>
      <div id="bars"></div>
-     <div class="legend">▎implied realized · <span style="color:var(--list)">│</span> OD list · <span style="color:var(--warn)">│</span> committed (term)</div>
+     <div class="legend">▎implied realized · <span style="color:var(--list)">│</span> OD list · <span style="color:var(--warn)">│</span> committed (term) · <span style="color:var(--amber)">ᵐ</span> OD market-filled (operator doesn't post chip) · <sup>*</sup> committed imputed</div>
    </div>`;
   const sel=document.getElementById("scn");
   SCN.forEach((s,i)=>{let o=document.createElement("option");o.value=i;o.textContent=`${s.op} — ${s.q}`;sel.appendChild(o);});
@@ -162,7 +163,8 @@ function buildGrid(){
 const ACT_DEFAULT={A100:100,H100:100,H200:100,GB200:90,GB300:85}; // in-service line excludes CIP ramp; take-or-pay demand → placed chips ~all billing (small lag on newest Blackwell)
 function load(i){cur=+i;const s=SCN[i];mix={...s.mix};act={};com={};
   const sc=document.getElementById("scn"); if(sc)sc.value=i;   // keep dropdown in sync with loaded scenario
-  CHIPS.forEach(ch=>{act[ch]=ACT_DEFAULT[ch]!=null?ACT_DEFAULT[ch]:100;com[ch]=Math.round(s.bookc||100);cost[ch]=(D.cost&&D.cost[ch])||0;});
+  const ad=(s.act_default!=null)?s.act_default:null;           // per-scenario in-service default (low for mid-commissioning fleets, e.g. IREN FY26)
+  CHIPS.forEach(ch=>{act[ch]=ad!=null?ad:(ACT_DEFAULT[ch]!=null?ACT_DEFAULT[ch]:100);com[ch]=Math.round(s.bookc||100);cost[ch]=(D.cost&&D.cost[ch])||0;});
   tilt=1;document.getElementById("tilt").value=100;buildGrid();buildCosts();render();} // default = scarcity (newer chips unsourceable → priced to list)
 function buildCosts(){
   const cg=document.getElementById("costgrid"); if(!cg)return; cg.innerHTML="";
@@ -178,6 +180,15 @@ function cterm(op,ch,L,tier){const tr=(D.termrates||{})[op]||{};const t=tr[ch]&&
 function render(){
   const s=SCN[cur],L=A(s.op),tier=s.term_tier||"premium";
   const present=CHIPS.filter(ch=>L[ch]!=null&&mix[ch]>0.001);
+  const own=(s.op==="CoreWeave"||s.op==="Nebius");           // operators that publish their own OD list
+  const B=(D.anchor_basis||{})[s.op]||{};                    // per-chip OD provenance: own / market / t3proxy
+  const assumedOD=ch=> own ? (B[ch]&&B[ch]!=="own") : false; // CW/Nebius: market-filled chip; IREN/APLD: pill covers it
+  // dynamic pill: say where THIS operator's OD anchors come from
+  const presB=present.map(ch=>B[ch]||(own?"own":"t3proxy"));
+  const pillTxt = own
+    ? (presB.every(b=>b==="own") ? "OD: own published list" : "OD: own list + mkt fill")
+    : "OD: CRI market-T3 proxy";
+  const pe=document.getElementById("asofpill"); if(pe)pe.textContent=pillTxt+" · CRI "+D.asof;
   const tot=CHIPS.reduce((a,ch)=>a+mix[ch],0)||1;
   const w={};CHIPS.forEach(ch=>w[ch]=mix[ch]/tot);
   // DERIVED: count = PP&E ÷ mix-weighted cost; realized = revenue ÷ (avg count × hrs) — both move with the mix.
@@ -218,7 +229,7 @@ function render(){
     const dod=(1-r[ch]/L[ch])*100,dt=(1-r[ch]/Cch)*100;
     b.insertAdjacentHTML("beforeend",`<div class="bar"><div class="top"><span style="color:${COL[ch]}">${ch}
       <span style="color:var(--mut);font-weight:400">· ${act[ch]}% svc · ${com[ch]}% com</span></span>
-      <span>$${r[ch].toFixed(2)} <span style="color:var(--list)">/ OD $${(+L[ch]).toFixed(2)}</span></span></div>
+      <span>$${r[ch].toFixed(2)} <span style="color:var(--list)">/ OD $${(+L[ch]).toFixed(2)}${assumedOD(ch)?'<sup title="operator does not publish this chip — CRI market median used" style="color:var(--amber)">ᵐ</sup>':''}</span></span></div>
       <div class="track"><div class="fill" style="width:${f}%;background:${COL[ch]}"></div>
         <div class="listmark" style="left:${lp}%"></div><div class="commitmark" style="left:${cm}%"></div></div>
       <div class="subpct"><b>−${dod.toFixed(0)}%</b> vs OD · <b class="c">−${dt.toFixed(0)}%</b> vs term${ct.real?"":"<sup>*</sup>"} ($${Cch.toFixed(2)})</div></div>`);
@@ -243,16 +254,57 @@ function render(){
         <div class="c tot">total</div><div class="n tot">${totalk.toFixed(0)}k</div><div class="k tot">$${avgk.toFixed(0)}k</div>${haveRev?`<div class="r tot">$${cm(s.rev)}M</div>`:''}</div>
       <div style="opacity:.65;margin-top:5px;font-size:10px">${havePPE?`$${(s.ppe/1000).toFixed(1)}B GPU systems (incl networking, not bare chips); `:''}${haveRev?`per-chip rev = share of reported $${cm(s.rev)}M — ties to filings`:'cost-weighted count'}</div>`;
   } else fl.innerHTML="";
-  const own=(s.op==="CoreWeave"||s.op==="Nebius");
+  const nMkt=present.filter(assumedOD).length;
   document.getElementById("note").innerHTML=
     `<b>Reading this:</b> ${s.op} ${s.q} realizes <b>$${priceActive.toFixed(2)}/GPU-hr</b> on its active fleet
      ($${R.toFixed(2)} across all deployed GPUs), a <b>${fmt(dBook)}</b> ${dBook>=0?'discount':'premium'}
      vs a book-weighted benchmark (or ${fmt(dOD)} vs pure OD, ${fmt(dTerm)} vs committed).
-     OD anchor = ${own?"operator's <b>own</b> published list":"CRI market T3 (not in panel)"}.
-     ${anyImp?`<b style="color:var(--warn)">*</b> committed leg imputed (${tier==='premium'?'own OD −~50% schedule':'wholesale-T3 −~15%, already near cost'}) where no published term rate. `:''}
+     ${(R>0&&priceActive/R>1.4)?`<b style="color:var(--amber)">Commissioning wedge:</b> only ~${(aw*100).toFixed(0)}% of capitalized GPUs are billing — capital ran ahead of revenue, so deployed-basis realized is just <b>$${R.toFixed(2)}</b> while the billing subset clears <b>$${priceActive.toFixed(2)}</b>. The in-service % is the load-bearing assumption here; slide it to test other billing-fleet sizes. `:''}
+     OD anchor = ${own?"operator's <b>own</b> published list"+(nMkt?` (<span style="color:var(--amber)">ᵐ</span> ${nMkt} chip${nMkt>1?'s':''} market-filled — operator doesn't post them)`:""):"<b>CRI market-T3</b> (operator publishes no retail OD)"}.
+     Committed leg is <b>always imputed</b> here (${tier==='premium'?'own OD −~50% schedule':'wholesale-T3 −~15%'}): no neocloud posts term rates in the panel — only AWS/Azure/GCP do, so the published-term path stays empty until they do.
      Per-chip mix/activation/committed and the discount-shape are <b>analyst assumptions</b>; blended R is reconstructed
-     from SEC filings (±~15%); list/term anchors live from CRI ${D.asof}. Borrows CRI's chip price shape and re-levels it
+     from SEC filings (±~15%); OD anchors are live from CRI ${D.asof}. Borrows CRI's chip price shape and re-levels it
      — a cross-check on the level, not an independent chip measurement.`;
+  drawTrend();
+}
+// ---- realized-vs-OD trend (cleanest metric: only OD is operator-published) ----
+function scnPct(s){
+  const L=A(s.op),mix=s.mix,tot=CHIPS.reduce((a,c)=>a+(mix[c]||0),0)||1,w={};
+  CHIPS.forEach(c=>w[c]=(mix[c]||0)/tot);
+  const present=CHIPS.filter(c=>L[c]!=null&&mix[c]>0);
+  if(!present.length)return null;
+  const derive=(s.ppe!=null&&s.ppe_begin!=null&&s.rev!=null&&D.cost);
+  let R;
+  if(derive){const mc=present.reduce((a,c)=>a+w[c]*((D.cost&&D.cost[c])||0),0);
+    const endk=s.ppe*1000/mc,begk=s.ppe_begin*1000/mc; R=s.rev*1000/(((endk+begk)/2)*(D.hours||2190));}
+  else R=s.R;
+  const wlist=present.reduce((a,c)=>a+w[c]*L[c],0);
+  return wlist>0?R/wlist*100:null;
+}
+const OPCOL={"CoreWeave":"#4a86d6","Nebius":"#e08a2e","IREN":"#9b6ad6","Applied Digital":"#9a9a3d"};
+const QLAB=["Sep'24","Dec'24","Mar'25","Jun'25","Sep'25","Dec'25","Mar'26"];
+function drawTrend(){
+  const host=document.getElementById("trendcard"); if(!host)return;
+  const pts=SCN.map((s,i)=>({i,op:s.op,idx:s.idx,q:s.q,pct:scnPct(s),stale:s.stale})).filter(p=>p.pct!=null);
+  if(!pts.length){host.innerHTML="";return;}
+  const W=720,H=240,pl=44,pr=12,pt=28,pb=42, iw=W-pl-pr, ih=H-pt-pb;
+  const xmin=0,xmax=6, ymax=Math.max(40,Math.ceil(Math.max(...pts.map(p=>p.pct))/10)*10);
+  const X=idx=>pl+(idx-xmin)/(xmax-xmin)*iw, Y=v=>pt+ih-(v/ymax)*ih;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:760px">`;
+  for(let v=0;v<=ymax;v+=10){const y=Y(v);
+    svg+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#2c3947"/>`+
+         `<text x="${pl-6}" y="${y+3}" fill="#a3b1c2" font-size="9" text-anchor="end">${v}%</text>`;}
+  QLAB.forEach((lb,k)=>{svg+=`<text x="${X(k)}" y="${H-pb+16}" fill="#a3b1c2" font-size="9" text-anchor="middle">${lb}</text>`;});
+  Object.keys(OPCOL).forEach(op=>{const ps=pts.filter(p=>p.op===op).sort((a,b)=>a.idx-b.idx);
+    if(!ps.length)return; const col=OPCOL[op];
+    if(ps.length>1)svg+=`<polyline points="${ps.map(p=>X(p.idx)+','+Y(p.pct)).join(' ')}" fill="none" stroke="${col}" stroke-width="2"/>`;
+    ps.forEach(p=>{const sel=p.i===cur;
+      svg+=`<circle cx="${X(p.idx)}" cy="${Y(p.pct)}" r="${sel?5.5:3.5}" fill="${p.stale?'#11151c':col}" stroke="${col}" stroke-width="${sel?2.5:p.stale?1.5:0}"${sel?' stroke="#e8eef5"':''}><title>${op} ${p.q}: ${p.pct.toFixed(0)}% of OD${p.stale?' (frozen — last reconstructable)':''}</title></circle>`;});});
+  svg+=`</svg>`;
+  const leg=Object.keys(OPCOL).map(op=>`<span style="color:${OPCOL[op]};margin-right:12px">● ${op}</span>`).join("");
+  host.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:2px">Realized as % of published OD list — by provider, over time</div>
+    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">Realized $/GPU-hr ÷ mix-weighted OD list — the cleanest cross-provider metric (OD is the one rate operators actually publish). CoreWeave/Nebius vs their <b>own</b> OD; IREN/Applied Digital vs CRI market-T3 (they post no retail OD). Hollow dot = frozen/stale quarter; ringed dot = current selection.</div>
+    ${svg}<div class="legend" style="margin-top:4px">${leg}</div>`;
 }
 boot();
 </script>
