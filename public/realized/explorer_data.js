@@ -96,7 +96,7 @@ const EXPLORER_DATA={
   "premium": {
    "y1": 0.36,
    "y3": 0.56,
-   "repr": 0.5
+   "repr": 0.55
   },
   "wholesale": {
    "y1": 0.07,
