@@ -163,7 +163,7 @@ function buildGrid(){
 const ACT_DEFAULT={A100:100,H100:100,H200:100,B200:90,GB200:90,GB300:85}; // in-service line excludes CIP ramp; take-or-pay demand → placed chips ~all billing (small lag on newest Blackwell)
 function load(i){cur=+i;const s=SCN[i];mix={...s.mix};act={};com={};
   const sc=document.getElementById("scn"); if(sc)sc.value=i;   // keep dropdown in sync with loaded scenario
-  const ad=(s.act_default!=null)?s.act_default:null;           // per-scenario in-service default (low for mid-commissioning fleets, e.g. IREN FY26)
+  const ad=(s.act_default!=null)?s.act_default:null;           // per-scenario in-service default (low where the buildout ran ahead of revenue, e.g. IREN FY26)
   CHIPS.forEach(ch=>{act[ch]=ad!=null?ad:(ACT_DEFAULT[ch]!=null?ACT_DEFAULT[ch]:100);com[ch]=Math.round(s.bookc||100);cost[ch]=(D.cost&&D.cost[ch])||0;});
   tilt=0.5;document.getElementById("tilt").value=50;buildGrid();buildCosts();render();} // default = 50% scarcity (half the dispersion; keeps H100 above all-in cost)
 function buildCosts(){
@@ -255,7 +255,7 @@ function render(){
     `<b>Reading this:</b> ${s.op} ${s.q} realizes <b>$${priceActive.toFixed(2)}/GPU-hr</b> on its active fleet
      ($${R.toFixed(2)} across all deployed GPUs), a <b>${fmt(dBook)}</b> ${dBook>=0?'discount':'premium'}
      vs a book-weighted benchmark (or ${fmt(dOD)} vs pure OD, ${fmt(dTerm)} vs committed).
-     ${(R>0&&priceActive/R>1.4)?`<b style="color:var(--amber)">Commissioning wedge:</b> only ~${(aw*100).toFixed(0)}% of capitalized GPUs are billing — capital ran ahead of revenue, so deployed-basis realized is just <b>$${R.toFixed(2)}</b> while the billing subset executes at <b>$${priceActive.toFixed(2)}</b>. The in-service % is the load-bearing assumption here; slide it to test other billing-fleet sizes. `:''}
+     ${(R>0&&priceActive/R>1.4)?`<b style="color:var(--amber)">Capital ahead of revenue:</b> only ~${(aw*100).toFixed(0)}% of capitalized GPUs are billing — the GPU buildout ran well ahead of revenue, so deployed-basis realized is just <b>$${R.toFixed(2)}</b> while the billing subset executes at <b>$${priceActive.toFixed(2)}</b>. The in-service % is the load-bearing assumption here; slide it to test other billing-fleet sizes. `:''}
      OD anchor = ${own?"operator's <b>own</b> published list"+(nMkt?` (<span style="color:var(--amber)">ᵐ</span> ${nMkt} chip${nMkt>1?'s':''} market-filled — operator doesn't post them)`:""):"<b>CRI market-T3</b> (operator publishes no retail OD)"}.
      Committed leg is <b>always imputed</b> here (${tier==='premium'?'own OD −~50% schedule':'wholesale-T3 −~15%'}): no neocloud posts term rates in the panel — only AWS/Azure/GCP do, so the published-term path stays empty until they do.
      Per-chip mix/activation/committed and the discount-shape are <b>analyst assumptions</b>; blended R is reconstructed
@@ -277,8 +277,8 @@ function scnPct(s){
   const actOf=c => s.act_default!=null ? s.act_default/100 : ((ACT_DEFAULT[c]!=null?ACT_DEFAULT[c]:100)/100);
   const aw=present.reduce((a,c)=>a+w[c]*actOf(c),0)||1e-9;
   const priceActive=R/aw;
-  const airpocket=(s.act_default!=null&&s.act_default<80);   // mid-commissioning (e.g. IREN FY26): show whole-fleet (deployed) so the air-pocket is visible
-  const rate=airpocket?R:priceActive;                        // CoreWeave/Nebius -> earning (matches landing); air-pocket -> deployed
+  const aheadOfRev=(s.act_default!=null&&s.act_default<80);   // buildout-ahead-of-revenue (e.g. IREN FY26): show whole-fleet (deployed) so it's visible
+  const rate=aheadOfRev?R:priceActive;                        // CoreWeave/Nebius -> earning (matches landing); buildout-ahead -> deployed
   const wlist=present.reduce((a,c)=>a+w[c]*L[c],0);
   return wlist>0?rate/wlist*100:null;
 }
@@ -304,7 +304,7 @@ function drawTrend(){
   svg+=`</svg>`;
   const leg=Object.keys(OPCOL).map(op=>`<span style="color:${OPCOL[op]};margin-right:12px">● ${op}</span>`).join("");
   host.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:2px">Discount to published on-demand list — by provider, over time</div>
-    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">How far below each operator's own published OD list it actually executes (1 − executed $/GPU-hr ÷ mix-weighted OD). CoreWeave/Nebius vs their <b>own</b> OD; IREN/Applied Digital vs CRI market-T3 (they post no retail OD). Higher = deeper discount; mid-commissioning quarters (IREN FY26) shown whole-fleet to surface the air-pocket. Hollow dot = interpolated/frozen quarter; ringed dot = current selection.</div>
+    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">How far below each operator's own published OD list it actually executes (1 − executed $/GPU-hr ÷ mix-weighted OD). CoreWeave/Nebius vs their <b>own</b> OD; IREN/Applied Digital vs CRI market-T3 (they post no retail OD). Higher = deeper discount; IREN FY26 shown whole-fleet (its GPU buildout ran ahead of revenue). Hollow dot = interpolated/frozen quarter; ringed dot = current selection.</div>
     ${svg}<div class="legend" style="margin-top:4px">${leg}</div>`;
 }
 // ---- executed $/GPU-hr level (absolute mark) — same per-provider basis as the discount chart ----
@@ -343,7 +343,7 @@ function drawLevels(){
   svg+=`</svg>`;
   const leg=Object.keys(OPCOL).map(op=>`<span style="color:${OPCOL[op]};margin-right:12px">● ${op}</span>`).join("");
   host.innerHTML=`<div style="font-size:13px;font-weight:600;margin-bottom:2px">Executed $/GPU-hr — by provider, over time</div>
-    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">The absolute rate the compute marks at (companion to the discount chart above). CoreWeave/Nebius earning rate; IREN whole-fleet (air-pocket). Ringed dot = current selection.</div>
+    <div style="font-size:11px;color:#a3b1c2;margin-bottom:6px">The absolute rate the compute marks at (companion to the discount chart above). CoreWeave/Nebius earning rate; IREN whole-fleet (buildout ahead of revenue). Ringed dot = current selection.</div>
     ${svg}<div class="legend" style="margin-top:4px">${leg}</div>`;
 }
 boot();
