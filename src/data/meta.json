@@ -28,6 +28,8 @@
       "h200-sxm-141gb",
       "b200-sxm-180gb",
       "gb200-nvl-nvl",
+      "b300-sxm-288gb",
+      "gb300-nvl-nvl",
       "a100-sxm-80gb",
       "a100-sxm-40gb"
     ],
@@ -39,7 +41,7 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 297,
+    "total_rows": 341,
     "window_days": 7,
     "window_end": "2026-07-01",
     "window_start": "2026-06-25"
@@ -59,9 +61,9 @@
       "RTX 6000Ada",
       "RTX A6000"
     ],
-    "latest_collected_at_utc": "2026-07-01 15:25:07.934860+00:00",
+    "latest_collected_at_utc": "2026-07-01 20:29:13.850530+00:00",
     "n_chips": 12,
-    "n_offers_latest_cycle": 1803,
+    "n_offers_latest_cycle": 1822,
     "status": "ok",
     "summary_file": "vast_summary.csv",
     "window_days": 30,
@@ -80,7 +82,7 @@
       "l40s",
       "rtx-pro-6000"
     ],
-    "latest_collected_at_utc": "2026-07-01 15:25:46.431969+00:00",
+    "latest_collected_at_utc": "2026-07-01 20:29:31.031731+00:00",
     "n_available_latest_cycle": 39,
     "n_chips": 9,
     "n_sku_regions_latest_cycle": 300,
