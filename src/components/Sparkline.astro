@@ -2,7 +2,7 @@
 /*
   Inline SVG sparkline. Reads per-series history from the bundled
   indices_history CSV via seriesHistory(), capped to the trailing N points
-  (default 7 — labelled as "7d" in the table headers, since snapshots are
+  (default 30 — labelled as "30d" in the table headers, since snapshots are
   daily and gap-free). Auto-scaled (min..max within the window); a flat
   series renders as a centered horizontal line. Stroke uses currentColor so
   callers can theme via a wrapping color rule.
@@ -20,7 +20,7 @@ interface Props {
   windowDays?: number;
 }
 
-const { seriesId, median, width = 60, height = 18, windowDays = 7 } = Astro.props;
+const { seriesId, median, width = 60, height = 18, windowDays = 30 } = Astro.props;
 
 const hist = seriesHistory(seriesId);
 // Make sure today's median is reflected even if the bundled history file

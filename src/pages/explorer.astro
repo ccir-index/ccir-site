@@ -7,7 +7,7 @@ import {
 import { TIERS, TIER_LABELS, REGION_LABELS } from '../data/types';
 
 // Inline-SVG sparkline string. Mirrors components/Sparkline.astro so the
-// explorer's client-rendered tables get the same trailing-7d trend the
+// explorer's client-rendered tables get the same trailing-30d trend the
 // homepage rates table and /tiers ladder use. Built server-side and
 // attached to each row so the inline script just looks up a string.
 function buildSparkSvg(
@@ -15,7 +15,7 @@ function buildSparkSvg(
   median: number,
   width = 56,
   height = 16,
-  windowDays = 7,
+  windowDays = 30,
 ): string {
   const empty = `<span class="sparkline-empty" style="display:inline-block;width:${width}px;height:${height}px;"></span>`;
   const hist = seriesHistory(seriesId);
@@ -215,7 +215,7 @@ const indicativeClient = indicativeRates.map((r) => ({
               <th>Int</th>
               <th>Region</th>
               <th>Median</th>
-              <th>Trend · 7d</th>
+              <th>Trend · 30d</th>
               <th>IQR</th>
               <th>Src</th>
               <th>Obs</th>
@@ -286,7 +286,7 @@ const indicativeClient = indicativeRates.map((r) => ({
               <th>Int</th>
               <th>Region</th>
               <th>Median</th>
-              <th>Trend · 7d</th>
+              <th>Trend · 30d</th>
               <th>Src</th>
             </tr>
           </thead>
@@ -301,7 +301,7 @@ const indicativeClient = indicativeRates.map((r) => ({
       // -------- helpers --------
       function fmt(n, dp) { return Number(n).toFixed(dp != null ? dp : 2); }
       // SVG strings are precomputed server-side via buildSparkSvg so the
-      // explorer's filtered tables get the same trailing-7d trend used on
+      // explorer's filtered tables get the same trailing-30d trend used on
       // the homepage rates table and /tiers ladder.
 
       // -------- HEADLINE table --------

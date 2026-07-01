@@ -1,5 +1,5 @@
 ---
-import { headlineRates, meta, prevMedians } from '../data/snapshot';
+import { headlineRates, meta, seriesHistory } from '../data/snapshot';
 import Sparkline from './Sparkline.astro';
 
 // Premium-chip series only. Featured flagship cells under the 7-segment
@@ -31,36 +31,51 @@ const short = (r: typeof ticks[number]) => {
   return `${tier} ${chip}`;
 };
 
-// Direction glyph: today's price_median vs prior day's. Round to the
-// displayed cents precision before comparing so a sub-cent rounding
-// difference never reads as a real move. When no prior median is
-// available (new series, first day, or missing prior CSV bundle), show
-// flat — the tick exists today but there's no day-over-day signal yet.
-function direction(r: typeof ticks[number]): 'up' | 'down' | 'flat' {
-  const today = Math.round(r.price_median * 100) / 100;
-  const prior = prevMedians.get(r.series_id);
-  if (prior === undefined || !Number.isFinite(prior)) return 'flat';
-  const yday = Math.round(prior * 100) / 100;
-  if (today > yday) return 'up';
-  if (today < yday) return 'down';
-  return 'flat';
+// 30-day change: today's price_median vs the bundled history point closest
+// to 30 calendar days ago. Returns null (→ flat glyph, no %) when there is
+// no reference point at least ~2 weeks back — bootstrap days or new series
+// don't have a meaningful 30-day window yet.
+const DAY = 86_400_000;
+const MIN_LOOKBACK_DAYS = 14; // reference must be at least this old to show a %
+
+function change30(r: typeof ticks[number]): { pct: number; dir: 'up' | 'down' | 'flat' } | null {
+  const hist = seriesHistory(r.series_id);
+  if (hist.length < 2) return null;
+  const latestMs = Date.parse(hist[hist.length - 1]!.date);
+  const targetMs = latestMs - 30 * DAY;
+  // Point whose date is nearest to 30 days ago.
+  let ref = hist[0]!;
+  let best = Infinity;
+  for (const p of hist) {
+    const d = Math.abs(Date.parse(p.date) - targetMs);
+    if (d < best) { best = d; ref = p; }
+  }
+  const lookbackDays = (latestMs - Date.parse(ref.date)) / DAY;
+  if (lookbackDays < MIN_LOOKBACK_DAYS || !(ref.median > 0)) return null;
+  const pct = ((r.price_median - ref.median) / ref.median) * 100;
+  const rounded = Math.round(pct * 10) / 10;
+  const dir = rounded > 0 ? 'up' : rounded < 0 ? 'down' : 'flat';
+  return { pct: rounded, dir };
 }
 
 const runLabel = meta.as_of_date;
 ---
 <div class="tape" role="region" aria-label="Published premium-chip rates">
-  <span class="tape-label">AS OF · {runLabel} · 7D TREND</span>
+  <span class="tape-label">AS OF · {runLabel} · 30D CHANGE</span>
   <div class="tape-rail">
     <div class="tape-marquee">
       {[0, 1].map((dup) => (
         <div class="tape-track" aria-hidden={dup === 1 ? 'true' : 'false'}>
           {ticks.map((r) => {
-            const dir = direction(r);
+            const chg = change30(r);
+            const dir = chg?.dir ?? 'flat';
+            const glyph = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '─';
+            const pctLabel = chg ? `${chg.pct > 0 ? '+' : ''}${chg.pct.toFixed(1)}%` : '';
             return (
               <span class="tick">
                 <span class="sym">{short(r)}</span>
                 <span class="px">${fmt(r.price_median)}</span>
-                <span class={`dir dir-${dir}`}>{dir === 'up' ? '▲' : dir === 'down' ? '▼' : '─'}</span>
+                <span class={`dir dir-${dir}`}>{glyph}{pctLabel && ` ${pctLabel}`}</span>
                 <span class="spark"><Sparkline seriesId={r.series_id} median={r.price_median} width={42} height={14} /></span>
               </span>
             );
@@ -138,7 +153,7 @@ const runLabel = meta.as_of_date;
     color: var(--ink);
     font-weight: var(--weight-strong);
   }
-  .tick .dir { font-size: 9px; }
+  .tick .dir { font-size: var(--fs-xs); white-space: nowrap; }
   .tick .dir-up { color: var(--neg); }
   .tick .dir-down { color: var(--pos); }
   .tick .dir-flat { color: var(--ink-faint); }

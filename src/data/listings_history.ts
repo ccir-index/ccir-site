@@ -120,7 +120,7 @@ export interface ProviderSeries {
   points: { x: number; y: number }[];
   bundled_any: boolean;
   latest_price: number;
-  prev7_price: number | null;
+  prev30_price: number | null;
 }
 
 function median(xs: number[]): number {
@@ -165,10 +165,10 @@ export function buildSeries(rows: ListingRow[]): ProviderSeries[] {
     if (points.length === 0) continue;
     const latest = points[points.length - 1].y;
     const latestMs = points[points.length - 1].x;
-    let prev7: number | null = null;
+    let prev30: number | null = null;
     for (let i = points.length - 2; i >= 0; i--) {
       const days = (latestMs - points[i].x) / 86400000;
-      if (days >= 6) { prev7 = points[i].y; break; }
+      if (days >= 29) { prev30 = points[i].y; break; }
     }
     out.push({
       source_name: m.source,
@@ -180,7 +180,7 @@ export function buildSeries(rows: ListingRow[]): ProviderSeries[] {
       points,
       bundled_any: bundledAny.get(key) === true,
       latest_price: latest,
-      prev7_price: prev7,
+      prev30_price: prev30,
     });
   }
   // Sort by latest price ascending (financial convention: low to high).

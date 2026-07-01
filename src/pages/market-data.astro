@@ -38,24 +38,6 @@ const cards = [
       'Vast is the one live, executable marketplace in the panel, so it is pulled out of the list-ask benchmark and re-surfaced here on both axes: price (how the live venue sits vs the ex-Vast Tier-3 list-ask floor) and quantity (implied utilization — machine-reconstructed share of listed capacity not currently rentable). Single-venue signal, adjacent to the methodology.',
     inside: 'Clearing basis · implied utilization since 2026-05-13 · whole-node share',
   },
-  {
-    href: '/utilization',
-    kind: 'Observatory',
-    title: 'Availability Observatory',
-    cadence: 'Paused — data as of 2026-05-13',
-    summary:
-      'Shadeform aggregates 19 GPU clouds into a single view: where each chip is procurable, per-provider price spread, boot-time tradeoffs, config availability, long-tail catalog. Collection is paused pending the pipeline migration; the page shows the last published snapshot. Observability data, not part of the CCIR rate methodology.',
-    inside: '19 providers · 11 headline chips · SKU × region grid',
-  },
-  {
-    href: '/vast',
-    kind: 'Observatory',
-    title: 'Vast.ai Observatory',
-    cadence: 'Paused — data as of 2026-05-13',
-    summary:
-      'The per-host order-book deep dive — distribution shape, quality bands, $/perf frontier, supply structure, geography, egress and storage. Collection is paused pending the pipeline migration; the page shows the last published snapshot. For live Vast signals see the Vast Overlay. Observability data, not part of the CCIR rate methodology.',
-    inside: '9 sections · verified vs unverified · dedicated vs shared',
-  },
 ];
 ---
 <Base
@@ -68,8 +50,8 @@ const cards = [
     <p class="dek">
       Observability views for the GPU compute markets CCIR measures: the
       panel inputs that feed the reference rates, the demand side read
-      through posted inventory, the Vast overlay, and two paused
-      observatories. The published reference rates live on
+      through posted inventory, and the Vast overlay. The published
+      reference rates live on
       <a href="/">Rates</a> and <a href="/tiers">Tiers</a>.
     </p>
 
@@ -93,9 +75,9 @@ const cards = [
 
     <p class="foot-note">
       Panel inputs feed the operator-equal median that produces each published
-      CRI rate. Observatories are adjacent surfaces — Shadeform aggregation and
-      the Vast.ai order book — that CCIR exposes for visibility but does not
-      incorporate into the rate methodology. See the
+      CRI rate. The Vast overlay is an adjacent surface — the one live,
+      executable venue in the panel — that CCIR exposes for visibility but does
+      not incorporate into the rate methodology. See the
       <a href="/documents">Methodology document</a> for panel definition and
       eligibility filters.
     </p>

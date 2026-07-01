@@ -87,7 +87,7 @@ const windowEnd = listingsMeta?.window_end ?? '—';
               <th>Provider</th>
               <th>Type</th>
               <th class="num">Latest</th>
-              <th class="num">7-day Δ</th>
+              <th class="num">30-day Δ</th>
               <th>Bundle</th>
               <th class="num">Days</th>
             </tr>
@@ -223,7 +223,7 @@ const windowEnd = listingsMeta?.window_end ?? '—';
           `<td class="provider">${dot}<code>${s.source_name}</code></td>` +
           `<td>${intBadge}</td>` +
           `<td class="num posted">${fmtPrice(s.latest_price)}</td>` +
-          `<td class="num">${fmtChange(s.latest_price, s.prev7_price)}</td>` +
+          `<td class="num">${fmtChange(s.latest_price, s.prev30_price)}</td>` +
           `<td>${bundle}</td>` +
           `<td class="num dim">${s.points.length}</td>` +
         '</tr>';
