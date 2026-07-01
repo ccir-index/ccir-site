@@ -1,8 +1,8 @@
 {
   "as_of_date": "2026-07-01",
-  "published_at_ct": "2026-07-01T09:22:09-05:00",
-  "published_at_utc": "2026-07-01T14:22:09+00:00",
-  "run_id": "export-20260701T142156Z-826aa9b6",
+  "published_at_ct": "2026-07-01T17:22:27-05:00",
+  "published_at_utc": "2026-07-01T22:22:27+00:00",
+  "run_id": "export-20260701T222220Z-d37ce92d",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 31,
@@ -12,12 +12,14 @@
       "h200-sxm-141gb",
       "b200-sxm-180gb",
       "gb200-nvl-nvl",
+      "b300-sxm-288gb",
+      "gb300-nvl-nvl",
       "a100-sxm-80gb",
       "a100-sxm-40gb"
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 8262,
+    "total_rows": 8318,
     "window_days": 90,
     "window_end": "2026-07-01",
     "window_start": "2026-04-03"
@@ -113,7 +115,7 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 153,
+    "occupancy_cycles": 155,
     "occupancy_series_start": "2026-05-13",
     "runpod_occupancy_chips": [],
     "runpod_occupancy_cycles": 0,
