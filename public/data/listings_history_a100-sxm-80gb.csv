@@ -1717,12 +1717,12 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-07-02,seeweb,a100-sxm-80gb,A100,80GB,SXM,Unknown,6M,NonInterruptible,Reserved,EU,EU,SIF,T2IF,T2,1.0131,False,,Available,v2.0.0
 2026-07-02,sesterce,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,IIF,T2IF,T2,1.4850,False,,Available,v2.0.0
 2026-07-02,tensordock,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,1.2000,False,,Available,v2.0.0
-2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-Central,US,DIF,T3IF,T3,0.4000,True,local-nvme,Available,v2.0.0
-2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-Central,US,DIF,T3IF,T3,0.4000,True,local-nvme,Available,v2.0.0
-2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,APAC,APAC,DIF,T3IF,T3,0.4000,True,local-nvme,Available,v2.0.0
+2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,0.6667,True,local-nvme,Available,v2.0.0
 2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,1.6133,True,local-nvme,Available,v2.0.0
 2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,APAC,APAC,DIF,T3IF,T3,0.4000,True,local-nvme,Available,v2.0.0
 2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-Central,US,DIF,T3IF,T3,0.4000,True,local-nvme,Available,v2.0.0
 2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,APAC,APAC,DIF,T3IF,T3,0.4000,True,local-nvme,Available,v2.0.0
-2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,0.6667,True,local-nvme,Available,v2.0.0
+2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-Central,US,DIF,T3IF,T3,0.4000,True,local-nvme,Available,v2.0.0
+2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,APAC,APAC,DIF,T3IF,T3,0.4000,True,local-nvme,Available,v2.0.0
+2026-07-02,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-Central,US,DIF,T3IF,T3,0.4000,True,local-nvme,Available,v2.0.0
 2026-07-02,vultr,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,2.8000,False,,Available,v2.0.0
