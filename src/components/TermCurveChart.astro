@@ -88,7 +88,7 @@ interface SeriesView {
 }
 
 // OD anchor = the NEOCLOUD band's own OD companion (pooled T2IF+T3IF,
-// global-USD — the SAME panel as the committed tenors, apples-to-apples,
+// US/EU-core — the SAME panel as the committed tenors, apples-to-apples,
 // John 2026-07-02). Falls back to the T2IF US & EU headline on snapshots
 // predating the band OD series (gold PR #41); the caption discloses which
 // anchor is in effect.
@@ -104,7 +104,7 @@ function odPoint(chip: string): Pt | null {
       value: band.price_median,
       prov: band.promotion_status === 'Provisional',
       anchor: false,
-      title: `${chip} · on-demand (NEOCLOUD band, global-USD — same pooled panel as the committed tenors) · median $${fmt(band.price_median)} · ${band.n_sources} sources / ${band.n_observations} obs · ${band.promotion_status}`,
+      title: `${chip} · on-demand (NEOCLOUD band, US & EU — same pooled panel as the committed tenors) · median $${fmt(band.price_median)} · ${band.n_sources} sources / ${band.n_observations} obs · ${band.promotion_status}`,
     };
   }
   const c = t2ifOdCell(chip, 'ALL');
@@ -158,7 +158,7 @@ function tenorPoint(chip: string, term: Term, months: number): Pt | null {
     value: c.price_median,
     prov: c.promotion_status === 'Provisional',
     anchor: months === 12,
-    title: `${chip} · ${term} committed (NEOCLOUD band, global-USD) · median $${fmt(c.price_median)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs · ${c.promotion_status}`,
+    title: `${chip} · ${term} committed (NEOCLOUD band, US & EU) · median $${fmt(c.price_median)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs · ${c.promotion_status}`,
   };
 }
 
@@ -293,7 +293,7 @@ const ariaLabel =
 
   <figcaption class="tcv-foot" id="tcv-caption">
     <span class="tcv-note">
-      Posted committed asks across the neocloud panel (US, EU &amp; India) ·
+      Posted committed asks across the neocloud panel (US &amp; EU) ·
       as of {meta.as_of_date} · market intelligence — not a citable
       reference rate
     </span>
