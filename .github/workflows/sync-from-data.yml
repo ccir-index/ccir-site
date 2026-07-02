@@ -73,7 +73,7 @@ jobs:
           # Per-chip listings_history CSVs power the public /markets time-series
           # view. Graceful per-file skip — older snapshots predate this product
           # and won't have the files; the site falls back to "no data yet" UI.
-          for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb gb200-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
+          for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb b300-sxm-288gb gb200-nvl-nvl gb300-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
             fname="listings_history_${chip}.csv"
             if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
@@ -84,7 +84,7 @@ jobs:
           done
           # Per-chip marketplace CSVs power the public /marketplace intraday
           # view. Same graceful per-file skip pattern.
-          for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb gb200-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
+          for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb b300-sxm-288gb gb200-nvl-nvl gb300-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
             fname="marketplace_${chip}.csv"
             if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
@@ -254,7 +254,7 @@ jobs:
           # can fetch them client-side at runtime (they're too large to
           # bundle at build time — ~1-2 MB each).
           mkdir -p public/data
-          for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb gb200-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
+          for chip in h100-sxm-80gb h200-sxm-141gb b200-sxm-180gb b300-sxm-288gb gb200-nvl-nvl gb300-nvl-nvl a100-sxm-80gb a100-sxm-40gb; do
             for prefix in listings_history marketplace; do
               fname="${prefix}_${chip}.csv"
               if [ -s ".sync/$fname" ]; then

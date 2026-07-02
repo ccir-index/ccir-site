@@ -1,0 +1,410 @@
+---
+/*
+  Committed par curve — the flagship chart for /term. Server-rendered inline
+  SVG; every number is known at build time, no client chart library.
+
+  Axis choice: tenor in months on a SQUARE-ROOT scale. A linear month axis
+  crushes OD/1M/3M into the left quarter of the plot; an equal-spaced
+  ordinal axis lies about the time between marks (1M→3M would read as wide
+  as 6M→1Y). sqrt(months) keeps order and a sense of elapsed time while
+  giving the dense short end room to read. Disclosed in the caption.
+
+  Display is capped at the 1Y anchor tenor: 2Y/3Y band cells exist in the
+  snapshot but this page plots OD → 1Y only (page-level cap, 2026-07-01).
+
+  Series colors are chart-local custom properties defined for BOTH themes
+  and validated with the dataviz six-checks script against each theme's
+  surface (adjacency order = vertical order on the plot: B200, H200, H100,
+  A100):
+    terminal (dark, surface #111418):   worst adjacent CVD ΔE 12.9 — PASS
+    editorial (light, surface #fbf7ee): worst adjacent CVD ΔE 15.8 — PASS
+  Provisional cells are shape-encoded (hollow marks), never color-only.
+*/
+import { committedBandCell, t2ifOdCell, meta } from '../data/snapshot';
+import type { Rate, Term } from '../data/types';
+
+const fmt = (n: number, dp = 2) => n.toFixed(dp);
+
+// --- geometry -------------------------------------------------------------
+const W = 920;
+const H = 430;
+// Right gutter sized for the full end-label: "H200 2.96 −26% vs OD".
+const MARGIN = { top: 28, right: 158, bottom: 38, left: 46 };
+const x0 = MARGIN.left;
+const x1 = W - MARGIN.right;
+const y0 = MARGIN.top;
+const y1 = H - MARGIN.bottom;
+const innerW = x1 - x0;
+const innerH = y1 - y0;
+
+const MAX_MONTHS = 12;
+const xOf = (months: number) =>
+  x0 + innerW * (Math.sqrt(months) / Math.sqrt(MAX_MONTHS));
+
+const Y_MIN = 1;
+const Y_MAX = 7;
+const yOf = (v: number) => y0 + innerH * ((Y_MAX - v) / (Y_MAX - Y_MIN));
+const yTicks = [1, 2, 3, 4, 5, 6, 7];
+
+const TENORS: { term: Term; months: number }[] = [
+  { term: '1M', months: 1 },
+  { term: '3M', months: 3 },
+  { term: '6M', months: 6 },
+  { term: '1Y', months: 12 },
+];
+const X_TICKS = [{ label: 'OD', months: 0 }, ...TENORS.map((t) => ({ label: t.term as string, months: t.months }))];
+
+// Divider between the on-demand anchor and the committed region — placed at
+// the sqrt-space midpoint between OD (0) and 1M (1).
+const odDividerX = x0 + innerW * (0.5 / Math.sqrt(MAX_MONTHS));
+const anchorX = xOf(12); // 1Y — the anchor tenor
+
+// --- data -----------------------------------------------------------------
+// Vertical order on the plot (B200 top … A100 bottom) is the palette's
+// validated adjacency order; the array order here is render order only.
+const CHIPS = [
+  { chip: 'H100', cls: 'h100' },
+  { chip: 'H200', cls: 'h200' },
+  { chip: 'B200', cls: 'b200' },
+  { chip: 'A100', cls: 'a100' },
+];
+
+interface Pt {
+  x: number;
+  y: number;
+  months: number;
+  value: number;
+  prov: boolean;
+  anchor: boolean;
+  title: string;
+}
+interface SeriesView {
+  chip: string;
+  cls: string;
+  path: string;
+  pts: Pt[];
+  end: Pt;
+}
+
+function odPoint(chip: string): Pt | null {
+  const c = t2ifOdCell(chip, 'ALL');
+  if (!c) return null;
+  return {
+    x: xOf(0),
+    y: yOf(c.price_median),
+    months: 0,
+    value: c.price_median,
+    prov: c.promotion_status === 'Provisional',
+    anchor: false,
+    title: `${chip} · on-demand (T2IF headline, US & EU) · median $${fmt(c.price_median)} · ${c.n_sources} sources / ${c.n_observations} obs · ${c.promotion_status}`,
+  };
+}
+
+// Signed spread vs the chip's region=ALL (US & EU blended) T2IF OD headline
+// — a signed spread, not a "discount" (committed can price above spot).
+// Explicit + when positive, real minus sign when negative. Null where the
+// chip has no OD reference (the label then omits the %).
+function spreadVsOd(chip: string, median: number): string | null {
+  const od = t2ifOdCell(chip, 'ALL');
+  if (!od?.price_median) return null;
+  const pct = (median / od.price_median - 1) * 100;
+  const rounded = Math.round(Math.abs(pct));
+  if (rounded === 0) return '0% vs OD';
+  return `${pct > 0 ? '+' : '−'}${rounded}% vs OD`;
+}
+
+function tenorPoint(chip: string, term: Term, months: number): Pt | null {
+  const c: Rate | undefined = committedBandCell(chip, term);
+  if (!c) return null;
+  return {
+    x: xOf(months),
+    y: yOf(c.price_median),
+    months,
+    value: c.price_median,
+    prov: c.promotion_status === 'Provisional',
+    anchor: months === 12,
+    title: `${chip} · ${term} committed (NEOCLOUD band, global-USD) · median $${fmt(c.price_median)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs · ${c.promotion_status}`,
+  };
+}
+
+const series: SeriesView[] = CHIPS.flatMap(({ chip, cls }) => {
+  const pts = [
+    odPoint(chip),
+    ...TENORS.map((t) => tenorPoint(chip, t.term, t.months)),
+  ].filter((p): p is Pt => p !== null);
+  if (pts.length < 2) return [];
+  const path = pts
+    .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+    .join(' ');
+  return [{ chip, cls, path, pts, end: pts[pts.length - 1]! }];
+});
+
+// Direct end-labels — resolve vertical collisions (snapshot data changes
+// daily; converging curves can land labels on top of each other). Labels
+// are pushed apart to a minimum gap; a displaced label gets a short leader
+// line back to its line end.
+const LBL_GAP = 15;
+const endLabels = (() => {
+  const items = series
+    .map((s) => ({ s, y: s.end.y }))
+    .sort((a, b) => a.y - b.y);
+  for (let i = 1; i < items.length; i++) {
+    const prev = items[i - 1]!;
+    const cur = items[i]!;
+    if (cur.y - prev.y < LBL_GAP) cur.y = prev.y + LBL_GAP;
+  }
+  // keep inside the plot's vertical extent
+  const over = items.length ? items[items.length - 1]!.y - (y1 - 2) : 0;
+  if (over > 0) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      items[i]!.y -= over;
+      if (i > 0 && items[i]!.y - items[i - 1]!.y >= LBL_GAP) break;
+    }
+  }
+  return items.map(({ s, y }) => ({
+    s,
+    y,
+    leader: Math.abs(y - s.end.y) > 2,
+    spd: spreadVsOd(s.chip, s.end.value),
+  }));
+})();
+
+const chipNames = series.map((s) => s.chip).join(', ');
+const ariaLabel =
+  `Committed par curve, as of ${meta.as_of_date}: USD per GPU-hour by tenor for ${chipNames}. ` +
+  `Each line runs from the on-demand anchor through committed asks at 1, 3 and 6 months to the 1-year anchor tenor where published. ` +
+  `End labels give each chip's terminal rate and its signed spread versus that chip's US and EU blended T2IF on-demand headline. ` +
+  `Hollow marks are Provisional cells (2–4 sources); hover any mark for panel depth.`;
+---
+<figure class="tcv" aria-describedby="tcv-caption">
+  <div class="tcv-head">
+    <span class="tcv-kicker">Committed par curve · USD per GPU-hr</span>
+    <span class="tcv-asof">as of {meta.as_of_date}</span>
+  </div>
+
+  <div class="tcv-scroll">
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      role="img"
+      aria-label={ariaLabel}
+      class="tcv-svg"
+    >
+      {/* y grid — hairlines, recessive */}
+      {yTicks.map((v) => (
+        <line
+          class:list={['grid', { baseline: v === Y_MIN }]}
+          x1={x0} x2={x1} y1={yOf(v)} y2={yOf(v)}
+        />
+      ))}
+      {yTicks.map((v) => (
+        <text class="ytick" x={x0 - 8} y={yOf(v) + 3.5}>${v}</text>
+      ))}
+
+      {/* OD | committed divider */}
+      <line class="divider" x1={odDividerX} x2={odDividerX} y1={y0} y2={y1} />
+
+      {/* 1Y anchor tenor — subtle emphasis */}
+      <line class="anchor-line" x1={anchorX} x2={anchorX} y1={y0} y2={y1} />
+      <text class="anchor-cap" x={anchorX} y={y0 - 10}>1Y anchor</text>
+
+      {/* x ticks */}
+      {X_TICKS.map((t) => (
+        <>
+          <line class="xtickmark" x1={xOf(t.months)} x2={xOf(t.months)} y1={y1} y2={y1 + 4} />
+          <text
+            class:list={['xtick', { 'xtick-anchor': t.months === 12 }]}
+            x={xOf(t.months)}
+            y={y1 + 17}
+          >{t.label}</text>
+        </>
+      ))}
+
+      {/* series lines */}
+      {series.map((s) => (
+        <path class={`ln s-${s.cls}`} d={s.path} />
+      ))}
+
+      {/* marks — filled = Published, hollow = Provisional; 1Y slightly larger */}
+      {series.map((s) => s.pts.map((p) => (
+        <circle
+          class:list={['pt', `s-${s.cls}`, { prov: p.prov }]}
+          cx={p.x} cy={p.y} r={p.anchor ? 5.5 : 4.5}
+        />
+      )))}
+
+      {/* hover targets — generous hit area, n disclosed via title */}
+      {series.map((s) => s.pts.map((p) => (
+        <circle class="hit" cx={p.x} cy={p.y} r={13}>
+          <title>{p.title}</title>
+        </circle>
+      )))}
+
+      {/* direct end-labels — rate + signed % vs OD; leader line when displaced */}
+      {endLabels.map(({ s, y, leader, spd }) => (
+        <>
+          {leader && (
+            <line class="leader" x1={s.end.x + 6} y1={s.end.y} x2={s.end.x + 9} y2={y} />
+          )}
+          <text class="lbl" x={s.end.x + 11} y={y + 3.5}>
+            <tspan class="lbl-name">{s.chip}</tspan>
+            <tspan class="lbl-val" dx="5">{fmt(s.end.value)}</tspan>
+            {spd && <tspan class="lbl-spd" dx="6">{spd}</tspan>}
+          </text>
+        </>
+      ))}
+    </svg>
+  </div>
+
+  <figcaption class="tcv-foot" id="tcv-caption">
+    <span class="tcv-note">
+      NEOCLOUD band (pooled T2IF + T3IF grade, assigned per SKU) · global-USD
+      panel (US, EU, India) · operator-equal median of posted committed asks ·
+      1-day marks as of {meta.as_of_date} · market intelligence — not a
+      citable reference rate
+    </span>
+    <span class="tcv-note">
+      OD = T2IF on-demand headline, US &amp; EU blended — the fixed reference
+      for the end-label % · hollow marks = Provisional (2–4 sources; hover any
+      mark for panel depth) · point-to-point lines, no interpolation · term
+      axis compressed (√months) · B300 joins as its committed panel clears
+      the gate
+    </span>
+  </figcaption>
+</figure>
+
+<style>
+  /*
+    Series colors — chart-local tokens, one set per site theme, derived to
+    sit with each theme's palette and validated with the dataviz six-checks
+    script against the theme surface (see component header comment).
+    Terminal values double as the :root default (site default theme).
+  */
+  .tcv {
+    --series-h100: #cc7d00; /* amber — kin to the terminal accent */
+    --series-h200: #00829e; /* cyan — kin to --info */
+    --series-b200: #cb69c5; /* magenta */
+    --series-a100: #5f7fd9; /* slate blue */
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    padding: 12px 14px 12px;
+    margin: 0 0 20px;
+  }
+  :global(html[data-theme="editorial"]) .tcv {
+    --series-h100: #a3660f;
+    --series-h200: #0d96b6;
+    --series-b200: #a02887;
+    --series-a100: #4d5fc0;
+  }
+
+  .tcv-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 9px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .tcv-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: var(--weight-strong);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    color: var(--ink-dim);
+  }
+  .tcv-asof {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .tcv-scroll { overflow-x: auto; }
+  .tcv-svg { display: block; width: 100%; min-width: 680px; height: auto; }
+
+  /* chrome — recessive hairlines */
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .grid.baseline { stroke: var(--rule-2); }
+  .divider { stroke: var(--rule-2); stroke-width: 1; }
+  .xtickmark { stroke: var(--rule-2); stroke-width: 1; }
+
+  .anchor-line { stroke: var(--accent); stroke-width: 1; opacity: 0.3; }
+  .anchor-cap {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    fill: var(--accent);
+    text-anchor: middle;
+  }
+
+  .ytick, .xtick {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    fill: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .ytick { text-anchor: end; }
+  .xtick { text-anchor: middle; }
+  .xtick-anchor { fill: var(--accent); font-weight: var(--weight-strong); }
+
+  /* marks */
+  .ln {
+    fill: none;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .ln.s-h100 { stroke: var(--series-h100); }
+  .ln.s-h200 { stroke: var(--series-h200); }
+  .ln.s-b200 { stroke: var(--series-b200); }
+  .ln.s-a100 { stroke: var(--series-a100); }
+
+  /* Published: filled dot with a 2px surface ring so marks stay legible
+     where they cross a line. Provisional: hollow — surface fill, series
+     stroke (shape encoding, not color-only). */
+  .pt { stroke: var(--surface); stroke-width: 2; }
+  .pt.s-h100 { fill: var(--series-h100); }
+  .pt.s-h200 { fill: var(--series-h200); }
+  .pt.s-b200 { fill: var(--series-b200); }
+  .pt.s-a100 { fill: var(--series-a100); }
+  .pt.prov { fill: var(--surface); }
+  .pt.prov.s-h100 { stroke: var(--series-h100); }
+  .pt.prov.s-h200 { stroke: var(--series-h200); }
+  .pt.prov.s-b200 { stroke: var(--series-b200); }
+  .pt.prov.s-a100 { stroke: var(--series-a100); }
+
+  .hit { fill: transparent; cursor: help; }
+
+  .leader { stroke: var(--ink-faint); stroke-width: 1; }
+
+  /* direct labels — text wears ink tokens, identity comes from the line end */
+  .lbl {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+  .lbl-name { fill: var(--ink); font-weight: var(--weight-strong); letter-spacing: 0.04em; }
+  .lbl-val { fill: var(--ink-dim); }
+  /* signed % vs OD — muted so the rate stays primary; neutral ink, not
+     red/green (a spread is context, not P&L) */
+  .lbl-spd { fill: var(--ink-faint); font-size: 10px; }
+
+  .tcv-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+  }
+  .tcv-note {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+  }
+</style>

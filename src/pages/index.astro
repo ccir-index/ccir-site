@@ -1,7 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
-import { headlineRates, meta, premiumChipsList, tierMatrix } from '../data/snapshot';
+import {
+  committedBandCell, headlineRates, meta, premiumChipsList, tierMatrix,
+} from '../data/snapshot';
 import { TIERS } from '../data/types';
+import type { Term } from '../data/types';
+
+const chipCount = premiumChipsList().length;
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 
@@ -10,25 +15,20 @@ const ANCHOR = 'CRI-T1IF-H100-SXM-GTD-OD-ALL';
 const anchorRate = headlineRates.find((r) => r.series_id === ANCHOR);
 const anchorMedian = anchorRate?.price_median ?? 0;
 
-// T1IF/T2IF/T3IF anchor ladder for the homepage spotlight on H100.
+// Product-card previews. Rates card: the H100 tier ladder. Term card: the
+// H100 neocloud committed strip (OD → tenors) — market intelligence, badged.
 const anchorChip = 'H100';
 const anchorMatrix = tierMatrix(anchorChip);
-const anchorRows = TIERS.map((t) => ({ tier: t, cell: anchorMatrix[t] }));
-const anchorMax = Math.max(
-  0,
-  ...anchorRows.map((r) => r.cell?.price_median ?? 0),
-);
-
-// Per-silicon ladder: 5 premium silicons × 3 tiers, OD baseline.
-const chips = (() => {
-  const live = premiumChipsList();
-  return live.length > 0 ? live : ['GB200', 'B200', 'H200', 'H100', 'A100'];
-})();
-const chipLadder = chips.map((c) => ({ chip: c, cells: tierMatrix(c) }));
-
-function chipDisplay(token: string): string {
-  return token.replace(/-/g, ' ');
-}
+const ratesPreview = TIERS.map((t) => ({
+  tier: t,
+  median: anchorMatrix[t]?.price_median,
+}));
+const TERM_PREVIEW_TENORS: Term[] = ['3M', '6M', '1Y'];
+const t2Od = anchorMatrix.T2IF?.price_median;
+const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
+  tenor: t,
+  median: committedBandCell(anchorChip, t)?.price_median,
+}));
 ---
 <Base
   title="Reference Rates · CCIR"
@@ -47,49 +47,54 @@ function chipDisplay(token: string): string {
     </div>
 
     <section class="featured">
-      <div class="featured-grid">
-        <div class="featured-stat">
-          <div class="kicker">Today · T1IF · H100 SXM · On-demand</div>
-          <div class="stat-number">${fmt(anchorMedian)}<span class="stat-unit">/GPU-hr</span></div>
-          <div class="stat-meta">
-            Reference: <code>{ANCHOR}</code>
+      <div class="product-cards">
+        <a class="product-card" href="/rates">
+          <div class="pc-head">
+            <span class="kicker">Reference Rates</span>
+            <span class="pc-tag citable">Citable</span>
           </div>
-        </div>
+          <div class="pc-kicker">Today · T1IF · {anchorChip} SXM · On-demand</div>
+          <div class="pc-number">${fmt(anchorMedian)}<span class="pc-unit">/GPU-hr</span></div>
+          <div class="pc-preview">
+            {ratesPreview.map(({ tier, median }) => (
+              <span class="pc-cell">
+                <span class={`pc-label tier-${tier.toLowerCase()}`}>{tier}</span>
+                <span class="pc-val">{median != null ? `$${fmt(median)}` : '—'}</span>
+              </span>
+            ))}
+          </div>
+          <p class="pc-desc">One independent rate per tier, per premium
+          silicon — with US / EU splits. The benchmark.</p>
+          <div class="pc-series"><code>{ANCHOR}</code></div>
+          <span class="pc-foot">Tier ladder →</span>
+        </a>
 
-        <aside class="featured-ladder" aria-label={`Tier ladder for ${anchorChip} on-demand`}>
-          <div class="ladder-head">
-            <span class="kicker">{anchorChip} · On-demand · Tier ladder</span>
+        <a class="product-card" href="/term">
+          <div class="pc-head">
+            <span class="kicker">Committed Term Structure</span>
+            <span class="pc-tag mi">Market&nbsp;Intelligence</span>
           </div>
-          <ul class="ladder-rows">
-            {anchorRows.map(({ tier, cell }) => {
-              if (!cell) {
-                return (
-                  <li class="ladder-row empty">
-                    <span class={`ladder-tier tier-${tier.toLowerCase()}`}>{tier}</span>
-                    <span class="ladder-track"></span>
-                    <span class="ladder-prices"><span class="ladder-price empty">—</span></span>
-                  </li>
-                );
-              }
-              const pctOfMax = anchorMax > 0 ? (cell.price_median / anchorMax) * 100 : 0;
-              return (
-                <li class="ladder-row">
-                  <span class={`ladder-tier tier-${tier.toLowerCase()}`}>{tier}</span>
-                  <span class="ladder-track">
-                    <span
-                      class={`ladder-fill fill-${tier.toLowerCase()}`}
-                      style={`width: ${pctOfMax}%`}
-                    ></span>
-                  </span>
-                  <span class="ladder-prices">
-                    <span class="ladder-price">${fmt(cell.price_median)}</span>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-          <div class="ladder-foot">USD per GPU-hour · operator-equal median</div>
-        </aside>
+          <div class="pc-kicker">Today · {anchorChip} · 1-year committed · Neocloud band</div>
+          <div class="pc-number">{termPreview.find((t) => t.tenor === '1Y')?.median != null
+            ? `$${fmt(termPreview.find((t) => t.tenor === '1Y')!.median!)}`
+            : '—'}<span class="pc-unit">/GPU-hr</span></div>
+          <div class="pc-preview">
+            <span class="pc-cell">
+              <span class="pc-label">OD</span>
+              <span class="pc-val">{t2Od != null ? `$${fmt(t2Od)}` : '—'}</span>
+            </span>
+            {termPreview.map(({ tenor, median }) => (
+              <span class="pc-cell">
+                <span class="pc-label">{tenor}</span>
+                <span class="pc-val">{median != null ? `$${fmt(median)}` : '—'}</span>
+              </span>
+            ))}
+          </div>
+          <p class="pc-desc">Posted committed asks by tenor, beside the
+          on-demand rate — the term axis of the compute market.</p>
+          <div class="pc-series"><code>CRI-NEOCLOUD-{anchorChip}-ALL-GTD-1yr-ALL</code></div>
+          <span class="pc-foot">Term structure →</span>
+        </a>
       </div>
     </section>
 
@@ -120,7 +125,7 @@ function chipDisplay(token: string): string {
           <span class="cov-label">Intelligence Factory tiers</span>
         </div>
         <div class="cov-card">
-          <span class="cov-num">{chips.length}</span>
+          <span class="cov-num">{chipCount}</span>
           <span class="cov-label">premium silicons</span>
         </div>
         <div class="cov-card">
@@ -139,72 +144,13 @@ function chipDisplay(token: string): string {
         <div class="kicker">Section 02 · Tier Structure</div>
         <h2>Same Chip — Three Products</h2>
         <p class="standfirst">
-          The same H100 silicon is deployed across all three tiers. A Tier 1
-          hyperscale deployment, a Tier 2 dedicated cluster, and a Tier 3
-          marketplace listing aren't three prices of one product — they're
-          three products that happen to share a chip, differing in fabric,
-          tenancy, and the work they can run. CCIR prices each one, making the
-          full compute market visible — the rate at every grade the chip is
-          offered.
+          The same H100 silicon is deployed at all three tiers — hyperscale,
+          dedicated cluster, marketplace. Each tier is a distinct capability
+          bundle — fabric, tenancy, bundle depth — and each carries its own
+          rate. CCIR prices all three; the full ladder, with US / EU splits
+          and per-tier panels, lives on <a href="/rates">/rates</a>.
         </p>
       </header>
-
-      <div class="table-wrap">
-        <table class="data ladder-table">
-          <thead>
-            <tr>
-              <th rowspan="2" class="chip-col">Silicon</th>
-              {TIERS.map((t) => (
-                <th colspan="2" class={`tier-col tier-col-${t.toLowerCase()}`}>
-                  <span class={`tier-badge tier-badge-${t.toLowerCase()}`}>{t}</span>
-                </th>
-              ))}
-            </tr>
-            <tr class="sub-row">
-              {TIERS.map(() => (
-                <>
-                  <th class="sub">Median $/hr</th>
-                  <th class="sub">n</th>
-                </>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {chipLadder.map(({ chip, cells }) => {
-              const refSeries = cells.T1IF?.series_id ?? cells.T2IF?.series_id ?? cells.T3IF?.series_id;
-              return (
-              <tr>
-                <td class="chip-cell">
-                  <div class="chip-name">{chipDisplay(chip)}</div>
-                  {refSeries && <code class="chip-series">{refSeries}</code>}
-                </td>
-                {TIERS.map((t) => {
-                  const c = cells[t];
-                  if (!c) {
-                    return (
-                      <>
-                        <td class="num empty">—</td>
-                        <td class="num empty">—</td>
-                      </>
-                    );
-                  }
-                  const isShadow = c.promotion_status === 'Shadow';
-                  return (
-                    <>
-                      <td class={`num posted tier-pos-${t.toLowerCase()} ${isShadow ? 'shadow' : ''}`}
-                          title={`Median ${fmt(c.price_median)} · Mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs${isShadow ? ' · Shadow (panel below 3-source / 5-obs gate)' : ''}`}>
-                        ${fmt(c.price_median)}
-                      </td>
-                      <td class="num n">{c.n_sources}</td>
-                    </>
-                  );
-                })}
-              </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
     </section>
 
     <section class="methodology">
@@ -291,94 +237,100 @@ function chipDisplay(token: string): string {
       padding: 24px 0;
       margin: 8px 0 18px;
     }
-    .featured-grid {
+    .product-cards {
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 1fr);
-      gap: 36px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
       align-items: stretch;
     }
     @media (max-width: 820px) {
-      .featured-grid { grid-template-columns: 1fr; }
+      .product-cards { grid-template-columns: 1fr; }
     }
-    .featured-stat {
+    .product-card {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
+      padding: 18px 20px;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      text-decoration: none;
+      color: var(--ink);
     }
-    .featured-stat .kicker { color: var(--accent); }
-    .stat-number {
+    .pc-kicker {
       font-family: var(--font-mono);
-      font-size: 64px;
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .pc-number {
+      font-family: var(--font-mono);
+      font-size: 46px;
       font-weight: var(--weight-strong);
       color: var(--ink);
       line-height: 1.05;
       letter-spacing: -0.02em;
     }
-    .stat-unit {
-      font-size: var(--fs-md);
+    .pc-unit {
+      font-size: var(--fs-sm);
       color: var(--ink-dim);
       margin-left: 6px;
       font-weight: var(--weight-body);
     }
-    .stat-meta {
+    .pc-series {
       font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      color: var(--ink-dim);
-      letter-spacing: 0.04em;
-      line-height: 1.6;
+      font-size: 10px;
+      color: var(--ink-faint);
+      letter-spacing: 0.03em;
     }
-    .stat-meta code {
-      font-family: var(--font-mono);
-      color: var(--accent);
-      letter-spacing: 0.04em;
-    }
-
-    .featured-ladder {
-      border-left: 1px solid var(--rule);
-      padding-left: 24px;
+    .pc-series code { color: var(--ink-faint); }
+    .product-card:hover { border-color: var(--accent); text-decoration: none; }
+    .pc-head {
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    @media (max-width: 820px) {
-      .featured-ladder { border-left: none; padding-left: 0; border-top: 1px solid var(--rule); padding-top: 16px; }
-    }
-    .ladder-rows {
-      list-style: none; margin: 0; padding: 0;
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .ladder-row {
-      display: grid;
-      grid-template-columns: 44px minmax(0, 1fr) auto;
-      align-items: center;
+      align-items: baseline;
+      justify-content: space-between;
       gap: 10px;
+    }
+    .pc-tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      padding: 2px 7px;
+      border: 1px solid var(--rule-2);
+      white-space: nowrap;
+    }
+    .pc-tag.citable { color: var(--pos); border-color: var(--pos); }
+    .pc-tag.mi { color: var(--accent); border-color: var(--accent); }
+    .pc-desc {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+    .pc-preview {
+      display: flex;
+      gap: 18px;
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
     }
-    .ladder-tier { font-weight: var(--weight-strong); letter-spacing: 0.06em; }
-    .ladder-tier.tier-t1if { color: var(--tier-t1if); }
-    .ladder-tier.tier-t2if { color: var(--tier-t2if); }
-    .ladder-tier.tier-t3if { color: var(--tier-t3if); }
-    .ladder-track {
-      display: block;
-      height: 10px;
-      background: var(--surface-3);
-      border: 1px solid var(--rule);
+    .pc-cell { display: flex; flex-direction: column; gap: 2px; }
+    .pc-label {
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 10px;
     }
-    .ladder-fill { display: block; height: 100%; }
-    .fill-t1if { background: var(--tier-t1if); }
-    .fill-t2if { background: var(--tier-t2if); }
-    .fill-t3if { background: var(--tier-t3if); }
-    .ladder-prices {
-      display: inline-flex; align-items: center; gap: 8px;
-      min-width: 70px; justify-content: flex-end;
-    }
-    .ladder-price { color: var(--ink); font-weight: var(--weight-strong); }
-    .ladder-price.empty { color: var(--ink-faint); }
-    .ladder-foot {
+    .pc-label.tier-t1if { color: var(--tier-t1if); }
+    .pc-label.tier-t2if { color: var(--tier-t2if); }
+    .pc-label.tier-t3if { color: var(--tier-t3if); }
+    .pc-val { color: var(--ink); font-weight: var(--weight-strong); }
+    .pc-foot {
+      margin-top: auto;
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-faint);
+      color: var(--accent);
       text-transform: uppercase;
       letter-spacing: var(--tracking-eye);
     }

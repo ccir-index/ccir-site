@@ -1,0 +1,348 @@
+---
+/*
+  Implied forward rates — the DERIVED companion to the committed par curve.
+  Step/segment chart: one horizontal segment per bootstrap window at the
+  break-even renewal rate, per chip. Server-rendered inline SVG.
+
+  Derived treatment (vs the par chart): shorter plot, a tinted plot field
+  (--surface-2), no point markers — the window segment is the mark — plus a
+  "DERIVED" badge in the header. Same chip → color mapping as the par curve
+  (color follows the entity), same √months term axis, validated palette
+  (see TermCurveChart.astro header for the six-checks results).
+
+  f(t1→t2) = (m2·r2 − m1·r1) / (m2 − m1) — break-even renewal arithmetic on
+  posted par committed asks; not a traded forward.
+*/
+import { committedBandCell, meta } from '../data/snapshot';
+import type { Rate, Term } from '../data/types';
+
+const fmt = (n: number, dp = 2) => n.toFixed(dp);
+
+// --- geometry -------------------------------------------------------------
+const W = 920;
+const H = 330;
+// Right gutter matches TermCurveChart so the two plots share a right edge.
+const MARGIN = { top: 24, right: 158, bottom: 38, left: 46 };
+const x0 = MARGIN.left;
+const x1 = W - MARGIN.right;
+const y0 = MARGIN.top;
+const y1 = H - MARGIN.bottom;
+const innerW = x1 - x0;
+const innerH = y1 - y0;
+
+const MAX_MONTHS = 12; // page-level display cap at the 1Y anchor tenor
+const xOf = (months: number) =>
+  x0 + innerW * (Math.sqrt(months) / Math.sqrt(MAX_MONTHS));
+
+const Y_MIN = 1;
+const Y_MAX = 7; // same y-domain as the par chart — the two read as one system
+const yOf = (v: number) => y0 + innerH * ((Y_MAX - v) / (Y_MAX - Y_MIN));
+const yTicks = [1, 2, 3, 4, 5, 6, 7];
+
+const X_TICKS: { label: string; months: number }[] = [
+  { label: '0', months: 0 },
+  { label: '1M', months: 1 },
+  { label: '3M', months: 3 },
+  { label: '6M', months: 6 },
+  { label: '1Y', months: 12 },
+];
+
+// --- data -----------------------------------------------------------------
+// Same windows as the Section table below the chart.
+const WINDOWS: { from: Term | null; to: Term; m1: number; m2: number; label: string }[] = [
+  { from: null, to: '1M', m1: 0, m2: 1, label: '0→1M (par)' },
+  { from: '1M', to: '3M', m1: 1, m2: 3, label: '1M→3M' },
+  { from: '3M', to: '6M', m1: 3, m2: 6, label: '3M→6M' },
+  { from: '6M', to: '1Y', m1: 6, m2: 12, label: '6M→1Y' },
+];
+
+const CHIPS = [
+  { chip: 'H100', cls: 'h100' },
+  { chip: 'H200', cls: 'h200' },
+  { chip: 'B200', cls: 'b200' },
+  { chip: 'A100', cls: 'a100' },
+];
+
+interface SegView {
+  xa: number;
+  xb: number;
+  y: number;
+  value: number;
+  title: string;
+}
+interface FwdSeries {
+  chip: string;
+  cls: string;
+  segs: SegView[];
+  risers: { x: number; ya: number; yb: number }[];
+  end: SegView;
+}
+
+const legNote = (c: Rate, t: Term) =>
+  `${t} par $${fmt(c.price_median)} (n=${c.n_sources}, ${c.promotion_status})`;
+
+function windowSeg(chip: string, w: (typeof WINDOWS)[number]): SegView | null {
+  const far = committedBandCell(chip, w.to);
+  if (!far) return null;
+  if (w.from === null) {
+    const v = far.price_median;
+    return {
+      xa: xOf(w.m1), xb: xOf(w.m2), y: yOf(v), value: v,
+      title: `${chip} · 0→1M window = 1M par committed $${fmt(v)} · n=${far.n_sources} sources · ${far.promotion_status}`,
+    };
+  }
+  const near = committedBandCell(chip, w.from);
+  if (!near) return null;
+  const v = (w.m2 * far.price_median - w.m1 * near.price_median) / (w.m2 - w.m1);
+  return {
+    xa: xOf(w.m1), xb: xOf(w.m2), y: yOf(v), value: v,
+    title: `${chip} · ${w.label} implied forward $${fmt(v)} · derived from ${legNote(near, w.from)} and ${legNote(far, w.to)}`,
+  };
+}
+
+const series: FwdSeries[] = CHIPS.flatMap(({ chip, cls }) => {
+  const segs = WINDOWS
+    .map((w) => windowSeg(chip, w))
+    .filter((s): s is SegView => s !== null);
+  if (segs.length === 0) return [];
+  const risers = segs.slice(1).map((s, i) => {
+    const prev = segs[i]!;
+    // Only draw a riser where the windows abut (no gap in the ladder).
+    return prev.xb === s.xa ? { x: s.xa, ya: prev.y, yb: s.y } : null;
+  }).filter((r): r is { x: number; ya: number; yb: number } => r !== null);
+  return [{ chip, cls, segs, risers, end: segs[segs.length - 1]! }];
+});
+
+// Direct end-labels — collision resolver with leader lines (data changes
+// daily; the 6M→1Y forwards can converge).
+const LBL_GAP = 15;
+const endLabels = (() => {
+  const items = series
+    .map((s) => ({ s, y: s.end.y }))
+    .sort((a, b) => a.y - b.y);
+  for (let i = 1; i < items.length; i++) {
+    const prev = items[i - 1]!;
+    const cur = items[i]!;
+    if (cur.y - prev.y < LBL_GAP) cur.y = prev.y + LBL_GAP;
+  }
+  const over = items.length ? items[items.length - 1]!.y - (y1 - 2) : 0;
+  if (over > 0) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      items[i]!.y -= over;
+      if (i > 0 && items[i]!.y - items[i - 1]!.y >= LBL_GAP) break;
+    }
+  }
+  return items.map(({ s, y }) => ({ s, y, leader: Math.abs(y - s.end.y) > 2 }));
+})();
+
+const chipNames = series.map((s) => s.chip).join(', ');
+const ariaLabel =
+  `Implied forward rates, derived, as of ${meta.as_of_date}: break-even renewal rate in USD per GPU-hour per bootstrap window ` +
+  `(0 to 1 month par, then 1M–3M, 3M–6M and 6M–1Y) for ${chipNames}. ` +
+  `Derived from posted par committed asks, not a traded forward market. Hover any step for its value and both par legs; the par inputs are in the committed matrix above.`;
+---
+<figure class="fsc" aria-describedby="fsc-caption">
+  <div class="fsc-head">
+    <span class="fsc-kicker">Implied forward rates — derived (break-even renewal)</span>
+    <span class="fsc-meta">
+      <span class="fsc-badge">Derived</span>
+      <span class="fsc-asof">as of {meta.as_of_date}</span>
+    </span>
+  </div>
+
+  <div class="fsc-scroll">
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      role="img"
+      aria-label={ariaLabel}
+      class="fsc-svg"
+    >
+      {/* tinted plot field — signals the secondary, derived reading */}
+      <rect class="field" x={x0} y={y0} width={innerW} height={innerH} />
+
+      {/* y grid */}
+      {yTicks.map((v) => (
+        <line
+          class:list={['grid', { baseline: v === Y_MIN }]}
+          x1={x0} x2={x1} y1={yOf(v)} y2={yOf(v)}
+        />
+      ))}
+      {yTicks.map((v) => (
+        <text class="ytick" x={x0 - 8} y={yOf(v) + 3.5}>${v}</text>
+      ))}
+
+      {/* x ticks — window boundaries */}
+      {X_TICKS.map((t) => (
+        <>
+          <line class="xtickmark" x1={xOf(t.months)} x2={xOf(t.months)} y1={y1} y2={y1 + 4} />
+          <text class="xtick" x={xOf(t.months)} y={y1 + 17}>{t.label}</text>
+        </>
+      ))}
+
+      {/* risers — faint connectors between abutting windows */}
+      {series.map((s) => s.risers.map((r) => (
+        <line class={`riser s-${s.cls}`} x1={r.x} x2={r.x} y1={r.ya} y2={r.yb} />
+      )))}
+
+      {/* forward segments — the mark is the window */}
+      {series.map((s) => s.segs.map((seg) => (
+        <line class={`seg s-${s.cls}`} x1={seg.xa} x2={seg.xb} y1={seg.y} y2={seg.y} />
+      )))}
+
+      {/* hover targets — full window width, title discloses both par legs */}
+      {series.map((s) => s.segs.map((seg) => (
+        <rect
+          class="hit"
+          x={seg.xa} y={seg.y - 12}
+          width={seg.xb - seg.xa} height={24}
+        >
+          <title>{seg.title}</title>
+        </rect>
+      )))}
+
+      {/* direct end-labels — no legend box; leader line when displaced */}
+      {endLabels.map(({ s, y, leader }) => (
+        <>
+          {leader && (
+            <line class="leader" x1={s.end.xb + 3} y1={s.end.y} x2={s.end.xb + 9} y2={y} />
+          )}
+          <text class="lbl" x={s.end.xb + 11} y={y + 3.5}>
+            <tspan class="lbl-name">{s.chip}</tspan>
+            <tspan class="lbl-val" dx="5">{fmt(s.end.value)}</tspan>
+          </text>
+        </>
+      ))}
+    </svg>
+  </div>
+
+  <figcaption class="fsc-foot" id="fsc-caption">
+    <span class="fsc-note">
+      Derived — break-even renewal arithmetic on posted par committed asks ·
+      not a traded forward market · NEOCLOUD band · global-USD · market
+      intelligence — not a citable reference rate
+    </span>
+    <span class="fsc-note">
+      Each step spans its bootstrap window on the √months term axis · hover
+      any step for both par legs and panel depth · forwards inherit the
+      thinness of their par legs
+    </span>
+  </figcaption>
+</figure>
+
+<style>
+  /* Same chip → color mapping as the par curve (color follows the entity);
+     values validated per theme — see TermCurveChart.astro header. */
+  .fsc {
+    --series-h100: #cc7d00;
+    --series-h200: #00829e;
+    --series-b200: #cb69c5;
+    --series-a100: #5f7fd9;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    padding: 12px 14px 12px;
+    margin: 0 0 20px;
+  }
+  :global(html[data-theme="editorial"]) .fsc {
+    --series-h100: #a3660f;
+    --series-h200: #0d96b6;
+    --series-b200: #a02887;
+    --series-a100: #4d5fc0;
+  }
+
+  .fsc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 9px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .fsc-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: var(--weight-strong);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    color: var(--ink-dim);
+  }
+  .fsc-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    white-space: nowrap;
+  }
+  .fsc-badge {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: var(--weight-strong);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-dim);
+    border: 1px solid var(--rule-2);
+    padding: 2px 6px;
+  }
+  .fsc-asof {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+
+  .fsc-scroll { overflow-x: auto; }
+  .fsc-svg { display: block; width: 100%; min-width: 680px; height: auto; }
+
+  .field { fill: var(--surface-2); }
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .grid.baseline { stroke: var(--rule-2); }
+  .xtickmark { stroke: var(--rule-2); stroke-width: 1; }
+
+  .ytick, .xtick {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    fill: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .ytick { text-anchor: end; }
+  .xtick { text-anchor: middle; }
+
+  .seg { stroke-width: 2; stroke-linecap: butt; }
+  .seg.s-h100 { stroke: var(--series-h100); }
+  .seg.s-h200 { stroke: var(--series-h200); }
+  .seg.s-b200 { stroke: var(--series-b200); }
+  .seg.s-a100 { stroke: var(--series-a100); }
+
+  .riser { stroke-width: 1; opacity: 0.45; }
+  .riser.s-h100 { stroke: var(--series-h100); }
+  .riser.s-h200 { stroke: var(--series-h200); }
+  .riser.s-b200 { stroke: var(--series-b200); }
+  .riser.s-a100 { stroke: var(--series-a100); }
+
+  .hit { fill: transparent; cursor: help; }
+
+  .leader { stroke: var(--ink-faint); stroke-width: 1; }
+
+  .lbl {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+  .lbl-name { fill: var(--ink); font-weight: var(--weight-strong); letter-spacing: 0.04em; }
+  .lbl-val { fill: var(--ink-dim); }
+
+  .fsc-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+  }
+  .fsc-note {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+  }
+</style>

@@ -9,7 +9,7 @@
 export type Tier = 'T1IF' | 'T2IF' | 'T3IF';
 export type Term = 'OnDemand' | '1M' | '3M' | '6M' | '1Y' | '2Y' | '3Y' | '5Y';
 export type Confidence = 'High' | 'Medium' | 'Low';
-export type PromotionStatus = 'Published' | 'Shadow';
+export type PromotionStatus = 'Published' | 'Provisional' | 'Shadow';
 
 // Axis tokens — `ALL` is the pooled sentinel per the 7-segment grammar.
 export type FormFactor = 'SXM' | 'PCIe' | 'NVL' | 'ALL';
@@ -105,6 +105,8 @@ export const TIER_OIL_GRADES: Record<Tier, string> = {
 // the NVL-form Blackwell.
 export const PREMIUM_CHIPS: readonly string[] = [
   'GB200',
+  'GB300',
+  'B300',
   'B200',
   'H200',
   'H100',

@@ -71,22 +71,91 @@ function parseRow(line: string, headers: string[]): Rate {
   };
 }
 
-function parseCsv(text: string): Rate[] {
+function parseAllRows(text: string): Rate[] {
   const lines = text.trim().split(/\r?\n/);
   const headers = lines[0]!.split(',');
   return lines.slice(1)
     .filter((l) => l.trim().length > 0)
     .map((line) => parseRow(line, headers))
-    .filter((r) => r.series_id && r.factory_type && r.gpu_model)
-    // OD-only site: drop every committed-term row at the loader so no
-    // 1M / 3M / 6M / 1Y / 2Y / 3Y / 5Y series can leak into any page or
-    // explorer table. The CSVs still carry them (committed-term cells are a
-    // hyperscaler reserved-pricing schedule, not a market signal we surface).
-    .filter((r) => r.commitment_term === 'OnDemand');
+    .filter((r) => r.series_id && r.factory_type && r.gpu_model);
+}
+
+function parseCsv(text: string): Rate[] {
+  // OD-only for the benchmark pools: no committed-term row can leak into the
+  // tier ladders or explorer tables. Committed-term surfaces ONLY through the
+  // dedicated market-intelligence band below (committedBandCell), which is
+  // badged "not a citable reference rate" wherever it renders.
+  return parseAllRows(text).filter((r) => r.commitment_term === 'OnDemand');
 }
 
 const publishedRates: Rate[] = parseCsv(csvText);
 const shadowRates: Rate[] = parseCsv(shadowCsvText);
+
+// Committed-term MARKET INTELLIGENCE band (gating note 2026-06-27, live PR
+// #37). CRI-NEOCLOUD-* = T2IF+T3IF committed pooled per chip × tenor,
+// global-USD scope. Tier-2 product: every surface that renders these MUST
+// badge "market intelligence — not a citable reference rate". Published +
+// Provisional only (Shadow band cells — e.g. B300 at n=1 — stay dark).
+const committedBandRates: Rate[] = parseAllRows(csvText).filter(
+  (r) => r.factory_type === 'NEOCLOUD' && r.commitment_term !== 'OnDemand',
+);
+
+// T1IF committed cells (the strict T1IF cell IS the T1IF band — Azure/GCP
+// reserved schedule). Same MI badge rule. Thin today (mostly n<=2).
+const t1ifCommittedRates: Rate[] = parseAllRows(csvText).filter(
+  (r) => r.factory_type === 'T1IF' && r.commitment_term !== 'OnDemand',
+);
+
+export type GeoToken = 'ALL' | 'US' | 'EU';
+
+// NEOCLOUD band cell for (chip, tenor) — baseline axes (form/region pooled).
+export function committedBandCell(chip: string, term: Term): Rate | undefined {
+  return committedBandRates
+    .filter(
+      (r) => r.gpu_model === chip && r.commitment_term === term &&
+             r.form_factor === 'ALL' && r.region === 'ALL',
+    )
+    .sort((a, b) => variantRank(a) - variantRank(b) || (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+}
+
+export function t1ifCommittedCell(chip: string, term: Term): Rate | undefined {
+  return t1ifCommittedRates
+    .filter(
+      (r) => r.gpu_model === chip && r.commitment_term === term &&
+             r.form_factor === 'ALL' && r.region === 'ALL',
+    )
+    .sort((a, b) => variantRank(a) - variantRank(b) || (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+}
+
+// Every tenor with at least one non-Shadow band cell, in curve order.
+export function committedBandTenors(): Term[] {
+  const order: Term[] = ['1M', '3M', '6M', '1Y', '2Y', '3Y', '5Y'];
+  return order.filter((t) => committedBandRates.some((r) => r.commitment_term === t));
+}
+
+// OD headline cell per (tier, chip, geo). region=US/EU cells ride the
+// geo-split series (#32); Provisional geo cells surface with their status
+// (Shadow never does). Published+Provisional pool — the strict
+// Published-only flagship rule stays for region=ALL flagship views;
+// the geo cuts are explicitly allowed to be Provisional-badged.
+export function tierOdCell(tier: Tier, chip: string, region: GeoToken): Rate | undefined {
+  return headlineRates
+    .filter(
+      (r) => r.tier === tier && r.gpu_model === chip &&
+             r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
+             r.interruptibility === 'GTD' && r.region === region &&
+             r.promotion_status !== 'Shadow',
+    )
+    .sort((a, b) => variantRank(a) - variantRank(b) || (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+}
+
+// T2IF OD — the seam-consistent OD companion for the committed band (same
+// market segment on both sides of the row; a T1IF OD next to a neocloud
+// committed number would recreate the cross-seam comparison the gating
+// removed).
+export function t2ifOdCell(chip: string, region: GeoToken): Rate | undefined {
+  return tierOdCell('T2IF', chip, region);
+}
 
 // Previous-day medians per series_id. Drives the ticker arrows: today's
 // price_median vs prior-day price_median. Empty map on bootstrap days when
@@ -243,12 +312,14 @@ export const meta: SnapshotMeta = {
 // (Blackwell → Hopper → Ampere), then long-tail / indicative chips
 // in same generation order, DC-grade before consumer within each gen.
 const CHIP_ORDER = [
-  // Premium scope (v2.0 algorithmic tier coverage)
-  'GB200', 'B200',          // Blackwell (2024) — GB200 NVL72 leads (flagship)
+  // Premium scope (algorithmic tier coverage; B300/GB300 promoted to
+  // PREMIUM_CHIPS 2026-07-01 on the GB200 precedent). GB200 leads (flagship
+  // rack-scale, deepest panel); GB300 slots beside it when it publishes.
+  'GB200', 'GB300',         // Blackwell rack-scale
+  'B300', 'B200',           // Blackwell / Blackwell Ultra SXM
   'H200', 'H100',           // Hopper (2023)
   'A100',                   // Ampere (2020)
   // Long-tail / indicative
-  'GB300', 'B300',          // Blackwell Ultra (2025)
   'L40S', 'L40', 'L4',      // Ada DC (2022-2023)
   '5090', '4090',           // Blackwell/Ada consumer
   'A40', 'A10',             // Ampere DC long-tail

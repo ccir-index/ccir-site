@@ -1,0 +1,78 @@
+---
+import Base from '../layouts/Base.astro';
+import TermCurveChart from '../components/TermCurveChart.astro';
+import { meta } from '../data/snapshot';
+// Implied-forwards section (ForwardStepChart) held off the page 2026-07-02:
+// the band-median bootstrap differences par legs drawn from DIFFERENT
+// provider subsets per tenor — the same composition-mismatch artifact the
+// committed-term gating removed at tier level. Reinstate once the forwards
+// are computed within-provider (per-operator tenor ladders, then aggregated)
+// alongside the spread-to-spot series. Component kept in src/components/.
+---
+<Base
+  title="Committed Term Structure · CCIR"
+  description="Committed-term GPU compute rates by tenor — the pooled T2IF + T3IF committed band charted against the on-demand headline. Market intelligence, not a citable reference rate."
+  ogImage="/og/home.png"
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Market Intelligence · {meta.as_of_date}</div>
+      <h1>Committed Term Structure</h1>
+      <p class="standfirst">
+        The price of guaranteed capacity, by tenor. Posted committed asks from
+        one month out to one year — the term axis the on-demand headline
+        can't see.
+      </p>
+    </header>
+
+    <aside class="mi-banner" role="note">
+      <strong>Market intelligence — not a citable reference rate.</strong>
+      Committed-term cells are a descriptive market product, firewalled from
+      the citable benchmark on <a href="/rates">/rates</a>. Panel depth is
+      disclosed on every mark (hover); thin cells render hollow (Provisional).
+    </aside>
+
+    <section class="curve-section">
+      <header class="sec-head">
+        <div class="kicker">Section 01 · Committed asks by tenor</div>
+        <h2>The Neocloud committed term curve</h2>
+      </header>
+
+      <TermCurveChart />
+    </section>
+
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { margin-bottom: 18px; max-width: 84ch; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-3xl);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 12px;
+    }
+    .standfirst em { font-style: italic; color: var(--accent); }
+
+    .mi-banner {
+      margin: 0 0 28px;
+      padding: 12px 16px;
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      background: var(--surface);
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      line-height: 1.6;
+      max-width: 84ch;
+    }
+    .mi-banner strong { color: var(--accent); }
+    .mi-banner a { color: var(--accent); }
+
+    .sec-head { margin-bottom: 14px; max-width: 84ch; }
+    .sec-head h2 { font-size: var(--fs-2xl); margin: 4px 0 10px; }
+
+    .curve-section { margin: 0 0 36px; }
+  </style>
+</Base>

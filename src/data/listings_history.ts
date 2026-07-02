@@ -14,7 +14,9 @@ export const PREMIUM_CHIPS = [
   { id: 'h100-sxm-80gb',  label: 'H100 SXM',     short: 'H100' },
   { id: 'h200-sxm-141gb', label: 'H200 SXM',     short: 'H200' },
   { id: 'b200-sxm-180gb', label: 'B200 SXM',     short: 'B200' },
+  { id: 'b300-sxm-288gb', label: 'B300 SXM',     short: 'B300' },
   { id: 'gb200-nvl-nvl',  label: 'GB200 NVL',    short: 'GB200' },
+  { id: 'gb300-nvl-nvl',  label: 'GB300 NVL',    short: 'GB300' },
   { id: 'a100-sxm-80gb',  label: 'A100 SXM 80G', short: 'A100-80' },
   { id: 'a100-sxm-40gb',  label: 'A100 SXM 40G', short: 'A100-40' },
 ] as const;

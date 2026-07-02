@@ -16,7 +16,11 @@ interface Props {
 const {
   title = 'CCIR · Compute Credit Index Research',
   description = 'Independent reference rates for GPU compute. Aggregated from publicly-observed posted prices across the Intelligence Factory Taxonomy.',
-  showTape = true,
+  // Ticker suppressed 2026-07-02: the v2026-07-01 panel activation (31→41
+  // sources) + same-day restatements make day-over-day arrows read as market
+  // moves when they're composition changes. Flip back to true once the panel
+  // has a few days of stable history.
+  showTape = false,
   ogImage = '/og-default.png',
   noindex = false,
 } = Astro.props;
