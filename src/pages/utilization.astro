@@ -1,39 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
-import ObsPanel from '../components/ObsPanel.astro';
 
-// /utilization — the SUPPLY & DEMAND page (prototype rebuild, 2026-07-02).
-//
-// The page is the instrumentation layer for a composite supply–demand index
-// in development. Five instruments, one panel each:
-//
-//   01 MEASURED    measured marketplace utilization (Vast rented/total —
-//                  the one measured source)                       [live feed]
-//   02 BREADTH     availability breadth (X of Y venues, Cluster vs
-//                  Fractional) + three-state upgrade placeholder  [live feed]
-//   03 DEMAND      spot-to-on-demand spread per chip (AWS)        [future feed]
-//   04 DEPTH       executable market depth — offer counts + posted
-//                  price range across marketplace venues          [future feed]
-//   05 DIVERGENCE  posted vs executable — the signature chart     [future feed]
-//
-// Sections 03–05 are wired to /data/ CSVs the pipeline does not export yet
-// (contracts in DESIGN.md at repo root). Until those land, each falls back
-// to a deterministic PLACEHOLDER sample rendered under an "Illustrative
-// sample" badge; flip SHOW_SAMPLE_WHEN_MISSING in the script to get the
-// standard "warming up" empty state instead.
-//
-// Naming note: "/observatory" is already taken by the (paused) Shadeform
-// Availability Observatory page — this page deliberately does NOT use the
-// word Observatory in its visible name to avoid the collision.
-//
-// Charts: sections 01–04 keep client-side Chart.js (their data is runtime
-// CSVs fetched per chip — the existing pattern on this page). Section 05 is
-// a client-built inline SVG following the TermCurveChart house conventions
-// (chart-local per-theme series tokens, direct end labels, mono captions,
-// hover <title> depth disclosure). Series colors reuse the TermCurveChart
-// validated pair and re-passed the dataviz six-checks on both surfaces
-// (2026-07-02): dark #cc7d00/#00829e worst CVD ΔE 79.7 PASS; light
-// #a3660f/#0d96b6 worst CVD ΔE 75.0 PASS.
+// /utilization — the supply page: measured Vast utilization (the lead chart) +
+// the Availability Index (breadth of genuine-capacity venues showing launchable
+// stock). Reads the export_availability_index CSVs from /data/ client-side;
+// degrades to a "warming up" state if absent. /availability redirects here.
 const CHIPS = [
   { slug: 'h100-sxm',      label: 'H100',  vast: 'h100-sxm' },
   { slug: 'h200-sxm',      label: 'H200',  vast: 'h200-sxm' },
@@ -44,43 +15,38 @@ const CHIPS = [
 const DEFAULT_CHIP = 'h100-sxm';
 ---
 <Base
-  title="Supply & Demand · CCIR"
-  description="CCIR — the supply–demand instrument panel: measured marketplace utilization, availability breadth across genuine-capacity venues, the spot-to-on-demand spread, executable market depth, and the posted-vs-executable divergence."
+  title="Utilization & Availability · CCIR"
+  description="CCIR — measured marketplace utilization (the share of listed GPUs rented, supply-normalized) charted over time, alongside the Availability Index: how many genuine-capacity GPU venues (X of Y) show launchable stock."
   ogImage="/og-utilization.png"
 >
-  <section class="wrap sd-page">
-    <div class="kicker">CCIR · SUPPLY &amp; DEMAND <span class="mi-tag">Market&nbsp;Intelligence</span></div>
-    <h1>Supply &amp; Demand</h1>
+  <section class="wrap ai-page">
+    <div class="kicker">CCIR · SUPPLY OBSERVATORY <span class="mi-tag">Market&nbsp;Intelligence</span></div>
+    <h1>Utilization &amp; Availability</h1>
     <p class="deck">
-      Five instruments, each measuring one thing. <strong>Measured
-      utilization</strong> — of the capacity the one marketplace we can measure
-      actually lists, how much is occupied. <strong>Availability breadth</strong>
-      — of the genuine-capacity venues we probe, how many show launchable stock.
-      <strong>Demand gauge</strong> — the posted spot ask as a share of the same
-      venue's posted on-demand rate. <strong>Executable depth</strong> — how many
-      launchable offers the marketplace venues list, and at what posted range.
-      <strong>Divergence</strong> — the gap between the posted-rate reference and
-      the executable component. Together they are the component gauges of a
-      composite supply–demand index in development.
+      Two lenses on GPU supply. <strong>Utilization</strong> — of the capacity the
+      one marketplace we can measure actually lists, how much is rented, tracked
+      over time. <strong>Availability</strong> — of the genuine-capacity venues we
+      probe, how many show launchable stock (<strong>X of Y</strong>), so the slope
+      reads demand tightening or easing.
     </p>
 
-    <!-- chip selector — sections 01/02 overlay every selected chip;
-         sections 03–05 follow the FIRST selected chip -->
+    <!-- chip selector -->
     <div class="chips" role="tablist" aria-label="GPU model">
       {CHIPS.map((c) => (
         <button class="chip" role="tab" data-chip={c.slug} data-vast={c.vast}
                 aria-selected={c.slug === DEFAULT_CHIP ? 'true' : 'false'}>{c.label}</button>
       ))}
-      <span class="chip-hint">select one or more to compare · sections 03–05 follow the first selection</span>
+      <span class="chip-hint">select one or more to compare</span>
     </div>
 
-    <!-- ══ Section 01 · MEASURED — Vast rented/total, the only measured source ══ -->
-    <ObsPanel num="01" kicker="Measured" title="Measured marketplace utilization" windowId="util-window">
-      <p class="panel-sub" slot="sub">
-        Vast.ai — the one marketplace venue that discloses rented / total listed
-        GPUs. Rolling 7-day occupancy of listed supply, denominator fixed to each
-        window's median listed capacity.
-      </p>
+    <!-- primary: measured utilization (Vast) -->
+    <div class="card util-card">
+      <div class="card-head">
+        <div>
+          <h2>Measured utilization <span class="tag">one marketplace source</span></h2>
+          <p class="card-sub">Vast.ai — the only marketplace that discloses rented / total. Rolling 7-day utilization, denominator fixed to each window's median listed capacity.</p>
+        </div>
+      </div>
       <div class="util-grid">
         <div class="util-now" id="util-now">
           <span class="util-big" id="u-now">—</span>
@@ -89,200 +55,82 @@ const DEFAULT_CHIP = 'h100-sxm';
         <div class="chart-wrap util-wrap"><canvas id="utilChart"></canvas></div>
       </div>
       <div class="empty" id="util-empty" hidden>Vast utilization warming up.</div>
-      <p slot="caption">
-        Measures: share of listed GPUs occupied on Vast.ai — one measured source.
-        A rented GPU and a host-paused GPU are indistinguishable in the
-        disclosure, so the series reads as an upper bound on paid occupancy.
-        Trailing 7-day window · daily marks.
-      </p>
-    </ObsPanel>
+    </div>
 
-    <!-- ══ Section 02 · BREADTH — X of Y venues with launchable stock ══ -->
-    <ObsPanel num="02" kicker="Breadth" title="Availability breadth" windowId="avail-window">
-      <p class="panel-sub" slot="sub">
-        Rolling 7-day breadth — the share of genuine-capacity venues
-        (<strong>X of Y</strong>) showing launchable stock; falling = venues
-        selling out. Dashed verticals mark a change in the venue panel.
-        <span id="trend-mode">Cluster (8×) vs Fractional.</span>
-      </p>
-
-      <div class="band" id="band">
-        <div class="stat stat-frac">
-          <span class="stat-lbl">Fractional — venues available</span>
-          <span class="stat-val" id="s-frac">—</span>
-          <span class="stat-sub" id="s-frac-sub">any launchable shape · 7d</span>
-        </div>
-        <div class="stat stat-clu">
-          <span class="stat-lbl">Cluster (8×) — venues available</span>
-          <span class="stat-val" id="s-clu">—</span>
-          <span class="stat-sub" id="s-clu-sub">full 8-GPU node · 7d</span>
-        </div>
-        <div class="stat">
-          <span class="stat-lbl">Panel sources</span>
-          <span class="stat-val" id="s-srcs">—</span>
-          <span class="stat-sub" id="s-srcs-sub">venues probed</span>
-        </div>
-        <!-- THREE-STATE UPGRADE — reserved stat cell (hidden). When the
-             three-state feed lands this becomes the "advertised ·
-             unfulfillable" venue count; see the placeholder block below. -->
-        <div class="stat stat-adv" id="s-adv-cell" hidden>
-          <span class="stat-lbl">Advertised · unfulfillable</span>
-          <span class="stat-val" id="s-adv">—</span>
-          <span class="stat-sub" id="s-adv-sub">listed but waitlist / quote-only · 7d</span>
-        </div>
+    <!-- headline stat band -->
+    <div class="band" id="band">
+      <div class="stat stat-frac">
+        <span class="stat-lbl">Fractional — venues available</span>
+        <span class="stat-val" id="s-frac">—</span>
+        <span class="stat-sub" id="s-frac-sub">any launchable shape · 7d</span>
       </div>
+      <div class="stat stat-clu">
+        <span class="stat-lbl">Cluster (8×) — venues available</span>
+        <span class="stat-val" id="s-clu">—</span>
+        <span class="stat-sub" id="s-clu-sub">full 8-GPU node · 7d</span>
+      </div>
+      <div class="stat">
+        <span class="stat-lbl">Panel sources</span>
+        <span class="stat-val" id="s-srcs">—</span>
+        <span class="stat-sub" id="s-srcs-sub">venues probed</span>
+      </div>
+    </div>
 
+    <!-- primary: availability over time -->
+    <div class="card chart-card">
       <div class="card-head">
+        <div>
+          <h2>Availability over time</h2>
+          <p class="card-sub">Rolling 7-day breadth — the share of genuine-capacity venues (X of Y) showing stock; falling = venues selling out. Dashed verticals mark a change in the venue panel. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
+        </div>
         <div class="confbadge" id="confbadge"></div>
       </div>
       <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
       <div class="empty" id="trend-empty" hidden>Series warming up — first publish lands on the next daily build.</div>
+    </div>
 
-      <!-- ── THREE-STATE BREADTH UPGRADE — PLACEHOLDER ──────────────────────
-           Today each venue in the breadth read is binary: in stock vs no
-           stock observed. Wave-1 probing already captures waitlist /
-           out-of-stock / quote-only chips, which split "no stock" into two
-           distinct states:
-
-             in stock · advertised but unfulfillable · not listed
-
-           When the pipeline exports the extra columns (availability_index
-           trend v2 — column contract in DESIGN.md), (a) unhide this legend,
-           (b) unhide the #s-adv-cell stat above, and (c) add a stacked
-           per-state venue-count band beneath the trend chart in the slot
-           marked #state-band-slot. The nodes are kept in the DOM (hidden)
-           so the layout already reserves their space plan. -->
-      <div class="state-legend" id="state-legend" hidden aria-hidden="true">
-        <span class="state-chip st-in"><i></i>in stock</span>
-        <span class="state-chip st-adv"><i></i>advertised · unfulfillable</span>
-        <span class="state-chip st-not"><i></i>not listed</span>
-      </div>
-      <div id="state-band-slot" hidden aria-hidden="true">
-        <!-- future: stacked venue-count band (in-stock / advertised-but-
-             unfulfillable / not-listed), same x-axis as the trend chart -->
-      </div>
-
-      <details class="panel-details">
-        <summary>
-          <span class="sum-main">The panel <span class="sum-count" id="panel-count"></span></span>
-          <span class="sum-sub">Each genuine-capacity source, one vote · 7-day availability</span>
-          <span class="sum-chev" aria-hidden="true">▾</span>
-        </summary>
-        <div class="panel" id="panel"></div>
-        <p class="foot">Excludes catalog-eligibility (Azure) and probabilistic-score (AWS) sources from the headline. Resellers that duplicate a directly-probed operator are deduped. Sources below the minimum observed-cycle threshold are held out until they accumulate probes.</p>
-      </details>
-
-      <p slot="caption">
-        Measures: of the Y genuine-capacity venues that disclosed a signal for
-        this chip (venue count in the stat band; per-venue detail above), the
-        share X/Y that showed launchable stock. Breadth, not a median —
-        availability is bimodal and a median collapses on a bare majority.
-        Rolling 7-day window · daily marks.
-      </p>
-    </ObsPanel>
-
-    <!-- ══ Section 03 · DEMAND GAUGE — spot ask as % of posted on-demand ══ -->
-    <ObsPanel num="03" kicker="Demand gauge" title="Spot-to-on-demand spread" sampleId="gauge-sample" windowId="gauge-window">
-      <p class="panel-sub" slot="sub">
-        The posted spot ask as a share of the same instance's posted on-demand
-        rate. A spread tightening toward parity reads as demand pressure; a
-        widening discount reads as slack.
-      </p>
-      <div class="chart-wrap gauge-wrap"><canvas id="gaugeChart"></canvas></div>
-      <div class="empty" id="gauge-empty" hidden>Demand gauge warming up — feed lands with the pipeline export.</div>
-      <p slot="caption">
-        Measures: AWS posted spot ask ÷ posted on-demand rate for the matching
-        instance, pooled across regions (region count on hover) — one source
-        until another venue discloses a comparable posted pair. Both legs are
-        posted prices; the ratio is a posted-price spread, not a transaction
-        record. Dashed guide = parity with the posted on-demand rate. Daily
-        marks.
-      </p>
-    </ObsPanel>
-
-    <!-- ══ Section 04 · DEPTH — executable offers: count + posted range ══ -->
-    <ObsPanel num="04" kicker="Depth" title="Executable market depth" sampleId="depth-sample" windowId="depth-window">
-      <p class="panel-sub" slot="sub">
-        Offers you can launch against right now, across the executable
-        marketplace venues: how many, and at what posted per-GPU range. Two
-        panels, one axis each — count and price are different scales.
-      </p>
-      <div class="depth-legend">
-        <span class="lg-swatch lg-band"><i></i>min–max posted range</span>
-        <span class="lg-swatch lg-med"><i></i>median posted ask</span>
-      </div>
-      <div class="chart-wrap depth-wrap"><canvas id="depthPriceChart"></canvas></div>
-      <div class="depth-count-lbl">launchable offers · count</div>
-      <div class="chart-wrap depth-count-wrap"><canvas id="depthCountChart"></canvas></div>
-      <div class="empty" id="depth-empty" hidden>Depth series warming up — feed lands with the pipeline export.</div>
-      <p slot="caption">
-        Measures: the number of launchable offers and their posted per-GPU $/hr
-        range (min / median / max) across the executable marketplace venues
-        (venue count on hover). Offers are list-asks you can launch against —
-        listings, not transactions. Daily marks.
-      </p>
-    </ObsPanel>
-
-    <!-- ══ Section 05 · DIVERGENCE — posted vs executable (signature chart) ══ -->
-    <ObsPanel num="05" kicker="Divergence" title="Posted vs executable" sampleId="dvg-sample" windowId="dvg-window">
-      <p class="panel-sub" slot="sub">
-        The posted-rate reference steps when operators reprice their rate cards;
-        the executable component moves daily with launchable marketplace offers.
-        The shaded region is the gap between them.
-      </p>
-      <div class="dvg-legend">
-        <span class="lg-swatch lg-posted"><i></i>posted-rate reference (steps)</span>
-        <span class="lg-swatch lg-exec"><i></i>executable component (daily)</span>
-        <span class="lg-swatch lg-gap"><i></i>gap</span>
-      </div>
-      <div class="dvg-scroll"><div id="dvg-chart"></div></div>
-      <div class="empty" id="dvg-empty" hidden>Divergence series warming up — feed lands with the pipeline export.</div>
-      <p slot="caption">
-        Measures: the operator-equal median of posted on-demand asks across the
-        rate panel (posted-rate reference; source count on hover) against the
-        median posted ask across launchable marketplace offers (executable
-        component; venue count on hover). Both legs are posted asks — the gap
-        is a posted-price spread between the posted market and the market you
-        can launch against right now. Daily marks.
-      </p>
-    </ObsPanel>
-
-    <aside class="composite-note" role="note">
-      <span class="kicker">In development</span>
-      A composite supply–demand index built from these five instruments.
-      Sections 03–05 currently render illustrative samples where badged; the
-      composite publishes once the demand-gauge and depth feeds are live.
-    </aside>
+    <!-- source panel (collapsed by default) -->
+    <details class="card panel-card">
+      <summary>
+        <span class="sum-main"><h2>The panel</h2><span class="sum-count" id="panel-count"></span></span>
+        <span class="sum-sub">Each genuine-capacity source, one vote · 7-day availability</span>
+        <span class="sum-chev" aria-hidden="true">▾</span>
+      </summary>
+      <div class="panel" id="panel"></div>
+      <p class="foot">Excludes catalog-eligibility (Azure) and probabilistic-score (AWS) sources from the headline. Resellers that duplicate a directly-probed operator are deduped. Sources below the minimum observed-cycle threshold are held out until they accumulate probes.</p>
+    </details>
 
     <details class="method-details">
       <summary>Methodology</summary>
       <p class="method">
-        <strong>Utilization</strong> is a measured metric — rented / total listed
-        GPUs as one marketplace discloses them — and is never blended into
-        availability. <strong>Breadth</strong>: each source's window rate is its
-        share of capacity-probes that found stock, count-weighted within source;
-        the headline is the share of venues with any stock, shown Fractional
-        (any shape) and Cluster (full 8-GPU node). Each rolling point uses the
-        venues present in that window, and dashed verticals flag where the panel
-        set changed, so added venues don't read as a demand move.
-        <strong>Demand gauge, depth, divergence</strong> are posted-price
-        instruments: every input is a publicly posted ask; no series on this
-        page represents transactions. Every trend labels the time window it
-        draws.
+        Each source's window rate is its share of capacity-probes that found
+        stock, count-weighted within source. The headline is <em>breadth</em> —
+        of the Y genuine-capacity venues that disclosed a signal, the share X/Y
+        that found any stock — shown as Fractional (any shape) and Cluster (full
+        8-GPU node). Breadth, not a median, because availability is bimodal
+        (venues clump dry or flush) and a median collapses to 0 or 1 on a bare
+        majority; its slope over time is the demand read. Each rolling point uses
+        the venues present in that window, and dashed verticals flag where the
+        panel set changed, so added venues don't read as a demand move. Utilization
+        is a separate measured metric — never blended into availability.
       </p>
     </details>
   </section>
 
   <script>
     import Chart from 'chart.js/auto';
-    import { lastValueLabelPlugin, LAST_VALUE_GUTTER } from '../data/chartExtras';
 
     const DEFAULT_CHIP = 'h100-sxm';
-    // The charts run on independent timelines. Availability begins where the
-    // full venue panel is live; utilization runs back to the first full 7-day
-    // Vast window (raw data begins 2026-05-13; first ~6 days are ramp).
+    // The two charts run on independent timelines (decoupled below in renderAll).
+    // Availability begins where the full venue panel is live — the panel steps up
+    // to its full source set on this date, so the breadth trend starts clean with
+    // no composition jumps. Utilization runs much further back: Vast discloses
+    // rented/total continuously, so its only floor is the first full 7-day window
+    // (raw data begins 2026-05-13, but the first ~6 days are partial-window ramp).
     const AVAIL_START = '2026-06-16';
     const UTIL_START  = '2026-05-19';
+    // Plain category x-axis with pre-formatted date labels — no time adapter, so
+    // nothing to break. autoSkip thins the labels as the range grows.
     const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const fmtDate = (iso) => { const p = String(iso).split('-'); return p.length === 3 ? `${MONTHS[+p[1]-1]} ${+p[2]}` : iso; };
     const catAxis = (ink) => ({
@@ -293,17 +141,8 @@ const DEFAULT_CHIP = 'h100-sxm';
     const $ = (id) => document.getElementById(id);
     const pct = (v) => (v == null || isNaN(v)) ? '—' : (v * 100).toFixed(0) + '%';
     const ACCENT = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff9100';
+    const TEAL = '#4cc4b0';
     const css = (n, f) => (getComputedStyle(document.documentElement).getPropertyValue(n).trim() || f);
-    // chart-local series tokens (per-theme values set in <style>; validated
-    // pair — see frontmatter comment)
-    const seriesPosted = () => {
-      const el = document.querySelector('.sd-page');
-      return (el && getComputedStyle(el).getPropertyValue('--series-posted').trim()) || '#cc7d00';
-    };
-    const seriesExec = () => {
-      const el = document.querySelector('.sd-page');
-      return (el && getComputedStyle(el).getPropertyValue('--series-exec').trim()) || '#00829e';
-    };
 
     // tiny CSV parser (numeric/clean fields only)
     async function loadCsv(path) {
@@ -311,7 +150,7 @@ const DEFAULT_CHIP = 'h100-sxm';
         const r = await fetch(path, { cache: 'no-cache' });
         if (!r.ok) return null;
         const txt = (await r.text()).trim();
-        if (!txt || txt.startsWith('<')) return null; // 200-with-HTML dev fallback
+        if (!txt) return null;
         const [head, ...lines] = txt.split(/\r?\n/);
         const cols = head.split(',');
         return lines.map((ln) => {
@@ -324,14 +163,9 @@ const DEFAULT_CHIP = 'h100-sxm';
     }
 
     const num = (x) => (x === '' || x == null ? null : Number(x));
-    let trendChart, utilChart, gaugeChart, depthPriceChart, depthCountChart;
-    const state = {
-      headline: null, sources: null, util: null,
-      trend: {}, vtrend: {},
-      gauge: {}, depth: {}, dvg: {},   // future-feed caches (per chip)
-    };
-    // fixed per-chip colors for the multi-chip overlays (sections 01/02 —
-    // unchanged from the live page; readable on both themes).
+    let trendChart, utilChart;
+    const state = { headline: null, sources: null, util: null, trend: {}, vtrend: {} };
+    // fixed per-chip colors for the multi-chip overlays (readable on both themes).
     const CHIP_COLORS = {
       'h100-sxm': '#ff9100', 'a100-sxm-80gb': '#14b8a6', 'b200-sxm': '#8b5cf6',
       'h200-sxm': '#3b82f6', 'gb200': '#ec4899',
@@ -345,93 +179,9 @@ const DEFAULT_CHIP = 'h100-sxm';
       return g;
     }
 
-    const setWindow = (id, rows) => {
-      const el = $(id);
-      if (!el) return;
-      if (!rows || !rows.length) { el.textContent = ''; return; }
-      el.textContent = `${fmtDate(rows[0].as_of_date)} → ${fmtDate(rows[rows.length - 1].as_of_date)} · daily marks`;
-    };
-
-    // ════════════════════════════════════════════════════════════════════
-    // PLACEHOLDER SAMPLE DATA — sections 03–05.
-    //
-    // The pipeline does not export these feeds yet (CSV contracts in
-    // DESIGN.md at repo root). Until it does, a missing CSV falls back to
-    // the deterministic samples below and the panel shows its
-    // "Illustrative sample" badge. Flip SHOW_SAMPLE_WHEN_MISSING to false
-    // at product launch to show the standard "warming up" empty state for
-    // any chip whose feed hasn't landed.
-    //
-    // Every sample row carries the SAME column names as the future CSV, so
-    // the renderers are already contract-shaped and switching to live data
-    // is a pure pipeline change.
-    // ════════════════════════════════════════════════════════════════════
-    const SHOW_SAMPLE_WHEN_MISSING = true;
-
-    const sampleDates = (n) => {
-      const out = []; const today = new Date();
-      for (let i = n - 1; i >= 0; i--) {
-        const t = new Date(today); t.setDate(today.getDate() - i);
-        out.push(t.toISOString().slice(0, 10));
-      }
-      return out;
-    };
-
-    // PLACEHOLDER: /data/spot_gauge_{chip}.csv — spot tightening toward OD.
-    const SAMPLE_GAUGE_PCT = [
-      0.34, 0.33, 0.35, 0.34, 0.36, 0.35, 0.33, 0.34, 0.36, 0.37,
-      0.36, 0.38, 0.37, 0.39, 0.38, 0.40, 0.39, 0.41, 0.40, 0.42,
-      0.41, 0.43, 0.42, 0.44, 0.43, 0.45, 0.44, 0.46,
-    ];
-    const sampleGauge = () => sampleDates(28).map((d, i) => ({
-      as_of_date: d,
-      spot_pct_of_od: String(SAMPLE_GAUGE_PCT[i]),
-      spot_median_usd: (SAMPLE_GAUGE_PCT[i] * 6.0).toFixed(2),
-      od_posted_usd: '6.00',
-      n_regions: '6',
-    }));
-
-    // PLACEHOLDER: /data/executable_depth_{chip}.csv — drifting cheaper,
-    // deepening offer count.
-    const SAMPLE_DEPTH = {
-      n:   [52, 54, 51, 55, 57, 54, 56, 58, 55, 57, 60, 58, 56, 59,
-            61, 58, 60, 57, 59, 62, 60, 58, 61, 63, 60, 62, 59, 61],
-      min: [1.79, 1.75, 1.79, 1.72, 1.75, 1.79, 1.75, 1.72, 1.69, 1.72,
-            1.75, 1.72, 1.69, 1.65, 1.69, 1.72, 1.69, 1.65, 1.69, 1.65,
-            1.62, 1.65, 1.69, 1.65, 1.62, 1.65, 1.62, 1.65],
-      med: [2.38, 2.36, 2.39, 2.35, 2.33, 2.36, 2.32, 2.30, 2.33, 2.29,
-            2.31, 2.28, 2.30, 2.26, 2.28, 2.25, 2.27, 2.24, 2.26, 2.22,
-            2.24, 2.21, 2.23, 2.20, 2.22, 2.19, 2.21, 2.18],
-      max: [3.45, 3.40, 3.48, 3.42, 3.38, 3.44, 3.40, 3.36, 3.42, 3.38,
-            3.34, 3.40, 3.36, 3.32, 3.38, 3.34, 3.30, 3.36, 3.32, 3.28,
-            3.34, 3.30, 3.26, 3.32, 3.28, 3.24, 3.30, 3.26],
-    };
-    const sampleDepth = () => sampleDates(28).map((d, i) => ({
-      as_of_date: d,
-      n_offers: String(SAMPLE_DEPTH.n[i]),
-      n_venues: '4',
-      price_min: String(SAMPLE_DEPTH.min[i]),
-      price_median: String(SAMPLE_DEPTH.med[i]),
-      price_max: String(SAMPLE_DEPTH.max[i]),
-    }));
-
-    // PLACEHOLDER: /data/posted_executable_{chip}.csv — posted reference
-    // stepping down twice while the executable component breathes below it.
-    const SAMPLE_DVG_EXEC = [
-      2.41, 2.38, 2.44, 2.36, 2.40, 2.33, 2.37, 2.30, 2.35, 2.28,
-      2.31, 2.24, 2.29, 2.21, 2.26, 2.18, 2.23, 2.15, 2.20, 2.12,
-      2.16, 2.08, 2.13, 2.05, 2.10, 2.02, 2.06, 1.98,
-    ];
-    const sampleDvg = () => sampleDates(28).map((d, i) => ({
-      as_of_date: d,
-      posted_median_usd: i < 10 ? '2.99' : i < 19 ? '2.79' : '2.49',
-      executable_median_usd: String(SAMPLE_DVG_EXEC[i]),
-      n_posted_sources: '29',
-      n_executable_venues: '4',
-    }));
-    // ════════════════════ end PLACEHOLDER block ═════════════════════════
-
-    // ── shared chart plumbing (sections 01/02 — carried from live page) ──
+    // Draw dashed verticals where the voting venue panel changed (chart.$markers
+    // holds the x-indices), so a composition shift reads as an added-venue event,
+    // not a demand move.
     const markerPlugin = {
       id: 'changeMarkers',
       afterDraw(chart) {
@@ -450,6 +200,7 @@ const DEFAULT_CHIP = 'h100-sxm';
       },
     };
 
+    // lazy-load + cache a per-chip trend CSV
     async function avTrend(chip) {
       if (state.trend[chip] === undefined) state.trend[chip] = await loadCsv(`/data/availability_index_trend_${chip}.csv`);
       return state.trend[chip] || [];
@@ -457,10 +208,6 @@ const DEFAULT_CHIP = 'h100-sxm';
     async function vuTrend(vast) {
       if (state.vtrend[vast] === undefined) state.vtrend[vast] = await loadCsv(`/data/vast_utilization_trend_${vast}.csv`);
       return state.vtrend[vast] || [];
-    }
-    async function futureCsv(cache, chip, path) {
-      if (cache[chip] === undefined) cache[chip] = await loadCsv(path);
-      return cache[chip];
     }
     const mapByDate = (rows, key) => { const m = {}; (rows || []).forEach((r) => (m[r.as_of_date] = num(r[key]))); return m; };
     const unionDates = (lists) => [...new Set(lists.flat().map((r) => r.as_of_date))].sort();
@@ -492,11 +239,6 @@ const DEFAULT_CHIP = 'h100-sxm';
       if (h) { badge.textContent = h.confidence === 'thin' ? 'thin panel' : 'market read';
                badge.className = 'confbadge ' + (h.confidence === 'thin' ? 'thin' : 'ok'); }
       else badge.textContent = '';
-      // THREE-STATE PLACEHOLDER: when the headline CSV carries
-      // n_advertised_unfulfillable (v2 contract, DESIGN.md), populate and
-      // unhide the reserved stat cell + legend:
-      //   $('s-adv').textContent = `${h.n_advertised_unfulfillable} / ${h.n_sources}`;
-      //   $('s-adv-cell').hidden = false; $('state-legend').hidden = false;
     }
 
     function renderPanel(chip) {
@@ -519,13 +261,14 @@ const DEFAULT_CHIP = 'h100-sxm';
     function renderTrend(selected, dates, trends) {
       const empty = $('trend-empty');
       const ctx = $('trendChart').getContext('2d');
-      if (!dates.length) { empty.hidden = false; $('avail-window').textContent = ''; if (trendChart) { trendChart.destroy(); trendChart = null; } return; }
+      if (!dates.length) { empty.hidden = false; if (trendChart) { trendChart.destroy(); trendChart = null; } return; }
       empty.hidden = true;
-      $('avail-window').textContent = `${fmtDate(dates[0])} → ${fmtDate(dates[dates.length - 1])} · rolling 7-day window · daily marks`;
       const labels = dates.map(fmtDate);
       const ink = css('--ink-dim', '#9a9991');
       const grid = css('--rule', '#2a2a2a') + '44';
       const series = (rows, key) => { const m = mapByDate(rows, key); return dates.map((d) => (m[d] == null ? null : m[d] * 100)); };
+      // change markers: x-indices where the venue panel set shifts (single-chip
+      // only — on a multi-chip axis each chip's panel changes would collide).
       let markers = [];
       if (selected.length === 1) {
         const sig = {}; (trends[selected[0].slug] || []).forEach((r) => (sig[r.as_of_date] = r.panel_signature));
@@ -560,6 +303,8 @@ const DEFAULT_CHIP = 'h100-sxm';
       const single = selected.length === 1;
       const nowEl = $('util-now');
       const latestFor = (ch) => { const u = (state.util || []).find((r) => r.chip_slug === ch.vast); return u ? num(u.utilization) : null; };
+      // Single chip: one big number. Multi: a color-keyed per-chip list so the
+      // headline matches every line on the chart instead of just selected[0].
       if (single) {
         nowEl.innerHTML =
           `<span class="util-big">${pct(latestFor(selected[0]))}</span>` +
@@ -573,9 +318,8 @@ const DEFAULT_CHIP = 'h100-sxm';
       const empty = $('util-empty');
       const ctx = $('utilChart').getContext('2d');
       const anyData = selected.some((ch) => (vtrends[ch.vast] || []).length);
-      if (!anyData || !dates.length) { empty.hidden = false; $('util-window').textContent = ''; if (utilChart) { utilChart.destroy(); utilChart = null; } return; }
+      if (!anyData || !dates.length) { empty.hidden = false; if (utilChart) { utilChart.destroy(); utilChart = null; } return; }
       empty.hidden = true;
-      $('util-window').textContent = `${fmtDate(dates[0])} → ${fmtDate(dates[dates.length - 1])} · trailing 7-day window · daily marks`;
       const labels = dates.map(fmtDate);
       const ink = css('--ink-dim', '#9a9991');
       const datasets = selected.map((ch) => {
@@ -591,278 +335,23 @@ const DEFAULT_CHIP = 'h100-sxm';
       } catch (err) { empty.hidden = false; empty.textContent = 'CHART ERR: ' + (err && err.message ? err.message : String(err)); }
     }
 
-    // ── Section 03 · demand gauge ────────────────────────────────────────
-    function renderGauge(rows, sample) {
-      $('gauge-sample').hidden = !sample;
-      const empty = $('gauge-empty');
-      const ctx = $('gaugeChart').getContext('2d');
-      if (!rows || !rows.length) {
-        empty.hidden = false; $('gauge-window').textContent = '';
-        if (gaugeChart) { gaugeChart.destroy(); gaugeChart = null; }
-        return;
-      }
-      empty.hidden = true;
-      setWindow('gauge-window', rows);
-      const ink = css('--ink-dim', '#9a9991');
-      const grid = css('--rule', '#2a2a2a') + '44';
-      const c = seriesPosted();
-      const labels = rows.map((r) => fmtDate(r.as_of_date));
-      const data = rows.map((r) => { const v = num(r.spot_pct_of_od); return v == null ? null : v * 100; });
-      const cfg = {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            // parity guide — spot ask equal to posted OD
-            { label: 'parity with posted OD', data: rows.map(() => 100),
-              borderColor: css('--ink-faint', '#8e8a82') + '99', borderWidth: 1, borderDash: [4, 4],
-              pointRadius: 0, pointHoverRadius: 0, fill: false, ccirSkipLastValue: true },
-            { label: 'spot as % of posted OD', data,
-              borderColor: c, backgroundColor: gradient(ctx, c), borderWidth: 2.5,
-              fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 5 },
-          ],
-        },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          layout: { padding: { right: LAST_VALUE_GUTTER } },
-          scales: {
-            y: { min: 0, max: 110, ticks: { color: ink, callback: (v) => v + '%', font: { family: 'IBM Plex Mono' } }, grid: { color: grid } },
-            x: catAxis(ink),
-          },
-          plugins: {
-            legend: { display: false }, // single data series — the title names it
-            ccirLastValueLabel: { format: (v) => v.toFixed(0) + '%', datasetLabels: false },
-            tooltip: { filter: (c2) => c2.datasetIndex === 1, callbacks: {
-              label: (c2) => {
-                const r = rows[c2.dataIndex];
-                return `spot at ${c2.parsed.y.toFixed(0)}% of posted OD · ${r.n_regions ?? '—'} regions`;
-              },
-            } },
-          },
-        },
-        plugins: [lastValueLabelPlugin],
-      };
-      try {
-        if (gaugeChart) { gaugeChart.data = cfg.data; gaugeChart.update(); }
-        else gaugeChart = new Chart(ctx, cfg);
-      } catch (err) { empty.hidden = false; empty.textContent = 'CHART ERR: ' + (err && err.message ? err.message : String(err)); }
-    }
-
-    // ── Section 04 · executable market depth ────────────────────────────
-    function renderDepth(rows, sample) {
-      $('depth-sample').hidden = !sample;
-      const empty = $('depth-empty');
-      const pctx = $('depthPriceChart').getContext('2d');
-      const cctx = $('depthCountChart').getContext('2d');
-      if (!rows || !rows.length) {
-        empty.hidden = false; $('depth-window').textContent = '';
-        if (depthPriceChart) { depthPriceChart.destroy(); depthPriceChart = null; }
-        if (depthCountChart) { depthCountChart.destroy(); depthCountChart = null; }
-        return;
-      }
-      empty.hidden = true;
-      setWindow('depth-window', rows);
-      const ink = css('--ink-dim', '#9a9991');
-      const grid = css('--rule', '#2a2a2a') + '44';
-      const c = seriesExec();
-      const labels = rows.map((r) => fmtDate(r.as_of_date));
-      const arr = (k) => rows.map((r) => num(r[k]));
-      const shared = {
-        responsive: true, maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        layout: { padding: { right: LAST_VALUE_GUTTER } },
-      };
-      const priceCfg = {
-        type: 'line',
-        data: { labels, datasets: [
-          { label: 'max posted ask', data: arr('price_max'), borderColor: c + '55', borderWidth: 1,
-            pointRadius: 0, pointHoverRadius: 0, fill: '+1', backgroundColor: c + '22', ccirSkipLastValue: true },
-          { label: 'min posted ask', data: arr('price_min'), borderColor: c + '55', borderWidth: 1,
-            pointRadius: 0, pointHoverRadius: 0, fill: false, ccirSkipLastValue: true },
-          { label: 'median posted ask', data: arr('price_median'), borderColor: c, borderWidth: 2.5,
-            pointRadius: 0, pointHoverRadius: 5, fill: false, tension: 0.25 },
-        ] },
-        options: {
-          ...shared,
-          scales: {
-            y: { ticks: { color: ink, callback: (v) => '$' + Number(v).toFixed(2), font: { family: 'IBM Plex Mono' } }, grid: { color: grid } },
-            x: catAxis(ink),
-          },
-          plugins: {
-            legend: { display: false }, // HTML legend above the panel
-            ccirLastValueLabel: { format: (v) => '$' + v.toFixed(2), datasetLabels: false },
-            tooltip: { callbacks: {
-              label: (c2) => {
-                const r = rows[c2.dataIndex];
-                return `${c2.dataset.label}: $${c2.parsed.y.toFixed(2)} · ${r.n_offers} offers / ${r.n_venues} venues`;
-              },
-            } },
-          },
-        },
-        plugins: [lastValueLabelPlugin],
-      };
-      const countCfg = {
-        type: 'line',
-        data: { labels, datasets: [
-          { label: 'launchable offers', data: arr('n_offers'), borderColor: c, backgroundColor: gradient(cctx, c),
-            borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, fill: true, tension: 0.25 },
-        ] },
-        options: {
-          ...shared,
-          scales: {
-            y: { beginAtZero: true, ticks: { color: ink, precision: 0, font: { family: 'IBM Plex Mono' } }, grid: { color: grid } },
-            x: catAxis(ink),
-          },
-          plugins: {
-            legend: { display: false },
-            ccirLastValueLabel: { format: (v) => v.toFixed(0), datasetLabels: false },
-            tooltip: { callbacks: {
-              label: (c2) => `${c2.parsed.y.toFixed(0)} launchable offers · ${rows[c2.dataIndex].n_venues} venues`,
-            } },
-          },
-        },
-        plugins: [lastValueLabelPlugin],
-      };
-      try {
-        if (depthPriceChart) { depthPriceChart.data = priceCfg.data; depthPriceChart.update(); }
-        else depthPriceChart = new Chart(pctx, priceCfg);
-        if (depthCountChart) { depthCountChart.data = countCfg.data; depthCountChart.update(); }
-        else depthCountChart = new Chart(cctx, countCfg);
-      } catch (err) { empty.hidden = false; empty.textContent = 'CHART ERR: ' + (err && err.message ? err.message : String(err)); }
-    }
-
-    // ── Section 05 · posted vs executable — house-style inline SVG ──────
-    // Client-built because the data is a runtime CSV; follows the
-    // TermCurveChart conventions (theme-token classes, direct end labels,
-    // hover <title> depth disclosure). All .dvg-* styles are :global in the
-    // page <style> — the SVG is injected via innerHTML, so Astro's scoped
-    // attribute never lands on these nodes (house gotcha).
-    function niceStep(raw) {
-      const p = Math.pow(10, Math.floor(Math.log10(raw)));
-      const m = raw / p;
-      return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p;
-    }
-    function renderDivergence(rows, sample) {
-      $('dvg-sample').hidden = !sample;
-      const wrap = $('dvg-chart');
-      const empty = $('dvg-empty');
-      if (!rows || !rows.length) { wrap.innerHTML = ''; empty.hidden = false; $('dvg-window').textContent = ''; return; }
-      empty.hidden = true;
-      setWindow('dvg-window', rows);
-
-      const posted = rows.map((r) => num(r.posted_median_usd));
-      const exec = rows.map((r) => num(r.executable_median_usd));
-      const N = rows.length;
-      const W = 920, H = 330;
-      const M = { top: 16, right: 170, bottom: 30, left: 46 };
-      const x0 = M.left, x1 = W - M.right, yT = M.top, yB = H - M.bottom;
-      const all = posted.concat(exec).filter((v) => v != null);
-      let lo = Math.min(...all), hi = Math.max(...all);
-      const padY = (hi - lo) * 0.18 || 0.5;
-      lo = Math.max(0, lo - padY); hi += padY;
-      const X = (i) => x0 + (x1 - x0) * (N === 1 ? 0.5 : i / (N - 1));
-      const Y = (v) => yB - (yB - yT) * ((v - lo) / (hi - lo));
-      const f1 = (n) => n.toFixed(1);
-
-      // y grid — nice ticks
-      const step = niceStep((hi - lo) / 4);
-      const ticks = [];
-      for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) ticks.push(v);
-      let g = '';
-      ticks.forEach((v) => {
-        g += `<line class="dvg-grid" x1="${x0}" x2="${x1}" y1="${f1(Y(v))}" y2="${f1(Y(v))}"/>`;
-        g += `<text class="dvg-tick dvg-ytick" x="${x0 - 8}" y="${f1(Y(v) + 3.5)}">$${v.toFixed(2)}</text>`;
-      });
-      // x ticks — ~5 evenly spaced dates
-      const nx = Math.min(5, N);
-      for (let k = 0; k < nx; k++) {
-        const i = Math.round((N - 1) * (nx === 1 ? 0 : k / (nx - 1)));
-        g += `<text class="dvg-tick dvg-xtick" x="${f1(X(i))}" y="${yB + 16}">${fmtDate(rows[i].as_of_date)}</text>`;
-      }
-
-      // gap region: posted step-after forward, executable reversed
-      let gap = `M${f1(X(0))},${f1(Y(posted[0]))}`;
-      for (let i = 1; i < N; i++) gap += ` H${f1(X(i))} V${f1(Y(posted[i]))}`;
-      for (let i = N - 1; i >= 0; i--) gap += ` L${f1(X(i))},${f1(Y(exec[i]))}`;
-      gap += ' Z';
-
-      // posted — step-after (rate cards reprice discretely)
-      let pPath = `M${f1(X(0))},${f1(Y(posted[0]))}`;
-      for (let i = 1; i < N; i++) pPath += ` H${f1(X(i))} V${f1(Y(posted[i]))}`;
-      // executable — daily polyline
-      const ePath = exec.map((v, i) => `${i ? 'L' : 'M'}${f1(X(i))},${f1(Y(v))}`).join(' ');
-
-      // per-day hover bands with full depth disclosure
-      let hits = '';
-      const colW = (x1 - x0) / Math.max(1, N - 1);
-      rows.forEach((r, i) => {
-        const gapPct = posted[i] ? ((exec[i] - posted[i]) / posted[i]) * 100 : null;
-        const t = `${r.as_of_date} · posted $${posted[i]?.toFixed(2)} (${r.n_posted_sources ?? '—'} sources) · ` +
-                  `executable $${exec[i]?.toFixed(2)} (${r.n_executable_venues ?? '—'} venues)` +
-                  (gapPct == null ? '' : ` · gap ${gapPct > 0 ? '+' : '−'}${Math.abs(gapPct).toFixed(0)}%`);
-        const xa = i === 0 ? x0 : X(i) - colW / 2;
-        const wdt = i === 0 || i === N - 1 ? colW / 2 : colW;
-        hits += `<rect class="dvg-hit" x="${f1(xa)}" y="${yT}" width="${f1(wdt)}" height="${f1(yB - yT)}"><title>${t}</title></rect>`;
-      });
-
-      // direct end labels — colored swatch + ink text; collision-pushed
-      const last = N - 1;
-      const gapPctEnd = posted[last] ? ((exec[last] - posted[last]) / posted[last]) * 100 : null;
-      const items = [
-        { key: 'posted', yRaw: Y(posted[last]), txt: `Posted ${posted[last].toFixed(2)}`, extra: '' },
-        { key: 'exec', yRaw: Y(exec[last]), txt: `Executable ${exec[last].toFixed(2)}`,
-          extra: gapPctEnd == null ? '' : `${gapPctEnd > 0 ? '+' : '−'}${Math.abs(gapPctEnd).toFixed(0)}% vs posted` },
-      ].sort((a, b) => a.yRaw - b.yRaw).map((it) => ({ ...it, y: it.yRaw }));
-      if (items[1].y - items[0].y < 16) items[1].y = items[0].y + 16;
-      let lbls = '';
-      items.forEach((it) => {
-        if (Math.abs(it.y - it.yRaw) > 2) lbls += `<line class="dvg-leader" x1="${x1 + 5}" y1="${f1(it.yRaw)}" x2="${x1 + 8}" y2="${f1(it.y)}"/>`;
-        lbls += `<rect class="dvg-sw dvg-sw-${it.key}" x="${x1 + 10}" y="${f1(it.y - 4)}" width="8" height="3" rx="1.5"/>`;
-        lbls += `<text class="dvg-lbl" x="${x1 + 22}" y="${f1(it.y + 1)}">${it.txt}` +
-                (it.extra ? `<tspan class="dvg-lbl-dim" dx="5">${it.extra}</tspan>` : '') + `</text>`;
-      });
-
-      const aria = `Posted versus executable, ${rows[0].as_of_date} to ${rows[last].as_of_date}: ` +
-        `the posted-rate reference (stepped line) against the executable component (daily line), USD per GPU-hour, with the gap shaded. ` +
-        `Latest: posted $${posted[last].toFixed(2)}, executable $${exec[last].toFixed(2)}` +
-        (gapPctEnd == null ? '.' : `, a ${Math.abs(gapPctEnd).toFixed(0)} percent posted-price spread.`);
-
-      wrap.innerHTML =
-        `<svg class="dvg-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${aria}">` +
-        g +
-        `<path class="dvg-gap" d="${gap}"/>` +
-        `<path class="dvg-posted" d="${pPath}"/>` +
-        `<path class="dvg-exec" d="${ePath}"/>` +
-        lbls + hits +
-        `</svg>`;
-    }
-
-    // ── future-feed refresh (sections 03–05 follow the primary chip) ─────
-    async function refreshFuture(chip) {
-      const [g, d, v] = await Promise.all([
-        futureCsv(state.gauge, chip, `/data/spot_gauge_${chip}.csv`),
-        futureCsv(state.depth, chip, `/data/executable_depth_${chip}.csv`),
-        futureCsv(state.dvg, chip, `/data/posted_executable_${chip}.csv`),
-      ]);
-      const pick = (rows, sampler) =>
-        (rows && rows.length) ? { rows, sample: false }
-        : SHOW_SAMPLE_WHEN_MISSING ? { rows: sampler(), sample: true }
-        : { rows: null, sample: false };
-      const G = pick(g, sampleGauge); renderGauge(G.rows, G.sample);
-      const D = pick(d, sampleDepth); renderDepth(D.rows, D.sample);
-      const V = pick(v, sampleDvg); renderDivergence(V.rows, V.sample);
-    }
-
     async function renderAll(selected) {
       const primary = selected[0];
       renderBand(primary.slug);
       renderPanel(primary.slug);
       const trends = {}, vtrends = {};
       await Promise.all(selected.map(async (ch) => {
+        // Availability: only plot days the panel is a market read (confidence=ok,
+        // ≥3 sources) from the full-panel start. The early cold-start days are
+        // single-source and whipsaw — the data flags them thin; we suppress them.
         trends[ch.slug] = (await avTrend(ch.slug)).filter((r) => r.confidence === 'ok' && r.as_of_date >= AVAIL_START);
+        // Utilization: independent, longer history back to the first full window.
         vtrends[ch.vast] = (await vuTrend(ch.vast)).filter((r) => r.as_of_date >= UTIL_START);
       }));
+      // Each chart trims its own left edge to the first day where every displayed
+      // series has data, so there's no partial leading region. The two axes are
+      // independent — availability is the short full-panel window, utilization the
+      // longer Vast record — so they no longer share a start.
       const trimStart = (dates, maps) => {
         const firsts = maps.map((m) => dates.find((d) => m[d] != null)).filter(Boolean);
         if (!firsts.length) return dates;
@@ -879,7 +368,6 @@ const DEFAULT_CHIP = 'h100-sxm';
       const uDates = trimStart(unionDates(Object.values(vtrends)), uMaps);
       renderTrend(selected, aDates, trends);
       renderUtil(selected, uDates, vtrends);
-      await refreshFuture(primary.slug);
     }
 
     function init() {
@@ -914,23 +402,11 @@ const DEFAULT_CHIP = 'h100-sxm';
   </script>
 
   <style>
-    .sd-page {
-      max-width: 1040px;
-      /* chart-local series tokens — one set per theme, validated pair (see
-         frontmatter comment). Terminal values double as the default. */
-      --series-posted: #cc7d00;
-      --series-exec: #00829e;
-    }
-    :global(html[data-theme='editorial']) .sd-page {
-      --series-posted: #a3660f;
-      --series-exec: #0d96b6;
-    }
-
+    .ai-page { max-width: 1040px; }
     .kicker { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .18em; color: var(--accent); margin-bottom: .4rem; }
     /* MI family tag — same treatment as the landing product card; no
        "not a citable reference rate" disclaimer here (page publishes no
-       rate — measured utilization + availability breadth + posted-price
-       spread instruments only). */
+       rate — measured utilization + availability breadth only). */
     .mi-tag {
       font-family: var(--font-mono);
       font-size: 9px;
@@ -943,8 +419,8 @@ const DEFAULT_CHIP = 'h100-sxm';
       white-space: nowrap;
       vertical-align: middle;
     }
-    .sd-page h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; margin: 0 0 .6rem; }
-    .deck { max-width: 72ch; color: var(--ink-dim); line-height: 1.6; margin: 0 0 1.8rem; }
+    .ai-page h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; margin: 0 0 .6rem; }
+    .deck { max-width: 64ch; color: var(--ink-dim); line-height: 1.6; margin: 0 0 1.8rem; }
     .deck strong { color: var(--ink); font-weight: 600; }
 
     .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
@@ -953,13 +429,7 @@ const DEFAULT_CHIP = 'h100-sxm';
     .chip[aria-selected='true'] { background: var(--accent); color: #0b0c0e; border-color: var(--accent); font-weight: 600; }
     .chip-hint { font-family: var(--font-mono); font-size: .68rem; color: var(--ink-faint); align-self: center; margin-left: .3rem; }
 
-    .panel-sub { font-size: .82rem; color: var(--ink-dim); margin: .35rem 0 0; max-width: 84ch; }
-    .panel-sub strong { color: var(--ink); }
-
-    .band { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 1.2rem; }
-    /* THREE-STATE PLACEHOLDER: when #s-adv-cell unhides, the band grid grows
-       to four columns — flip the template below at the same time. */
-    /* .band { grid-template-columns: repeat(4, 1fr); } */
+    .band { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 1.6rem; }
     .stat { background: var(--bg); padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: .25rem; }
     .stat-lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-faint); }
     .stat-val { font-family: var(--font-mono); font-size: 2rem; font-weight: 600; line-height: 1; color: var(--ink); }
@@ -968,103 +438,58 @@ const DEFAULT_CHIP = 'h100-sxm';
     .stat-clu { background: color-mix(in srgb, var(--accent) 6%, var(--bg)); }
     .stat-sub { font-size: .68rem; color: var(--ink-faint); }
 
-    .card-head { display: flex; justify-content: flex-end; margin-bottom: .5rem; }
+    .card { border: 1px solid var(--rule); border-radius: 12px; padding: 1.4rem; margin-bottom: 1.6rem; background: color-mix(in srgb, var(--ink) 2%, transparent); }
+    .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+    .card h2 { font-family: var(--font-display); font-size: 1.3rem; margin: 0 0 .2rem; }
+    .card-sub { font-size: .82rem; color: var(--ink-dim); margin: 0; }
+    .tag { font-family: var(--font-mono); font-size: .6rem; text-transform: uppercase; letter-spacing: .1em; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); padding: .15rem .5rem; border-radius: 4px; vertical-align: middle; margin-left: .4rem; }
+    .lg { font-family: var(--font-mono); font-size: .78rem; padding-left: 1.1rem; position: relative; }
+    .lg::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: .7rem; height: .2rem; border-radius: 2px; }
+    .lg-clu::before { background: var(--accent); width: .9rem; height: .26rem; }
+    .lg-frac::before { background: var(--ink-faint); }
+    .lg-fix::before { background: var(--accent); width: .9rem; height: .26rem; }
+    .lg-naive::before { background: var(--ink-faint); }
 
     .chart-wrap { position: relative; height: 300px; }
     .util-wrap { height: 240px; }
-    .gauge-wrap { height: 260px; }
-    .depth-wrap { height: 240px; }
-    .depth-count-wrap { height: 140px; }
-    .depth-count-lbl { font-family: var(--font-mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-faint); margin: .8rem 0 .2rem; }
     .empty { text-align: center; color: var(--ink-faint); font-size: .85rem; padding: 2rem 0; }
 
     .confbadge { font-family: var(--font-mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; padding: .25rem .6rem; border-radius: 999px; white-space: nowrap; }
     .confbadge.ok { background: color-mix(in srgb, #4cc4b0 18%, transparent); color: #4cc4b0; }
     .confbadge.thin { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
 
-    /* THREE-STATE PLACEHOLDER legend — hidden until the v2 feed lands.
-       Status-palette job: each state carries a swatch + label, never
-       color-alone. */
-    .state-legend { display: flex; gap: 1rem; flex-wrap: wrap; margin: .6rem 0 0; }
-    .state-chip { font-family: var(--font-mono); font-size: .68rem; color: var(--ink-dim); display: inline-flex; align-items: center; gap: .35rem; }
-    .state-chip i { width: .7rem; height: .7rem; border-radius: 2px; display: inline-block; }
-    .st-in i { background: var(--pos); }
-    .st-adv i { background: var(--accent); }
-    .st-not i { background: transparent; border: 1px solid var(--ink-faint); }
-
-    /* collapsed source panel inside section 02 */
-    .panel-details { border-top: 1px solid var(--rule); margin-top: 1rem; }
-    .panel-details > summary { list-style: none; cursor: pointer; padding: .9rem 0; display: grid; grid-template-columns: 1fr auto; grid-template-areas: 'main chev' 'sub chev'; align-items: center; gap: .15rem .8rem; }
-    .panel-details > summary::-webkit-details-marker { display: none; }
-    .sum-main { grid-area: main; font-family: var(--font-display); font-size: 1.05rem; display: flex; align-items: baseline; gap: .6rem; }
+    .panel-card { padding: 0; }
+    .panel-card > summary { list-style: none; cursor: pointer; padding: 1.2rem 1.4rem; display: grid; grid-template-columns: 1fr auto; grid-template-areas: 'main chev' 'sub chev'; align-items: center; gap: .15rem .8rem; }
+    .panel-card > summary::-webkit-details-marker { display: none; }
+    .sum-main { grid-area: main; display: flex; align-items: baseline; gap: .6rem; }
+    .sum-main h2 { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
     .sum-count { font-family: var(--font-mono); font-size: .78rem; color: var(--accent); }
-    .sum-sub { grid-area: sub; font-size: .78rem; color: var(--ink-dim); }
+    .sum-sub { grid-area: sub; font-size: .82rem; color: var(--ink-dim); }
     .sum-chev { grid-area: chev; color: var(--ink-faint); font-size: 1rem; transition: transform .2s; }
-    .panel-details[open] .sum-chev { transform: rotate(180deg); }
-    .panel { display: flex; flex-direction: column; gap: .35rem; padding: .4rem 0 .8rem; }
+    .panel-card[open] .sum-chev { transform: rotate(180deg); }
+    .panel-card[open] > summary { border-bottom: 1px solid var(--rule); }
+    .panel { display: flex; flex-direction: column; gap: .35rem; padding: 1.2rem 1.4rem; }
     .row { display: grid; grid-template-columns: 9rem 1fr 2.6rem auto; align-items: center; gap: .7rem; font-family: var(--font-mono); font-size: .78rem; }
     .row-name { color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .row-bar { height: .55rem; background: color-mix(in srgb, var(--ink) 8%, transparent); border-radius: 3px; overflow: hidden; }
     .row-fill { display: block; height: 100%; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 55%, transparent), var(--accent)); border-radius: 3px; }
     .row-pct { text-align: right; color: var(--ink); }
     .bar-8x { font-size: .64rem; color: var(--ink-faint); }
-    .foot { font-size: .72rem; color: var(--ink-faint); line-height: 1.5; margin: .4rem 0 0; }
+    .foot { font-size: .72rem; color: var(--ink-faint); line-height: 1.5; margin: 1rem 0 0; }
+    .panel-card .foot { padding: 0 1.4rem 1.3rem; margin-top: .2rem; }
 
     .util-grid { display: grid; grid-template-columns: 200px 1fr; gap: 1.5rem; align-items: center; }
     .util-now { display: flex; flex-direction: column; gap: .2rem; }
-    /* Built via innerHTML in renderUtil — scoped styles never land on these
-       nodes, so the rules must be :global (house gotcha). */
+    /* These elements are built via innerHTML in renderUtil, so Astro's scoped
+       style attribute is never applied to them — the rules must be :global or
+       they silently no-op (only inline styles like color survive). */
     :global(.util-big) { font-family: var(--font-mono); font-size: 3rem; font-weight: 600; line-height: 1; color: var(--accent); }
     :global(.util-now-lbl) { font-size: .72rem; color: var(--ink-dim); }
+    .util-naive { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-faint); margin-top: .3rem; }
     :global(.util-list) { display: flex; flex-direction: column; gap: .55rem; margin-bottom: .5rem; }
     :global(.util-row) { display: flex; align-items: baseline; gap: .6rem; font-family: var(--font-mono); }
     :global(.util-row-chip) { font-size: .82rem; font-weight: 600; min-width: 3.2rem; }
     :global(.util-row-val) { font-size: 1.6rem; font-weight: 600; color: var(--ink); line-height: 1; }
-
-    /* HTML legends for sections 04/05 — swatch carries identity, text wears
-       ink tokens */
-    .depth-legend, .dvg-legend { display: flex; gap: 1rem; flex-wrap: wrap; margin: .2rem 0 .6rem; }
-    .lg-swatch { font-family: var(--font-mono); font-size: .68rem; color: var(--ink-dim); display: inline-flex; align-items: center; gap: .4rem; }
-    .lg-swatch i { display: inline-block; border-radius: 2px; }
-    .lg-band i { width: .85rem; height: .55rem; background: color-mix(in srgb, var(--series-exec) 22%, transparent); border: 1px solid color-mix(in srgb, var(--series-exec) 45%, transparent); }
-    .lg-med i { width: .85rem; height: 3px; background: var(--series-exec); }
-    .lg-posted i { width: .85rem; height: 3px; background: var(--series-posted); }
-    .lg-exec i { width: .85rem; height: 3px; background: var(--series-exec); }
-    .lg-gap i { width: .85rem; height: .55rem; background: color-mix(in srgb, var(--series-posted) 12%, transparent); border: 1px dashed color-mix(in srgb, var(--series-posted) 40%, transparent); }
-
-    /* ── divergence SVG (injected via innerHTML → :global required) ────── */
-    .dvg-scroll { overflow-x: auto; }
-    :global(.dvg-svg) { display: block; width: 100%; min-width: 680px; height: auto; }
-    :global(.dvg-grid) { stroke: var(--rule); stroke-width: 1; }
-    :global(.dvg-tick) { font-family: var(--font-mono); font-size: 10.5px; fill: var(--ink-faint); font-variant-numeric: tabular-nums; }
-    :global(.dvg-ytick) { text-anchor: end; }
-    :global(.dvg-xtick) { text-anchor: middle; }
-    :global(.dvg-gap) { fill: var(--series-posted); opacity: .1; stroke: none; }
-    :global(.dvg-posted) { stroke: var(--series-posted); fill: none; stroke-width: 2; }
-    :global(.dvg-exec) { stroke: var(--series-exec); fill: none; stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
-    :global(.dvg-hit) { fill: transparent; cursor: help; }
-    :global(.dvg-leader) { stroke: var(--ink-faint); stroke-width: 1; }
-    :global(.dvg-sw) { stroke: none; }
-    :global(.dvg-sw-posted) { fill: var(--series-posted); }
-    :global(.dvg-sw-exec) { fill: var(--series-exec); }
-    :global(.dvg-lbl) { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); font-variant-numeric: tabular-nums; }
-    :global(.dvg-lbl-dim) { fill: var(--ink-faint); font-size: 10px; }
-
-    .composite-note {
-      margin: 0 0 1.6rem;
-      padding: 12px 16px;
-      border: 1px solid var(--rule);
-      border-left: 2px solid var(--accent);
-      background: var(--surface);
-      font-size: .82rem;
-      color: var(--ink-dim);
-      line-height: 1.6;
-      max-width: 84ch;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .composite-note .kicker { margin-bottom: 0; }
 
     .method-details { border-top: 1px solid var(--rule); padding-top: 1rem; }
     .method-details > summary { list-style: none; cursor: pointer; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
@@ -1072,7 +497,7 @@ const DEFAULT_CHIP = 'h100-sxm';
     .method-details > summary::before { content: '▸ '; }
     .method-details[open] > summary::before { content: '▾ '; }
     .method { font-size: .76rem; color: var(--ink-faint); line-height: 1.65; max-width: 70ch; margin: .8rem 0 0; }
-    .method strong { color: var(--ink-dim); font-weight: 600; }
+    .method em { color: var(--ink-dim); font-style: italic; }
 
     @media (max-width: 720px) {
       .band { grid-template-columns: repeat(2, 1fr); }
