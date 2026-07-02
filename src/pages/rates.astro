@@ -41,6 +41,14 @@ function chipDisplay(token: string): string {
   return token.replace(/-/g, ' ');
 }
 
+// Show the P legend only when some rendered cell actually carries the marker
+// (any geo view of the ladder, or the emerging strip below).
+const ladderHasProvisional = (['ALL', 'US', 'EU'] as GeoToken[]).some((g) =>
+  ladders[g].some(({ cells }) =>
+    TIERS.some((t) => cells[t]?.promotion_status === 'Provisional'),
+  ),
+);
+
 function cellTitle(c: Rate): string {
   const prov = c.promotion_status === 'Provisional'
     ? ' · Provisional (2 sources — below the full 3-source gate, auto-promotes at 3)'
@@ -136,7 +144,10 @@ function emergingDisplay(model: string): string {
     </div>
     <p class="table-foot">
       USD per GPU-hour · operator-equal median of posted list rates ·
-      hover a rate for panel depth and distribution.
+      hover a rate for panel depth and distribution.{ladderHasProvisional && (
+        <> <sup class="prov">P</sup> = Provisional — an emerging cell published
+        at 2 sources, auto-promotes at 3.</>
+      )}
     </p>
 
     <section class="defs-section">
@@ -185,7 +196,10 @@ function emergingDisplay(model: string): string {
         </table>
       </div>
       <p class="table-foot">
-        Watching: GB300 NVL72 (1 source, below the Provisional floor) ·
+        {emergingRows.some((r) => r.promotion_status === 'Provisional') && (
+          <><sup class="prov">P</sup> = Provisional — published at 2 sources,
+          auto-promotes at 3. </>
+        )}Watching: GB300 NVL72 (1 source, below the Provisional floor) ·
         MI325X / MI355X (no public on-demand rate yet). Panels appear here
         once they clear the 2-source floor.
       </p>
