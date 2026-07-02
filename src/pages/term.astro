@@ -1,12 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
 import TermCurveChart from '../components/TermCurveChart.astro';
-import ForwardStepChart from '../components/ForwardStepChart.astro';
 import { meta } from '../data/snapshot';
-// Forwards section reinstated (PR-D): ForwardStepChart now reads the
-// within-provider implied forwards (gold.committed_mi_daily) — both par
-// legs from one operator's ladder — which removes the composition-mismatch
-// artifact that held the band-median bootstrap off the page at launch.
+// Implied-forwards section CUT (John 2026-07-02): with the par curve's OD
+// anchor moving to the pooled NEOCLOUD band OD (apples-to-apples), the
+// derived step chart adds confusion without adding signal for most readers.
+// The within-provider forwards DATA still ships in committed_mi.csv and
+// ForwardStepChart.astro (already rewired to it) stays in src/components —
+// reinstating is one import + one tag.
 ---
 <Base
   title="Committed Term Structure · CCIR"
@@ -38,21 +39,6 @@ import { meta } from '../data/snapshot';
       </header>
 
       <TermCurveChart />
-    </section>
-
-    <section class="curve-section">
-      <header class="sec-head">
-        <div class="kicker">Section 02 · Implied forward rates — derived</div>
-        <h2>What the curve implies about renewal</h2>
-        <p class="sec-lede">
-          The break-even rate for the window between two tenors, computed on
-          each operator's own posted ladder — commit for three months or
-          commit for six: the price the back window has to clear for the
-          longer commitment to break even.
-        </p>
-      </header>
-
-      <ForwardStepChart />
     </section>
 
     <aside class="mi-more">

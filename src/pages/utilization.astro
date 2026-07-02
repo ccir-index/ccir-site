@@ -20,7 +20,7 @@ const DEFAULT_CHIP = 'h100-sxm';
   ogImage="/og-utilization.png"
 >
   <section class="wrap ai-page">
-    <div class="kicker">CCIR · SUPPLY OBSERVATORY</div>
+    <div class="kicker">CCIR · SUPPLY OBSERVATORY <span class="mi-tag">Market&nbsp;Intelligence</span></div>
     <h1>Utilization &amp; Availability</h1>
     <p class="deck">
       Two lenses on GPU supply. <strong>Utilization</strong> — of the capacity the
@@ -404,6 +404,21 @@ const DEFAULT_CHIP = 'h100-sxm';
   <style>
     .ai-page { max-width: 1040px; }
     .kicker { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .18em; color: var(--accent); margin-bottom: .4rem; }
+    /* MI family tag — same treatment as the landing product card; no
+       "not a citable reference rate" disclaimer here (page publishes no
+       rate — measured utilization + availability breadth only). */
+    .mi-tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      padding: 2px 7px;
+      margin-left: 8px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      white-space: nowrap;
+      vertical-align: middle;
+    }
     .ai-page h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; margin: 0 0 .6rem; }
     .deck { max-width: 64ch; color: var(--ink-dim); line-height: 1.6; margin: 0 0 1.8rem; }
     .deck strong { color: var(--ink); font-weight: 600; }
