@@ -293,22 +293,28 @@ const ariaLabel =
 
   <figcaption class="tcv-foot" id="tcv-caption">
     <span class="tcv-note">
-      NEOCLOUD band (pooled T2IF + T3IF grade, assigned per SKU) · global-USD
-      panel (US, EU, India) · operator-equal median of posted committed asks ·
-      1-day marks as of {meta.as_of_date} · market intelligence — not a
-      citable reference rate
+      Posted committed asks across the neocloud panel (US, EU &amp; India) ·
+      as of {meta.as_of_date} · market intelligence — not a citable
+      reference rate
     </span>
-    <span class="tcv-note">
-      {odFallbackUsed
-        ? 'OD = T2IF on-demand headline, US & EU blended'
-        : 'OD = the band’s own on-demand pool (same T2IF+T3IF panel, global-USD) — both sides of the OD→committed step draw one panel'}
-      &nbsp;· end-label % = within-provider signed spread — each operator's
-      committed ask vs its own on-demand rate, operator-equal median (hover
-      the label for pair count) · hollow marks = Provisional (2–4 sources;
-      hover any mark for panel depth) · point-to-point lines, no
-      interpolation · term axis compressed (√months) · B300 joins as its
-      committed panel clears the gate
-    </span>
+    <details class="tcv-details">
+      <summary>Chart notes</summary>
+      <ul class="tcv-notes-list">
+        <li>Band = the pooled neocloud grade (T2IF + T3IF, assigned per SKU),
+        in USD · operator-equal median.</li>
+        <li>{odFallbackUsed
+          ? 'OD = the T2IF on-demand headline, US & EU blended.'
+          : 'OD = the band’s own on-demand pool — the same panel on both sides of the OD→committed step.'}</li>
+        <li>End-label % = within-provider signed spread — each operator's
+        committed ask vs its own on-demand rate, aggregated operator-equal.
+        Hover the label for pair count.</li>
+        <li>Hollow marks = Provisional (2–4 sources). Hover any mark for
+        panel depth.</li>
+        <li>Lines connect posted marks only (no interpolation) · term axis
+        compressed (√months) so the short end reads · 1-day marks ·
+        B300 joins as its committed panel clears the gate.</li>
+      </ul>
+    </details>
   </figcaption>
 </figure>
 
@@ -441,6 +447,31 @@ const ariaLabel =
     border-top: 1px solid var(--rule);
   }
   .tcv-note {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+  }
+
+  .tcv-details { margin-top: 2px; }
+  .tcv-details summary {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: fit-content;
+  }
+  .tcv-notes-list {
+    margin: 6px 0 2px;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .tcv-notes-list li {
     font-family: var(--font-mono);
     font-size: calc(var(--fs-xs) - 1px);
     color: var(--ink-faint);
