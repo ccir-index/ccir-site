@@ -1,0 +1,110 @@
+---
+/*
+  ObsPanel — shared section chrome for the /utilization supply–demand page.
+
+  One panel = one instrument. The chrome enforces three house rules in one
+  place so every section carries them by construction:
+
+    · numbered section head (Section NN · KICKER) — term.astro convention
+    · a time-window label slot on the title row — every trend on the site
+      labels the window it draws (house rule); renderers update it by id
+    · an "Illustrative sample" badge slot — sections designed against
+      pipeline feeds that don't exist yet (see DESIGN.md) show this badge
+      whenever they render placeholder data, so sample output can never be
+      mistaken for a live read
+
+  Caption content is slotted from the page (slot="caption"); the wrapper
+  sets inheritable type properties (mono, small, faint) so slotted text
+  picks up the caption voice without needing :global rules.
+*/
+interface Props {
+  num: string;          // "01" … "05"
+  kicker: string;       // section eyebrow, e.g. "MEASURED"
+  title: string;
+  windowId?: string;    // id of the time-window label span (renderer updates it)
+  window?: string;      // static window text, if known at build time
+  sampleId?: string;    // id of the sample badge (hidden until a renderer shows it)
+}
+const { num, kicker, title, windowId, window: win, sampleId } = Astro.props;
+---
+<section class="obs-panel">
+  <header class="obs-head">
+    <div class="obs-kicker">Section {num} · {kicker}</div>
+    <div class="obs-title-row">
+      <h2>{title}</h2>
+      {sampleId && (
+        <span class="obs-sample" id={sampleId} hidden>Illustrative sample — feed not yet live</span>
+      )}
+      {(windowId || win) && <span class="obs-window" id={windowId}>{win}</span>}
+    </div>
+    <slot name="sub" />
+  </header>
+  <slot />
+  <div class="obs-caption"><slot name="caption" /></div>
+</section>
+
+<style>
+  .obs-panel {
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 1.4rem;
+    margin-bottom: 1.8rem;
+    background: color-mix(in srgb, var(--ink) 2%, transparent);
+  }
+  .obs-head { margin-bottom: 1rem; }
+  .obs-kicker {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.35rem;
+  }
+  .obs-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+  }
+  .obs-title-row h2 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    margin: 0;
+  }
+  .obs-sample {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.2rem 0.55rem;
+    border: 1px dashed var(--accent);
+    color: var(--accent);
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  /* time-window label — right-aligned on wide screens */
+  .obs-window {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  /* caption voice — inheritable properties only, so slotted <p> from the
+     page picks them up without :global */
+  .obs-caption {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-faint);
+    line-height: 1.6;
+    margin-top: 0.85rem;
+    max-width: 84ch;
+  }
+  .obs-caption :global(p) { margin: 0 0 0.35rem; }
+  .obs-caption :global(p:last-child) { margin-bottom: 0; }
+
+  @media (max-width: 720px) {
+    .obs-window { margin-left: 0; width: 100%; }
+  }
+</style>
