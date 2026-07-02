@@ -62,6 +62,15 @@ jobs:
             echo "no vast_basis.csv at $DATE — /basis keeps previous"
             : > .sync/vast_basis.csv
           fi
+          # Within-provider committed MI (spread-to-spot + implied forwards)
+          # powers the /term end-label % and forwards section. Graceful:
+          # snapshots predating gold.committed_mi_daily won't carry it.
+          if curl -fsSL -H "Authorization: token $GH_PAT" -o .sync/committed_mi.csv "$BASE/committed_mi.csv"; then
+            echo "fetched committed_mi.csv"
+          else
+            echo "no committed_mi.csv at $DATE — /term keeps previous"
+            : > .sync/committed_mi.csv
+          fi
           # Prior-day CSV powers the ticker's day-over-day arrows. Graceful
           # skip if the prior date isn't published (e.g. holidays, gaps).
           if curl -fsSL -H "Authorization: token $GH_PAT" -o .sync/rates_daily_prev.csv "$PREV_BASE/rates_daily.csv"; then
@@ -250,6 +259,10 @@ jobs:
           if [ -s .sync/vast_basis.csv ]; then
             cp .sync/vast_basis.csv src/data/vast_basis.csv
           fi
+          # Within-provider committed MI — same leave-previous rule.
+          if [ -s .sync/committed_mi.csv ]; then
+            cp .sync/committed_mi.csv src/data/committed_mi.csv
+          fi
           # listings_history CSVs land in public/data so the /markets page
           # can fetch them client-side at runtime (they're too large to
           # bundle at build time — ~1-2 MB each).
@@ -417,7 +430,7 @@ jobs:
           set -euo pipefail
           git config user.email "ccir-pipeline@ccir.io"
           git config user.name  "CCIR Pipeline"
-          git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/rates_daily_prev.csv src/data/indices_history.csv src/data/meta.json src/data/vast_basis.csv
+          git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/rates_daily_prev.csv src/data/indices_history.csv src/data/meta.json src/data/vast_basis.csv src/data/committed_mi.csv
           # public/data/listings_history_*.csv only exists once the upstream
           # pipeline starts emitting these files; -A on a missing dir is fine.
           if [ -d public/data ]; then

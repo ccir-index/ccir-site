@@ -10,10 +10,17 @@
   (color follows the entity), same √months term axis, validated palette
   (see TermCurveChart.astro header for the six-checks results).
 
-  f(t1→t2) = (m2·r2 − m1·r1) / (m2 − m1) — break-even renewal arithmetic on
-  posted par committed asks; not a traded forward.
+  f(t1→t2) = (m2·r2 − m1·r1) / (m2 − m1) — break-even renewal arithmetic
+  where BOTH par legs come from the same operator's posted ladder (the
+  within-provider series, gold.committed_mi_daily), then aggregated
+  operator-equal across ladders; not a traded forward. Differencing
+  band medians instead would mix provider sets per leg — the composition
+  artifact that held this section off the page at launch (2026-07-02).
+  The 0→1M window is the 1M par itself (single leg, no differencing) and
+  still reads from the band cell.
 */
 import { committedBandCell, meta } from '../data/snapshot';
+import { wpForwards } from '../data/committed_mi';
 import type { Rate, Term } from '../data/types';
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
@@ -78,25 +85,29 @@ interface FwdSeries {
   end: SegView;
 }
 
-const legNote = (c: Rate, t: Term) =>
-  `${t} par $${fmt(c.price_median)} (n=${c.n_sources}, ${c.promotion_status})`;
-
 function windowSeg(chip: string, w: (typeof WINDOWS)[number]): SegView | null {
-  const far = committedBandCell(chip, w.to);
-  if (!far) return null;
   if (w.from === null) {
+    // 0→1M window = the 1M par committed itself — a single leg, so the
+    // band cell is composition-safe here.
+    const far: Rate | undefined = committedBandCell(chip, w.to);
+    if (!far) return null;
     const v = far.price_median;
     return {
       xa: xOf(w.m1), xb: xOf(w.m2), y: yOf(v), value: v,
       title: `${chip} · 0→1M window = 1M par committed $${fmt(v)} · n=${far.n_sources} sources · ${far.promotion_status}`,
     };
   }
-  const near = committedBandCell(chip, w.from);
-  if (!near) return null;
-  const v = (w.m2 * far.price_median - w.m1 * near.price_median) / (w.m2 - w.m1);
+  // Differenced windows read the within-provider series: both legs one
+  // operator's ladder, aggregated operator-equal across ladders.
+  const row = wpForwards(chip).find((f) => f.tenor_from === w.from && f.tenor === w.to);
+  if (!row) return null;
+  const v = row.value;
   return {
     xa: xOf(w.m1), xb: xOf(w.m2), y: yOf(v), value: v,
-    title: `${chip} · ${w.label} implied forward $${fmt(v)} · derived from ${legNote(near, w.from)} and ${legNote(far, w.to)}`,
+    title:
+      `${chip} · ${w.label} implied forward $${fmt(v)} · within-provider ` +
+      `break-even renewal (both par legs one operator's ladder) · ` +
+      `operator-equal median of ${row.n_pairs} ladders`,
   };
 }
 
@@ -139,7 +150,8 @@ const chipNames = series.map((s) => s.chip).join(', ');
 const ariaLabel =
   `Implied forward rates, derived, as of ${meta.as_of_date}: break-even renewal rate in USD per GPU-hour per bootstrap window ` +
   `(0 to 1 month par, then 1M–3M, 3M–6M and 6M–1Y) for ${chipNames}. ` +
-  `Derived from posted par committed asks, not a traded forward market. Hover any step for its value and both par legs; the par inputs are in the committed matrix above.`;
+  `Each differenced window is computed within-provider — both par legs from the same operator's posted ladder — then aggregated operator-equal. ` +
+  `Not a traded forward market. Hover any step for its value and ladder count.`;
 ---
 <figure class="fsc" aria-describedby="fsc-caption">
   <div class="fsc-head">
@@ -217,14 +229,15 @@ const ariaLabel =
 
   <figcaption class="fsc-foot" id="fsc-caption">
     <span class="fsc-note">
-      Derived — break-even renewal arithmetic on posted par committed asks ·
-      not a traded forward market · NEOCLOUD band · global-USD · market
-      intelligence — not a citable reference rate
+      Derived — break-even renewal arithmetic computed within-provider (both
+      par legs from one operator's posted ladder), aggregated operator-equal
+      across ladders · not a traded forward market · NEOCLOUD band ·
+      global-USD · market intelligence — not a citable reference rate
     </span>
     <span class="fsc-note">
       Each step spans its bootstrap window on the √months term axis · hover
-      any step for both par legs and panel depth · forwards inherit the
-      thinness of their par legs
+      any step for its ladder count · 0→1M window = the 1M par committed
+      itself · a window renders only where ≥2 operators post both legs
     </span>
   </figcaption>
 </figure>

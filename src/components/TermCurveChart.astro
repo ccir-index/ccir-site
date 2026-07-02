@@ -21,6 +21,7 @@
   Provisional cells are shape-encoded (hollow marks), never color-only.
 */
 import { committedBandCell, t2ifOdCell, meta } from '../data/snapshot';
+import { wpSpread } from '../data/committed_mi';
 import type { Rate, Term } from '../data/types';
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
@@ -100,17 +101,31 @@ function odPoint(chip: string): Pt | null {
   };
 }
 
-// Signed spread vs the chip's region=ALL (US & EU blended) T2IF OD headline
-// — a signed spread, not a "discount" (committed can price above spot).
-// Explicit + when positive, real minus sign when negative. Null where the
-// chip has no OD reference (the label then omits the %).
-function spreadVsOd(chip: string, median: number): string | null {
-  const od = t2ifOdCell(chip, 'ALL');
-  if (!od?.price_median) return null;
-  const pct = (median / od.price_median - 1) * 100;
+// Signed spread for the end label — the WITHIN-PROVIDER series
+// (committed_mi.csv): each operator's committed ask differenced against its
+// OWN on-demand rate, aggregated operator-equal. Replaces the interim
+// band-median-vs-headline % — that differenced two DIFFERENT provider
+// panels and carried a ~3pp composition gap on H100 1Y (−18% cross-panel
+// vs −21% within-provider, 2026-07-02). A signed spread, not a "discount"
+// (committed can price above spot). Null when the chip has no
+// within-provider row at its end tenor — the label then omits the %.
+const TERM_OF_MONTHS: Record<number, Term> = { 1: '1M', 3: '3M', 6: '6M', 12: '1Y' };
+
+function spreadVsOd(chip: string, months: number): { txt: string; title: string } | null {
+  const term = TERM_OF_MONTHS[months];
+  if (!term) return null;
+  const row = wpSpread(chip, term);
+  if (!row) return null;
+  const pct = row.spread * 100;
   const rounded = Math.round(Math.abs(pct));
-  if (rounded === 0) return '0% vs OD';
-  return `${pct > 0 ? '+' : '−'}${rounded}% vs OD`;
+  const txt = rounded === 0 ? '0% vs OD' : `${pct > 0 ? '+' : '−'}${rounded}% vs OD`;
+  return {
+    txt,
+    title:
+      `${chip} ${term} committed vs own OD: ${pct > 0 ? '+' : '−'}${Math.abs(pct).toFixed(1)}% — ` +
+      `within-provider signed spread (both legs one operator's book), ` +
+      `operator-equal median of ${row.n_pairs} provider pairs`,
+  };
 }
 
 function tenorPoint(chip: string, term: Term, months: number): Pt | null {
@@ -165,7 +180,7 @@ const endLabels = (() => {
     s,
     y,
     leader: Math.abs(y - s.end.y) > 2,
-    spd: spreadVsOd(s.chip, s.end.value),
+    spd: spreadVsOd(s.chip, s.end.months),
   }));
 })();
 
@@ -173,7 +188,7 @@ const chipNames = series.map((s) => s.chip).join(', ');
 const ariaLabel =
   `Committed par curve, as of ${meta.as_of_date}: USD per GPU-hour by tenor for ${chipNames}. ` +
   `Each line runs from the on-demand anchor through committed asks at 1, 3 and 6 months to the 1-year anchor tenor where published. ` +
-  `End labels give each chip's terminal rate and its signed spread versus that chip's US and EU blended T2IF on-demand headline. ` +
+  `End labels give each chip's terminal rate and its within-provider signed spread — that chip's committed asks versus the same operators' own on-demand rates, aggregated operator-equal. ` +
   `Hollow marks are Provisional cells (2–4 sources); hover any mark for panel depth.`;
 ---
 <figure class="tcv" aria-describedby="tcv-caption">
@@ -246,9 +261,10 @@ const ariaLabel =
             <line class="leader" x1={s.end.x + 6} y1={s.end.y} x2={s.end.x + 9} y2={y} />
           )}
           <text class="lbl" x={s.end.x + 11} y={y + 3.5}>
+            {spd && <title>{spd.title}</title>}
             <tspan class="lbl-name">{s.chip}</tspan>
             <tspan class="lbl-val" dx="5">{fmt(s.end.value)}</tspan>
-            {spd && <tspan class="lbl-spd" dx="6">{spd}</tspan>}
+            {spd && <tspan class="lbl-spd" dx="6">{spd.txt}</tspan>}
           </text>
         </>
       ))}
@@ -263,11 +279,12 @@ const ariaLabel =
       citable reference rate
     </span>
     <span class="tcv-note">
-      OD = T2IF on-demand headline, US &amp; EU blended — the fixed reference
-      for the end-label % · hollow marks = Provisional (2–4 sources; hover any
-      mark for panel depth) · point-to-point lines, no interpolation · term
-      axis compressed (√months) · B300 joins as its committed panel clears
-      the gate
+      OD = T2IF on-demand headline, US &amp; EU blended · end-label % =
+      within-provider signed spread — each operator's committed ask vs its
+      own on-demand rate, operator-equal median (hover the label for pair
+      count) · hollow marks = Provisional (2–4 sources; hover any mark for
+      panel depth) · point-to-point lines, no interpolation · term axis
+      compressed (√months) · B300 joins as its committed panel clears the gate
     </span>
   </figcaption>
 </figure>
