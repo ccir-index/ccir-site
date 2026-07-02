@@ -47,8 +47,11 @@ const Y_MAX = 7;
 const yOf = (v: number) => y0 + innerH * ((Y_MAX - v) / (Y_MAX - Y_MIN));
 const yTicks = [1, 2, 3, 4, 5, 6, 7];
 
+// Tenor floor at 3M (John 2026-07-02): the 1M point both crowded the short
+// end and escaped the y-domain — B200's 1M committed carries a scarcity
+// premium ABOVE OD (short-end contango, tracked in gold/committed_mi) that
+// belongs to the data story, not this chart's par-curve read.
 const TENORS: { term: Term; months: number }[] = [
-  { term: '1M', months: 1 },
   { term: '3M', months: 3 },
   { term: '6M', months: 6 },
   { term: '1Y', months: 12 },
@@ -56,8 +59,8 @@ const TENORS: { term: Term; months: number }[] = [
 const X_TICKS = [{ label: 'OD', months: 0 }, ...TENORS.map((t) => ({ label: t.term as string, months: t.months }))];
 
 // Divider between the on-demand anchor and the committed region — placed at
-// the sqrt-space midpoint between OD (0) and 1M (1).
-const odDividerX = x0 + innerW * (0.5 / Math.sqrt(MAX_MONTHS));
+// the sqrt-space midpoint between OD (0) and the first committed tenor (3M).
+const odDividerX = x0 + innerW * (Math.sqrt(3) / 2 / Math.sqrt(MAX_MONTHS));
 const anchorX = xOf(12); // 1Y — the anchor tenor
 
 // --- data -----------------------------------------------------------------
