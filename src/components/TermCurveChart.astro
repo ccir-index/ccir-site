@@ -20,7 +20,7 @@
     editorial (light, surface #fbf7ee): worst adjacent CVD ΔE 15.8 — PASS
   Provisional cells are shape-encoded (hollow marks), never color-only.
 */
-import { committedBandCell, t2ifOdCell, meta } from '../data/snapshot';
+import { committedBandCell, neocloudOdCell, t2ifOdCell, meta } from '../data/snapshot';
 import { wpSpread } from '../data/committed_mi';
 import type { Rate, Term } from '../data/types';
 
@@ -87,9 +87,29 @@ interface SeriesView {
   end: Pt;
 }
 
+// OD anchor = the NEOCLOUD band's own OD companion (pooled T2IF+T3IF,
+// global-USD — the SAME panel as the committed tenors, apples-to-apples,
+// John 2026-07-02). Falls back to the T2IF US & EU headline on snapshots
+// predating the band OD series (gold PR #41); the caption discloses which
+// anchor is in effect.
+let odFallbackUsed = false;
+
 function odPoint(chip: string): Pt | null {
+  const band = neocloudOdCell(chip);
+  if (band) {
+    return {
+      x: xOf(0),
+      y: yOf(band.price_median),
+      months: 0,
+      value: band.price_median,
+      prov: band.promotion_status === 'Provisional',
+      anchor: false,
+      title: `${chip} · on-demand (NEOCLOUD band, global-USD — same pooled panel as the committed tenors) · median $${fmt(band.price_median)} · ${band.n_sources} sources / ${band.n_observations} obs · ${band.promotion_status}`,
+    };
+  }
   const c = t2ifOdCell(chip, 'ALL');
   if (!c) return null;
+  odFallbackUsed = true;
   return {
     x: xOf(0),
     y: yOf(c.price_median),
@@ -279,12 +299,15 @@ const ariaLabel =
       citable reference rate
     </span>
     <span class="tcv-note">
-      OD = T2IF on-demand headline, US &amp; EU blended · end-label % =
-      within-provider signed spread — each operator's committed ask vs its
-      own on-demand rate, operator-equal median (hover the label for pair
-      count) · hollow marks = Provisional (2–4 sources; hover any mark for
-      panel depth) · point-to-point lines, no interpolation · term axis
-      compressed (√months) · B300 joins as its committed panel clears the gate
+      {odFallbackUsed
+        ? 'OD = T2IF on-demand headline, US & EU blended'
+        : 'OD = the band’s own on-demand pool (same T2IF+T3IF panel, global-USD) — both sides of the OD→committed step draw one panel'}
+      &nbsp;· end-label % = within-provider signed spread — each operator's
+      committed ask vs its own on-demand rate, operator-equal median (hover
+      the label for pair count) · hollow marks = Provisional (2–4 sources;
+      hover any mark for panel depth) · point-to-point lines, no
+      interpolation · term axis compressed (√months) · B300 joins as its
+      committed panel clears the gate
     </span>
   </figcaption>
 </figure>

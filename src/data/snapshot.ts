@@ -85,7 +85,12 @@ function parseCsv(text: string): Rate[] {
   // tier ladders or explorer tables. Committed-term surfaces ONLY through the
   // dedicated market-intelligence band below (committedBandCell), which is
   // badged "not a citable reference rate" wherever it renders.
-  return parseAllRows(text).filter((r) => r.commitment_term === 'OnDemand');
+  // NEOCLOUD band rows are excluded at EVERY term — the band's OD companion
+  // anchor (product_class=market_intelligence upstream) must not flow into
+  // the citable/indicative pools; it surfaces only via neocloudOdCell.
+  return parseAllRows(text).filter(
+    (r) => r.commitment_term === 'OnDemand' && r.factory_type !== 'NEOCLOUD',
+  );
 }
 
 const publishedRates: Rate[] = parseCsv(csvText);
@@ -105,6 +110,24 @@ const committedBandRates: Rate[] = parseAllRows(csvText).filter(
 const t1ifCommittedRates: Rate[] = parseAllRows(csvText).filter(
   (r) => r.factory_type === 'T1IF' && r.commitment_term !== 'OnDemand',
 );
+
+// NEOCLOUD band OD companion — the same pooled T2IF+T3IF global-USD panel
+// as the committed band, at on-demand. The apples-to-apples OD anchor for
+// the /term par curve (both sides of the OD→1M step draw one panel). MI,
+// never citable. Absent on snapshots predating the gold emit (PR #41) —
+// callers fall back to the T2IF headline.
+const neocloudOdRates: Rate[] = parseAllRows(csvText).filter(
+  (r) => r.factory_type === 'NEOCLOUD' && r.commitment_term === 'OnDemand',
+);
+
+export function neocloudOdCell(chip: string): Rate | undefined {
+  return neocloudOdRates
+    .filter(
+      (r) => r.gpu_model === chip && r.form_factor === 'ALL' &&
+             r.region === 'ALL' && r.promotion_status !== 'Shadow',
+    )
+    .sort((a, b) => variantRank(a) - variantRank(b) || (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+}
 
 export type GeoToken = 'ALL' | 'US' | 'EU';
 
