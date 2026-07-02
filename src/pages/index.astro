@@ -10,8 +10,8 @@ const chipCount = premiumChipsList().length;
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 
-// Anchor — T1IF H100 SXM on-demand. Featured stat block on the hero.
-const ANCHOR = 'CRI-T1IF-H100-SXM-GTD-OD-ALL';
+// Anchor — T2IF H100 SXM on-demand. Featured stat block on the hero.
+const ANCHOR = 'CRI-T2IF-H100-SXM-GTD-OD-ALL';
 const anchorRate = headlineRates.find((r) => r.series_id === ANCHOR);
 const anchorMedian = anchorRate?.price_median ?? 0;
 
@@ -53,7 +53,7 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
             <span class="kicker">Reference Rates</span>
             <span class="pc-tag citable">Citable</span>
           </div>
-          <div class="pc-kicker">Today · T1IF · {anchorChip} SXM · On-demand</div>
+          <div class="pc-kicker">Today · T2IF · {anchorChip} SXM · On-demand</div>
           <div class="pc-number">${fmt(anchorMedian)}<span class="pc-unit">/GPU-hr</span></div>
           <div class="pc-preview">
             {ratesPreview.map(({ tier, median }) => (
