@@ -41,6 +41,11 @@ import { meta } from '../data/snapshot';
       <TermCurveChart />
     </section>
 
+    <aside class="mi-more">
+      <span class="kicker">More market intelligence</span>
+      <a href="/realized/">Realized vs. Rate Card — what operators actually
+      realize per GPU-hour, estimated from public filings →</a>
+    </aside>
   </section>
 
   <style>
@@ -74,5 +79,22 @@ import { meta } from '../data/snapshot';
     .sec-head h2 { font-size: var(--fs-2xl); margin: 4px 0 10px; }
 
     .curve-section { margin: 0 0 36px; }
+
+    .mi-more {
+      margin: 0 0 36px;
+      padding: 12px 16px;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      max-width: 84ch;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .mi-more a {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      line-height: 1.5;
+    }
   </style>
 </Base>
