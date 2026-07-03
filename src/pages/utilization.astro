@@ -5,12 +5,23 @@ import Base from '../layouts/Base.astro';
 // the Availability Index (breadth of genuine-capacity venues showing launchable
 // stock). Reads the export_availability_index CSVs from /data/ client-side;
 // degrades to a "warming up" state if absent. /availability redirects here.
-const CHIPS = [
+// Two independent chip selectors: measured utilization is limited to the
+// chips Vast discloses; the Availability Index has its own universe (it now
+// includes B300, which has no Vast leg). Selections do not couple.
+const UTIL_CHIPS = [
   { slug: 'h100-sxm',      label: 'H100',  vast: 'h100-sxm' },
   { slug: 'h200-sxm',      label: 'H200',  vast: 'h200-sxm' },
   { slug: 'b200-sxm',      label: 'B200',  vast: 'b200-sxm' },
   { slug: 'a100-sxm-80gb', label: 'A100',  vast: 'a100-sxm' },
   { slug: 'gb200',         label: 'GB200', vast: 'gb200' },
+];
+const AVAIL_CHIPS = [
+  { slug: 'h100-sxm',      label: 'H100' },
+  { slug: 'h200-sxm',      label: 'H200' },
+  { slug: 'b200-sxm',      label: 'B200' },
+  { slug: 'b300',          label: 'B300' },
+  { slug: 'a100-sxm-80gb', label: 'A100' },
+  { slug: 'gb200',         label: 'GB200' },
 ];
 const DEFAULT_CHIP = 'h100-sxm';
 ---
@@ -30,9 +41,9 @@ const DEFAULT_CHIP = 'h100-sxm';
       reads demand tightening or easing.
     </p>
 
-    <!-- chip selector -->
-    <div class="chips" role="tablist" aria-label="GPU model">
-      {CHIPS.map((c) => (
+    <!-- chip selector — measured utilization (Vast-disclosed chips only) -->
+    <div class="chips" id="chips-util" role="tablist" aria-label="GPU model — utilization">
+      {UTIL_CHIPS.map((c) => (
         <button class="chip" role="tab" data-chip={c.slug} data-vast={c.vast}
                 aria-selected={c.slug === DEFAULT_CHIP ? 'true' : 'false'}>{c.label}</button>
       ))}
@@ -55,6 +66,15 @@ const DEFAULT_CHIP = 'h100-sxm';
         <div class="chart-wrap util-wrap"><canvas id="utilChart"></canvas></div>
       </div>
       <div class="empty" id="util-empty" hidden>Vast utilization warming up.</div>
+    </div>
+
+    <!-- chip selector — Availability Index (its own universe; incl. B300) -->
+    <div class="chips avail-chips" id="chips-avail" role="tablist" aria-label="GPU model — availability">
+      {AVAIL_CHIPS.map((c) => (
+        <button class="chip" role="tab" data-chip={c.slug}
+                aria-selected={c.slug === DEFAULT_CHIP ? 'true' : 'false'}>{c.label}</button>
+      ))}
+      <span class="chip-hint">select one or more to compare</span>
     </div>
 
     <!-- headline stat band -->
@@ -168,7 +188,7 @@ const DEFAULT_CHIP = 'h100-sxm';
     // fixed per-chip colors for the multi-chip overlays (readable on both themes).
     const CHIP_COLORS = {
       'h100-sxm': '#ff9100', 'a100-sxm-80gb': '#14b8a6', 'b200-sxm': '#8b5cf6',
-      'h200-sxm': '#3b82f6', 'gb200': '#ec4899',
+      'h200-sxm': '#3b82f6', 'gb200': '#ec4899', 'b300': '#22c55e',
     };
     const colorFor = (slug) => CHIP_COLORS[slug] || ACCENT;
 
@@ -335,39 +355,68 @@ const DEFAULT_CHIP = 'h100-sxm';
       } catch (err) { empty.hidden = false; empty.textContent = 'CHART ERR: ' + (err && err.message ? err.message : String(err)); }
     }
 
-    async function renderAll(selected) {
+    // Each chart trims its own left edge to the first day where every displayed
+    // series has data, so there's no partial leading region. The two sections are
+    // fully independent — availability is the short full-panel window, utilization
+    // the longer Vast record — each with its own chip selection.
+    const trimStart = (dates, maps) => {
+      const firsts = maps.map((m) => dates.find((d) => m[d] != null)).filter(Boolean);
+      if (!firsts.length) return dates;
+      const start = firsts.reduce((a, b) => (a > b ? a : b));
+      return dates.filter((d) => d >= start);
+    };
+
+    async function renderAvailability(selected) {
       const primary = selected[0];
       renderBand(primary.slug);
       renderPanel(primary.slug);
-      const trends = {}, vtrends = {};
+      const trends = {};
       await Promise.all(selected.map(async (ch) => {
-        // Availability: only plot days the panel is a market read (confidence=ok,
-        // ≥3 sources) from the full-panel start. The early cold-start days are
-        // single-source and whipsaw — the data flags them thin; we suppress them.
+        // Only plot days the panel is a market read (confidence=ok, ≥3 sources)
+        // from the full-panel start. The early cold-start days are single-source
+        // and whipsaw — the data flags them thin; we suppress them.
         trends[ch.slug] = (await avTrend(ch.slug)).filter((r) => r.confidence === 'ok' && r.as_of_date >= AVAIL_START);
-        // Utilization: independent, longer history back to the first full window.
-        vtrends[ch.vast] = (await vuTrend(ch.vast)).filter((r) => r.as_of_date >= UTIL_START);
       }));
-      // Each chart trims its own left edge to the first day where every displayed
-      // series has data, so there's no partial leading region. The two axes are
-      // independent — availability is the short full-panel window, utilization the
-      // longer Vast record — so they no longer share a start.
-      const trimStart = (dates, maps) => {
-        const firsts = maps.map((m) => dates.find((d) => m[d] != null)).filter(Boolean);
-        if (!firsts.length) return dates;
-        const start = firsts.reduce((a, b) => (a > b ? a : b));
-        return dates.filter((d) => d >= start);
-      };
       const aMaps = [];
       selected.forEach((ch) => {
         aMaps.push(mapByDate(trends[ch.slug], 'breadth_8x'));
         if (selected.length === 1) aMaps.push(mapByDate(trends[ch.slug], 'breadth'));
       });
       const aDates = trimStart(unionDates(Object.values(trends)), aMaps);
+      renderTrend(selected, aDates, trends);
+    }
+
+    async function renderUtilization(selected) {
+      const vtrends = {};
+      await Promise.all(selected.map(async (ch) => {
+        vtrends[ch.vast] = (await vuTrend(ch.vast)).filter((r) => r.as_of_date >= UTIL_START);
+      }));
       const uMaps = selected.map((ch) => mapByDate(vtrends[ch.vast], 'utilization'));
       const uDates = trimStart(unionDates(Object.values(vtrends)), uMaps);
-      renderTrend(selected, aDates, trends);
       renderUtil(selected, uDates, vtrends);
+    }
+
+    // Wire one tab group (multi-select, min 1) to a render callback.
+    function wireTabs(rootId, onChange) {
+      const tabs = Array.from(document.querySelectorAll(`#${rootId} .chip`));
+      const meta = (slug) => { const t = tabs.find((x) => x.dataset.chip === slug); return t ? { slug, vast: t.dataset.vast, label: t.textContent.trim() } : null; };
+      let selected = [DEFAULT_CHIP];
+      const apply = () => {
+        tabs.forEach((t) => {
+          const on = selected.includes(t.dataset.chip);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+          const c = on ? (CHIP_COLORS[t.dataset.chip] || '') : '';
+          t.style.background = c; t.style.borderColor = c; t.style.color = on ? '#0b0c0e' : '';
+        });
+        onChange(selected.map(meta).filter(Boolean));
+      };
+      tabs.forEach((t) => t.addEventListener('click', () => {
+        const slug = t.dataset.chip;
+        if (selected.includes(slug)) { if (selected.length > 1) selected = selected.filter((s2) => s2 !== slug); }
+        else selected = [...selected, slug];
+        apply();
+      }));
+      apply();
     }
 
     function init() {
@@ -377,25 +426,8 @@ const DEFAULT_CHIP = 'h100-sxm';
         loadCsv('/data/vast_utilization.csv'),
       ]).then(([h, s, u]) => {
         state.headline = h; state.sources = s; state.util = u;
-        const tabs = Array.from(document.querySelectorAll('.chip'));
-        const meta = (slug) => { const t = tabs.find((x) => x.dataset.chip === slug); return t ? { slug, vast: t.dataset.vast, label: t.textContent.trim() } : null; };
-        let selected = [DEFAULT_CHIP];
-        const apply = () => {
-          tabs.forEach((t) => {
-            const on = selected.includes(t.dataset.chip);
-            t.setAttribute('aria-selected', on ? 'true' : 'false');
-            const c = on ? (CHIP_COLORS[t.dataset.chip] || '') : '';
-            t.style.background = c; t.style.borderColor = c; t.style.color = on ? '#0b0c0e' : '';
-          });
-          renderAll(selected.map(meta).filter(Boolean));
-        };
-        tabs.forEach((t) => t.addEventListener('click', () => {
-          const slug = t.dataset.chip;
-          if (selected.includes(slug)) { if (selected.length > 1) selected = selected.filter((s2) => s2 !== slug); }
-          else selected = [...selected, slug];
-          apply();
-        }));
-        apply();
+        wireTabs('chips-util', renderUtilization);
+        wireTabs('chips-avail', renderAvailability);
       });
     }
     init();
@@ -428,6 +460,7 @@ const DEFAULT_CHIP = 'h100-sxm';
     .chip:hover { color: var(--ink); border-color: var(--ink-faint); }
     .chip[aria-selected='true'] { background: var(--accent); color: #0b0c0e; border-color: var(--accent); font-weight: 600; }
     .chip-hint { font-family: var(--font-mono); font-size: .68rem; color: var(--ink-faint); align-self: center; margin-left: .3rem; }
+    .avail-chips { margin-top: 1.6rem; }
 
     .band { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; margin-bottom: 1.6rem; }
     .stat { background: var(--bg); padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: .25rem; }

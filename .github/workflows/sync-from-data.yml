@@ -152,7 +152,7 @@ jobs:
           fi
           # Utilization CSVs power /utilization (implied) + the /basis
           # occupancy section. IMU chip slugs (h100-sxm form), not silicon_id.
-          for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
+          for chip in h100-sxm h200-sxm b200-sxm b300 gb200 a100-sxm-80gb a100-sxm-40gb; do
             fname="utilization_implied_${chip}.csv"
             if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
@@ -169,7 +169,7 @@ jobs:
               : > ".sync/$fname"
             fi
           done
-          for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
+          for chip in h100-sxm h200-sxm b200-sxm b300 gb200 a100-sxm-80gb a100-sxm-40gb; do
             fname="utilization_intraday_${chip}.csv"
             if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
               echo "fetched $fname"
@@ -191,7 +191,7 @@ jobs:
           # Availability Index (curated multi-source) — powers the new /utilization
           # page: per-chip headline + 90d trend, plus the cross-chip headline +
           # per-source panel. IMU chip slugs.
-          for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
+          for chip in h100-sxm h200-sxm b200-sxm b300 gb200 a100-sxm-80gb a100-sxm-40gb; do
             for prefix in availability_index availability_index_trend; do
               fname="${prefix}_${chip}.csv"
               if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
@@ -316,7 +316,7 @@ jobs:
             echo "staged public/data/shadeform_summary.csv"
           fi
           # Stage utilization CSVs (implied per chip + sources + macro + occupancy).
-          for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
+          for chip in h100-sxm h200-sxm b200-sxm b300 gb200 a100-sxm-80gb a100-sxm-40gb; do
             for prefix in utilization_implied utilization_intraday; do
               fname="${prefix}_${chip}.csv"
               if [ -s ".sync/$fname" ]; then
@@ -343,7 +343,7 @@ jobs:
             fi
           done
           # Stage Availability Index + Vast utilization CSVs (the new /utilization).
-          for chip in h100-sxm h200-sxm b200-sxm gb200 a100-sxm-80gb a100-sxm-40gb; do
+          for chip in h100-sxm h200-sxm b200-sxm b300 gb200 a100-sxm-80gb a100-sxm-40gb; do
             for prefix in availability_index availability_index_trend; do
               fname="${prefix}_${chip}.csv"
               if [ -s ".sync/$fname" ]; then
