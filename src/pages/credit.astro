@@ -178,7 +178,7 @@ function monthsSince(iso: string, epoch: string): number {
 // clamped to the plot; a leader line is flagged when the block sits away
 // from its mark.
 type LabLine = { t: string; cls: 'pt-label' | 'pt-tag' | 'pt-sub' };
-interface LabIn { x: number; y: number; lines: LabLine[]; rid?: string }
+interface LabIn { x: number; y: number; lines: LabLine[]; rid?: string; v?: number }
 interface LabOut extends LabIn {
   lx: number; ly: number; w: number; h: number; leader: boolean;
   linePos: { t: string; cls: string; y: number }[];
@@ -192,6 +192,12 @@ function layoutLabels(items: LabIn[], marks: { x: number; y: number }[]): LabOut
   const collide = (a: Box, b: Box) =>
     Math.abs(a.lx - b.lx) < (a.w + b.w) / 2 + 6 &&
     a.ly < b.ly + b.h + 3 && b.ly < a.ly + a.h + 3;
+  // Within a local x-window, a lower-value mark's label must not sit above a
+  // higher-value one's — else near-tied points (e.g. 5.96 vs 6.00, ~2px apart)
+  // read inverted. Penalise value-order violations so the solver picks a
+  // slightly-less-ideal but order-consistent slot over the nearest one.
+  const INV_PEN = 1000;
+  const X_WIN = 120;
   for (const it of [...items].sort((a, b) => a.x - b.x || a.y - b.y)) {
     const w = Math.max(...it.lines.map((l) => l.t.length * CHAR_W[l.cls]));
     const h = it.lines.reduce((s, l) => s + LINE_H[l.cls], 0);
@@ -205,18 +211,33 @@ function layoutLabels(items: LabIn[], marks: { x: number; y: number }[]): LabOut
       }
     }
     let box: Box | null = null;
-    for (const c of cands) {
+    let bestCost = Infinity;
+    for (let ci = 0; ci < cands.length; ci++) {
+      const c = cands[ci];
       const lx = Math.min(Math.max(c.lx, x0 + w / 2 + 2), x1 - w / 2 - 2);
       const ly = Math.min(Math.max(c.ly, y0 + 2), y1 - h - 2);
       const b = { lx, ly, w, h };
-      const hitLabel = placed.some((p) => collide(b, p));
+      if (placed.some((p) => collide(b, p))) continue;
       const hitMark = marks.some(
         (d) =>
           !(d.x === it.x && d.y === it.y) &&
           Math.abs(lx - d.x) < w / 2 + 8 &&
           d.y > ly - 6 && d.y < ly + h + 6
       );
-      if (!hitLabel && !hitMark) { box = b; break; }
+      if (hitMark) continue;
+      // cost = original preference order (ci) + value-inversion penalty
+      let cost = ci;
+      if (it.v != null) {
+        const cy = ly + h / 2;
+        for (const p of placed) {
+          if (p.v == null || Math.abs(p.x - it.x) > X_WIN) continue;
+          const pcy = p.ly + p.h / 2;
+          if (it.v > p.v && cy > pcy + 2) cost += INV_PEN;
+          else if (it.v < p.v && cy < pcy - 2) cost += INV_PEN;
+        }
+      }
+      if (cost < bestCost) { bestCost = cost; box = b; }
+      if (cost === 0) break; // ideal, order-consistent slot — stop scanning
     }
     if (!box) {
       // Worst case: stack straight down from the mark past whatever is there.
@@ -281,7 +302,7 @@ for (const p of tapeCfg) {
       { t: p.tag, cls: 'pt-tag' },
     ];
     if (p.sub) lines.push({ t: p.sub, cls: 'pt-sub' });
-    aLabelItems.push({ x: X, y: Y, lines, rid });
+    aLabelItems.push({ x: X, y: Y, lines, rid, v: p.v });
   } else {
     const yLo = ay(p.lo!), yHi = ay(p.hi!), yEx = ay(p.extra!);
     aMarks.push({ kind: 'range', x: X, yLo, yHi, rid, tier: p.tier });
@@ -292,8 +313,8 @@ for (const p of tapeCfg) {
       { t: p.tag, cls: 'pt-tag' },
     ];
     if (p.sub) lines.push({ t: p.sub, cls: 'pt-sub' });
-    aLabelItems.push({ x: X, y: yHi, lines, rid });
-    aLabelItems.push({ x: X, y: yEx, lines: [{ t: `+${p.extra!.toFixed(2)}`, cls: 'pt-label' }], rid });
+    aLabelItems.push({ x: X, y: yHi, lines, rid, v: (p.lo! + p.hi!) / 2 });
+    aLabelItems.push({ x: X, y: yEx, lines: [{ t: `+${p.extra!.toFixed(2)}`, cls: 'pt-label' }], rid, v: p.extra! });
   }
 }
 const aLabels = layoutLabels(aLabelItems, aObstacles);
@@ -351,7 +372,7 @@ const bObstacles = [
 ];
 const bLabelItems: LabIn[] = [
   ...bondPath.map((p) => ({
-    x: bx(p.date), y: by(p.v),
+    x: bx(p.date), y: by(p.v), v: p.v,
     lines: [
       { t: p.v.toFixed(3), cls: 'pt-label' } as LabLine,
       { t: p.tag, cls: 'pt-tag' } as LabLine,
@@ -359,7 +380,7 @@ const bLabelItems: LabIn[] = [
     rid: `row-${p.id}`,
   })),
   ...bondContext.map((p) => ({
-    x: bx(p.date), y: by(p.v),
+    x: bx(p.date), y: by(p.v), v: p.v,
     lines: [{ t: p.tag, cls: 'pt-tag' } as LabLine],
     rid: `row-${p.id}`,
   })),
