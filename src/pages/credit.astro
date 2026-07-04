@@ -247,17 +247,25 @@ const ax = (iso: string) => x0 + (x1 - x0) * (monthsSince(iso, A_EPOCH) / A_SPAN
 const A_YMAX = 14;
 const ay = (v: number) => y0 + (y1 - y0) * ((A_YMAX - v) / A_YMAX);
 
+// Credit-enhancement tier is the primary encoding, not the date: the low
+// spreads are the IG-contract-wrapped facilities, the high ones the
+// unwrapped GPU-only / non-IG legs. Colour carries that; the eye should
+// read "cheap = wrapped," not "cheap = later." Tiers, strong → weak:
+//   strong = IG-offtake-contract-wrapped (Microsoft)
+//   mid    = customer-credit-scaled GPU collateral (IG + unrated mix)
+//   weak   = unwrapped GPU-only / non-IG leg
+type Tier = 'strong' | 'mid' | 'weak';
 const tapeCfg = [
-  { id: 'crwv-ddtl-1', date: '2023-07-30', v: 9.62, tag: 'CRWV DDTL 1.0', sub: "as amended '24" },
-  { id: 'crwv-ddtl-2', date: '2024-05-16', v: null, lo: 6.0, hi: 6.5, extra: 13.0, tag: 'CRWV DDTL 2.0', sub: 'IG / non-IG' },
-  { id: 'crwv-ddtl-3', date: '2025-07-28', v: 4.0, tag: 'CRWV DDTL 3.0', sub: null },
-  { id: 'crwv-ddtl-2-1', date: '2025-09-29', v: 4.25, tag: 'CRWV DDTL 2.1', sub: null },
-  { id: 'crwv-ddtl-4', date: '2026-03-30', v: 2.25, tag: 'CRWV DDTL 4.0', sub: 'contract-wrapped' },
-  { id: 'crwv-ddtl-5', date: '2026-05-15', v: 4.5, tag: 'CRWV DDTL 5.0', sub: null },
-  { id: 'iren-hw3-ddtl', date: '2026-05-29', v: 2.25, tag: 'IREN H3', sub: 'contract-wrapped' },
+  { id: 'crwv-ddtl-1', date: '2023-07-30', v: 9.62, tag: 'CRWV DDTL 1.0', sub: "as amended '24", tier: 'weak' as Tier },
+  { id: 'crwv-ddtl-2', date: '2024-05-16', v: null, lo: 6.0, hi: 6.5, extra: 13.0, tag: 'CRWV DDTL 2.0', sub: 'IG / non-IG', tier: 'mid' as Tier, tierExtra: 'weak' as Tier },
+  { id: 'crwv-ddtl-3', date: '2025-07-28', v: 4.0, tag: 'CRWV DDTL 3.0', sub: null, tier: 'mid' as Tier },
+  { id: 'crwv-ddtl-2-1', date: '2025-09-29', v: 4.25, tag: 'CRWV DDTL 2.1', sub: null, tier: 'mid' as Tier },
+  { id: 'crwv-ddtl-4', date: '2026-03-30', v: 2.25, tag: 'CRWV DDTL 4.0', sub: 'contract-wrapped', tier: 'strong' as Tier },
+  { id: 'crwv-ddtl-5', date: '2026-05-15', v: 4.5, tag: 'CRWV DDTL 5.0', sub: null, tier: 'mid' as Tier },
+  { id: 'iren-hw3-ddtl', date: '2026-05-29', v: 2.25, tag: 'IREN H3', sub: 'contract-wrapped', tier: 'strong' as Tier },
 ].map((p) => ({ ...p, inst: inst(p.id) }));
 
-interface Mark { kind: 'dot' | 'diamond' | 'range'; x: number; y?: number; yLo?: number; yHi?: number; rid: string }
+interface Mark { kind: 'dot' | 'diamond' | 'range'; x: number; y?: number; yLo?: number; yHi?: number; rid: string; tier: Tier }
 const aMarks: Mark[] = [];
 const aObstacles: { x: number; y: number }[] = [];
 const aLabelItems: LabIn[] = [];
@@ -266,7 +274,7 @@ for (const p of tapeCfg) {
   const rid = `row-${p.id}`;
   if (p.v != null) {
     const Y = ay(p.v);
-    aMarks.push({ kind: 'dot', x: X, y: Y, rid });
+    aMarks.push({ kind: 'dot', x: X, y: Y, rid, tier: p.tier });
     aObstacles.push({ x: X, y: Y });
     const lines: LabLine[] = [
       { t: `+${p.v.toFixed(2)}`, cls: 'pt-label' },
@@ -276,8 +284,8 @@ for (const p of tapeCfg) {
     aLabelItems.push({ x: X, y: Y, lines, rid });
   } else {
     const yLo = ay(p.lo!), yHi = ay(p.hi!), yEx = ay(p.extra!);
-    aMarks.push({ kind: 'range', x: X, yLo, yHi, rid });
-    aMarks.push({ kind: 'diamond', x: X, y: yEx, rid });
+    aMarks.push({ kind: 'range', x: X, yLo, yHi, rid, tier: p.tier });
+    aMarks.push({ kind: 'diamond', x: X, y: yEx, rid, tier: (p as any).tierExtra ?? p.tier });
     aObstacles.push({ x: X, y: yLo }, { x: X, y: yHi }, { x: X, y: yEx }, { x: X, y: (yLo + yHi) / 2 });
     const lines: LabLine[] = [
       { t: `+${p.lo!.toFixed(2)}–${p.hi!.toFixed(2)}`, cls: 'pt-label' },
@@ -308,26 +316,33 @@ const bx = (iso: string) => x0 + (x1 - x0) * (monthsSince(iso, B_EPOCH) / B_SPAN
 const B_YMIN = 5, B_YMAX = 10;
 const by = (v: number) => y0 + (y1 - y0) * ((B_YMAX - v) / (B_YMAX - B_YMIN));
 
-// Headline compression path (the brief's named vintages), by pricing/close date.
+// Credit-support tier is the primary encoding here too — the coupon fell
+// because the offtake credit improved, not merely because time passed.
+// Tiers, strongest → weakest support, ordered as the market priced them:
+//   strong = hyperscaler-IG tenant (AWS/Amazon/Microsoft/Oracle) or IG-rated bond
+//   mid    = Google-guaranteed lease (Fluidstack is the tenant, Google guarantees)
+//   weak   = neocloud / self-operated offtake, unrated
+// `long` marks the 2042 maturities — their coupon embeds ~16y of duration
+// the 2030–31 bonds don't, so they are not like-for-like on the y-axis.
 const bondPath = [
-  { id: 'wulf-notes-7750-2030', date: '2025-10-22', tag: 'WULF 7.750' },
-  { id: 'cifr-7125-2030', date: '2025-11-13', tag: 'CIFR 7.125' },
-  { id: 'apld-9250-2030', date: '2025-11-20', tag: 'APLD 9.250' },
-  { id: 'cifr-6125-2031', date: '2026-02-11', tag: 'CIFR 6.125' },
-  { id: 'hut-riverbend-6192-2042', date: '2026-04-30', tag: 'HUT 6.192' },
-  { id: 'iren-hw3-notes', date: '2026-05-29', tag: 'IREN 5.96' },
-  { id: 'hut-beaconpoint-6129-2042', date: '2026-06-09', tag: 'HUT 6.129' },
-  { id: 'cifr-6000-2031', date: '2026-06-15', tag: 'CIFR 6.000' },
+  { id: 'wulf-notes-7750-2030', date: '2025-10-22', tag: 'WULF 7.750', tier: 'mid' as Tier },
+  { id: 'cifr-7125-2030', date: '2025-11-13', tag: 'CIFR 7.125', tier: 'mid' as Tier },
+  { id: 'apld-9250-2030', date: '2025-11-20', tag: 'APLD 9.250', tier: 'weak' as Tier },
+  { id: 'cifr-6125-2031', date: '2026-02-11', tag: 'CIFR 6.125', tier: 'strong' as Tier },
+  { id: 'hut-riverbend-6192-2042', date: '2026-04-30', tag: 'HUT 6.192', tier: 'strong' as Tier, long: true },
+  { id: 'iren-hw3-notes', date: '2026-05-29', tag: 'IREN 5.96', tier: 'strong' as Tier },
+  { id: 'hut-beaconpoint-6129-2042', date: '2026-06-09', tag: 'HUT 6.129', tier: 'strong' as Tier, long: true },
+  { id: 'cifr-6000-2031', date: '2026-06-15', tag: 'CIFR 6.000', tier: 'strong' as Tier },
 ].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
 
-// Context: the other filed project bonds of the window (grey), plus the one
+// Context: the other filed project bonds of the window, plus the one
 // press-reported SPV bond (hollow) — no silent caps on what the window held.
 const bondContext = [
-  { id: 'wulf-jv-7250-2030', date: '2025-12-29', tag: 'WULF JV 7.250', press: false },
-  { id: 'apld-6750-2031', date: '2026-03-10', tag: 'APLD 6.750', press: false },
-  { id: 'corz-7750-2031', date: '2026-05-06', tag: 'CORZ 7.750', press: false },
-  { id: 'apld-7000-2031', date: '2026-06-16', tag: 'APLD 7.000', press: false },
-  { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc 6.250', press: true },
+  { id: 'wulf-jv-7250-2030', date: '2025-12-29', tag: 'WULF JV 7.250', tier: 'mid' as Tier, press: false },
+  { id: 'apld-6750-2031', date: '2026-03-10', tag: 'APLD 6.750', tier: 'strong' as Tier, press: false },
+  { id: 'corz-7750-2031', date: '2026-05-06', tag: 'CORZ 7.750', tier: 'weak' as Tier, press: false },
+  { id: 'apld-7000-2031', date: '2026-06-16', tag: 'APLD 7.000', tier: 'weak' as Tier, press: false },
+  { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc 6.250', tier: 'mid' as Tier, press: true },
 ].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
 
 const bObstacles = [
@@ -394,15 +409,21 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     <div class="panel">
       <div class="panel-head">
         <div>
-          <div class="panel-title">GPU-collateral floating-rate tape — spread over SOFR</div>
+          <div class="panel-title">GPU-collateral floating spreads — by credit enhancement</div>
           <div class="panel-sub">
-            Filed spreads on GPU-secured floating-rate facilities at signing ·
+            Filed spread over SOFR at signing, coloured by what backs the loan ·
             window Jul 2023 – Jun 2026 · CoreWeave DDTL vintages + IREN Hardware 3
           </div>
         </div>
         <span class="badge">FILED TERMS</span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Spread over SOFR on GPU-collateralized facilities, July 2023 to June 2026, compressing from +9.62 to +2.25">
+      <div class="legend">
+        <span class="lg-item"><span class="lg-dot tier-strong"></span>IG-contract-wrapped (Microsoft offtake)</span>
+        <span class="lg-item"><span class="lg-dot tier-mid"></span>Customer-credit-scaled GPU collateral</span>
+        <span class="lg-item"><span class="lg-dot tier-weak"></span>Unwrapped GPU-only / non-IG leg</span>
+        <span class="lg-item lg-note">◆ non-IG leg · mostly one borrower (CoreWeave)</span>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Spread over SOFR on GPU-collateralized facilities, July 2023 to June 2026. The lowest spreads (+2.25) are the IG-contract-wrapped facilities; the highest (+9.62, +13) are unwrapped or non-IG.">
         {A_TICKS_Y.map((t) => (
           <>
             <line x1={x0} y1={ay(t)} x2={x1} y2={ay(t)} class="grid" />
@@ -415,14 +436,14 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
         {aMarks.map((m) =>
           m.kind === 'dot' ? (
-            <circle cx={m.x} cy={m.y} r="4.5" class="pt hot" data-row={m.rid} />
+            <circle cx={m.x} cy={m.y} r="4.5" class={`pt hot tier-${m.tier}`} data-row={m.rid} />
           ) : m.kind === 'diamond' ? (
-            <path d={`M ${m.x} ${m.y! - 5.5} L ${m.x + 5.5} ${m.y} L ${m.x} ${m.y! + 5.5} L ${m.x - 5.5} ${m.y} Z`} class="pt-alt hot" data-row={m.rid} />
+            <path d={`M ${m.x} ${m.y! - 5.5} L ${m.x + 5.5} ${m.y} L ${m.x} ${m.y! + 5.5} L ${m.x - 5.5} ${m.y} Z`} class={`hot tier-fill-${m.tier}`} data-row={m.rid} />
           ) : (
             <g class="hot" data-row={m.rid}>
-              <line x1={m.x} y1={m.yLo} x2={m.x} y2={m.yHi} class="range" />
-              <line x1={m.x - 5} y1={m.yLo} x2={m.x + 5} y2={m.yLo} class="range" />
-              <line x1={m.x - 5} y1={m.yHi} x2={m.x + 5} y2={m.yHi} class="range" />
+              <line x1={m.x} y1={m.yLo} x2={m.x} y2={m.yHi} class={`range tier-stroke-${m.tier}`} />
+              <line x1={m.x - 5} y1={m.yLo} x2={m.x + 5} y2={m.yLo} class={`range tier-stroke-${m.tier}`} />
+              <line x1={m.x - 5} y1={m.yHi} x2={m.x + 5} y2={m.yHi} class={`range tier-stroke-${m.tier}`} />
             </g>
           )
         )}
@@ -442,11 +463,28 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       <details class="panel-foot-disclosure">
         <summary>How to read this</summary>
         <div class="panel-foot">
-          Spreads as stated in the credit agreements (percentage points over the
-          SOFR variant named in each filing). DDTL 2.0 prints as a bar: +6.00–6.50%
-          on investment-grade contract loans, +13.00% (marked ◆) non-IG. DDTL 4.0
-          and IREN Hardware 3 (+2.25%, 2026) are effectively Microsoft/IG-contract-wrapped.
-          Vintage date = signing/closing per filing.
+          <p>
+            Colour, not the date, is the story. The two lowest spreads (+2.25%,
+            2026) are the facilities wrapped by an investment-grade offtake
+            contract — CoreWeave DDTL 4.0 and IREN Hardware 3, both effectively
+            Microsoft-backed — while the widest (+9.62% in 2023, and the +13.00%
+            non-IG leg of DDTL 2.0) are unwrapped GPU collateral on weaker credit.
+            The market did not simply reprice a GPU pledge from +9.62% to +2.25%;
+            a large part of that move is the pledge being re-underwritten as
+            IG-contract paper. Read the compression as credit enhancement, not
+            calendar.
+          </p>
+          <p>
+            Spreads are stated in the credit agreements (percentage points over
+            the SOFR variant each filing names); vintage date = signing/close.
+            DDTL 2.0 prints as a bar — +6.00–6.50% on IG contract loans, +13.00%
+            (◆) non-IG. One caveat the level understates: DDTL 4.0 is only
+            ~$4.5B floating at +2.25%; ~$4.0B is a fixed UST-based tranche, so its
+            all-in cost sits above the plotted spread (the ledger's effective-rate
+            column runs ~7–11% across these facilities). Six of seven points are
+            CoreWeave itself, so this is closer to one issuer's spread history
+            than a market cross-section.
+          </p>
         </div>
       </details>
     </div>
@@ -455,15 +493,21 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     <div class="panel">
       <div class="panel-head">
         <div>
-          <div class="panel-title">Lease-backed project-bond coupons — fixed-rate senior secured 144A</div>
+          <div class="panel-title">Project-bond coupons — by offtake credit support</div>
           <div class="panel-sub">
-            Coupon at pricing/close, single-campus SPV issuers against hyperscaler / AI-lab
-            leases · window Oct 2025 – Jun 2026
+            Coupon at pricing/close, fixed-rate senior secured 144A, coloured by who
+            backs the lease · window Oct 2025 – Jun 2026
           </div>
         </div>
         <span class="badge">FILED TERMS</span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Lease-backed project bond coupons, October 2025 to June 2026, compressing from 9.25 percent to under 6 percent">
+      <div class="legend">
+        <span class="lg-item"><span class="lg-dot tier-strong"></span>Hyperscaler-IG tenant / IG-rated</span>
+        <span class="lg-item"><span class="lg-dot tier-mid"></span>Google-guaranteed (Fluidstack tenant)</span>
+        <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud / self-operated offtake</span>
+        <span class="lg-item lg-note">◎ 2042 maturity (longer tenor) · ○ press-reported</span>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Fixed-rate project bond coupons, October 2025 to June 2026. The lowest coupons (~6 percent) carry hyperscaler-IG offtake or an IG rating; the widest (9.25 percent) is neocloud-offtake.">
         {B_TICKS_Y.map((t) => (
           <>
             <line x1={x0} y1={by(t)} x2={x1} y2={by(t)} class="grid" />
@@ -474,12 +518,18 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
           <text x={bx(t.iso)} y={y1 + 24} class="tick tick-x">{t.label}</text>
         ))}
         <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
-        <polyline points={bondLine} class="path" />
+        <polyline points={bondLine} class="path-seq" />
         {bondContext.map((p) => (
-          <circle cx={bx(p.date)} cy={by(p.v)} r="4" class={p.press ? 'pt pt-hollow hot' : 'pt pt-ctx hot'} data-row={`row-${p.id}`} />
+          <>
+            {(p as any).long && <circle cx={bx(p.date)} cy={by(p.v)} r="7.5" class={`ring tier-stroke-${p.tier}`} />}
+            <circle cx={bx(p.date)} cy={by(p.v)} r="4" class={p.press ? `pt-hollow hot tier-stroke-${p.tier}` : `pt hot tier-${p.tier}`} data-row={`row-${p.id}`} />
+          </>
         ))}
         {bondPath.map((p) => (
-          <circle cx={bx(p.date)} cy={by(p.v)} r="4.5" class="pt hot" data-row={`row-${p.id}`} />
+          <>
+            {(p as any).long && <circle cx={bx(p.date)} cy={by(p.v)} r="8" class={`ring tier-stroke-${p.tier}`} />}
+            <circle cx={bx(p.date)} cy={by(p.v)} r="4.5" class={`pt hot tier-${p.tier}`} data-row={`row-${p.id}`} />
+          </>
         ))}
         {bLabels.map((L) => (
           <g class="hot" data-row={L.rid}>
@@ -497,12 +547,29 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       <details class="panel-foot-disclosure">
         <summary>How to read this</summary>
         <div class="panel-foot">
-          Solid teal: the compression path APLD 9.25 → WULF 7.75 → CIFR 7.125 →
-          6.125 → HUT 6.19/6.13 → CIFR 6.00 + IREN 5.96, dated by pricing/close
-          per filing. Grey: other fixed-rate senior secured project issues filed
-          in the window. Hollow: Meridian Arc 6.25% — press-reported (Bloomberg/LCD),
-          no issuer release; SPV landlord paper against a Google-guaranteed
-          Fluidstack lease, shown for completeness and flagged accordingly.
+          <p>
+            The coupon fell because the offtake credit improved, not merely
+            because time passed. The ~6% cluster (CIFR Black Pearl/Stingray,
+            IREN, APLD ComputeCo 2) is backed by an investment-grade tenant —
+            Amazon, AWS, Microsoft, Oracle — or is an IG-rated bond (Hut 8's
+            BBB− 2042s); the 7.1–7.75% band is Google-guaranteed paper where the
+            tenant is unrated Fluidstack; and the 9.25% outlier (APLD ComputeCo 1)
+            is leased to CoreWeave, itself a levered neocloud. Same coupon axis,
+            three different credit structures. The faint grey line only orders the
+            named vintages by date — it is a reading aid, not a single-driver
+            trend.
+          </p>
+          <p>
+            Two comparability caveats the y-axis hides. Tenor: Hut 8's 6.19/6.13%
+            notes (◎) mature in 2042 — ~16 years — so their coupon embeds far more
+            duration than the 2030–31 bonds; they are not like-for-like at the same
+            level. Structure: IREN 5.96% is Microsoft-*contract*-secured GPU
+            financing under a common-terms agreement, structurally closer to the
+            floating-rate facilities in the chart above than to a single-campus
+            lease bond. ○ = Meridian Arc 6.25%, press-reported (Bloomberg/LCD), no
+            issuer release — SPV landlord paper on a Google-guaranteed Fluidstack
+            lease, shown for completeness and flagged.
+          </p>
         </div>
       </details>
     </div>
@@ -838,6 +905,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       line-height: 1.5;
       max-width: 100ch;
     }
+    .panel-foot p { margin: 0 0 9px; }
+    .panel-foot p:last-child { margin-bottom: 0; }
     /* Chart definitions — collapsed by default, expandable (site pattern). */
     .panel-foot-disclosure { margin: 0; }
     .panel-foot-disclosure > summary {
@@ -863,14 +932,26 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     .tick-y { text-anchor: end; }
     .tick-x { text-anchor: middle; }
     .pt { fill: var(--accent); }
-    .pt-alt { fill: var(--warn); }
     .pt-ctx { fill: var(--ink-faint); }
-    .pt-hollow { fill: none; stroke: var(--warn); stroke-width: 1.5; }
-    .range { stroke: var(--accent); stroke-width: 2; }
-    .path {
+    .pt-hollow { fill: none; stroke-width: 1.6; }
+    .range { stroke-width: 2; }
+    .ring { fill: none; stroke-width: 1.4; opacity: 0.85; }
+    /* Credit-enhancement ramp — strong → weak support. Reinforced by
+       y-position + legend, so colour is redundant, not sole-carrying. */
+    .tier-strong, .tier-fill-strong { fill: var(--accent); }
+    .tier-mid, .tier-fill-mid { fill: var(--info); }
+    .tier-weak, .tier-fill-weak { fill: var(--warn); }
+    .tier-stroke-strong { stroke: var(--accent); }
+    .tier-stroke-mid { stroke: var(--info); }
+    .tier-stroke-weak { stroke: var(--warn); }
+    /* Chronological reading aid only — deliberately faint + dashed so it
+       reads as sequence, not a single-driver trend. */
+    .path-seq {
       fill: none;
-      stroke: color-mix(in srgb, var(--accent) 55%, transparent);
-      stroke-width: 1.25;
+      stroke: var(--ink-faint);
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+      opacity: 0.5;
     }
     .leader {
       stroke: var(--ink-faint);
@@ -879,6 +960,26 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     }
     .hot { cursor: pointer; }
     .hot:hover { opacity: 0.75; }
+
+    /* --- chart legend ----------------------------------------------------- */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 18px;
+      padding: 0 var(--pad-panel) 10px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+    }
+    .lg-item { display: inline-flex; align-items: center; gap: 6px; }
+    .lg-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      display: inline-block; flex-shrink: 0;
+    }
+    .lg-dot.tier-strong { background: var(--accent); }
+    .lg-dot.tier-mid { background: var(--info); }
+    .lg-dot.tier-weak { background: var(--warn); }
+    .lg-note { color: var(--ink-faint); }
     .pt-label {
       font-family: var(--font-mono);
       font-size: 11px;
