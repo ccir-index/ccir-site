@@ -80,6 +80,83 @@ const TYPE_LABEL: Record<string, string> = {
 const issuers = [...new Set(instruments.map((i: any) => i.issuer))];
 const types = [...new Set(instruments.map((i: any) => i.instrument_type))];
 
+// Lender facet. Filings name the same institution many ways ("Morgan
+// Stanley (lead)", "MS Senior Funding", bare "MS"), so rows are tagged with
+// canonical institution names via pattern match over the filed lender
+// strings. The display column keeps the strings exactly as filed.
+const LENDER_CANON: [string, RegExp][] = [
+  ['Morgan Stanley', /morgan stanley|\bms\b/i],
+  ['Goldman Sachs', /goldman|gs bank|gs lending/i],
+  ['J.P. Morgan', /j\.?p\.? ?morgan|jpmorgan|\bjpm\b/i],
+  ['MUFG', /mufg/i],
+  ['Blackstone', /blackstone/i],
+  ['Magnetar', /magnetar|magai/i],
+  ['Blue Owl', /blue owl/i],
+  ['PIMCO', /pimco/i],
+  ['Apollo', /apollo/i],
+  ['BlackRock', /blackrock/i],
+  ['Macquarie', /macquarie/i],
+  ['Brookfield', /brookfield/i],
+  ['Upper90', /upper90/i],
+  ['USD.AI (Permian Labs)', /usd\.ai|permian/i],
+  ['Citi', /\bciti\b|citibank/i],
+  ['Barclays', /barclays/i],
+  ['Wells Fargo', /wells fargo/i],
+  ['Bank of America', /bank of america|bofa/i],
+  ['Santander', /santander/i],
+  ['Mizuho', /mizuho/i],
+  ['SMBC', /smbc/i],
+  ['Scotiabank', /scotia/i],
+  ['BMO', /\bbmo\b/i],
+  ['TD', /\btd\b/i],
+  ['UBS', /\bubs\b/i],
+  ['Crédit Agricole', /agricole|cacib/i],
+  ['BNP Paribas', /bnp/i],
+  ['HSBC', /hsbc/i],
+  ['Natixis', /natixis/i],
+  ['Bpifrance', /bpifrance/i],
+  ['La Banque Postale', /banque postale/i],
+  ['ABN AMRO', /abn amro/i],
+  ['DNB', /\bdnb\b/i],
+  ['Nordea', /nordea/i],
+  ['SEB', /\bseb\b/i],
+  ['Eksfin', /eksfin/i],
+  ['RBC', /\brbc\b|royal bank of canada/i],
+  ['KeyBank', /keybank/i],
+  ['SVB / First Citizens', /\bsvb\b|first citizens/i],
+  ['First National Bank of Omaha', /omaha|fnbo/i],
+  ['U.S. Bank', /u\.s\. bank/i],
+  ['Wilmington Trust', /wilmington/i],
+  ['WSFS', /wsfs/i],
+  ['CSC Delaware Trust', /csc delaware/i],
+  ['Cantor Fitzgerald', /cantor/i],
+  ['B. Riley', /b\. ?riley/i],
+  ['Coatue', /coatue/i],
+  ['Galaxy Digital', /galaxy/i],
+  ['Generate', /generate/i],
+  ['Spring Lane', /spring lane|soluna2/i],
+  ['Coinbase', /coinbase/i],
+  ['Two Prime', /two prime/i],
+  ['FalconX', /falconx/i],
+  ['Dell Financial', /dell/i],
+  ['Victory Park', /victory park/i],
+  ['Yorkville', /yorkville|ya ii/i],
+  ['Starion Bank', /starion/i],
+  ['Cornerstone Bank', /cornerstone/i],
+  ['Landsbankinn', /landsbankinn/i],
+  ['NVIDIA', /nvidia/i],
+  ['Valor', /valor/i],
+  ['Newmark (arranger)', /newmark/i],
+];
+const lenderSlug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+function lenderTags(i: any): string[] {
+  const txt = (i.lenders ?? []).join(' · ');
+  return LENDER_CANON.filter(([, re]) => re.test(txt)).map(([n]) => n);
+}
+const lenderFacet = LENDER_CANON
+  .map(([n]) => n)
+  .filter((n) => instruments.some((i: any) => lenderTags(i).includes(n)));
+
 // --- chart geometry ----------------------------------------------------------
 const W = 920;
 const H = 340;
@@ -99,7 +176,7 @@ function monthsSince(iso: string, epoch: string): number {
 // clamped to the plot; a leader line is flagged when the block sits away
 // from its mark.
 type LabLine = { t: string; cls: 'pt-label' | 'pt-tag' | 'pt-sub' };
-interface LabIn { x: number; y: number; lines: LabLine[] }
+interface LabIn { x: number; y: number; lines: LabLine[]; rid?: string }
 interface LabOut extends LabIn {
   lx: number; ly: number; w: number; h: number; leader: boolean;
   linePos: { t: string; cls: string; y: number }[];
@@ -178,34 +255,35 @@ const tapeCfg = [
   { id: 'iren-hw3-ddtl', date: '2026-05-29', v: 2.25, tag: 'IREN H3', sub: 'contract-wrapped' },
 ].map((p) => ({ ...p, inst: inst(p.id) }));
 
-interface Mark { kind: 'dot' | 'diamond' | 'range'; x: number; y?: number; yLo?: number; yHi?: number }
+interface Mark { kind: 'dot' | 'diamond' | 'range'; x: number; y?: number; yLo?: number; yHi?: number; rid: string }
 const aMarks: Mark[] = [];
 const aObstacles: { x: number; y: number }[] = [];
 const aLabelItems: LabIn[] = [];
 for (const p of tapeCfg) {
   const X = ax(p.date);
+  const rid = `row-${p.id}`;
   if (p.v != null) {
     const Y = ay(p.v);
-    aMarks.push({ kind: 'dot', x: X, y: Y });
+    aMarks.push({ kind: 'dot', x: X, y: Y, rid });
     aObstacles.push({ x: X, y: Y });
     const lines: LabLine[] = [
       { t: `+${p.v.toFixed(2)}`, cls: 'pt-label' },
       { t: p.tag, cls: 'pt-tag' },
     ];
     if (p.sub) lines.push({ t: p.sub, cls: 'pt-sub' });
-    aLabelItems.push({ x: X, y: Y, lines });
+    aLabelItems.push({ x: X, y: Y, lines, rid });
   } else {
     const yLo = ay(p.lo!), yHi = ay(p.hi!), yEx = ay(p.extra!);
-    aMarks.push({ kind: 'range', x: X, yLo, yHi });
-    aMarks.push({ kind: 'diamond', x: X, y: yEx });
+    aMarks.push({ kind: 'range', x: X, yLo, yHi, rid });
+    aMarks.push({ kind: 'diamond', x: X, y: yEx, rid });
     aObstacles.push({ x: X, y: yLo }, { x: X, y: yHi }, { x: X, y: yEx }, { x: X, y: (yLo + yHi) / 2 });
     const lines: LabLine[] = [
       { t: `+${p.lo!.toFixed(2)}–${p.hi!.toFixed(2)}`, cls: 'pt-label' },
       { t: p.tag, cls: 'pt-tag' },
     ];
     if (p.sub) lines.push({ t: p.sub, cls: 'pt-sub' });
-    aLabelItems.push({ x: X, y: yHi, lines });
-    aLabelItems.push({ x: X, y: yEx, lines: [{ t: `+${p.extra!.toFixed(2)}`, cls: 'pt-label' }] });
+    aLabelItems.push({ x: X, y: yHi, lines, rid });
+    aLabelItems.push({ x: X, y: yEx, lines: [{ t: `+${p.extra!.toFixed(2)}`, cls: 'pt-label' }], rid });
   }
 }
 const aLabels = layoutLabels(aLabelItems, aObstacles);
@@ -261,10 +339,12 @@ const bLabelItems: LabIn[] = [
       { t: p.v.toFixed(3), cls: 'pt-label' } as LabLine,
       { t: p.tag, cls: 'pt-tag' } as LabLine,
     ],
+    rid: `row-${p.id}`,
   })),
   ...bondContext.map((p) => ({
     x: bx(p.date), y: by(p.v),
     lines: [{ t: p.tag, cls: 'pt-tag' } as LabLine],
+    rid: `row-${p.id}`,
   })),
 ];
 const bLabels = layoutLabels(bLabelItems, bObstacles);
@@ -332,11 +412,11 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
         {aMarks.map((m) =>
           m.kind === 'dot' ? (
-            <circle cx={m.x} cy={m.y} r="4.5" class="pt" />
+            <circle cx={m.x} cy={m.y} r="4.5" class="pt hot" data-row={m.rid} />
           ) : m.kind === 'diamond' ? (
-            <path d={`M ${m.x} ${m.y! - 5.5} L ${m.x + 5.5} ${m.y} L ${m.x} ${m.y! + 5.5} L ${m.x - 5.5} ${m.y} Z`} class="pt-alt" />
+            <path d={`M ${m.x} ${m.y! - 5.5} L ${m.x + 5.5} ${m.y} L ${m.x} ${m.y! + 5.5} L ${m.x - 5.5} ${m.y} Z`} class="pt-alt hot" data-row={m.rid} />
           ) : (
-            <g>
+            <g class="hot" data-row={m.rid}>
               <line x1={m.x} y1={m.yLo} x2={m.x} y2={m.yHi} class="range" />
               <line x1={m.x - 5} y1={m.yLo} x2={m.x + 5} y2={m.yLo} class="range" />
               <line x1={m.x - 5} y1={m.yHi} x2={m.x + 5} y2={m.yHi} class="range" />
@@ -344,7 +424,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
           )
         )}
         {aLabels.map((L) => (
-          <g>
+          <g class="hot" data-row={L.rid}>
             {L.leader && (
               <line
                 x1={L.x} y1={L.y + (L.ly > L.y ? 7 : -7)}
@@ -393,13 +473,13 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
         <polyline points={bondLine} class="path" />
         {bondContext.map((p) => (
-          <circle cx={bx(p.date)} cy={by(p.v)} r="4" class={p.press ? 'pt pt-hollow' : 'pt pt-ctx'} />
+          <circle cx={bx(p.date)} cy={by(p.v)} r="4" class={p.press ? 'pt pt-hollow hot' : 'pt pt-ctx hot'} data-row={`row-${p.id}`} />
         ))}
         {bondPath.map((p) => (
-          <circle cx={bx(p.date)} cy={by(p.v)} r="4.5" class="pt" />
+          <circle cx={bx(p.date)} cy={by(p.v)} r="4.5" class="pt hot" data-row={`row-${p.id}`} />
         ))}
         {bLabels.map((L) => (
-          <g>
+          <g class="hot" data-row={L.rid}>
             {L.leader && (
               <line
                 x1={L.x} y1={L.y + (L.ly > L.y ? 7 : -7)}
@@ -429,8 +509,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       <h2>Instrument ledger</h2>
       <p class="standfirst">
         Every live instrument across the panel. Filter by issuer, type,
-        seniority, or confirmation status; click a column header to sort;
-        each row links the filing or release it was taken from.
+        seniority, lender, or confirmation status; click a column header to
+        sort; each row links the filing or release it was taken from.
       </p>
     </div>
     <div class="filters" id="credit-filters">
@@ -454,6 +534,10 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <option value="press">Press</option>
         <option value="rumored">Rumored</option>
       </select>
+      <select id="f-lender" aria-label="Filter by lender or agent">
+        <option value="">All lenders / agents</option>
+        {lenderFacet.map((n) => <option value={lenderSlug(n)}>{n}</option>)}
+      </select>
       <input id="f-q" type="search" placeholder="Search issuer, lender, collateral…" aria-label="Search rows" />
       <span class="count mono" id="f-count"></span>
     </div>
@@ -468,6 +552,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
             <th class="sortable sort-num" data-key="rate">Rate</th>
             <th class="sortable" data-key="mat">Maturity</th>
             <th class="sortable" data-key="sen">Seniority</th>
+            <th>Lenders / Agents</th>
             <th class="sortable" data-key="status">Status</th>
             <th>Source</th>
           </tr>
@@ -475,6 +560,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <tbody>
           {instruments.map((i: any) => (
             <tr
+              id={`row-${i.id}`}
               data-issuer={i.issuer}
               data-type={i.instrument_type}
               data-sen={senClass(i.seniority)}
@@ -482,6 +568,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
               data-size={i.size_usd_m ?? ''}
               data-rate={rateSortKey(i.rate) ?? ''}
               data-mat={i.maturity ?? ''}
+              data-lenders={lenderTags(i).map(lenderSlug).join('|')}
             >
               <td class="c-issuer">
                 <span class="issuer-name">{i.issuer}</span>
@@ -498,6 +585,14 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
               </td>
               <td class="c-mat" title={i.maturity_note ?? ''}>{i.maturity ?? '—'}</td>
               <td class="c-sen" title={i.seniority ?? ''}>{senClass(i.seniority)}</td>
+              <td class="c-lenders" title={(i.lenders ?? []).join(' · ')}>
+                {(i.lenders ?? []).length === 0 ? '—' : (
+                  <>
+                    <span class="lender-first">{i.lenders[0]}</span>
+                    {i.lenders.length > 1 && <span class="lender-more">+{i.lenders.length - 1}</span>}
+                  </>
+                )}
+              </td>
               <td class="c-status"><span class={`chip chip-${i.status}`}>{i.status}</span></td>
               <td class="c-src"><a href={i.source.url} target="_blank" rel="noopener noreferrer" title={i.source.doc}>{i.source.doc.split(';')[0]}</a></td>
             </tr>
@@ -510,7 +605,11 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       latest-reported principal outstanding where filed, committed/face where
       drawn balances are undisclosed (hover the size). Non-USD sizes use the
       USD equivalents reported in the filings themselves. Rate sorting uses
-      the filed coupon or spread; undisclosed rates sort last.
+      the filed coupon or spread; undisclosed rates sort last. Lender cells
+      show the lead institution as filed (hover for the full list); the
+      lender filter matches on normalized institution names across every
+      role — lender, agent, trustee, or arranger — as named in the filings.
+      Clicking a chart data point jumps to its ledger row.
     </p>
 
     <!-- Methodology -->
@@ -563,6 +662,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       var selType = document.getElementById('f-type');
       var selSen = document.getElementById('f-sen');
       var selStatus = document.getElementById('f-status');
+      var selLender = document.getElementById('f-lender');
       var q = document.getElementById('f-q');
       var count = document.getElementById('f-count');
       var tbody = document.querySelector('#credit-table tbody');
@@ -581,7 +681,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
 
       function apply() {
         var vi = selIssuer.value, vt = selType.value, vs = selSen.value,
-            vst = selStatus.value, vq = q.value.trim().toLowerCase();
+            vst = selStatus.value, vl = selLender.value,
+            vq = q.value.trim().toLowerCase();
         var shown = 0;
         rows.forEach(function (r) {
           var ok =
@@ -589,8 +690,10 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
             (!vt || r.dataset.type === vt) &&
             (!vs || r.dataset.sen === vs) &&
             (!vst || r.dataset.status === vst) &&
+            (!vl || (r.dataset.lenders || '').split('|').indexOf(vl) !== -1) &&
             (!vq || r.textContent.toLowerCase().indexOf(vq) !== -1 ||
-              (r.querySelector('.c-name').title || '').toLowerCase().indexOf(vq) !== -1);
+              (r.querySelector('.c-name').title || '').toLowerCase().indexOf(vq) !== -1 ||
+              (r.querySelector('.c-lenders').title || '').toLowerCase().indexOf(vq) !== -1);
           r.style.display = ok ? '' : 'none';
           if (ok) shown++;
         });
@@ -647,11 +750,28 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         });
       });
 
-      [selIssuer, selType, selSen, selStatus].forEach(function (el) {
+      [selIssuer, selType, selSen, selStatus, selLender].forEach(function (el) {
         el.addEventListener('change', apply);
       });
       q.addEventListener('input', apply);
       apply();
+
+      // --- chart mark -> ledger row -----------------------------------------
+      // Clicking a data point (or its label) clears filters so the row is
+      // visible, scrolls it to center, and flashes it.
+      document.querySelectorAll('svg .hot[data-row]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var row = document.getElementById(el.getAttribute('data-row'));
+          if (!row) return;
+          selIssuer.value = ''; selType.value = ''; selSen.value = '';
+          selStatus.value = ''; selLender.value = ''; q.value = '';
+          apply();
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          row.classList.remove('flash');
+          void row.offsetWidth; // restart the animation on repeat clicks
+          row.classList.add('flash');
+        });
+      });
     })();
   </script>
 
@@ -754,6 +874,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       stroke-width: 0.75;
       opacity: 0.55;
     }
+    .hot { cursor: pointer; }
+    .hot:hover { opacity: 0.75; }
     .pt-label {
       font-family: var(--font-mono);
       font-size: 11px;
@@ -802,7 +924,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       letter-spacing: 0.04em;
     }
     .table-scroll { overflow-x: auto; border: 1px solid var(--rule); }
-    #credit-table { min-width: 1080px; }
+    #credit-table { min-width: 1240px; }
     #credit-table td { font-size: var(--fs-sm); }
     #credit-table th.sortable {
       cursor: pointer;
@@ -821,8 +943,29 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     #credit-table tbody tr.stripe:not(:hover) td {
       background: color-mix(in srgb, var(--surface-2) 55%, transparent);
     }
-    .c-issuer, .c-name, .c-type, .c-rate, .c-mat, .c-sen, .c-status, .c-src { text-align: left !important; }
+    .c-issuer, .c-name, .c-type, .c-rate, .c-mat, .c-sen, .c-lenders, .c-status, .c-src { text-align: left !important; }
     .c-name { max-width: 300px; }
+    .c-lenders { max-width: 210px; }
+    .c-lenders .lender-first {
+      display: inline-block;
+      max-width: 165px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: bottom;
+    }
+    .c-lenders .lender-more {
+      margin-left: 5px;
+      color: var(--accent);
+      font-size: var(--fs-xs);
+    }
+    #credit-table tbody tr.flash td {
+      animation: row-flash 2.2s ease-out;
+    }
+    @keyframes row-flash {
+      0%, 35% { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+      100% { background: transparent; }
+    }
     .c-issuer .issuer-name { display: block; }
     .c-issuer .ticker {
       font-size: var(--fs-xs);
