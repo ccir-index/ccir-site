@@ -7,8 +7,11 @@
   it. Undisclosed stays undisclosed — no estimates. Retired instruments are
   excluded from the table and listed in the methodology note.
 
-  Charts read the same JSON by instrument id (chartPoint throws at build
-  time if an id disappears), so the tape can never drift from the ledger.
+  Charts read the same JSON by instrument id (inst() throws at build time if
+  an id disappears), so the tape can never drift from the ledger. Chart
+  labels are placed by a build-time greedy solver (layoutLabels) that
+  guarantees no label-label or label-mark overlap; a faint leader line is
+  drawn whenever a label had to move away from its mark.
 */
 import Base from '../layouts/Base.astro';
 import creditData from '../data/credit_instruments.json';
@@ -48,6 +51,10 @@ function fmtRate(rate: any): string {
 function rateTitle(rate: any): string {
   return rate.note ?? '';
 }
+// Numeric sort key for the rate column: coupon or spread where filed.
+function rateSortKey(rate: any): number | null {
+  return rate.value ?? rate.value_low ?? null;
+}
 function fmtSize(v: number | null): string {
   if (v == null) return '—';
   if (v >= 1000) return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
@@ -75,14 +82,82 @@ const types = [...new Set(instruments.map((i: any) => i.instrument_type))];
 
 // --- chart geometry ----------------------------------------------------------
 const W = 920;
-const H = 320;
-const M = { top: 26, right: 30, bottom: 40, left: 46 };
+const H = 340;
+const M = { top: 26, right: 30, bottom: 44, left: 46 };
 const x0 = M.left, x1 = W - M.right, y0 = M.top, y1 = H - M.bottom;
 
 function monthsSince(iso: string, epoch: string): number {
   const [ey, em] = epoch.split('-').map(Number);
   const [y, m, d] = iso.split('-').map(Number);
   return (y - ey) * 12 + (m - em) + ((d ?? 15) - 1) / 30;
+}
+
+// --- label layout solver -----------------------------------------------------
+// Greedy, deterministic, build-time. Each label is a block of 1–3 mono lines
+// anchored to a mark. Candidates fan out above/below and sideways; the first
+// candidate that collides with no placed label and no mark wins. Labels are
+// clamped to the plot; a leader line is flagged when the block sits away
+// from its mark.
+type LabLine = { t: string; cls: 'pt-label' | 'pt-tag' | 'pt-sub' };
+interface LabIn { x: number; y: number; lines: LabLine[] }
+interface LabOut extends LabIn {
+  lx: number; ly: number; w: number; h: number; leader: boolean;
+  linePos: { t: string; cls: string; y: number }[];
+}
+const CHAR_W: Record<string, number> = { 'pt-label': 6.9, 'pt-tag': 5.8, 'pt-sub': 5.2 };
+const LINE_H: Record<string, number> = { 'pt-label': 11, 'pt-tag': 10, 'pt-sub': 9 };
+
+function layoutLabels(items: LabIn[], marks: { x: number; y: number }[]): LabOut[] {
+  const placed: LabOut[] = [];
+  type Box = { lx: number; ly: number; w: number; h: number };
+  const collide = (a: Box, b: Box) =>
+    Math.abs(a.lx - b.lx) < (a.w + b.w) / 2 + 6 &&
+    a.ly < b.ly + b.h + 3 && b.ly < a.ly + a.h + 3;
+  for (const it of [...items].sort((a, b) => a.x - b.x || a.y - b.y)) {
+    const w = Math.max(...it.lines.map((l) => l.t.length * CHAR_W[l.cls]));
+    const h = it.lines.reduce((s, l) => s + LINE_H[l.cls], 0);
+    const cands: { lx: number; ly: number }[] = [];
+    for (const dx of [0, -30, 30, -60, 60, -95, 95]) {
+      for (const dir of [-1, 1]) {
+        for (let step = 0; step < 6; step++) {
+          const gap = 9 + step * 12;
+          cands.push({ lx: it.x + dx, ly: dir < 0 ? it.y - gap - h : it.y + gap });
+        }
+      }
+    }
+    let box: Box | null = null;
+    for (const c of cands) {
+      const lx = Math.min(Math.max(c.lx, x0 + w / 2 + 2), x1 - w / 2 - 2);
+      const ly = Math.min(Math.max(c.ly, y0 + 2), y1 - h - 2);
+      const b = { lx, ly, w, h };
+      const hitLabel = placed.some((p) => collide(b, p));
+      const hitMark = marks.some(
+        (d) =>
+          !(d.x === it.x && d.y === it.y) &&
+          Math.abs(lx - d.x) < w / 2 + 8 &&
+          d.y > ly - 6 && d.y < ly + h + 6
+      );
+      if (!hitLabel && !hitMark) { box = b; break; }
+    }
+    if (!box) {
+      // Worst case: stack straight down from the mark past whatever is there.
+      const lx = Math.min(Math.max(it.x, x0 + w / 2 + 2), x1 - w / 2 - 2);
+      let ly = it.y + 9, guard = 0;
+      while (placed.some((p) => collide({ lx, ly, w, h }, p)) && guard++ < 60) ly += 6;
+      box = { lx, ly: Math.min(ly, y1 - h - 2), w, h };
+    }
+    const above = box.ly + h <= it.y;
+    const vGap = above ? it.y - (box.ly + h) : box.ly - it.y;
+    const leader = Math.abs(box.lx - it.x) > 16 || vGap > 26;
+    let yc = box.ly;
+    const linePos = it.lines.map((l) => {
+      const y = yc + LINE_H[l.cls] - 2;
+      yc += LINE_H[l.cls];
+      return { t: l.t, cls: l.cls, y };
+    });
+    placed.push({ ...it, lx: box.lx, ly: box.ly, w, h, leader, linePos });
+  }
+  return placed;
 }
 
 // ---- Chart A: GPU-collateral SOFR spread tape -------------------------------
@@ -93,16 +168,47 @@ const ax = (iso: string) => x0 + (x1 - x0) * (monthsSince(iso, A_EPOCH) / A_SPAN
 const A_YMAX = 14;
 const ay = (v: number) => y0 + (y1 - y0) * ((A_YMAX - v) / A_YMAX);
 
-// dy = label offset; issuer tag drawn under the spread label.
 const tapeCfg = [
-  { id: 'crwv-ddtl-1', date: '2023-07-30', v: 9.62, tag: 'CRWV DDTL 1.0', sub: "as amended '24", dy: -14 },
-  { id: 'crwv-ddtl-2', date: '2024-05-16', v: null, lo: 6.0, hi: 6.5, extra: 13.0, tag: 'CRWV DDTL 2.0', sub: 'IG / non-IG', dy: -14 },
-  { id: 'crwv-ddtl-3', date: '2025-07-28', v: 4.0, tag: 'CRWV DDTL 3.0', sub: null, dy: 22 },
-  { id: 'crwv-ddtl-2-1', date: '2025-09-29', v: 4.25, tag: 'CRWV DDTL 2.1', sub: null, dy: -14 },
-  { id: 'crwv-ddtl-4', date: '2026-03-30', v: 2.25, tag: 'CRWV DDTL 4.0', sub: 'contract-wrapped', dy: 22 },
-  { id: 'crwv-ddtl-5', date: '2026-05-15', v: 4.5, tag: 'CRWV DDTL 5.0', sub: null, dy: -14 },
-  { id: 'iren-hw3-ddtl', date: '2026-05-29', v: 2.25, tag: 'IREN H3', sub: 'contract-wrapped', dy: -14 },
+  { id: 'crwv-ddtl-1', date: '2023-07-30', v: 9.62, tag: 'CRWV DDTL 1.0', sub: "as amended '24" },
+  { id: 'crwv-ddtl-2', date: '2024-05-16', v: null, lo: 6.0, hi: 6.5, extra: 13.0, tag: 'CRWV DDTL 2.0', sub: 'IG / non-IG' },
+  { id: 'crwv-ddtl-3', date: '2025-07-28', v: 4.0, tag: 'CRWV DDTL 3.0', sub: null },
+  { id: 'crwv-ddtl-2-1', date: '2025-09-29', v: 4.25, tag: 'CRWV DDTL 2.1', sub: null },
+  { id: 'crwv-ddtl-4', date: '2026-03-30', v: 2.25, tag: 'CRWV DDTL 4.0', sub: 'contract-wrapped' },
+  { id: 'crwv-ddtl-5', date: '2026-05-15', v: 4.5, tag: 'CRWV DDTL 5.0', sub: null },
+  { id: 'iren-hw3-ddtl', date: '2026-05-29', v: 2.25, tag: 'IREN H3', sub: 'contract-wrapped' },
 ].map((p) => ({ ...p, inst: inst(p.id) }));
+
+interface Mark { kind: 'dot' | 'diamond' | 'range'; x: number; y?: number; yLo?: number; yHi?: number }
+const aMarks: Mark[] = [];
+const aObstacles: { x: number; y: number }[] = [];
+const aLabelItems: LabIn[] = [];
+for (const p of tapeCfg) {
+  const X = ax(p.date);
+  if (p.v != null) {
+    const Y = ay(p.v);
+    aMarks.push({ kind: 'dot', x: X, y: Y });
+    aObstacles.push({ x: X, y: Y });
+    const lines: LabLine[] = [
+      { t: `+${p.v.toFixed(2)}`, cls: 'pt-label' },
+      { t: p.tag, cls: 'pt-tag' },
+    ];
+    if (p.sub) lines.push({ t: p.sub, cls: 'pt-sub' });
+    aLabelItems.push({ x: X, y: Y, lines });
+  } else {
+    const yLo = ay(p.lo!), yHi = ay(p.hi!), yEx = ay(p.extra!);
+    aMarks.push({ kind: 'range', x: X, yLo, yHi });
+    aMarks.push({ kind: 'diamond', x: X, y: yEx });
+    aObstacles.push({ x: X, y: yLo }, { x: X, y: yHi }, { x: X, y: yEx }, { x: X, y: (yLo + yHi) / 2 });
+    const lines: LabLine[] = [
+      { t: `+${p.lo!.toFixed(2)}–${p.hi!.toFixed(2)}`, cls: 'pt-label' },
+      { t: p.tag, cls: 'pt-tag' },
+    ];
+    if (p.sub) lines.push({ t: p.sub, cls: 'pt-sub' });
+    aLabelItems.push({ x: X, y: yHi, lines });
+    aLabelItems.push({ x: X, y: yEx, lines: [{ t: `+${p.extra!.toFixed(2)}`, cls: 'pt-label' }] });
+  }
+}
+const aLabels = layoutLabels(aLabelItems, aObstacles);
 
 const A_TICKS_Y = [0, 2, 4, 6, 8, 10, 12, 14];
 const A_TICKS_X = [
@@ -124,25 +230,44 @@ const by = (v: number) => y0 + (y1 - y0) * ((B_YMAX - v) / (B_YMAX - B_YMIN));
 
 // Headline compression path (the brief's named vintages), by pricing/close date.
 const bondPath = [
-  { id: 'wulf-notes-7750-2030', date: '2025-10-22', tag: 'WULF 7.750', dy: -12 },
-  { id: 'cifr-7125-2030', date: '2025-11-13', tag: 'CIFR 7.125', dy: 22 },
-  { id: 'apld-9250-2030', date: '2025-11-20', tag: 'APLD 9.250', dy: -12 },
-  { id: 'cifr-6125-2031', date: '2026-02-11', tag: 'CIFR 6.125', dy: 22 },
-  { id: 'hut-riverbend-6192-2042', date: '2026-04-30', tag: 'HUT 6.192', dy: -12 },
-  { id: 'iren-hw3-notes', date: '2026-05-29', tag: 'IREN 5.96', dy: 22 },
-  { id: 'hut-beaconpoint-6129-2042', date: '2026-06-09', tag: 'HUT 6.129', dy: -14 },
-  { id: 'cifr-6000-2031', date: '2026-06-15', tag: 'CIFR 6.000', dy: 24 },
+  { id: 'wulf-notes-7750-2030', date: '2025-10-22', tag: 'WULF 7.750' },
+  { id: 'cifr-7125-2030', date: '2025-11-13', tag: 'CIFR 7.125' },
+  { id: 'apld-9250-2030', date: '2025-11-20', tag: 'APLD 9.250' },
+  { id: 'cifr-6125-2031', date: '2026-02-11', tag: 'CIFR 6.125' },
+  { id: 'hut-riverbend-6192-2042', date: '2026-04-30', tag: 'HUT 6.192' },
+  { id: 'iren-hw3-notes', date: '2026-05-29', tag: 'IREN 5.96' },
+  { id: 'hut-beaconpoint-6129-2042', date: '2026-06-09', tag: 'HUT 6.129' },
+  { id: 'cifr-6000-2031', date: '2026-06-15', tag: 'CIFR 6.000' },
 ].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
 
 // Context: the other filed project bonds of the window (grey), plus the one
 // press-reported SPV bond (hollow) — no silent caps on what the window held.
 const bondContext = [
-  { id: 'wulf-jv-7250-2030', date: '2025-12-29', tag: 'WULF JV 7.250', dy: -12, press: false },
-  { id: 'apld-6750-2031', date: '2026-03-10', tag: 'APLD 6.750', dy: 22, press: false },
-  { id: 'corz-7750-2031', date: '2026-05-06', tag: 'CORZ 7.750', dy: -12, press: false },
-  { id: 'apld-7000-2031', date: '2026-06-16', tag: 'APLD 7.000', dy: -26, press: false },
-  { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc 6.250', dy: -12, press: true },
+  { id: 'wulf-jv-7250-2030', date: '2025-12-29', tag: 'WULF JV 7.250', press: false },
+  { id: 'apld-6750-2031', date: '2026-03-10', tag: 'APLD 6.750', press: false },
+  { id: 'corz-7750-2031', date: '2026-05-06', tag: 'CORZ 7.750', press: false },
+  { id: 'apld-7000-2031', date: '2026-06-16', tag: 'APLD 7.000', press: false },
+  { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc 6.250', press: true },
 ].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
+
+const bObstacles = [
+  ...bondPath.map((p) => ({ x: bx(p.date), y: by(p.v) })),
+  ...bondContext.map((p) => ({ x: bx(p.date), y: by(p.v) })),
+];
+const bLabelItems: LabIn[] = [
+  ...bondPath.map((p) => ({
+    x: bx(p.date), y: by(p.v),
+    lines: [
+      { t: p.v.toFixed(3), cls: 'pt-label' } as LabLine,
+      { t: p.tag, cls: 'pt-tag' } as LabLine,
+    ],
+  })),
+  ...bondContext.map((p) => ({
+    x: bx(p.date), y: by(p.v),
+    lines: [{ t: p.tag, cls: 'pt-tag' } as LabLine],
+  })),
+];
+const bLabels = layoutLabels(bLabelItems, bObstacles);
 
 const B_TICKS_Y = [5, 6, 7, 8, 9, 10];
 const B_TICKS_X = [
@@ -205,38 +330,42 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
           <text x={ax(t.iso)} y={y1 + 24} class="tick tick-x">{t.label}</text>
         ))}
         <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
-        {tapeCfg.map((p) => (
+        {aMarks.map((m) =>
+          m.kind === 'dot' ? (
+            <circle cx={m.x} cy={m.y} r="4.5" class="pt" />
+          ) : m.kind === 'diamond' ? (
+            <path d={`M ${m.x} ${m.y! - 5.5} L ${m.x + 5.5} ${m.y} L ${m.x} ${m.y! + 5.5} L ${m.x - 5.5} ${m.y} Z`} class="pt-alt" />
+          ) : (
+            <g>
+              <line x1={m.x} y1={m.yLo} x2={m.x} y2={m.yHi} class="range" />
+              <line x1={m.x - 5} y1={m.yLo} x2={m.x + 5} y2={m.yLo} class="range" />
+              <line x1={m.x - 5} y1={m.yHi} x2={m.x + 5} y2={m.yHi} class="range" />
+            </g>
+          )
+        )}
+        {aLabels.map((L) => (
           <g>
-            {p.v != null && (
-              <>
-                <circle cx={ax(p.date)} cy={ay(p.v)} r="4.5" class="pt" />
-                <text x={ax(p.date)} y={ay(p.v) + p.dy} class="pt-label">+{p.v.toFixed(2)}</text>
-                <text x={ax(p.date)} y={ay(p.v) + p.dy + 11} class="pt-tag">{p.tag}</text>
-                {p.sub && <text x={ax(p.date)} y={ay(p.v) + p.dy + 21} class="pt-sub">{p.sub}</text>}
-              </>
+            {L.leader && (
+              <line
+                x1={L.x} y1={L.y + (L.ly > L.y ? 7 : -7)}
+                x2={L.lx} y2={L.ly > L.y ? L.ly + 1 : L.ly + L.h + 1}
+                class="leader"
+              />
             )}
-            {p.lo != null && (
-              <>
-                <line x1={ax(p.date)} y1={ay(p.lo)} x2={ax(p.date)} y2={ay(p.hi)} class="range" />
-                <line x1={ax(p.date) - 5} y1={ay(p.lo)} x2={ax(p.date) + 5} y2={ay(p.lo)} class="range" />
-                <line x1={ax(p.date) - 5} y1={ay(p.hi)} x2={ax(p.date) + 5} y2={ay(p.hi)} class="range" />
-                <circle cx={ax(p.date)} cy={ay(p.extra)} r="4.5" class="pt pt-alt" />
-                <text x={ax(p.date)} y={ay(p.extra) - 10} class="pt-label">+{p.extra.toFixed(2)}</text>
-                <text x={ax(p.date)} y={ay(p.hi) + p.dy} class="pt-label">+{p.lo.toFixed(2)}–{p.hi.toFixed(2)}</text>
-                <text x={ax(p.date)} y={ay(p.hi) + p.dy + 11} class="pt-tag">{p.tag}</text>
-                {p.sub && <text x={ax(p.date)} y={ay(p.hi) + p.dy + 21} class="pt-sub">{p.sub}</text>}
-              </>
-            )}
+            {L.linePos.map((ln) => <text x={L.lx} y={ln.y} class={ln.cls}>{ln.t}</text>)}
           </g>
         ))}
       </svg>
-      <div class="panel-foot">
-        Spreads as stated in the credit agreements (percentage points over the
-        SOFR variant named in each filing). DDTL 2.0 prints as a bar: +6.00–6.50%
-        on investment-grade contract loans, +13.00% (marked ◆) non-IG. DDTL 4.0
-        and IREN Hardware 3 (+2.25%, 2026) are effectively Microsoft/IG-contract-wrapped.
-        Vintage date = signing/closing per filing.
-      </div>
+      <details class="panel-foot-disclosure">
+        <summary>How to read this</summary>
+        <div class="panel-foot">
+          Spreads as stated in the credit agreements (percentage points over the
+          SOFR variant named in each filing). DDTL 2.0 prints as a bar: +6.00–6.50%
+          on investment-grade contract loans, +13.00% (marked ◆) non-IG. DDTL 4.0
+          and IREN Hardware 3 (+2.25%, 2026) are effectively Microsoft/IG-contract-wrapped.
+          Vintage date = signing/closing per filing.
+        </div>
+      </details>
     </div>
 
     <!-- Chart B — project-bond coupon compression -->
@@ -264,27 +393,35 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
         <polyline points={bondLine} class="path" />
         {bondContext.map((p) => (
-          <g>
-            <circle cx={bx(p.date)} cy={by(p.v)} r="4" class={p.press ? 'pt pt-hollow' : 'pt pt-ctx'} />
-            <text x={bx(p.date)} y={by(p.v) + p.dy} class="pt-tag pt-tag-ctx">{p.tag}</text>
-          </g>
+          <circle cx={bx(p.date)} cy={by(p.v)} r="4" class={p.press ? 'pt pt-hollow' : 'pt pt-ctx'} />
         ))}
         {bondPath.map((p) => (
+          <circle cx={bx(p.date)} cy={by(p.v)} r="4.5" class="pt" />
+        ))}
+        {bLabels.map((L) => (
           <g>
-            <circle cx={bx(p.date)} cy={by(p.v)} r="4.5" class="pt" />
-            <text x={bx(p.date)} y={by(p.v) + p.dy} class="pt-label">{p.v.toFixed(3)}</text>
-            <text x={bx(p.date)} y={by(p.v) + p.dy + 11} class="pt-tag">{p.tag}</text>
+            {L.leader && (
+              <line
+                x1={L.x} y1={L.y + (L.ly > L.y ? 7 : -7)}
+                x2={L.lx} y2={L.ly > L.y ? L.ly + 1 : L.ly + L.h + 1}
+                class="leader"
+              />
+            )}
+            {L.linePos.map((ln) => <text x={L.lx} y={ln.y} class={ln.cls}>{ln.t}</text>)}
           </g>
         ))}
       </svg>
-      <div class="panel-foot">
-        Solid teal: the compression path APLD 9.25 → WULF 7.75 → CIFR 7.125 →
-        6.125 → HUT 6.19/6.13 → CIFR 6.00 + IREN 5.96, dated by pricing/close
-        per filing. Grey: other fixed-rate senior secured project issues filed
-        in the window. Hollow: Meridian Arc 6.25% — press-reported (Bloomberg/LCD),
-        no issuer release; SPV landlord paper against a Google-guaranteed
-        Fluidstack lease, shown for completeness and flagged accordingly.
-      </div>
+      <details class="panel-foot-disclosure">
+        <summary>How to read this</summary>
+        <div class="panel-foot">
+          Solid teal: the compression path APLD 9.25 → WULF 7.75 → CIFR 7.125 →
+          6.125 → HUT 6.19/6.13 → CIFR 6.00 + IREN 5.96, dated by pricing/close
+          per filing. Grey: other fixed-rate senior secured project issues filed
+          in the window. Hollow: Meridian Arc 6.25% — press-reported (Bloomberg/LCD),
+          no issuer release; SPV landlord paper against a Google-guaranteed
+          Fluidstack lease, shown for completeness and flagged accordingly.
+        </div>
+      </details>
     </div>
 
     <!-- Ledger table -->
@@ -292,8 +429,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       <h2>Instrument ledger</h2>
       <p class="standfirst">
         Every live instrument across the panel. Filter by issuer, type,
-        seniority, or confirmation status; each row links the filing or
-        release it was taken from.
+        seniority, or confirmation status; click a column header to sort;
+        each row links the filing or release it was taken from.
       </p>
     </div>
     <div class="filters" id="credit-filters">
@@ -324,14 +461,14 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       <table class="data" id="credit-table">
         <thead>
           <tr>
-            <th>Issuer</th>
-            <th>Instrument</th>
-            <th>Type</th>
-            <th>Size $M</th>
-            <th>Rate</th>
-            <th>Maturity</th>
-            <th>Seniority</th>
-            <th>Status</th>
+            <th class="sortable" data-key="issuer">Issuer</th>
+            <th class="sortable" data-key="name">Instrument</th>
+            <th class="sortable" data-key="type">Type</th>
+            <th class="sortable sort-num" data-key="size">Size $M</th>
+            <th class="sortable sort-num" data-key="rate">Rate</th>
+            <th class="sortable" data-key="mat">Maturity</th>
+            <th class="sortable" data-key="sen">Seniority</th>
+            <th class="sortable" data-key="status">Status</th>
             <th>Source</th>
           </tr>
         </thead>
@@ -342,6 +479,9 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
               data-type={i.instrument_type}
               data-sen={senClass(i.seniority)}
               data-status={i.status}
+              data-size={i.size_usd_m ?? ''}
+              data-rate={rateSortKey(i.rate) ?? ''}
+              data-mat={i.maturity ?? ''}
             >
               <td class="c-issuer">
                 <span class="issuer-name">{i.issuer}</span>
@@ -369,7 +509,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       † hover for borrower entity, collateral, and size notes. Sizes are
       latest-reported principal outstanding where filed, committed/face where
       drawn balances are undisclosed (hover the size). Non-USD sizes use the
-      USD equivalents reported in the filings themselves.
+      USD equivalents reported in the filings themselves. Rate sorting uses
+      the filed coupon or spread; undisclosed rates sort last.
     </p>
 
     <!-- Methodology -->
@@ -424,9 +565,20 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       var selStatus = document.getElementById('f-status');
       var q = document.getElementById('f-q');
       var count = document.getElementById('f-count');
-      var rows = Array.prototype.slice.call(
-        document.querySelectorAll('#credit-table tbody tr')
-      );
+      var tbody = document.querySelector('#credit-table tbody');
+      var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+      rows.forEach(function (r, idx) { r.dataset.orig = idx; });
+
+      function restripe() {
+        var vis = 0;
+        rows.forEach(function (r) {
+          if (r.style.display !== 'none') {
+            r.classList.toggle('stripe', vis % 2 === 1);
+            vis++;
+          }
+        });
+      }
+
       function apply() {
         var vi = selIssuer.value, vt = selType.value, vs = selSen.value,
             vst = selStatus.value, vq = q.value.trim().toLowerCase();
@@ -443,7 +595,58 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
           if (ok) shown++;
         });
         count.textContent = shown + ' / ' + rows.length + ' instruments';
+        restripe();
       }
+
+      // --- column sorting ---------------------------------------------------
+      var sortKey = null, sortDir = 1;
+      var NUMERIC = { size: true, rate: true };
+      function rowVal(r, key) {
+        if (key === 'name') return r.cells[1].textContent.trim().toLowerCase();
+        var v = r.dataset[key];
+        if (NUMERIC[key]) {
+          var n = parseFloat(v);
+          return isNaN(n) ? null : n;
+        }
+        return v === undefined || v === '' ? null : v.toLowerCase();
+      }
+      function sortRows() {
+        var sorted = rows.slice().sort(function (a, b) {
+          if (sortKey === null) return a.dataset.orig - b.dataset.orig;
+          var va = rowVal(a, sortKey), vb = rowVal(b, sortKey);
+          if (va === null && vb === null) return a.dataset.orig - b.dataset.orig;
+          if (va === null) return 1;  // blanks/undisclosed always last
+          if (vb === null) return -1;
+          if (va < vb) return -1 * sortDir;
+          if (va > vb) return 1 * sortDir;
+          return a.dataset.orig - b.dataset.orig;
+        });
+        sorted.forEach(function (r) { tbody.appendChild(r); });
+        restripe();
+      }
+      var headers = document.querySelectorAll('#credit-table th.sortable');
+      headers.forEach(function (th) {
+        th.addEventListener('click', function () {
+          var key = th.dataset.key;
+          if (sortKey === key) {
+            if (sortDir === 1) { sortDir = -1; }
+            else { sortKey = null; sortDir = 1; } // third click: back to ledger order
+          } else {
+            sortKey = key;
+            sortDir = 1;
+          }
+          headers.forEach(function (h) {
+            h.classList.remove('sort-asc', 'sort-desc');
+            h.removeAttribute('aria-sort');
+          });
+          if (sortKey) {
+            th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+            th.setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+          }
+          sortRows();
+        });
+      });
+
       [selIssuer, selType, selSen, selStatus].forEach(function (el) {
         el.addEventListener('change', apply);
       });
@@ -506,12 +709,25 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     }
     .panel svg { display: block; width: 100%; height: auto; }
     .panel-foot {
-      padding: 8px var(--pad-panel) var(--pad-panel);
+      padding: 4px var(--pad-panel) var(--pad-panel);
       font-size: var(--fs-sm);
       color: var(--ink-dim);
       line-height: 1.5;
       max-width: 100ch;
     }
+    /* Chart definitions — collapsed by default, expandable (site pattern). */
+    .panel-foot-disclosure { margin: 0; }
+    .panel-foot-disclosure > summary {
+      list-style: none; cursor: pointer;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: var(--tracking-eye); text-transform: uppercase;
+      color: var(--ink-dim); font-weight: var(--weight-strong);
+      padding: 4px var(--pad-panel) 10px;
+    }
+    .panel-foot-disclosure > summary::-webkit-details-marker { display: none; }
+    .panel-foot-disclosure > summary::before { content: '▸ '; color: var(--accent); }
+    .panel-foot-disclosure[open] > summary::before { content: '▾ '; }
+    .panel-foot-disclosure[open] > summary { padding-bottom: 2px; }
 
     /* --- svg marks -------------------------------------------------------- */
     .grid { stroke: color-mix(in srgb, var(--rule) 70%, transparent); stroke-width: 1; }
@@ -533,6 +749,11 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       stroke: color-mix(in srgb, var(--accent) 55%, transparent);
       stroke-width: 1.25;
     }
+    .leader {
+      stroke: var(--ink-faint);
+      stroke-width: 0.75;
+      opacity: 0.55;
+    }
     .pt-label {
       font-family: var(--font-mono);
       font-size: 11px;
@@ -553,7 +774,6 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       fill: var(--ink-faint);
       text-anchor: middle;
     }
-    .pt-tag-ctx { fill: var(--ink-faint); }
 
     /* --- filters + table --------------------------------------------------- */
     .ledger-head { margin: 8px 0 14px; max-width: 84ch; }
@@ -584,6 +804,23 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     .table-scroll { overflow-x: auto; border: 1px solid var(--rule); }
     #credit-table { min-width: 1080px; }
     #credit-table td { font-size: var(--fs-sm); }
+    #credit-table th.sortable {
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    #credit-table th.sortable::after {
+      content: '↕';
+      margin-left: 5px;
+      opacity: 0.35;
+      font-size: 0.9em;
+    }
+    #credit-table th.sortable:hover { color: var(--ink); }
+    #credit-table th.sort-asc::after { content: '▲'; opacity: 1; color: var(--accent); }
+    #credit-table th.sort-desc::after { content: '▼'; opacity: 1; color: var(--accent); }
+    #credit-table tbody tr.stripe:not(:hover) td {
+      background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+    }
     .c-issuer, .c-name, .c-type, .c-rate, .c-mat, .c-sen, .c-status, .c-src { text-align: left !important; }
     .c-name { max-width: 300px; }
     .c-issuer .issuer-name { display: block; }
