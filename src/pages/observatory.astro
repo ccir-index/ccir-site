@@ -7,7 +7,7 @@ const DEFAULT_CHIP = 'h100-sxm';
 const availMeta = (meta as any).availability;
 ---
 <Base
-  title="Availability Observatory · CCIR"
+  title="Availability Observatory · CMR"
   description="Cross-provider availability and pricing grid for GPU compute, sourced from the Shadeform aggregator. Collection paused — shows the last published snapshot (2026-05-13)."
 >
   <!-- vast-page class brings the Bloomberg-terminal chrome (ticker strip,
@@ -34,7 +34,7 @@ const availMeta = (meta as any).availability;
         This page surfaces the cross-provider view Shadeform aggregates:
         where each chip is procurable, across providers and regions;
         the per-provider price spread; boot-time tradeoffs; config availability;
-        long-tail chip catalog. <strong>Observatory data — not part of the CCIR rate
+        long-tail chip catalog. <strong>Observatory data — not part of the CMR rate
         methodology.</strong> Shadeform-reported pricing is third-party-attributed.
       </p>
     </details>
@@ -261,7 +261,7 @@ const availMeta = (meta as any).availability;
         <p class="footnote">
           Per-cycle <code>pct_available = n_available ÷ n_total_sku_region</code>
           for the selected chip, at the 3-hour collection cadence. Shadeform
-          exposes current state only; CCIR persists the cycle-by-cycle history
+          exposes current state only; CMR persists the cycle-by-cycle history
           drawn here. The series ends 2026-05-13, when collection was paused.
         </p>
       </details>
@@ -330,7 +330,7 @@ const availMeta = (meta as any).availability;
         <p class="footnote">
           Every chip Shadeform reports across the headline + long-tail panel.
           B300, GH200, and RTX Pro 6000 give early visibility into chips before
-          they hit the CCIR rate panel.
+          they hit the CMR rate panel.
         </p>
       </details>
     </section>
@@ -339,7 +339,7 @@ const availMeta = (meta as any).availability;
       Collected every three hours while live; collection has been paused since
       2026-05-13 pending the pipeline migration, and every figure on this page
       reflects the last published snapshot. Shadeform aggregator API authenticated via
-      CCIR research key — values are public list-asks as Shadeform reports them.
+      CMR research key — values are public list-asks as Shadeform reports them.
       Aggregator depth: 19 GPU clouds, 28 GPU types, 269 instance types,
       ~671 (type × region) availability cells per cycle.
     </p>

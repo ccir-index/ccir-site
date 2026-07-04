@@ -6,53 +6,14 @@ const GH_BASE = 'https://github.com/ccir-index/ccir-methodology/blob/main';
 const docs = [
   {
     title: 'Methodology',
-    slug: 'CCIR_Methodology_v2_0_0.md',
+    slug: 'CMR_Methodology_v2_0_0.md',
     summary:
       'Panel definition, eligibility filters, source-class taxonomy, algorithmic tier classifier, publication thresholds, and the naming convention that binds the published rate to the SKU it references.',
     sections: [
       'Part 0 — Independence and administration posture',
-      'Part 1 — What CCIR measures (list-asks, intelligence-factory frame)',
+      'Part 1 — What CMR measures (list-asks, intelligence-factory frame)',
       'Part 4 — Operator-equal median and multi-horizon fallback',
       'Part 11 — Algorithmic tier rubric (T1IF / T2IF / T3IF)',
-    ],
-  },
-  {
-    title: 'Governance',
-    slug: 'CCIR_Governance_v2_0_0.md',
-    summary:
-      'Administrator profile, structural independence from monitored markets, conflicts-of-interest policy, control framework, complaints procedure, change-control workflow, and regulatory disclaimer.',
-    sections: [
-      '§1 — Administrator profile and structural independence',
-      '§2 — Conflicts of interest policy',
-      '§3 — Control framework (audit infrastructure, manifest, version stamping)',
-      '§5 — Complaints procedure',
-      '§6 — Methodology change-control workflow',
-    ],
-  },
-  {
-    title: 'IOSCO Alignment',
-    slug: 'CCIR_IOSCO_Alignment_v2_0_0.md',
-    summary:
-      'Principle-by-principle crosswalk against the 19 IOSCO Principles for Financial Benchmarks (July 2013). 14 of 19 Compliant, 2 Targeted (Oversight Board, First Annual Audit), 3 Not Applicable (submitter principles — structurally inapplicable to algorithmic collection).',
-    sections: [
-      '§1 — Summary crosswalk (one-line per principle)',
-      '§2.1 — Section I · Governance (Principles 1–5)',
-      '§2.2 — Section II · Benchmark Quality (Principles 6–10)',
-      '§2.3 — Section III · Quality of the Methodology (Principles 11–14)',
-      '§2.4 — Section IV · Accountability (Principles 15–19)',
-    ],
-  },
-  {
-    title: 'Fallback Language Guidance',
-    slug: 'CCIR_Fallback_Language_Guidance_v2_0_0.md',
-    summary:
-      'Drafting guidance for structured-finance counsel citing CRI rates in credit agreements. Benchmark definition templates per series, disruption-event surface, replacement-rate waterfall, mandatory threshold-adjustment-spread mechanic, and conforming-changes authority. Adapted from ARRC hardwired-LIBOR conventions.',
-    sections: [
-      '§2 — Benchmark definition language + per-series templates',
-      '§3 — Trigger / disruption events (4)',
-      '§4 — Replacement-rate waterfall (5 steps)',
-      '§5 — Threshold-adjustment spread (mandatory)',
-      '§7 — Tier-class considerations (T1IF / T2IF / T3IF)',
     ],
   },
 ];
@@ -62,16 +23,15 @@ const EFFECTIVE = '2026-05-13';
 const REPO_URL = 'https://github.com/ccir-index/ccir-methodology';
 ---
 <Base
-  title="Documents · CCIR"
-  description="Methodology, governance, and IOSCO alignment documents for CCIR's CRI reference-rate family. Versioned, effective-dated, and publicly archived alongside the rate snapshots."
+  title="Documents · CMR"
+  description="The methodology behind CMR's benchmark rate family. Versioned, effective-dated, and publicly archived alongside the rate snapshots."
 >
   <section class="wrap top">
     <h1>Documents</h1>
     <p class="dek">
-      The methodology, governance, and IOSCO alignment documents that define how
-      CCIR produces and publishes the CRI reference-rate family. Each document
-      is versioned, effective-dated, and held in a single public repository
-      alongside the published rate snapshots.
+      The methodology that defines how CMR produces and publishes its
+      benchmark rate family. Versioned, effective-dated, and held in a
+      public repository alongside the published rate snapshots.
     </p>
 
     <div class="bundle-meta">
@@ -106,11 +66,9 @@ const REPO_URL = 'https://github.com/ccir-index/ccir-methodology';
     </div>
 
     <p class="foot-note">
-      CCIR's IOSCO alignment is voluntary. The CRI rate family is not currently
-      subject to mandatory benchmark regulation in any jurisdiction; alignment
-      is maintained as a structural precondition for citation in credit documents and other benchmark applications.
-      See the Governance document, §10 (Regulatory disclaimer), for the full
-      liability statement.
+      CMR is an independent market-intelligence publisher. It holds no
+      positions in the markets it measures; methodology changes are
+      versioned, effective-dated, and archived.
     </p>
   </section>
 

@@ -20,14 +20,14 @@ const asOf = rows[0]?.as_of_date ?? meta.as_of_date;
 const windowDays = rows[0]?.window_days ?? 7;
 ---
 <Base
-  title="Clearing Basis · CCIR"
-  description="How the one live, executable marketplace venue (Vast) prices relative to the posted list-ask floor at matched tier. An overlay adjacent to the CCIR benchmark — not part of it."
+  title="Clearing Basis · CMR"
+  description="How the one live, executable marketplace venue (Vast) prices relative to the posted list-ask floor at matched tier. An overlay adjacent to the CMR benchmark — not part of it."
 >
   <section class="wrap top">
     <div class="kicker">Overlay · Marketplace clearing vs list-ask</div>
     <h1>Clearing Basis</h1>
     <p class="dek">
-      The CCIR reference rate is a <strong>list-ask benchmark</strong> — every
+      The CMR benchmark rate is a <strong>list-ask benchmark</strong> — every
       panel source posts a rate card. One venue is different: Vast.ai is a live,
       continuously-repriced, executable marketplace. It is pulled out of the
       benchmark so the index stays a clean list-ask, and re-surfaced here as a
@@ -69,7 +69,7 @@ const windowDays = rows[0]?.window_days ?? 7;
       tier (Tier 3). Input is the bid clearing floor where Vast exposes one,
       otherwise the on-demand live ask (flagged per row). <strong>Single-venue
       signal</strong> — Vast only; it is the lone executable marketplace in the
-      panel, not the whole market. Not a CCIR reference rate. {meta.methodology_version}.
+      panel, not the whole market. Not a CMR benchmark rate. {meta.methodology_version}.
     </p>
 
     <div class="occ-section">
@@ -101,7 +101,7 @@ const windowDays = rows[0]?.window_days ?? 7;
         rented <em>or</em> host-paused — the public feed cannot distinguish
         them, so the utilization read is IMPLIED: share of listed capacity not currently
         rentable. Denominator is listed capacity only. History begins
-        2026-05-13. Single-venue signal — not a CCIR reference rate.
+        2026-05-13. Single-venue signal — not a CMR benchmark rate.
       </p>
     </div>
   </section>

@@ -31,16 +31,16 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
 }));
 ---
 <Base
-  title="Reference Rates · CCIR"
-  description="Daily reference rates for GPU compute across the Intelligence Factory Taxonomy. T1IF, T2IF, and T3IF tier medians published each morning by 07:30 ET."
+  title="Benchmark Rates & Market Intelligence · CMR"
+  description="Daily benchmark rates for GPU compute across the Intelligence Factory Taxonomy. T1IF, T2IF, and T3IF tier medians published each morning by 07:30 ET."
   ogImage="/og/home.png"
 >
   <section class="wrap top">
     <div class="hero">
-      <div class="kicker">CCIR · Independent Reference Rates · {meta.as_of_date}</div>
+      <div class="kicker">CMR · GPU Compute Market Intelligence · {meta.as_of_date}</div>
       <h1>Independent Reference Rates for GPU Compute</h1>
       <p class="standfirst lede">
-        CCIR provides a reference rate for all levels of the GPU
+        CMR provides a benchmark rate for all levels of the GPU
         compute market — <em>Tier 1</em>, <em>Tier 2</em>,
         <em>Tier 3</em> across the Intelligence Factory Taxonomy.
       </p>
@@ -50,8 +50,8 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
       <div class="product-cards">
         <a class="product-card" href="/rates">
           <div class="pc-head">
-            <span class="kicker">Reference Rates</span>
-            <span class="pc-tag citable">Citable</span>
+            <span class="kicker">Benchmark Rates</span>
+            <span class="pc-tag published">Published</span>
           </div>
           <div class="pc-kicker">Today · T2IF · {anchorChip} SXM · On-demand</div>
           <div class="pc-number">${fmt(anchorMedian)}<span class="pc-unit">/GPU-hr</span></div>
@@ -100,7 +100,7 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
 
     <aside class="independence-block" aria-label="Independence statement">
       <p>
-        CCIR holds no positions in the markets it measures. No
+        CMR holds no positions in the markets it measures. No
         marketplace operations, no swap desk, no trading
         relationships.
       </p>
@@ -147,7 +147,7 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
           The same H100 silicon is deployed at all three tiers — hyperscale,
           dedicated cluster, marketplace. Each tier is a distinct capability
           bundle — fabric, tenancy, bundle depth — and each carries its own
-          rate. CCIR prices all three; the full ladder, with US / EU splits
+          rate. CMR prices all three; the full ladder, with US / EU splits
           and per-tier panels, lives on <a href="/rates">/rates</a>.
         </p>
       </header>
@@ -178,12 +178,10 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
       </div>
       <p class="meth-tail">
         See <a href="/tiers">/tiers</a> for tier definitions, the
-        T1IF-anchored spread matrix, and classification, and
-        <a href="/applications">/applications</a> for worked
-        credit-document examples.
+        T1IF-anchored spread matrix, and classification.
       </p>
       <p class="meth-cta">
-        <a href="https://github.com/ccir-index/ccir-methodology/blob/main/CCIR_Methodology_v2_0_0.md">
+        <a href="https://github.com/ccir-index/ccir-methodology/blob/main/CMR_Methodology_v2_0_0.md">
           Read the full methodology · v2.0.0 →
         </a>
       </p>
@@ -196,21 +194,14 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
       </header>
       <ul class="disc-list">
         <li>
-          <strong>Indicative reference rates.</strong> Long-tail chips
+          <strong>Indicative benchmark rates.</strong> Long-tail chips
           (L4, L40S, A40, T4, V100, 3090, 4090, 5090, etc.) appear in the
           explorer as panel medians with no tier coverage. Treat them as
           reference points, not benchmark rates.
         </li>
         <li>
-          <strong>No positions.</strong> CCIR holds no positions in the
+          <strong>No positions.</strong> CMR holds no positions in the
           markets it measures.
-        </li>
-        <li>
-          <strong>Credit document citation.</strong> The
-          <a href="/applications">Applications</a> page contains worked
-          drafting examples — defined terms, covenant mechanics, fallback
-          waterfall — showing how a CCIR rate fits into a senior-secured
-          GPU-backed facility.
         </li>
       </ul>
     </section>
@@ -300,7 +291,7 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
       border: 1px solid var(--rule-2);
       white-space: nowrap;
     }
-    .pc-tag.citable { color: var(--pos); border-color: var(--pos); }
+    .pc-tag.published { color: var(--pos); border-color: var(--pos); }
     .pc-tag.mi { color: var(--accent); border-color: var(--accent); }
     .pc-desc {
       margin: 0;

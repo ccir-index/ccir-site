@@ -14,8 +14,8 @@ interface Props {
 }
 
 const {
-  title = 'CCIR · Compute Credit Index Research',
-  description = 'Independent reference rates for GPU compute. Aggregated from publicly-observed posted prices across the Intelligence Factory Taxonomy.',
+  title = 'CMR · Compute Market Research',
+  description = 'Independent benchmark rates for GPU compute. Aggregated from publicly-observed posted prices across the Intelligence Factory Taxonomy.',
   // Ticker suppressed 2026-07-02: the v2026-07-01 panel activation (31→41
   // sources) + same-day restatements make day-over-day arrows read as market
   // moves when they're composition changes. Flip back to true once the panel
@@ -43,7 +43,7 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE).href : undefined;
   {noindex && <meta name="robots" content="noindex,follow" />}
   {!noindex && <link rel="canonical" href={canonical} />}
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="CCIR" />
+  <meta property="og:site_name" content="Compute Market Research" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
@@ -53,6 +53,7 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE).href : undefined;
   <meta name="twitter:description" content={description} />
   {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
   <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -89,22 +90,24 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE).href : undefined;
     </div>
     <div class="wrap footer-inner">
       <div class="lhs">
-        <strong>CCIR {meta.methodology_version}</strong> · Independent
-        reference rates across the Intelligence Factory Taxonomy. Each
-        tier is a defined capability bundle, with one reference rate
-        per tier. Published each morning by 07:30 ET.
+        <strong>CMR {meta.methodology_version}</strong> · Independent
+        benchmark rates and market intelligence across the Intelligence
+        Factory Taxonomy. Each tier is a defined capability bundle, with
+        one benchmark rate per tier. Published each morning by 07:30 ET.
+        <span class="llc-note">Compute Market Research is a publication
+        of CCIR LLC.</span>
       </div>
       <div class="rhs">
         <a href={`https://github.com/ccir-index/ccir-v2-data/tree/main/indices/snapshots/${meta.as_of_date}`}>Data</a>
         <a href="/documents">Documents</a>
         <a href="/tiers">Tiers</a>
-        <a href="/applications">Applications</a>
         <a href="/market-data">Market Data</a>
         <span class="social">
-          <a href="https://www.linkedin.com/company/compute-credit-index-research/" aria-label="CCIR on LinkedIn" rel="me noopener" target="_blank">
+          <!-- LinkedIn slug updates when the account renames (runbook step) -->
+          <a href="https://www.linkedin.com/company/compute-credit-index-research/" aria-label="CMR on LinkedIn" rel="me noopener" target="_blank">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V24h-4V8zm7.5 0h3.83v2.2h.05c.53-1 1.84-2.2 3.78-2.2 4.04 0 4.79 2.66 4.79 6.11V24h-4v-7.09c0-1.69-.03-3.86-2.36-3.86-2.36 0-2.72 1.84-2.72 3.74V24h-4V8z"/></svg>
           </a>
-          <a href="https://x.com/CCIR_IO" aria-label="CCIR on X" rel="me noopener" target="_blank">
+          <a href="https://x.com/cmr_research" aria-label="CMR on X" rel="me noopener" target="_blank">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
         </span>

@@ -58,7 +58,7 @@ function cellTitle(c: Rate): string {
 
 // Emerging & non-NVIDIA silicon — indicative source-class cells (no tier_v3
 // coverage by design: inference/AMD ride the source-class axis). Surfaced
-// here as clearly-labeled indicative rates; the citable ladder above stays
+// here as clearly-labeled indicative rates; the benchmark ladder above stays
 // premium-tier only. Watch chips (e.g. GB300 at n=1) appear when they clear
 // the Provisional floor.
 const EMERGING_CHIPS = ['MI300X', 'RTXPRO6000', 'RTX PRO 6000'];
@@ -75,18 +75,18 @@ function emergingDisplay(model: string): string {
 }
 ---
 <Base
-  title="Reference Rates · CCIR"
-  description="Citable daily reference rates for GPU compute — T1IF, T2IF, T3IF operator-equal medians per premium silicon, with US/EU home-geography splits."
+  title="Benchmark Rates · CMR"
+  description="Daily benchmark rates for GPU compute — T1IF, T2IF, T3IF operator-equal medians per premium silicon, with US/EU home-geography splits."
   ogImage="/og/home.png"
 >
   <section class="wrap top">
     <header class="page-head">
-      <div class="kicker">Citable Benchmark · {meta.as_of_date}</div>
-      <h1>Reference Rates</h1>
+      <div class="kicker">Benchmark Rates · {meta.as_of_date}</div>
+      <h1>Benchmark Rates</h1>
       <p class="standfirst">
-        On-demand reference rates per premium silicon across the Intelligence
+        On-demand benchmark rates per premium silicon across the Intelligence
         Factory Taxonomy — an operator-equal median at each tier, published
-        daily. Every number on this page is the citable series; committed-term
+        daily. Every number on this page is the published benchmark series; committed-term
         market intelligence lives on <a href="/term">/term</a>.
       </p>
     </header>
@@ -214,7 +214,7 @@ function emergingDisplay(model: string): string {
         Geographic breakout cells (US / EU) surface at 2 sources as
         <em>Provisional</em> and auto-promote at 3. Below-gate cells emit as
         Shadow series — visible in the <a href="/explorer">explorer</a>, never
-        cited here. The T1IF-anchored spread matrix is on
+        published here. The T1IF-anchored spread matrix is on
         <a href="/tiers">/tiers</a>.
       </p>
     </section>

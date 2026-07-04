@@ -102,8 +102,8 @@ const indicativeClient = indicativeRates.map((r) => ({
 }));
 ---
 <Base
-  title="Explorer · CCIR"
-  description="Series-by-series explorer for CCIR reference rates: filter by tier, chip, and form factor to compare medians, means, IQR, and observation counts."
+  title="Explorer · CMR"
+  description="Series-by-series explorer for CMR benchmark rates: filter by tier, chip, and form factor to compare medians, means, IQR, and observation counts."
   ogImage="/og/explorer.png"
 >
   <section class="wrap top">
@@ -126,11 +126,11 @@ const indicativeClient = indicativeRates.map((r) => ({
     <dl class="status-legend">
       <div class="leg-item">
         <dt><span class="status-badge status-published">PUB</span></dt>
-        <dd><strong>Published</strong> — cleared the full gate (≥3 sources, sample floor). The citable reference fixing; also drives the headline pages.</dd>
+        <dd><strong>Published</strong> — cleared the full gate (≥3 sources, sample floor). The published benchmark series; also drives the headline pages.</dd>
       </div>
       <div class="leg-item">
         <dt><span class="status-badge status-provisional">PROV</span></dt>
-        <dd><strong>Provisional</strong> — an emerging regional breakout cell at 2 sources. <em>Surfaced as intelligence, not citable</em>; auto-promotes to Published when a 3rd source lands.</dd>
+        <dd><strong>Provisional</strong> — an emerging regional breakout cell at 2 sources. <em>Surfaced as intelligence, not yet benchmark-grade</em>; auto-promotes to Published when a 3rd source lands.</dd>
       </div>
       <div class="leg-item">
         <dt><span class="status-badge status-shadow">SHD</span></dt>
@@ -326,7 +326,7 @@ const indicativeClient = indicativeRates.map((r) => ({
           var statusBadge = r.status === 'Shadow'
             ? '<span class="status-badge status-shadow" title="Shadow — below the publication floor (single-source, or a core cell held to the strict gate). Shown in the explorer for transparency only; never surfaced on a headline page.">SHD</span>'
             : (r.status === 'Provisional'
-              ? '<span class="status-badge status-provisional" title="Provisional — emerging regional breakout cell at 2 sources. Surfaced as intelligence, not citable; auto-promotes to Published when a 3rd source lands.">PROV</span>'
+              ? '<span class="status-badge status-provisional" title="Provisional — emerging regional breakout cell at 2 sources. Surfaced as intelligence, not yet benchmark-grade; auto-promotes to Published when a 3rd source lands.">PROV</span>'
               : '');
           return '<tr class="' + rowCls + '">' +
             '<td class="sid"><code>' + r.id + '</code>' + statusBadge + '</td>' +

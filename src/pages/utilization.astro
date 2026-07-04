@@ -26,12 +26,12 @@ const AVAIL_CHIPS = [
 const DEFAULT_CHIP = 'h100-sxm';
 ---
 <Base
-  title="Utilization & Availability · CCIR"
-  description="CCIR — measured marketplace utilization (the share of listed GPUs rented, supply-normalized) charted over time, alongside the Availability Index: how many genuine-capacity GPU venues (X of Y) show launchable stock."
+  title="Utilization & Availability · CMR"
+  description="CMR — measured marketplace utilization (the share of listed GPUs rented, supply-normalized) charted over time, alongside the Availability Index: how many genuine-capacity GPU venues (X of Y) show launchable stock."
   ogImage="/og-utilization.png"
 >
   <section class="wrap ai-page">
-    <div class="kicker">CCIR · SUPPLY OBSERVATORY <span class="mi-tag">Market&nbsp;Intelligence</span></div>
+    <div class="kicker">CMR · SUPPLY OBSERVATORY <span class="mi-tag">Market&nbsp;Intelligence</span></div>
     <h1>Utilization &amp; Availability</h1>
     <p class="deck">
       Two lenses on GPU supply. <strong>Utilization</strong> — of the capacity the
@@ -436,9 +436,9 @@ const DEFAULT_CHIP = 'h100-sxm';
   <style>
     .ai-page { max-width: 1040px; }
     .kicker { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .18em; color: var(--accent); margin-bottom: .4rem; }
-    /* MI family tag — same treatment as the landing product card; no
-       "not a citable reference rate" disclaimer here (page publishes no
-       rate — measured utilization + availability breadth only). */
+    /* MI family tag — same treatment as the landing product card (page
+       publishes no rate — measured utilization + availability breadth
+       only). */
     .mi-tag {
       font-family: var(--font-mono);
       font-size: 9px;
