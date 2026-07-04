@@ -936,14 +936,17 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     .pt-hollow { fill: none; stroke-width: 1.6; }
     .range { stroke-width: 2; }
     .ring { fill: none; stroke-width: 1.4; opacity: 0.85; }
-    /* Credit-enhancement ramp — strong → weak support. Reinforced by
+    /* Credit-enhancement ramp — strong → weak support, a teal→amber→red
+       heat ramp. Chosen over teal/blue/amber because in the terminal
+       (dark) theme --accent teal and --info cyan collapse into each other;
+       teal/amber/red stay distinct in both themes. Reinforced by
        y-position + legend, so colour is redundant, not sole-carrying. */
     .tier-strong, .tier-fill-strong { fill: var(--accent); }
-    .tier-mid, .tier-fill-mid { fill: var(--info); }
-    .tier-weak, .tier-fill-weak { fill: var(--warn); }
+    .tier-mid, .tier-fill-mid { fill: var(--warn); }
+    .tier-weak, .tier-fill-weak { fill: var(--neg); }
     .tier-stroke-strong { stroke: var(--accent); }
-    .tier-stroke-mid { stroke: var(--info); }
-    .tier-stroke-weak { stroke: var(--warn); }
+    .tier-stroke-mid { stroke: var(--warn); }
+    .tier-stroke-weak { stroke: var(--neg); }
     /* Chronological reading aid only — deliberately faint + dashed so it
        reads as sequence, not a single-driver trend. */
     .path-seq {
@@ -977,8 +980,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       display: inline-block; flex-shrink: 0;
     }
     .lg-dot.tier-strong { background: var(--accent); }
-    .lg-dot.tier-mid { background: var(--info); }
-    .lg-dot.tier-weak { background: var(--warn); }
+    .lg-dot.tier-mid { background: var(--warn); }
+    .lg-dot.tier-weak { background: var(--neg); }
     .lg-note { color: var(--ink-faint); }
     .pt-label {
       font-family: var(--font-mono);
