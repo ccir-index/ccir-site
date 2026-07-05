@@ -98,11 +98,11 @@
       "maturity": "2030-08-21",
       "maturity_note": "Monthly amortization from Apr 2026",
       "seniority": "Senior secured (SPV); parent guarantee of CCAC VII",
-      "security": "Substantially all CCAC VII assets + 100% equity; GPU servers for a customer contract; DSCR ≥1.40x from Apr 2027",
+      "security": "Substantially all CCAC VII assets + 100% equity; GPU servers under a long-term OpenAI agreement (OpenAI is the offtaker/revenue source, unrated; contract not stated as pledged collateral); DSCR ≥1.40x from Apr 2027",
       "lenders": ["MUFG (admin)", "MS Asset Funding (JLA/bookrunner)", "MUFG (JLA/bookrunner)", "Goldman Sachs Bank (JLA)"],
       "status": "confirmed",
       "issued": "2025-07-28",
-      "source": { "doc": "8-K 7/31/25 (DDTL 3.0); First Amendment 8-K 1/2/26", "date": "2025-07-31", "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000033/crwv-20250728.htm" },
+      "source": { "doc": "8-K 7/31/25 (DDTL 3.0); First Amendment 8-K 1/2/26; CoreWeave IR release 7/28/25 names OpenAI offtake", "date": "2025-07-31", "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000033/crwv-20250728.htm" },
       "as_of": "2026-03-31"
     },
     {
@@ -140,7 +140,7 @@
       "maturity": "2031-11-15",
       "maturity_note": null,
       "seniority": "Senior secured (SPV); parent guarantee",
-      "security": "All borrower assets + 100% equity; GPU servers for customer contracts; DSCR ≥1.35x",
+      "security": "All borrower assets + 100% equity; GPU servers for 2 non-IG (unrated) customer contracts; DSCR ≥1.35x",
       "lenders": ["MS Senior Funding (admin)", "MUFG (lead)", "Morgan Stanley (lead)", "U.S. Bank Trust Co. (collateral)"],
       "status": "confirmed",
       "issued": "2026-05-15",

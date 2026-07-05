@@ -273,16 +273,16 @@ const ay = (v: number) => y0 + (y1 - y0) * ((A_YMAX - v) / A_YMAX);
 // unwrapped GPU-only / non-IG legs. Colour carries that; the eye should
 // read "cheap = wrapped," not "cheap = later." Tiers, strong → weak:
 //   strong = IG-offtake-contract-wrapped (Microsoft)
-//   mid    = customer-credit-scaled GPU collateral (IG + unrated mix)
+//   mid    = customer offtake contracts, no single-IG wrap (2.0/2.1 IG+unrated mix; 3.0 = OpenAI, single/unrated; 5.0 = 2 non-IG customers)
 //   weak   = unwrapped GPU-only / non-IG leg
 type Tier = 'strong' | 'mid' | 'weak';
 const tapeCfg = [
   { id: 'crwv-ddtl-1', date: '2023-07-30', v: 9.62, tag: 'CRWV DDTL 1.0', sub: "as amended '24", tier: 'weak' as Tier },
   { id: 'crwv-ddtl-2', date: '2024-05-16', v: null, lo: 6.0, hi: 6.5, extra: 13.0, tag: 'CRWV DDTL 2.0', sub: 'IG / non-IG', tier: 'mid' as Tier, tierExtra: 'weak' as Tier },
-  { id: 'crwv-ddtl-3', date: '2025-07-28', v: 4.0, tag: 'CRWV DDTL 3.0', sub: null, tier: 'mid' as Tier },
+  { id: 'crwv-ddtl-3', date: '2025-07-28', v: 4.0, tag: 'CRWV DDTL 3.0', sub: 'OpenAI offtake', tier: 'mid' as Tier },
   { id: 'crwv-ddtl-2-1', date: '2025-09-29', v: 4.25, tag: 'CRWV DDTL 2.1', sub: null, tier: 'mid' as Tier },
   { id: 'crwv-ddtl-4', date: '2026-03-30', v: 2.25, tag: 'CRWV DDTL 4.0', sub: 'contract-wrapped', tier: 'strong' as Tier },
-  { id: 'crwv-ddtl-5', date: '2026-05-15', v: 4.5, tag: 'CRWV DDTL 5.0', sub: null, tier: 'mid' as Tier },
+  { id: 'crwv-ddtl-5', date: '2026-05-15', v: 4.5, tag: 'CRWV DDTL 5.0', sub: '2 non-IG customers', tier: 'mid' as Tier },
   { id: 'iren-hw3-ddtl', date: '2026-05-29', v: 2.25, tag: 'IREN H3', sub: 'contract-wrapped', tier: 'strong' as Tier },
 ].map((p) => ({ ...p, inst: inst(p.id) }));
 
@@ -439,10 +439,16 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <span class="badge">FILED TERMS</span>
       </div>
       <div class="legend">
-        <span class="lg-item"><span class="lg-dot tier-strong"></span>IG-contract-wrapped (Microsoft offtake)</span>
-        <span class="lg-item"><span class="lg-dot tier-mid"></span>Customer-credit-scaled GPU collateral</span>
-        <span class="lg-item"><span class="lg-dot tier-weak"></span>Unwrapped GPU-only / non-IG leg</span>
-        <span class="lg-item lg-note">◆ non-IG leg · mostly one borrower (CoreWeave)</span>
+        <div class="lg-line">
+          <span class="lg-head">By contract support · IG → none</span>
+          <span class="lg-item"><span class="lg-dot tier-strong"></span>IG offtake contract (e.g. Microsoft)</span>
+          <span class="lg-item"><span class="lg-dot tier-mid"></span>Customer contracts · no IG wrap</span>
+          <span class="lg-item"><span class="lg-dot tier-weak"></span>GPU hardware only, no contract</span>
+        </div>
+        <div class="lg-line">
+          <span class="lg-head">Mark</span>
+          <span class="lg-item lg-note">● whole facility · │ lo–hi range · ◆ non-IG leg (mostly CoreWeave)</span>
+        </div>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Spread over SOFR on GPU-collateralized facilities, July 2023 to June 2026. The lowest spreads (+2.25) are the IG-contract-wrapped facilities; the highest (+9.62, +13) are unwrapped or non-IG.">
         {A_TICKS_Y.map((t) => (
@@ -523,10 +529,16 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <span class="badge">FILED TERMS</span>
       </div>
       <div class="legend">
-        <span class="lg-item"><span class="lg-dot tier-strong"></span>Hyperscaler-IG tenant / IG-rated</span>
-        <span class="lg-item"><span class="lg-dot tier-mid"></span>Google-guaranteed (Fluidstack tenant)</span>
-        <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud / self-operated offtake</span>
-        <span class="lg-item lg-note">◎ 2042 maturity (longer tenor) · ○ press-reported</span>
+        <div class="lg-line">
+          <span class="lg-head">By contract support · IG → none</span>
+          <span class="lg-item"><span class="lg-dot tier-strong"></span>Hyperscaler-IG tenant / IG-rated</span>
+          <span class="lg-item"><span class="lg-dot tier-mid"></span>Google-guaranteed lease (Fluidstack tenant)</span>
+          <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud / self-operated, unrated</span>
+        </div>
+        <div class="lg-line">
+          <span class="lg-head">Mark</span>
+          <span class="lg-item lg-note">● filed bond · ◎ 2042 maturity (longer tenor) · ○ press-reported</span>
+        </div>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Fixed-rate project bond coupons, October 2025 to June 2026. The lowest coupons (~6 percent) carry hyperscaler-IG offtake or an IG rating; the widest (9.25 percent) is neocloud-offtake.">
         {B_TICKS_Y.map((t) => (
@@ -999,12 +1011,23 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     /* --- chart legend ----------------------------------------------------- */
     .legend {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px 18px;
+      flex-direction: column;
+      gap: 5px;
       padding: 0 var(--pad-panel) 10px;
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       color: var(--ink-dim);
+    }
+    .lg-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 18px;
+    }
+    .lg-head {
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
     .lg-item { display: inline-flex; align-items: center; gap: 6px; }
     .lg-dot {
