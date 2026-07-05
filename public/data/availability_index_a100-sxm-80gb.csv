@@ -1,6 +1,6 @@
 chip_slug,scope,window_days,as_of_date,n_sources,n_sources_8x,n_sources_thin,n_cycles,confidence,n_available,breadth,n_available_8x,breadth_8x,panel_signature,pct_available_median,pct_available_mean,pct_available_min,pct_available_max,pct_available_8x_median,pct_available_8x_mean,methodology_version
-a100-sxm-80gb,geo:EU,7,2026-07-04,2,0,0,58,thin,1,0.5,0,,c4b2d406,0.4655,0.4655,0.0,0.931,,,v2.0.0
-a100-sxm-80gb,geo:US,7,2026-07-04,6,3,0,174,ok,5,0.8333,2,0.6667,e9e24b01,1.0,0.8161,0.0,1.0,0.2759,0.4253,v2.0.0
-a100-sxm-80gb,global,7,2026-07-04,13,6,0,311,ok,11,0.8462,5,0.8333,72e8ccd0,1.0,0.8061,0.0,1.0,0.2004,0.3515,v2.0.0
-a100-sxm-80gb,tier:T2,7,2026-07-04,3,3,0,87,ok,2,0.6667,2,0.6667,b810ae34,1.0,0.6667,0.0,1.0,0.2759,0.4253,v2.0.0
-a100-sxm-80gb,tier:T3,7,2026-07-04,3,0,0,87,ok,3,1.0,0,,d961b4c1,1.0,0.9655,0.8966,1.0,,,v2.0.0
+a100-sxm-80gb,geo:EU,7,2026-07-05,2,0,0,64,thin,1,0.5,0,,c4b2d406,0.4688,0.4688,0.0,0.9375,,,v2.0.0
+a100-sxm-80gb,geo:US,7,2026-07-05,6,3,0,192,ok,5,0.8333,2,0.6667,e9e24b01,1.0,0.8333,0.0,1.0,0.375,0.4583,v2.0.0
+a100-sxm-80gb,global,7,2026-07-05,13,6,0,335,ok,11,0.8462,5,0.8333,72e8ccd0,1.0,0.8141,0.0,1.0,0.25,0.3681,v2.0.0
+a100-sxm-80gb,tier:T2,7,2026-07-05,3,3,0,96,ok,2,0.6667,2,0.6667,b810ae34,1.0,0.6667,0.0,1.0,0.375,0.4583,v2.0.0
+a100-sxm-80gb,tier:T3,7,2026-07-05,3,0,0,96,ok,3,1.0,0,,d961b4c1,1.0,1.0,1.0,1.0,,,v2.0.0
