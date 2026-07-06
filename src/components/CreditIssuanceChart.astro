@@ -114,10 +114,11 @@ const qLabel = (q: string) => q.replace('-', ' ');
         carry a fuzzy issuance date, so they are in the total but not placed in a bar.</>
       )}
       {heldOut.length > 0 && (
-        <> {heldOut.length} large deal{heldOut.length === 1 ? ' is' : 's are'} held out
-        (${(heldOutUsd / 1000).toFixed(1)}B) as out of scope — data-center-campus credit
-        where GPUs aren't the security, and program umbrellas that would double-count
-        confirmed tranches.</>
+        <> This measures <strong>GPU-collateralized</strong> debt only —
+        secured by the GPUs or equipment themselves. {heldOut.length} instruments
+        (${(heldOutUsd / 1000).toFixed(0)}B) are tracked in the ledger but excluded
+        here: convertibles, unsecured corporate notes, real-estate and
+        data-center-campus credit, and unconfirmed deals.</>
       )} Pre-2024 issuance (${(preBaseUsd / 1000).toFixed(1)}B) is small and sits in the
       cumulative line's starting level rather than as its own bars.
     </p>
