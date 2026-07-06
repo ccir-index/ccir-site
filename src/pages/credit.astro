@@ -354,14 +354,15 @@ const bondPath = [
   { id: 'cifr-6000-2031', date: '2026-06-15', tag: 'CIFR 6.000', tier: 'strong' as Tier },
 ].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
 
-// Context: the other filed project bonds of the window, plus the one
-// press-reported SPV bond (hollow) — no silent caps on what the window held.
+// Context: the other filed project bonds of the window. Meridian Arc (the
+// large SPV landlord bond) is now confirmed — issuer-counsel priced release
+// + Fitch BB — so it is a filled dot, no longer hollow. No silent caps.
 const bondContext = [
   { id: 'wulf-jv-7250-2030', date: '2025-12-29', tag: 'WULF JV 7.250', tier: 'mid' as Tier, press: false },
   { id: 'apld-6750-2031', date: '2026-03-10', tag: 'APLD 6.750', tier: 'strong' as Tier, press: false },
   { id: 'corz-7750-2031', date: '2026-05-06', tag: 'CORZ 7.750', tier: 'weak' as Tier, press: false },
   { id: 'apld-7000-2031', date: '2026-06-16', tag: 'APLD 7.000', tier: 'weak' as Tier, press: false },
-  { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc 6.250', tier: 'mid' as Tier, press: true },
+  { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc 6.250', tier: 'mid' as Tier, press: false },
 ].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
 
 const bObstacles = [
@@ -535,7 +536,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         </div>
         <div class="lg-line">
           <span class="lg-head">Mark</span>
-          <span class="lg-item lg-note">● filed bond · ◎ 2042 maturity (longer tenor) · ○ press-reported</span>
+          <span class="lg-item lg-note">● filed bond · ◎ 2042 maturity (longer tenor)</span>
         </div>
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Fixed-rate project bond coupons, October 2025 to June 2026. The lowest coupons (~6 percent) carry hyperscaler-IG offtake or an IG rating; the widest (9.25 percent) is neocloud-offtake.">
@@ -597,9 +598,11 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
             level. Structure: IREN 5.96% is Microsoft-*contract*-secured GPU
             financing under a common-terms agreement, structurally closer to the
             floating-rate facilities in the chart above than to a single-campus
-            lease bond. ○ = Meridian Arc 6.25%, press-reported (Bloomberg/LCD), no
-            issuer release — SPV landlord paper on a Google-guaranteed Fluidstack
-            lease, shown for completeness and flagged.
+            lease bond. Meridian Arc 6.25% is SPV landlord paper on a Google-
+            guaranteed Fluidstack lease — confirmed via issuer counsel (Latham)
+            pricing release and Fitch's BB rating (on the Google guarantee;
+            Fluidstack unrated). The JV parents are private, so there is no SEC
+            filing.
           </p>
         </div>
       </details>
