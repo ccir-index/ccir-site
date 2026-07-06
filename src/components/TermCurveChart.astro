@@ -211,7 +211,7 @@ const ariaLabel =
   `Committed par curve, as of ${meta.as_of_date}: USD per GPU-hour by tenor for ${chipNames}. ` +
   `Each line runs from the on-demand anchor through committed asks at 1, 3 and 6 months to the 1-year anchor tenor where published. ` +
   `End labels give each chip's terminal rate and its within-provider signed spread — that chip's committed asks versus the same operators' own on-demand rates, aggregated operator-equal. ` +
-  `Hollow marks are Provisional cells (2–4 sources); hover any mark for panel depth.`;
+  `Hollow points are thin panels (fewer than 3 provider pairs); hover any point for the spread and pair count.`;
 ---
 <figure class="tcv" aria-describedby="tcv-caption">
   <div class="tcv-head">
@@ -310,10 +310,10 @@ const ariaLabel =
         <li>This avoids the composition bias in a raw committed-vs-OD median,
         which differences two different provider panels and overstates the
         discount (H100 1Y: −24% cross-panel vs −12% within-provider). The plotted
-        tenor levels are therefore OD-consistent implied marks, not raw medians.</li>
-        <li>Hollow marks = thin (fewer than 3 provider pairs). Hover any mark
+        tenor levels are therefore OD-consistent implied levels, not raw medians.</li>
+        <li>Hollow points = thin (fewer than 3 provider pairs). Hover any point
         for the spread and pair count.</li>
-        <li>Term axis compressed (√months) so the short end reads · 1-day marks ·
+        <li>Term axis compressed (√months) so the short end reads · 1-day snapshots ·
         B300 joins as its committed panel clears the gate.</li>
       </ul>
     </details>
