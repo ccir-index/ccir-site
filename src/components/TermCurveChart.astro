@@ -140,25 +140,34 @@ function spreadVsOd(chip: string, months: number): { txt: string; title: string 
   };
 }
 
-function tenorPoint(chip: string, term: Term, months: number): Pt | null {
-  const c: Rate | undefined = neocloudCommittedCell(chip, term);
-  if (!c) return null;
-  const v = headlineValue(c);
+// Tenor point = the observed on-demand rate stepped down by the WITHIN-PROVIDER
+// term spread (committed_mi: each operator's committed ask vs its OWN on-demand,
+// operator-equal). Anchoring at OD and applying that spread keeps the line's
+// drop equal to the end-label at every tenor. The raw committed median differences
+// two DIFFERENT provider panels (OD n≫committed n) and overstates the discount —
+// e.g. H100 1Y reads −24% cross-panel but −12% within-provider.
+function tenorPoint(chip: string, term: Term, months: number, odValue: number): Pt | null {
+  const sp = wpSpread(chip, term);
+  if (!sp) return null;
+  const v = odValue * (1 + sp.spread);
+  const pctTxt = `${sp.spread >= 0 ? '+' : '−'}${Math.abs(sp.spread * 100).toFixed(1)}%`;
   return {
     x: xOf(months),
     y: yOf(v),
     months,
     value: v,
-    prov: c.promotion_status === 'Provisional',
+    prov: sp.n_pairs < 3,
     anchor: months === 12,
-    title: `${chip} · ${term} committed (Neocloud) · ${headlineStatOf(c)} $${fmt(v)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs · ${c.promotion_status}`,
+    title: `${chip} · ${term} committed vs own OD: ${pctTxt} — within-provider spread (${sp.n_pairs} provider pairs) → $${fmt(v)} implied off the $${fmt(odValue)} on-demand rate`,
   };
 }
 
 const series: SeriesView[] = CHIPS.flatMap(({ chip, cls }) => {
+  const od = odPoint(chip);
+  if (!od) return [];
   const pts = [
-    odPoint(chip),
-    ...TENORS.map((t) => tenorPoint(chip, t.term, t.months)),
+    od,
+    ...TENORS.map((t) => tenorPoint(chip, t.term, t.months, od.value)),
   ].filter((p): p is Pt => p !== null);
   if (pts.length < 2) return [];
   const path = pts
@@ -292,17 +301,19 @@ const ariaLabel =
     <details class="tcv-details">
       <summary>Chart notes</summary>
       <ul class="tcv-notes-list">
-        <li>Series = the Neocloud operator segment, guaranteed ·
-        operator-equal (median of per-source medians).</li>
-        <li>OD = the Neocloud guaranteed on-demand rate — the same segment
-        on both sides of the OD→committed step.</li>
-        <li>End-label % = within-provider signed spread — each operator's
-        committed ask vs its own on-demand rate, aggregated operator-equal.
-        Hover the label for pair count.</li>
-        <li>Hollow marks = Provisional (2–4 sources). Hover any mark for
-        panel depth.</li>
-        <li>Lines connect posted marks only (no interpolation) · term axis
-        compressed (√months) so the short end reads · 1-day marks ·
+        <li>OD anchor = the observed Neocloud (operator-tier T2) guaranteed
+        on-demand rate.</li>
+        <li>Each tenor = the OD anchor stepped down by the <strong>within-provider
+        term spread</strong> — each operator's committed ask vs its <em>own</em>
+        on-demand rate, aggregated operator-equal. So the line's drop equals the
+        end-label at every tenor.</li>
+        <li>This avoids the composition bias in a raw committed-vs-OD median,
+        which differences two different provider panels and overstates the
+        discount (H100 1Y: −24% cross-panel vs −12% within-provider). The plotted
+        tenor levels are therefore OD-consistent implied marks, not raw medians.</li>
+        <li>Hollow marks = thin (fewer than 3 provider pairs). Hover any mark
+        for the spread and pair count.</li>
+        <li>Term axis compressed (√months) so the short end reads · 1-day marks ·
         B300 joins as its committed panel clears the gate.</li>
       </ul>
     </details>
