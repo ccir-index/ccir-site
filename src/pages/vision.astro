@@ -1,0 +1,169 @@
+---
+import Base from '../layouts/Base.astro';
+import { meta } from '../data/snapshot';
+---
+<Base
+  title="Vision · CCIR"
+  description="What a financialized compute market looks like — worked examples of deals settled on the CCIR reference rate, with CCIR as the neutral settlement index and nothing more."
+  ogImage="/og/home.png"
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Vision · What CCIR settles · {meta.as_of_date}</div>
+      <h1>What a Financialized Compute Market Looks Like</h1>
+      <p class="standfirst">
+        The <a href="/research/unfinancialized-compute">research</a> prices what
+        the missing market costs. This shows the deals that close the gap — cash
+        settled on a neutral reference rate, with CCIR as the settlement index
+        and nothing more.
+      </p>
+    </header>
+
+    <section class="body">
+      <p class="lead">
+        Every worked example below is <strong>cash-settled</strong>: no GPUs
+        change hands through the contract, and each party keeps buying or selling
+        capacity physically as it does today. The contract references the
+        <strong>CCIR reference rate</strong>, settled <strong>Asian-style</strong>
+        — on the <em>average</em> of the daily rate over the term, not a single
+        day's fix. Compute is consumed continuously, like power; an average
+        matches the exposure and is far harder to move than one fixing. It is how
+        power and commodity swaps already settle.
+      </p>
+
+      <!-- Example 1 -->
+      <h2>1 · A lab and a cloud lock the price</h2>
+      <p>
+        An <strong>AI lab</strong> buying H100 capacity is exposed to prices
+        <em>rising</em>; it wants to fix its cost to budget a training run. A
+        <strong>neocloud</strong> selling that capacity is exposed to prices
+        <em>falling</em>; it wants to fix revenue. They take opposite sides of one
+        swap.
+      </p>
+      <div class="deal-wrap">
+        <table class="data deal">
+          <tbody>
+            <tr><td class="k">Notional</td><td>1,000 H100s × 1 year = 8.76M GPU-hours</td></tr>
+            <tr><td class="k">Fixed strike (K)</td><td>$2.50 / GPU-hour</td></tr>
+            <tr><td class="k">Floating</td><td>average CCIR H100 · Neocloud rate over the year (Ā)</td></tr>
+            <tr><td class="k">Settlement</td><td>(Ā − K) × notional</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="outcomes">
+        <li><strong>Ā = $3.00</strong> (prices rose): the cloud pays the lab (3.00−2.50) × 8.76M = <strong>$4.38M</strong>. The lab's physical bill rose, the hedge covered it — its all-in cost stays $2.50.</li>
+        <li><strong>Ā = $2.00</strong> (prices fell): the lab pays the cloud <strong>$4.38M</strong>. The cloud's realized price fell, the hedge made it whole — its revenue is floored at $2.50.</li>
+      </ul>
+      <p>
+        Either way, both sides have certainty. Neither delivers compute through
+        CCIR; they simply agree to settle against the rate CCIR publishes.
+      </p>
+
+      <!-- Example 2 -->
+      <h2>2 · A cloud turns certainty into cheaper capital</h2>
+      <p>
+        A neocloud is building a cluster <em>ahead</em> of a signed offtake —
+        merchant capacity, which is expensive to finance (uncontracted debt sizes
+        at roughly half the advance and twice the coverage of contracted debt). It
+        sells its output forward with the same swap: it receives fixed, pays
+        floating, and its revenue is locked at K regardless of spot —
+        <strong>synthetic cash-flow certainty</strong> without waiting for a
+        signed customer.
+      </p>
+      <div class="deal-wrap">
+        <table class="data deal">
+          <tbody>
+            <tr><td class="k">Facility</td><td>$500M secured buildout loan</td></tr>
+            <tr><td class="k">Hedge</td><td>revenue locked via a CCIR-settled swap</td></tr>
+            <tr><td class="k">Lender response</td><td>more debt, tighter spread — the ~90bp cash-flow-certainty slice</td></tr>
+            <tr><td class="k">Order of magnitude</td><td>~90bp on $500M ≈ <strong>$4.5M / year</strong>, plus a larger leverage lift</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        That ~90bp is the number the <a href="/research/unfinancialized-compute">research
+        page</a> estimates the sector is paying today for the <em>absence</em> of
+        this hedge. It is not a universal lever — a price hedge fixes revenue
+        volatility, not the counterparty's credit, and lenders still size to
+        collateral, sponsor and covenants. But where revenue volatility is the
+        binding constraint, it moves the number.
+      </p>
+
+      <!-- Where it goes -->
+      <h2>Where it goes next</h2>
+      <p>
+        Once a rate is stable enough to settle on, the rest of the structure
+        follows the pattern power and freight already took. Dealers sell
+        <strong>cluster swaps</strong> — swapping a specific fleet's settlement for
+        the CCIR hub rate at a spread, and warehousing the basis. Buyers in one
+        region hedge against the reference and lay off the <strong>locational
+        basis</strong> separately. A forward curve lengthens as liquidity builds
+        toward the tenor of the debt it supports. None of it requires CCIR to be
+        more than the reference.
+      </p>
+
+      <h2>CCIR's role — and only role</h2>
+      <p>
+        In every case CCIR publishes the rate. It is <strong>not a counterparty,
+        does not run a venue, holds no position, and marks nothing.</strong> It is
+        the neutral settlement rate two sides agree to reference — the compute
+        analog of a power hub index or SOFR. The parties, and their dealers, do
+        everything else. That neutrality is the whole point: a price a market can
+        settle on has to be one no participant controls.
+      </p>
+
+      <p class="method">
+        Forward-looking. These structures do not exist in compute today; the page
+        describes what a neutral reference makes possible, using the CCIR rate as
+        the settlement index. Certainty premium (~90bp) from Gohdes/Simshauser/Wilson
+        (2022, <em>Energy Economics</em>); see the
+        <a href="/research/unfinancialized-compute">research</a> and the
+        <a href="/credit">credit ledger</a>.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display); font-size: var(--fs-3xl);
+      line-height: var(--lh-display); font-weight: var(--weight-display);
+      margin: 6px 0 12px;
+    }
+    .standfirst a { color: var(--accent); }
+    .standfirst em { font-style: italic; color: var(--accent); }
+
+    .body { max-width: 80ch; }
+    .body .lead { font-size: var(--fs-lg); }
+    .body h2 {
+      font-family: var(--font-display); font-size: var(--fs-xl);
+      margin: 30px 0 8px;
+    }
+    .body p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 14px; }
+    .body p em { color: var(--accent); font-style: italic; }
+    .body a { color: var(--accent); }
+
+    .deal-wrap { border: 1px solid var(--rule); border-left: 2px solid var(--accent); background: var(--surface); margin: 8px 0 16px; overflow-x: auto; }
+    table.deal { width: 100%; border-collapse: collapse; }
+    table.deal td { font-family: var(--font-body); font-size: var(--fs-sm); color: var(--ink); line-height: 1.5; vertical-align: top; }
+    table.deal td.k {
+      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
+      text-transform: uppercase; letter-spacing: var(--tracking-eye); white-space: nowrap;
+      width: 30%; background: var(--surface-2);
+    }
+    table.deal td strong { color: var(--accent); }
+
+    .outcomes { max-width: 84ch; margin: 4px 0 16px; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; }
+    .outcomes li { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.6; }
+    .outcomes strong { color: var(--ink); }
+
+    .method {
+      font-family: var(--font-mono); font-size: var(--fs-xs) !important;
+      color: var(--ink-faint) !important; line-height: 1.7 !important;
+      border-top: 1px solid var(--rule); padding-top: 14px; margin-top: 26px !important; max-width: 90ch;
+    }
+    .method a { color: var(--accent); }
+  </style>
+</Base>
