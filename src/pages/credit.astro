@@ -83,6 +83,12 @@ const TYPE_LABEL: Record<string, string> = {
 const issuers = [...new Set(instruments.map((i: any) => i.issuer))];
 const types = [...new Set(instruments.map((i: any) => i.instrument_type))];
 
+// GPU-collateralized subset — the strict issuance scope charted below. The
+// full ledger also carries convertibles, unsecured notes, and data-center
+// credit, tracked for context but not secured by the GPUs themselves.
+const inScopeC = instruments.filter((i: any) => !i.exclude_from_issuance && typeof i.size_usd_m === 'number' && i.size_usd_m > 0);
+const inScopeUsdB = Math.round(inScopeC.reduce((a: number, i: any) => a + i.size_usd_m, 0) / 1000);
+
 // Lender facet. Filings name the same institution many ways ("Morgan
 // Stanley (lead)", "MS Senior Funding", bare "MS"), so rows are tagged with
 // canonical institution names via pattern match over the filed lender
@@ -412,7 +418,10 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         The debt stack behind AI compute, as filed. {instruments.length}
         instruments across {issuers.length} issuers — public companies from
         their SEC filings, private issuers from company, lender, or arranger
-        statements. Coupons, spreads, collateral, and lenders are reproduced
+        statements. Of these, ${inScopeUsdB}B across {inScopeC.length} are
+        secured directly by the GPUs — the issuance measure charted below;
+        convertibles, unsecured notes, and data-center credit are tracked for
+        context. Coupons, spreads, collateral, and lenders are reproduced
         as disclosed; where a filing does not state a term, the row says
         <em>undisclosed</em> — nothing here is estimated.
       </p>
