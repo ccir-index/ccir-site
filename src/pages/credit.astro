@@ -285,7 +285,7 @@ const ay = (v: number) => y0 + (y1 - y0) * ((A_YMAX - v) / A_YMAX);
 type Tier = 'strong' | 'mid' | 'weak';
 const tapeCfg = [
   { id: 'crwv-ddtl-1', date: '2023-07-30', v: 9.62, tag: 'CRWV DDTL 1.0', sub: "as amended '24", tier: 'weak' as Tier },
-  { id: 'crwv-ddtl-2', date: '2024-05-16', v: null, lo: 6.0, hi: 6.5, extra: 13.0, tag: 'CRWV DDTL 2.0', sub: 'IG / non-IG', tier: 'mid' as Tier, tierExtra: 'weak' as Tier },
+  { id: 'crwv-ddtl-2', date: '2024-05-16', v: null, lo: 6.0, hi: 6.5, extra: 13.0, tag: 'CRWV DDTL 2.0', sub: 'IG / non-IG', tier: 'strong' as Tier, tierExtra: 'mid' as Tier },
   { id: 'crwv-ddtl-3', date: '2025-07-28', v: 4.0, tag: 'CRWV DDTL 3.0', sub: 'OpenAI offtake', tier: 'mid' as Tier },
   { id: 'crwv-ddtl-2-1', date: '2025-09-29', v: 4.25, tag: 'CRWV DDTL 2.1', sub: null, tier: 'mid' as Tier },
   { id: 'crwv-ddtl-4', date: '2026-03-30', v: 2.25, tag: 'CRWV DDTL 4.0', sub: 'contract-wrapped', tier: 'strong' as Tier },
