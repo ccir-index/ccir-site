@@ -31,18 +31,18 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
 }));
 ---
 <Base
-  title="Reference Rates · CCIR"
-  description="Daily reference rates for GPU compute across the Intelligence Factory Taxonomy. T1IF, T2IF, and T3IF tier medians published each morning by 07:30 ET."
+  title="Independent Analysis of the Compute Market · CCIR"
+  description="Independent analysis of the GPU compute market — tracked daily across all chips and deployments, from premium silicon to the long tail."
   ogImage="/og/home.png"
 >
   <section class="wrap top">
     <div class="hero">
-      <div class="kicker">CCIR · Independent Reference Rates · {meta.as_of_date}</div>
-      <h1>Independent Reference Rates for GPU Compute</h1>
+      <div class="kicker">CCIR · Independent Compute Market Analysis · {meta.as_of_date}</div>
+      <h1>Independent Analysis of the Compute Market</h1>
       <p class="standfirst lede">
-        CCIR provides a reference rate for all levels of the GPU
-        compute market — <em>Tier 1</em>, <em>Tier 2</em>,
-        <em>Tier 3</em> across the Intelligence Factory Taxonomy.
+        Tracked daily across all chips and deployments — from
+        <em>premium silicon</em> to the <em>long tail</em>, covering
+        global compute from {meta.contributing_today} providers.
       </p>
     </div>
 
@@ -51,7 +51,7 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
         <a class="product-card" href="/rates">
           <div class="pc-head">
             <span class="kicker">Reference Rates</span>
-            <span class="pc-tag citable">Citable</span>
+            <span class="pc-tag citable">Daily</span>
           </div>
           <div class="pc-kicker">Today · T2IF · {anchorChip} SXM · On-demand</div>
           <div class="pc-number">${fmt(anchorMedian)}<span class="pc-unit">/GPU-hr</span></div>
@@ -63,8 +63,8 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
               </span>
             ))}
           </div>
-          <p class="pc-desc">One independent rate per tier, per premium
-          silicon — with US / EU splits. The benchmark.</p>
+          <p class="pc-desc">One reference rate per tier, per premium
+          silicon — with US / EU splits, updated daily.</p>
           <div class="pc-series"><code>{ANCHOR}</code></div>
           <span class="pc-foot">Tier ladder →</span>
         </a>
@@ -100,18 +100,17 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
 
     <aside class="independence-block" aria-label="Independence statement">
       <p>
-        CCIR holds no positions in the markets it measures. No
-        marketplace operations, no swap desk, no trading
-        relationships.
+        Independent analysis — CCIR operates no marketplace and no
+        trading desk.
       </p>
-      <p class="ib-tag">Built for citation.</p>
+      <p class="ib-tag">Tracked daily.</p>
     </aside>
 
-    <ul class="hero-tagline" aria-label="Index principles">
+    <ul class="hero-tagline" aria-label="Coverage principles">
       <li>Independent</li>
       <li>Open methodology</li>
-      <li>Built for citation</li>
-      <li>Capability-graded</li>
+      <li>Tracked daily</li>
+      <li>Premium to long-tail</li>
     </ul>
 
     <section class="coverage">
@@ -122,7 +121,7 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
       <div class="cov-grid">
         <div class="cov-card">
           <span class="cov-num">{TIERS.length}</span>
-          <span class="cov-label">Intelligence Factory tiers</span>
+          <span class="cov-label">operator tiers</span>
         </div>
         <div class="cov-card">
           <span class="cov-num">{chipCount}</span>
@@ -131,10 +130,6 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
         <div class="cov-card">
           <span class="cov-num">{meta.contributing_today}</span>
           <span class="cov-label">contributing operators today</span>
-        </div>
-        <div class="cov-card">
-          <span class="cov-num">{meta.methodology_version}</span>
-          <span class="cov-label">methodology</span>
         </div>
       </div>
     </section>
@@ -145,72 +140,28 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
         <h2>Same Chip — Three Products</h2>
         <p class="standfirst">
           The same H100 silicon is deployed at all three tiers — hyperscale,
-          dedicated cluster, marketplace. Each tier is a distinct capability
-          bundle — fabric, tenancy, bundle depth — and each carries its own
-          rate. CCIR prices all three; the full ladder, with US / EU splits
-          and per-tier panels, lives on <a href="/rates">/rates</a>.
+          dedicated cluster, marketplace. Each tier is a distinct product —
+          fabric, tenancy, bundle depth — and each carries its own rate. CCIR
+          tracks all three; the full ladder, with US / EU splits and per-tier
+          panels, lives on <a href="/rates">/rates</a>.
         </p>
       </header>
     </section>
 
-    <section class="methodology">
-      <header class="sec-head">
-        <div class="kicker">Section 03 · Methodology</div>
-        <h2>How the rate is built.</h2>
-      </header>
-      <div class="meth-grid">
-        <div class="meth-item">
-          <span class="meth-label">Inputs</span>
-          <p>Provider-posted rate cards and on-demand pricing pages, scraped daily. No solicited quotes, no broker feeds.</p>
-        </div>
-        <div class="meth-item">
-          <span class="meth-label">Aggregation</span>
-          <p>Operator-equal median: each operator counts as one vote regardless of SKU count. Median of per-source medians at each tier.</p>
-        </div>
-        <div class="meth-item">
-          <span class="meth-label">Gate</span>
-          <p>3 sources / 5 observations to publish. Below-gate cells emit as Shadow series and are flagged in the explorer.</p>
-        </div>
-        <div class="meth-item">
-          <span class="meth-label">Tier classification</span>
-          <p>Per-SKU algorithmic classifier on a capability bundle (fabric, host topology, support, compliance). Premium silicons only.</p>
-        </div>
-      </div>
-      <p class="meth-tail">
-        See <a href="/tiers">/tiers</a> for tier definitions, the
-        T1IF-anchored spread matrix, and classification, and
-        <a href="/applications">/applications</a> for worked
-        credit-document examples.
-      </p>
-      <p class="meth-cta">
-        <a href="https://github.com/ccir-index/ccir-methodology/blob/main/CCIR_Methodology_v2_0_0.md">
-          Read the full methodology · v2.0.0 →
-        </a>
-      </p>
-    </section>
-
     <section class="disclosures">
       <header class="sec-head">
-        <div class="kicker">Section 04 · Disclosures</div>
+        <div class="kicker">Section 03 · Disclosures</div>
         <h2>Scope and independence.</h2>
       </header>
       <ul class="disc-list">
         <li>
-          <strong>Indicative reference rates.</strong> Long-tail chips
+          <strong>Long-tail coverage.</strong> Long-tail chips
           (L4, L40S, A40, T4, V100, 3090, 4090, 5090, etc.) appear in the
-          explorer as panel medians with no tier coverage. Treat them as
-          reference points, not benchmark rates.
+          explorer as panel medians without tier coverage.
         </li>
         <li>
-          <strong>No positions.</strong> CCIR holds no positions in the
-          markets it measures.
-        </li>
-        <li>
-          <strong>Credit document citation.</strong> The
-          <a href="/applications">Applications</a> page contains worked
-          drafting examples — defined terms, covenant mechanics, fallback
-          waterfall — showing how a CCIR rate fits into a senior-secured
-          GPU-backed facility.
+          <strong>Independent.</strong> CCIR operates no marketplace and
+          no trading desk.
         </li>
       </ul>
     </section>
@@ -392,7 +343,7 @@ const termPreview = TERM_PREVIEW_TENORS.map((t) => ({
     .coverage { margin: 28px 0 32px; }
     .cov-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1px;
       background: var(--rule);
       border: 1px solid var(--rule);

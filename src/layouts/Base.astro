@@ -15,7 +15,7 @@ interface Props {
 
 const {
   title = 'CCIR · Compute Credit Index Research',
-  description = 'Independent reference rates for GPU compute. Aggregated from publicly-observed posted prices across the Intelligence Factory Taxonomy.',
+  description = 'Independent analysis of the GPU compute market — aggregated from publicly-observed posted prices across dozens of providers.',
   // Ticker suppressed 2026-07-02: the v2026-07-01 panel activation (31→41
   // sources) + same-day restatements make day-over-day arrows read as market
   // moves when they're composition changes. Flip back to true once the panel
@@ -80,25 +80,15 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE).href : undefined;
     <slot />
   </main>
   <footer class="site-footer">
-    <div class="wrap disclosure-foot">
-      <strong>Independent · Observable · Posted · No positions in the markets we measure</strong>
-      Every rate is sourced from publicly-accessible, provider-operated
-      pricing pages and official documentation — no solicited quotes, no
-      broker-mediated prices, no sponsored feeds. If a tier is only exposed
-      through sales contact, it is not in the index.
-    </div>
     <div class="wrap footer-inner">
       <div class="lhs">
-        <strong>CCIR {meta.methodology_version}</strong> · Independent
-        reference rates across the Intelligence Factory Taxonomy. Each
-        tier is a defined capability bundle, with one reference rate
-        per tier. Published each morning by 07:30 ET.
+        <strong>CCIR</strong> · Independent analysis of the GPU compute
+        market — reference rates, term structure, credit, and utilization,
+        updated each morning by 07:30 ET.
       </div>
       <div class="rhs">
         <a href={`https://github.com/ccir-index/ccir-v2-data/tree/main/indices/snapshots/${meta.as_of_date}`}>Data</a>
-        <a href="/documents">Documents</a>
         <a href="/tiers">Tiers</a>
-        <a href="/applications">Applications</a>
         <a href="/market-data">Market Data</a>
         <span class="social">
           <a href="https://www.linkedin.com/company/compute-credit-index-research/" aria-label="CCIR on LinkedIn" rel="me noopener" target="_blank">

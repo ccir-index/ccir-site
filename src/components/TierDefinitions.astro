@@ -1,7 +1,7 @@
 ---
 /*
-  Three Intelligence Factory tiers. Premium-chip algorithmic taxonomy —
-  T1IF / T2IF / T3IF, classified per-SKU from the capability bundle
+  Three tiers of GPU compute. Premium-chip classification —
+  T1IF / T2IF / T3IF, assigned per-SKU from the attributes each SKU
   (fabric, host topology, bundle depth, support).
 
   Each tier is a WSJ-style feature box:
@@ -25,19 +25,19 @@ const tiers: Array<{
     code: 'T1IF',
     name: TIER_LABELS.T1IF,
     standfirst:
-      'Top-grade disclosed cluster fabric — non-blocking, rail-optimized RDMA at training scale — on dedicated single-tenant bare-metal, with the full enterprise bundle: managed operations, tiered support, observability, egress allowance, regulated-workload compliance. The deepest capability bundle in the CCIR panel.',
+      'Disclosed top-tier cluster fabric — non-blocking, rail-optimized RDMA at training scale — on dedicated single-tenant bare-metal, with the full enterprise bundle: managed operations, tiered support, observability, egress allowance, regulated-workload compliance. The most complete configuration in the CCIR panel.',
   },
   {
     code: 'T2IF',
     name: TIER_LABELS.T2IF,
     standfirst:
-      'Dedicated single-tenant bare-metal with a disclosed, mid-grade real cluster fabric; no requirement for the full enterprise bundle. The middle grade — real fabric, lighter wrap.',
+      'Dedicated single-tenant bare-metal with a disclosed, mid-tier real cluster fabric; no requirement for the full enterprise bundle. The middle configuration — real fabric, lighter wrap.',
   },
   {
     code: 'T3IF',
     name: TIER_LABELS.T3IF,
     standfirst:
-      'Co-located, shared, or marketplace supply — plus dedicated hosts that don\'t disclose a real fabric. Variable Ethernet underlay, self-serve, no support tier, interruptibility common. The lowest rate band — and the most constrained bundle behind it.',
+      'Co-located, shared, or marketplace supply — plus dedicated hosts that don\'t disclose a real fabric. Variable Ethernet underlay, self-serve, no support tier, interruptibility common. The lowest rate band — and the most constrained configuration behind it.',
   },
 ];
 
@@ -58,8 +58,8 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
     key: 'fabric',
     label: 'Fabric',
     cells: {
-      T1IF: 'Top-grade disclosed RDMA — non-blocking, rail-optimized, training-scale',
-      T2IF: 'Mid-grade disclosed real cluster fabric',
+      T1IF: 'Disclosed RDMA — non-blocking, rail-optimized, training-scale',
+      T2IF: 'Disclosed mid-tier real cluster fabric',
       T3IF: 'Ethernet, undisclosed, or trivial RDMA',
     },
   },
@@ -74,7 +74,7 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
   },
   {
     key: 'operators',
-    label: 'Examples at this grade',
+    label: 'Examples at this tier',
     cells: {
       T1IF: 'e.g. AWS · CoreWeave (flagship SXM clusters)',
       T2IF: 'e.g. CoreWeave (A100) — same operator, different grade per SKU',
@@ -95,13 +95,12 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
 <section class={`tiers ${compact ? 'tiers-compact' : ''}`}>
   {!headerless && (
     <header class="tiers-header">
-      <div class="kicker">Intelligence Factory Taxonomy</div>
+      <div class="kicker">Tier Structure</div>
       <h2>Three Production Tiers</h2>
       <p class="standfirst">
-        Each tier is a defined capability bundle — fabric, host, support,
-        compliance. CCIR publishes one reference rate per tier so users
-        can match the index cited to the deployment grade they pay for,
-        narrowing basis risk relative to a single-rate alternative.
+        Each tier bundles a defined set of attributes — fabric, host,
+        support, compliance. CCIR publishes one reference rate per tier so
+        users can match the rate to the class of compute they actually buy.
       </p>
     </header>
   )}
@@ -142,17 +141,11 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
       </tbody>
     </table>
     <p class="cap-caption">
-      Each tier is a capability bundle. The matrix describes what the
-      rate at each tier actually packages — fabric, host, bundle depth,
-      use case. Tiers are assigned <strong>per&#8209;SKU</strong>, not per
-      operator: the same provider appears at several grades as its products
-      differ — CoreWeave's flagship SXM clusters classify as T1IF, its A100
-      as T2IF, its L40S as T3IF. The exact classification gates — fabric
-      thresholds, bundle scoring, disclosure standards — are maintained in
-      the administrator's internal methodology and are deliberately not
-      published, so a rate cannot be engineered against them. The full panel
-      roster is disclosed to methodology reviewers under the governance
-      process.
+      Each tier describes a distinct class of compute — fabric, host,
+      bundled services, use case. Tiers are assigned
+      <strong>per&#8209;SKU</strong>, not per operator: the same provider
+      appears at several tiers as its products differ — CoreWeave's flagship
+      SXM clusters classify as T1IF, its A100 as T2IF, its L40S as T3IF.
     </p>
   </div>
 </section>

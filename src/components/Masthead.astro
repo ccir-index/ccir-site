@@ -9,9 +9,7 @@ const nav = [
   { href: '/term', label: 'Market Intelligence' },
   { href: '/credit', label: 'Credit' },
   { href: '/utilization', label: 'Utilization' },
-  { href: '/applications', label: 'Applications' },
   { href: '/explorer', label: 'Explorer' },
-  { href: '/documents', label: 'Documents' },
   { href: '/contact', label: 'Contact' },
 ];
 
@@ -35,7 +33,6 @@ function dateline(iso: string): string {
     </a>
     <div class="masthead-meta">
       <span class="dateline">{dateline(meta.as_of_date)}</span>
-      <span class="version">{meta.methodology_version}</span>
       <ThemeToggle />
     </div>
   </div>

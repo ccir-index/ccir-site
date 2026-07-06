@@ -25,19 +25,18 @@ function chipDisplay(token: string): string {
 ---
 <Base
   title="Tier structure · CCIR"
-  description="The three Intelligence Factory tiers — T1IF, T2IF, T3IF — defined by fabric bandwidth, deployment grade, and capability bundle. Tier-class reference rates for GPU compute."
+  description="The three tiers — T1IF, T2IF, T3IF — defined by fabric bandwidth, host topology, and bundled services. Tier-class reference rates for GPU compute."
   ogImage="/og/tiers.png"
 >
   <section class="wrap top">
     <div class="hero-solo">
-      <div class="kicker">Intelligence Factory Taxonomy · {meta.as_of_date}</div>
-      <h1>Three Tiers of Intelligence Factory</h1>
+      <div class="kicker">Tier Structure · {meta.as_of_date}</div>
+      <h1>Three Tiers of GPU Compute</h1>
       <details class="def-disclosure">
         <summary>How to read this</summary>
         <p class="standfirst lede">
-          CCIR publishes one independent reference rate per tier so the
-          rate cited matches the deployment grade
-          of the collateral pledged.
+          CCIR publishes one independent reference rate per tier so each
+          rate reflects the class of compute it measures.
         </p>
       </details>
     </div>
@@ -47,9 +46,9 @@ function chipDisplay(token: string): string {
         <div class="kicker">Per-Silicon Ladder · On-Demand · {meta.as_of_date}</div>
         <h2>Same chip, three tiers.</h2>
         <details class="def-disclosure">
-          <summary>Definitions &amp; methodology</summary>
+          <summary>Definitions &amp; notes</summary>
           <p class="standfirst">
-            Median rate per chip across each Intelligence Factory tier.
+            Median rate per chip across each tier.
             <em>n</em> is the number of independent operators contributing to
             that median. An em-dash means the cell has no Published row in
             today's snapshot.
@@ -112,7 +111,7 @@ function chipDisplay(token: string): string {
 
     <section class="defs-section">
       <header class="sec-head">
-        <div class="kicker">Capability bundle · per tier</div>
+        <div class="kicker">What each tier covers · per tier</div>
         <h2>What each tier packages.</h2>
       </header>
       <TierDefinitions headerless={true} />
@@ -121,19 +120,18 @@ function chipDisplay(token: string): string {
     <section class="classification">
       <header class="sec-head">
         <div class="kicker">Classification</div>
-        <h2>How the algorithm assigns a tier.</h2>
+        <h2>How each SKU maps to a tier.</h2>
       </header>
       <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
+        <summary>Definitions &amp; notes</summary>
         <p class="class-body">
-          Tier assignment is per-SKU and grade-based — driven by the
-          capability bundle each SKU exposes, not by which operator hosts
-          it. An interruptible SKU from any operator routes to T3IF; a
-          dedicated-host SKU with top-grade fabric and a full enterprise
-          bundle routes to T1IF; a dedicated-host SKU with mid-grade
-          disclosed fabric routes to T2IF; everything else routes to T3IF.
-          The same operator can therefore appear in two or three tiers
-          across its SKU catalog, depending on what each SKU actually
+          Tier assignment is per-SKU — driven by what each SKU exposes,
+          not by which operator hosts it. An interruptible SKU routes to
+          T3IF; a dedicated-host SKU with top-tier fabric and a full
+          enterprise bundle routes to T1IF; a dedicated-host SKU with
+          mid-tier disclosed fabric routes to T2IF; everything else routes
+          to T3IF. The same operator can therefore appear in two or three
+          tiers across its SKU catalog, depending on what each SKU actually
           packages.
         </p>
       </details>
@@ -144,7 +142,7 @@ function chipDisplay(token: string): string {
         <div class="kicker">Basis decomposition · Disc./Prem. vs T1IF</div>
         <h2>What's in the rate.</h2>
         <details class="def-disclosure">
-          <summary>Definitions &amp; methodology</summary>
+          <summary>Definitions &amp; notes</summary>
           <p class="standfirst">
             Reading <strong>across a row</strong> (same chip, varying tier)
             isolates the deployment premium — fabric, support, compliance,
@@ -158,10 +156,7 @@ function chipDisplay(token: string): string {
     </section>
 
     <p class="page-leadout">
-      Worked credit drafting examples — defined terms, covenant
-      mechanics, fallback waterfall — live in
-      <a href="/applications">Applications</a>. The full rate history
-      across tier, chip, and term is in the
+      The full rate history across tier, chip, and term is in the
       <a href="/explorer">Explorer</a>.
     </p>
 

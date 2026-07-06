@@ -4,7 +4,7 @@
   with two parallel taxonomies in the `factory_type` column:
 
     - HEADLINE rows: T1IF / T2IF / T3IF on the 6 premium silicons. These
-      drive the homepage, /tiers, /spreads, /applications.
+      drive the homepage, /tiers, and /rates.
     - INDICATIVE rows: legacy source-class codes (HIF / IIF / SIF / DIF) on
       long-tail chips with no algorithmic tier coverage. These ride along
       as reference rates only — surfaced on /explorer Section 2 with no

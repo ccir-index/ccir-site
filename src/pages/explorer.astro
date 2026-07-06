@@ -113,7 +113,7 @@ const indicativeClient = indicativeRates.map((r) => ({
       Two sections, split by chip coverage. <strong>Tiered</strong> series
       cover the premium silicons — H100, H200, B200, GB200, A100 — with full
       T1IF/T2IF/T3IF classification; <strong>Untiered</strong> chips are
-      long-tail silicon outside the v2.0 tier scope, shown as plain panel
+      long-tail silicon outside our current tier coverage, shown as plain panel
       medians for breadth (no tier applied). Every series carries a publication
       <strong>status</strong> — <code class="prov-inline">PUB</code> /
       <code class="prov-inline">PROV</code> /
@@ -126,11 +126,11 @@ const indicativeClient = indicativeRates.map((r) => ({
     <dl class="status-legend">
       <div class="leg-item">
         <dt><span class="status-badge status-published">PUB</span></dt>
-        <dd><strong>Published</strong> — cleared the full gate (≥3 sources, sample floor). The citable reference fixing; also drives the headline pages.</dd>
+        <dd><strong>Published</strong> — cleared the full gate (≥3 sources, sample floor) — our headline reading, and what drives the headline pages.</dd>
       </div>
       <div class="leg-item">
         <dt><span class="status-badge status-provisional">PROV</span></dt>
-        <dd><strong>Provisional</strong> — an emerging regional breakout cell at 2 sources. <em>Surfaced as intelligence, not citable</em>; auto-promotes to Published when a 3rd source lands.</dd>
+        <dd><strong>Provisional</strong> — an emerging regional breakout cell at 2 sources. <em>An early read at 2 sources</em>; promotes to Published when a 3rd source lands.</dd>
       </div>
       <div class="leg-item">
         <dt><span class="status-badge status-shadow">SHD</span></dt>
@@ -235,7 +235,7 @@ const indicativeClient = indicativeRates.map((r) => ({
         <span class="sec-sub">Long-tail silicon · no tier applied · {indicativeClient.length} series</span>
       </header>
       <p class="ind-note">
-        These chips fall outside the v2.0 algorithmic tier scope. Rates are
+        These chips fall outside our current tier coverage. Rates are
         reported as panel medians across operators offering the SKU; tier
         classification is not applied.
       </p>
@@ -326,7 +326,7 @@ const indicativeClient = indicativeRates.map((r) => ({
           var statusBadge = r.status === 'Shadow'
             ? '<span class="status-badge status-shadow" title="Shadow — below the publication floor (single-source, or a core cell held to the strict gate). Shown in the explorer for transparency only; never surfaced on a headline page.">SHD</span>'
             : (r.status === 'Provisional'
-              ? '<span class="status-badge status-provisional" title="Provisional — emerging regional breakout cell at 2 sources. Surfaced as intelligence, not citable; auto-promotes to Published when a 3rd source lands.">PROV</span>'
+              ? '<span class="status-badge status-provisional" title="Provisional — emerging regional breakout cell at 2 sources. An early read at 2 sources; promotes to Published when a 3rd source lands.">PROV</span>'
               : '');
           return '<tr class="' + rowCls + '">' +
             '<td class="sid"><code>' + r.id + '</code>' + statusBadge + '</td>' +

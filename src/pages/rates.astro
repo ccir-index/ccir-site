@@ -76,17 +76,16 @@ function emergingDisplay(model: string): string {
 ---
 <Base
   title="Reference Rates · CCIR"
-  description="Citable daily reference rates for GPU compute — T1IF, T2IF, T3IF operator-equal medians per premium silicon, with US/EU home-geography splits."
+  description="Daily reference rates for GPU compute — T1IF, T2IF, T3IF operator-equal medians per premium silicon, with US/EU home-geography splits."
   ogImage="/og/home.png"
 >
   <section class="wrap top">
     <header class="page-head">
-      <div class="kicker">Citable Benchmark · {meta.as_of_date}</div>
+      <div class="kicker">Reference Rates · {meta.as_of_date}</div>
       <h1>Reference Rates</h1>
       <p class="standfirst">
-        On-demand reference rates per premium silicon across the Intelligence
-        Factory Taxonomy — an operator-equal median at each tier, published
-        daily. Every number on this page is the citable series; committed-term
+        On-demand reference rates per premium silicon across our three tiers —
+        an operator-equal median at each tier, published daily. Committed-term
         market intelligence lives on <a href="/term">/term</a>.
       </p>
     </header>
@@ -152,7 +151,7 @@ function emergingDisplay(model: string): string {
 
     <section class="defs-section">
       <header class="sec-head">
-        <div class="kicker">Capability bundle · per tier</div>
+        <div class="kicker">What each tier covers · per tier</div>
         <h2>What each tier packages.</h2>
       </header>
       <TierDefinitions headerless={true} />
@@ -164,8 +163,8 @@ function emergingDisplay(model: string): string {
         <h2>Priced outside the tier ladder.</h2>
         <p class="standfirst">
           AMD Instinct and inference-class silicon publish as indicative panel
-          medians with no algorithmic tier grade. Where a chip is offered at
-          more than one deployment grade, each grade publishes its own series.
+          medians, outside the tier structure. Where a chip ships in more than
+          one configuration, each configuration publishes its own series.
         </p>
       </header>
       <div class="table-wrap narrow">
@@ -213,8 +212,8 @@ function emergingDisplay(model: string): string {
         A cell publishes when its panel clears 3 sources and 5 observations.
         Geographic breakout cells (US / EU) surface at 2 sources as
         <em>Provisional</em> and auto-promote at 3. Below-gate cells emit as
-        Shadow series — visible in the <a href="/explorer">explorer</a>, never
-        cited here. The T1IF-anchored spread matrix is on
+        Shadow series — visible in the <a href="/explorer">explorer</a>, not
+        published here. The T1IF-anchored spread matrix is on
         <a href="/tiers">/tiers</a>.
       </p>
     </section>
