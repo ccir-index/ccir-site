@@ -1,11 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import TierDefinitions from '../components/TierDefinitions.astro';
-import {
-  indicativeRates, meta, premiumChipsList, tierMatrix, tierOdCell,
-} from '../data/snapshot';
-import type { GeoToken } from '../data/snapshot';
-import { TIERS } from '../data/types';
+import { headlineRates, meta, premiumChipsList, headlineValue, headlineStatOf } from '../data/snapshot';
+import { TIERS, TIER_LABELS_SHORT } from '../data/types';
 import type { Rate, Tier } from '../data/types';
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
@@ -15,220 +12,98 @@ const chips = (() => {
   return live.length > 0 ? live : ['GB200', 'B200', 'H200', 'H100', 'A100'];
 })();
 
-// Three geo views of the same ladder. region=ALL is the blended core
-// headline (displayed "US & EU"); US/EU are the home-geography splits (#32).
-// The ALL view uses the strict Published-only flagship rule (tierMatrix);
-// the geo cuts allow Provisional cells, explicitly badged.
-const GEOS: { token: GeoToken; label: string }[] = [
-  { token: 'ALL', label: 'US & EU' },
-  { token: 'US', label: 'US' },
-  { token: 'EU', label: 'EU' },
-];
+// Guaranteed on-demand reference cell per (segment, chip): int=GTD, form
+// pooled. Prefer the US cut (now emitted per-interruptibility); fall back to
+// all-regions where a US guaranteed cell isn't present. Guaranteed-only on
+// purpose — the interruptible/spot pool (int=ALL) drags the number below the
+// real on-demand rate (US H100 Hyperscaler $9.15 guaranteed vs $5.40 pooled).
+const STAT_RANK: Record<string, number> = { Published: 0, Provisional: 1, Shadow: 2 };
+function odCell(tier: Tier, chip: string): Rate | undefined {
+  const pick = (region: string) => headlineRates
+    .filter((r) => r.tier === tier && r.gpu_model === chip &&
+                   r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
+                   r.region === region && r.interruptibility === 'GTD' &&
+                   r.promotion_status !== 'Shadow')
+    .sort((a, b) =>
+      (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
+      (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+  return pick('US') ?? pick('ALL');
+}
 
 type LadderRow = { chip: string; cells: Partial<Record<Tier, Rate | undefined>> };
-const ladders: Record<GeoToken, LadderRow[]> = { ALL: [], US: [], EU: [] };
-for (const chip of chips) {
-  const allCells = tierMatrix(chip);
-  ladders.ALL.push({ chip, cells: allCells });
-  for (const geo of ['US', 'EU'] as GeoToken[]) {
+const ladder: LadderRow[] = chips
+  .map((chip) => {
     const cells: Partial<Record<Tier, Rate | undefined>> = {};
-    for (const t of TIERS) cells[t] = tierOdCell(t, chip, geo);
-    ladders[geo].push({ chip, cells });
-  }
-}
+    for (const t of TIERS) cells[t] = odCell(t, chip);
+    return { chip, cells };
+  })
+  // Drop chips with no guaranteed cell in any segment (e.g. GB200 today).
+  .filter((row) => TIERS.some((t) => row.cells[t]));
 
 function chipDisplay(token: string): string {
   return token.replace(/-/g, ' ');
 }
 
-// Show the P legend only when some rendered cell actually carries the marker
-// (any geo view of the ladder, or the emerging strip below).
-const ladderHasProvisional = (['ALL', 'US', 'EU'] as GeoToken[]).some((g) =>
-  ladders[g].some(({ cells }) =>
-    TIERS.some((t) => cells[t]?.promotion_status === 'Provisional'),
-  ),
-);
-
 function cellTitle(c: Rate): string {
-  const prov = c.promotion_status === 'Provisional'
-    ? ' · Provisional (2 sources — below the full 3-source gate, auto-promotes at 3)'
-    : '';
-  return `Median ${fmt(c.price_median)} · Mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs${prov}`;
-}
-
-// Emerging & non-NVIDIA silicon — indicative source-class cells (no tier_v3
-// coverage by design: inference/AMD ride the source-class axis). Surfaced
-// here as clearly-labeled indicative rates; the citable ladder above stays
-// premium-tier only. Watch chips (e.g. GB300 at n=1) appear when they clear
-// the Provisional floor.
-const EMERGING_CHIPS = ['MI300X', 'RTXPRO6000', 'RTX PRO 6000'];
-const emergingRows = indicativeRates
-  .filter(
-    (r) => EMERGING_CHIPS.includes(r.gpu_model) &&
-           r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-           r.promotion_status !== 'Shadow',
-  )
-  .sort((a, b) => a.gpu_model.localeCompare(b.gpu_model) || a.region.localeCompare(b.region));
-
-function emergingDisplay(model: string): string {
-  return model === 'RTXPRO6000' ? 'RTX PRO 6000' : model;
+  const kind = headlineStatOf(c);
+  return `${kind === 'mean' ? 'Mean' : 'Median'} (n=${c.n_sources}) · region ${c.region} · median ${fmt(c.price_median)} · mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)}`;
 }
 ---
 <Base
   title="Reference Rates · CCIR"
-  description="Citable daily reference rates for GPU compute — T1IF, T2IF, T3IF operator-equal medians per premium silicon, with US/EU home-geography splits."
+  description="Daily guaranteed on-demand reference rates for GPU compute — Hyperscaler, Neocloud, and Marketplace median rates per chip."
   ogImage="/og/home.png"
 >
   <section class="wrap top">
     <header class="page-head">
-      <div class="kicker">Citable Benchmark · {meta.as_of_date}</div>
+      <div class="kicker">Reference Rates · US · {meta.as_of_date}</div>
       <h1>Reference Rates</h1>
       <p class="standfirst">
-        On-demand reference rates per premium silicon across the Intelligence
-        Factory Taxonomy — an operator-equal median at each tier, published
-        daily. Every number on this page is the citable series; committed-term
-        market intelligence lives on <a href="/term">/term</a>.
+        Guaranteed on-demand reference rate per chip across the three operator
+        segments. Committed term on <a href="/term">/term</a>; interruptible,
+        regional, and every other grain on <a href="/explorer">/explorer</a>.
       </p>
     </header>
 
-    <div class="controls" role="group" aria-label="Geography">
-      <span class="ctrl-label">Geography</span>
-      {GEOS.map((g, i) => (
-        <button class:list={['geo-btn', { on: i === 0 }]} data-geo={g.token} type="button">{g.label}</button>
-      ))}
-      <span class="ctrl-note">US &amp; EU = blended core headline · US / EU keyed on operator home geography</span>
-    </div>
-
-    <div class="table-wrap" id="ladder-wrap" data-geo="ALL">
+    <div class="table-wrap">
       <table class="data ladder-table">
         <thead>
           <tr>
             <th class="chip-col">Silicon</th>
             {TIERS.map((t) => (
               <th class={`tier-col tier-col-${t.toLowerCase()}`}>
-                <span class={`tier-badge tier-badge-${t.toLowerCase()}`}>{t}</span>
-                <span class="th-sub">Median $/hr</span>
+                <span class={`tier-badge tier-badge-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</span>
+                <span class="th-sub">$/hr</span>
               </th>
             ))}
           </tr>
         </thead>
-        {GEOS.map((g) => (
-          <tbody class={`geo-view geo-${g.token.toLowerCase()}`}>
-            {ladders[g.token].map(({ chip, cells }) => {
-              const refSeries =
-                cells.T1IF?.series_id ?? cells.T2IF?.series_id ?? cells.T3IF?.series_id;
-              return (
-                <tr>
-                  <td class="chip-cell">
-                    <div class="chip-name">{chipDisplay(chip)}</div>
-                    {refSeries && <code class="chip-series">{refSeries}</code>}
+        <tbody>
+          {ladder.map(({ chip, cells }) => (
+            <tr>
+              <td class="chip-cell"><div class="chip-name">{chipDisplay(chip)}</div></td>
+              {TIERS.map((t) => {
+                const c = cells[t];
+                if (!c) return <td class="num empty">—</td>;
+                return (
+                  <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
+                    ${fmt(headlineValue(c))}
                   </td>
-                  {TIERS.map((t) => {
-                    const c = cells[t];
-                    if (!c) {
-                      return <td class="num empty">—</td>;
-                    }
-                    const isProv = c.promotion_status === 'Provisional';
-                    return (
-                      <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
-                        ${fmt(c.price_median)}{isProv && <sup class="prov" title="Provisional — 2 sources, below the full gate">P</sup>}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        ))}
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
       </table>
     </div>
     <p class="table-foot">
-      USD per GPU-hour · operator-equal median of posted list rates ·
-      hover a rate for panel depth and distribution.{ladderHasProvisional && (
-        <> <sup class="prov">P</sup> = Provisional — an emerging cell published
-        at 2 sources, auto-promotes at 3.</>
-      )}
+      USD per GPU-hour · guaranteed on-demand, US operators · mean where the panel is deep (n≥10), median below that · hover a rate for both, region, IQR, and panel depth.
     </p>
 
     <section class="defs-section">
-      <header class="sec-head">
-        <div class="kicker">Capability bundle · per tier</div>
-        <h2>What each tier packages.</h2>
-      </header>
       <TierDefinitions headerless={true} />
     </section>
-
-    <section class="emerging">
-      <header class="sec-head">
-        <div class="kicker">Emerging &amp; non-NVIDIA silicon · indicative</div>
-        <h2>Priced outside the tier ladder.</h2>
-        <p class="standfirst">
-          AMD Instinct and inference-class silicon publish as indicative panel
-          medians with no algorithmic tier grade. Where a chip is offered at
-          more than one deployment grade, each grade publishes its own series.
-        </p>
-      </header>
-      <div class="table-wrap narrow">
-        <table class="data emerging-table">
-          <thead>
-            <tr>
-              <th class="chip-col">Silicon</th>
-              <th>Region</th>
-              <th class="num-h">Median $/hr</th>
-              <th class="num-h">n</th>
-            </tr>
-          </thead>
-          <tbody>
-            {emergingRows.map((r) => (
-              <tr>
-                <td class="chip-cell">
-                  <span class="chip-name">{emergingDisplay(r.gpu_model)}</span>
-                  <code class="chip-series">{r.series_id}</code>
-                </td>
-                <td class="cls">{r.region}</td>
-                <td class="num posted" title={cellTitle(r)}>
-                  ${fmt(r.price_median)}{r.promotion_status === 'Provisional' && <sup class="prov">P</sup>}
-                </td>
-                <td class="num n">{r.n_sources}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p class="table-foot">
-        {emergingRows.some((r) => r.promotion_status === 'Provisional') && (
-          <><sup class="prov">P</sup> = Provisional — published at 2 sources,
-          auto-promotes at 3. </>
-        )}Watching: GB300 NVL72 (1 source, below the Provisional floor) ·
-        MI325X / MI355X (no public on-demand rate yet). Panels appear here
-        once they clear the 2-source floor.
-      </p>
-    </section>
-
-    <section class="gate-note">
-      <header class="sec-head">
-        <div class="kicker">Publication gate</div>
-      </header>
-      <p>
-        A cell publishes when its panel clears 3 sources and 5 observations.
-        Geographic breakout cells (US / EU) surface at 2 sources as
-        <em>Provisional</em> and auto-promote at 3. Below-gate cells emit as
-        Shadow series — visible in the <a href="/explorer">explorer</a>, never
-        cited here. The T1IF-anchored spread matrix is on
-        <a href="/tiers">/tiers</a>.
-      </p>
-    </section>
   </section>
-
-  <script>
-    const wrap = document.getElementById('ladder-wrap');
-    for (const btn of document.querySelectorAll<HTMLButtonElement>('.geo-btn')) {
-      btn.addEventListener('click', () => {
-        wrap?.setAttribute('data-geo', btn.dataset.geo ?? 'ALL');
-        for (const b of document.querySelectorAll('.geo-btn')) b.classList.toggle('on', b === btn);
-      });
-    }
-  </script>
 
   <style>
     .top { padding-top: 32px; }
@@ -242,56 +117,17 @@ function emergingDisplay(model: string): string {
     }
     .standfirst a { color: var(--accent); }
 
-    .controls {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 0 0 14px;
-    }
-    .ctrl-label {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      color: var(--ink-dim);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-eye);
-    }
-    .geo-btn {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: var(--ink-dim);
-      background: var(--surface);
-      border: 1px solid var(--rule);
-      padding: 5px 12px;
-      cursor: pointer;
-    }
-    .geo-btn:hover { color: var(--ink); }
-    .geo-btn.on { color: var(--accent); border-color: var(--accent); }
-    .ctrl-note {
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-faint);
-      letter-spacing: 0.02em;
-    }
-
     .table-wrap {
       border: 1px solid var(--rule);
       background: var(--surface);
       overflow-x: auto;
     }
-    .table-wrap .geo-view { display: none; }
-    .table-wrap[data-geo="ALL"] .geo-all { display: table-row-group; }
-    .table-wrap[data-geo="US"] .geo-us { display: table-row-group; }
-    .table-wrap[data-geo="EU"] .geo-eu { display: table-row-group; }
-
     table.ladder-table { width: 100%; border-collapse: collapse; }
     table.ladder-table th.chip-col { text-align: left; width: 14%; }
     table.ladder-table th.tier-col { text-align: center; padding: 10px 14px; }
-    table.ladder-table th.tier-col-t1if { color: var(--tier-t1if); }
-    table.ladder-table th.tier-col-t2if { color: var(--tier-t2if); }
-    table.ladder-table th.tier-col-t3if { color: var(--tier-t3if); }
+    table.ladder-table th.tier-col-t1 { color: var(--tier-t1); }
+    table.ladder-table th.tier-col-t2 { color: var(--tier-t2); }
+    table.ladder-table th.tier-col-t3 { color: var(--tier-t3); }
     table.ladder-table th .th-sub {
       display: block;
       font-size: calc(var(--fs-xs) - 2px);
@@ -309,29 +145,13 @@ function emergingDisplay(model: string): string {
       font-weight: var(--weight-strong);
       letter-spacing: 0.04em;
     }
-    table.ladder-table .chip-cell .chip-series {
-      display: block;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--ink-faint);
-      letter-spacing: 0.02em;
-      font-weight: 400;
-      margin-top: 2px;
-    }
     table.ladder-table td.num { text-align: center; }
     table.ladder-table td.posted { font-weight: var(--weight-strong); cursor: help; }
-    table.ladder-table td.tier-pos-t1if { color: var(--tier-t1if); }
-    table.ladder-table td.tier-pos-t2if { color: var(--ink); }
-    table.ladder-table td.tier-pos-t3if { color: var(--ink); }
+    /* Middle tier (Neocloud) is the market that matters — give it the accent. */
+    table.ladder-table td.tier-pos-t2 { color: var(--accent); font-weight: var(--weight-strong); }
+    table.ladder-table th.tier-col-t2 { color: var(--accent); }
+    table.ladder-table td.tier-pos-t1, table.ladder-table td.tier-pos-t3 { color: var(--ink); }
     table.ladder-table td.empty { color: var(--ink-faint); }
-    table.ladder-table td.n { color: var(--ink-dim); }
-    sup.prov {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      color: var(--accent);
-      margin-left: 3px;
-      cursor: help;
-    }
 
     .table-foot {
       margin: 10px 0 0;
@@ -344,44 +164,5 @@ function emergingDisplay(model: string): string {
     }
 
     .defs-section { margin: 32px 0 0; }
-    .emerging { margin: 32px 0 0; }
-    .table-wrap.narrow { max-width: 640px; }
-    table.emerging-table th { text-align: left; padding: 8px 14px; }
-    table.emerging-table th.num-h { text-align: right; }
-    table.emerging-table td.cls {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      color: var(--ink-dim);
-      letter-spacing: 0.03em;
-    }
-    table.emerging-table td.num { text-align: right; }
-    table.emerging-table td.posted { font-weight: var(--weight-strong); cursor: help; }
-    table.emerging-table .chip-cell .chip-name {
-      font-family: var(--font-mono);
-      font-size: var(--fs-sm);
-      color: var(--ink);
-      font-weight: var(--weight-strong);
-      letter-spacing: 0.04em;
-    }
-    table.emerging-table .chip-cell .chip-series {
-      display: block;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--ink-faint);
-      letter-spacing: 0.02em;
-      font-weight: 400;
-      margin-top: 2px;
-    }
-
-    .gate-note { margin: 28px 0 32px; max-width: 80ch; }
-    .gate-note p {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
-      color: var(--ink);
-      line-height: 1.6;
-      margin: 0;
-    }
-    .gate-note a { color: var(--accent); }
-    .sec-head { margin-bottom: 10px; }
   </style>
 </Base>

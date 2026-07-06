@@ -1,44 +1,142 @@
 ---
 import Base from '../layouts/Base.astro';
 import { meta } from '../data/snapshot';
+
+const audiences = [
+  {
+    kicker: 'Operators & marketplaces',
+    body:
+      'Clouds, neoclouds, and marketplaces with on-demand, committed, or ' +
+      'transaction pricing. Contributing places your capacity in the ' +
+      'reference the market reads — and sharpens the segment you operate in.',
+  },
+  {
+    kicker: 'Lenders & credit desks',
+    body:
+      'Banks and funds financing GPU buildouts. We track GPU-backed debt ' +
+      'issuance and the rates operators post; the credit side sharpens both, ' +
+      'and connects the price of compute to the cost of financing it.',
+  },
+  {
+    kicker: 'Exchanges & desks',
+    body:
+      'Venues and desks with executed prints. A neutral reference is only ' +
+      'as good as the transactions behind it; executed data is where the ' +
+      'reference earns its standing.',
+  },
+];
 ---
 <Base
-  title="Contact · CCIR"
-  description="Contact CCIR at research@ccir.io for benchmark inquiries, methodology questions, and credit-document drafting support."
+  title="Data Partnership · CCIR"
+  description="Partner with CCIR — contribute compute pricing, transaction, or credit data to an independent, neutral reference for the GPU compute market."
   showTape={false}
 >
   <section class="wrap top">
-    <div class="kicker">Get in touch · {meta.as_of_date}</div>
-    <h1>Contact CCIR</h1>
+    <header class="page-head">
+      <div class="kicker">Data Partnership · {meta.as_of_date}</div>
+      <h1>Contribute to the reference</h1>
+      <p class="standfirst">
+        CCIR publishes independent analysis of the GPU compute market —
+        reference rates, term structure, credit, and supply, tracked daily. We
+        operate no marketplace and no trading desk. If you produce compute
+        pricing, transaction, or credit data, contributing strengthens a
+        neutral point the whole market can measure against.
+      </p>
+    </header>
 
-    <article class="card">
-      <div class="card-kicker">Email</div>
-      <a class="email" href="mailto:research@ccir.io">research@ccir.io</a>
-    </article>
+    <section class="why">
+      <header class="sec-head">
+        <div class="kicker">Why a neutral reference</div>
+        <h2>Markets financialize on shared price infrastructure.</h2>
+      </header>
+      <p class="prose">
+        Every market that grew a financial layer did it on a neutral reference
+        it could settle, lend, and hedge against — crude on Platts assessments,
+        used vehicles on Manheim, ocean freight on the Baltic indices. Compute
+        is earlier. Capacity is bought and sold daily and increasingly
+        financed, but there is no neutral reference the market shares. The more
+        of the market that contributes, the more representative that reference
+        becomes — and the more useful it is to everyone who transacts against
+        it or lends into it.
+      </p>
+    </section>
+
+    <section class="audiences">
+      <header class="sec-head">
+        <div class="kicker">Who we'd like to hear from</div>
+      </header>
+      <div class="aud-grid">
+        {audiences.map((a) => (
+          <article class="aud-card">
+            <div class="aud-kicker">{a.kicker}</div>
+            <p class="aud-body">{a.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="how">
+      <header class="sec-head">
+        <div class="kicker">How we work</div>
+      </header>
+      <p class="prose">
+        CCIR is independent: no marketplace, no trading desk. We report
+        <strong>observed prices</strong> — we do not mark, value, or rate
+        collateral, and we take no position in the markets we measure. Raw
+        contributions are held in confidence; what we publish are aggregated
+        references. Terms are set per partner.
+      </p>
+    </section>
+
+    <a class="contact-card" href="mailto:research@ccir.io">
+      <div class="cc-kicker">Start a conversation</div>
+      <span class="cc-email">research@ccir.io</span>
+    </a>
   </section>
 
   <style>
-    .top { padding-top: 28px; }
-    h1 {
+    .top { padding-top: 32px; }
+    .page-head { max-width: 80ch; margin-bottom: 8px; }
+    .page-head h1 {
       font-family: var(--font-display);
       font-size: var(--fs-hero);
       line-height: var(--lh-display);
-      margin: 6px 0 20px;
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
       letter-spacing: -0.01em;
+      max-width: 20ch;
     }
 
-    .card {
-      background: var(--surface);
+    .sec-head { max-width: 80ch; margin-bottom: 12px; }
+    .sec-head h2 { font-size: var(--fs-2xl); margin: 4px 0 0; }
+
+    .why, .audiences, .how { margin: 34px 0 0; }
+    .prose {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0;
+      max-width: 80ch;
+    }
+    .prose strong { color: var(--accent); }
+
+    .aud-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--rule);
       border: 1px solid var(--rule);
-      border-left: 2px solid var(--accent);
-      padding: 20px 22px;
-      max-width: 64ch;
-      margin-bottom: 40px;
+    }
+    @media (max-width: 860px) { .aud-grid { grid-template-columns: 1fr; } }
+    .aud-card {
+      background: var(--surface);
+      padding: 18px 20px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-    .card-kicker {
+    .aud-kicker {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       color: var(--accent);
@@ -46,14 +144,42 @@ import { meta } from '../data/snapshot';
       letter-spacing: var(--tracking-eye);
       font-weight: var(--weight-strong);
     }
-    .card .email {
+    .aud-body {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .contact-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      padding: 20px 22px;
+      max-width: 64ch;
+      margin: 34px 0 40px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .contact-card:hover { background: var(--surface-2); text-decoration: none; }
+    .cc-kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+    }
+    .cc-email {
       font-family: var(--font-mono);
       font-size: var(--fs-xl);
       color: var(--accent);
       font-weight: var(--weight-strong);
-      margin: 4px 0;
       word-break: break-all;
     }
-    .card .email:hover { text-decoration: underline; }
   </style>
 </Base>

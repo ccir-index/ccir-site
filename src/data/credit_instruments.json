@@ -2921,6 +2921,8 @@
     },
     {
       "id": "xai-valor-program",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Program umbrella, not a discrete issuance: ~$7.5B is equity, scale partly rumored (status: press), and the confirmed Apollo tranches under it are tracked separately — counting it would double-count.",
       "issuer": "xAI",
       "ticker": null,
       "issuer_type": "private",
@@ -2984,6 +2986,8 @@
     },
     {
       "id": "meta-beignet-hyperion",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Data-center campus credit, not GPU-collateral: security is the Hyperion campus plus Meta's operating-lease guarantee (Meta is tenant, not borrower); an IG hyperscaler real-estate SPV, different in kind from neocloud GPU-backed debt.",
       "issuer": "Meta / Blue Owl \"Hyperion\" JV (Richland Parish, LA)",
       "ticker": null,
       "issuer_type": "private",

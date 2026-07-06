@@ -20,7 +20,7 @@
     editorial (light, surface #fbf7ee): worst adjacent CVD ΔE 15.8 — PASS
   Provisional cells are shape-encoded (hollow marks), never color-only.
 */
-import { committedBandCell, neocloudOdCell, t2ifOdCell, meta } from '../data/snapshot';
+import { neocloudCommittedCell, tierOdCell, headlineValue, headlineStatOf, meta } from '../data/snapshot';
 import { wpSpread } from '../data/committed_mi';
 import type { Rate, Term } from '../data/types';
 
@@ -95,32 +95,21 @@ interface SeriesView {
 // John 2026-07-02). Falls back to the T2IF US & EU headline on snapshots
 // predating the band OD series (gold PR #41); the caption discloses which
 // anchor is in effect.
-let odFallbackUsed = false;
-
+// OD anchor = the Neocloud (operator-tier T2) guaranteed on-demand cell — the
+// same segment as the committed tenors below, so the OD→committed step is
+// apples-to-apples.
 function odPoint(chip: string): Pt | null {
-  const band = neocloudOdCell(chip);
-  if (band) {
-    return {
-      x: xOf(0),
-      y: yOf(band.price_median),
-      months: 0,
-      value: band.price_median,
-      prov: band.promotion_status === 'Provisional',
-      anchor: false,
-      title: `${chip} · on-demand (NEOCLOUD band, US & EU — same pooled panel as the committed tenors) · median $${fmt(band.price_median)} · ${band.n_sources} sources / ${band.n_observations} obs · ${band.promotion_status}`,
-    };
-  }
-  const c = t2ifOdCell(chip, 'ALL');
+  const c = tierOdCell('T2', chip, 'ALL');
   if (!c) return null;
-  odFallbackUsed = true;
+  const v = headlineValue(c);
   return {
     x: xOf(0),
-    y: yOf(c.price_median),
+    y: yOf(v),
     months: 0,
-    value: c.price_median,
+    value: v,
     prov: c.promotion_status === 'Provisional',
     anchor: false,
-    title: `${chip} · on-demand (T2IF headline, US & EU) · median $${fmt(c.price_median)} · ${c.n_sources} sources / ${c.n_observations} obs · ${c.promotion_status}`,
+    title: `${chip} · on-demand (Neocloud, guaranteed) · ${headlineStatOf(c)} $${fmt(v)} · ${c.n_sources} sources / ${c.n_observations} obs · ${c.promotion_status}`,
   };
 }
 
@@ -152,16 +141,17 @@ function spreadVsOd(chip: string, months: number): { txt: string; title: string 
 }
 
 function tenorPoint(chip: string, term: Term, months: number): Pt | null {
-  const c: Rate | undefined = committedBandCell(chip, term);
+  const c: Rate | undefined = neocloudCommittedCell(chip, term);
   if (!c) return null;
+  const v = headlineValue(c);
   return {
     x: xOf(months),
-    y: yOf(c.price_median),
+    y: yOf(v),
     months,
-    value: c.price_median,
+    value: v,
     prov: c.promotion_status === 'Provisional',
     anchor: months === 12,
-    title: `${chip} · ${term} committed (NEOCLOUD band, US & EU) · median $${fmt(c.price_median)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs · ${c.promotion_status}`,
+    title: `${chip} · ${term} committed (Neocloud) · ${headlineStatOf(c)} $${fmt(v)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)} · ${c.n_sources} sources / ${c.n_observations} obs · ${c.promotion_status}`,
   };
 }
 
@@ -296,18 +286,16 @@ const ariaLabel =
 
   <figcaption class="tcv-foot" id="tcv-caption">
     <span class="tcv-note">
-      Posted committed asks across the neocloud panel (US &amp; EU) ·
-      as of {meta.as_of_date} · market intelligence — not a citable
-      reference rate
+      Posted committed asks across the Neocloud segment ·
+      as of {meta.as_of_date} · a market-intelligence series
     </span>
     <details class="tcv-details">
       <summary>Chart notes</summary>
       <ul class="tcv-notes-list">
-        <li>Band = the pooled neocloud grade (T2IF + T3IF, assigned per SKU),
-        in USD · operator-equal median.</li>
-        <li>{odFallbackUsed
-          ? 'OD = the T2IF on-demand headline, US & EU blended.'
-          : 'OD = the band’s own on-demand pool — the same panel on both sides of the OD→committed step.'}</li>
+        <li>Series = the Neocloud operator segment, guaranteed ·
+        operator-equal (median of per-source medians).</li>
+        <li>OD = the Neocloud guaranteed on-demand rate — the same segment
+        on both sides of the OD→committed step.</li>
         <li>End-label % = within-provider signed spread — each operator's
         committed ask vs its own on-demand rate, aggregated operator-equal.
         Hover the label for pair count.</li>

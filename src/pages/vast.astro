@@ -33,8 +33,7 @@ const vastMeta = (meta as any).vast;
         This page surfaces what the median alone omits: distribution shape,
         quality bands, $/perf frontier, supply structure, geography, egress
         and storage costs, network quality, long-tail catalog, and the
-        time-series of the spread itself. <strong>Observatory data — not part of the CCIR rate
-        methodology.</strong> Vast is the reference marketplace, not a tier.
+        time-series of the spread itself. <strong>Observatory data — exploratory market detail, separate from our headline reference rates.</strong> Vast is the reference marketplace, not a tier.
       </p>
     </details>
 
@@ -81,7 +80,7 @@ const vastMeta = (meta as any).vast;
         <div class="qs-cell"><span class="qs-lbl">SPREAD</span><span class="qs-val" id="qs-spread">—</span></div>
       </div>
       <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
+        <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Every offer live on Vast at the snapshot for the selected chip, binned by per-whole-GPU
           $/hr (log scale on x). The vertical amber line marks the median; the
@@ -108,7 +107,7 @@ const vastMeta = (meta as any).vast;
         <canvas id="qualityChart"></canvas>
       </div>
       <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
+        <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Median per-GPU $/hr for offers tagged <code>verified</code> (audited
           datacenter hosts) vs <code>deverified</code> (hosted, unverified).
@@ -144,7 +143,7 @@ const vastMeta = (meta as any).vast;
         </table>
       </div>
       <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
+        <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           <strong>DLPerf</strong> is Vast.ai's composite deep-learning benchmark — a
           synthetic mixed-precision matmul/conv score that proxies training
@@ -171,7 +170,7 @@ const vastMeta = (meta as any).vast;
         <canvas id="multiChart"></canvas>
       </div>
       <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
+        <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Count of live offers by GPU count (1×, 2×, 4×, 8×, other) for the
           selected chip. Reveals whether the chip has scale-up supply or only
@@ -222,7 +221,7 @@ const vastMeta = (meta as any).vast;
         </div>
       </div>
       <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
+        <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Egress cost ($/TB) and storage cost ($/GB-mo) distributions across
           live offers, exposed per-offer in the Vast API. Egress ranges
@@ -246,7 +245,7 @@ const vastMeta = (meta as any).vast;
         <canvas id="netChart"></canvas>
       </div>
       <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
+        <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Bandwidth distribution is bimodal: consumer-hosted GPUs at gigabit-class,
           proper datacenter offers at multi-Gbps. Same chip, very different
@@ -296,7 +295,7 @@ const vastMeta = (meta as any).vast;
         <canvas id="spreadChart"></canvas>
       </div>
       <details class="def-disclosure">
-        <summary>Definitions &amp; methodology</summary>
+        <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Five lines show how the per-GPU $/hr distribution shifts over time:
           p10 (cheapest 10%), p25, p50 (median), p75, p90 (most expensive 10%).

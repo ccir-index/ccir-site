@@ -17,6 +17,7 @@
 */
 import Base from '../layouts/Base.astro';
 import creditData from '../data/credit_instruments.json';
+import CreditIssuanceChart from '../components/CreditIssuanceChart.astro';
 
 const AS_OF = creditData._meta.as_of;
 const instruments = creditData.instruments;
@@ -427,11 +428,26 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       </div>
     </div>
 
+    <!-- Issuance by quarter — the observed scale + growth opener -->
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">GPU-backed debt issuance — observed, by quarter</div>
+          <div class="panel-sub">
+            Amount issued for every tracked instrument, bucketed by issuance
+            quarter · the line is cumulative tracked debt
+          </div>
+        </div>
+        <span class="badge">AS FILED</span>
+      </div>
+      <CreditIssuanceChart />
+    </div>
+
     <!-- Chart A — GPU-collateral SOFR spread tape -->
     <div class="panel">
       <div class="panel-head">
         <div>
-          <div class="panel-title">GPU-collateral floating spreads — by credit enhancement</div>
+          <div class="panel-title">GPU-collateral floating spreads — CoreWeave &amp; IREN</div>
           <div class="panel-sub">
             Filed spread over SOFR at signing, coloured by what backs the loan ·
             window Jul 2023 – Jun 2026 · CoreWeave DDTL vintages + IREN Hardware 3
@@ -720,7 +736,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
 
     <!-- Methodology -->
     <div class="metho" id="methodology">
-      <h2>Methodology</h2>
+      <h2>Sources &amp; method</h2>
       <p>
         This ledger is compiled from primary documents only: SEC EDGAR filings
         (10-K/10-Q/8-K/20-F/6-K, prospectuses, indentures filed as exhibits)

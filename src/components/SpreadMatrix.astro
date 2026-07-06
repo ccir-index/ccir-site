@@ -1,6 +1,6 @@
 ---
 /*
-  Tier spread matrix — chip × term × tier, with discount/premium vs T1IF.
+  Tier spread matrix — chip × term × tier, with discount/premium vs T1.
   Extracted from /spreads so it can render on both /spreads and /tiers
   without duplicating markup. Styles are component-scoped (Astro), so the
   shared class names (.matrix, .tier-col, .num) never collide with a host
@@ -39,7 +39,7 @@ const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
         {TIERS.map(() => (
           <>
             <th class="sub">Posted</th>
-            <th class="sub">Disc. / Prem. vs T1IF</th>
+            <th class="sub">Disc. / Prem. vs T1</th>
           </>
         ))}
       </tr>
@@ -59,7 +59,7 @@ const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
                 </>
               );
             }
-            const isT1 = t === 'T1IF';
+            const isT1 = t === 'T1';
             return (
               <>
                 <td class={`num posted ${isT1 ? 'baseline' : ''}`}
@@ -107,9 +107,9 @@ const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
   .legend .sw { width: 8px; height: 8px; display: inline-block; }
   .legend .abbr { color: var(--ink); font-weight: var(--weight-strong); letter-spacing: 0.06em; }
   .legend .nm { color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); }
-  .tier-sw-t1if { background: var(--tier-t1if); }
-  .tier-sw-t2if { background: var(--tier-t2if); }
-  .tier-sw-t3if { background: var(--tier-t3if); }
+  .tier-sw-t1 { background: var(--tier-t1); }
+  .tier-sw-t2 { background: var(--tier-t2); }
+  .tier-sw-t3 { background: var(--tier-t3); }
 
   .table-wrap {
     border: 1px solid var(--rule);
@@ -124,9 +124,9 @@ const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
     font-weight: var(--weight-strong);
     background: var(--surface-2);
   }
-  table.matrix thead .tier-col-t1if { color: var(--tier-t1if); }
-  table.matrix thead .tier-col-t2if { color: var(--tier-t2if); }
-  table.matrix thead .tier-col-t3if { color: var(--tier-t3if); }
+  table.matrix thead .tier-col-t1 { color: var(--tier-t1); }
+  table.matrix thead .tier-col-t2 { color: var(--tier-t2); }
+  table.matrix thead .tier-col-t3 { color: var(--tier-t3); }
   table.matrix thead .sub {
     font-size: calc(var(--fs-xs) - 1px);
     color: var(--ink-faint);
@@ -144,7 +144,7 @@ const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
     letter-spacing: 0.04em;
   }
   table.matrix td.posted { color: var(--ink); font-weight: var(--weight-strong); }
-  table.matrix td.posted.baseline { color: var(--tier-t1if); }
+  table.matrix td.posted.baseline { color: var(--tier-t1); }
   table.matrix td.empty { color: var(--ink-faint); }
   table.matrix td.disc .disc-val { color: var(--pos); }
   table.matrix td.disc .prem-val { color: var(--warn); font-weight: var(--weight-strong); }
@@ -154,7 +154,7 @@ const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
     font-size: var(--fs-xs);
   }
   table.matrix td.disc .baseline-dash {
-    color: var(--tier-t1if);
+    color: var(--tier-t1);
     opacity: 0.7;
     font-size: var(--fs-xs);
     text-transform: uppercase;

@@ -4,16 +4,21 @@ import { meta } from '../data/snapshot';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const nav = [
-  { href: '/', label: 'Home' },
   { href: '/rates', label: 'Rates' },
-  { href: '/term', label: 'Market Intelligence' },
+  // Market Intelligence is a hub — light it up on every piece it houses.
+  { href: '/intelligence', label: 'Market Intelligence',
+    match: ['/intelligence', '/term', '/basis', '/spreads', '/realized',
+            '/utilization', '/observatory', '/availability', '/markets',
+            '/marketplace', '/vast'] },
   { href: '/credit', label: 'Credit' },
-  { href: '/utilization', label: 'Utilization' },
-  { href: '/applications', label: 'Applications' },
   { href: '/explorer', label: 'Explorer' },
-  { href: '/documents', label: 'Documents' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/contact', label: 'Data Partnership' },
 ];
+
+function isActive(n: { href: string; match?: string[] }): boolean {
+  const group = n.match ?? [n.href];
+  return group.includes(path);
+}
 
 // Format dateline like a broadsheet: "Sunday, April 26, 2026"
 function dateline(iso: string): string {
@@ -35,7 +40,6 @@ function dateline(iso: string): string {
     </a>
     <div class="masthead-meta">
       <span class="dateline">{dateline(meta.as_of_date)}</span>
-      <span class="version">{meta.methodology_version}</span>
       <ThemeToggle />
     </div>
   </div>
@@ -47,7 +51,7 @@ function dateline(iso: string): string {
             href={n.href}
             target={n.external ? '_blank' : undefined}
             rel={n.external ? 'noopener noreferrer' : undefined}
-            class:list={['nav-link', { on: path === n.href }]}
+            class:list={['nav-link', { on: isActive(n) }]}
           >{n.label}{n.external && <span class="ext-mark" aria-hidden="true">↗</span>}</a>
         ))}
       </nav>

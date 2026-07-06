@@ -5,12 +5,12 @@ import { meta } from '../data/snapshot';
 ---
 <Base
   title="Tier spreads · CCIR"
-  description="Premium and discount spreads across Intelligence Factory tiers, measured against T1IF as the reference. Daily basis snapshot for credit-document drafting."
+  description="Premium and discount spreads across our three operator segments, measured against T1 (Hyperscaler) as the reference. Daily basis snapshot."
   ogImage="/og/spreads.png"
 >
   <section class="wrap top">
     <div class="hero-solo">
-      <div class="kicker">Disc./Prem. vs Tier 1 IF · {meta.as_of_date}</div>
+      <div class="kicker">Disc./Prem. vs T1 · Hyperscaler · {meta.as_of_date}</div>
       <h1>Tier Spread Matrix</h1>
       <details class="def-disclosure">
         <summary>How to read this</summary>
@@ -20,16 +20,16 @@ import { meta } from '../data/snapshot';
         </p>
         <p class="standfirst lede">
           Reading <strong>across a row</strong> — same chip, varying
-          tier — shows what the market is charging for the capability
-          bundle: fabric, support, compliance, operational wrap. A lender
-          underwriting a T1IF facility needs to know how much of the rate
-          is silicon and how much is infrastructure.
+          segment — shows what the market is charging for the operator
+          segment: hyperscaler, neocloud, or marketplace. A lender
+          underwriting a T1 (Hyperscaler) facility needs to know how much of
+          the rate is silicon and how much is the operator.
         </p>
         <p class="standfirst lede">
-          Reading <strong>down a column</strong> — same tier, varying
-          generation — shows the generation premium when the bundle is
-          held constant: what newer silicon commands over older silicon
-          at equivalent deployment grade, without the two signals
+          Reading <strong>down a column</strong> — same segment, varying
+          generation — shows the generation premium when the operator
+          segment is held constant: what newer silicon commands over older
+          silicon within the same segment, without the two signals
           confounding each other.
         </p>
       </details>

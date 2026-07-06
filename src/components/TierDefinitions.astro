@@ -1,14 +1,14 @@
 ---
 /*
-  Three Intelligence Factory tiers. Premium-chip algorithmic taxonomy —
-  T1IF / T2IF / T3IF, classified per-SKU from the capability bundle
-  (fabric, host topology, bundle depth, support).
+  Three operator segments of GPU compute — T1 Hyperscaler / T2 Neocloud /
+  T3 Marketplace. The segment is a property of the operator (registry
+  operator_class), not the chip; the same silicon is priced across all three.
 
-  Each tier is a WSJ-style feature box:
-    kicker (mono code badge) → serif headline (full IF name) →
-    standfirst (2-3 sentences, throughput framing) → capability matrix.
+  Each segment is a WSJ-style feature box:
+    kicker (mono code badge) → serif headline (segment name) →
+    standfirst (2-3 sentences) → operator matrix.
 */
-import { TIERS, TIER_LABELS, type Tier } from '../data/types';
+import { TIERS, TIER_LABELS, TIER_LABELS_SHORT, type Tier } from '../data/types';
 
 interface Props {
   compact?: boolean;
@@ -22,22 +22,22 @@ const tiers: Array<{
   standfirst: string;
 }> = [
   {
-    code: 'T1IF',
-    name: TIER_LABELS.T1IF,
+    code: 'T1',
+    name: TIER_LABELS.T1,
     standfirst:
-      'Top-grade disclosed cluster fabric — non-blocking, rail-optimized RDMA at training scale — on dedicated single-tenant bare-metal, with the full enterprise bundle: managed operations, tiered support, observability, egress allowance, regulated-workload compliance. The deepest capability bundle in the CCIR panel.',
+      'The global hyperscale clouds — AWS, Azure, Google Cloud, Oracle. Deep managed capacity, enterprise contracts, and the widest service surface. On-demand GPU rates sit at the top of the market.',
   },
   {
-    code: 'T2IF',
-    name: TIER_LABELS.T2IF,
+    code: 'T2',
+    name: TIER_LABELS.T2,
     standfirst:
-      'Dedicated single-tenant bare-metal with a disclosed, mid-grade real cluster fabric; no requirement for the full enterprise bundle. The middle grade — real fabric, lighter wrap.',
+      'The dedicated GPU specialists — CoreWeave, Lambda, Nebius and peers. Single-tenant clusters built for training and inference, priced below the hyperscalers.',
   },
   {
-    code: 'T3IF',
-    name: TIER_LABELS.T3IF,
+    code: 'T3',
+    name: TIER_LABELS.T3,
     standfirst:
-      'Co-located, shared, or marketplace supply — plus dedicated hosts that don\'t disclose a real fabric. Variable Ethernet underlay, self-serve, no support tier, interruptibility common. The lowest rate band — and the most constrained bundle behind it.',
+      'Marketplace and shared-pool venues — Vast, RunPod and aggregators. Self-serve capacity, interruptibility common, at the lowest rate band in the panel.',
   },
 ];
 
@@ -47,47 +47,47 @@ type AttrKey = 'tenancy' | 'fabric' | 'bundle' | 'operators' | 'use';
 const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }> = [
   {
     key: 'tenancy',
-    label: 'Tenancy',
+    label: 'Footprint',
     cells: {
-      T1IF: 'Dedicated bare-metal, single-tenant',
-      T2IF: 'Dedicated bare-metal, single-tenant',
-      T3IF: 'Shared-pool or marketplace',
+      T1: 'Managed multi-service hyperscale cloud',
+      T2: 'Dedicated single-tenant GPU clusters',
+      T3: 'Shared-pool or marketplace supply',
     },
   },
   {
     key: 'fabric',
-    label: 'Fabric',
+    label: 'Networking',
     cells: {
-      T1IF: 'Top-grade disclosed RDMA — non-blocking, rail-optimized, training-scale',
-      T2IF: 'Mid-grade disclosed real cluster fabric',
-      T3IF: 'Ethernet, undisclosed, or trivial RDMA',
+      T1: 'Hyperscale backbone, managed networking',
+      T2: 'Dedicated cluster fabric, often InfiniBand',
+      T3: 'Variable — Ethernet or undisclosed',
     },
   },
   {
     key: 'bundle',
-    label: 'Bundle depth',
+    label: 'Services',
     cells: {
-      T1IF: 'Managed ops, tiered support, observability, egress allowance, compliance',
-      T2IF: 'Bundle varies — not gated; observed mix of basic to richer disclosures',
-      T3IF: 'Self-serve, no support tier',
+      T1: 'Full enterprise services, support, compliance',
+      T2: 'Focused GPU stack, lighter wrap',
+      T3: 'Self-serve, minimal support',
     },
   },
   {
     key: 'operators',
-    label: 'Examples at this grade',
+    label: 'Examples in this segment',
     cells: {
-      T1IF: 'e.g. AWS · CoreWeave (flagship SXM clusters)',
-      T2IF: 'e.g. CoreWeave (A100) — same operator, different grade per SKU',
-      T3IF: 'e.g. Scaleway · CoreWeave (L40S)',
+      T1: 'e.g. AWS · Azure · Google Cloud · Oracle',
+      T2: 'e.g. CoreWeave · Lambda · Nebius',
+      T3: 'e.g. Vast · RunPod · marketplaces',
     },
   },
   {
     key: 'use',
-    label: 'Use case',
+    label: 'Typical use',
     cells: {
-      T1IF: 'Production training, regulated workloads',
-      T2IF: 'Dedicated training, less ceremony',
-      T3IF: 'Cost-sensitive batch, dev/test, spot',
+      T1: 'Enterprise & regulated workloads',
+      T2: 'Dedicated training & inference',
+      T3: 'Cost-sensitive batch, dev/test, spot',
     },
   },
 ];
@@ -95,13 +95,12 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
 <section class={`tiers ${compact ? 'tiers-compact' : ''}`}>
   {!headerless && (
     <header class="tiers-header">
-      <div class="kicker">Intelligence Factory Taxonomy</div>
-      <h2>Three Production Tiers</h2>
+      <div class="kicker">Operator Segments</div>
+      <h2>Three Operator Segments</h2>
       <p class="standfirst">
-        Each tier is a defined capability bundle — fabric, host, support,
-        compliance. CCIR publishes one reference rate per tier so users
-        can match the index cited to the deployment grade they pay for,
-        narrowing basis risk relative to a single-rate alternative.
+        Each segment is a class of operator — hyperscaler, neocloud, or
+        marketplace. CCIR publishes one reference rate per segment so users
+        can compare the same silicon across where it is actually operated.
       </p>
     </header>
   )}
@@ -110,8 +109,7 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
     {tiers.map((t) => (
       <article class={`tier-card tier-${t.code.toLowerCase()}`}>
         <header class="tc-head">
-          <span class={`tc-badge tier-badge tier-badge-${t.code.toLowerCase()}`}>{t.code}</span>
-          <h3>{t.name}</h3>
+          <h3 class={`tc-name tc-name-${t.code.toLowerCase()}`}>{t.name}</h3>
         </header>
         <p class="tc-standfirst">{t.standfirst}</p>
       </article>
@@ -125,7 +123,7 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
           <th class="attr-col">Attribute</th>
           {TIERS.map((t) => (
             <th class={`tier-col tier-col-${t.toLowerCase()}`}>
-              <span class={`tier-badge tier-badge-${t.toLowerCase()}`}>{t}</span>
+              <span class={`seg-name seg-name-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</span>
             </th>
           ))}
         </tr>
@@ -142,17 +140,11 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
       </tbody>
     </table>
     <p class="cap-caption">
-      Each tier is a capability bundle. The matrix describes what the
-      rate at each tier actually packages — fabric, host, bundle depth,
-      use case. Tiers are assigned <strong>per&#8209;SKU</strong>, not per
-      operator: the same provider appears at several grades as its products
-      differ — CoreWeave's flagship SXM clusters classify as T1IF, its A100
-      as T2IF, its L40S as T3IF. The exact classification gates — fabric
-      thresholds, bundle scoring, disclosure standards — are maintained in
-      the administrator's internal methodology and are deliberately not
-      published, so a rate cannot be engineered against them. The full panel
-      roster is disclosed to methodology reviewers under the governance
-      process.
+      Each segment describes a distinct class of operator — hyperscaler,
+      neocloud, or marketplace. The segment is a property of the
+      <strong>operator</strong>, not the chip: the same silicon is priced
+      across all three, so the ladder compares one chip's hyperscale,
+      neocloud, and marketplace rate side by side.
     </p>
   </div>
 </section>
@@ -196,6 +188,19 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
     font-weight: var(--weight-display);
     letter-spacing: -0.005em;
   }
+  .tc-name-t1 { color: var(--tier-t1); }
+  .tc-name-t2 { color: var(--accent); }  /* middle tier (Neocloud) highlighted */
+  .tc-name-t3 { color: var(--tier-t3); }
+  .seg-name {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    font-weight: var(--weight-strong);
+  }
+  .seg-name-t1 { color: var(--tier-t1); }
+  .seg-name-t2 { color: var(--accent); }
+  .seg-name-t3 { color: var(--tier-t3); }
   .tc-standfirst {
     font-family: var(--font-body);
     font-size: var(--fs-md);

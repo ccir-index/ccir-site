@@ -1,0 +1,162 @@
+---
+/*
+  GPU-backed debt issuance by quarter — observed from the tracked instrument
+  ledger (credit_instruments.json). Bars = amount issued that quarter (left
+  axis); line = cumulative tracked (right axis). Observed only — no modelling
+  of drawdowns or amortization. Caveats live in the expandable note.
+*/
+import creditData from '../data/credit_instruments.json';
+
+const instruments = (creditData as any).instruments as any[];
+
+function quarterOf(iso: string): string | null {
+  // Match a YYYY-MM anywhere in the string — issuance dates are often prose
+  // ("Priced ~2026-04-16", "Reported 2026-02-19", "Closed; PR 2026-01-07").
+  const m = /(\d{4})-(\d{2})/.exec(iso || '');
+  if (!m) return null;
+  const q = +m[2] <= 3 ? 1 : +m[2] <= 6 ? 2 : +m[2] <= 9 ? 3 : 4;
+  return `${m[1]}-Q${q}`;
+}
+
+// Scope: discrete GPU-collateral debt issuance. A few tracked rows are held
+// out (exclude_from_issuance) — e.g. data-center-campus credit where GPUs
+// aren't the security, or program umbrellas that would double-count confirmed
+// tranches. They stay in the ledger elsewhere; here they'd distort the series.
+const sized = instruments.filter(
+  (i) => typeof i.size_usd_m === 'number' && i.size_usd_m > 0 && !i.exclude_from_issuance,
+);
+const heldOut = instruments.filter(
+  (i) => typeof i.size_usd_m === 'number' && i.size_usd_m > 0 && i.exclude_from_issuance,
+);
+const heldOutUsd = heldOut.reduce((a, i) => a + i.size_usd_m, 0);
+const byQuarter = new Map<string, number>();
+let undated = 0;
+let undatedUsd = 0;
+for (const i of sized) {
+  const q = quarterOf(i.issued);
+  if (q === null) { undated++; undatedUsd += i.size_usd_m; continue; }
+  byQuarter.set(q, (byQuarter.get(q) ?? 0) + i.size_usd_m);
+}
+
+const WINDOW_START = '2024-Q1';
+const allQ = [...byQuarter.keys()].sort();
+const preBaseUsd = allQ.filter((q) => q < WINDOW_START).reduce((a, q) => a + byQuarter.get(q)!, 0);
+const windowQ = allQ.filter((q) => q >= WINDOW_START);
+
+let cum = preBaseUsd;
+const bars = windowQ.map((q) => {
+  const issued = byQuarter.get(q)!;
+  cum += issued;
+  return { q, issued_b: issued / 1000, cum_b: cum / 1000 };
+});
+
+const totalTrackedB = sized.reduce((a, i) => a + i.size_usd_m, 0) / 1000;
+const maxBar = Math.max(...bars.map((b) => b.issued_b), 1);
+const maxCum = Math.max(...bars.map((b) => b.cum_b), 1);
+const asOf = (creditData as any)._meta?.as_of ?? '';
+
+// --- svg geometry ----------------------------------------------------------
+const W = 920, H = 300;
+const M = { top: 20, right: 58, bottom: 40, left: 54 };
+const x0 = M.left, x1 = W - M.right, y0 = M.top, y1 = H - M.bottom;
+const n = bars.length;
+const band = (x1 - x0) / n;
+const barW = Math.min(band * 0.62, 46);
+const bx = (i: number) => x0 + band * (i + 0.5);
+const byBar = (v: number) => y1 - (v / maxBar) * (y1 - y0);
+const byCum = (v: number) => y1 - (v / maxCum) * (y1 - y0);
+
+const yTicks = 4;
+const barTicks = Array.from({ length: yTicks + 1 }, (_, k) => Math.round((maxBar / yTicks) * k));
+const cumTicks = Array.from({ length: yTicks + 1 }, (_, k) => Math.round((maxCum / yTicks) * k));
+const cumPath = bars.map((b, i) => `${i === 0 ? 'M' : 'L'} ${bx(i).toFixed(1)} ${byCum(b.cum_b).toFixed(1)}`).join(' ');
+const qLabel = (q: string) => q.replace('-', ' ');
+---
+<figure class="ci">
+  <svg viewBox={`0 0 ${W} ${H}`} role="img"
+       aria-label={`GPU-backed debt issuance by quarter from 2024. Quarterly issuance (bars) rises to over thirty billion dollars; cumulative tracked (line) reaches ${totalTrackedB.toFixed(0)} billion.`}>
+    {barTicks.map((t) => (
+      <>
+        <line x1={x0} y1={byBar(t)} x2={x1} y2={byBar(t)} class="ci-grid" />
+        <text x={x0 - 8} y={byBar(t) + 3} class="ci-tick ci-tick-l">{t}</text>
+      </>
+    ))}
+    {cumTicks.map((t) => (
+      <text x={x1 + 8} y={byCum(t) + 3} class="ci-tick ci-tick-r">{t}</text>
+    ))}
+    <text x={x0 - 8} y={y0 - 7} class="ci-axis-label ci-axis-l">$B issued / qtr</text>
+    <text x={x1 + 8} y={y0 - 7} class="ci-axis-label ci-axis-r">cumulative $B</text>
+
+    {bars.map((b, i) => (
+      <>
+        <rect x={bx(i) - barW / 2} y={byBar(b.issued_b)} width={barW}
+              height={Math.max(0, y1 - byBar(b.issued_b))} class="ci-bar">
+          <title>{`${qLabel(b.q)} — $${b.issued_b.toFixed(1)}B issued · $${b.cum_b.toFixed(0)}B cumulative`}</title>
+        </rect>
+        <text x={bx(i)} y={y1 + 16} class="ci-tick ci-tick-x">{qLabel(b.q)}</text>
+      </>
+    ))}
+
+    <path d={cumPath} class="ci-cum-line" />
+    {bars.map((b, i) => (
+      <circle cx={bx(i)} cy={byCum(b.cum_b)} r="2.5" class="ci-cum-dot" />
+    ))}
+  </svg>
+
+  <details class="ci-notes">
+    <summary>Notes</summary>
+    <p>
+      {sized.length} tracked instruments, ${totalTrackedB.toFixed(1)}B total issued, as of {asOf}.
+      Observed from filings — amount issued at close, not drawn balance; no
+      drawdown or amortization is modelled.
+      {undated > 0 && (
+        <> {undated} instrument{undated === 1 ? '' : 's'} (${(undatedUsd / 1000).toFixed(1)}B)
+        carry a fuzzy issuance date, so they are in the total but not placed in a bar.</>
+      )}
+      {heldOut.length > 0 && (
+        <> {heldOut.length} large deal{heldOut.length === 1 ? ' is' : 's are'} held out
+        (${(heldOutUsd / 1000).toFixed(1)}B) as out of scope — data-center-campus credit
+        where GPUs aren't the security, and program umbrellas that would double-count
+        confirmed tranches.</>
+      )} Pre-2024 issuance (${(preBaseUsd / 1000).toFixed(1)}B) is small and sits in the
+      cumulative line's starting level rather than as its own bars.
+    </p>
+  </details>
+</figure>
+
+<style>
+  .ci { margin: 0; }
+  .ci-head {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: var(--tracking-eye); text-transform: uppercase;
+    color: var(--accent); font-weight: var(--weight-strong);
+    padding-left: 54px; margin-bottom: 6px;
+  }
+  .ci svg { width: 100%; height: auto; display: block; }
+  .ci-grid { stroke: var(--rule); stroke-width: 1; }
+  .ci-tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim); }
+  .ci-tick-l { text-anchor: end; }
+  .ci-tick-r { text-anchor: start; }
+  .ci-tick-x { text-anchor: middle; }
+  .ci-axis-label { font-family: var(--font-mono); font-size: 9px; fill: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.04em; }
+  .ci-axis-l { text-anchor: start; }
+  .ci-axis-r { text-anchor: end; }
+  .ci-bar { fill: var(--accent); opacity: 0.85; }
+  .ci-bar:hover { opacity: 1; }
+  .ci-cum-line { fill: none; stroke: var(--ink); stroke-width: 1.6; opacity: 0.7; }
+  .ci-cum-dot { fill: var(--ink); opacity: 0.7; }
+  .ci-notes { margin-top: 8px; }
+  .ci-notes > summary {
+    list-style: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: var(--tracking-eye); text-transform: uppercase;
+    color: var(--ink-dim); font-weight: var(--weight-strong); padding: 4px 0;
+  }
+  .ci-notes > summary::-webkit-details-marker { display: none; }
+  .ci-notes > summary::before { content: '▸ '; color: var(--accent); }
+  .ci-notes[open] > summary::before { content: '▾ '; }
+  .ci-notes p {
+    font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
+    line-height: 1.55; margin: 4px 0 0; max-width: 90ch;
+  }
+</style>

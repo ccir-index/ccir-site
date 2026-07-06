@@ -1,22 +1,23 @@
 ---
 import { headlineRates, meta, seriesHistory } from '../data/snapshot';
+import { TIER_LABELS_SHORT, type Tier } from '../data/types';
 import Sparkline from './Sparkline.astro';
 
 // Premium-chip series only. Featured flagship cells under the 7-segment
-// grammar. T1IF / T2IF / T3IF spread across the canonical 6 silicons.
+// grammar. T1 / T2 / T3 operator segments across the canonical 6 silicons.
 const featured = [
-  'CRI-T1IF-H100-ALL-GTD-OD-ALL',
-  'CRI-T2IF-H100-ALL-GTD-OD-ALL',
-  'CRI-T3IF-H100-ALL-ALL-OD-ALL',
-  'CRI-T1IF-H200-ALL-GTD-OD-ALL',
-  'CRI-T2IF-H200-ALL-GTD-OD-ALL',
-  'CRI-T3IF-H200-ALL-ALL-OD-ALL',
-  'CRI-T1IF-B200-ALL-GTD-OD-ALL',
-  'CRI-T2IF-B200-ALL-GTD-OD-ALL',
-  'CRI-T3IF-B200-ALL-ALL-OD-ALL',
-  'CRI-T1IF-GB200-ALL-GTD-OD-ALL',
-  'CRI-T2IF-A100-ALL-GTD-OD-ALL',
-  'CRI-T3IF-A100-ALL-ALL-OD-ALL',
+  'CRI-T1-H100-ALL-GTD-OD-ALL',
+  'CRI-T2-H100-ALL-GTD-OD-ALL',
+  'CRI-T3-H100-ALL-GTD-OD-ALL',
+  'CRI-T1-H200-ALL-GTD-OD-ALL',
+  'CRI-T2-H200-ALL-GTD-OD-ALL',
+  'CRI-T3-H200-ALL-GTD-OD-ALL',
+  'CRI-T1-B200-ALL-GTD-OD-ALL',
+  'CRI-T2-B200-ALL-GTD-OD-ALL',
+  'CRI-T3-B200-ALL-GTD-OD-ALL',
+  'CRI-T1-GB200-ALL-GTD-OD-ALL',
+  'CRI-T2-A100-ALL-GTD-OD-ALL',
+  'CRI-T3-A100-ALL-GTD-OD-ALL',
 ];
 
 const ticks = featured
@@ -26,9 +27,11 @@ const ticks = featured
 const fmt = (n: number) => n.toFixed(2);
 const short = (r: typeof ticks[number]) => {
   const parts = r.series_id.split('-');
-  const tier = parts[1]!;
+  const tier = parts[1]! as Tier;
   const chip = parts.slice(2, parts.length - 4).join('-');
-  return `${tier} ${chip}`;
+  // Show the operator-segment name (Hyperscaler / Neocloud / Marketplace),
+  // never the raw T1/T2/T3 code.
+  return `${TIER_LABELS_SHORT[tier] ?? tier} ${chip}`;
 };
 
 // 30-day change: today's price_median vs the bundled history point closest

@@ -1,0 +1,166 @@
+---
+import Base from '../layouts/Base.astro';
+import { meta } from '../data/snapshot';
+
+// Market Intelligence hub — an index of the analyses CCIR publishes on the
+// compute market's price and supply. Each card links an existing piece; the
+// grouping is the taxonomy (price structure / realized economics / supply).
+interface Piece {
+  href: string;
+  title: string;
+  blurb: string;
+}
+interface Cluster {
+  kicker: string;
+  heading: string;
+  standfirst: string;
+  pieces: Piece[];
+}
+
+const clusters: Cluster[] = [
+  {
+    kicker: 'Price structure',
+    heading: 'How the market prices the same silicon',
+    standfirst:
+      'On-demand is one point on a surface. These break the rate out by tenor, by where it actually transacts, and by how far it ranges across operators.',
+    pieces: [
+      { href: '/term', title: 'Committed term structure',
+        blurb: 'Posted committed asks by tenor — the price of guaranteed capacity from one month to a year, per chip.' },
+      { href: '/basis', title: 'On-demand vs clearing basis',
+        blurb: 'Posted on-demand asks against marketplace clearing — where list rates sit above what actually transacts.' },
+      { href: '/spreads', title: 'Spreads & dispersion',
+        blurb: 'How far the same chip ranges across operator segments and providers — the width of the market, not just its middle.' },
+    ],
+  },
+  {
+    kicker: 'Realized economics',
+    heading: 'What operators actually earn',
+    standfirst:
+      'Rate cards are asks. Filings show what clouds realize per GPU-hour once discounts, commitments, and idle time are in the number.',
+    pieces: [
+      { href: '/realized/', title: 'Realized vs rate card',
+        blurb: 'Per-GPU-hour realization estimated from public filings — CoreWeave realizes well below its own posted rate card.' },
+    ],
+  },
+  {
+    kicker: 'Supply & availability',
+    heading: 'Who has capacity, and how much moves',
+    standfirst:
+      'Price without supply is half the picture. These track how much of the tracked fleet is working, how many venues have capacity, and the live marketplace tape.',
+    pieces: [
+      { href: '/utilization', title: 'Utilization & availability',
+        blurb: 'How much of the tracked fleet is rented versus idle, and how many venues have capacity — a breadth read on supply.' },
+      { href: '/markets', title: 'Marketplace tape',
+        blurb: 'Per-cycle cheapest asks across marketplaces and the Vast observatory — the live spot tape beneath the reference rate.' },
+    ],
+  },
+];
+---
+<Base
+  title="Market Intelligence · CCIR"
+  description="CCIR's market-intelligence library — term structure, clearing basis, spreads, realized economics, and supply across the GPU compute market."
+  ogImage="/og/home.png"
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Market Intelligence · {meta.as_of_date}</div>
+      <h1>Market Intelligence</h1>
+      <p class="standfirst">
+        Analyses of the compute market's price and supply, updated daily. The
+        headline reference rate lives on <a href="/rates">/rates</a>; the full
+        grain on <a href="/explorer">/explorer</a>. Everything below is where we
+        take the numbers apart.
+      </p>
+    </header>
+
+    {clusters.map((c) => (
+      <section class="cluster">
+        <header class="cluster-head">
+          <div class="kicker">{c.kicker}</div>
+          <h2>{c.heading}</h2>
+          <p class="cluster-standfirst">{c.standfirst}</p>
+        </header>
+        <div class="card-grid">
+          {c.pieces.map((p) => (
+            <a class="mi-card" href={p.href}>
+              <h3 class="mi-title">{p.title}</h3>
+              <p class="mi-blurb">{p.blurb}</p>
+              <span class="mi-foot">Open →</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { margin-bottom: 8px; max-width: 82ch; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-3xl);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 12px;
+    }
+    .standfirst a { color: var(--accent); }
+
+    .cluster { margin: 32px 0 0; }
+    .cluster-head { max-width: 82ch; margin-bottom: 14px; }
+    .cluster-head h2 {
+      font-size: var(--fs-2xl);
+      margin: 4px 0 8px;
+    }
+    .cluster-standfirst {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.6;
+      margin: 0;
+      max-width: 78ch;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+    @media (max-width: 860px) { .card-grid { grid-template-columns: 1fr; } }
+
+    .mi-card {
+      background: var(--surface);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .mi-card:hover { background: var(--surface-2); text-decoration: none; }
+    .mi-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      font-weight: var(--weight-display);
+      letter-spacing: -0.005em;
+      margin: 0;
+    }
+    .mi-blurb {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.55;
+      margin: 0;
+    }
+    .mi-foot {
+      margin-top: auto;
+      padding-top: 6px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+  </style>
+</Base>
