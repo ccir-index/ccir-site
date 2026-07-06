@@ -53,6 +53,8 @@ function parseRow(line: string, headers: string[]): Rate {
     headline_window_days: num('headline_window_days'),
     price_mean: num('price_mean_usd_per_gpu_hour'),
     price_median: num('price_median'),
+    price_headline: numOrNull('price_headline'),
+    headline_stat: (() => { const v = get('headline_stat'); return v === undefined || v === '' ? null : v; })(),
     price_p25: num('price_p25'),
     price_p75: num('price_p75'),
     price_min: num('price_min'),
@@ -88,8 +90,14 @@ function parseCsv(text: string): Rate[] {
   // NEOCLOUD band rows are excluded at EVERY term — the band's OD companion
   // anchor (product_class=market_intelligence upstream) must not flow into
   // the citable/indicative pools; it surfaces only via neocloudOdCell.
+  // The retired GRADE taxonomy (T1IF/T2IF/T3IF) and the NEOCLOUD/STRIPPED
+  // market-intelligence bands ship in the same CSV as duplicate series; drop
+  // them here so only the operator-segment headline (T1/T2/T3) flows through.
+  const DROP_FACTORY_TYPES = new Set([
+    'NEOCLOUD', 'STRIPPED', 'T1IF', 'T2IF', 'T3IF',
+  ]);
   return parseAllRows(text).filter(
-    (r) => r.commitment_term === 'OnDemand' && r.factory_type !== 'NEOCLOUD',
+    (r) => r.commitment_term === 'OnDemand' && !DROP_FACTORY_TYPES.has(r.factory_type),
   );
 }
 
@@ -105,10 +113,10 @@ const committedBandRates: Rate[] = parseAllRows(csvText).filter(
   (r) => r.factory_type === 'NEOCLOUD' && r.commitment_term !== 'OnDemand',
 );
 
-// T1IF committed cells (the strict T1IF cell IS the T1IF band — Azure/GCP
-// reserved schedule). Same MI badge rule. Thin today (mostly n<=2).
+// T1 (Hyperscaler) committed cells — the strict T1 cell IS the T1 band
+// (Azure/GCP reserved schedule). Same MI badge rule. Thin today (mostly n<=2).
 const t1ifCommittedRates: Rate[] = parseAllRows(csvText).filter(
-  (r) => r.factory_type === 'T1IF' && r.commitment_term !== 'OnDemand',
+  (r) => r.factory_type === 'T1' && r.commitment_term !== 'OnDemand',
 );
 
 // NEOCLOUD band OD companion — the same pooled T2IF+T3IF global-USD panel
@@ -177,7 +185,7 @@ export function tierOdCell(tier: Tier, chip: string, region: GeoToken): Rate | u
 // committed number would recreate the cross-seam comparison the gating
 // removed).
 export function t2ifOdCell(chip: string, region: GeoToken): Rate | undefined {
-  return tierOdCell('T2IF', chip, region);
+  return tierOdCell('T2', chip, region);
 }
 
 // Previous-day medians per series_id. Drives the ticker arrows: today's
@@ -260,6 +268,39 @@ export const flagshipRates: Rate[] = headlineRates.filter(
 // Section 2 only.
 export const indicativeRates: Rate[] = rates.filter((r) => r.scope === 'indicative');
 
+// Headline value per the n-rule, preferring the gold-derived column when the
+// snapshot carries it. n>=10 → mean (deep panel), else median (thin, outlier-
+// fragile). One place; pages call this instead of reimplementing the rule.
+export function headlineValue(r: Rate): number {
+  if (r.price_headline != null) return r.price_headline;
+  return (r.n_sources ?? 0) >= 10 ? r.price_mean : r.price_median;
+}
+export function headlineStatOf(r: Rate): 'mean' | 'median' {
+  if (r.headline_stat === 'mean' || r.headline_stat === 'median') return r.headline_stat;
+  return (r.n_sources ?? 0) >= 10 ? 'mean' : 'median';
+}
+
+// Operator-tier T2 (Neocloud) committed cell per (chip, tenor) — the committed
+// term-structure source that replaces the retired NEOCLOUD grade band. Prefer
+// GTD (committed is guaranteed by nature), form + region pooled, non-Shadow.
+export function neocloudCommittedCell(chip: string, term: Term): Rate | undefined {
+  return headlineRates
+    .filter((r) => r.tier === 'T2' && r.gpu_model === chip &&
+                   r.commitment_term === term && r.form_factor === 'ALL' &&
+                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
+                   r.promotion_status !== 'Shadow')
+    .sort((a, b) => variantRank(a) - variantRank(b) || (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+}
+
+// Tenors with at least one operator-tier T2 committed cell, in curve order.
+export function neocloudCommittedTenors(): Term[] {
+  const order: Term[] = ['1M', '3M', '6M', '1Y', '2Y', '3Y', '5Y'];
+  return order.filter((t) => headlineRates.some(
+    (r) => r.tier === 'T2' && r.commitment_term === t &&
+           r.form_factor === 'ALL' && r.region === 'ALL' &&
+           r.interruptibility === 'GTD' && r.promotion_status !== 'Shadow'));
+}
+
 // Native-product rule for the T-tier headline cells: all three tiers
 // (T1IF/T2IF/T3IF) are GTD-only — apples-to-apples guaranteed-grade marks.
 // (T3IF used to pool GTD+INT for marketplace spot, but the one live/executable
@@ -316,7 +357,7 @@ export const baselineRates: Rate[] = (() => {
 // observed n_sources per tier across pooled OD rows — the simplest measure
 // of how broad each tier's panel is.
 function computeSourcesByTier(): Record<Tier, number> {
-  const out: Record<Tier, number> = { T1IF: 0, T2IF: 0, T3IF: 0 };
+  const out: Record<Tier, number> = { T1: 0, T2: 0, T3: 0 };
   for (const r of headlineRates) {
     if (!r.tier) continue;
     if (r.commitment_term !== 'OnDemand') continue;
@@ -479,7 +520,7 @@ export function spreadMatrix(): SpreadRow[] {
   const rows: SpreadRow[] = [];
   for (const [key, rs] of groups) {
     const [chip, term] = key.split('|') as [string, Term];
-    const t1 = rs.find((r) => r.tier === 'T1IF');
+    const t1 = rs.find((r) => r.tier === 'T1');
     const baseline = t1?.price_median ?? null;
     const cells: Partial<Record<Tier, SpreadCell>> = {};
     for (const tier of TIERS) {
@@ -512,9 +553,9 @@ export function spreadMatrix(): SpreadRow[] {
 export type TierMatrixView = Record<Tier, Rate | undefined>;
 
 export function tierMatrix(chip: string): TierMatrixView {
-  const out: TierMatrixView = { T1IF: undefined, T2IF: undefined, T3IF: undefined };
-  for (const tier of ['T1IF', 'T2IF', 'T3IF'] as Tier[]) {
-    const wantInt: Interruptibility = tier === 'T3IF' ? 'ALL' : 'GTD';
+  const out: TierMatrixView = { T1: undefined, T2: undefined, T3: undefined };
+  for (const tier of ['T1', 'T2', 'T3'] as Tier[]) {
+    const wantInt: Interruptibility = 'GTD';
     const candidates = flagshipRates.filter(
       (r) => r.tier === tier && r.gpu_model === chip && r.commitment_term === 'OnDemand' &&
              r.form_factor === 'ALL' && r.region === 'ALL',
@@ -540,7 +581,7 @@ export function premiumChipsList(): string[] {
   for (const r of headlineRates) {
     if (r.promotion_status !== 'Published') continue;
     if (!r.tier) continue;
-    if (r.tier !== 'T1IF' && r.tier !== 'T2IF') continue;
+    if (r.tier !== 'T1' && r.tier !== 'T2') continue;
     present.add(r.gpu_model);
   }
   return [...PREMIUM_CHIPS].filter((c) => present.has(c));

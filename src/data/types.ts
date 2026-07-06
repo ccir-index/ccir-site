@@ -1,12 +1,11 @@
 /*
-  Premium-chip algorithmic taxonomy. Three deployment tiers — T1IF, T2IF,
-  T3IF — classified per-SKU from a capability bundle (fabric, host topology,
-  bundle depth). The merged v2.0 methodology covers ONLY this 3-tier model
-  on the 6 premium silicons. Long-tail chips (L4, L40, L40S, A40, T4, V100,
-  3090, 4090, 5090, etc.) appear in the data as INDICATIVE rates with no
-  tier coverage — the algorithmic classifier doesn't fire on them.
+  Operator segments — the three deployment classes every source falls into,
+  keyed on the registry's operator_class: T1 Hyperscaler, T2 Neocloud, T3
+  Marketplace. This is provenance, not a quality grade — the segment is a
+  property of the operator, and the same chip is priced across all three.
+  Every chip carries a segment (premium + AMD/RTX/long-tail alike).
 */
-export type Tier = 'T1IF' | 'T2IF' | 'T3IF';
+export type Tier = 'T1' | 'T2' | 'T3';
 export type Term = 'OnDemand' | '1M' | '3M' | '6M' | '1Y' | '2Y' | '3Y' | '5Y';
 export type Confidence = 'High' | 'Medium' | 'Low';
 export type PromotionStatus = 'Published' | 'Provisional' | 'Shadow';
@@ -44,6 +43,11 @@ export interface Rate {
   headline_window_days: number;
   price_mean: number;
   price_median: number;
+  // Gold-derived headline: the single value the site shows (n>=10 mean, else
+  // median), plus which stat it is. Nullable — snapshots predating the export
+  // change won't carry them; callers fall back to the n-rule inline.
+  price_headline: number | null;
+  headline_stat: string | null;
   price_p25: number;
   price_p75: number;
   price_min: number;
@@ -72,29 +76,19 @@ export interface SnapshotMeta {
   sources_by_tier: Record<Tier, number>;
 }
 
-export const TIERS: readonly Tier[] = ['T1IF', 'T2IF', 'T3IF'] as const;
+export const TIERS: readonly Tier[] = ['T1', 'T2', 'T3'] as const;
 
 export const TIER_LABELS: Record<Tier, string> = {
-  T1IF: 'Tier 1 Intelligence Factory',
-  T2IF: 'Tier 2 Intelligence Factory',
-  T3IF: 'Tier 3 Intelligence Factory',
+  T1: 'Hyperscaler',
+  T2: 'Neocloud',
+  T3: 'Marketplace',
 };
 
-// Compact form for narrow contexts (table column headers, etc.) where the
-// full Intelligence Factory name would wrap.
+// Compact form for narrow contexts (table column headers, etc.).
 export const TIER_LABELS_SHORT: Record<Tier, string> = {
-  T1IF: 'Tier 1 IF',
-  T2IF: 'Tier 2 IF',
-  T3IF: 'Tier 3 IF',
-};
-
-// Crude-oil grade parallels. Body-prose flavor only — never a card subtitle.
-// Three quality grades quoted side by side because they price distinct
-// feedstock grades — same logic for compute deployment tiers.
-export const TIER_OIL_GRADES: Record<Tier, string> = {
-  T1IF: 'Light Sweet Crude',
-  T2IF: 'Medium Crude',
-  T3IF: 'Heavy Sour Crude',
+  T1: 'Hyperscaler',
+  T2: 'Neocloud',
+  T3: 'Marketplace',
 };
 
 // Premium silicons covered by the merged v2.0 algorithmic taxonomy. Tokens

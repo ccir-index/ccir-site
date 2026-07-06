@@ -3,8 +3,9 @@
 
   The CCIR rate index is a list-ask benchmark; Vast is the one live/executable
   venue and is pulled from the rate panel. This overlay re-surfaces Vast as a
-  separate signal: how the live marketplace price sits vs the ex-Vast T3IF
-  list-ask floor at matched tier. NOT part of the benchmark. Single-venue.
+  separate signal: how the live marketplace price sits vs the ex-Vast T3
+  (Marketplace) list-ask floor at matched segment. NOT part of the benchmark.
+  Single-venue.
 */
 import csvText from './vast_basis.csv?raw';
 

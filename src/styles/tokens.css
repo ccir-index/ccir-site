@@ -32,9 +32,9 @@ html[data-theme="terminal"] {
   --neutral: #6b7176;
 
   /* T-tier ramp — amber dominant, off-white middle, dim grey tail */
-  --tier-t1if: #ffb400;
-  --tier-t2if: #cfcdc6;
-  --tier-t3if: #6b7176;
+  --tier-t1: #ffb400;
+  --tier-t2: #cfcdc6;
+  --tier-t3: #6b7176;
 
   /* Type — terminal: serif headlines + sans body + mono data */
   --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
@@ -96,9 +96,9 @@ html[data-theme="editorial"] {
   --neutral: #6b7176;
 
   /* T-tier ramp — navy dominant, mid grey middle, light grey tail */
-  --tier-t1if: #143055;
-  --tier-t2if: #6e6c66;
-  --tier-t3if: #b8b3a4;
+  --tier-t1: #143055;
+  --tier-t2: #6e6c66;
+  --tier-t3: #b8b3a4;
 
   --font-serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
   --font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system, sans-serif;
