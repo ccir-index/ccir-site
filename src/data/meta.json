@@ -1,11 +1,11 @@
 {
   "as_of_date": "2026-07-06",
-  "published_at_ct": "2026-07-06T02:13:56-05:00",
-  "published_at_utc": "2026-07-06T07:13:56+00:00",
-  "run_id": "export-20260706T071317Z-41bb69ae",
+  "published_at_ct": "2026-07-06T06:25:40-05:00",
+  "published_at_utc": "2026-07-06T11:25:40+00:00",
+  "run_id": "export-20260706T112530Z-6ea2fe51",
   "methodology_version": "v2.0.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
-  "contributing_today": 0,
+  "contributing_today": 47,
   "listings_history": {
     "chips": [
       "h100-sxm-80gb",
@@ -19,7 +19,7 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 10922,
+    "total_rows": 11255,
     "window_days": 90,
     "window_end": "2026-07-06",
     "window_start": "2026-04-08"
@@ -94,5 +94,33 @@
     "window_end": "2026-07-06",
     "window_start": "2026-06-07"
   },
-  "utilization": null
+  "utilization": {
+    "chips": [
+      "h100-sxm",
+      "h200-sxm",
+      "b200-sxm",
+      "gb200",
+      "a100-sxm-80gb",
+      "a100-sxm-40gb"
+    ],
+    "imu_series_start": "2026-05-28",
+    "intraday_window_days": 30,
+    "n_sources": 13,
+    "occupancy_chips": [
+      "h100-sxm",
+      "h100-pcie",
+      "h200-sxm",
+      "b200-sxm",
+      "gb200",
+      "a100-sxm",
+      "all"
+    ],
+    "occupancy_cycles": 172,
+    "occupancy_series_start": "2026-05-13",
+    "runpod_occupancy_chips": [],
+    "runpod_occupancy_cycles": 0,
+    "runpod_occupancy_series_start": null,
+    "status": "ok",
+    "window_days": 90
+  }
 }
