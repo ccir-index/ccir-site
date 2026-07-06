@@ -3009,6 +3009,8 @@
     },
     {
       "id": "meta-elpaso",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Out of scope on two counts: data-center-campus credit (security is the El Paso campus, not GPUs — same basis as the excluded meta-beignet-hyperion), and status is rumored/unclosed (~$13B 'in the works', no close as of early Jul 2026), so it isn't issued debt.",
       "issuer": "Meta / Blue Owl \"Hyperion\" JV (Richland Parish, LA)",
       "ticker": null,
       "issuer_type": "private",
