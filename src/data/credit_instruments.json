@@ -2678,15 +2678,15 @@
       "size_usd_m": 5700,
       "size_note": "Single tranche; ~$19B book — largest AI high-yield financing to date",
       "rate": { "kind": "fixed", "value": 6.25, "note": "6.25% coupon at par (tight end of 6.25–6.375% guidance); 5-yr non-call 2; BB (Fitch, on Google lease guarantee; Fluidstack unrated)" },
-      "maturity": "~2031 (5-yr non-call 2)",
+      "maturity": "2031 (5-yr non-call 2)",
       "maturity_note": null,
       "seniority": "Senior secured project bonds (SPV landlord)",
       "security": "430 MW (2 DCs) Sullivan County, Indiana; 100% leased to Fluidstack on 15-yr triple-net lease guaranteed by Google",
       "lenders": ["Morgan Stanley (sole bookrunner)"],
-      "status": "press",
+      "status": "confirmed",
       "issued": "Priced ~2026-04-16/17",
-      "source": { "doc": "Bloomberg; LCD (no Fluidstack or MS release)", "date": "2026-04-15", "url": "https://www.bloomberg.com/news/articles/2026-04-15/google-linked-data-centers-selling-record-5-7-billion-junk-bond" },
-      "as_of": "2026-07-02"
+      "source": { "doc": "Latham & Watkins (issuer counsel) priced release 4/20/26; Fitch BB on Google lease guarantee (Fluidstack unrated); S&P rated; Bloomberg/LCD secondary. Private JV — no SEC filing.", "date": "2026-04-20", "url": "https://www.lw.com/en/news/latham-advises-on-meridian-arc-holdco-senior-secured-notes-offering-to-finance-ai-data-center" },
+      "as_of": "2026-07-05"
     },
     {
       "id": "fluidstack-macquarie",
