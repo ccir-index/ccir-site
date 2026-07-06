@@ -26,13 +26,6 @@ const scenarios = [
       </p>
     </header>
 
-    <aside class="hyp-banner" role="note">
-      <strong>Hypothetical.</strong> No liquid compute-forward market exists;
-      this prices its absence, not an observed market. It is a
-      <strong>price</strong> estimate, not a valuation — we size a cost-of-funds
-      friction and mark no asset. Every input is a range.
-    </aside>
-
     <section class="body">
       <h2>The question</h2>
       <p>
@@ -127,8 +120,6 @@ const scenarios = [
 
       <h2>Caveats</h2>
       <ul class="caveats">
-        <li>Hypothetical — prices the absence of a market, not an observed one.</li>
-        <li>Price, not value — a cost-of-funds friction; no asset is marked.</li>
         <li>Premium is the certainty slice only (~90bp); the 225/700bp spreads bundle counterparty credit and are upper bounds.</li>
         <li>The exposed fraction is a modeled scenario, not a measurement — the single largest source of range width, stated deliberately.</li>
         <li>Hedges are imperfect substitutes (basis, shape, volume risk persist); the certainty slice is narrowed, not closed.</li>
@@ -154,15 +145,6 @@ const scenarios = [
       margin: 6px 0 12px;
     }
     .standfirst em { font-style: italic; color: var(--accent); }
-
-    .hyp-banner {
-      margin: 4px 0 24px; padding: 12px 16px;
-      border: 1px solid var(--rule); border-left: 2px solid var(--accent);
-      background: var(--surface);
-      font-family: var(--font-body); font-size: var(--fs-sm);
-      color: var(--ink); line-height: 1.6; max-width: 84ch;
-    }
-    .hyp-banner strong { color: var(--accent); }
 
     .body { max-width: 80ch; }
     .body h2 {
