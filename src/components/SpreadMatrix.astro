@@ -15,11 +15,10 @@ const pctAbs = (n: number) => `${(Math.abs(n) * 100).toFixed(1)}%`;
 const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
 ---
 <div class="legend">
-  <span class="lk">Tier:</span>
+  <span class="lk">Segment:</span>
   {TIERS.map((t) => (
     <span class="lc">
       <span class={`sw tier-sw-${t.toLowerCase()}`}></span>
-      <span class="abbr">{t}</span>
       <span class="nm">{TIER_LABELS[t]}</span>
     </span>
   ))}
@@ -32,14 +31,14 @@ const dollarAbs = (n: number) => `$${Math.abs(n).toFixed(2)}`;
         <th rowspan="2" class="cell-head">Chip</th>
         <th rowspan="2" class="cell-head">Term</th>
         {TIERS.map((t) => (
-          <th colspan="2" class={`tier-col tier-col-${t.toLowerCase()}`}>{t} · {TIER_LABELS_SHORT[t]}</th>
+          <th colspan="2" class={`tier-col tier-col-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</th>
         ))}
       </tr>
       <tr>
         {TIERS.map(() => (
           <>
             <th class="sub">Posted</th>
-            <th class="sub">Disc. / Prem. vs T1</th>
+            <th class="sub">Disc. / Prem. vs Hyperscaler</th>
           </>
         ))}
       </tr>

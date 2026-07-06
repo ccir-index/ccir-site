@@ -4,14 +4,14 @@ import SpreadMatrix from '../components/SpreadMatrix.astro';
 import { meta } from '../data/snapshot';
 ---
 <Base
-  title="Tier spreads · CCIR"
-  description="Premium and discount spreads across our three operator segments, measured against T1 (Hyperscaler) as the reference. Daily basis snapshot."
+  title="Segment spreads · CCIR"
+  description="Premium and discount spreads across the three operator segments, measured against Hyperscaler as the reference. Daily basis snapshot."
   ogImage="/og/spreads.png"
 >
   <section class="wrap top">
     <div class="hero-solo">
-      <div class="kicker">Disc./Prem. vs T1 · Hyperscaler · {meta.as_of_date}</div>
-      <h1>Tier Spread Matrix</h1>
+      <div class="kicker">Disc./Prem. vs Hyperscaler · {meta.as_of_date}</div>
+      <h1>Segment Spread Matrix</h1>
       <details class="def-disclosure">
         <summary>How to read this</summary>
         <p class="standfirst lede">
@@ -22,7 +22,7 @@ import { meta } from '../data/snapshot';
           Reading <strong>across a row</strong> — same chip, varying
           segment — shows what the market is charging for the operator
           segment: hyperscaler, neocloud, or marketplace. A lender
-          underwriting a T1 (Hyperscaler) facility needs to know how much of
+          underwriting a Hyperscaler facility needs to know how much of
           the rate is silicon and how much is the operator.
         </p>
         <p class="standfirst lede">

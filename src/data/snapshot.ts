@@ -113,6 +113,13 @@ const committedBandRates: Rate[] = parseAllRows(csvText).filter(
   (r) => r.factory_type === 'NEOCLOUD' && r.commitment_term !== 'OnDemand',
 );
 
+// Operator-tier T2 (Neocloud) committed rows — the /term source that replaces
+// the retired NEOCLOUD band. Uses parseAllRows (NOT parseCsv) so committed
+// terms aren't stripped by the OnDemand-only gate that headlineRates rides on.
+const t2CommittedRates: Rate[] = parseAllRows(csvText).filter(
+  (r) => r.factory_type === 'T2' && r.commitment_term !== 'OnDemand',
+);
+
 // T1 (Hyperscaler) committed cells — the strict T1 cell IS the T1 band
 // (Azure/GCP reserved schedule). Same MI badge rule. Thin today (mostly n<=2).
 const t1ifCommittedRates: Rate[] = parseAllRows(csvText).filter(
@@ -284,8 +291,8 @@ export function headlineStatOf(r: Rate): 'mean' | 'median' {
 // term-structure source that replaces the retired NEOCLOUD grade band. Prefer
 // GTD (committed is guaranteed by nature), form + region pooled, non-Shadow.
 export function neocloudCommittedCell(chip: string, term: Term): Rate | undefined {
-  return headlineRates
-    .filter((r) => r.tier === 'T2' && r.gpu_model === chip &&
+  return t2CommittedRates
+    .filter((r) => r.gpu_model === chip &&
                    r.commitment_term === term && r.form_factor === 'ALL' &&
                    r.region === 'ALL' && r.interruptibility === 'GTD' &&
                    r.promotion_status !== 'Shadow')
@@ -295,8 +302,8 @@ export function neocloudCommittedCell(chip: string, term: Term): Rate | undefine
 // Tenors with at least one operator-tier T2 committed cell, in curve order.
 export function neocloudCommittedTenors(): Term[] {
   const order: Term[] = ['1M', '3M', '6M', '1Y', '2Y', '3Y', '5Y'];
-  return order.filter((t) => headlineRates.some(
-    (r) => r.tier === 'T2' && r.commitment_term === t &&
+  return order.filter((t) => t2CommittedRates.some(
+    (r) => r.commitment_term === t &&
            r.form_factor === 'ALL' && r.region === 'ALL' &&
            r.interruptibility === 'GTD' && r.promotion_status !== 'Shadow'));
 }
