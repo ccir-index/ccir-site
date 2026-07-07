@@ -1,0 +1,316 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Calibrated to the Common Crawl provider-primary backfill, stepped-panel
+// recompute of 2026-07-06. Research notes are dated, not updated in place.
+const AS_OF = '2026-07-06';
+
+// Monthly stepped-panel medians: posted prices carried forward between
+// captures (max 6 months — a posted price persists until changed), so panel
+// composition changes only on provider entry, never on scrape dropout.
+// mo | OD median | n providers | committed median | n | spread %
+const D = [
+  { mo: '2023-10', od: 4.78, no: 1, cm: 3.37, nc: 1, sp: 29 },
+  { mo: '2023-11', od: 4.78, no: 1, cm: 3.37, nc: 1, sp: 29 },
+  { mo: '2023-12', od: 4.78, no: 1, cm: 1.89, nc: 1, sp: 60 },
+  { mo: '2024-01', od: 4.78, no: 1, cm: 1.89, nc: 1, sp: 60 },
+  { mo: '2024-02', od: 4.30, no: 3, cm: 1.89, nc: 1, sp: 56 },
+  { mo: '2024-03', od: 4.30, no: 3, cm: 1.89, nc: 1, sp: 56 },
+  { mo: '2024-04', od: 4.30, no: 3, cm: 1.89, nc: 1, sp: 56 },
+  { mo: '2024-05', od: 4.30, no: 4, cm: 3.06, nc: 2, sp: 29 },
+  { mo: '2024-06', od: 4.30, no: 4, cm: 3.71, nc: 2, sp: 14 },
+  { mo: '2024-07', od: 3.92, no: 4, cm: 2.12, nc: 3, sp: 46 },
+  { mo: '2024-08', od: 3.49, no: 5, cm: 2.21, nc: 4, sp: 37 },
+  { mo: '2024-09', od: 3.24, no: 5, cm: 2.21, nc: 4, sp: 32 },
+  { mo: '2024-10', od: 3.00, no: 7, cm: 2.30, nc: 5, sp: 23 },
+  { mo: '2024-11', od: 2.99, no: 7, cm: 2.30, nc: 5, sp: 23 },
+  { mo: '2024-12', od: 2.84, no: 7, cm: 2.50, nc: 5, sp: 12 },
+  { mo: '2025-01', od: 2.84, no: 7, cm: 2.50, nc: 5, sp: 12 },
+  { mo: '2025-02', od: 2.84, no: 7, cm: 2.50, nc: 5, sp: 12 },
+  { mo: '2025-03', od: 2.84, no: 7, cm: 2.50, nc: 5, sp: 12 },
+  { mo: '2025-04', od: 2.84, no: 7, cm: 2.30, nc: 5, sp: 19 },
+  { mo: '2025-05', od: 2.79, no: 6, cm: 2.39, nc: 4, sp: 14 },
+  { mo: '2025-06', od: 2.84, no: 7, cm: 2.39, nc: 4, sp: 16 },
+  { mo: '2025-07', od: 2.84, no: 7, cm: 2.39, nc: 4, sp: 16 },
+  { mo: '2025-08', od: 2.79, no: 8, cm: 1.94, nc: 6, sp: 30 },
+  { mo: '2025-09', od: 2.92, no: 8, cm: 2.00, nc: 6, sp: 32 },
+  { mo: '2025-10', od: 2.92, no: 8, cm: 2.00, nc: 6, sp: 32 },
+  { mo: '2025-11', od: 2.92, no: 8, cm: 1.99, nc: 5, sp: 32 },
+  { mo: '2025-12', od: 3.18, no: 7, cm: 1.94, nc: 4, sp: 39 },
+  { mo: '2026-01', od: 3.18, no: 7, cm: 1.94, nc: 4, sp: 39 },
+  { mo: '2026-02', od: 3.18, no: 7, cm: 1.94, nc: 4, sp: 39 },
+  { mo: '2026-03', od: 3.74, no: 5, cm: 2.39, nc: 3, sp: 36 },
+  { mo: '2026-04', od: 3.74, no: 5, cm: 2.50, nc: 3, sp: 33 },
+  { mo: '2026-05', od: 3.98, no: 4, cm: 2.50, nc: 3, sp: 37 },
+  { mo: '2026-06', od: 3.39, no: 5, cm: 2.50, nc: 3, sp: 26 },
+];
+
+// --- chart geometry (build-time) -------------------------------------------
+const W = 760, H = 320, PADL = 44, PADR = 118, PADT = 16, PADB = 26;
+const SPREAD_H = 74; // spread band below
+const innerW = W - PADL - PADR, innerH = H - PADT - PADB;
+const Y_MIN = 1.5, Y_MAX = 5.0;
+const x = (i: number) => PADL + (i * innerW) / (D.length - 1);
+const y = (v: number) => PADT + innerH - ((v - Y_MIN) / (Y_MAX - Y_MIN)) * innerH;
+const pts = (key: 'od' | 'cm') => D.map((d, i) => `${x(i).toFixed(1)},${y(d[key]).toFixed(1)}`).join(' ');
+// thin-panel prefix (n<3 OD): dashed
+const THIN_END = D.findIndex((d) => d.no >= 3); // first index with n>=3
+const odThin = D.slice(0, THIN_END + 1).map((d, i) => `${x(i).toFixed(1)},${y(d.od).toFixed(1)}`).join(' ');
+const odSolid = D.slice(THIN_END).map((d, i) => `${x(i + THIN_END).toFixed(1)},${y(d.od).toFixed(1)}`).join(' ');
+const yTicks = [2, 3, 4, 5];
+const xTickIdx = D.map((d, i) => (d.mo.endsWith('-01') || d.mo.endsWith('-07') ? i : -1)).filter((i) => i >= 0);
+const SP_MAX = 60;
+const spY = (v: number) => (SPREAD_H - 18) * (1 - v / SP_MAX) + 4;
+const last = D[D.length - 1];
+---
+<Base
+  title="On-Demand vs Committed, 2023–2026 · CCIR Research"
+  description="Three years of neocloud H100 on-demand vs committed posted prices from a provider-primary backfill: a persistent committed discount, a 2025 floor near $2.80, and a turn upward from December 2025."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · calibrated {AS_OF} · backfill window 2023-10 → 2026-06</div>
+      <h1>On-Demand vs Committed, Three Years</h1>
+      <p class="standfirst">
+        Monthly neocloud H100 posted prices reconstructed from archived pricing
+        pages: on-demand versus committed-term, October 2023 through June 2026.
+        Two findings survive the composition repair: the committed discount is
+        persistent and schedule-like, and guaranteed on-demand did not crash to
+        the marketplace floor — it based near $2.80 through 2025 and has turned
+        up since December.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> The Series</h2>
+      <figure class="chart-fig">
+        <div class="chart-legend" aria-hidden="true">
+          <span class="lg lg-od"><span class="swatch swatch-od"></span>On-demand median</span>
+          <span class="lg lg-cm"><span class="swatch swatch-cm"></span>Committed median (pooled tenors)</span>
+        </div>
+        <div class="chart-box" id="odcm-chart">
+          <svg viewBox={`0 0 ${W} ${H + SPREAD_H}`} role="img"
+               aria-label="Monthly neocloud H100 on-demand and committed posted-price medians, October 2023 to June 2026, with the committed discount percentage below.">
+            {yTicks.map((t) => (
+              <g>
+                <line x1={PADL} x2={W - PADR} y1={y(t)} y2={y(t)} class="grid" />
+                <text x={PADL - 8} y={y(t) + 3} class="tick" text-anchor="end">${t}</text>
+              </g>
+            ))}
+            {xTickIdx.map((i) => (
+              <text x={x(i)} y={H - 8} class="tick" text-anchor="middle">{D[i].mo}</text>
+            ))}
+            <polyline points={odThin} class="line-od dashed" />
+            <polyline points={odSolid} class="line-od" />
+            <polyline points={pts('cm')} class="line-cm" />
+            {D.map((d, i) => (
+              <g>
+                <circle cx={x(i)} cy={y(d.od)} r="2.6" class="dot-od" />
+                <circle cx={x(i)} cy={y(d.cm)} r="2.6" class="dot-cm" />
+              </g>
+            ))}
+            <text x={x(D.length - 1) + 10} y={y(last.od) + 3} class="endlab endlab-od">OD ${last.od.toFixed(2)}</text>
+            <text x={x(D.length - 1) + 10} y={y(last.cm) + 3} class="endlab endlab-cm">Committed ${last.cm.toFixed(2)}</text>
+
+            <g transform={`translate(0 ${H})`}>
+              <text x={PADL - 8} y={spY(0) + 3} class="tick" text-anchor="end">0%</text>
+              <text x={PADL - 8} y={spY(50) + 3} class="tick" text-anchor="end">50%</text>
+              <line x1={PADL} x2={W - PADR} y1={spY(0)} y2={spY(0)} class="grid" />
+              {D.map((d, i) => (
+                <rect x={x(i) - 3.2} width="6.4" y={spY(d.sp)} height={spY(0) - spY(d.sp)} class="spread-bar" />
+              ))}
+              <text x={W - PADR + 10} y={spY(30)} class="endlab endlab-sp">Committed</text>
+              <text x={W - PADR + 10} y={spY(30) + 13} class="endlab endlab-sp">discount %</text>
+            </g>
+            <line id="odcm-cross" x1="0" x2="0" y1={PADT} y2={H + SPREAD_H - 14} class="crosshair" style="display:none" />
+          </svg>
+          <div id="odcm-tip" class="tip" style="display:none"></div>
+        </div>
+        <figcaption class="tfoot">
+          Neocloud H100 $/GPU-hr, monthly medians across a stepped provider
+          panel (n grows 1 → 8; dashed where n &lt; 3). Committed pools posted
+          tenors (1–12 mo dominant). Hover for per-month panel depth.
+        </figcaption>
+      </figure>
+      <details class="tbl-details">
+        <summary>Table view — all 33 months with panel depth</summary>
+        <div class="twrap">
+          <table>
+            <thead><tr><th>Month</th><th class="num">OD median</th><th class="num">n</th><th class="num">Committed</th><th class="num">n</th><th class="num">Discount</th></tr></thead>
+            <tbody>
+              {D.map((d) => (
+                <tr><td>{d.mo}</td><td class="num">${d.od.toFixed(2)}</td><td class="num dim">{d.no}</td><td class="num">${d.cm.toFixed(2)}</td><td class="num dim">{d.nc}</td><td class="num">{d.sp}%</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Method, and the Composition Repair</h2>
+      <p>
+        Source: archived provider pricing pages (Common Crawl and Wayback
+        captures), provider-primary, for eight neoclouds. Raw monthly medians
+        whipsaw because the capture panel changes month to month (n = 1–6) —
+        the largest swings in a naive plot are providers entering and leaving,
+        not prices moving. The repair exploits the fact that a <strong>posted
+        price is a step function</strong>: it persists until the provider
+        changes it. Each provider's last observed price is carried forward
+        (capped at six months), so the panel changes composition only when a
+        provider first enters — never on a missed capture. The same
+        carry-forward convention, tighter-capped, governs the live daily panel
+        per the <a href="/documents/methodology">Methodology</a>.
+      </p>
+      <p>
+        The backfill is a different collection method from the live daily
+        panel and is not spliced to it. For reference, the live series
+        (<code>CRI-T2-H100-ALL-GTD-OD-ALL</code>, 20 sources) printed $3.22 on
+        {AS_OF} — inside the backfill's June range on a much deeper panel.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> What Survives</h2>
+      <p>
+        <strong>The committed discount is persistent and schedule-like.</strong>
+        Committed prices sit below on-demand in every month of the window,
+        mostly 20–50% below, settling at 26–39% over the last year — the
+        time-series counterpart of the fixed discount schedule visible in
+        today's cross-section (≈ −36% at one year). The discount compresses
+        when on-demand falls toward committed (mid-2025, ~12–16%) and re-opens
+        when on-demand recovers — committed reprices slower in both
+        directions, which is what an administered schedule looks like.
+      </p>
+      <p>
+        <strong>Guaranteed on-demand did not crash to the marketplace floor.</strong>
+        The widely-cited "$2 H100" of late 2024 was real but was an
+        auction/interruptible print. Posted guaranteed on-demand at neoclouds
+        slid from ~$4.78 to a floor of ~$2.80, held that base through 2025,
+        and turned upward from December 2025 — +20–40% off the floor by
+        spring 2026. The guaranteed–interruptible gap is a grade distinction,
+        not noise; pooling the two grades is how the steeper narrative gets
+        made.
+      </p>
+      <p>
+        <strong>Rate-card stickiness is visible provider by provider.</strong>
+        The flat stretches are not interpolation artifacts: individual posted
+        cards genuinely sit unchanged for quarters at a time (one large
+        neocloud's H100 card held one price from April 2023 to December 2024,
+        then moved once). Posted-price series move in steps, which is also why
+        the carry-forward repair is faithful.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> Limitations</h2>
+      <p>
+        Panel depth is thin early (n = 1 before February 2024 — dashed above;
+        treat those months as a single provider's card, not a market level).
+        Committed pools whatever tenors providers posted (predominantly one
+        month to one year), so the discount series mixes tenor as well as
+        provider. Captures are monthly at best; a mid-month cut appears one
+        month late. All prices are posted list asks, not transactions. Eight
+        providers is the recoverable archive, not the full market.
+      </p>
+    </section>
+  </section>
+
+  <script is:inline define:vars={{ D, W, H, PADL, PADR, PADT, SPREAD_H }}>
+    (function () {
+      var box = document.getElementById('odcm-chart');
+      var tip = document.getElementById('odcm-tip');
+      var cross = document.getElementById('odcm-cross');
+      var svg = box.querySelector('svg');
+      if (!box || !tip || !svg) return;
+      var innerW = W - PADL - PADR;
+      function show(ev) {
+        var r = svg.getBoundingClientRect();
+        var relX = ((ev.clientX - r.left) / r.width) * W;
+        var i = Math.round(((relX - PADL) / innerW) * (D.length - 1));
+        if (i < 0 || i > D.length - 1) { hide(); return; }
+        var d = D[i];
+        var xPix = PADL + (i * innerW) / (D.length - 1);
+        cross.setAttribute('x1', xPix); cross.setAttribute('x2', xPix);
+        cross.style.display = '';
+        tip.innerHTML = '<strong>' + d.mo + '</strong><br>OD $' + d.od.toFixed(2) +
+          ' <span class="tn">(n=' + d.no + ')</span><br>Committed $' + d.cm.toFixed(2) +
+          ' <span class="tn">(n=' + d.nc + ')</span><br>Discount ' + d.sp + '%';
+        tip.style.display = '';
+        var left = (xPix / W) * r.width + 12;
+        if (left > r.width - 150) left -= 170;
+        tip.style.left = left + 'px';
+        tip.style.top = '18px';
+      }
+      function hide() { tip.style.display = 'none'; cross.style.display = 'none'; }
+      box.addEventListener('mousemove', show);
+      box.addEventListener('mouseleave', hide);
+    })();
+  </script>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec strong { color: var(--accent); }
+    .sec code { font-family: var(--font-mono); font-size: 0.9em; background: var(--surface-2); padding: 1px 5px; border: 1px solid var(--rule); }
+
+    .chart-fig { margin: 0 0 10px; max-width: 820px; }
+    .chart-legend { display: flex; gap: 18px; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); margin-bottom: 6px; }
+    .swatch { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 6px; }
+    .swatch-od { background: var(--ink); }
+    .swatch-cm { background: var(--accent); }
+    .chart-box { position: relative; border: 1px solid var(--rule); background: var(--surface); overflow: hidden; }
+    .chart-box svg { display: block; width: 100%; height: auto; }
+    .grid { stroke: var(--rule); stroke-width: 1; }
+    .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+    .line-od { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+    .line-od.dashed { stroke-dasharray: 4 4; }
+    .line-cm { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+    .dot-od { fill: var(--ink); }
+    .dot-cm { fill: var(--surface); stroke: var(--accent); stroke-width: 1.6; }
+    .endlab { font-family: var(--font-mono); font-size: 11px; font-weight: 600; }
+    .endlab-od { fill: var(--ink); }
+    .endlab-cm { fill: var(--accent); }
+    .endlab-sp { fill: var(--ink-faint); font-weight: 400; font-size: 10px; }
+    .spread-bar { fill: var(--accent); opacity: 0.35; }
+    .crosshair { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 3 3; }
+    .tip {
+      position: absolute; pointer-events: none;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink); background: var(--surface-2);
+      border: 1px solid var(--rule-2); padding: 8px 10px; line-height: 1.6;
+      min-width: 130px;
+    }
+    .tip :global(.tn) { color: var(--ink-faint); }
+    .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin: 8px 0 0; line-height: 1.6; }
+
+    .tbl-details { margin: 12px 0 0; max-width: 820px; }
+    .tbl-details summary { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--accent); cursor: pointer; }
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin-top: 8px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 6px 12px; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.dim { color: var(--ink-faint); }
+  </style>
+</Base>
