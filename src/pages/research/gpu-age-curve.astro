@@ -5,19 +5,32 @@ import Base from '../../layouts/Base.astro';
 // updated in place — a re-run gets a new note.
 const AS_OF = '2026-07-06';
 
+// §02 — Neocloud column only (the deepest, most market-sensitive panel).
+// The five datacenter HBM generations carry the fit; the two workstation-
+// class rows are out-of-sample witnesses, deliberately outside the fit.
 const ageCurve = [
-  { gen: 'B300', rel: 'late 2025', age: '~0.8y', t1: '—', t2: '7.85 (n5)', t3: '7.39 (n3)' },
-  { gen: 'B200', rel: 'early 2025', age: '~1.4y', t1: '—', t2: '6.92 (n8)', t3: '5.98 (n5)' },
-  { gen: 'H200', rel: 'mid 2024', age: '~2.1y', t1: '8.96 (n4)', t2: '4.18 (n14)', t3: '3.82 (n7)' },
-  { gen: 'H100', rel: 'late 2022', age: '~3.7y', t1: '9.15 (n4)', t2: '3.22 (n20)', t3: '2.91 (n8)' },
-  { gen: 'A100 80GB', rel: 'late 2020', age: '~5.7y', t1: '2.74 (n3)', t2: '1.80 (n13)', t3: '1.40 (n8)' },
-  { gen: 'L40S', rel: 'late 2023', age: '~2.7y', t1: '—', t2: '1.63 (n6)', t3: '0.88 (n7)' },
-  { gen: 'RTX PRO 6000', rel: 'early 2026', age: '~0.3y', t1: '—', t2: '1.97 (n4)', t3: '2.22 (n4)' },
-  { gen: '5090', rel: 'early 2026', age: '~0.5y', t1: '—', t2: '—', t3: '0.69 (n5)' },
-  { gen: '4090', rel: 'late 2022', age: '~3.7y', t1: '—', t2: '—', t3: '0.46 (n5)' },
-  { gen: 'A40', rel: 'late 2020', age: '~5.7y', t1: '—', t2: '—', t3: '0.40 (n4)' },
-  { gen: '3090', rel: 'late 2020', age: '~5.8y', t1: '—', t2: '—', t3: '0.22 (n5)' },
+  { gen: 'B300', arch: 'blackwell', archLabel: 'Blackwell', rel: 'late 2025', ageN: 0.8, age: '~0.8y', rateN: 7.85, rate: '$7.85', n: 5, fit: true, side: 'right' },
+  { gen: 'B200', arch: 'blackwell', archLabel: 'Blackwell', rel: 'early 2025', ageN: 1.4, age: '~1.4y', rateN: 6.92, rate: '$6.92', n: 8, fit: true, side: 'right' },
+  { gen: 'H200', arch: 'hopper', archLabel: 'Hopper', rel: 'mid 2024', ageN: 2.1, age: '~2.1y', rateN: 4.18, rate: '$4.18', n: 14, fit: true, side: 'below' },
+  { gen: 'H100', arch: 'hopper', archLabel: 'Hopper', rel: 'late 2022', ageN: 3.7, age: '~3.7y', rateN: 3.22, rate: '$3.22', n: 20, fit: true, side: 'above' },
+  { gen: 'A100 80GB', arch: 'ampere', archLabel: 'Ampere', rel: 'late 2020', ageN: 5.7, age: '~5.7y', rateN: 1.80, rate: '$1.80', n: 13, fit: true, side: 'above' },
+  { gen: 'RTX PRO 6000', arch: 'blackwell', archLabel: 'Blackwell (workstation)', rel: 'early 2026', ageN: 0.3, age: '~0.3y', rateN: 1.97, rate: '$1.97', n: 4, fit: false, side: 'right' },
+  { gen: 'L40S', arch: 'ada', archLabel: 'Ada (workstation)', rel: 'late 2023', ageN: 2.7, age: '~2.7y', rateN: 1.63, rate: '$1.63', n: 6, fit: false, side: 'below' },
 ];
+
+// --- fit chart geometry (log y) --------------------------------------------
+// ln(rate) on age over the five fit rows: slope -0.2957/yr (≈ -26%/yr),
+// mean age 2.74, mean ln 1.436, R² 0.96.
+const FIT = { slope: -0.2957, meanAge: 2.74, meanLn: 1.436 };
+const CW = 680, CH = 320, CPL = 46, CPR = 150, CPT = 18, CPB = 34;
+const cInnerW = CW - CPL - CPR, cInnerH = CH - CPT - CPB;
+const AGE_MAX = 6.4, LN_MIN = Math.log(1.3), LN_MAX = Math.log(9.5);
+const cx = (a: number) => CPL + (a / AGE_MAX) * cInnerW;
+const cy = (v: number) => CPT + cInnerH * (1 - (Math.log(v) - LN_MIN) / (LN_MAX - LN_MIN));
+const fitAt = (a: number) => Math.exp(FIT.meanLn + FIT.slope * (a - FIT.meanAge));
+const FIT_X0 = 0.15, FIT_X1 = 6.2;
+const cyTicks = [2, 3, 5, 8];
+const cxTicks = [0, 1, 2, 3, 4, 5, 6];
 
 const bwTable = [
   { gen: 'B300', bw: '~8.0 TB/s', v: '0.98' },
@@ -101,37 +114,84 @@ const wattTable = [
     <section class="sec">
       <h2><span class="n">02</span> The Age Curve ({AS_OF}, Guaranteed On-Demand, $/GPU-hr)</h2>
       <p class="fit-line">
-        Neocloud column, log rate on age: <strong>≈ −26% per year, R² 0.96</strong>
+        Neocloud rate, log scale, on age: <strong>≈ −26% per year, R² 0.96</strong>
         across the five datacenter generations (ages approximate).
       </p>
+      <figure class="chart-fig">
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
+               aria-label="Neocloud guaranteed on-demand rate per GPU-hour, log scale, against generation age. Five datacenter generations sit on a fitted line declining 26 percent per year; two workstation-class chips sit far below it.">
+            {cyTicks.map((t) => (
+              <g>
+                <line x1={CPL} x2={CW - CPR} y1={cy(t)} y2={cy(t)} class="grid" />
+                <text x={CPL - 8} y={cy(t) + 3} class="tick" text-anchor="end">${t}</text>
+              </g>
+            ))}
+            {cxTicks.map((a) => (
+              <text x={cx(a)} y={CH - 12} class="tick" text-anchor="middle">{a}y</text>
+            ))}
+            <text x={CW - CPR} y={CH - 12} class="tick" text-anchor="start">  age</text>
+            <line x1={cx(FIT_X0)} y1={cy(fitAt(FIT_X0))} x2={cx(FIT_X1)} y2={cy(fitAt(FIT_X1))} class="fitln" />
+            <text x={cx(FIT_X1) + 8} y={cy(fitAt(FIT_X1)) + 4} class="fitlab" text-anchor="start">fit −26%/yr · R² 0.96</text>
+            {ageCurve.map((r) => (
+              <g>
+                <circle cx={cx(r.ageN)} cy={cy(r.rateN)} r="5"
+                        class={`pt pt-${r.arch} ${r.fit ? '' : 'pt-witness'}`} />
+                <text x={cx(r.ageN) + (r.side === 'right' ? 11 : 0)}
+                      y={cy(r.rateN) + (r.side === 'above' ? -11 : r.side === 'below' ? 19 : 4)}
+                      class={`ptlab lab-${r.arch}`}
+                      text-anchor={r.side === 'right' ? 'start' : 'middle'}>
+                  {r.gen} {r.rate}
+                </text>
+              </g>
+            ))}
+          </svg>
+        </div>
+        <div class="chart-legend">
+          <span class="lg"><span class="dotk dk-blackwell"></span>Blackwell</span>
+          <span class="lg"><span class="dotk dk-hopper"></span>Hopper</span>
+          <span class="lg"><span class="dotk dk-ampere"></span>Ampere</span>
+          <span class="lg"><span class="dotk dk-ada"></span>Ada</span>
+          <span class="lg"><span class="dotk dk-hollow"></span>hollow = workstation-class, outside the fit</span>
+        </div>
+        <figcaption class="tfoot">
+          Neocloud guaranteed on-demand, $/GPU-hr on a log scale, against
+          generation age. Headline stat per the published rule (mean where
+          n≥10, else median).
+        </figcaption>
+      </figure>
       <div class="twrap">
         <table>
           <thead>
-            <tr><th>Generation</th><th>Released</th><th>Age</th><th class="num">Hyperscaler</th><th class="num">Neocloud</th><th class="num">Marketplace</th></tr>
+            <tr><th>Generation</th><th>Architecture</th><th>Released</th><th>Age</th><th class="num">Neocloud $/GPU-hr</th><th class="num">n</th><th>In fit</th></tr>
           </thead>
           <tbody>
             {ageCurve.map((r) => (
-              <tr>
-                <td class="gen">{r.gen}</td><td class="dim">{r.rel}</td><td class="dim">{r.age}</td>
-                <td class="num">{r.t1}</td><td class="num strong">{r.t2}</td><td class="num">{r.t3}</td>
+              <tr class={r.fit ? '' : 'witness-row'}>
+                <td class="gen">{r.gen}</td>
+                <td><span class={`arch-tag at-${r.arch}`}>{r.archLabel}</span></td>
+                <td class="dim">{r.rel}</td><td class="dim">{r.age}</td>
+                <td class="num strong">{r.rate}</td><td class="num dim">{r.n}</td>
+                <td class="dim">{r.fit ? 'yes' : 'witness'}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p class="tfoot">
-        Headline stat per the published rule (mean where n≥10, else median); n
-        = sources. Hyperscaler H100/H200 cells carry posted rate-card levels
-        that reprice slowly; the Neocloud column is the deepest panel and the
-        reference column here.
-      </p>
       <p>
         The regularity is the finding: five generations spanning five years of
         silicon, and a single log-linear slope explains 96% of the variance in
-        the Neocloud rate. B300 $7.85 → H100 $3.22 over ~2.9 years of age
-        difference, H100 $3.22 → A100 $1.80 over ~2.0 more; the largest
-        deviation from the line is H200, which trades below it — consistent
-        with the bandwidth pricing in the next section.
+        the Neocloud rate. The largest deviation is H200, which trades below
+        the line — consistent with the bandwidth pricing in the next section.
+      </p>
+      <p>
+        The two hollow points are the tell. <strong>RTX PRO 6000 is
+        three-months-old Blackwell silicon priced at $1.97 — where
+        5.7-year-old A100 trades</strong> — because its memory bandwidth
+        (~1.8 TB/s of GDDR7, no HBM, no NVLink) is A100-class. A brand-new
+        chip prices at the old chip's level when it carries the old chip's
+        bandwidth: age is not the priced variable. Section 03 makes that
+        explicit.
       </p>
     </section>
 
@@ -303,5 +363,58 @@ const wattTable = [
       padding: 10px 14px;
       max-width: 700px;
     }
+
+    /* architecture palette — same hue family as /credit's validated set */
+    .top {
+      --arch-blackwell: #0d9488;
+      --arch-hopper: #b9770a;
+      --arch-ampere: #c11f57;
+      --arch-ada: #5b5852;
+    }
+    :global(html[data-theme='terminal']) .top {
+      --arch-blackwell: #2dd4bf;
+      --arch-hopper: #ffb400;
+      --arch-ampere: #ff4d84;
+      --arch-ada: #9a9991;
+    }
+    .chart-fig { margin: 0 0 14px; max-width: 700px; }
+    .chart-box { border: 1px solid var(--rule); background: var(--surface); }
+    .chart-box svg { display: block; width: 100%; height: auto; }
+    .grid { stroke: var(--rule); stroke-width: 1; }
+    .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+    .fitln { stroke: var(--ink-dim); stroke-width: 1.4; stroke-dasharray: 5 4; }
+    .fitlab { font-family: var(--font-mono); font-size: 11px; font-weight: 600; fill: var(--ink-dim); }
+    .pt-blackwell { fill: var(--arch-blackwell); }
+    .pt-hopper { fill: var(--arch-hopper); }
+    .pt-ampere { fill: var(--arch-ampere); }
+    .pt-ada { fill: var(--arch-ada); }
+    .pt-witness { fill: var(--surface); stroke-width: 2.2; }
+    .pt-witness.pt-blackwell { stroke: var(--arch-blackwell); }
+    .pt-witness.pt-ada { stroke: var(--arch-ada); }
+    .ptlab { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; }
+    .lab-blackwell { fill: var(--arch-blackwell); }
+    .lab-hopper { fill: var(--arch-hopper); }
+    .lab-ampere { fill: var(--arch-ampere); }
+    .lab-ada { fill: var(--arch-ada); }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); }
+    .dotk { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+    .dk-blackwell { background: var(--arch-blackwell); }
+    .dk-hopper { background: var(--arch-hopper); }
+    .dk-ampere { background: var(--arch-ampere); }
+    .dk-ada { background: var(--arch-ada); }
+    .dk-hollow { background: var(--surface); border: 2px solid var(--ink-dim); }
+    .arch-tag {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      padding: 1px 7px;
+      border: 1px solid currentColor;
+      border-radius: 2px;
+      white-space: nowrap;
+    }
+    .at-blackwell { color: var(--arch-blackwell); }
+    .at-hopper { color: var(--arch-hopper); }
+    .at-ampere { color: var(--arch-ampere); }
+    .at-ada { color: var(--arch-ada); }
+    tr.witness-row td { opacity: 0.75; }
   </style>
 </Base>
