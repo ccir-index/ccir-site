@@ -189,11 +189,63 @@ const rolloverPrecedents: { feature: string; precedent: string }[] = [
   { feature: 'Projected (look-forward) DSCR test on expiring capacity', precedent: 'CMBS underwritten rollover NOI; project-finance re-contracting cases in merchant power' },
   { feature: 'Rollover Reserve sized in months of debt service', precedent: 'CMBS rollover/TI-LC reserves; aircraft ABS maintenance and remarketing reserves' },
 ];
+
+// On-page contents — ids match the anchored use-case articles and section h3s.
+const toc = [
+  {
+    id: 'uc-01',
+    kicker: 'Use case 01',
+    label: 'Market Price Monitoring Covenant',
+    secs: [
+      ['uc-01-s01', 'What a Market Price Monitoring Covenant Is'],
+      ['uc-01-s02', 'Hypothetical Facility Terms'],
+      ['uc-01-s03', 'Defined Terms'],
+      ['uc-01-s04', 'The Covenant'],
+      ['uc-01-s05', 'Fallback Architecture'],
+      ['uc-01-s06', 'Worked Numerical Example'],
+      ['uc-01-s07', 'Precedent Map'],
+      ['uc-01-s08', 'Limitations and Notes for Practitioners'],
+      ['uc-01-s09', 'The Covenant Against Three Years of History'],
+      ['uc-01-s10', 'The Exposure-Weighted Variant'],
+    ],
+  },
+  {
+    id: 'uc-02',
+    kicker: 'Use case 02',
+    label: 'Re-Leasing Risk Sized Against the Term Curve',
+    secs: [
+      ['uc-02-s01', 'Why Rollover Is the Central Credit Question'],
+      ['uc-02-s02', 'Worked Rollover Exhibit'],
+      ['uc-02-s03', 'Defined Terms and Covenant'],
+      ['uc-02-s04', 'Precedent Map'],
+      ['uc-02-s05', 'Limitations'],
+    ],
+  },
+  {
+    id: 'uc-03',
+    kicker: 'Use case 03',
+    label: 'Monitoring a Multi-Generation Pool',
+    secs: [
+      ['uc-03-s01', 'The Pool Reference Rate'],
+      ['uc-03-s02', 'The Property That Makes Pools Monitorable'],
+      ['uc-03-s03', 'Precedent and Limitations'],
+    ],
+  },
+];
 ---
 <Base
   title="Applications · CCIR"
   description="Worked drafting examples showing how a CCIR reference rate fits into credit agreements, structured-finance contracts, and benchmark-citation language."
 >
+  <nav class="apps-navband" aria-label="Use cases">
+    <div class="wrap apps-nav-inner">
+      {toc.map((u) => (
+        <a class="apps-nav-link" href={'#' + u.id}>
+          <span class="apps-nav-n">{u.kicker.replace('Use case ', 'UC')}</span> {u.label}
+        </a>
+      ))}
+    </div>
+  </nav>
   <section class="wrap top">
     <h1>Applications</h1>
     <p class="dek">
@@ -212,7 +264,26 @@ const rolloverPrecedents: { feature: string; precedent: string }[] = [
       public at <a href="/documents">/documents</a>.
     </p>
 
-    <article class="usecase">
+    <nav class="toc" id="contents" aria-label="Contents">
+      <div class="toc-kicker">Contents</div>
+      <div class="toc-grid">
+        {toc.map((u) => (
+          <div class="toc-group">
+            <a class="toc-uc" href={'#' + u.id}>
+              <span class="toc-uc-kicker">{u.kicker}</span>
+              {u.label}
+            </a>
+            <ol class="toc-secs">
+              {u.secs.map((s) => (
+                <li><a href={'#' + s[0]}>{s[1]}</a></li>
+              ))}
+            </ol>
+          </div>
+        ))}
+      </div>
+    </nav>
+
+    <article class="usecase" id="uc-01">
       <header class="uc-head">
         <span class="uc-kicker">Use case 01 · Senior-secured term loan</span>
         <h2>Market Price Monitoring Covenant Tied to a CRI Rate</h2>
@@ -247,7 +318,7 @@ const rolloverPrecedents: { feature: string; precedent: string }[] = [
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">01</span> What a Market Price Monitoring Covenant Is</h3>
+        <h3 id="uc-01-s01"><span class="sec-n">01</span> What a Market Price Monitoring Covenant Is</h3>
         <p>
           A market price monitoring covenant is a covenant that tests a
           published reference price (or a function of published prices)
@@ -280,7 +351,7 @@ const rolloverPrecedents: { feature: string; precedent: string }[] = [
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">02</span> Hypothetical Facility Terms</h3>
+        <h3 id="uc-01-s02"><span class="sec-n">02</span> Hypothetical Facility Terms</h3>
         <div class="ftable-wrap">
           <table class="ftable">
             <tbody>
@@ -296,7 +367,7 @@ const rolloverPrecedents: { feature: string; precedent: string }[] = [
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">03</span> Defined Terms</h3>
+        <h3 id="uc-01-s03"><span class="sec-n">03</span> Defined Terms</h3>
         <p>
           Drafted to be embeddable in a credit agreement's Definitions
           section. The dual-anchor convention — naming the publication, the
@@ -348,7 +419,7 @@ established with the Administrative Agent pursuant to Section 4.05.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">04</span> The Covenant</h3>
+        <h3 id="uc-01-s04"><span class="sec-n">04</span> The Covenant</h3>
         <pre class="cov-body">
 <span class="cov-h">Section 7.01   Market Price Maintenance Covenant.</span>
 
@@ -465,7 +536,7 @@ Event has occurred and is continuing.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">05</span> Fallback Architecture</h3>
+        <h3 id="uc-01-s05"><span class="sec-n">05</span> Fallback Architecture</h3>
         <p>
           The fallback waterfall draws from the ISDA 2018 Benchmarks
           Supplement and the ARRC hardwired LIBOR transition language,
@@ -569,7 +640,7 @@ or any Lender.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">06</span> Worked Numerical Example</h3>
+        <h3 id="uc-01-s06"><span class="sec-n">06</span> Worked Numerical Example</h3>
         <p class="calib-note">
           Calibration: example values below are derived from a Closing Date
           Reference Rate of <strong>${fmt(closingRate)}</strong> per GPU per
@@ -633,7 +704,7 @@ or any Lender.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">07</span> Precedent Map</h3>
+        <h3 id="uc-01-s07"><span class="sec-n">07</span> Precedent Map</h3>
         <p>
           The covenant structure illustrated above maps to established
           commodity-credit precedent as follows:
@@ -671,7 +742,7 @@ or any Lender.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">08</span> Limitations and Notes for Practitioners</h3>
+        <h3 id="uc-01-s08"><span class="sec-n">08</span> Limitations and Notes for Practitioners</h3>
         <p>
           <strong>This is illustrative, not transactional.</strong> The
           hypothetical facility, dollar thresholds, tier breakpoints, and
@@ -721,7 +792,7 @@ or any Lender.</pre>
       </p>
 
       <section class="sec">
-        <h3><span class="sec-n">09</span> The Covenant Against Three Years of History</h3>
+        <h3 id="uc-01-s09"><span class="sec-n">09</span> The Covenant Against Three Years of History</h3>
         <p>
           The same tier mechanics, run against reconstructed history instead
           of a stylized trajectory. Rates are the monthly neocloud H100
@@ -773,7 +844,7 @@ or any Lender.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">10</span> The Exposure-Weighted Variant</h3>
+        <h3 id="uc-01-s10"><span class="sec-n">10</span> The Exposure-Weighted Variant</h3>
         <p>
           The predictable borrower objection to Section 7.01 as drafted: a
           heavily contracted borrower's revenue does not move when the index
@@ -837,7 +908,7 @@ expirations) certified by a Responsible Officer.</pre>
       </section>
     </article>
 
-    <article class="usecase">
+    <article class="usecase" id="uc-02">
       <header class="uc-head">
         <span class="uc-kicker">Use case 02 · Contract rollover</span>
         <h2>Re-Leasing Risk Sized Against the Published Term Curve</h2>
@@ -874,7 +945,7 @@ expirations) certified by a Responsible Officer.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">01</span> Why Rollover Is the Central Credit Question</h3>
+        <h3 id="uc-02-s01"><span class="sec-n">01</span> Why Rollover Is the Central Credit Question</h3>
         <p>
           Compute is not storable. An expiring contract does not leave the
           borrower holding inventory it can warehouse until prices recover —
@@ -897,7 +968,7 @@ expirations) certified by a Responsible Officer.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">02</span> Worked Rollover Exhibit</h3>
+        <h3 id="uc-02-s02"><span class="sec-n">02</span> Worked Rollover Exhibit</h3>
         <p class="calib-note">
           Calibration: stylized facility — {FLEET_GPUS.toLocaleString()} GPUs
           (1,000 nodes), {(ANCHOR_SHARE * 100).toFixed(0)}% of capacity under
@@ -931,7 +1002,7 @@ expirations) certified by a Responsible Officer.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">03</span> Defined Terms and Covenant</h3>
+        <h3 id="uc-02-s03"><span class="sec-n">03</span> Defined Terms and Covenant</h3>
         <pre class="cov-body">
 <span class="cov-h">"Anchor Contract"</span> means any Committed Customer Contract projected to
 account for twenty percent (20%) or more of the Borrower's gross rental
@@ -996,7 +1067,7 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">04</span> Precedent Map</h3>
+        <h3 id="uc-02-s04"><span class="sec-n">04</span> Precedent Map</h3>
         <div class="ftable-wrap">
           <table class="ftable">
             <thead>
@@ -1018,7 +1089,7 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">05</span> Limitations</h3>
+        <h3 id="uc-02-s05"><span class="sec-n">05</span> Limitations</h3>
         <p>
           <strong>This is illustrative, not transactional.</strong> The
           vintage contract rate, fleet size, anchor share, and closing DSCR
@@ -1041,7 +1112,7 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
       </p>
     </article>
 
-    <article class="usecase">
+    <article class="usecase" id="uc-03">
       <header class="uc-head">
         <span class="uc-kicker">Use case 03 · Pool surveillance</span>
         <h2>Monitoring a Multi-Generation Pool</h2>
@@ -1073,7 +1144,7 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">01</span> The Pool Reference Rate</h3>
+        <h3 id="uc-03-s01"><span class="sec-n">01</span> The Pool Reference Rate</h3>
         <pre class="cov-body">
 <span class="cov-h">"Pool Reference Rate"</span> means, as of any date of determination, the
 weighted average of the CCIR series corresponding to each Generation
@@ -1094,7 +1165,7 @@ Servicer Report.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">02</span> The Property That Makes Pools Monitorable</h3>
+        <h3 id="uc-03-s02"><span class="sec-n">02</span> The Property That Makes Pools Monitorable</h3>
         <p>
           The cross-section of generation pricing is log-linear in age at a
           common slope (≈ −26% per year; see
@@ -1120,7 +1191,7 @@ Servicer Report.</pre>
       </section>
 
       <section class="sec">
-        <h3><span class="sec-n">03</span> Precedent and Limitations</h3>
+        <h3 id="uc-03-s03"><span class="sec-n">03</span> Precedent and Limitations</h3>
         <p>
           The construction is standard in adjacent asset classes: aircraft
           ABS monitors fleet value on appraisals weighted by airframe type
@@ -1169,6 +1240,99 @@ Servicer Report.</pre>
       padding-top: 24px;
       margin-bottom: 40px;
     }
+
+    /* Sticky use-case bar + anchor offsets */
+    .apps-navband {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+    }
+    .apps-nav-inner {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
+    .apps-nav-inner::-webkit-scrollbar { display: none; }
+    .apps-nav-link {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
+    .apps-nav-n { color: var(--accent); font-weight: var(--weight-strong); }
+    .usecase[id], .sec h3[id] { scroll-margin-top: 52px; }
+
+    /* Contents block */
+    .toc {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      padding: 18px 22px 8px;
+      margin: 0 0 40px;
+      max-width: 1160px;
+    }
+    .toc-kicker {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+      margin-bottom: 12px;
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+    @media (max-width: 860px) { .toc-grid { grid-template-columns: 1fr; } }
+    .toc-uc {
+      display: block;
+      font-family: var(--font-display);
+      font-size: var(--fs-md);
+      font-weight: var(--weight-strong);
+      color: var(--ink);
+      text-decoration: none;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+    .toc-uc:hover { color: var(--accent); text-decoration: none; }
+    .toc-uc-kicker {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .toc-secs {
+      margin: 0 0 10px;
+      padding-left: 0;
+      list-style: none;
+      counter-reset: tocsec;
+    }
+    .toc-secs li {
+      counter-increment: tocsec;
+      margin: 0 0 5px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      line-height: 1.5;
+    }
+    .toc-secs li::before {
+      content: counter(tocsec, decimal-leading-zero) ' ';
+      color: var(--ink-faint);
+    }
+    .toc-secs a { color: var(--ink-dim); text-decoration: none; }
+    .toc-secs a:hover { color: var(--accent); text-decoration: none; }
+    :global(html[data-theme="terminal"]) .toc-uc { font-family: var(--font-mono); }
     .uc-head { max-width: 80ch; margin-bottom: 22px; }
     .uc-kicker {
       font-family: var(--font-mono);
@@ -1298,8 +1462,11 @@ Servicer Report.</pre>
       line-height: 1.6 !important;
     }
 
+    /* Tables escape the 76ch prose column: size to content up to the full
+       page width, scroll only when the viewport itself is narrower. */
     .ftable-wrap {
-      max-width: none;
+      width: fit-content;
+      max-width: min(1160px, calc(100vw - 40px));
       margin: 0 0 18px;
       overflow-x: auto;
       border: 1px solid var(--rule);
