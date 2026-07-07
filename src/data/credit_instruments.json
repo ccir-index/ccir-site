@@ -69,12 +69,12 @@
     "value": null,
     "value_low": 6.0,
     "value_high": 6.5,
-    "note": "SOFR + 6.00–6.50% (investment-grade contract loans) / SOFR + 13.00% (non-IG); effective ~11% per 10-Q"
+    "note": "Pre-Fifth-Amendment grid: SOFR + 6.00-6.50% (investment-grade contract loans) / SOFR + 13.00% (non-IG). Fifth Amendment (8-K 10/2/25): all new draws SOFR + 4.25% (or base rate + 3.25%), flat; 1.50% upfront on draws, 3.00% commitment fee on undrawn below $2.4B. Effective ~11% per 10-Q."
    },
    "maturity": "2030-08",
    "maturity_note": "Each draw 5-yr; quarterly amortization from Jan 2026",
    "seniority": "Senior secured (SPV); parent guarantee",
-   "security": "CCAC IV equity + all assets; borrowing base = % of depreciated GPU-server cost, scaled by customer credit rating",
+   "security": "CCAC IV equity + all assets; borrowing base = % of depreciated GPU-server cost (credit-agreement schedule; treatment by customer rating not restated in the Fifth Amendment 8-K rate section)",
    "lenders": [
     "Blackstone credit entities (lead)",
     "Magnetar (lead)",
@@ -87,7 +87,7 @@
     "date": "2025-10-02",
     "url": "https://www.sec.gov/Archives/edgar/data/1769628/000119312525227562/d910811d8k.htm"
    },
-   "as_of": "2026-03-31"
+   "as_of": "2026-07-06"
   },
   {
    "id": "crwv-ddtl-2-1",
