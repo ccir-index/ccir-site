@@ -577,7 +577,9 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
           <text x={bx(t.iso)} y={y1 + 24} class="tick tick-x">{t.label}</text>
         ))}
         <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
-        <polyline points={bondLine} class="path-seq" />
+        {/* Chronological connector removed 2026-07-06: x already encodes
+            time, so a thread through the marks only implied the single-
+            driver trend the tier coloring exists to refute. */}
         {bondContext.map((p) => (
           <>
             {(p as any).long && <circle cx={bx(p.date)} cy={by(p.v)} r="7.5" class={`ring tier-stroke-${p.tier}`} />}
