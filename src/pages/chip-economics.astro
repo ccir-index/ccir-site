@@ -11,7 +11,7 @@ const SNAP_DATE = '2026-07-06';
 ---
 <Base
   title="Chip Economics · CCIR"
-  description="Chip economics from published reference rates — earning power per spec-sheet unit across capacity, bandwidth, compute, and power lenses on the same daily $/GPU-hr cell. One denominator makes the cross-section flat: that is the dimension the market prices."
+  description="Comparability analysis across GPU generations: earning power per spec-sheet unit — the same daily reference rates re-denominated per GB, per TB/s, per PFLOP, per kW. One denominator makes the cross-section flat: that is the dimension the market prices."
   ogImage="/og/home.png"
 >
   <nav class="apps-navband" aria-label="On this page">
@@ -39,6 +39,31 @@ const SNAP_DATE = '2026-07-06';
     <!-- ======================= §01 LENSES ======================= -->
     <section class="sec wide" id="lenses">
       <h2><span class="n">01</span> Four Lenses on One Rate</h2>
+
+      <p>
+        <strong>For credit readers.</strong> The cash flow from a pool of GPUs comes down to two numbers:
+        the rent the chips collect, and how long they keep collecting it. Rates are quoted per GPU per
+        hour, which sounds like a standard unit — it isn't. "One GPU" is not a fixed amount of anything:
+        a 2020 chip and a 2026 chip are both one GPU the way a studio and an office tower are both one
+        building. Rent quoted by the building tells you nothing about what space should cost; rent per
+        square foot is what makes buildings comparable. This page finds the square foot. It divides each
+        chip's hourly rate by the numbers on its spec sheet — memory size, memory speed, compute speed,
+        power draw — and one of the four divisions works: old chips and new chips earn almost exactly the
+        same per unit of memory bandwidth. Renters do very different things with these chips — training,
+        inference, everything between — but the prices they pay line up on bandwidth, and on nothing else
+        the spec sheet offers. That is also why rents fall as chips age: not because old chips earn less
+        per unit — they don't — but because each new generation arrives carrying more bandwidth. So the
+        decline rate in a credit model is not a number to elect. It is the pace at which new chips add
+        bandwidth, and this page is where you watch it.
+      </p>
+      <p>
+        <strong>Three cautions.</strong> These are posted rates for hours actually rented — how many hours
+        a pool rents is utilization, the operator's number, and <a href="/realized">realized revenue runs
+        below posted rates</a>. The rate is gross: it pays the machine's operating costs before it pays
+        anyone's debt service — the Economic Life section takes up the cost side. And a market rate
+        reaches a contracted pool only as its contracts roll: it prices the exposed capacity, not the
+        locked book.
+      </p>
 
       <div class="heromult" id="heromult">
         <div class="lens-grid">
@@ -208,8 +233,14 @@ const SNAP_DATE = '2026-07-06';
       <p>
         Re-denominated per unit of memory bandwidth, datacenter silicon from eight months to 5.7 years of
         age clears inside <strong>$0.87–0.98 per TB/s-hour</strong> — ±6% around a $0.92 mean. The band is
-        the test, published daily: a spread that holds tight means the age discount remains priced away;
-        a widening spread is the falsifiable marker firing. Members are disclosed on every print.
+        the test: a spread that holds tight means the age discount remains priced away; a widening spread
+        is the falsifiable marker firing. Members are disclosed on every exhibit.
+      </p>
+      <p>
+        The flatness is a like-for-like property. It holds across cells that share an operator segment,
+        interruptibility grade, term, and region — the series named under each exhibit. Pooled cuts,
+        marketplace minimums, or mixed interruptibility grades will not reproduce it: grade and tenor are
+        different markets per unit of bandwidth, as everywhere else on this site.
       </p>
 
       <figure class="chart-fig">
@@ -496,7 +527,9 @@ const SNAP_DATE = '2026-07-06';
         of the bandwidth frontier across five generations on one date — not the band's own decay through
         time, which is the parameter the crossing actually needs. No one has that parameter, because the
         band has no published history. That is the argument for starting the series now: every month of
-        publication shrinks the one unmeasured input.
+        publication shrinks the one unmeasured input. The band is also an observed equilibrium, not a
+        law — in the 2023 shortage, frontier chips cleared far above any spec-sheet line. The flatness
+        carries a date, which is the second argument for watching it.
       </p>
     </section>
 
