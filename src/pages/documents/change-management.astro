@@ -1,0 +1,114 @@
+---
+import Base from '../../layouts/Base.astro';
+import { meta } from '../../data/snapshot';
+---
+<Base
+  title="Change Management Policy · CCIR"
+  description="How CCIR methodology changes are classified, disclosed, and versioned; material-change definition; restatements versus series breaks."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Documents · Change Management · as published {meta.as_of_date}</div>
+      <h1>Change Management Policy</h1>
+      <p class="standfirst">
+        A reference series is only useful if the reader knows when and how the
+        measurement underneath it can change. This policy governs every change
+        to the <a href="/documents/methodology">Methodology</a>.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> Versioning</h2>
+      <p>
+        Every published row carries a methodology version. A change to
+        collection, aggregation, panel rules, or series definitions increments
+        the version; history restated under a new version is stamped with it
+        row by row, so any historical value can be traced to the methodology
+        that produced it.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Classification</h2>
+      <p>
+        <strong>Non-material changes</strong> — defect fixes, source additions
+        or exits under the existing panel rules, new series on existing
+        grammar — are applied and noted in the data repository's change log.
+      </p>
+      <p>
+        <strong>Material changes</strong> — a material change is one that,
+        applied to the trailing history, would move a headline series'
+        30-day average by more than <strong>10%</strong>. Material changes are
+        announced on the site before taking effect where practicable, and are
+        run as parallel (shadow) series alongside the incumbent before
+        promotion whenever the change permits it.
+      </p>
+      <p>
+        <strong>Series breaks</strong> — a change that redefines what a series
+        measures (its universe, segment definition, or price basis) is not
+        made in place: the old series ends and a new identifier begins.
+        In-place history is never silently redefined.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> Restatements</h2>
+      <p>
+        When a defect or a material change requires it, history is restated:
+        republished in full under the current methodology version. Restated
+        snapshots replace prior ones at the published locations; prior
+        versions remain retrievable through the data repository's history.
+        Restatements are disclosed in the change log with the reason and the
+        affected range.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> Panel changes</h2>
+      <p>
+        The source panel is versioned. New sources enter only through a panel
+        version change; a source that stops publishing carries forward at its
+        last-good price for at most seven days and then exits its cells. A
+        source's exit or entry is never applied retroactively except through a
+        disclosed restatement.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 80ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 26px 0; max-width: 76ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+    .sec p {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 12px;
+    }
+    .sec strong { color: var(--accent); }
+  </style>
+</Base>

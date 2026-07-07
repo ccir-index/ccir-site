@@ -1,0 +1,118 @@
+---
+import Base from '../../layouts/Base.astro';
+import { meta } from '../../data/snapshot';
+---
+<Base
+  title="Governance & Complaints · CCIR"
+  description="CCIR administrator identity, independence and conflicts posture, and the procedure for queries and complaints about published series."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Documents · Governance · as published {meta.as_of_date}</div>
+      <h1>Governance &amp; Complaints</h1>
+      <p class="standfirst">
+        Who publishes the series, the conflicts posture they are published
+        under, and how to challenge a number.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> Administrator</h2>
+      <p>
+        The CCIR reference series are published by <strong>Compute Credit
+        Index Research LLC</strong>, a Delaware limited liability company
+        formed March 11, 2026. Contact:
+        <a href="mailto:research@ccir.io">research@ccir.io</a>.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Independence and conflicts</h2>
+      <p>
+        The administrator operates no marketplace, runs no trading desk, and
+        holds no positions in the markets it measures. No revenue is tied to
+        the level of any published series. Data partnerships never purchase
+        placement, weighting, or influence over a published value; raw
+        contributions are held in confidence and only aggregates publish.
+        The administrator reports observed prices and does not value or rate
+        any asset.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> Decision-making</h2>
+      <p>
+        Methodology and administration decisions are made by the
+        administrator under the published
+        <a href="/documents/methodology">Methodology</a> and
+        <a href="/documents/change-management">Change Management Policy</a>.
+        CCIR is a small administrator and says so: there is currently no
+        external oversight committee. An independent oversight function will
+        be added as adoption of the series warrants it, and this page will be
+        updated when it is.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> Queries and complaints</h2>
+      <p>
+        Anyone may challenge a published value or the treatment of a source by
+        writing to <a href="mailto:research@ccir.io">research@ccir.io</a>.
+        Substantive challenges are acknowledged within five business days and
+        answered against the underlying observation data. Where a challenge
+        identifies a defect, correction follows the
+        <a href="/documents/change-management">Change Management Policy</a>
+        and the outcome is noted in the change log. A record of complaints and
+        outcomes is retained.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> Standards reference</h2>
+      <p>
+        Methodology and governance are designed with reference to the IOSCO
+        <em>Principles for Oil Price Reporting Agencies</em> (2012) and
+        <em>Principles for Financial Benchmarks</em> (2013). CCIR does not
+        claim assured compliance; independent external assurance of adherence
+        will be sought when adoption warrants it.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 80ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 26px 0; max-width: 76ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+    .sec p {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 12px;
+    }
+    .sec strong { color: var(--accent); }
+  </style>
+</Base>

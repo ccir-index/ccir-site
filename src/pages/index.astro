@@ -11,15 +11,18 @@ const fmt = (n: number, dp = 2) => n.toFixed(dp);
 // n≥10 → mean (deep enough to trust), else median (small panels skew).
 const N_MEAN_THRESHOLD = 10;
 const STAT_RANK: Record<string, number> = { Published: 0, Provisional: 1, Shadow: 2 };
+// Mirrors /rates exactly: US cut first, region-pooled fallback — the home
+// ladder and the rates ladder must always show the same numbers.
 function odCell(tier: Tier, chip: string): Rate | undefined {
-  return headlineRates
+  const pick = (region: string) => headlineRates
     .filter((r) => r.tier === tier && r.gpu_model === chip &&
                    r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
+                   r.region === region && r.interruptibility === 'GTD' &&
                    r.promotion_status !== 'Shadow')
     .sort((a, b) =>
       (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
       (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+  return pick('US') ?? pick('ALL');
 }
 function headlineStat(c: Rate): number {
   return c.n_sources >= N_MEAN_THRESHOLD ? c.price_mean : c.price_median;
@@ -93,7 +96,7 @@ const miPieces: { href: string; title: string; blurb: string }[] = [
           </tbody>
         </table>
       </div>
-      <p class="block-foot">USD per GPU-hour · guaranteed on-demand · mean where the panel is deep (n≥10), median below.</p>
+      <p class="block-foot">USD per GPU-hour · guaranteed on-demand, US operators · mean where the panel is deep (n≥10), median below · same series as <a href="/rates">/rates</a>.</p>
     </section>
 
     <!-- Layer 2 — market intelligence -->

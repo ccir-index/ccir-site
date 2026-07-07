@@ -1,0 +1,189 @@
+---
+import Base from '../../layouts/Base.astro';
+import { meta } from '../../data/snapshot';
+---
+<Base
+  title="Methodology · CCIR"
+  description="CCIR methodology — what the series measure, where prices come from, how they are aggregated, and the series grammar."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Documents · Methodology · as published {meta.as_of_date}</div>
+      <h1>Methodology</h1>
+      <p class="standfirst">
+        This document describes current practice for every published CCIR
+        series. It is deliberately short: what the numbers measure, where they
+        come from, and how they are computed. Changes to anything on this page
+        are governed by the <a href="/documents/change-management">Change
+        Management Policy</a>.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> What the series are</h2>
+      <p>
+        CCIR publishes daily reference series for GPU rental prices, in U.S.
+        dollars per GPU per hour, on the grain
+        <strong>chip × operator segment × form factor × interruptibility ×
+        commitment term × region</strong>. Every price is a
+        <strong>posted, publicly observable list ask</strong> collected from a
+        provider-operated pricing surface — not an executed transaction, not a
+        solicited quote, not a broker-mediated or sponsored feed. If a price is
+        only available through sales contact, it is not in the index.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Operator segments</h2>
+      <p>
+        Series are segmented by the class of operator posting the price, not by
+        hardware grade:
+      </p>
+      <ul>
+        <li><strong>Hyperscaler</strong> — integrated cloud majors (list rate cards).</li>
+        <li><strong>Neocloud</strong> — GPU-specialist clouds selling dedicated capacity.</li>
+        <li><strong>Marketplace</strong> — multi-seller venues and aggregated marketplaces.</li>
+      </ul>
+      <p>
+        In series identifiers these carry the tokens <code>T1</code> /
+        <code>T2</code> / <code>T3</code> respectively.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> Collection</h2>
+      <p>
+        Prices are collected by automated daily collection from each provider's
+        public pricing pages or APIs, early morning U.S. time. Each observation
+        records the provider, chip, posted price, and its axes (form factor,
+        interruptibility, commitment term, region). Raw observations are
+        archived; published series are aggregates.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> Aggregation and the headline statistic</h2>
+      <p>
+        Aggregation is <strong>operator-equal</strong>: one source, one vote. A
+        provider's multiple qualifying listings in a cell are reduced to a
+        per-source value first, so no provider's listing count moves a series.
+      </p>
+      <p>
+        The headline statistic per cell follows a disclosed rule:
+        <strong>mean when the panel has ten or more sources (n ≥ 10), median
+        below that</strong>. The statistic actually used is stamped on every
+        row (<code>headline_stat</code>), and every cell publishes its source
+        count <em>n</em>, observation count, and interquartile range alongside
+        the headline value.
+      </p>
+      <p>
+        <strong>There is no publication gate.</strong> Every populated cell
+        publishes, whatever its depth; panel depth <em>n</em> is the trust
+        signal, and thin cells should be read as indicative. This is a
+        deliberate choice: suppressing thin cells hides the coverage boundary
+        instead of disclosing it.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> Windows and composition stability</h2>
+      <p>
+        Each cell is computed on the shortest observation window with data:
+        one day, else three days, else seven. Panel membership is versioned;
+        when a panel member transiently fails collection, its last-good price
+        carries forward for at most seven days so one missed scrape does not
+        change a series' composition. Members absent beyond that exit the cell.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">06</span> Series grammar</h2>
+      <p>Every series identifier is fully self-describing:</p>
+      <pre class="grammar">CRI-&#123;SEGMENT&#125;-&#123;CHIP&#125;-&#123;FORM&#125;-&#123;INT&#125;-&#123;TERM&#125;-&#123;REGION&#125;
+
+SEGMENT   T1 Hyperscaler · T2 Neocloud · T3 Marketplace
+FORM      SXM · PCIe · NVL · ALL (pooled)
+INT       GTD guaranteed · INT interruptible · ALL (pooled)
+TERM      OD on-demand · 1mo 3mo 6mo 1yr 2yr 3yr committed
+REGION    US · EU · APAC · ALL (pooled)
+
+Example:  CRI-T2-H100-ALL-GTD-OD-US
+          Neocloud · H100 · guaranteed on-demand · United States</pre>
+      <p>
+        <code>ALL</code> on any axis means that axis is pooled for that
+        series. The reference ladder on <a href="/rates">/rates</a> shows the
+        guaranteed on-demand US cut per chip and segment, with each cell's
+        series identifier printed beneath the rate.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">07</span> Publication, history, restatement</h2>
+      <p>
+        Series publish daily by 07:30 ET at ccir.io. History is append-only
+        with a methodology version stamped on every row. When a defect or a
+        material methodology change requires it, history is restated —
+        republished in full under the current version — per the
+        <a href="/documents/change-management">Change Management Policy</a>.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 80ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 26px 0; max-width: 76ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+    .sec p, .sec ul {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 12px;
+    }
+    .sec ul { padding-left: 20px; }
+    .sec li { margin-bottom: 6px; }
+    .sec strong { color: var(--accent); }
+    .sec code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      background: var(--surface-2);
+      padding: 1px 5px;
+      border: 1px solid var(--rule);
+    }
+    .grammar {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink);
+      line-height: 1.8;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      padding: 14px 16px;
+      overflow-x: auto;
+      margin: 0 0 12px;
+    }
+  </style>
+</Base>
