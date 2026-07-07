@@ -418,6 +418,16 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
   description="Debt facts across the compute-infrastructure capital stack — every instrument as filed, from SEC filings and issuer or lender releases, with the source linked on every row."
   ogImage="/og/credit.png"
 >
+  <nav class="apps-navband" aria-label="On this page">
+    <div class="wrap apps-nav-inner">
+      <a class="apps-nav-link" href="#issuance">Issuance</a>
+      <a class="apps-nav-link" href="#spreads">Spreads</a>
+      <a class="apps-nav-link" href="#coupons">Coupons</a>
+      <a class="apps-nav-link" href="#ledger">Ledger</a>
+      <a class="apps-nav-link" href="#collateral-treatment">Collateral treatment</a>
+      <a class="apps-nav-link" href="#methodology">Method</a>
+    </div>
+  </nav>
   <section class="wrap top">
     <div class="hero-solo">
       <div class="kicker">Market Intelligence · Compute Credit · as of {AS_OF}</div>
@@ -431,7 +441,11 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         convertibles, unsecured notes, and data-center credit are tracked for
         context. Coupons, spreads, collateral, and lenders are reproduced
         as disclosed; where a filing does not state a term, the row says
-        <em>undisclosed</em> — nothing here is estimated.
+        <em>undisclosed</em> — nothing here is estimated. One pattern holds
+        across the whole ledger: no GPU-collateralized instrument references
+        a market residual value — every disclosed schedule amortizes
+        collateral toward zero
+        (<a href="#collateral-treatment">collateral treatment</a>).
       </p>
       <div class="disclosure">
         <strong>Sourced as filed</strong>
@@ -446,7 +460,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     </div>
 
     <!-- Issuance by quarter — the observed scale + growth opener -->
-    <div class="panel">
+    <div class="panel" id="issuance">
       <div class="panel-head">
         <div>
           <div class="panel-title">GPU-backed debt issuance — observed, by quarter</div>
@@ -461,7 +475,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     </div>
 
     <!-- Chart A — GPU-collateral SOFR spread tape -->
-    <div class="panel">
+    <div class="panel" id="spreads">
       <div class="panel-head">
         <div>
           <div class="panel-title">GPU-collateral floating spreads — CoreWeave &amp; IREN</div>
@@ -551,7 +565,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     </div>
 
     <!-- Chart B — project-bond coupon compression -->
-    <div class="panel">
+    <div class="panel" id="coupons">
       <div class="panel-head">
         <div>
           <div class="panel-title">Project-bond coupons — by offtake credit support</div>
@@ -646,7 +660,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     </div>
 
     <!-- Ledger table -->
-    <div class="ledger-head">
+    <div class="ledger-head" id="ledger">
       <h2>Instrument ledger</h2>
       <p class="standfirst">
         Every live instrument across the panel. Filter by issuer, type,
@@ -948,6 +962,36 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
 
   <style>
     .top { padding-top: 28px; }
+
+    /* Sticky on-page jump bar (same pattern as /applications) */
+    .apps-navband {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+    }
+    .apps-nav-inner {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
+    .apps-nav-inner::-webkit-scrollbar { display: none; }
+    .apps-nav-link {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
+    #issuance, #spreads, #coupons, #ledger,
+    #collateral-treatment, #methodology { scroll-margin-top: 52px; }
     h1 {
       font-family: var(--font-display);
       font-size: var(--fs-hero);
