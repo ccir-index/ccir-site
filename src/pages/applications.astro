@@ -745,6 +745,70 @@ or any Lender.</pre>
           smooths on a 30-day average and includes the 15% interim test.
         </p>
       </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">10</span> The Exposure-Weighted Variant</h3>
+        <p>
+          The predictable borrower objection to Section 7.01 as drafted: a
+          heavily contracted borrower's revenue does not move when the index
+          moves, so a raw-index trigger over-tightens exactly the borrower
+          the lender likes most. The objection is sound, and the repair is
+          established practice — reserve-based lending credits hedged volumes
+          into the borrowing base at their hedge prices and applies the price
+          deck only to unhedged volumes. Committed customer contracts are
+          this market's hedge, so contracted capacity earns contract-price
+          credit in the <em>test</em>, not merely in the coverage
+          requirement: the covenant classifies tiers on a blended rate
+          rather than the bare index.
+        </p>
+        <pre class="cov-body">
+<span class="cov-h">"Exposed Capacity"</span> means, as of any Determination Date, the portion of
+the Pool Nodes' capacity that is either (a) not subject to a Committed
+Customer Contract or (b) subject to a Committed Customer Contract
+scheduled to expire within twelve (12) months of such date.
+
+<span class="cov-h">"Effective Revenue Rate"</span> means, as of any Determination Date, the
+capacity-weighted average of (a) the contracted rates applicable to
+capacity that is not Exposed Capacity and (b) the Reference Rate
+Average applied to Exposed Capacity.
+
+<span class="cov-h">Section 7.01(a) (Exposure-Weighted Variant).</span> As of each Determination
+Date, the Effective Revenue Rate (in place of the Reference Rate
+Average) shall be classified against the Tier Thresholds. The Borrower
+shall deliver with each compliance certificate a schedule of Committed
+Customer Contracts (contracted rates, covered capacity, and scheduled
+expirations) certified by a Responsible Officer.</pre>
+        <p>
+          The variant encodes the expiry dynamic mechanically: far from
+          expiry, the index flows through only the uncontracted sliver and
+          the covenant barely engages; as contracts roll toward their
+          expiration dates, Exposed Capacity grows and the same index level
+          bites progressively harder, reaching full force at the cliff. At
+          the 2025 floor in the Section 09 backtest (index at $2.79 against
+          contracts written at close):
+        </p>
+        <div class="ftable-wrap">
+          <table class="ftable">
+            <thead><tr><th>Contracted share (beyond 12 mo)</th><th>Effective Revenue Rate</th><th>Tier at the 2025 floor</th></tr></thead>
+            <tbody>
+              <tr><td>85%</td><td>$4.07</td><td>Tier 1 · Baseline</td></tr>
+              <tr><td>50%</td><td>$3.55</td><td>Tier 2 · Watch</td></tr>
+              <tr><td>15%</td><td>$3.02</td><td>Tier 3 · Step-Up</td></tr>
+              <tr><td>0% (raw index)</td><td>$2.79</td><td>Tier 4 · Triggered</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>What the lender receives for the relief:</strong> a
+          certified monthly contract-book schedule (rates, shares, expiry
+          ladder) it would otherwise negotiate for separately, and no
+          softening on the exposed slice. The variant also shares its inputs
+          with Use case 02: the Effective Revenue Rate here and the Projected
+          Rollover DSCR there are the same computation at different horizons,
+          so one covenant package runs on one data feed — the published
+          series plus the borrower's contract ladder.
+        </p>
+      </section>
     </article>
 
     <article class="usecase">
