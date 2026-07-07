@@ -450,4 +450,7 @@ jobs:
             exit 0
           fi
           git commit -m "data: refresh snapshot to $DATE"
-          git push origin main
+          # Rebase-retry: an interactive session pushing at the same moment
+          # loses the race and rejected the push (2026-07-07); data-refresh
+          # commits never conflict with source edits, so rebase and retry.
+          git push origin main || { git pull --rebase origin main && git push origin main; }
