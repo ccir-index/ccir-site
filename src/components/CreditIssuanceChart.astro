@@ -51,8 +51,18 @@ const bars = windowQ.map((q) => {
 });
 
 const totalTrackedB = sized.reduce((a, i) => a + i.size_usd_m, 0) / 1000;
-const maxBar = Math.max(...bars.map((b) => b.issued_b), 1);
-const maxCum = Math.max(...bars.map((b) => b.cum_b), 1);
+
+// Y scales get headroom above the data max, rounded up to a clean tick
+// step so bars and line never touch the chart ceiling.
+const Y_TICKS = 4;
+function axisMax(raw: number): number {
+  const target = raw * 1.05;
+  const pow = Math.pow(10, Math.floor(Math.log10(target / Y_TICKS)));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * pow).find((s) => s * Y_TICKS >= target)!;
+  return step * Y_TICKS;
+}
+const maxBar = axisMax(Math.max(...bars.map((b) => b.issued_b), 1));
+const maxCum = axisMax(Math.max(...bars.map((b) => b.cum_b), 1));
 const asOf = (creditData as any)._meta?.as_of ?? '';
 
 // --- svg geometry ----------------------------------------------------------
@@ -66,7 +76,7 @@ const bx = (i: number) => x0 + band * (i + 0.5);
 const byBar = (v: number) => y1 - (v / maxBar) * (y1 - y0);
 const byCum = (v: number) => y1 - (v / maxCum) * (y1 - y0);
 
-const yTicks = 4;
+const yTicks = Y_TICKS;
 const barTicks = Array.from({ length: yTicks + 1 }, (_, k) => Math.round((maxBar / yTicks) * k));
 const cumTicks = Array.from({ length: yTicks + 1 }, (_, k) => Math.round((maxCum / yTicks) * k));
 const cumPath = bars.map((b, i) => `${i === 0 ? 'M' : 'L'} ${bx(i).toFixed(1)} ${byCum(b.cum_b).toFixed(1)}`).join(' ');
