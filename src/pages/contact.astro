@@ -92,6 +92,19 @@ const audiences = [
       <div class="cc-kicker">Start a conversation</div>
       <span class="cc-email">research@ccir.io</span>
     </a>
+
+    <section class="administrator">
+      <header class="sec-head">
+        <div class="kicker">Administrator</div>
+      </header>
+      <p class="prose admin-line">
+        The CCIR reference series are published by
+        <strong>Compute Credit Index Research LLC</strong>, a Delaware limited
+        liability company formed March 11, 2026. The administrator operates no
+        marketplace, runs no trading desk, and holds no positions in the
+        markets it measures.
+      </p>
+    </section>
   </section>
 
   <style>
@@ -111,6 +124,9 @@ const audiences = [
     .sec-head h2 { font-size: var(--fs-2xl); margin: 4px 0 0; }
 
     .why, .audiences, .how { margin: 34px 0 0; }
+    .administrator { margin: 0 0 40px; }
+    .admin-line { font-size: var(--fs-sm); color: var(--ink-dim); }
+    .admin-line strong { color: var(--ink); }
     .prose {
       font-family: var(--font-body);
       font-size: var(--fs-md);
