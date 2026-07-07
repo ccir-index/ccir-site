@@ -49,7 +49,7 @@ const wattTable = [
 ---
 <Base
   title="The age curve prices bandwidth · CCIR Research"
-  description="GPU earning power by generation: raw rental rates decline ~25%/yr with age, but per unit of memory bandwidth datacenter silicon is flat — the cross-section is already inference-priced."
+  description="GPU earning power by generation: raw rental rates decline ≈26%/yr with age (R² 0.96), but per unit of memory bandwidth datacenter silicon is flat — the cross-section is already inference-priced."
   showTape={false}
 >
   <section class="wrap top">
@@ -57,11 +57,11 @@ const wattTable = [
       <div class="kicker">Research · calibrated to the {AS_OF} snapshot</div>
       <h1>The age curve prices bandwidth</h1>
       <p class="standfirst">
-        Every GPU credit model carries a rental-rate decline assumption — the
-        path of a generation's earning power as it ages. This note measures
-        what the market's cross-section says, from published CCIR series, and
-        finds the decline has a specific shape: steep in dollars, flat per
-        unit of memory bandwidth, banded per watt.
+        A GPU generation's earning power declines as it ages, and underwriting
+        GPU-backed credit requires the path. This note measures it from
+        published CCIR series and finds a specific shape: close to log-linear
+        at ≈ −26% per year in dollars (R² 0.96 across five datacenter
+        generations), flat per unit of memory bandwidth, banded per watt.
       </p>
     </header>
 
@@ -100,6 +100,10 @@ const wattTable = [
 
     <section class="sec">
       <h2><span class="n">02</span> The age curve ({AS_OF}, guaranteed on-demand, $/GPU-hr)</h2>
+      <p class="fit-line">
+        Neocloud column, log rate on age: <strong>≈ −26% per year, R² 0.96</strong>
+        across the five datacenter generations (ages approximate).
+      </p>
       <div class="twrap">
         <table>
           <thead>
@@ -122,11 +126,12 @@ const wattTable = [
         reference column here.
       </p>
       <p>
-        On the Neocloud column the raw decline is close to log-linear at
-        <strong>≈ −25% per year of age</strong>: B300 $7.85 → H100 $3.22 over
-        ~2.9 years of age difference, H100 $3.22 → A100 $1.80 over ~2.0 more.
-        That single number is the "rental decline assumption" most GPU credit
-        models currently carry as a guess.
+        The regularity is the finding: five generations spanning five years of
+        silicon, and a single log-linear slope explains 96% of the variance in
+        the Neocloud rate. B300 $7.85 → H100 $3.22 over ~2.9 years of age
+        difference, H100 $3.22 → A100 $1.80 over ~2.0 more; the largest
+        deviation from the line is H200, which trades below it — consistent
+        with the bandwidth pricing in the next section.
       </p>
     </section>
 
@@ -288,5 +293,15 @@ const wattTable = [
     td.dim { color: var(--ink-dim); }
     td.strong { color: var(--accent); font-weight: var(--weight-strong); }
     .tfoot { font-family: var(--font-mono) !important; font-size: calc(var(--fs-xs) - 1px) !important; color: var(--ink-faint) !important; }
+    .fit-line {
+      font-family: var(--font-mono) !important;
+      font-size: var(--fs-sm) !important;
+      color: var(--ink) !important;
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      background: var(--surface-2);
+      padding: 10px 14px;
+      max-width: 700px;
+    }
   </style>
 </Base>
