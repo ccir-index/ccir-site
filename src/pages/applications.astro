@@ -157,6 +157,32 @@ const backtest: { period: string; rate: string; tier: string; cls: string; conse
   { period: 'Jun 2026', rate: '$3.39', tier: 'Tier 3 · re-tightening', cls: 't3', consequence: 'Phase-in restarts — the month the 15% interim test exists for' },
 ];
 
+// ---------------------------------------------------------------------------
+// Use case 03 — multi-generation pool surveillance. Pool Reference Rate =
+// unit-weighted average of the published per-generation Neocloud guaranteed
+// on-demand cells (US-first, region-pooled fallback), weights fixed at
+// closing per the asset schedule.
+function poolCell(chip: string): Rate | undefined {
+  const pick = (region: string) => headlineRates
+    .filter((r) => r.tier === 'T2' && r.gpu_model === chip &&
+                   r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
+                   r.region === region && r.interruptibility === 'GTD' &&
+                   r.promotion_status !== 'Shadow')
+    .sort((a, b) => (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+  return pick('US') ?? pick('ALL');
+}
+const POOL = [
+  { chip: 'H100', weight: 0.50 },
+  { chip: 'H200', weight: 0.30 },
+  { chip: 'A100', weight: 0.20 },
+];
+const poolRows = POOL.map((p) => {
+  const cell = poolCell(p.chip);
+  return { ...p, cell, rate: cell ? headlineValue(cell) : null };
+}).filter((r) => r.rate != null);
+const poolWeightSum = poolRows.reduce((s, r) => s + r.weight, 0);
+const poolRate = poolRows.reduce((s, r) => s + r.weight * (r.rate as number), 0) / (poolWeightSum || 1);
+
 const rolloverPrecedents: { feature: string; precedent: string }[] = [
   { feature: 'Lease Sweep Period triggered ahead of a major contract expiry', precedent: 'CMBS lease-sweep / specified-tenant sweep provisions (cash trap commencing 12-18 months before a major tenant lease expiration)' },
   { feature: 'Re-lease rate assumption drawn from a published market series', precedent: 'Aircraft ABS re-leasing assumptions keyed to appraiser-published lease-rate data; container ABS per-diem re-lease assumptions' },
@@ -1013,6 +1039,102 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
         a non-storable compute market where the re-contracting price is
         published daily.
       </p>
+    </article>
+
+    <article class="usecase">
+      <header class="uc-head">
+        <span class="uc-kicker">Use case 03 · Pool surveillance</span>
+        <h2>Monitoring a Multi-Generation Pool</h2>
+        <p class="uc-lede">
+          Securitized and warehouse pools are not one chip — they are mixed
+          fleets across generations. A worked construction for the composite
+          reference such a pool needs: a unit-weighted basket of the
+          published per-generation series, fixed at closing, verified in
+          surveillance. Modeled on fleet-weighted appraisal conventions in
+          aircraft ABS and vintage-index surveillance in auto ABS. Drafting
+          illustration, not a model form.
+        </p>
+      </header>
+
+      <section class="uc-rate">
+        <div class="rate-kicker">Worked pool (live, calibrating this example)</div>
+        <div class="rate-id">{poolRows.map((r) => `${(r.weight * 100).toFixed(0)}% ${r.chip}`).join(' · ')}</div>
+        <div class="rate-price">${fmt(poolRate)}<span class="rate-unit">/GPU-hr · Pool Reference Rate</span></div>
+        <div class="rate-meta">
+          Unit-weighted basket of Neocloud guaranteed on-demand cells
+          <span class="sep">·</span>
+          as of {meta.as_of_date}
+        </div>
+        <div class="rate-thresholds">
+          {poolRows.map((r) => (
+            <span><strong>{r.chip}</strong> ${fmt(r.rate as number)} <span class="dim">× {(r.weight * 100).toFixed(0)}% (n={r.cell?.n_sources})</span></span>
+          ))}
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">01</span> The Pool Reference Rate</h3>
+        <pre class="cov-body">
+<span class="cov-h">"Pool Reference Rate"</span> means, as of any date of determination, the
+weighted average of the CCIR series corresponding to each Generation
+represented in the Asset Schedule (for each Generation, the Neocloud
+guaranteed on-demand series for the applicable region), weighted by
+each Generation's share of Pool GPU units as set forth in the Asset
+Schedule. Weights are fixed as of the Closing Date and adjusted only
+upon an asset substitution, addition, or disposition reflected in a
+Servicer Report.</pre>
+        <p>
+          Every input is a published series with disclosed panel depth, and
+          the weights come from the deal's own asset schedule — so trustee,
+          servicer, rating surveillance, and investors compute the same
+          number from public data plus one document they already hold. The
+          single-series covenants in Use case 01 run unchanged on the pool
+          rate.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">02</span> The Property That Makes Pools Monitorable</h3>
+        <p>
+          The cross-section of generation pricing is log-linear in age at a
+          common slope (≈ −26% per year; see
+          <a href="/research/gpu-age-curve">the age-curve note</a>). That has
+          a direct consequence for pools: <strong>a static pool's earning
+          power declines at approximately the same rate regardless of its
+          generation mix.</strong> Mix determines the level; it does not
+          change the slope. The only lever that changes a pool's decline
+          path is substitution — replacing aging units with newer
+          generations — which is precisely the servicer behavior
+          surveillance exists to verify.
+        </p>
+        <p>
+          Surveillance therefore watches four things: the Pool Reference
+          Rate against its closing level; mix drift in the Servicer Report
+          against the weights being applied; whether substitutions actually
+          entered the basket on schedule; and panel depth <em>n</em> on each
+          underlying cell, so a thinning input is visible before it matters.
+          Generations without a published cell (a new chip in its first
+          weeks) enter the basket only by amendment — the same discipline as
+          any index addition.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3><span class="sec-n">03</span> Precedent and Limitations</h3>
+        <p>
+          The construction is standard in adjacent asset classes: aircraft
+          ABS monitors fleet value on appraisals weighted by airframe type
+          and vintage; container ABS tracks per-diem rates by box type and
+          age; auto ABS surveillance marks pools against vintage- and
+          segment-level auction indices. GPUs are, if anything, easier — the
+          per-generation series publish daily rather than quarterly.
+          Limitations: the basket inherits each cell's panel depth (thin
+          cells are disclosed, not hidden); unit weighting is one convention
+          (cost-basis or capacity weighting are alternatives the documents
+          can elect); and the pool rate is an earning-power reference for
+          the collateral, not a valuation of it.
+        </p>
+      </section>
     </article>
   </section>
 
