@@ -1,0 +1,64 @@
+---
+import Base from '../../layouts/Base.astro';
+import { meta } from '../../data/snapshot';
+
+const notes = [
+  {
+    href: '/research/gpu-age-curve',
+    date: '2026-07-06',
+    title: 'The age curve prices bandwidth',
+    blurb:
+      'GPU earning power by generation, three ways: raw rates decline ~25%/yr ' +
+      'with age, but per unit of memory bandwidth datacenter silicon is flat — ' +
+      'and per watt it sorts into shell classes. What that says about an ' +
+      'inference-led market, with the markers to watch.',
+  },
+];
+---
+<Base
+  title="Research · CCIR"
+  description="CCIR research notes — analyses of observed compute prices: generation decline curves, normalizations, and market-structure findings."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {meta.as_of_date}</div>
+      <h1>Research notes</h1>
+      <p class="standfirst">
+        Dated analyses of observed prices from the CCIR panel. Every note works
+        only from published series and public filings, states its calibration
+        date, and lists what would falsify it. Notes are not updated in place —
+        follow-ups get new notes.
+      </p>
+    </header>
+
+    <div class="note-list">
+      {notes.map((n) => (
+        <a class="note-card" href={n.href}>
+          <span class="note-date">{n.date}</span>
+          <h2 class="note-title">{n.title}</h2>
+          <p class="note-blurb">{n.blurb}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 80ch; margin-bottom: 22px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .note-list { display: flex; flex-direction: column; gap: 1px; background: var(--rule); border: 1px solid var(--rule); max-width: 880px; margin-bottom: 40px; }
+    .note-card { background: var(--surface); padding: 18px 22px; text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: 6px; }
+    .note-card:hover { background: var(--surface-2); text-decoration: none; }
+    .note-date { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.04em; }
+    .note-title { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0; }
+    .note-blurb { font-family: var(--font-body); font-size: var(--fs-sm); color: var(--ink-dim); line-height: 1.6; margin: 0; max-width: 76ch; }
+  </style>
+</Base>

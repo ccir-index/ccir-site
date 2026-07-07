@@ -1,0 +1,287 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Calibrated to the 2026-07-06 snapshot. Research notes are dated and not
+// updated in place — a re-run gets a new note.
+const AS_OF = '2026-07-06';
+
+const ageCurve = [
+  { gen: 'B300', rel: 'late 2025', age: '~0.8y', t1: '—', t2: '7.85 (n5)', t3: '7.39 (n3)' },
+  { gen: 'B200', rel: 'early 2025', age: '~1.4y', t1: '—', t2: '6.92 (n8)', t3: '5.98 (n5)' },
+  { gen: 'H200', rel: 'mid 2024', age: '~2.1y', t1: '8.96 (n4)', t2: '4.18 (n14)', t3: '3.82 (n7)' },
+  { gen: 'H100', rel: 'late 2022', age: '~3.7y', t1: '9.15 (n4)', t2: '3.22 (n20)', t3: '2.91 (n8)' },
+  { gen: 'A100 80GB', rel: 'late 2020', age: '~5.7y', t1: '2.74 (n3)', t2: '1.80 (n13)', t3: '1.40 (n8)' },
+  { gen: 'L40S', rel: 'late 2023', age: '~2.7y', t1: '—', t2: '1.63 (n6)', t3: '0.88 (n7)' },
+  { gen: 'RTX PRO 6000', rel: 'early 2026', age: '~0.3y', t1: '—', t2: '1.97 (n4)', t3: '2.22 (n4)' },
+  { gen: '5090', rel: 'early 2026', age: '~0.5y', t1: '—', t2: '—', t3: '0.69 (n5)' },
+  { gen: '4090', rel: 'late 2022', age: '~3.7y', t1: '—', t2: '—', t3: '0.46 (n5)' },
+  { gen: 'A40', rel: 'late 2020', age: '~5.7y', t1: '—', t2: '—', t3: '0.40 (n4)' },
+  { gen: '3090', rel: 'late 2020', age: '~5.8y', t1: '—', t2: '—', t3: '0.22 (n5)' },
+];
+
+const bwTable = [
+  { gen: 'B300', bw: '~8.0 TB/s', v: '0.98' },
+  { gen: 'B200', bw: '8.0 TB/s', v: '0.87' },
+  { gen: 'H200', bw: '4.8 TB/s', v: '0.87' },
+  { gen: 'H100 SXM', bw: '3.35 TB/s', v: '0.96' },
+  { gen: 'A100 80GB', bw: '2.0 TB/s', v: '0.90' },
+];
+
+const flopTable = [
+  { gen: 'B300', pf: '~2.25 PF', v: '~3.5' },
+  { gen: 'B200', pf: '2.25 PF', v: '3.1' },
+  { gen: 'H200', pf: '0.99 PF', v: '4.2' },
+  { gen: 'H100', pf: '0.99 PF', v: '3.3' },
+  { gen: 'A100 80GB', pf: '0.31 PF', v: '5.8' },
+];
+
+const wattTable = [
+  { gen: 'B200', tdp: '1.0 kW', v: '6.92', shell: 'liquid' },
+  { gen: 'B300', tdp: '~1.3 kW', v: '~6.0', shell: 'liquid' },
+  { gen: 'H200', tdp: '0.7 kW', v: '5.97', shell: 'dense air / liquid' },
+  { gen: 'L4 (Mkt)', tdp: '72 W', v: '5.83', shell: 'any air / edge' },
+  { gen: 'L40S', tdp: '350 W', v: '4.66', shell: 'air' },
+  { gen: 'H100', tdp: '0.7 kW', v: '4.60', shell: 'air' },
+  { gen: 'A100 80GB', tdp: '400 W', v: '4.50', shell: 'air' },
+  { gen: 'A40 (Mkt)', tdp: '300 W', v: '~1.3', shell: 'air' },
+  { gen: '5090 / 4090 / 3090 (Mkt)', tdp: '350–575 W', v: '1.0–1.2', shell: 'consumer' },
+];
+---
+<Base
+  title="The age curve prices bandwidth · CCIR Research"
+  description="GPU earning power by generation: raw rental rates decline ~25%/yr with age, but per unit of memory bandwidth datacenter silicon is flat — the cross-section is already inference-priced."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · calibrated to the {AS_OF} snapshot</div>
+      <h1>The age curve prices bandwidth</h1>
+      <p class="standfirst">
+        Every GPU credit model carries a rental-rate decline assumption — the
+        path of a generation's earning power as it ages. This note measures
+        what the market's cross-section says, from published CCIR series, and
+        finds the decline has a specific shape: steep in dollars, flat per
+        unit of memory bandwidth, banded per watt.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> What this measures — and what it doesn't</h2>
+      <p>
+        This is the <strong>income leg only</strong>: what a chip earns per
+        hour, by generation, across operator segments. It is not a residual
+        value. Resale-market evidence (American Compute's
+        <a href="https://www.amcompute.com/blog/gpu-depreciation-residual-value-report-2026"
+        rel="noopener" target="_blank">2026 residual-value report</a>, built on
+        secondary-market transactions) shows rental rates and resale prices can
+        diverge — H100 rentals fell through a period in which H100 resale
+        values rose on datacenter-shell scarcity. CCIR publishes observed
+        prices; valuation belongs to the reader.
+      </p>
+      <p>
+        An A100 renting below an H100 is not "the same asset, older." The chip
+        has migrated down the use-case ladder (frontier training → fine-tuning
+        → inference → batch → hobbyist) and often down the operator ladder —
+        in the current panel, 3090 / A40 / L4 / L40 list <em>only</em> in the
+        Marketplace segment, while A100 still spans all three. The curve
+        deliberately measures <strong>total earning-power decline</strong>,
+        reassignment included, because that is what a lender finances — the
+        same convention by which an aircraft's lease-rate curve includes its
+        migration from passenger to cargo.
+      </p>
+      <p>
+        One caveat governs everything below: a cross-section (many generations,
+        one date) is not a cohort curve (one generation through time). Reading
+        it as a decline path assumes the next generation ages like the last —
+        exactly the assumption an inference-led demand shift would break.
+        Section 05 lists the observable markers.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> The age curve ({AS_OF}, guaranteed on-demand, $/GPU-hr)</h2>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr><th>Generation</th><th>Released</th><th>Age</th><th class="num">Hyperscaler</th><th class="num">Neocloud</th><th class="num">Marketplace</th></tr>
+          </thead>
+          <tbody>
+            {ageCurve.map((r) => (
+              <tr>
+                <td class="gen">{r.gen}</td><td class="dim">{r.rel}</td><td class="dim">{r.age}</td>
+                <td class="num">{r.t1}</td><td class="num strong">{r.t2}</td><td class="num">{r.t3}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="tfoot">
+        Headline stat per the published rule (mean where n≥10, else median); n
+        = sources. Hyperscaler H100/H200 cells carry posted rate-card levels
+        that reprice slowly; the Neocloud column is the deepest panel and the
+        reference column here.
+      </p>
+      <p>
+        On the Neocloud column the raw decline is close to log-linear at
+        <strong>≈ −25% per year of age</strong>: B300 $7.85 → H100 $3.22 over
+        ~2.9 years of age difference, H100 $3.22 → A100 $1.80 over ~2.0 more.
+        That single number is the "rental decline assumption" most GPU credit
+        models currently carry as a guess.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> Three normalizations, three markets</h2>
+      <p>
+        Divide the Neocloud rate by the chip's capability and the curve
+        splits. Per unit of <strong>memory bandwidth</strong> — the binding
+        resource for LLM serving:
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Generation</th><th class="num">HBM bandwidth</th><th class="num">$/TB/s-hr</th></tr></thead>
+          <tbody>
+            {bwTable.map((r) => (
+              <tr><td class="gen">{r.gen}</td><td class="num dim">{r.bw}</td><td class="num strong">{r.v}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Datacenter silicon from eight months to 5.7 years old clears inside
+        <strong>$0.87–0.98 per TB/s-hour</strong> — ±6% around $0.92. After
+        bandwidth normalization there is essentially no age discount left.
+      </p>
+      <p>
+        Per unit of <strong>dense BF16 compute</strong> — the binding resource
+        for frontier training:
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Generation</th><th class="num">BF16 dense</th><th class="num">$/PFLOP-hr</th></tr></thead>
+          <tbody>
+            {flopTable.map((r) => (
+              <tr><td class="gen">{r.gen}</td><td class="num dim">{r.pf}</td><td class="num strong">{r.v}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Per FLOP, older chips get <em>more</em> expensive with age — the
+        opposite of a depreciation curve. Compute-normalization does not
+        flatten the cross-section; bandwidth-normalization does.
+      </p>
+      <p>
+        Per unit of <strong>nameplate power</strong> — the facility's
+        constraint, which determines which datacenters can physically host a
+        chip:
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Generation</th><th class="num">TDP</th><th class="num">$/kW-hr</th><th>Shell class</th></tr></thead>
+          <tbody>
+            {wattTable.map((r) => (
+              <tr><td class="gen">{r.gen}</td><td class="num dim">{r.tdp}</td><td class="num strong">{r.v}</td><td class="dim">{r.shell}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The watt-rent sorts the panel into three bands: consumer silicon with
+        no datacenter bundle at ~$1/kW-hr, <strong>air-cooled datacenter
+        silicon flat at $4.50–4.66</strong> across five years of age (A100 =
+        H100 = L40S per watt), and liquid-class silicon at $6–7. When the
+        shell is the binding constraint, chips that fit the same shells
+        converge on the same watt-rent — and part of the Blackwell premium is
+        rent on scarce liquid-cooled capacity. The breadth of facilities that
+        can host a chip is also the residual-support mechanism visible in the
+        resale data: old air-cooled generations fit the largest installed
+        shell base.
+      </p>
+      <p>
+        <strong>Reading.</strong> The marginal renter across generations is
+        paying for bandwidth-hours, not FLOP-hours — the pricing signature of
+        a serving-dominated market. If frontier training set the
+        cross-section, old chips would trade at a steep per-FLOP discount;
+        instead they trade at a per-FLOP premium and a per-bandwidth par. At
+        the margin, the repricing an "inference shift" is expected to cause
+        appears to have already happened.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> If volume keeps moving to inference — the watchlist</h2>
+      <p>
+        Stated as observables CCIR already publishes, so each can be checked
+        rather than argued:
+      </p>
+      <ol>
+        <li><strong>The $/TB/s band is the price.</strong> Serving demand deepening → the band tightens and new generations enter at it (B300's 0.98 decaying toward 0.87–0.90 as scarcity fades). Training re-tightening → Blackwell decouples upward per-TB/s.</li>
+        <li><strong>Term structure loads the short end.</strong> Inference buyers resist tenors beyond one year; the 1Y cell becomes the market's effective clearing tenor.</li>
+        <li><strong>The guaranteed–interruptible spread narrows on older generations.</strong> Today: H100 Neocloud guaranteed $3.22 vs interruptible $2.00 (−38%); A100 $1.80 vs $1.14 (−36%). Structural narrowing on old generations means bursty serving demand is reaching down the ladder.</li>
+        <li><strong>Old-generation floors hold.</strong> In power-market terms, depreciated chips are peakers — low carrying cost, dispatched into demand spikes — while new fleets are baseload needing committed offtake. A100 holding ~$0.90/TB/s at 5.7 years is the floor holding; watch it as Blackwell supply normalizes.</li>
+        <li><strong>Utilization becomes the swing variable.</strong> Serving is diurnal, training is flat; realized-vs-posted gaps widen for serving-heavy operators even where posted rates hold.</li>
+        <li><strong>Contract quality shifts.</strong> Many short-tenor customers replace one five-year offtake: diversification up, committed coverage down — and underwriting moves from offtake credit toward market-rate reference.</li>
+        <li><strong>The liquid watt-premium compresses.</strong> As liquid-cooled shells build out, $6–7/kW-hr should converge toward the $4.6 air band — a facility-driven repricing of new silicon independent of age. If instead the air band decays first, old-generation floors break from the facility side.</li>
+      </ol>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> Limitations</h2>
+      <p>
+        Single cross-section, not a cohort. List asks, not executed
+        transactions. The headline stat mixes mean (deep panels) and median
+        (thin) per the published rule; form factor is pooled and the SXM/PCIe
+        mix differs by generation; bandwidth is a crude capability proxy
+        (ignores HBM capacity, interconnect domain, FP4 paths — the B300 BF16
+        figure is approximate); the A100 Hyperscaler cell is a slow-moving
+        rate card; thin cells (n&lt;3) are indicative. Sources and series per
+        the <a href="/documents/methodology">Methodology</a>; underlying cells
+        are visible in the <a href="/explorer">Explorer</a>.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p, .sec ol {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 13px;
+    }
+    .sec ol { padding-left: 22px; }
+    .sec li { margin-bottom: 8px; }
+    .sec strong { color: var(--accent); }
+    .sec em { font-style: italic; }
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 12px; max-width: 700px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.gen { color: var(--ink); font-weight: var(--weight-strong); }
+    td.dim { color: var(--ink-dim); }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); }
+    .tfoot { font-family: var(--font-mono) !important; font-size: calc(var(--fs-xs) - 1px) !important; color: var(--ink-faint) !important; }
+  </style>
+</Base>

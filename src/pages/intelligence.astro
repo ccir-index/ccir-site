@@ -28,8 +28,9 @@ const clusters: Cluster[] = [
         blurb: 'Posted committed asks by tenor — the price of guaranteed capacity from one month to a year, per chip.' },
       { href: '/basis', title: 'On-demand vs clearing basis',
         blurb: 'Posted on-demand asks against marketplace clearing — where list rates sit above what actually transacts.' },
-      { href: '/spreads', title: 'Spreads & dispersion',
-        blurb: 'How far the same chip ranges across operator segments and providers — the width of the market, not just its middle.' },
+      // Spreads (/spreads) de-listed 2026-07-06: baselines on the Hyperscaler
+      // rate card (inflated) and duplicates what /rates shows side-by-side.
+      // Revisit as a basis product once the operator panel has weeks of history.
     ],
   },
   {
@@ -40,6 +41,17 @@ const clusters: Cluster[] = [
     pieces: [
       { href: '/realized/', title: 'Realized vs rate card',
         blurb: 'Per-GPU-hour realization estimated from public filings — CoreWeave realizes well below its own posted rate card.' },
+    ],
+  },
+  {
+    kicker: 'Research',
+    heading: 'Dated notes on observed prices',
+    standfirst:
+      'Analyses built only from published series and public filings, each ' +
+      'calibrated to a stated snapshot with its limitations listed.',
+    pieces: [
+      { href: '/research/gpu-age-curve', title: 'The age curve prices bandwidth',
+        blurb: 'GPU earning power by generation: ~−25%/yr in dollars, flat per unit of memory bandwidth, banded per watt — and what that says about an inference-led market.' },
     ],
   },
   {

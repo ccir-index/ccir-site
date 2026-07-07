@@ -253,6 +253,10 @@ jobs:
         run: |
           set -euo pipefail
           cp .sync/rates_daily.csv      src/data/rates_daily.csv
+          # Public download copies — the footer / documents pages link these
+          # directly (the upstream data repo is private).
+          cp .sync/rates_daily.csv      public/data/rates_daily.csv
+          cp .sync/indices_history.csv  public/data/rates_history.csv 2>/dev/null || true
           cp .sync/rates_shadow.csv     src/data/rates_shadow.csv
           cp .sync/rates_daily_prev.csv src/data/rates_daily_prev.csv
           # Overlay CSV — leave the previous copy in place if this snapshot lacked it.
