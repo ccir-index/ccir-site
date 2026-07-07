@@ -80,12 +80,17 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE).href : undefined;
     <slot />
   </main>
   <footer class="site-footer">
+    <div class="wrap disclosure-foot">
+      <strong>Independent · Observable · Posted · No positions in the markets we measure</strong>
+      Every rate is sourced from publicly-accessible, provider-operated
+      pricing pages and official documentation — no solicited quotes, no
+      broker-mediated prices, no sponsored feeds. CCIR holds no positions
+      in the markets it measures and clears no trades.
+    </div>
     <div class="wrap footer-inner">
       <div class="lhs">
         <strong>CCIR</strong> · Citable reference rates and independent
         analysis of the GPU compute market, updated each morning by 07:30 ET.
-        Sourced from publicly-posted provider pricing — no solicited quotes,
-        no sponsored feeds, and no positions in the markets we measure.
       </div>
       <div class="rhs">
         <a href="/data/rates_daily.csv">Rates CSV</a>
