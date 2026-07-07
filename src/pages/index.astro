@@ -89,7 +89,10 @@ const miPieces: { href: string; title: string; blurb: string }[] = [
                   const c = cells[t];
                   if (!c) return <td class="num empty">—</td>;
                   return (
-                    <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>${fmt(headlineStat(c))}</td>
+                    <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
+                      ${fmt(headlineStat(c))}
+                      <div class="cell-sid">{c.series_id}</div>
+                    </td>
                   );
                 })}
               </tr>
@@ -179,6 +182,15 @@ const miPieces: { href: string; title: string; blurb: string }[] = [
     }
     table.ladder-table td.num { text-align: center; }
     table.ladder-table td.posted { font-weight: var(--weight-strong); cursor: help; }
+    .cell-sid {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 2px);
+      font-weight: var(--weight-body);
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+      margin-top: 3px;
+      white-space: nowrap;
+    }
     /* Middle tier (Neocloud) is the market that matters — give it the accent. */
     table.ladder-table td.tier-pos-t2 { color: var(--accent); }
     table.ladder-table th.tier-col-t2 { color: var(--accent); }
