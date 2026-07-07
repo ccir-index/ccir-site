@@ -50,18 +50,9 @@ const clusters: Cluster[] = [
     pieces: [
       { href: '/utilization', title: 'Utilization & availability',
         blurb: 'How much of the tracked fleet is rented versus idle, and how many venues have capacity — a breadth read on supply.' },
-      { href: '/markets', title: 'Marketplace tape',
-        blurb: 'Per-cycle cheapest asks across marketplaces and the Vast observatory — the live spot tape beneath the reference rate.' },
-    ],
-  },
-  {
-    kicker: 'Market structure — research',
-    heading: 'The cost of not being financialized',
-    standfirst:
-      'A working estimate of what the compute market pays, in excess cost of funds, for having no way to hedge and trade compute forwards — the price of not being financialized. Hypothetical.',
-    pieces: [
-      { href: '/research/unfinancialized-compute', title: 'The cost of an unfinancialized compute market',
-        blurb: 'An estimate of what the market pays in excess cost of funds for having no way to hedge and trade compute forwards — ~$0.4B/yr today, heading to $2–5B by 2028.' },
+      // Marketplace tape (/markets) de-listed 2026-07-06: a MIN-of-panel stat
+      // amplifies provider drop-in/out during panel changes — re-list once the
+      // fixed panel has a stable window. Page stays reachable by URL.
     ],
   },
 ];
