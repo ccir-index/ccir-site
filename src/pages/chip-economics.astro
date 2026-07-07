@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 
-// Normalized Rates — Phase 0 (static). Inline data from the age-curve memo's
+// Chip Economics — Phase 0 (static). Inline data from the age-curve memo's
 // verified numbers (2026-07-06 snapshot), exactly how gpu-age-curve is built.
 // Phase 2 swaps this for normalized_daily.csv per the spec
 // (v2/ccir-v2-notebooks/drafts/normalized_rates_spec_2026_07.md §9).
@@ -10,8 +10,8 @@ const PRINT_DATE = '2026-07-07';
 const SNAP_DATE = '2026-07-06';
 ---
 <Base
-  title="Normalized Rates · CCIR"
-  description="Published reference rates re-denominated by vendor spec-sheet constants — capacity, bandwidth, compute, and power lenses on the same daily $/GPU-hr cell. One denominator makes the cross-section flat: that is the dimension the market prices."
+  title="Chip Economics · CCIR"
+  description="Chip economics from published reference rates — earning power per spec-sheet unit across capacity, bandwidth, compute, and power lenses on the same daily $/GPU-hr cell. One denominator makes the cross-section flat: that is the dimension the market prices."
   ogImage="/og/home.png"
 >
   <nav class="apps-navband" aria-label="On this page">
@@ -28,8 +28,8 @@ const SNAP_DATE = '2026-07-06';
 
     <header class="page-head">
       <div class="kicker">Market Intelligence</div>
-      <h1>Normalized Rates</h1>
-      <p class="standfirst">What the market prices.</p>
+      <h1>Chip Economics</h1>
+      <p class="standfirst">Earning power per spec-sheet unit.</p>
     </header>
 
     <div class="designation" role="note">
