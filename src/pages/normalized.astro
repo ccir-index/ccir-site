@@ -1,0 +1,1014 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Normalized Rates — Phase 0 (static). Inline data from the age-curve memo's
+// verified numbers (2026-07-06 snapshot), exactly how gpu-age-curve is built.
+// Phase 2 swaps this for normalized_daily.csv per the spec
+// (v2/ccir-v2-notebooks/drafts/normalized_rates_spec_2026_07.md §9).
+// Lens values: $/GB-hr = rate ÷ registry hbm_capacity_gb; spreads = (max−min)/mean.
+const PRINT_DATE = '2026-07-07';
+const SNAP_DATE = '2026-07-06';
+---
+<Base
+  title="Normalized Rates · CCIR"
+  description="Published reference rates re-denominated by vendor spec-sheet constants — capacity, bandwidth, compute, and power lenses on the same daily $/GPU-hr cell. One denominator makes the cross-section flat: that is the dimension the market prices."
+  ogImage="/og/home.png"
+>
+  <nav class="apps-navband" aria-label="On this page">
+    <div class="wrap apps-nav-inner">
+      <a class="apps-nav-link" href="#lenses">Lenses</a>
+      <a class="apps-nav-link" href="#bandwidth">Bandwidth</a>
+      <a class="apps-nav-link" href="#watt-rent">Watt-Rent</a>
+      <a class="apps-nav-link" href="#economic-life">Economic Life</a>
+      <a class="apps-nav-link" href="#method">Method</a>
+    </div>
+  </nav>
+
+  <section class="wrap top">
+
+    <header class="page-head">
+      <div class="kicker">Market Intelligence</div>
+      <h1>Normalized Rates</h1>
+      <p class="standfirst">What the market prices.</p>
+    </header>
+
+    <div class="designation" role="note">
+      <p class="desig-main">Analytical decomposition of published reference rates — <em>not a reference rate</em>.</p>
+    </div>
+
+    <!-- ======================= §01 LENSES ======================= -->
+    <section class="sec wide" id="lenses">
+      <h2><span class="n">01</span> Four Lenses on One Rate</h2>
+
+      <div class="heromult" id="heromult">
+        <div class="lens-grid">
+
+          <!-- Panel 1: Capacity $/GB-hr -->
+          <div class="lens-panel">
+            <header class="lp-head">
+              <div class="lp-row">
+                <span class="lp-name">Capacity</span>
+                <span class="lp-unit">$ / GB-hr</span>
+                <span class="lp-spread">spread 56%</span>
+              </div>
+              <p class="lp-kick">what the chip can hold — <span class="kx">the size of model and context it can host</span></p>
+            </header>
+            <svg viewBox="0 0 240 210" role="img" aria-label="Capacity lens: dollars per gigabyte of HBM per hour against generation age. Values scatter from 0.0225 to 0.0403; cross-generation spread 56 percent.">
+              <line x1="36" x2="228" y1="98.4" y2="98.4" class="grid"/>
+              <line x1="36" x2="228" y1="30.9" y2="30.9" class="grid"/>
+              <text x="32" y="101.4" class="tick" text-anchor="end">.02</text>
+              <text x="32" y="33.9" class="tick" text-anchor="end">.04</text>
+              <line x1="36" x2="228" y1="166" y2="166" class="axisln"/>
+              <text x="36" y="180" class="tick" text-anchor="middle">0y</text>
+              <text x="128.9" y="180" class="tick" text-anchor="middle">3y</text>
+              <text x="221.8" y="180" class="tick" text-anchor="middle">6y</text>
+              <g class="gdot g-B300"><circle class="hit" cx="60.8" cy="73.8" r="13" tabindex="0" data-gen="B300" aria-label="B300, capacity lens, 2.7 cents per GB-hour"/><circle class="pt pt-blackwell" cx="60.8" cy="73.8" r="4.5"/><text x="60.8" y="87.8" class="ptlab lab-blackwell" text-anchor="middle">B300</text></g>
+              <g class="gdot g-B200"><circle class="hit" cx="79.4" cy="36.3" r="13" tabindex="0" data-gen="B200" aria-label="B200, capacity lens, 3.8 cents per GB-hour"/><circle class="pt pt-blackwell" cx="79.4" cy="36.3" r="4.5"/><text x="79.4" y="28.3" class="ptlab lab-blackwell" text-anchor="middle">B200</text></g>
+              <g class="gdot g-H200"><circle class="hit" cx="101" cy="66" r="13" tabindex="0" data-gen="H200" aria-label="H200, capacity lens, 3.0 cents per GB-hour"/><circle class="pt pt-hopper" cx="101" cy="66" r="4.5"/><text x="109" y="69" class="ptlab lab-hopper" text-anchor="start">H200</text></g>
+              <g class="gdot g-H100"><circle class="hit" cx="150.6" cy="29.9" r="13" tabindex="0" data-gen="H100" aria-label="H100, capacity lens, 4.0 cents per GB-hour"/><circle class="pt pt-hopper" cx="150.6" cy="29.9" r="4.5"/><text x="150.6" y="22" class="ptlab lab-hopper" text-anchor="middle">H100</text></g>
+              <g class="gdot g-A100"><circle class="hit" cx="212.5" cy="90" r="13" tabindex="0" data-gen="A100" aria-label="A100, capacity lens, 2.25 cents per GB-hour"/><circle class="pt pt-ampere" cx="212.5" cy="90" r="4.5"/><text x="204.5" y="93" class="ptlab lab-ampere" text-anchor="end">A100</text></g>
+            </svg>
+          </div>
+
+          <!-- Panel 2: Bandwidth $/TB/s-hr — the flat one -->
+          <div class="lens-panel lp-flat">
+            <header class="lp-head">
+              <div class="lp-row">
+                <span class="lp-name">Bandwidth</span>
+                <span class="lp-unit">$ / TB/s-hr</span>
+                <span class="lp-spread">spread 12%</span>
+              </div>
+              <p class="lp-kick">how fast it moves data — <span class="kx">the dimension inference workloads buy</span></p>
+            </header>
+            <svg viewBox="0 0 240 210" role="img" aria-label="Bandwidth lens: dollars per terabyte-per-second of memory bandwidth per hour against generation age. All five generations sit inside a narrow band from 0.87 to 0.98; cross-generation spread 12 percent.">
+              <rect x="36" y="24.1" width="192" height="16" class="bandfill"/>
+              <line x1="36" x2="228" y1="32.8" y2="32.8" class="bandmean"/>
+              <line x1="36" x2="228" y1="93.6" y2="93.6" class="grid"/>
+              <line x1="36" x2="228" y1="21.2" y2="21.2" class="grid"/>
+              <text x="32" y="96.6" class="tick" text-anchor="end">.50</text>
+              <text x="32" y="24.2" class="tick" text-anchor="end">1.00</text>
+              <line x1="36" x2="228" y1="166" y2="166" class="axisln"/>
+              <text x="36" y="180" class="tick" text-anchor="middle">0y</text>
+              <text x="128.9" y="180" class="tick" text-anchor="middle">3y</text>
+              <text x="221.8" y="180" class="tick" text-anchor="middle">6y</text>
+              <g class="gdot g-B300"><circle class="hit" cx="60.8" cy="24.1" r="13" tabindex="0" data-gen="B300" aria-label="B300, bandwidth lens, 98 cents per TB/s-hour"/><circle class="pt pt-blackwell" cx="60.8" cy="24.1" r="4.5"/></g>
+              <g class="gdot g-B200"><circle class="hit" cx="79.4" cy="40.1" r="13" tabindex="0" data-gen="B200" aria-label="B200, bandwidth lens, 87 cents per TB/s-hour"/><circle class="pt pt-blackwell" cx="79.4" cy="40.1" r="4.5"/></g>
+              <g class="gdot g-H200"><circle class="hit" cx="101" cy="40.1" r="13" tabindex="0" data-gen="H200" aria-label="H200, bandwidth lens, 87 cents per TB/s-hour"/><circle class="pt pt-hopper" cx="101" cy="40.1" r="4.5"/></g>
+              <g class="gdot g-H100"><circle class="hit" cx="150.6" cy="27" r="13" tabindex="0" data-gen="H100" aria-label="H100, bandwidth lens, 96 cents per TB/s-hour"/><circle class="pt pt-hopper" cx="150.6" cy="27" r="4.5"/></g>
+              <g class="gdot g-A100"><circle class="hit" cx="212.5" cy="35.7" r="13" tabindex="0" data-gen="A100" aria-label="A100, bandwidth lens, 90 cents per TB/s-hour"/><circle class="pt pt-ampere" cx="212.5" cy="35.7" r="4.5"/></g>
+            </svg>
+            <div class="lp-foot">flattest cross-section — see §02</div>
+          </div>
+
+          <!-- Panel 3: Compute $/PFLOP-hr -->
+          <div class="lens-panel">
+            <header class="lp-head">
+              <div class="lp-row">
+                <span class="lp-name">Compute</span>
+                <span class="lp-unit">$ / PFLOP-hr</span>
+                <span class="lp-spread">spread 68%</span>
+              </div>
+              <p class="lp-kick">how fast it does arithmetic — <span class="kx">training speed</span></p>
+            </header>
+            <svg viewBox="0 0 240 210" role="img" aria-label="Compute lens: dollars per dense BF16 petaflop per hour against generation age. Values fan out from 3.1 to 5.8, rising with age; cross-generation spread 68 percent.">
+              <line x1="36" x2="228" y1="119.2" y2="119.2" class="grid"/>
+              <line x1="36" x2="228" y1="72.5" y2="72.5" class="grid"/>
+              <line x1="36" x2="228" y1="25.7" y2="25.7" class="grid"/>
+              <text x="32" y="122.2" class="tick" text-anchor="end">$2</text>
+              <text x="32" y="75.5" class="tick" text-anchor="end">$4</text>
+              <text x="32" y="28.7" class="tick" text-anchor="end">$6</text>
+              <line x1="36" x2="228" y1="166" y2="166" class="axisln"/>
+              <text x="36" y="180" class="tick" text-anchor="middle">0y</text>
+              <text x="128.9" y="180" class="tick" text-anchor="middle">3y</text>
+              <text x="221.8" y="180" class="tick" text-anchor="middle">6y</text>
+              <g class="gdot g-B300"><circle class="hit" cx="60.8" cy="84.2" r="13" tabindex="0" data-gen="B300" aria-label="B300, compute lens, about 3.5 dollars per PFLOP-hour"/><circle class="pt pt-blackwell" cx="60.8" cy="84.2" r="4.5"/></g>
+              <g class="gdot g-B200"><circle class="hit" cx="79.4" cy="93.5" r="13" tabindex="0" data-gen="B200" aria-label="B200, compute lens, 3.1 dollars per PFLOP-hour"/><circle class="pt pt-blackwell" cx="79.4" cy="93.5" r="4.5"/></g>
+              <g class="gdot g-H200"><circle class="hit" cx="101" cy="67.8" r="13" tabindex="0" data-gen="H200" aria-label="H200, compute lens, 4.2 dollars per PFLOP-hour"/><circle class="pt pt-hopper" cx="101" cy="67.8" r="4.5"/></g>
+              <g class="gdot g-H100"><circle class="hit" cx="150.6" cy="88.8" r="13" tabindex="0" data-gen="H100" aria-label="H100, compute lens, 3.3 dollars per PFLOP-hour"/><circle class="pt pt-hopper" cx="150.6" cy="88.8" r="4.5"/></g>
+              <g class="gdot g-A100"><circle class="hit" cx="212.5" cy="30.4" r="13" tabindex="0" data-gen="A100" aria-label="A100, compute lens, 5.8 dollars per PFLOP-hour"/><circle class="pt pt-ampere" cx="212.5" cy="30.4" r="4.5"/></g>
+            </svg>
+          </div>
+
+          <!-- Panel 4: Power $/kW-hr -->
+          <div class="lens-panel">
+            <header class="lp-head">
+              <div class="lp-row">
+                <span class="lp-name">Power</span>
+                <span class="lp-unit">$ / kW-hr</span>
+                <span class="lp-spread">spread 43%</span>
+              </div>
+              <p class="lp-kick">what it costs to keep lit — <span class="kx">rent per watt against facility cost per watt</span></p>
+            </header>
+            <svg viewBox="0 0 240 210" role="img" aria-label="Power lens: dollars per kilowatt of TDP per hour against generation age. Values sort into two levels, 4.50 to 4.60 and 5.97 to 6.92; cross-generation spread 43 percent.">
+              <line x1="36" x2="228" y1="125.5" y2="125.5" class="grid"/>
+              <line x1="36" x2="228" y1="84.9" y2="84.9" class="grid"/>
+              <line x1="36" x2="228" y1="44.4" y2="44.4" class="grid"/>
+              <text x="32" y="128.5" class="tick" text-anchor="end">$2</text>
+              <text x="32" y="87.9" class="tick" text-anchor="end">$4</text>
+              <text x="32" y="47.4" class="tick" text-anchor="end">$6</text>
+              <line x1="36" x2="228" y1="166" y2="166" class="axisln"/>
+              <text x="36" y="180" class="tick" text-anchor="middle">0y</text>
+              <text x="128.9" y="180" class="tick" text-anchor="middle">3y</text>
+              <text x="221.8" y="180" class="tick" text-anchor="middle">6y</text>
+              <g class="gdot g-B300"><circle class="hit" cx="60.8" cy="44.4" r="13" tabindex="0" data-gen="B300" aria-label="B300, power lens, about 6 dollars per kilowatt-hour of TDP"/><circle class="pt pt-blackwell" cx="60.8" cy="44.4" r="4.5"/></g>
+              <g class="gdot g-B200"><circle class="hit" cx="79.4" cy="25.8" r="13" tabindex="0" data-gen="B200" aria-label="B200, power lens, 6.92 dollars per kilowatt-hour of TDP"/><circle class="pt pt-blackwell" cx="79.4" cy="25.8" r="4.5"/></g>
+              <g class="gdot g-H200"><circle class="hit" cx="101" cy="45" r="13" tabindex="0" data-gen="H200" aria-label="H200, power lens, 5.97 dollars per kilowatt-hour of TDP"/><circle class="pt pt-hopper" cx="101" cy="45" r="4.5"/></g>
+              <g class="gdot g-H100"><circle class="hit" cx="150.6" cy="72.8" r="13" tabindex="0" data-gen="H100" aria-label="H100, power lens, 4.60 dollars per kilowatt-hour of TDP"/><circle class="pt pt-hopper" cx="150.6" cy="72.8" r="4.5"/></g>
+              <g class="gdot g-A100"><circle class="hit" cx="212.5" cy="74.8" r="13" tabindex="0" data-gen="A100" aria-label="A100, power lens, 4.50 dollars per kilowatt-hour of TDP"/><circle class="pt pt-ampere" cx="212.5" cy="74.8" r="4.5"/></g>
+            </svg>
+          </div>
+
+        </div>
+        <div class="tip" id="hero-tip" role="status"></div>
+      </div>
+
+      <div class="hero-legend">
+        <span><span class="dotk dk-blackwell"></span>Blackwell</span>
+        <span><span class="dotk dk-hopper"></span>Hopper</span>
+        <span><span class="dotk dk-ampere"></span>Ampere</span>
+        <span class="note">same horizontal position = same generation in every panel · hover or focus any dot for all four readings</span>
+      </div>
+
+      <p class="tfoot">
+        Neocloud (T2) guaranteed on-demand, US, generations on age (x, years) against each lens (y, from zero).
+        Spread = (max − min) ÷ mean across the five generations. Example prints · {PRINT_DATE} · rates from the
+        {SNAP_DATE} snapshot. Headline stat per published rule (mean where n ≥ 10, else median).
+      </p>
+
+      <p class="lede">
+        One observed number underlies every panel: the Neocloud guaranteed on-demand rate, in dollars per
+        GPU-hour. Each panel divides that rate by one spec-sheet denominator — and where a denominator makes
+        the cross-section <strong>flat</strong>, that denominator is the dimension the market prices.
+      </p>
+
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr><th>Generation</th><th>Age</th><th class="num">$/GPU-hr</th><th class="num">n</th><th class="num">$/GB-hr</th><th class="num">$/TB/s-hr</th><th class="num">$/PFLOP-hr</th><th class="num">$/kW-hr</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="gen">B300</td><td class="dim">~0.8y</td><td class="num strong">$7.85</td><td class="num dim">5</td><td class="num">0.0273</td><td class="num">0.98</td><td class="num">~3.5</td><td class="num">~6.0</td></tr>
+            <tr><td class="gen">B200</td><td class="dim">~1.4y</td><td class="num strong">$6.92</td><td class="num dim">8</td><td class="num">0.0384</td><td class="num">0.87</td><td class="num">3.1</td><td class="num">6.92</td></tr>
+            <tr><td class="gen">H200</td><td class="dim">~2.1y</td><td class="num strong">$4.18</td><td class="num dim">14</td><td class="num">0.0296</td><td class="num">0.87</td><td class="num">4.2</td><td class="num">5.97</td></tr>
+            <tr><td class="gen">H100</td><td class="dim">~3.7y</td><td class="num strong">$3.22</td><td class="num dim">20</td><td class="num">0.0403</td><td class="num">0.96</td><td class="num">3.3</td><td class="num">4.60</td></tr>
+            <tr><td class="gen">A100 80GB</td><td class="dim">~5.7y</td><td class="num strong">$1.80</td><td class="num dim">13</td><td class="num">0.0225</td><td class="num">0.90</td><td class="num">5.8</td><td class="num">4.50</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sid">
+        <b>CRI-T2-&#123;chip&#125;-&#123;form&#125;-GTD-OD-US-&#123;GB|BW|PF|KW&#125;</b> · derived series carry the underlying citable
+        cell in the first seven segments; strip the lens suffix to reach the parent. $/GB-hr computed from
+        registry HBM capacity (80 / 80 / 141 / 180 / 288 GB).
+      </p>
+    </section>
+
+    <!-- ======================= §02 BANDWIDTH BAND ======================= -->
+    <section class="sec wide" id="bandwidth">
+      <h2><span class="n">02</span> The Bandwidth Band</h2>
+      <p>
+        Re-denominated per unit of memory bandwidth, datacenter silicon from eight months to 5.7 years of
+        age clears inside <strong>$0.87–0.98 per TB/s-hour</strong> — ±6% around a $0.92 mean. The band is
+        the test, published daily: a spread that holds tight means the age discount remains priced away;
+        a widening spread is the falsifiable marker firing. Members are disclosed on every print.
+      </p>
+
+      <figure class="chart-fig">
+        <div class="chart-box" id="bw-chart">
+          <svg viewBox="0 0 680 300" role="img"
+               aria-label="Bandwidth band, zoomed axis from 0.80 to 1.02 dollars per TB/s-hour. A shaded band spans 0.87 to 0.98 with a mean line at 0.92. Five labeled generation dots sit inside the band.">
+            <line x1="46" x2="540" y1="250" y2="250" class="grid"/>
+            <line x1="46" x2="540" y1="196.8" y2="196.8" class="grid"/>
+            <line x1="46" x2="540" y1="143.6" y2="143.6" class="grid"/>
+            <line x1="46" x2="540" y1="90.5" y2="90.5" class="grid"/>
+            <line x1="46" x2="540" y1="37.3" y2="37.3" class="grid"/>
+            <text x="38" y="253" class="tick" text-anchor="end">0.80</text>
+            <text x="38" y="199.8" class="tick" text-anchor="end">0.85</text>
+            <text x="38" y="146.6" class="tick" text-anchor="end">0.90</text>
+            <text x="38" y="93.5" class="tick" text-anchor="end">0.95</text>
+            <text x="38" y="40.3" class="tick" text-anchor="end">1.00</text>
+
+            <rect x="46" y="58.5" width="494" height="117" class="bw-band"/>
+            <line x1="46" x2="540" y1="58.5" y2="58.5" class="bw-edge"/>
+            <line x1="46" x2="540" y1="175.5" y2="175.5" class="bw-edge"/>
+            <line x1="46" x2="540" y1="122.4" y2="122.4" class="bandmean"/>
+
+            <text x="548" y="61.5" class="annot">0.98 — max</text>
+            <text x="548" y="125.4" class="annot annot-acc">0.92 — mean ±6%</text>
+            <text x="548" y="178.5" class="annot">0.87 — min</text>
+
+            <text x="46" y="288" class="tick" text-anchor="middle">0y</text>
+            <text x="205.4" y="288" class="tick" text-anchor="middle">2y</text>
+            <text x="364.7" y="288" class="tick" text-anchor="middle">4y</text>
+            <text x="524.1" y="288" class="tick" text-anchor="middle">6y</text>
+            <text x="540" y="288" class="tick" text-anchor="start">  age</text>
+            <text x="548" y="253" class="zoomnote">axis zoomed:</text>
+            <text x="548" y="264" class="zoomnote">$0.80–1.02, not to zero</text>
+
+            <line id="bw-cross" class="crosshair" x1="0" x2="0" y1="16" y2="250" style="display:none"/>
+
+            <g><circle class="pt pt-blackwell" cx="109.7" cy="58.5" r="5.5"/><text x="109.7" y="47.5" class="ptlab lab-blackwell" text-anchor="middle">B300 0.98</text></g>
+            <g><circle class="pt pt-blackwell" cx="157.5" cy="175.5" r="5.5"/><text x="157.5" y="192.5" class="ptlab lab-blackwell" text-anchor="middle">B200 0.87</text></g>
+            <g><circle class="pt pt-hopper" cx="213.3" cy="175.5" r="5.5"/><text x="216.3" y="192.5" class="ptlab lab-hopper" text-anchor="start">H200 0.87</text></g>
+            <g><circle class="pt pt-hopper" cx="340.8" cy="79.8" r="5.5"/><text x="340.8" y="68.8" class="ptlab lab-hopper" text-anchor="middle">H100 SXM 0.96</text></g>
+            <g><circle class="pt pt-ampere" cx="500.2" cy="143.6" r="5.5"/><text x="500.2" y="132.6" class="ptlab lab-ampere" text-anchor="middle">A100 0.90</text></g>
+          </svg>
+          <div class="tip" id="bw-tip"></div>
+        </div>
+        <figcaption class="tfoot">
+          $/TB/s-hr against generation age; band = min–max across qualifying members, mean line at $0.92.
+          Denominator: vendor nameplate memory bandwidth. Example prints · {PRINT_DATE} · rates from the
+          {SNAP_DATE} snapshot.
+        </figcaption>
+      </figure>
+
+      <!-- honest empty-history strip -->
+      <div class="hist-strip" aria-label="Band history: series begins 2026-07-07, no history exists yet">
+        <span class="hist-eye">Band history</span>
+        <svg viewBox="0 0 680 92">
+          <line x1="24" x2="656" y1="66" y2="66" class="axisln"/>
+          <line x1="40" y1="60" x2="40" y2="72" class="axisln"/>
+          <circle cx="40" cy="40" r="5" class="hist-dot"/>
+          <text x="52" y="36" class="hist-lab-ink">2026-07-07 · first print · band mean $0.92 · spread 12%</text>
+          <text x="40" y="82" class="hist-lab" text-anchor="middle">series begins</text>
+          <line x1="194" y1="62" x2="194" y2="70" class="grid"/>
+          <line x1="348" y1="62" x2="348" y2="70" class="grid"/>
+          <line x1="502" y1="62" x2="502" y2="70" class="grid"/>
+          <text x="194" y="82" class="hist-lab" text-anchor="middle">+30d</text>
+          <text x="348" y="82" class="hist-lab" text-anchor="middle">+60d</text>
+          <text x="502" y="82" class="hist-lab" text-anchor="middle">+90d</text>
+          <text x="656" y="56" class="hist-lab" text-anchor="end">history accrues from launch — nothing is plotted here because nothing exists yet</text>
+        </svg>
+      </div>
+      <p class="sid"><b>CRB-T2-BW-ALL-OD-US</b> · band row fields: band_min · band_max · band_mean · band_spread_pct · n_chips · member_chips. Emission gate n_chips ≥ 3, all members publication-qualified. Research-grade at launch (Shadow → Provisional).</p>
+    </section>
+
+    <!-- ======================= §03 WATT-RENT ======================= -->
+    <section class="sec wide" id="watt-rent">
+      <h2><span class="n">03</span> Watt-Rent by Shell Class</h2>
+      <p>
+        Per unit of nameplate power, the panel sorts by shell class rather than by age — here the
+        dispersion is the finding. Consumer silicon with no datacenter bundle rents near
+        <strong>$1 per kW-hr</strong>; air-cooled datacenter silicon is flat at
+        <strong>$4.50–4.66</strong> across five years of age (A100 = H100 = L40S per watt); liquid-class
+        silicon rents at <strong>$6–7</strong>. Watt-rent prices the shell a chip can occupy.
+      </p>
+
+      <figure class="chart-fig">
+        <div class="chart-box">
+          <svg viewBox="0 0 680 230" role="img"
+               aria-label="Watt-rent by shell class: three lanes on a dollars-per-kilowatt-hour axis. Liquid-class chips cluster at 6 to 7 dollars, air-cooled datacenter chips cluster tightly at 4.50 to 4.66, consumer and marketplace chips near 1 dollar.">
+            <line x1="120" y1="14" x2="120" y2="196" class="grid"/>
+            <line x1="192" y1="14" x2="192" y2="196" class="grid"/>
+            <line x1="264" y1="14" x2="264" y2="196" class="grid"/>
+            <line x1="336" y1="14" x2="336" y2="196" class="grid"/>
+            <line x1="408" y1="14" x2="408" y2="196" class="grid"/>
+            <line x1="480" y1="14" x2="480" y2="196" class="grid"/>
+            <line x1="552" y1="14" x2="552" y2="196" class="grid"/>
+            <line x1="624" y1="14" x2="624" y2="196" class="grid"/>
+            <line x1="120" x2="660" y1="196" y2="196" class="axisln"/>
+            <text x="120" y="214" class="tick" text-anchor="middle">$0</text>
+            <text x="192" y="214" class="tick" text-anchor="middle">$1</text>
+            <text x="264" y="214" class="tick" text-anchor="middle">$2</text>
+            <text x="336" y="214" class="tick" text-anchor="middle">$3</text>
+            <text x="408" y="214" class="tick" text-anchor="middle">$4</text>
+            <text x="480" y="214" class="tick" text-anchor="middle">$5</text>
+            <text x="552" y="214" class="tick" text-anchor="middle">$6</text>
+            <text x="624" y="214" class="tick" text-anchor="middle">$7</text>
+            <text x="660" y="214" class="tick" text-anchor="end">$/kW-hr</text>
+
+            <text x="8" y="34" class="tick">LIQUID-CLASS</text>
+            <text x="8" y="46" class="tick" opacity="0.7">$6–7</text>
+            <text x="8" y="94" class="tick">AIR-COOLED DC</text>
+            <text x="8" y="106" class="tick" opacity="0.7">$4.50–4.66</text>
+            <text x="8" y="154" class="tick">MKT / CONSUMER</text>
+            <text x="8" y="166" class="tick" opacity="0.7">~$1.0–1.3</text>
+
+            <rect x="552" y="20" width="72" height="36" class="bandfill"/>
+            <g><circle class="pt pt-blackwell" cx="618.2" cy="38" r="5"/><text x="616" y="16" class="ptlab lab-blackwell" text-anchor="middle">B200 6.92</text></g>
+            <g><circle class="pt pt-blackwell" cx="552" cy="47" r="5"/><text x="552" y="64" class="ptlab lab-blackwell" text-anchor="middle">B300 ~6.0</text></g>
+            <g><circle class="pt pt-hollow ph-hopper" cx="549.8" cy="29" r="5"/><text x="540" y="18" class="ptlab lab-hopper" text-anchor="end">H200 5.97 †</text></g>
+
+            <rect x="444" y="80" width="11.5" height="36" class="airband"/>
+            <g><circle class="pt pt-ampere" cx="444" cy="108" r="5"/><text x="432" y="112" class="ptlab lab-ampere" text-anchor="end">A100 4.50 · 5.7y</text></g>
+            <g><circle class="pt pt-hopper" cx="451.2" cy="98" r="5"/><text x="439" y="101" class="ptlab lab-hopper" text-anchor="end">H100 4.60 · 3.7y</text></g>
+            <g><circle class="pt pt-ada" cx="455.5" cy="88" r="5"/><text x="466" y="86" class="ptlab lab-ada" text-anchor="start">L40S 4.66 · 2.7y</text></g>
+            <g><circle class="pt pt-hollow ph-ada" cx="539.8" cy="108" r="5"/><text x="548" y="112" class="ptlab lab-ada" text-anchor="start">L4 5.83 ‡</text></g>
+
+            <rect x="192" y="140" width="14.4" height="36" class="bandfill"/>
+            <text x="214" y="150" class="ptlab lab-dim" text-anchor="start">5090 / 4090 / 3090 · $1.0–1.2 (Mkt)</text>
+            <g><circle class="pt pt-ampere" cx="213.6" cy="168" r="5"/><text x="222" y="172" class="ptlab lab-ampere" text-anchor="start">A40 ~1.3 (Mkt)</text></g>
+          </svg>
+        </div>
+        <figcaption class="tfoot">
+          Revenue per kW of nameplate TDP, by shell class — gross rent per unit of power envelope, not margin.
+          † H200 hosts in dense-air or liquid shells. ‡ L4 is an edge part — any air shell — and sits outside
+          the datacenter air band. Marketplace rows (Mkt) are Marketplace-segment prints, indicative.
+          Example prints · {PRINT_DATE} · rates from the {SNAP_DATE} snapshot.
+        </figcaption>
+      </figure>
+
+      <details class="tbl-details">
+        <summary>table view — watt-rent panel</summary>
+        <div class="twrap">
+          <table>
+            <thead><tr><th>Generation</th><th class="num">TDP</th><th class="num">$/kW-hr</th><th>Shell class</th></tr></thead>
+            <tbody>
+              <tr><td class="gen">B200</td><td class="num dim">1.0 kW</td><td class="num strong">6.92</td><td class="dim">liquid</td></tr>
+              <tr><td class="gen">B300</td><td class="num dim">~1.3 kW</td><td class="num strong">~6.0</td><td class="dim">liquid</td></tr>
+              <tr><td class="gen">H200</td><td class="num dim">0.7 kW</td><td class="num strong">5.97</td><td class="dim">dense air / liquid</td></tr>
+              <tr><td class="gen">L4 (Mkt)</td><td class="num dim">72 W</td><td class="num strong">5.83</td><td class="dim">any air / edge</td></tr>
+              <tr><td class="gen">L40S</td><td class="num dim">350 W</td><td class="num strong">4.66</td><td class="dim">air</td></tr>
+              <tr><td class="gen">H100</td><td class="num dim">0.7 kW</td><td class="num strong">4.60</td><td class="dim">air</td></tr>
+              <tr><td class="gen">A100 80GB</td><td class="num dim">400 W</td><td class="num strong">4.50</td><td class="dim">air</td></tr>
+              <tr><td class="gen">A40 (Mkt)</td><td class="num dim">300 W</td><td class="num strong">~1.3</td><td class="dim">air</td></tr>
+              <tr><td class="gen">5090 / 4090 / 3090 (Mkt)</td><td class="num dim">350–575 W</td><td class="num strong">1.0–1.2</td><td class="dim">consumer</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+      <p class="sid"><b>CRB-T2-KW-AIR-OD-US</b> · <b>CRB-T2-KW-LIQ-OD-US</b> · cohort = cooling_class (air | liquid); consumer prints are Marketplace-segment context, not band members.</p>
+    </section>
+
+    <!-- ======================= §04 ECONOMIC LIFE ======================= -->
+    <section class="sec wide" id="economic-life">
+      <h2><span class="n">04</span> Economic Life — the Breakeven Altimeter</h2>
+      <p>
+        Watt-rent and cash operating cost are the same unit. A chip exits economic life when its
+        watt-rent decays to the cash boundary beneath it — so one log-scale strip reads as an
+        altimeter: today's rent bands above, the cash operating boundary below, and the gap between
+        them is distance to shutdown. Air-cooled silicon today covers its cash operating cost
+        <strong>≈5–7×</strong>; the consumer band near $1 is the visible preview of late life,
+        close above the boundary.
+      </p>
+
+      <div class="identity">
+        <b>Cost-side basis.</b> Chip TDP understates system draw: an 8×H100 HGX server draws
+        ≈10.2 kW against 5.6 kW of chip TDP — a ≈1.8× system factor (CPUs, NVSwitch, fans).
+        Every cost rung below is restated per chip-TDP-kW through that factor, so both sides of the
+        altimeter share the watt-rent lens's denominator. The factor is a disclosed election.
+      </div>
+
+      <figure class="chart-fig">
+        <div class="chart-box">
+          <svg viewBox="0 0 760 520" role="img"
+               aria-label="Breakeven altimeter: a vertical log scale in dollars per TDP-kilowatt-hour. Rent bands sit high — liquid at 6 to 7, air-cooled at 4.50 to 4.66, consumer near 1. The cash operating boundary sits low: a combined power-plus-colo band at 0.64 to 0.87, with its components — wholesale colocation asking at 0.42 to 0.66 and a power-only floor at 0.22 — shown separately beneath. A bracket marks about 5 to 7 times coverage between the air band and the cash boundary.">
+            <text x="200" y="18" class="tick" text-anchor="start">$ / TDP-kW-hr · log scale</text>
+
+            <line x1="194" x2="200" y1="30" y2="30" class="axisln"/><text x="188" y="33" class="tick" text-anchor="end">$8</text>
+            <line x1="194" x2="200" y1="79.4" y2="79.4" class="axisln"/><text x="188" y="82.4" class="tick" text-anchor="end">$5</text>
+            <line x1="194" x2="200" y1="175.5" y2="175.5" class="axisln"/><text x="188" y="178.5" class="tick" text-anchor="end">$2</text>
+            <line x1="194" x2="200" y1="248.3" y2="248.3" class="axisln"/><text x="188" y="251.3" class="tick" text-anchor="end">$1</text>
+            <line x1="194" x2="200" y1="321" y2="321" class="axisln"/><text x="188" y="324" class="tick" text-anchor="end">$0.50</text>
+            <line x1="194" x2="200" y1="417.2" y2="417.2" class="axisln"/><text x="188" y="420.2" class="tick" text-anchor="end">$0.20</text>
+            <line x1="194" x2="200" y1="490" y2="490" class="axisln"/><text x="188" y="493" class="tick" text-anchor="end">$0.10</text>
+
+            <rect x="200" y="30" width="160" height="460" class="strip-frame"/>
+
+            <rect x="201" y="43.9" width="158" height="16.2" class="rent-liq"/>
+            <line x1="204" x2="216" y1="45.5" y2="45.5" class="mt-blackwell"/>
+            <line x1="204" x2="216" y1="60.1" y2="60.1" class="mt-blackwell"/>
+            <line x1="204" x2="216" y1="60.7" y2="60.7" class="mt-hopper"/>
+
+            <rect x="201" y="86.7" width="158" height="3.7" class="rent-air"/>
+            <line x1="204" x2="216" y1="86.7" y2="86.7" class="mt-ada"/>
+            <line x1="204" x2="216" y1="88.1" y2="88.1" class="mt-hopper"/>
+            <line x1="204" x2="216" y1="90.4" y2="90.4" class="mt-ampere"/>
+
+            <rect x="201" y="229.1" width="158" height="19.2" class="rent-con"/>
+
+            <line x1="280" y1="108" x2="280" y2="246" class="decayln"/>
+            <path d="M 276 240 L 280 250 L 284 240 Z" class="decayhead"/>
+            <text x="270" y="177" class="tick" text-anchor="middle" transform="rotate(-90 270 177)">rent decays toward cost</text>
+
+            <rect x="201" y="262.9" width="158" height="32.2" class="cash-band"/>
+            <line x1="201" x2="359" y1="262.9" y2="262.9" class="cash-edge"/>
+
+            <rect x="201" y="291.9" width="158" height="47.5" class="comp-fill"/>
+            <rect x="201" y="291.9" width="158" height="47.5" class="comp-frame"/>
+            <line x1="201" x2="359" y1="407.2" y2="407.2" class="floorln"/>
+
+            <line x1="166" y1="90.4" x2="166" y2="262.9" class="bracketln"/>
+            <line x1="160" x2="172" y1="90.4" y2="90.4" class="bracketln"/>
+            <line x1="160" x2="172" y1="262.9" y2="262.9" class="bracketln"/>
+            <text x="157" y="176.7" class="tick" text-anchor="middle" transform="rotate(-90 157 176.7)">≈5–7× cash coverage</text>
+
+            <line x1="360" x2="400" y1="52" y2="52" class="grid"/>
+            <text x="404" y="49" class="annot annot-acc">LIQUID-CLASS RENT $6–7</text>
+            <text x="404" y="62" class="annot">B200 6.92 · B300 ~6.0 · H200 5.97</text>
+
+            <line x1="360" x2="400" y1="88.5" y2="88.5" class="grid"/>
+            <text x="404" y="86" class="annot annot-acc">AIR-COOLED DC RENT $4.50–4.66</text>
+            <text x="404" y="99" class="annot">A100 4.50 · H100 4.60 · L40S 4.66 — flat across 5 yrs</text>
+
+            <line x1="360" x2="400" y1="238.7" y2="238.7" class="grid"/>
+            <text x="404" y="236" class="annot annot-acc">CONSUMER RENT ~$1.0–1.2</text>
+            <text x="404" y="249" class="annot">no datacenter bundle — the preview of late life</text>
+
+            <line x1="360" x2="400" y1="279" y2="279" class="grid"/>
+            <text x="404" y="276" class="annot annot-neg">SHUTDOWN BOUNDARY — CASH COST ≈$0.64–0.87</text>
+            <text x="404" y="289" class="annot">power + colo · sunk capex excluded · ≈$0.45–0.61 per H100-hr</text>
+            <text x="404" y="302" class="annot">before staffing / ops elections</text>
+
+            <line x1="360" x2="400" y1="315.7" y2="315.7" class="grid"/>
+            <text x="404" y="318" class="annot">COMPONENT — WHOLESALE COLO ASKING ≈$0.42–0.66</text>
+            <text x="404" y="331" class="annot">CBRE $165–265/kW-mo × 1.8 system draw</text>
+
+            <line x1="360" x2="400" y1="407.2" y2="407.2" class="grid"/>
+            <text x="404" y="404" class="annot">COMPONENT — POWER-ONLY FLOOR ≈$0.22</text>
+            <text x="404" y="417" class="annot">EIA 8.66¢/kWh × PUE 1.4 × 1.8 system draw</text>
+          </svg>
+        </div>
+        <figcaption class="tfoot">
+          Rent bands are CCIR prints (filled, member ticks at left edge); the cash boundary is a derivation
+          from disclosed elections (tinted), its components external reference data (outlined), cited inline.
+          Whether power is metered inside or beside the colo rate varies by contract — the power-only floor
+          and the colo asking band are therefore shown separately. All cost rungs per chip-TDP-kW via the
+          1.8× system factor. Example prints · {PRINT_DATE} · rates from the {SNAP_DATE} snapshot; cost
+          derivations verified 2026-07-07.
+        </figcaption>
+      </figure>
+
+      <div class="identity">
+        <b>The crossing identity.</b> rent per watt = band level × (chip TB/s ÷ chip kW).
+        Watt-rent <b>is</b> the chip's breakeven cash operating cost: economic life ends when watt-rent
+        decays to cash cost per TDP-kW — sunk capex excluded, which is why this boundary governs whether
+        an installed chip keeps running. Both sides are $/TDP-kW-hr. CCIR publishes the left side daily;
+        the cost side — colo terms, power price, staffing, the system factor, any decay election — is
+        the reader's.
+      </div>
+
+      <div class="worked">
+        <p class="weye">Worked illustration — hypothetical; every input elected by the reader</p>
+        <p>
+          Elect a cash operating boundary c = $0.75/TDP-kW-hr (inside the combined cash band above) and
+          a decay election g = 26%/yr (the cross-generation pace — see the caveat below). Air-band
+          watt-rent today ≈ $4.58/TDP-kW-hr.
+        </p>
+        <p class="wmath">years to crossing = ln(watt-rent ÷ c) ÷ g = ln(4.58 ÷ 0.75) ÷ 0.26 ≈ <b>7</b></p>
+        <p>
+          This is arithmetic on today's band against two elected inputs — a band-implied rent set against
+          an elected cash cost. It is not a projection of any rate, and CCIR publishes neither election.
+        </p>
+      </div>
+
+      <p>
+        <strong>The honest gap.</strong> The −26% per year slope is a cross-generation reading — the pace
+        of the bandwidth frontier across five generations on one date — not the band's own decay through
+        time, which is the parameter the crossing actually needs. No one has that parameter, because the
+        band has no published history. That is the argument for starting the series now: every month of
+        publication shrinks the one unmeasured input.
+      </p>
+    </section>
+
+    <!-- ======================= §05 METHOD ======================= -->
+    <section class="sec wide" id="method">
+      <h2><span class="n">05</span> Method &amp; Caveats</h2>
+
+      <p>
+        Normalized values equal the published parent series value divided by the disclosed constant.
+        The parent cell's pooling, stat, and gate decisions are inherited unchanged; denominators are
+        vendor nameplate constants from the silicon registry and are never restated — a correction is
+        a changelog entry, not a series break. Normalized series adopt the trimmed-mean stat
+        (T2, shadow phase) from first print.
+      </p>
+
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr><th>Lens</th><th>Denominator</th><th class="num">A100 80GB</th><th class="num">H100 SXM</th><th class="num">H200</th><th class="num">B200</th><th class="num">B300</th><th>Spec source</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="lens-cell"><span class="ln">Capacity · $/GB-hr</span><span class="lk">what the chip can hold — the size of model and context it can host</span></td>
+              <td class="dim">HBM capacity (GB)</td>
+              <td class="num">80</td><td class="num">80</td><td class="num">141</td><td class="num">180</td><td class="num">288</td>
+              <td class="dim wraps">vendor datasheet · spec_source pending registry ext.</td>
+            </tr>
+            <tr>
+              <td class="lens-cell"><span class="ln">Bandwidth · $/TB/s-hr</span><span class="lk">how fast it moves data — the dimension inference workloads buy</span></td>
+              <td class="dim">memory bandwidth (TB/s)</td>
+              <td class="num">2.0</td><td class="num">3.35</td><td class="num">4.8</td><td class="num">8.0</td><td class="num">~8.0</td>
+              <td class="dim wraps">vendor datasheet · spec_source pending registry ext.</td>
+            </tr>
+            <tr>
+              <td class="lens-cell"><span class="ln">Compute · $/PFLOP-hr</span><span class="lk">how fast it does arithmetic — training speed</span></td>
+              <td class="dim">dense BF16 (PFLOPS)</td>
+              <td class="num">0.31</td><td class="num">0.99</td><td class="num">0.99</td><td class="num">2.25</td><td class="num">~2.25</td>
+              <td class="dim wraps">vendor datasheet · dense, not sparse · pending</td>
+            </tr>
+            <tr>
+              <td class="lens-cell"><span class="ln">Power · $/kW-hr</span><span class="lk">what it costs to keep lit — rent per watt against facility cost per watt</span></td>
+              <td class="dim">TDP (kW)</td>
+              <td class="num">0.4</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">1.0</td><td class="num">~1.3</td>
+              <td class="dim wraps">vendor datasheet · spec_source pending registry ext.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sid">Denominators are variant-level: H100 SXM 3.35 TB/s and H100 PCIe 2.0 TB/s are different denominators. A chip without a disclosed denominator emits no row for that lens — no imputation.</p>
+
+      <div class="rulebox">
+        <p class="reye">Lens admission rule</p>
+        <p>
+          A lens is admitted when its denominator is a disclosed vendor nameplate constant, it answers a
+          question a credit reader has, and it tells a distinct story. Considered and excluded on record:
+          <strong>token throughput</strong> (measured, not nameplate), <strong>interconnect / fabric</strong>
+          (a cluster property with no per-chip denominator — the tier axis prices the fabric),
+          <strong>PUE-adjusted power</strong> (PUE is the reader's election), and
+          <strong>FP8 / FP4 precision variants</strong> (a precision election — disclosure, not columns).
+        </p>
+      </div>
+
+      <p><strong>Blind spots.</strong></p>
+      <ul>
+        <li>Denominators are nameplate constants — they capture none of a deployment's realized capacity, interconnect domain, or measured throughput.</li>
+        <li>System draw exceeds chip TDP (≈1.8× for HGX-class servers); TDP is the disclosed lens constant — delivered-power cost comparisons apply the system factor.</li>
+        <li>PUE, facility cost, and any decay election are the reader's; CCIR publishes prices, not the elections.</li>
+        <li>The cross-section is one date across generations, not a cohort through time; §04 states the consequence.</li>
+        <li>All numerators are posted list asks, not transactions; thin cells (n &lt; 3) are indicative.</li>
+      </ul>
+
+      <p class="sid">
+        Full construction: <a href="/documents/methodology">/documents/methodology</a> · underlying cells:
+        <a href="/explorer">/explorer</a> · the dated study these lenses generalize:
+        <a href="/research/gpu-age-curve">/research/gpu-age-curve</a>.
+      </p>
+    </section>
+
+  </section>
+
+  <script is:inline>
+    (function () {
+      'use strict';
+
+      /* ---------- hero: cross-panel generation highlight + tooltip ---------- */
+      var GENS = {
+        B300: { name: 'B300', age: '~0.8y', rate: '$7.85', n: 5,  gb: '$0.0273', bw: '$0.98', pf: '~$3.5', kw: '~$6.0' },
+        B200: { name: 'B200', age: '~1.4y', rate: '$6.92', n: 8,  gb: '$0.0384', bw: '$0.87', pf: '$3.1',  kw: '$6.92' },
+        H200: { name: 'H200', age: '~2.1y', rate: '$4.18', n: 14, gb: '$0.0296', bw: '$0.87', pf: '$4.2',  kw: '$5.97' },
+        H100: { name: 'H100', age: '~3.7y', rate: '$3.22', n: 20, gb: '$0.0403', bw: '$0.96', pf: '$3.3',  kw: '$4.60' },
+        A100: { name: 'A100 80GB', age: '~5.7y', rate: '$1.80', n: 13, gb: '$0.0225', bw: '$0.90', pf: '$5.8', kw: '$4.50' }
+      };
+      var hero = document.getElementById('heromult');
+      var heroTip = document.getElementById('hero-tip');
+      if (!hero || !heroTip) return;
+
+      function fillHeroTip(d) {
+        heroTip.textContent = '';
+        var head = document.createElement('strong');
+        head.textContent = d.name + ' · ' + d.age;
+        heroTip.appendChild(head);
+        var rows = [
+          ['rate', d.rate + '/GPU-hr (n=' + d.n + ')'],
+          ['capacity', d.gb + '/GB-hr'],
+          ['bandwidth', d.bw + '/TB/s-hr'],
+          ['compute', d.pf + '/PFLOP-hr'],
+          ['power', d.kw + '/kW-hr']
+        ];
+        rows.forEach(function (r) {
+          heroTip.appendChild(document.createElement('br'));
+          var lab = document.createElement('span');
+          lab.className = 'tn';
+          lab.textContent = r[0] + ' ';
+          heroTip.appendChild(lab);
+          heroTip.appendChild(document.createTextNode(r[1]));
+        });
+      }
+
+      function showHero(gen, cx, cy) {
+        var d = GENS[gen];
+        if (!d) return;
+        hero.dataset.hl = gen;
+        fillHeroTip(d);
+        heroTip.style.display = 'block';
+        var hr = hero.getBoundingClientRect();
+        var left = cx - hr.left + 14;
+        var top = cy - hr.top + 14;
+        if (left > hr.width - 190) left -= 210;
+        if (top > hr.height - 130) top -= 140;
+        heroTip.style.left = left + 'px';
+        heroTip.style.top = top + 'px';
+      }
+      function hideHero() {
+        delete hero.dataset.hl;
+        heroTip.style.display = 'none';
+      }
+
+      Array.prototype.forEach.call(hero.querySelectorAll('.hit'), function (el) {
+        el.addEventListener('pointermove', function (ev) {
+          showHero(el.getAttribute('data-gen'), ev.clientX, ev.clientY);
+        });
+        el.addEventListener('pointerleave', hideHero);
+        el.addEventListener('focus', function () {
+          var r = el.getBoundingClientRect();
+          showHero(el.getAttribute('data-gen'), r.left + r.width / 2, r.top + r.height / 2);
+        });
+        el.addEventListener('blur', hideHero);
+      });
+
+      /* ---------- §02 crosshair + tooltip (od-vs-committed pattern) ---------- */
+      var BW = [
+        { x: 109.7, gen: 'B300', v: '0.98', spec: '~8.0 TB/s', rate: '$7.85', n: 5 },
+        { x: 157.5, gen: 'B200', v: '0.87', spec: '8.0 TB/s',  rate: '$6.92', n: 8 },
+        { x: 213.3, gen: 'H200', v: '0.87', spec: '4.8 TB/s',  rate: '$4.18', n: 14 },
+        { x: 340.8, gen: 'H100 SXM', v: '0.96', spec: '3.35 TB/s', rate: '$3.22', n: 20 },
+        { x: 500.2, gen: 'A100 80GB', v: '0.90', spec: '2.0 TB/s', rate: '$1.80', n: 13 }
+      ];
+      var W2 = 680;
+      var box = document.getElementById('bw-chart');
+      var tip2 = document.getElementById('bw-tip');
+      var cross = document.getElementById('bw-cross');
+      if (!box || !tip2 || !cross) return;
+      var svg2 = box.querySelector('svg');
+
+      function fillBwTip(d) {
+        tip2.textContent = '';
+        var head = document.createElement('strong');
+        head.textContent = d.gen;
+        tip2.appendChild(head);
+        var rows = [
+          ['$/TB/s-hr ', d.v],
+          ['bandwidth ', d.spec],
+          ['underlying ', d.rate + '/GPU-hr'],
+          ['n ', String(d.n)]
+        ];
+        rows.forEach(function (r) {
+          tip2.appendChild(document.createElement('br'));
+          var lab = document.createElement('span');
+          lab.className = 'tn';
+          lab.textContent = r[0];
+          tip2.appendChild(lab);
+          tip2.appendChild(document.createTextNode(r[1]));
+        });
+      }
+
+      function showBw(ev) {
+        var r = svg2.getBoundingClientRect();
+        var relX = ((ev.clientX - r.left) / r.width) * W2;
+        var best = BW[0], bd = Math.abs(relX - BW[0].x);
+        for (var i = 1; i < BW.length; i++) {
+          var d = Math.abs(relX - BW[i].x);
+          if (d < bd) { bd = d; best = BW[i]; }
+        }
+        if (relX < 30 || relX > 560) { hideBw(); return; }
+        cross.setAttribute('x1', best.x);
+        cross.setAttribute('x2', best.x);
+        cross.style.display = '';
+        fillBwTip(best);
+        tip2.style.display = 'block';
+        var left = (best.x / W2) * r.width + 12;
+        if (left > r.width - 170) left -= 190;
+        tip2.style.left = left + 'px';
+        tip2.style.top = '18px';
+      }
+      function hideBw() {
+        tip2.style.display = 'none';
+        cross.style.display = 'none';
+      }
+      box.addEventListener('mousemove', showBw);
+      box.addEventListener('mouseleave', hideBw);
+    })();
+  </script>
+
+  <style>
+    .top { padding-top: 32px; padding-bottom: 40px; }
+    .page-head { max-width: 82ch; margin-bottom: 18px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+
+    /* sticky on-page jump bar (same pattern as /credit) */
+    .apps-navband {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+    }
+    .apps-nav-inner {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
+    .apps-nav-inner::-webkit-scrollbar { display: none; }
+    .apps-nav-link {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
+    #lenses, #bandwidth, #watt-rent, #economic-life, #method { scroll-margin-top: 52px; }
+
+    /* designation strip — single-sentence boundary element */
+    .designation {
+      border-top: 3px double var(--ink);
+      border-bottom: 3px double var(--ink);
+      padding: 13px 2px;
+      margin: 6px 0 34px;
+      max-width: 86ch;
+    }
+    .desig-main {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      font-style: italic;
+      line-height: 1.3;
+      margin: 0;
+      color: var(--ink);
+    }
+    .desig-main em { font-style: normal; color: var(--accent); font-weight: var(--weight-strong); }
+
+    /* sections */
+    .sec { margin: 44px 0; }
+    .sec h2 { font-size: var(--fs-xl); margin: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
+    .sec h2 .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; max-width: var(--measure-wide); }
+    .sec p.lede { margin-top: 18px; }
+    .sec strong { color: var(--accent); }
+    .sec ul { font-size: var(--fs-md); line-height: 1.65; padding-left: 22px; max-width: var(--measure-wide); }
+    .sec li { margin-bottom: 7px; }
+    .sec .sid {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      margin: 8px 0 0;
+      line-height: 1.7;
+      letter-spacing: 0.02em;
+      max-width: 100ch;
+    }
+    .sec .sid b { color: var(--ink-dim); font-weight: var(--weight-strong); }
+    .sec .sid a { color: var(--accent); }
+
+    /* architecture palette — same values as gpu-age-curve.astro */
+    .top {
+      --arch-blackwell: #0d9488;
+      --arch-hopper: #b9770a;
+      --arch-ampere: #c11f57;
+      --arch-ada: #5b5852;
+    }
+    :global(html[data-theme='terminal']) .top {
+      --arch-blackwell: #2dd4bf;
+      --arch-hopper: #ffb400;
+      --arch-ampere: #ff4d84;
+      --arch-ada: #9a9991;
+    }
+
+    /* §01 hero small multiples */
+    .heromult { position: relative; margin: 18px 0 10px; }
+    .lens-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .lens-panel { border: 1px solid var(--rule); background: var(--surface); display: flex; flex-direction: column; }
+    .lens-panel.lp-flat { border: 1.5px solid var(--accent); background: var(--surface-2); }
+    .lp-head { padding: 10px 12px 6px; }
+    .lp-row { display: flex; align-items: baseline; gap: 8px; }
+    .lp-name { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--weight-display); color: var(--ink); }
+    .lp-unit { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); }
+    .lp-spread {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      border: 1px solid var(--rule-2);
+      padding: 1px 6px;
+      white-space: nowrap;
+    }
+    .lp-flat .lp-spread { background: var(--accent); border-color: var(--accent); color: var(--surface); font-weight: var(--weight-strong); }
+    .lp-head .lp-kick {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-faint);
+      margin: 4px 0 0;
+      line-height: 1.5;
+      max-width: none;
+    }
+    .lp-flat .lp-kick { color: var(--ink-dim); }
+    .lens-panel svg { display: block; width: 100%; height: auto; }
+    .lp-foot {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--accent);
+      padding: 0 12px 9px;
+      margin-top: auto;
+    }
+    .hero-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); align-items: center; }
+    .dotk { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+    .dk-blackwell { background: var(--arch-blackwell); }
+    .dk-hopper { background: var(--arch-hopper); }
+    .dk-ampere { background: var(--arch-ampere); }
+    .hero-legend .note { color: var(--ink-faint); }
+
+    /* svg shared */
+    .grid { stroke: var(--rule); stroke-width: 1; }
+    .axisln { stroke: var(--rule-2); stroke-width: 1; }
+    .tick { font-family: var(--font-mono); font-size: 9px; fill: var(--ink-faint); }
+    .pt { stroke: var(--surface); stroke-width: 2; }
+    .pt-blackwell { fill: var(--arch-blackwell); }
+    .pt-hopper { fill: var(--arch-hopper); }
+    .pt-ampere { fill: var(--arch-ampere); }
+    .pt-ada { fill: var(--arch-ada); }
+    .pt-hollow { fill: var(--surface); stroke-width: 2; }
+    .pt-hollow.ph-hopper { stroke: var(--arch-hopper); }
+    .pt-hollow.ph-ada { stroke: var(--arch-ada); }
+    .ptlab { font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; }
+    .lab-blackwell { fill: var(--arch-blackwell); }
+    .lab-hopper { fill: var(--arch-hopper); }
+    .lab-ampere { fill: var(--arch-ampere); }
+    .lab-ada { fill: var(--arch-ada); }
+    .lab-dim { fill: var(--ink-dim); font-weight: 400; }
+    .hit { fill: transparent; cursor: pointer; outline: none; }
+    .hit:focus-visible { stroke: var(--accent); stroke-width: 1.5; fill: transparent; }
+    .bandfill { fill: var(--accent); opacity: 0.12; }
+    .airband { fill: var(--accent); opacity: 0.22; }
+    .bandmean { stroke: var(--accent); stroke-width: 1; }
+
+    /* generation cross-highlight */
+    .heromult[data-hl] .gdot { opacity: 0.2; transition: opacity 120ms; }
+    .heromult[data-hl="B300"] .g-B300,
+    .heromult[data-hl="B200"] .g-B200,
+    .heromult[data-hl="H200"] .g-H200,
+    .heromult[data-hl="H100"] .g-H100,
+    .heromult[data-hl="A100"] .g-A100 { opacity: 1; }
+    .gdot { opacity: 1; transition: opacity 120ms; }
+
+    /* tooltip (od-vs-committed pattern) — children are JS-created → :global */
+    .tip {
+      position: absolute; pointer-events: none; display: none;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink); background: var(--surface-2);
+      border: 1px solid var(--rule-2); padding: 8px 10px; line-height: 1.6;
+      min-width: 150px; z-index: 30;
+    }
+    .tip :global(.tn) { color: var(--ink-faint); }
+    .tip :global(strong) { color: var(--accent); }
+
+    .sec .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin: 8px 0 0; line-height: 1.7; max-width: 100ch; }
+
+    /* tables */
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 14px 0 8px; max-width: 900px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.gen { color: var(--ink); font-weight: var(--weight-strong); }
+    td.dim { color: var(--ink-dim); }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); }
+    td.wraps { white-space: normal; }
+    .tbl-details { margin: 12px 0 0; max-width: 900px; }
+    .tbl-details summary { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--accent); cursor: pointer; }
+
+    /* §02 band chart */
+    .chart-fig { margin: 16px 0 10px; max-width: 900px; }
+    .chart-box { position: relative; border: 1px solid var(--rule); background: var(--surface); overflow: hidden; }
+    .chart-box svg { display: block; width: 100%; height: auto; }
+    .crosshair { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 3 3; }
+    .bw-band { fill: var(--accent); opacity: 0.10; }
+    .bw-edge { stroke: var(--accent); stroke-width: 1; opacity: 0.45; }
+    .annot { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim); }
+    .annot-acc { fill: var(--accent); font-weight: 600; }
+    .annot-neg { fill: var(--neg); font-weight: 600; }
+    .zoomnote { font-family: var(--font-mono); font-size: 9px; fill: var(--ink-faint); }
+
+    /* history empty state */
+    .hist-strip { border: 1px solid var(--rule); background: var(--surface); margin: 14px 0 4px; max-width: 900px; position: relative; }
+    .hist-strip svg { display: block; width: 100%; height: auto; }
+    .hist-eye {
+      position: absolute; top: 8px; right: 10px;
+      font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--ink-faint); border: 1px solid var(--rule); padding: 1px 6px;
+      background: var(--surface);
+    }
+    .hist-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+    .hist-lab { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+    .hist-lab-ink { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; fill: var(--ink-dim); }
+
+    /* §04 altimeter marks */
+    .strip-frame { fill: none; stroke: var(--rule-2); stroke-width: 1; }
+    .rent-liq { fill: var(--accent); opacity: 0.14; }
+    .rent-air { fill: var(--accent); opacity: 0.5; }
+    .rent-con { fill: var(--accent); opacity: 0.10; }
+    .mt-blackwell { stroke: var(--arch-blackwell); stroke-width: 2; }
+    .mt-hopper { stroke: var(--arch-hopper); stroke-width: 2; }
+    .mt-ampere { stroke: var(--arch-ampere); stroke-width: 2; }
+    .mt-ada { stroke: var(--arch-ada); stroke-width: 2; }
+    .decayln { stroke: var(--ink-faint); stroke-width: 1; }
+    .decayhead { fill: var(--ink-faint); }
+    .cash-band { fill: var(--neg); opacity: 0.12; }
+    .cash-edge { stroke: var(--neg); stroke-width: 1.5; }
+    .comp-fill { fill: var(--ink); opacity: 0.05; }
+    .comp-frame { fill: none; stroke: var(--rule-2); stroke-width: 1; }
+    .floorln { stroke: var(--ink-dim); stroke-width: 1.5; }
+    .bracketln { stroke: var(--ink-dim); stroke-width: 1; }
+
+    /* §04 identity / worked boxes */
+    .identity {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      border: 1px solid var(--rule);
+      border-left: 2px solid var(--accent);
+      background: var(--surface-2);
+      padding: 12px 16px;
+      margin: 14px 0;
+      max-width: 760px;
+      line-height: 1.7;
+    }
+    .identity b { color: var(--accent); }
+    .worked {
+      border: 1px solid var(--rule-2);
+      background: var(--surface);
+      padding: 14px 18px;
+      margin: 16px 0;
+      max-width: 760px;
+    }
+    .worked .weye {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--warn);
+      font-weight: var(--weight-strong);
+      margin: 0 0 8px;
+    }
+    .worked p { font-size: var(--fs-sm); color: var(--ink-dim); margin: 0 0 8px; }
+    .worked .wmath { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--ink); margin: 8px 0; }
+    .worked .wmath b { color: var(--accent); }
+
+    /* §05 */
+    .lens-cell { white-space: normal; min-width: 210px; }
+    .lens-cell .ln { color: var(--ink); font-weight: var(--weight-strong); display: block; }
+    .lens-cell .lk { color: var(--ink-faint); font-size: calc(var(--fs-xs) - 1px); text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.5; display: block; margin-top: 2px; }
+    .rulebox {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      padding: 14px 18px;
+      margin: 14px 0;
+      max-width: 760px;
+      font-size: var(--fs-sm);
+      color: var(--ink);
+    }
+    .rulebox .reye { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); text-transform: uppercase; letter-spacing: var(--tracking-eye); color: var(--accent); font-weight: var(--weight-strong); margin: 0 0 8px; }
+    .rulebox p { font-size: var(--fs-sm); margin: 0 0 8px; }
+
+    /* responsive */
+    @media (max-width: 1000px) {
+      .lens-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .lens-grid { grid-template-columns: 1fr; }
+      .lp-kick .kx { display: none; }   /* pre-dash fragment survives on narrow */
+    }
+  </style>
+</Base>
