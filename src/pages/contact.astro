@@ -44,6 +44,24 @@ const audiences = [
       </p>
     </header>
 
+    <a class="contact-card contact-card-top" href="mailto:research@ccir.io">
+      <div class="cc-kicker">Start a conversation</div>
+      <span class="cc-email">research@ccir.io</span>
+    </a>
+
+    <section class="how how-top">
+      <header class="sec-head">
+        <div class="kicker">How we work</div>
+      </header>
+      <p class="prose">
+        CCIR is independent: no marketplace, no trading desk. We report
+        <strong>observed prices</strong> — we do not value or rate any asset,
+        and we take no position in the markets we measure. Raw
+        contributions are held in confidence; what we publish are aggregated
+        references. Terms are set per partner.
+      </p>
+    </section>
+
     <section class="why">
       <header class="sec-head">
         <div class="kicker">Why a neutral reference</div>
@@ -74,24 +92,6 @@ const audiences = [
         ))}
       </div>
     </section>
-
-    <section class="how">
-      <header class="sec-head">
-        <div class="kicker">How we work</div>
-      </header>
-      <p class="prose">
-        CCIR is independent: no marketplace, no trading desk. We report
-        <strong>observed prices</strong> — we do not value or rate any asset,
-        and we take no position in the markets we measure. Raw
-        contributions are held in confidence; what we publish are aggregated
-        references. Terms are set per partner.
-      </p>
-    </section>
-
-    <a class="contact-card" href="mailto:research@ccir.io">
-      <div class="cc-kicker">Start a conversation</div>
-      <span class="cc-email">research@ccir.io</span>
-    </a>
 
     <section class="administrator">
       <header class="sec-head">
@@ -181,6 +181,9 @@ const audiences = [
       text-decoration: none;
       color: var(--ink);
     }
+    .contact-card-top { margin: 26px 0 0; }
+    .how-top { margin: 26px 0 0; }
+    .administrator { margin-top: 34px; }
     .contact-card:hover { background: var(--surface-2); text-decoration: none; }
     .cc-kicker {
       font-family: var(--font-mono);
