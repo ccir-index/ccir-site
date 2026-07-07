@@ -141,6 +141,22 @@ const rolloverDscr = revClose > 0 ? (revPost / revClose) * CLOSE_DSCR : 0;
 const anchorRepricePct = VINTAGE_RATE > 0
   ? ((reLeaseRate - VINTAGE_RATE) / VINTAGE_RATE) * 100 : 0;
 
+// UC01 backtest — the covenant run against reconstructed history. Rates are
+// the stepped-panel monthly medians from the archived-page backfill
+// (/research/od-vs-committed), NOT the live series; close = 2024-02 at $4.30,
+// thresholds at 92/80/69% of close rounded to $0.05: 3.95 / 3.45 / 2.95.
+const BACKTEST_CLOSE = 4.30;
+const backtest: { period: string; rate: string; tier: string; cls: string; consequence: string }[] = [
+  { period: 'Feb – Jun 2024', rate: '$4.30', tier: 'Tier 1 · Baseline', cls: 't1', consequence: '30% CRC; quarterly reporting' },
+  { period: 'Jul – Aug 2024', rate: '$3.92 → $3.49', tier: 'Tier 2 · Watch', cls: 't2', consequence: '50% CRC; monthly reporting; no Restricted Payments' },
+  { period: 'Sep – Nov 2024', rate: '$3.24 → $2.99', tier: 'Tier 3 · Step-Up', cls: 't3', consequence: '70% CRC; Reserve to 6 mo debt service; 50% ECF sweep' },
+  { period: 'Dec 2024 – Nov 2025', rate: '$2.79 – $2.92', tier: 'Tier 4 · Triggered — 12 months', cls: 't4', consequence: '85% CRC; Reserve to 12 mo; 100% monthly sweep; 2.5% accelerated amortization per quarter' },
+  { period: 'Dec 2025 – Feb 2026', rate: '$3.18', tier: 'Tier 3 · improvement', cls: 't3', consequence: 'Automatic step-down; reserve release above 6-mo floor on compliance certificate' },
+  { period: 'Mar – Apr 2026', rate: '$3.74', tier: 'Tier 2', cls: 't2', consequence: 'Further step-down' },
+  { period: 'May 2026', rate: '$3.98', tier: 'Tier 1 · restored', cls: 't1', consequence: 'Full restoration' },
+  { period: 'Jun 2026', rate: '$3.39', tier: 'Tier 3 · re-tightening', cls: 't3', consequence: 'Phase-in restarts — the month the 15% interim test exists for' },
+];
+
 const rolloverPrecedents: { feature: string; precedent: string }[] = [
   { feature: 'Lease Sweep Period triggered ahead of a major contract expiry', precedent: 'CMBS lease-sweep / specified-tenant sweep provisions (cash trap commencing 12-18 months before a major tenant lease expiration)' },
   { feature: 'Re-lease rate assumption drawn from a published market series', precedent: 'Aircraft ABS re-leasing assumptions keyed to appraiser-published lease-rate data; container ABS per-diem re-lease assumptions' },
@@ -677,6 +693,58 @@ or any Lender.</pre>
         Definitions, the ISDA 2018 Benchmarks Supplement, and ARRC
         hardwired LIBOR transition language.
       </p>
+
+      <section class="sec">
+        <h3><span class="sec-n">09</span> The Covenant Against Three Years of History</h3>
+        <p>
+          The same tier mechanics, run against reconstructed history instead
+          of a stylized trajectory. Rates are the monthly neocloud H100
+          guaranteed on-demand medians from CCIR's archived-page backfill
+          (<a href="/research/od-vs-committed">On-Demand vs Committed, Three
+          Years</a>); the facility closes February 2024 at
+          ${fmt(BACKTEST_CLOSE)} with Tier Thresholds at 92% / 80% / 69% of
+          close ($3.95 / $3.45 / $2.95).
+        </p>
+        <div class="ftable-wrap">
+          <table class="traj">
+            <thead>
+              <tr><th>Period</th><th class="num">Reference rate</th><th>Tier</th><th>Operating requirements in force</th></tr>
+            </thead>
+            <tbody>
+              {backtest.map((r) => (
+                <tr>
+                  <td>{r.period}</td>
+                  <td class="num">{r.rate}</td>
+                  <td class={`tier tier-${r.cls.slice(1)}`}>{r.tier}</td>
+                  <td class="reqs">{r.consequence}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>Twelve months in Tier 4 and no default.</strong> Through the
+          2025 price floor the facility ran a funded reserve, a full cash
+          sweep, and accelerated amortization — the lender de-risked
+          mechanically through the trough while the borrower kept operating.
+          When the market turned in December 2025, restrictions stepped down
+          automatically, reaching full restoration by May 2026.
+        </p>
+        <p>
+          <strong>Every transition came from the published rate.</strong> No
+          waiver negotiations, no amendment cycle, no dispute about what the
+          market was doing — eight tier events in twenty-nine months, each one
+          mechanical.
+        </p>
+        <p class="calib-note">
+          Calibration notes: the exhibit uses monthly stepped-panel medians as
+          a stand-in for the drafting's 30-day daily Reference Rate Average;
+          the backfill panel is thin early and is a different collection
+          method from the live daily series (no splicing implied). June
+          2026's single-month re-tightening illustrates why the drafting
+          smooths on a 30-day average and includes the 15% interim test.
+        </p>
+      </section>
     </article>
 
     <article class="usecase">
