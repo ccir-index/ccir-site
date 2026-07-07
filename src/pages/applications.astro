@@ -235,7 +235,7 @@ const rolloverPrecedents: { feature: string; precedent: string }[] = [
         <div class="rate-meta">
           Neocloud operator segment · H100 · Guaranteed on-demand · US
           <span class="sep">·</span>
-          {statKind} of {ref?.n_sources} sources / {ref?.n_observations} observations
+          <span title="Observations are qualifying posted listings in the computation window; a source contributes one vote to the statistic however many of its listings pool into the cell (operator-equal aggregation).">{statKind} of {ref?.n_sources} sources / {ref?.n_observations} observations</span>
           <span class="sep">·</span>
           as of {meta.as_of_date}
         </div>
