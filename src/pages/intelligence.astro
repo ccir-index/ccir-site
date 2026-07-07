@@ -20,13 +20,13 @@ interface Cluster {
 const clusters: Cluster[] = [
   {
     kicker: 'Price structure',
-    heading: 'How the market prices the same silicon',
+    heading: 'How the Market Prices the Same Silicon',
     standfirst:
       'On-demand is one point on a surface. These break the rate out by tenor, by where it actually transacts, and by how far it ranges across operators.',
     pieces: [
-      { href: '/term', title: 'Committed term structure',
+      { href: '/term', title: 'Committed Term Structure',
         blurb: 'Posted committed asks by tenor — the price of guaranteed capacity from one month to a year, per chip.' },
-      { href: '/basis', title: 'On-demand vs clearing basis',
+      { href: '/basis', title: 'On-Demand vs Clearing Basis',
         blurb: 'Posted on-demand asks against marketplace clearing — where list rates sit above what actually transacts.' },
       // Spreads (/spreads) de-listed 2026-07-06: baselines on the Hyperscaler
       // rate card (inflated) and duplicates what /rates shows side-by-side.
@@ -35,33 +35,33 @@ const clusters: Cluster[] = [
   },
   {
     kicker: 'Realized economics',
-    heading: 'What operators actually earn',
+    heading: 'What Operators Actually Earn',
     standfirst:
       'Rate cards are asks. Our analysis of public filings estimates what clouds actually realize per GPU-hour, once discounts and commitments are in the number.',
     pieces: [
-      { href: '/realized/', title: 'Realized vs rate card',
+      { href: '/realized/', title: 'Realized vs Rate Card',
         blurb: 'Per-GPU-hour realization estimated from public filings — CoreWeave realizes well below its own posted rate card.' },
     ],
   },
   {
     kicker: 'Research',
-    heading: 'What the cross-section shows',
+    heading: 'What the Cross-Section Shows',
     standfirst:
       'Dated findings from the published series — decline curves, capability ' +
       'normalizations, market structure. Every note states its snapshot, its ' +
       'method, and what would falsify it.',
     pieces: [
-      { href: '/research/gpu-age-curve', title: 'The age curve prices bandwidth',
+      { href: '/research/gpu-age-curve', title: 'The Age Curve Prices Bandwidth',
         blurb: 'GPU earning power by generation: ≈−26%/yr in dollars (R² 0.96), flat per unit of memory bandwidth, banded per watt — and what that says about an inference-led market.' },
     ],
   },
   {
     kicker: 'Supply & availability',
-    heading: 'Who has capacity, and how much moves',
+    heading: 'Who Has Capacity, and How Much Moves',
     standfirst:
       'Price without supply is half the picture. These track how much of the tracked fleet is working, how many venues have capacity, and the live marketplace tape.',
     pieces: [
-      { href: '/utilization', title: 'Utilization & availability',
+      { href: '/utilization', title: 'Utilization & Availability',
         blurb: 'How much of the tracked fleet is rented versus idle, and how many venues have capacity — a breadth read on supply.' },
       // Marketplace tape (/markets) de-listed 2026-07-06: a MIN-of-panel stat
       // amplifies provider drop-in/out during panel changes — re-list once the
