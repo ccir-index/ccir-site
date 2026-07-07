@@ -2,6 +2,31 @@
 import Base from '../layouts/Base.astro';
 import { meta } from '../data/snapshot';
 
+const citation = [
+  {
+    kicker: 'Lender & borrower counsel',
+    body:
+      'Market-price covenants, rollover mechanics, and defined-terms ' +
+      'drafting against a published series — series selection, fallback ' +
+      'language, and how the change-management policy behaves inside a ' +
+      'facility over its life.',
+  },
+  {
+    kicker: 'Rating agencies',
+    body:
+      'Decline and re-contracting inputs by generation and tenor, mapping ' +
+      'collateral pools to published cells for surveillance, and questions ' +
+      'on methodology, history depth, and restatement policy.',
+  },
+  {
+    kicker: 'Regulators & supervisors',
+    body:
+      'Methodology, governance, and data-provenance questions — how the ' +
+      'series are constructed, what is archived, and how material changes ' +
+      'and restatements are handled and disclosed.',
+  },
+];
+
 const audiences = [
   {
     kicker: 'Operators & marketplaces',
@@ -27,20 +52,20 @@ const audiences = [
 ];
 ---
 <Base
-  title="Data Partnership · CCIR"
-  description="Partner with CCIR — contribute compute pricing, transaction, or credit data to an independent, neutral reference for the GPU compute market."
+  title="Contact · CCIR"
+  description="Contact CCIR — citation and use questions for lender and borrower counsel, rating agencies, and regulators; data partnerships for operators, lenders, and venues."
   showTape={false}
 >
   <section class="wrap top">
     <header class="page-head">
-      <div class="kicker">Data Partnership · {meta.as_of_date}</div>
-      <h1>Contribute to the Reference</h1>
+      <div class="kicker">Contact · {meta.as_of_date}</div>
+      <h1>Contact the Administrator</h1>
       <p class="standfirst">
-        CCIR publishes independent analysis of the GPU compute market —
-        reference rates, term structure, credit, and supply, tracked daily. We
-        operate no marketplace and no trading desk. If you produce compute
-        pricing, transaction, or credit data, contributing strengthens a
-        neutral point the whole market can measure against.
+        CCIR publishes citable reference series for the GPU compute market and
+        independent analysis built on them. We operate no marketplace and no
+        trading desk. Two conversations start here: citing a published series
+        — in a credit agreement, a rating analysis, or a surveillance report —
+        and contributing data to the reference.
       </p>
     </header>
 
@@ -48,6 +73,33 @@ const audiences = [
       <div class="cc-kicker">Start a conversation</div>
       <span class="cc-email">research@ccir.io</span>
     </a>
+
+    <section class="citation">
+      <header class="sec-head">
+        <div class="kicker">Citation & use</div>
+        <h2>Citing a Published Series</h2>
+      </header>
+      <p class="prose">
+        The reference series are built to be cited. Every cell on
+        <a href="/rates">/rates</a> prints its series identifier, the statistic
+        behind it, and panel depth; methodology, change-management, and
+        governance documents are published at
+        <a href="/documents">/documents</a>. We work through citation and use
+        questions with the people wiring a series into documents and analysis:
+      </p>
+      <div class="aud-grid cite-grid">
+        {citation.map((c) => (
+          <article class="aud-card">
+            <div class="aud-kicker">{c.kicker}</div>
+            <p class="aud-body">{c.body}</p>
+          </article>
+        ))}
+      </div>
+      <p class="prose cite-foot">
+        Worked covenant, rollover, and pool-surveillance mechanics are at
+        <a href="/applications">/applications</a>.
+      </p>
+    </section>
 
     <section class="how how-top">
       <header class="sec-head">
@@ -64,7 +116,7 @@ const audiences = [
 
     <section class="why">
       <header class="sec-head">
-        <div class="kicker">Why a neutral reference</div>
+        <div class="kicker">Data partnership</div>
         <h2>Markets Financialize on Shared Price Infrastructure</h2>
       </header>
       <p class="prose">
@@ -124,7 +176,9 @@ const audiences = [
     .sec-head { max-width: 80ch; margin-bottom: 12px; }
     .sec-head h2 { font-size: var(--fs-2xl); margin: 4px 0 0; }
 
-    .why, .audiences, .how { margin: 34px 0 0; }
+    .why, .audiences, .how, .citation { margin: 34px 0 0; }
+    .cite-grid { margin-top: 14px; }
+    .cite-foot { margin-top: 14px; font-size: var(--fs-sm); color: var(--ink-dim); }
     .administrator { margin: 0 0 40px; }
     .admin-line { font-size: var(--fs-sm); color: var(--ink-dim); }
     .admin-line strong { color: var(--ink); }
