@@ -1,0 +1,150 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Dated primer, 2026-07-07. Research notes are not updated in place —
+// follow-ups get new notes. This one synthesizes published CCIR series and
+// pages; it introduces no new measurement.
+const DATED = '2026-07-07';
+---
+<Base
+  title="Training, Inference, and What Compute Earns · CCIR Research"
+  description="A primer for credit readers: what training and inference workloads are, why they produce different demand profiles, and where the difference shows up in published compute prices, tenors, and utilization."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · primer · {DATED}</div>
+      <h1>Training, Inference, and What Compute Earns</h1>
+      <p class="standfirst">
+        GPU-backed credit is underwritten against what compute capacity earns,
+        and what it earns depends on which of two workloads is renting it.
+        This primer defines both in credit terms — no machine-learning
+        background assumed — and points to where the difference is already
+        visible in published series: tenor, price by generation, and
+        utilization.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> Two Workloads</h2>
+      <p>
+        <strong>Training builds the model.</strong> It is a project-style
+        compute campaign: thousands of the newest accelerators, wired together
+        on one high-bandwidth fabric, run near flat-out by a single customer
+        for months. The buyers are few — frontier labs and hyperscalers — and
+        the procurement is characteristically a multi-year committed contract
+        for a dedicated cluster. When the campaign ends, the demand ends with
+        it until the next model generation begins.
+      </p>
+      <p>
+        <strong>Inference runs the model.</strong> Every chatbot query, API
+        call, coding assistant, and AI feature inside an application is
+        inference: the trained model producing output for an end user. The
+        demand is recurring and usage-driven — it scales with adoption and
+        with the revenue of the applications on top, not with any one
+        project's calendar. It is latency-sensitive, it follows end-user
+        activity through the day, and it runs acceptably on a far wider range
+        of hardware than training does, including older generations.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> The Credit Translation</h2>
+      <p>
+        Training demand behaves like <strong>construction backlog</strong>:
+        lumpy, concentrated in a handful of counterparties, and wrapped in
+        multi-year contracts. Those contracts are the offtakes that appear in
+        GPU-backed credit as collateral quality — the ledger's own spread
+        history prices draws by the contract standing behind the compute
+        (<a href="/credit">/credit</a>).
+      </p>
+      <p>
+        Inference demand behaves like <strong>utility load</strong>: diffuse,
+        recurring, diurnal, and transacted at shorter tenors. And because a
+        GPU-hour is non-storable — an hour unsold is an hour gone — capacity
+        coming off contract reprices at the prevailing curve immediately,
+        the way power does, not the way a warehouse of inventory does.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> Where the Mix Shift Shows Up — Three Observables</h2>
+      <p>
+        <strong>Tenor.</strong> Training procurement supplies the long
+        committed contracts; inference demand transacts on-demand and at
+        commitments of a year or less. As the workload mix shifts, the
+        contract book behind a borrower shortens, and more of its revenue
+        rolls to the prevailing market each year — rollover exposure priced
+        off the published term curve
+        (<a href="/research/od-vs-committed">/research/od-vs-committed</a>;
+        worked rollover mechanics at <a href="/applications">/applications</a>).
+        Shorter books convert single-name offtake credit into portfolio and
+        market risk — the kind monitored with published series rather than
+        credit memos.
+      </p>
+      <p>
+        <strong>Price by generation.</strong> Inference consumes memory
+        bandwidth more than peak arithmetic, and older datacenter GPUs still
+        carry competitive bandwidth. In the current cross-section, rental
+        rates per unit of memory bandwidth are flat from A100 to B300 while
+        rates per unit of raw compute steepen with age — the pattern of a
+        market already pricing inference at the margin, and the mechanism by
+        which old silicon keeps earning
+        (<a href="/research/gpu-age-curve">/research/gpu-age-curve</a>).
+      </p>
+      <p>
+        <strong>Utilization.</strong> Inference load follows end-user activity
+        through the day, so realized revenue per GPU-hour sits below posted
+        rates even for contracted fleets. Posted price times full utilization
+        is not a revenue forecast; the filed realized figures are tracked at
+        <a href="/realized">/realized</a>.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> What This Does Not Say</h2>
+      <p>
+        This primer makes no forecast about the training-inference mix. The
+        point is narrower: the two workloads leave different fingerprints in
+        observable prices — tenor structure, per-generation pricing,
+        realized-versus-posted gaps — and each fingerprint is published as a
+        series that can be watched rather than assumed. The falsifiable
+        markers for an inference-led repricing are listed in the age-curve
+        note; the term structure and re-contracting history are in the
+        on-demand-versus-committed note. Sources and series construction per
+        the <a href="/documents/methodology">Methodology</a>.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 13px;
+    }
+    .sec strong { color: var(--accent); }
+  </style>
+</Base>

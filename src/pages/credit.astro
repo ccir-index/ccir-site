@@ -89,6 +89,14 @@ const types = [...new Set(instruments.map((i: any) => i.instrument_type))];
 const inScopeC = instruments.filter((i: any) => !i.exclude_from_issuance && typeof i.size_usd_m === 'number' && i.size_usd_m > 0);
 const inScopeUsdB = Math.round(inScopeC.reduce((a: number, i: any) => a + i.size_usd_m, 0) / 1000);
 
+// Collateral-treatment scan — amortization-family language anywhere in an
+// instrument's filed fields (schedules, depreciated-cost borrowing bases,
+// DSCR-targeted paydowns). Residual-value references tracked separately so
+// the section below stays true as rows change.
+const AMORT_RX = /amorti[sz]|depreciat|balloon|borrowing base|DSCR/i;
+const amortC = inScopeC.filter((i: any) => AMORT_RX.test(JSON.stringify(i)));
+const residualRefs = instruments.filter((i: any) => /residual value/i.test(JSON.stringify(i)));
+
 // Lender facet. Filings name the same institution many ways ("Morgan
 // Stanley (lead)", "MS Senior Funding", bare "MS"), so rows are tagged with
 // canonical institution names via pattern match over the filed lender
@@ -744,6 +752,36 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       role — lender, agent, trustee, or arranger — as named in the filings.
       Clicking a chart data point jumps to its ledger row.
     </p>
+
+    <!-- Collateral treatment -->
+    <div class="metho" id="collateral-treatment">
+      <h2>Collateral treatment</h2>
+      <p>
+        Of the {inScopeC.length} GPU-collateralized instruments, {amortC.length}
+        disclose amortization mechanics in their filed terms — depreciated-cost
+        borrowing bases, scheduled quarterly or monthly amortization,
+        DSCR-targeted paydowns, amortization-plus-balloon structures. Every
+        disclosed schedule points the same direction: collateral value is
+        written down toward zero over the facility's life. No GPU-collateralized
+        instrument on this ledger references a market residual value; the
+        remainder do not disclose amortization mechanics in any primary
+        document. The only residual-value reference anywhere on the ledger
+        {residualRefs.length === 1 ? ' is' : 's are'} in data-center real
+        estate — the Hyperion JV notes, where the guarantee is Meta's, on
+        leases, not on GPUs.
+      </p>
+      <p>
+        A structure that amortizes collateral to zero embeds no assumption
+        about terminal value. A structure that does not — partial
+        amortization, a balloon sized to a resale assumption — substitutes an
+        assumption for a schedule, and the difference between the two is
+        something to monitor, not to fix at close: worked covenant, rollover,
+        and pool-surveillance mechanics are at
+        <a href="/applications">/applications</a>, and the measured
+        per-generation decline path is at
+        <a href="/research/gpu-age-curve">/research/gpu-age-curve</a>.
+      </p>
+    </div>
 
     <!-- Methodology -->
     <div class="metho" id="methodology">
