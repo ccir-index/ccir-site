@@ -288,8 +288,8 @@ as_of_date,collected_at,collection_window_id,source_name,source_display_name,sil
 2026-07-08,2026-07-08T10:56:45.141291+00:00,2026-07-07-1800,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,6M,NonInterruptible,Other,1.2700,,,v2.0.0
 2026-07-08,2026-07-08T10:56:45.141291+00:00,2026-07-07-1800,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.4900,,,v2.0.0
 2026-07-08,2026-07-08T10:56:45.141291+00:00,2026-07-07-1800,runpod_spot,RunPod · Spot,a100-sxm-80gb,A100,SXM,OnDemand,Interruptible,Other,1.3900,,,v2.0.0
-2026-07-08,2026-07-08T10:56:46.254375+00:00,2026-07-07-1800,vast_ai_verified,Vast.ai (verified),a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,0.5933,0.9200,4,v2.0.0
 2026-07-08,2026-07-08T10:56:46.254375+00:00,2026-07-07-1800,vast_ai_verified,Vast.ai (verified),a100-sxm-80gb,A100,SXM,OnDemand,Interruptible,Other,0.3600,0.8333,4,v2.0.0
+2026-07-08,2026-07-08T10:56:46.254375+00:00,2026-07-07-1800,vast_ai_verified,Vast.ai (verified),a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,0.5933,0.9200,4,v2.0.0
 2026-07-08,2026-07-08T13:46:38.133330+00:00,2026-07-08-0600,runpod_cluster,RunPod · Cluster,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.7880,,,v2.0.0
 2026-07-08,2026-07-08T13:46:38.133330+00:00,2026-07-08-0600,runpod_community,RunPod · Community,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.3900,,,v2.0.0
 2026-07-08,2026-07-08T13:46:38.133330+00:00,2026-07-08-0600,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,1Y,NonInterruptible,Other,1.2200,,,v2.0.0
@@ -298,3 +298,21 @@ as_of_date,collected_at,collection_window_id,source_name,source_display_name,sil
 2026-07-08,2026-07-08T13:46:38.133330+00:00,2026-07-08-0600,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.4900,,,v2.0.0
 2026-07-08,2026-07-08T13:46:38.133330+00:00,2026-07-08-0600,runpod_spot,RunPod · Spot,a100-sxm-80gb,A100,SXM,OnDemand,Interruptible,Other,1.3900,,,v2.0.0
 2026-07-08,2026-07-08T13:46:50.949401+00:00,2026-07-08-0600,vast_ai_verified,Vast.ai (verified),a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,0.5933,0.6000,3,v2.0.0
+2026-07-08,2026-07-08T16:26:10.431004+00:00,2026-07-08-1000,vast_ai_verified,Vast.ai (verified),a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,0.5933,0.9333,3,v2.0.0
+2026-07-08,2026-07-08T16:26:10.431004+00:00,2026-07-08-1000,vast_ai_verified,Vast.ai (verified),a100-sxm-80gb,A100,SXM,OnDemand,Interruptible,Other,0.3600,0.9333,3,v2.0.0
+2026-07-08,2026-07-08T16:26:12.689720+00:00,2026-07-08-1000,runpod_cluster,RunPod · Cluster,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.7880,,,v2.0.0
+2026-07-08,2026-07-08T16:26:12.689720+00:00,2026-07-08-1000,runpod_community,RunPod · Community,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.3900,,,v2.0.0
+2026-07-08,2026-07-08T16:26:12.689720+00:00,2026-07-08-1000,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,1Y,NonInterruptible,Other,1.2200,,,v2.0.0
+2026-07-08,2026-07-08T16:26:12.689720+00:00,2026-07-08-1000,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,3M,NonInterruptible,Other,1.3000,,,v2.0.0
+2026-07-08,2026-07-08T16:26:12.689720+00:00,2026-07-08-1000,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,6M,NonInterruptible,Other,1.2700,,,v2.0.0
+2026-07-08,2026-07-08T16:26:12.689720+00:00,2026-07-08-1000,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.4900,,,v2.0.0
+2026-07-08,2026-07-08T16:26:12.689720+00:00,2026-07-08-1000,runpod_spot,RunPod · Spot,a100-sxm-80gb,A100,SXM,OnDemand,Interruptible,Other,1.3900,,,v2.0.0
+2026-07-08,2026-07-08T19:11:52.883378+00:00,2026-07-08-1400,runpod_cluster,RunPod · Cluster,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.7880,,,v2.0.0
+2026-07-08,2026-07-08T19:11:52.883378+00:00,2026-07-08-1400,runpod_community,RunPod · Community,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.3900,,,v2.0.0
+2026-07-08,2026-07-08T19:11:52.883378+00:00,2026-07-08-1400,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,1Y,NonInterruptible,Other,1.2200,,,v2.0.0
+2026-07-08,2026-07-08T19:11:52.883378+00:00,2026-07-08-1400,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,3M,NonInterruptible,Other,1.3000,,,v2.0.0
+2026-07-08,2026-07-08T19:11:52.883378+00:00,2026-07-08-1400,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,6M,NonInterruptible,Other,1.2700,,,v2.0.0
+2026-07-08,2026-07-08T19:11:52.883378+00:00,2026-07-08-1400,runpod_secure,RunPod · Secure,a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,1.4900,,,v2.0.0
+2026-07-08,2026-07-08T19:11:52.883378+00:00,2026-07-08-1400,runpod_spot,RunPod · Spot,a100-sxm-80gb,A100,SXM,OnDemand,Interruptible,Other,1.3900,,,v2.0.0
+2026-07-08,2026-07-08T19:11:57.420410+00:00,2026-07-08-1400,vast_ai_verified,Vast.ai (verified),a100-sxm-80gb,A100,SXM,OnDemand,NonInterruptible,Other,0.5933,1.0667,3,v2.0.0
+2026-07-08,2026-07-08T19:11:57.420410+00:00,2026-07-08-1400,vast_ai_verified,Vast.ai (verified),a100-sxm-80gb,A100,SXM,OnDemand,Interruptible,Other,0.3600,0.8000,3,v2.0.0
