@@ -5,19 +5,21 @@ import Sparkline from './Sparkline.astro';
 
 // Premium-chip series only. Featured flagship cells under the 7-segment
 // grammar. T1 / T2 / T3 operator segments across the canonical 6 silicons.
+// US cells only, matching the /rates and home ladders (tape is currently
+// hidden site-wide; if re-enabled it must not reintroduce region mixing).
 const featured = [
-  'CRI-T1-H100-ALL-GTD-OD-ALL',
-  'CRI-T2-H100-ALL-GTD-OD-ALL',
-  'CRI-T3-H100-ALL-GTD-OD-ALL',
-  'CRI-T1-H200-ALL-GTD-OD-ALL',
-  'CRI-T2-H200-ALL-GTD-OD-ALL',
-  'CRI-T3-H200-ALL-GTD-OD-ALL',
-  'CRI-T1-B200-ALL-GTD-OD-ALL',
-  'CRI-T2-B200-ALL-GTD-OD-ALL',
-  'CRI-T3-B200-ALL-GTD-OD-ALL',
-  'CRI-T1-GB200-ALL-GTD-OD-ALL',
-  'CRI-T2-A100-ALL-GTD-OD-ALL',
-  'CRI-T3-A100-ALL-GTD-OD-ALL',
+  'CRI-T1-H100-ALL-GTD-OD-US',
+  'CRI-T2-H100-ALL-GTD-OD-US',
+  'CRI-T3-H100-ALL-GTD-OD-US',
+  'CRI-T1-H200-ALL-GTD-OD-US',
+  'CRI-T2-H200-ALL-GTD-OD-US',
+  'CRI-T3-H200-ALL-GTD-OD-US',
+  'CRI-T1-B200-ALL-GTD-OD-US',
+  'CRI-T2-B200-ALL-GTD-OD-US',
+  'CRI-T3-B200-ALL-GTD-OD-US',
+  'CRI-T1-GB200-ALL-GTD-OD-US',
+  'CRI-T2-A100-ALL-GTD-OD-US',
+  'CRI-T3-A100-ALL-GTD-OD-US',
 ];
 
 const ticks = featured

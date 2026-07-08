@@ -13,21 +13,21 @@ const chips = (() => {
 })();
 
 // Guaranteed on-demand reference cell per (segment, chip): int=GTD, form
-// pooled. Prefer the US cut (now emitted per-interruptibility); fall back to
-// all-regions where a US guaranteed cell isn't present. Guaranteed-only on
-// purpose — the interruptible/spot pool (int=ALL) drags the number below the
-// real on-demand rate (US H100 Hyperscaler $9.15 guaranteed vs $5.40 pooled).
+// pooled, US only — no region fallback. A cell with no US series shows a
+// dash rather than quietly substituting the all-regions pool (which mixes
+// EU/APAC panels into a ladder labeled US). Guaranteed-only on purpose —
+// the interruptible/spot pool (int=ALL) drags the number below the real
+// on-demand rate (US H100 Hyperscaler $9.15 guaranteed vs $5.40 pooled).
 const STAT_RANK: Record<string, number> = { Published: 0, Provisional: 1, Shadow: 2 };
 function odCell(tier: Tier, chip: string): Rate | undefined {
-  const pick = (region: string) => headlineRates
+  return headlineRates
     .filter((r) => r.tier === tier && r.gpu_model === chip &&
                    r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === region && r.interruptibility === 'GTD' &&
+                   r.region === 'US' && r.interruptibility === 'GTD' &&
                    r.promotion_status !== 'Shadow')
     .sort((a, b) =>
       (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
       (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
-  return pick('US') ?? pick('ALL');
 }
 
 type LadderRow = { chip: string; cells: Partial<Record<Tier, Rate | undefined>> };
@@ -100,7 +100,7 @@ function cellTitle(c: Rate): string {
       </table>
     </div>
     <p class="table-foot">
-      USD per GPU-hour · guaranteed on-demand, US operators · mean where the panel is deep (n≥10), median below that · hover a rate for both, region, IQR, and panel depth.
+      USD per GPU-hour · guaranteed on-demand, US series only · mean where the panel is deep (n≥10), median below that · a dash means no published US series for that cell · hover a rate for both stats, IQR, and panel depth.
     </p>
 
     <section class="defs-section">

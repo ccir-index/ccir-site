@@ -71,10 +71,13 @@ const wattTable = [
       <h1>The GPU Age Curve: −26% per Year</h1>
       <p class="standfirst">
         A GPU generation's earning power declines as it ages, and underwriting
-        GPU-backed credit requires the path. This note measures it from
-        published CCIR series and finds a specific shape: close to log-linear
-        at ≈ −26% per year in dollars (R² 0.96 across five datacenter
-        generations), flat per unit of memory bandwidth, banded per watt.
+        GPU-backed credit requires the path. This note measures one input to
+        it: a single-date cross-section of published CCIR rates — five
+        datacenter generations, five different ages, all priced on {AS_OF} —
+        with a specific shape: close to log-linear at ≈ −26% per year in
+        dollars (R² 0.96), flat per unit of memory bandwidth, banded per
+        watt. The fitted line compares today's chips at today's prices; it is
+        not the path any generation has traced since its launch.
       </p>
     </header>
 
@@ -114,11 +117,15 @@ const wattTable = [
         cost is its economic end-of-life.
       </p>
       <p>
-        One caveat governs everything below: a cross-section (many generations,
-        one date) is not a cohort curve (one generation through time). Reading
-        it as a decline path assumes the next generation ages like the last —
+        One caveat governs everything below: <strong>a cross-section (many
+        generations, one date) is not a cohort curve</strong> (one generation
+        through time). The −26%/yr is a fit across differently-aged chips at
+        current prices — it describes how the market prices age today, not
+        the rate at which any chip's price actually fell, and it says nothing
+        about where each generation's pricing started at launch. Reading it
+        as a decline path assumes the next generation ages like the last —
         exactly the assumption an inference-led demand shift would break.
-        Section 05 lists the observable markers.
+        Section 04 lists the observable markers.
       </p>
     </section>
 
@@ -126,7 +133,9 @@ const wattTable = [
       <h2><span class="n">02</span> The Age Curve ({AS_OF}, Guaranteed On-Demand, $/GPU-hr)</h2>
       <p class="fit-line">
         Neocloud rate, log scale, on age: <strong>≈ −26% per year, R² 0.96</strong>
-        across the five datacenter generations (ages approximate).
+        across the five datacenter generations (ages approximate). All points
+        are one date's posted prices ({AS_OF}); the line is a fit across
+        generations of different ages, not the price history of any one chip.
       </p>
       <figure class="chart-fig">
         <div class="chart-box">
@@ -168,7 +177,8 @@ const wattTable = [
         <figcaption class="tfoot">
           Neocloud guaranteed on-demand, $/GPU-hr on a log scale, against
           generation age. Headline stat per the published rule (mean where
-          n≥10, else median).
+          n≥10, else median). Single-date cross-section ({AS_OF}) — the
+          fitted line is not a traced price history.
         </figcaption>
       </figure>
       <div class="twrap">

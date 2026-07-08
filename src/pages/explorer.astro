@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { headlineRates, meta } from '../data/snapshot';
+import { headlineRates, meta, headlineStatOf } from '../data/snapshot';
 import { TIERS, TIER_LABELS, REGION_LABELS } from '../data/types';
 
 // Trend/sparkline column removed 2026-07-06: the operator-tier panel is days
@@ -42,6 +42,10 @@ const rows = source.map((r) => ({
   region_label: REGION_LABELS[r.region],
   interrupt: r.interruptibility,
   mean: r.price_mean,
+  median: r.price_median,
+  // Which stat the published headline uses for this series (n≥10 mean, else
+  // median) — highlighted in the table so explorer numbers tie to /rates.
+  hstat: headlineStatOf(r),
   p25: r.price_p25,
   p75: r.price_p75,
   n_src: r.n_sources,
@@ -61,7 +65,9 @@ const rows = source.map((r) => ({
       out by form, interruptibility, and region. No curation: single-source
       cells sit alongside deep ones, each shown with its source count
       <em>n</em>. A dash means the axis isn't broken out for that series.
-      On-demand rates.
+      Mean and median are both shown; the one set in ink is the stat the
+      published headline uses for that series (mean at n≥10, median below),
+      so every number here ties to the rates ladder. On-demand rates.
     </p>
 
     <div class="filter-bank">
@@ -124,6 +130,7 @@ const rows = source.map((r) => ({
             <th class="sortable" data-key="interrupt">Int</th>
             <th class="sortable" data-key="region">Region</th>
             <th class="sortable" data-key="mean" data-num>Mean $/hr</th>
+            <th class="sortable" data-key="median" data-num>Median $/hr</th>
             <th class="sortable" data-key="p25" data-num>IQR</th>
             <th class="sortable" data-key="n_src" data-num>n</th>
           </tr>
@@ -170,7 +177,8 @@ const rows = source.map((r) => ({
             '<td class="dim">' + dash(r.form, r.form) + '</td>' +
             '<td class="dim">' + dash(r.interrupt, r.interrupt) + '</td>' +
             '<td class="dim">' + dash(r.region, r.region_label) + '</td>' +
-            '<td class="num posted">$' + fmt(r.mean) + '</td>' +
+            '<td class="num ' + (r.hstat === 'mean' ? 'posted headline-stat' : 'dim') + '" title="' + (r.hstat === 'mean' ? 'Headline stat for this series (n≥10)' : '') + '">$' + fmt(r.mean) + '</td>' +
+            '<td class="num ' + (r.hstat === 'median' ? 'posted headline-stat' : 'dim') + '" title="' + (r.hstat === 'median' ? 'Headline stat for this series (n<10)' : '') + '">$' + fmt(r.median) + '</td>' +
             '<td class="num dim">$' + fmt(r.p25) + '–$' + fmt(r.p75) + '</td>' +
             '<td class="num">' + r.n_src + '</td>' +
           '</tr>';
@@ -229,9 +237,12 @@ const rows = source.map((r) => ({
     .reset-btn:hover { color: var(--ink); border-color: var(--accent); }
 
     .table-wrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; }
-    #rows-table td.sid code { font-family: var(--font-mono); font-size: calc(var(--fs-sm) - 1px); color: var(--accent); letter-spacing: 0.02em; }
-    #rows-table td.chip { color: var(--ink); font-weight: var(--weight-strong); }
-    #rows-table td.posted { color: var(--ink); font-weight: var(--weight-strong); }
+    /* Row cells are innerHTML-injected by the inline script, so Astro's
+       scoped selectors never match them — these must be :global. */
+    #rows-table :global(td.sid code) { font-family: var(--font-mono); font-size: calc(var(--fs-sm) - 1px); color: var(--accent); letter-spacing: 0.02em; }
+    #rows-table :global(td.chip) { color: var(--ink); font-weight: var(--weight-strong); }
+    #rows-table :global(td.posted) { color: var(--ink); font-weight: var(--weight-strong); }
+    #rows-table :global(td.headline-stat) { box-shadow: inset 0 -2px 0 var(--accent); }
     #rows-table th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
     #rows-table th.sortable:hover { color: var(--accent); }
     #rows-table th.sortable::after { content: '↕'; margin-left: 5px; color: var(--ink-faint); font-size: 0.85em; }

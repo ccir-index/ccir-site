@@ -160,16 +160,15 @@ const backtest: { period: string; rate: string; tier: string; cls: string; conse
 // ---------------------------------------------------------------------------
 // Use case 03 — multi-generation pool surveillance. Pool Reference Rate =
 // unit-weighted average of the published per-generation Neocloud guaranteed
-// on-demand cells (US-first, region-pooled fallback), weights fixed at
-// closing per the asset schedule.
+// on-demand US cells (US only, matching the /rates ladder — no region
+// fallback), weights fixed at closing per the asset schedule.
 function poolCell(chip: string): Rate | undefined {
-  const pick = (region: string) => headlineRates
+  return headlineRates
     .filter((r) => r.tier === 'T2' && r.gpu_model === chip &&
                    r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === region && r.interruptibility === 'GTD' &&
+                   r.region === 'US' && r.interruptibility === 'GTD' &&
                    r.promotion_status !== 'Shadow')
     .sort((a, b) => (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
-  return pick('US') ?? pick('ALL');
 }
 const POOL = [
   { chip: 'H100', weight: 0.50 },
