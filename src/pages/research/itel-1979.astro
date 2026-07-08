@@ -1,0 +1,284 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const NYT = {
+  brink: 'https://www.nytimes.com/1979/07/29/archives/itel-corporation-is-at-the-brink-again.html',
+  delayed: 'https://www.nytimes.com/1980/10/17/archives/delayed-itel-report-puts-79-loss-at-4333-million-one-of-the-real.html',
+  bleak: 'https://www.nytimes.com/1980/12/19/archives/itel-chief-paints-a-bleak-picture.html',
+  salvage: 'https://www.nytimes.com/1981/02/15/business/itel-in-bankruptcy-trying-to-salvage-the-little-thats-left.html',
+};
+
+// 2026 $: BLS CPI-U (1982-84=100), figure-year annual average deflated to
+// May 2026 (index 335.1). 1978 = 65.2 (×5.14), 1979 = 72.6 (×4.62),
+// 1980 = 82.4 (×4.07). Same convention as the chip-economics worked example.
+const timeline = [
+  { date: '1975', event: 'Lloyd’s of London begins insuring Itel against early lessee returns — "in essence, Itel was insured against technological change."', figure: '', adj: '' },
+  { date: '1978', event: 'Record profit reported on a $1.7B lease book — the largest IBM-compatible lease portfolio after IBM itself.', figure: '$47.2M profit', adj: '≈$243M' },
+  { date: 'late 1978', event: 'Speculation about IBM’s next generation halts customer purchases. The record profit fails its audit and is restated — explicitly for a residual-value writedown.', figure: '→ $21.5M', adj: '≈$111M' },
+  { date: 'Jan 30, 1979', event: 'IBM announces the 4300 series: ~3.2× the performance of the 370/138, up to 30% cheaper. Lessees begin canceling.', figure: '', adj: '' },
+  { date: 'Q1 1979', event: 'First-quarter loss — small. The repricing has happened; the recognition has not.', figure: '−$4.4M', adj: '≈−$20M' },
+  { date: 'H2 1979', event: 'Lease-end recognition arrives on the lease calendar, not the market calendar.', figure: '~−$370M', adj: '≈−$1.7B' },
+  { date: 'FY 1979', event: 'Full-year net loss; workforce falls ~7,000 → 1,400; Data Products sold to National Semiconductor.', figure: '−$433.3M', adj: '≈−$2.0B' },
+  { date: 'Oct 16, 1980', event: 'The audited 1979 10-K is finally filed — more than nine months past fiscal year-end.', figure: '$1.2B debt', adj: '≈$4.9B' },
+  { date: 'Jan 19, 1981', event: 'Chapter 11 — at the time among the largest and most complex bankruptcies in U.S. history. Lloyd’s computer-leasing losses reach ~$340–400M market-wide.', figure: '~$340–400M', adj: '≈$1.5B' },
+  { date: '1983', event: 'Reorganization plan confirmed.', figure: '', adj: '' },
+];
+---
+<Base
+  title="The Company That Insured Itself Against Technological Change · CCIR Research"
+  description="Itel, 1979: the largest independent computer lessor in the world, a residual-value assumption, the IBM 4300 — and a market with no published price to check the marks against."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · 2026-07-08 · historical record</div>
+      <h1>The Company That Insured Itself Against Technological Change</h1>
+      <p class="standfirst">
+        Late in 1980, the SEC was still waiting for audited 1979 financial
+        statements from a company most people today have never heard of. When
+        the 10-K finally arrived — on October 16, 1980, more than nine months
+        past fiscal year-end — it reported a net loss of $433.3 million —
+        about $2.0 billion in 2026 dollars — one of the largest corporate
+        losses recorded to that date. Eighteen months earlier, Itel
+        Corporation of San Francisco had been the largest independent
+        computer lessor in the world, with a $1.7 billion lease book — some
+        $8 billion today — second only to IBM itself. The failure mechanism was not fraud
+        and not demand. It was a residual-value assumption meeting a new
+        generation of hardware. This is the sequence, from the contemporaneous
+        record.
+      </p>
+    </header>
+
+    <figure class="photo">
+      <img src="/img/research/ibm-370-operator.jpg" width="1600" height="1038"
+           alt="A computer operator in a white coat at the console of an IBM System/370 installation in the mid-1970s, with rows of mainframe cabinets behind him." loading="eager" />
+      <figcaption>
+        An IBM System/370 installation, mid-1970s — the machine class on
+        Itel's balance sheet. Photo via
+        <a href="https://commons.wikimedia.org/wiki/File:IBM_System370_model_145_(1).jpg" rel="noopener" target="_blank">Wikimedia Commons</a> (CC0).
+      </figcaption>
+    </figure>
+
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Date</th><th>Event</th><th class="num">Figure</th><th class="num">2026 $</th></tr></thead>
+        <tbody>
+          {timeline.map((r) => (
+            <tr>
+              <td class="tl-date">{r.date}</td>
+              <td class="tl-event">{r.event}</td>
+              <td class="num strong">{r.figure}</td>
+              <td class="num adj">{r.adj}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="tfoot">
+      Sources for every row are linked at the end of the note. 2026 dollars:
+      BLS CPI-U, figure-year annual average deflated to May 2026 (index
+      335.1; 1978 ×5.14, 1979 ×4.62, 1980 ×4.07).
+    </p>
+
+    <section class="sec">
+      <h2><span class="n">01</span> The Machine</h2>
+      <p>
+        Itel's core business wrote leveraged leases on IBM System/360 and
+        System/370 mainframes. The economics of a leveraged lease front-load
+        the accounting: much of the profit is recognized early, and the tail
+        of the transaction rests on the <strong>residual value</strong> — what
+        the machine will be worth when the lease ends. Itel's residual
+        assumptions were, by the standard of the day, aggressive, and the
+        company's answer to the obvious objection was an insurance policy.
+        From 1975, underwriters at Lloyd's of London insured Itel against
+        lessees returning machines early. As it was put at the time: in
+        essence, Itel was insured against technological change.
+      </p>
+      <p>
+        The model worked spectacularly while it worked. Itel grew into the
+        largest non-manufacturer lessor of IBM-compatible equipment, shipped
+        its own IBM-compatible processors, and reported a record profit for
+        1978: $47.2 million.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> The Market Moved First</h2>
+      <p>
+        IBM's next generation was announced on January 30, 1979 — but it was
+        telegraphed well before that, and the market acted on the
+        telegraphing. Through late 1978, speculation about the coming machines
+        halted customer purchases across the industry. Itel's lessees were
+        already behaving as if the 370 era was ending while Itel's books still
+        carried 370 residuals at levels that supported a record year.
+      </p>
+      <p>
+        The record did not survive its audit. The $47.2 million profit was
+        restated to $21.5 million — a write-down taken explicitly against
+        residual values, with the auditor declining to certify the original
+        figure. The customers had repriced the machines before IBM confirmed
+        why; the balance sheet caught up under audit.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> January 30, 1979</h2>
+      <p>
+        IBM announced the 4300 series — the 4331 and 4341 — on January 30,
+        1979: roughly 3.2 times the performance of the 370/138 at up to 30%
+        less cost.
+        The announcement repriced every 360/370 lease book in the industry
+        overnight. Itel's customers began canceling leases and returning
+        machines — to a lessor whose balance sheet said those machines were
+        worth far more than anyone would now pay to use them.
+      </p>
+      <p>
+        The recognition pattern is the instructive part. Itel's first quarter
+        of 1979 showed a loss of only $4.4 million. The full year lost $433.3
+        million — roughly $370 million of it landing in the second half.
+        Nothing about the 4300 got worse between March and September; what
+        changed is that lease-end recognition arrived. <strong>Losses
+        discovered at lease-end arrive on the calendar of the lease schedule,
+        not the calendar of the market event.</strong> Recognition at the
+        market event would not have made the loss smaller — it would have
+        dated it January, while the balance sheet still had options. Instead,
+        the first-quarter print showed a company that looked bruised but
+        solvent, and every party that dealt with Itel through mid-1979 dealt
+        with that version of it.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> The Unwind</h2>
+      <p>
+        The arc is legible in the headlines alone. By midsummer, The New York
+        Times had the company <a href={NYT.brink} rel="noopener"
+        target="_blank">"at the brink again"</a> (July 29, 1979).
+        Headcount went from roughly 7,000 to 1,400. The Data Products
+        division was sold to National Semiconductor in October 1979. The
+        Lloyd's policies — the insurance against technological change —
+        turned into the largest computer-leasing insurance loss on record,
+        some $340–400 million across the market, and the claims paid slowly:
+        by August 1980, Itel had collected $8.4 million of the $21.5 million
+        then claimed. The audited 1979 statements took until
+        <a href={NYT.delayed} rel="noopener" target="_blank">October 16,
+        1980</a> to file, with the company roughly $1.2 billion in debt and
+        negotiating a restructuring as it filed; in December the chief
+        executive was <a href={NYT.bleak} rel="noopener" target="_blank">
+        "painting a bleak picture"</a>. Chapter 11 followed on January 19,
+        1981 — at the time among the largest and most complex bankruptcies in
+        American history. By February the Times' framing was already
+        posthumous: <a href={NYT.salvage} rel="noopener" target="_blank">
+        "trying to salvage the little that's left."</a> The reorganization
+        took until 1983.
+      </p>
+      <figure class="photo">
+        <img src="/img/research/ibm-370-hands.jpg" width="1400" height="1417"
+             alt="An operator's hands on the front panel of an IBM System/370 console, covered in indicator lamps and rotary dials." loading="lazy" />
+        <figcaption>
+          The asset in question: an IBM System/370 operator console, 1970s.
+          Photo: Yves Tessier,
+          <a href="https://commons.wikimedia.org/wiki/File:Ordinateurs_centraux_348-3-001.jpg" rel="noopener" target="_blank">via Wikimedia Commons</a>
+          (<a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">CC BY-SA 4.0</a>).
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> The Measurement Gap</h2>
+      <p>
+        One fact about the period is easy to miss from 2026: no published
+        price series for used IBM mainframes existed. Residuals were set
+        against dealer quotes and recent transactions; the 1978 restatement
+        happened because an auditor pushed, not because any printed number
+        contradicted the marks. The confusion ran in both directions — as
+        late as mid-1979, months after the 4300 announcement and weeks before
+        the second-half cliff, trade-press sentiment on used 370 values was
+        not uniformly bearish, and some dealers predicted a used-370
+        <em>shortage</em>. The lessor, the auditor, the insurer, and the
+        lenders were all exposed to the same number, with nothing published
+        to observe it by.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">06</span> Why We Keep the File</h2>
+      <p>
+        CCIR publishes reference rates for rented compute — another
+        generation of expensive, single-purpose, rapidly improving machines
+        financed on multi-year paper. The credit structures in today's
+        market overwhelmingly amortize their collateral to zero and reference
+        no market residual (the ledger is on <a href="/credit">/credit</a>);
+        how earning power declines by generation is measured on
+        <a href="/research/gpu-age-curve">/research/gpu-age-curve</a>. This
+        note takes no view on any modern asset's value. It is a historical
+        record, kept because the sequence was legible only afterward — from
+        filings that arrived a year late.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">07</span> Sources</h2>
+      <ul class="src-list">
+        <li>The New York Times, July 29, 1979 — <a href={NYT.brink} rel="noopener" target="_blank">Itel Corporation Is at the Brink Again</a></li>
+        <li>The New York Times, October 17, 1980 — <a href={NYT.delayed} rel="noopener" target="_blank">Delayed Itel Report Puts '79 Loss at $433.3 Million</a></li>
+        <li>The New York Times, December 19, 1980 — <a href={NYT.bleak} rel="noopener" target="_blank">Itel Chief Paints a Bleak Picture</a></li>
+        <li>The New York Times, February 15, 1981 — <a href={NYT.salvage} rel="noopener" target="_blank">Itel in Bankruptcy: Trying to Salvage the Little That's Left</a></li>
+        <li>UPI, October 16, 1980 — <a href="https://www.upi.com/Archives/1980/10/16/Itel-Corporation-reported-Thursday-it-has-filed-its-delayed/7280340516800/" rel="noopener" target="_blank">Itel files its delayed 1979 report</a></li>
+        <li>UPI, January 19, 1981 — <a href="https://www.upi.com/Archives/1981/01/19/Itel-Corp-a-computer-leasing-firm-troubled-by-financial/7749348728400/" rel="noopener" target="_blank">Itel files under Chapter 11</a></li>
+        <li>The Washington Post, October 17, 1980 — <a href="https://www.washingtonpost.com/archive/business/1980/10/17/troubled-itel-lost-443-million-in-79/22c94650-9469-41af-b813-8cbe2055f616/" rel="noopener" target="_blank">Troubled Itel Lost $443 Million in '79</a> (headline figure differs from the 10-K's $433.3M)</li>
+        <li>The Christian Science Monitor, December 30, 1980 — <a href="https://www.csmonitor.com/1980/1230/123002.html" rel="noopener" target="_blank">Itel struggles to stay on its feet in technological storm</a></li>
+        <li>Background: <a href="https://www.encyclopedia.com/books/politics-and-business-magazines/itel-corporation" rel="noopener" target="_blank">Encyclopedia.com — Itel Corporation</a>; <a href="https://www.fundinguniverse.com/company-histories/itel-corporation-history/" rel="noopener" target="_blank">FundingUniverse — History of Itel Corporation</a>; Fortune, October 8, 1979 (print).</li>
+      </ul>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 18px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p, .sec ul {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 13px;
+    }
+    .sec strong { color: var(--accent); }
+    .sec em { font-style: italic; }
+    .photo { margin: 0 0 22px; max-width: 880px; }
+    .photo img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); filter: grayscale(0.1); }
+    .photo figcaption { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
+    .photo figcaption a { color: var(--ink-dim); }
+    .sec .photo { margin-top: 18px; }
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 8px; max-width: 880px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    td.tl-date { color: var(--ink); font-weight: var(--weight-strong); white-space: nowrap; }
+    td.tl-event { color: var(--ink-dim); font-family: var(--font-body); font-size: var(--fs-sm); line-height: 1.5; }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); }
+    td.adj { color: var(--ink-dim); white-space: nowrap; }
+    .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-bottom: 18px; }
+    .src-list { list-style: none; padding: 0; }
+    .src-list li { margin-bottom: 8px; font-size: var(--fs-sm); }
+  </style>
+</Base>
