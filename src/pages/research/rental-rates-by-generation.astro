@@ -60,7 +60,7 @@ const series = CHIPS.map((c) => {
 
 const yTicks = [0.5, 1, 2, 4, 8];
 const xTicks = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026].map((y) => ({ y, x: cx(y * 12) }));
-// Demand episodes (S04): 2021-01..2023-12 and 2025-12..panel end.
+// Demand episodes (S03): 2021-01..2023-12 and 2025-12..panel end.
 const ep1 = { a: cx(mk('2021-01')), b: cx(mk('2023-12')) };
 const ep2 = { a: cx(mk('2025-12')), b: cx(X1) };
 
@@ -70,15 +70,6 @@ const fits = [
   { gen: 'H100', win: 'Sep 2023 – Apr 2026 (2.6y)', fit: '−13.0%/yr', r2: '0.48', ep: '+1.5%/yr', path: '$3.50 → $3.64' },
 ];
 
-const regimes = [
-  { prov: 'AWS', kind: 'sticky', series: 'A100 (p4d)', path: '$32.77/instance, unchanged Nov 2020 → mid-2026 — 5.5 years' },
-  { prov: 'Paperspace', kind: 'sticky', series: 'V100', path: '$2.30, unchanged Oct 2017 → 2026 — over eight years' },
-  { prov: 'CoreWeave', kind: 'sticky', series: 'A100 rate card', path: '$2.06, unchanged Mar 2021 → card withdrawn Nov 2025' },
-  { prov: 'Lambda', kind: 'repricer', series: 'V100', path: '$1.50 → $0.85 → $0.55 (2022) → $0.79 (2026)' },
-  { prov: 'Lambda', kind: 'repricer', series: 'A100 80GB', path: '$1.50 → $1.79 (Jan 2024) → $2.06 → $2.79 (spring 2026)' },
-  { prov: 'DataCrunch / Verda', kind: 'repricer', series: 'A100 80GB', path: '$2.20 → $2.34 (2024 peak) → $1.12 (Jul 2025) → $1.29 (2026)' },
-  { prov: 'DataCrunch / Verda', kind: 'repricer', series: 'H200', path: '$2.00 (Aug 2025) → $3.39 (Mar 2026)' },
-];
 ---
 <Base
   title="GPU Rental Rates by Generation: Nine Years of Posted Prices · CCIR Research"
@@ -143,48 +134,12 @@ const regimes = [
         Posted panel-median guaranteed on-demand rate, $/GPU-hr, monthly, log
         scale, Oct 2017 – Jun 2026. Step-function repair (posted prices carry
         forward ≤6 months between captures); shaded bands are the two demand
-        episodes described in §04.
+        episodes described in §03.
       </figcaption>
     </figure>
 
     <section class="sec">
-      <h2><span class="n">01</span> The Data</h2>
-      <p>
-        <strong>Sources.</strong> Archived captures of provider pricing pages
-        from the Internet Archive's Wayback Machine and from Common Crawl WARC
-        records, spliced with CCIR's live panel from April 2026. Providers:
-        AWS, CoreWeave, DataCrunch (Verda from December 2025), Genesis Cloud,
-        Lambda, OCI, OVHcloud, Paperspace, RunPod, with Common Crawl
-        recoveries of Crusoe, Hyperstack, Together, and TensorDock. Every
-        observation is a price the provider itself posted, on a dated page,
-        with the capture URL recorded.
-      </p>
-      <p>
-        <strong>Filters.</strong> Guaranteed on-demand rates only — reserved,
-        spot, interruptible-community, and "starting-at" teaser rows excluded;
-        USD only; per-instance prices divided to per-GPU with the derivation
-        recorded per row; known page bugs excluded.
-      </p>
-      <p>
-        <strong>Repair.</strong> Posted prices are step functions: a page that
-        read $1.79 in January and $1.79 in June did not move in between. Gaps
-        between captures are carried forward at most six months; providers
-        drop out of the panel beyond that. The monthly panel value is the
-        median across providers present that month, with the count disclosed
-        per point; months with fewer than three providers are drawn dashed
-        and excluded from every fitted figure.
-      </p>
-      <p>
-        <strong>Basis notes.</strong> CoreWeave's componentized per-GPU rate
-        card (constant from 2021) was withdrawn in November 2025; its
-        instance-derived prices are a different billing basis and are treated
-        as a separate series. A100 pools 40GB and 80GB memory variants at
-        chip grain, matching the published series convention.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">02</span> The Paths</h2>
+      <h2><span class="n">01</span> The Paths</h2>
       <p>
         Fitted annual rates of change on the panel median, months with n≥3
         only:
@@ -216,38 +171,7 @@ const regimes = [
     </section>
 
     <section class="sec">
-      <h2><span class="n">03</span> Two Pricing Regimes</h2>
-      <p>
-        The panel divides cleanly into providers who post a list and leave
-        it, and providers who reprice. The declines in §02 are carried almost
-        entirely by the second group.
-      </p>
-      <div class="twrap">
-        <table>
-          <thead><tr><th>Provider</th><th>Regime</th><th>Series</th><th>Path in the record</th></tr></thead>
-          <tbody>
-            {regimes.map((r) => (
-              <tr>
-                <td class="gen">{r.prov}</td>
-                <td><span class={`regime rg-${r.kind}`}>{r.kind}</span></td>
-                <td class="dim">{r.series}</td>
-                <td class="dim path-cell">{r.path}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p>
-        Sticky lists adjust through means other than the list — commitment
-        discounts, page redesigns, delistings (OVHcloud removed its V100
-        tiers in late 2025; Together delisted A100 in early 2026) — or not at
-        all. Where posted prices move, they move in steps measured in tens of
-        percent.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">04</span> Two Demand Episodes</h2>
+      <h2><span class="n">02</span> Two Demand Episodes</h2>
       <p>
         The decline has been interrupted twice, visibly, in nine years.
       </p>
@@ -275,10 +199,10 @@ const regimes = [
     </section>
 
     <section class="sec">
-      <h2><span class="n">05</span> Cohort and Cross-Section</h2>
+      <h2><span class="n">03</span> Cohort and Cross-Section</h2>
       <p>
         The ≈−26%/yr figure in the <a href="/research/gpu-age-curve">age-curve
-        note</a> and the slower rates in §02 measure different things, and the
+        note</a> and the slower rates in §01 measure different things, and the
         difference is in the data rather than between two opinions. The
         cross-section compares differently-aged chips at one date: how the
         market prices age, today. A cohort path is one chip through time, and
@@ -293,7 +217,7 @@ const regimes = [
     </section>
 
     <section class="sec">
-      <h2><span class="n">06</span> Limitations</h2>
+      <h2><span class="n">04</span> Limitations</h2>
       <p>
         Posted asks, not transactions. Panel composition changes as providers
         enter, exit, redesign pages, or stop rendering prices server-side;
@@ -308,6 +232,44 @@ const regimes = [
         on request via <a href="/contact">/contact</a>.
       </p>
     </section>
+
+    <details class="method">
+      <summary>Methodology &amp; data — sources, filters, repair, basis</summary>
+      <div class="method-body">
+        <p>
+          <strong>Sources.</strong> Archived captures of provider pricing
+          pages from the Internet Archive's Wayback Machine and from Common
+          Crawl WARC records, spliced with CCIR's live panel from April 2026.
+          Providers: AWS, CoreWeave, DataCrunch (Verda from December 2025),
+          Genesis Cloud, Lambda, OCI, OVHcloud, Paperspace, RunPod, with
+          Common Crawl recoveries of Crusoe, Hyperstack, Together, and
+          TensorDock. Every observation is a price the provider itself
+          posted, on a dated page, with the capture URL recorded.
+        </p>
+        <p>
+          <strong>Filters.</strong> Guaranteed on-demand rates only —
+          reserved, spot, interruptible-community, and "starting-at" teaser
+          rows excluded; USD only; per-instance prices divided to per-GPU
+          with the derivation recorded per row; known page bugs excluded.
+        </p>
+        <p>
+          <strong>Repair.</strong> Posted prices are step functions: a page
+          that read $1.79 in January and $1.79 in June did not move in
+          between. Gaps between captures are carried forward at most six
+          months; providers drop out of the panel beyond that. The monthly
+          panel value is the median across providers present that month,
+          with the count disclosed per point; months with fewer than three
+          providers are drawn dashed and excluded from every fitted figure.
+        </p>
+        <p>
+          <strong>Basis notes.</strong> CoreWeave's componentized per-GPU
+          rate card (constant from 2021) was withdrawn in November 2025; its
+          instance-derived prices are a different billing basis and are
+          treated as a separate series. A100 pools 40GB and 80GB memory
+          variants at chip grain, matching the published series convention.
+        </p>
+      </div>
+    </details>
   </section>
 
   <style>
@@ -337,7 +299,7 @@ const regimes = [
       --arch-ampere: #ff4d84;
       --arch-hopper: #ffb400;
     }
-    .chart-fig { margin: 0 0 18px; max-width: 780px; }
+    .chart-fig { margin: 0 0 18px; max-width: 1120px; }
     .chart-box { border: 1px solid var(--rule); background: var(--surface); }
     .chart-box svg { display: block; width: 100%; height: auto; }
     .grid { stroke: var(--rule); stroke-width: 1; }
@@ -361,7 +323,7 @@ const regimes = [
     .sw-dash { background: repeating-linear-gradient(90deg, var(--ink-dim) 0 3px, transparent 3px 6px); }
     .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
 
-    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 12px; max-width: 780px; }
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 12px; max-width: 880px; }
     table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
     th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
     thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
@@ -369,9 +331,27 @@ const regimes = [
     td.gen { color: var(--ink); font-weight: var(--weight-strong); }
     td.dim { color: var(--ink-dim); }
     td.strong { color: var(--accent); font-weight: var(--weight-strong); }
-    td.path-cell { white-space: normal; min-width: 30ch; }
-    .regime { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); padding: 1px 7px; border: 1px solid currentColor; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
-    .rg-sticky { color: var(--ink-dim); }
-    .rg-repricer { color: var(--accent); }
+    .method { border: 1px solid var(--rule); background: var(--surface); max-width: 880px; margin: 26px 0 8px; }
+    .method summary {
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      padding: 12px 20px;
+      user-select: none;
+    }
+    .method summary:hover { color: var(--accent); }
+    .method-body { padding: 2px 20px 12px; }
+    .method-body p {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.6;
+      margin: 0 0 11px;
+      max-width: 78ch;
+    }
+    .method-body strong { color: var(--ink); }
   </style>
 </Base>
