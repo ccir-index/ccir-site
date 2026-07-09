@@ -164,7 +164,7 @@ const bwTable = [
           <div class="sm-panel">
             <div class="sm-head">
               <span class={`sm-chip lab-${s.cls}`}>{s.key}</span>
-              <span class="sm-val">{s.endVal.toFixed(2)} at {s.endAge}mo</span>
+              <span class="sm-val">{s.endVal.toFixed(2)}× MSRP at {s.endAge}mo</span>
             </div>
             <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
                  aria-label={`Annualized posted rent divided by MSRP for ${s.key}, by age in months, with the other four generations shown faintly for context. Latest ratio ${s.endVal.toFixed(2)} at ${s.endAge} months. Dashed segments mark months with fewer than three providers.`}>
@@ -188,10 +188,11 @@ const bwTable = [
         ))}
         <div class="sm-panel sm-key">
           <div class="sm-key-body">
-            <p><strong>Reading the panels.</strong> Each shows one
-            generation's annualized posted rent ÷ its MSRP, by age in
-            months from general availability; the other four are ghosted for
-            context.</p>
+            <p><strong>Reading the panels.</strong> The colored line is one
+            generation's annualized posted rental rate divided by its MSRP —
+            the rental-rate path, expressed as a multiple of the machine's
+            price — by age in months from general availability. The other
+            four generations are ghosted for context.</p>
             <p>The emphasized line is <strong>1.0</strong> — a year of posted
             hours equals the MSRP. Dashed segments = months with n&lt;3
             providers (shown, never fitted). Dot = latest n≥3 point.</p>
@@ -318,7 +319,7 @@ const bwTable = [
             <div class="sm-panel">
               <div class="sm-head">
                 <span class={`sm-chip lab-${s.cls}`}>{s.key}</span>
-                <span class="sm-val">{s.nEndVal.toFixed(2)} net at {s.endAge}mo</span>
+                <span class="sm-val">net {s.nEndVal.toFixed(2)}× MSRP at {s.endAge}mo</span>
               </div>
               <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
                    aria-label={`Net annualized revenue under the conservative elections divided by MSRP for ${s.key}, by age in months, with the other four generations ghosted. Dotted lines mark three-year and five-year recovery paces. Latest net ratio ${s.nEndVal.toFixed(2)} at ${s.endAge} months.`}>
