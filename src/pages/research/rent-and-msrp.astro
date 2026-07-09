@@ -72,11 +72,11 @@ const anchors = [
 ];
 
 const payback = [
-  { gen: 'V100', ga: 'Q3 2017', months: '11', cum: '$128,000', mult: '6.9×' },
-  { gen: 'A100', ga: 'May 2020', months: '15', cum: '$118,500', mult: '4.8×' },
-  { gen: 'H100', ga: 'Oct 2022', months: '14', cum: '$110,600', mult: '3.3×' },
-  { gen: 'H200', ga: 'Q2 2024', months: '17', cum: '$62,700', mult: '2.0×' },
-  { gen: 'B200', ga: 'Dec 2024', months: '15', cum: '$84,100', mult: '1.3×' },
+  { gen: 'V100', ga: 'Q3 2017', months: '11', cum: '$127,200', mult: '6.8×' },
+  { gen: 'A100', ga: 'May 2020', months: '15', cum: '$116,600', mult: '4.7×' },
+  { gen: 'H100', ga: 'Oct 2022', months: '14', cum: '$101,800', mult: '3.0×' },
+  { gen: 'H200', ga: 'Q2 2024', months: '17', cum: '$54,600', mult: '1.7×' },
+  { gen: 'B200', ga: 'Dec 2024', months: '16', cum: '$67,900', mult: '1.1×' },
 ];
 
 // Conservative elections: realization = 1/2 of posted (see /realized — filings
@@ -87,16 +87,16 @@ const scenarios = [
   { gen: 'V100', a: '11', b: '20', c: '24' },
   { gen: 'A100', a: '15', b: '29', c: '36' },
   { gen: 'H100', a: '14', b: '26', c: '40' },
-  { gen: 'H200', a: '17', b: 'not yet (26mo window)', c: 'not yet' },
-  { gen: 'B200', a: '15', b: 'not yet (18mo window)', c: 'not yet' },
+  { gen: 'H200', a: '17', b: 'not yet (24mo window)', c: 'not yet' },
+  { gen: 'B200', a: '16', b: 'not yet (16mo window)', c: 'not yet' },
 ];
 
 const ratioTable = [
-  { gen: 'V100', entry: '1.08 (Oct 2017, launch-adjacent)', last: '0.37 (Apr 2026, age 8.6y)' },
-  { gen: 'A100', entry: '1.44 (Nov 2020, launch week)', last: '0.63 (Jun 2026, age 6.1y)' },
-  { gen: 'H100', entry: '1.11 (Jan 2023)', last: '0.95 (Apr 2026, age 3.5y)' },
-  { gen: 'H200', entry: '0.61 (Oct 2024, entered low)', last: '1.27 (Apr 2026, age 2.0y)' },
-  { gen: 'B200', entry: '1.09 (Mar 2025)', last: '0.91 (Apr 2026, age 1.3y)' },
+  { gen: 'V100', entry: '1.08 (Oct 2017, launch-adjacent)', last: '0.38 (age 8.6y)' },
+  { gen: 'A100', entry: '1.44 (Nov 2020, launch week)', last: '0.70 (age 5.9y)' },
+  { gen: 'H100', entry: '1.11 (Jan 2023)', last: '0.95 (age 3.5y)' },
+  { gen: 'H200', entry: '0.61 (Oct 2024, entered low)', last: '1.27 (age 2.0y)' },
+  { gen: 'B200', entry: '1.09 (Mar 2025)', last: '0.91 (age 1.3y)' },
 ];
 
 const bwTable = [
@@ -114,7 +114,7 @@ const bwTable = [
 >
   <section class="wrap top">
     <header class="page-head">
-      <div class="kicker">Research · 2026-07-08 · window Oct 2017 – Jun 2026</div>
+      <div class="kicker">Research · 2026-07-08 · window Oct 2017 – Apr 2026</div>
       <h1>Rent and MSRP: Five Generations of Posted Prices</h1>
       <p class="standfirst">
         A rented GPU has two posted prices: what an hour of it rents for, and
@@ -177,7 +177,8 @@ const bwTable = [
       </div>
       <figcaption class="tfoot">
         Annualized posted panel-median rent ÷ MSRP anchor, by generation age
-        in months from GA, Oct 2017 – Jun 2026, shared scales across panels.
+        in months from GA, Oct 2017 – Apr 2026 (the archive's edge — the
+        live CCIR panel continues from there), shared scales across panels.
         Sources and repair per the
         <a href="/research/rental-rates-by-generation">cohort note</a>;
         anchors per §01.
@@ -231,7 +232,7 @@ const bwTable = [
       </p>
       <div class="twrap">
         <table>
-          <thead><tr><th>Generation</th><th>GA</th><th class="num">Months to pass anchor</th><th class="num">Cum. gross revenue to Jun 2026</th><th class="num">Multiple of anchor</th></tr></thead>
+          <thead><tr><th>Generation</th><th>GA</th><th class="num">Months to pass anchor</th><th class="num">Cum. gross revenue to Apr 2026</th><th class="num">Multiple of anchor</th></tr></thead>
           <tbody>
             {payback.map((p) => (
               <tr><td class="gen">{p.gen}</td><td class="dim">{p.ga}</td><td class="num strong">{p.months}</td><td class="num dim">{p.cum}</td><td class="num strong">{p.mult}</td></tr>
@@ -282,7 +283,7 @@ const bwTable = [
       <h2><span class="n">03</span> The Ratio Through Time</h2>
       <div class="twrap">
         <table>
-          <thead><tr><th>Generation</th><th>Ratio at panel entry</th><th>Ratio at latest n≥3 point</th></tr></thead>
+          <thead><tr><th>Generation</th><th>Ratio at panel entry</th><th>Ratio at the window's edge (Apr 2026)</th></tr></thead>
           <tbody>
             {ratioTable.map((r) => (
               <tr><td class="gen">{r.gen}</td><td class="dim">{r.entry}</td><td class="dim">{r.last}</td></tr>
@@ -295,10 +296,12 @@ const bwTable = [
         — posted pricing has repeatedly placed a new chip's annual rental
         stream at approximately its launch price. The ratio then decays with
         age at the cohort rates measured in the companion note, and rises
-        during demand episodes: H100's ratio today is roughly what it was at
-        launch, and H200's — which entered low — now sits above one. H200's
-        entry point reflects a single early repricer's aggressive list;
-        its anchor is also the weakest-documented of the five (§01).
+        during demand episodes: H100's ratio at the window's edge is roughly
+        its level at launch, and H200's — which entered low — sits above
+        one. H200's entry point reflects a single early repricer's
+        aggressive list; its anchor is also the weakest-documented of the
+        five (§01). The window ends at the archive's edge, April 2026; the
+        live CCIR panel is the continuation.
       </p>
     </section>
 
