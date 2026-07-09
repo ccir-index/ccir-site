@@ -7,16 +7,19 @@ import ratios from '../../data/rent_ratio_panels.json';
 // draws its own line in color — solid where n>=3, dashed thinner (shown,
 // never used in any figure) — with the other four generations ghosted
 // behind for context and the 1.0 line emphasized. Shared scales.
+// Cumulative-recovery panels: cumulative revenue / MSRP by age; the 1.0
+// crossing IS the payback month from the S02 tables. Gross and net share
+// the age axis; each has its own linear y scale.
 const AGE_MAX = 106;
-const YMAX = 1.6;
-const YMAX_NET = 0.65;
+const YMAX = 7.2;
+const YMAX_NET = 2.7;
 const CW = 340, CH = 205, PL = 32, PR = 14, PT = 12, PB = 24;
 const iw = CW - PL - PR, ih = CH - PT - PB;
 const cx = (a: number) => PL + (a / AGE_MAX) * iw;
-const cy = (v: number) => PT + ih * (1 - v / YMAX);
-const cyN = (v: number) => PT + ih * (1 - v / YMAX_NET);
+const cy = (v: number) => PT + ih * (1 - Math.min(v, YMAX) / YMAX);
+const cyN = (v: number) => PT + ih * (1 - Math.min(v, YMAX_NET) / YMAX_NET);
 
-type Pt = { m: string; age: number; med: number; n: number; ratio: number; rnet: number };
+type Pt = { m: string; age: number; med: number; n: number; ratio: number; rnet: number; cg: number; cn: number };
 function stepPaths(points: Pt[], want: (n: number) => boolean, yOf: (p: Pt) => number): string[] {
   const segs: string[] = [];
   let d: string | null = null;
@@ -50,30 +53,38 @@ const CHIPS = [
   { key: 'H200', cls: 'h200' },
   { key: 'B200', cls: 'blackwell' },
 ] as const;
-const yGross = (p: Pt) => cy(p.ratio);
-const yNet = (p: Pt) => cyN(p.rnet);
+const yGross = (p: Pt) => cy(p.cg);
+const yNet = (p: Pt) => cyN(p.cn);
 const series = CHIPS.map((c) => {
   const pts = (ratios as any)[c.key].points as Pt[];
-  const lastDeep = [...pts].reverse().find((p) => p.n >= 3) ?? pts[pts.length - 1]!;
+  const last = pts[pts.length - 1]!;
+  const xg = pts.find((p) => p.cg >= 1);
+  const xn = pts.find((p) => p.cn >= 1);
   return {
     ...c,
     solid: stepPaths(pts, (n) => n >= 3, yGross),
     thin: stepPaths(pts, (n) => n < 3, yGross),
     ghost: stepPaths(pts, () => true, yGross),
-    endX: cx(lastDeep.age), endY: cy(lastDeep.ratio),
-    endVal: lastDeep.ratio, endAge: lastDeep.age,
+    endVal: last.cg, endAge: last.age,
+    crossG: xg ? { x: cx(xg.age), y: cy(xg.cg), mo: xg.age } : null,
     nSolid: stepPaths(pts, (n) => n >= 3, yNet),
     nThin: stepPaths(pts, (n) => n < 3, yNet),
     nGhost: stepPaths(pts, () => true, yNet),
-    nEndX: cx(lastDeep.age), nEndY: cyN(lastDeep.rnet), nEndVal: lastDeep.rnet,
+    nEndVal: last.cn,
+    crossN: xn ? { x: cx(xn.age), y: cyN(xn.cn), mo: xn.age } : null,
   };
 });
-const yTicks = [0.5, 1.0, 1.5];
-const yTicksNet = [0.2, 0.4, 0.6];
+const yTicks = [1, 3, 5, 7];
+const yTicksNet = [1, 2];
+// Straight-line recovery paces on the net panels: cum = age/36 (3-yr) and
+// age/60 (5-yr) — straight diagonals on linear axes.
 const PACE = [
-  { v: 1 / 3, label: '3-yr pace' },
-  { v: 1 / 5, label: '5-yr pace' },
-];
+  { months: 36, label: '3-yr pace' },
+  { months: 60, label: '5-yr pace' },
+].map((p) => {
+  const xEnd = Math.min(AGE_MAX, p.months * YMAX_NET);
+  return { ...p, x1: cx(0), y1: cyN(0), x2: cx(xEnd), y2: cyN(xEnd / p.months) };
+});
 const xTicks = [0, 24, 48, 72, 96];
 
 const anchors = [
@@ -164,14 +175,14 @@ const bwTable = [
           <div class="sm-panel">
             <div class="sm-head">
               <span class={`sm-chip lab-${s.cls}`}>{s.key}</span>
-              <span class="sm-val">{s.endVal.toFixed(2)}× MSRP at {s.endAge}mo</span>
+              <span class="sm-val">{s.endVal.toFixed(1)}× MSRP recovered at {s.endAge}mo</span>
             </div>
             <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-                 aria-label={`Annualized posted rent divided by MSRP for ${s.key}, by age in months, with the other four generations shown faintly for context. Latest ratio ${s.endVal.toFixed(2)} at ${s.endAge} months. Dashed segments mark months with fewer than three providers.`}>
+                 aria-label={`Cumulative posted-rate revenue divided by MSRP for ${s.key}, rising with age in months; the 1.0 crossing marks gross payback${s.crossG ? ` at month ${s.crossG.mo}` : ''}. Ends at ${s.endVal.toFixed(1)} times MSRP at ${s.endAge} months. Other generations ghosted; dashed segments mark months with fewer than three providers.`}>
               {yTicks.map((t) => (
                 <g>
                   <line x1={PL} x2={CW - PR} y1={cy(t)} y2={cy(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
-                  <text x={PL - 6} y={cy(t) + 3} class="tick" text-anchor="end">{t.toFixed(1)}</text>
+                  <text x={PL - 6} y={cy(t) + 3} class="tick" text-anchor="end">{t}×</text>
                 </g>
               ))}
               {xTicks.map((a) => (
@@ -182,28 +193,34 @@ const bwTable = [
               )}
               {s.thin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
               {s.solid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
-              <circle cx={s.endX} cy={s.endY} r="3" class={`enddot dot-${s.cls}`} />
+              {s.crossG && (
+                <g>
+                  <circle cx={s.crossG.x} cy={s.crossG.y} r="3.4" class={`enddot dot-${s.cls}`} />
+                  <text x={s.crossG.x + 7} y={s.crossG.y + 12} class={`crosslab lab-${s.cls}`} text-anchor="start">{s.crossG.mo}mo</text>
+                </g>
+              )}
             </svg>
           </div>
         ))}
         <div class="sm-panel sm-key">
           <div class="sm-key-body">
             <p><strong>Reading the panels.</strong> The colored line is one
-            generation's annualized posted rental rate divided by its MSRP —
-            the rental-rate path, expressed as a multiple of the machine's
-            price — by age in months from general availability. The other
+            generation's cumulative posted-rate revenue divided by its MSRP,
+            rising with age in months from general availability. The other
             four generations are ghosted for context.</p>
-            <p>The emphasized line is <strong>1.0</strong> — a year of posted
-            hours equals the MSRP. Dashed segments = months with n&lt;3
-            providers (shown, never fitted). Dot = latest n≥3 point.</p>
+            <p>The emphasized line is <strong>1.0× — MSRP fully
+            recovered</strong>; the dot marks the crossing month, the gross
+            payback from the table below. Dashed segments = months with
+            n&lt;3 providers.</p>
           </div>
         </div>
       </div>
       <figcaption class="tfoot">
-        Annualized posted panel-median rent ÷ MSRP, by generation age
-        in months from general availability, Oct 2017 – Apr 2026 (the archive's edge — the
-        live CCIR panel continues from there), shared scales across panels.
-        Sources and repair per the
+        Cumulative posted panel-median revenue ÷ MSRP (100% utilization,
+        posted list, before all costs — §02), by generation age in months
+        from general availability, Oct 2017 – Apr 2026 (the archive's edge —
+        the live CCIR panel continues from there), shared scales across
+        panels. Sources and repair per the
         <a href="/research/rental-rates-by-generation">cohort note</a>;
         MSRP figures per §01.
       </figcaption>
@@ -308,10 +325,10 @@ const bwTable = [
         prices, not the elections.
       </p>
       <p>
-        The same panels, under the elections — net annualized revenue
-        (½ × posted, less cash cost) divided by MSRP. The dotted reference
-        lines are recovery paces: a line sitting on ⅓ recovers MSRP in
-        three years; on ⅕, in five.
+        The same panels, under the elections — cumulative net revenue
+        (½ × posted, less cash cost) divided by MSRP. The dotted diagonals
+        are straight-line recovery paces: a fleet tracking the steeper one
+        recovers MSRP in three years; the shallower one, in five.
       </p>
       <figure class="chart-fig">
         <div class="sm-grid">
@@ -322,17 +339,17 @@ const bwTable = [
                 <span class="sm-val">net {s.nEndVal.toFixed(2)}× MSRP at {s.endAge}mo</span>
               </div>
               <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-                   aria-label={`Net annualized revenue under the conservative elections divided by MSRP for ${s.key}, by age in months, with the other four generations ghosted. Dotted lines mark three-year and five-year recovery paces. Latest net ratio ${s.nEndVal.toFixed(2)} at ${s.endAge} months.`}>
+                   aria-label={`Cumulative net revenue under the conservative elections divided by MSRP for ${s.key}, rising with age in months${s.crossN ? `; crosses full recovery at month ${s.crossN.mo}` : '; has not yet crossed full recovery'}. Dotted diagonals mark three-year and five-year straight-line recovery paces. Other generations ghosted.`}>
                 {yTicksNet.map((t) => (
                   <g>
-                    <line x1={PL} x2={CW - PR} y1={cyN(t)} y2={cyN(t)} class="grid" />
-                    <text x={PL - 6} y={cyN(t) + 3} class="tick" text-anchor="end">{t.toFixed(1)}</text>
+                    <line x1={PL} x2={CW - PR} y1={cyN(t)} y2={cyN(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
+                    <text x={PL - 6} y={cyN(t) + 3} class="tick" text-anchor="end">{t}×</text>
                   </g>
                 ))}
                 {PACE.map((p) => (
                   <g>
-                    <line x1={PL} x2={CW - PR} y1={cyN(p.v)} y2={cyN(p.v)} class="grid-one" />
-                    <text x={CW - PR - 2} y={cyN(p.v) - 4} class="pacelab" text-anchor="end">{p.label}</text>
+                    <line x1={p.x1} y1={p.y1} x2={p.x2} y2={p.y2} class="grid-pace" />
+                    <text x={p.x2 - 4} y={p.y2 + 12} class="pacelab" text-anchor="end">{p.label}</text>
                   </g>
                 ))}
                 {xTicks.map((a) => (
@@ -343,26 +360,33 @@ const bwTable = [
                 )}
                 {s.nThin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
                 {s.nSolid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
-                <circle cx={s.nEndX} cy={s.nEndY} r="3" class={`enddot dot-${s.cls}`} />
+                {s.crossN && (
+                  <g>
+                    <circle cx={s.crossN.x} cy={s.crossN.y} r="3.4" class={`enddot dot-${s.cls}`} />
+                    <text x={s.crossN.x + 7} y={s.crossN.y + 12} class={`crosslab lab-${s.cls}`} text-anchor="start">{s.crossN.mo}mo</text>
+                  </g>
+                )}
               </svg>
             </div>
           ))}
           <div class="sm-panel sm-key">
             <div class="sm-key-body">
-              <p><strong>Reading the panels.</strong> Net run-rate =
-              (½ × posted panel-median − cash operating cost) × hours,
-              divided by MSRP; elections per this section.</p>
-              <p>Dotted lines: <strong>⅓ = 3-year</strong> and
-              <strong>⅕ = 5-year</strong> recovery pace. Dashed segments =
-              months with n&lt;3 providers. Dot = window's edge.</p>
+              <p><strong>Reading the panels.</strong> Cumulative net revenue
+              = (½ × posted panel-median − cash operating cost) × hours,
+              divided by MSRP; elections per this section. The <strong>1.0×
+              crossing</strong> (dot) is the conservative payback month from
+              the table above.</p>
+              <p>Dotted diagonals = <strong>3-year</strong> and
+              <strong>5-year</strong> straight-line recovery paces. Dashed
+              segments = months with n&lt;3 providers.</p>
             </div>
           </div>
         </div>
         <figcaption class="tfoot">
-          Net-of-elections run-rate ÷ MSRP, by generation age in months from
-          general availability, Oct 2017 – Apr 2026, shared scales across
-          panels. Same panel data as the gross chart; the elections are
-          stated in this section and are not CCIR publications.
+          Cumulative net-of-elections revenue ÷ MSRP, by generation age in
+          months from general availability, Oct 2017 – Apr 2026, shared
+          scales across panels. Same panel data as the gross chart; the
+          elections are stated in this section and are not CCIR publications.
         </figcaption>
       </figure>
     </section>
@@ -570,6 +594,8 @@ const bwTable = [
     }
     .sm-panel.maxed svg { max-height: 78vh; }
     .pacelab { font-family: var(--font-mono); font-size: 8.5px; fill: var(--ink-dim); letter-spacing: 0.04em; text-transform: uppercase; }
+    .grid-pace { stroke: var(--ink-dim); stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.7; }
+    .crosslab { font-family: var(--font-mono); font-size: 10px; font-weight: 600; }
     .sm-head {
       display: flex;
       justify-content: space-between;
