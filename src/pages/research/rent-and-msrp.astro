@@ -2,12 +2,14 @@
 import Base from '../../layouts/Base.astro';
 import ratios from '../../data/rent_ratio_panels.json';
 
-// Ratio-by-age chart: annualized posted panel-median rent / launch anchor,
-// per generation, on an age axis. Solid where n>=3, dashed thinner (shown,
-// never used in any figure). Ratio of two posted prices throughout.
+// Ratio-by-age, small multiples: one panel per generation (five stepped
+// lines in one frame was unreadable in the young-age region). Each panel
+// draws its own line in color — solid where n>=3, dashed thinner (shown,
+// never used in any figure) — with the other four generations ghosted
+// behind for context and the 1.0 line emphasized. Shared scales.
 const AGE_MAX = 106;
 const YMAX = 1.6;
-const CW = 720, CH = 340, PL = 44, PR = 118, PT = 18, PB = 36;
+const CW = 340, CH = 205, PL = 32, PR = 14, PT = 12, PB = 24;
 const iw = CW - PL - PR, ih = CH - PT - PB;
 const cx = (a: number) => PL + (a / AGE_MAX) * iw;
 const cy = (v: number) => PT + ih * (1 - v / YMAX);
@@ -53,11 +55,13 @@ const series = CHIPS.map((c) => {
     ...c,
     solid: stepPaths(pts, (n) => n >= 3),
     thin: stepPaths(pts, (n) => n < 3),
-    endX: cx(lastDeep.age), endY: cy(lastDeep.ratio), endVal: lastDeep.ratio,
+    ghost: stepPaths(pts, () => true),
+    endX: cx(lastDeep.age), endY: cy(lastDeep.ratio),
+    endVal: lastDeep.ratio, endAge: lastDeep.age,
   };
 });
-const yTicks = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5];
-const xTicks = [0, 12, 24, 36, 48, 60, 72, 84, 96];
+const yTicks = [0.5, 1.0, 1.5];
+const xTicks = [0, 24, 48, 72, 96];
 
 const anchors = [
   { gen: 'V100', usd: '$18,625', basis: 'DGX-1V $149,000 ÷ 8 (2017-05, NVIDIA announce)', grade: 'A' },
@@ -118,38 +122,49 @@ const bwTable = [
     </header>
 
     <figure class="chart-fig">
-      <div class="chart-box">
-        <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-             aria-label="Annualized posted rent divided by MSRP anchor, by generation age in months. Five stepped lines: each generation enters near a ratio of one and decays with age; H200 rose above one during the current demand episode. Dashed segments mark months with fewer than three providers.">
-          {yTicks.map((t) => (
-            <g>
-              <line x1={PL} x2={CW - PR} y1={cy(t)} y2={cy(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
-              <text x={PL - 7} y={cy(t) + 3} class="tick" text-anchor="end">{t.toFixed(2)}</text>
-            </g>
-          ))}
-          <text x={CW - PR} y={cy(1) - 5} class="onelab" text-anchor="end">1.0 = a year of posted hours equals the MSRP anchor</text>
-          {xTicks.map((a) => (
-            <text x={cx(a)} y={CH - 14} class="tick" text-anchor="middle">{a}mo</text>
-          ))}
-          {series.map((s) => (
-            <g>
+      <div class="sm-grid">
+        {series.map((s) => (
+          <div class="sm-panel">
+            <div class="sm-head">
+              <span class={`sm-chip lab-${s.cls}`}>{s.key}</span>
+              <span class="sm-val">{s.endVal.toFixed(2)} at {s.endAge}mo</span>
+            </div>
+            <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
+                 aria-label={`Annualized posted rent divided by MSRP anchor for ${s.key}, by age in months, with the other four generations shown faintly for context. Latest ratio ${s.endVal.toFixed(2)} at ${s.endAge} months. Dashed segments mark months with fewer than three providers.`}>
+              {yTicks.map((t) => (
+                <g>
+                  <line x1={PL} x2={CW - PR} y1={cy(t)} y2={cy(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
+                  <text x={PL - 6} y={cy(t) + 3} class="tick" text-anchor="end">{t.toFixed(1)}</text>
+                </g>
+              ))}
+              {xTicks.map((a) => (
+                <text x={cx(a)} y={CH - 8} class="tick" text-anchor="middle">{a}mo</text>
+              ))}
+              {series.filter((o) => o.key !== s.key).map((o) =>
+                o.ghost.map((d) => <path d={d} class="ln ln-ghost" />)
+              )}
               {s.thin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
               {s.solid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
-              <text x={s.endX + 8} y={s.endY + 4} class={`endlab lab-${s.cls}`} text-anchor="start">
-                {s.key} {s.endVal.toFixed(2)}
-              </text>
-            </g>
-          ))}
-        </svg>
-      </div>
-      <div class="chart-legend">
-        {CHIPS.map((c) => <span class="lg"><span class={`swatch sw-${c.cls}`}></span>{c.key}</span>)}
-        <span class="lg"><span class="swatch sw-dash"></span>dashed = month has n&lt;3 providers (shown, never fitted)</span>
+              <circle cx={s.endX} cy={s.endY} r="3" class={`enddot dot-${s.cls}`} />
+            </svg>
+          </div>
+        ))}
+        <div class="sm-panel sm-key">
+          <div class="sm-key-body">
+            <p><strong>Reading the panels.</strong> Each shows one
+            generation's annualized posted rent ÷ its MSRP anchor, by age in
+            months from GA; the other four are ghosted for context.</p>
+            <p>The emphasized line is <strong>1.0</strong> — a year of posted
+            hours equals the MSRP anchor. Dashed segments = months with n&lt;3
+            providers (shown, never fitted). Dot = latest n≥3 point.</p>
+          </div>
+        </div>
       </div>
       <figcaption class="tfoot">
-        Annualized posted panel-median rent ÷ MSRP anchor, by generation
-        age in months from GA, Oct 2017 – Jun 2026. Sources and repair per
-        the <a href="/research/rental-rates-by-generation">cohort note</a>;
+        Annualized posted panel-median rent ÷ MSRP anchor, by generation age
+        in months from GA, Oct 2017 – Jun 2026, shared scales across panels.
+        Sources and repair per the
+        <a href="/research/rental-rates-by-generation">cohort note</a>;
         anchors per §01.
       </figcaption>
     </figure>
@@ -355,33 +370,55 @@ const bwTable = [
       --arch-blackwell: #2dd4bf;
     }
     .chart-fig { margin: 0 0 18px; max-width: 780px; }
-    .chart-box { border: 1px solid var(--rule); background: var(--surface); }
-    .chart-box svg { display: block; width: 100%; height: auto; }
+    .sm-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+    .sm-panel { background: var(--surface); padding: 10px 12px 8px; }
+    .sm-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+    }
+    .sm-chip { font-size: var(--fs-sm); font-weight: var(--weight-strong); letter-spacing: 0.03em; }
+    .sm-val { font-size: calc(var(--fs-xs) - 1px); color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+    .sm-panel svg { display: block; width: 100%; height: auto; }
+    .sm-key { display: flex; align-items: center; }
+    .sm-key-body p {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      line-height: 1.55;
+      margin: 0 0 8px;
+    }
+    .sm-key-body strong { color: var(--accent); font-weight: var(--weight-strong); }
     .grid { stroke: var(--rule); stroke-width: 1; }
     .grid-one { stroke: var(--ink-dim); stroke-width: 1.1; stroke-dasharray: 1 3; }
-    .onelab { font-family: var(--font-mono); font-size: 9.5px; fill: var(--ink-faint); letter-spacing: 0.03em; }
     .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
-    .ln { fill: none; stroke-width: 1.8; }
+    .ln { fill: none; stroke-width: 1.7; }
     .ln-thin { stroke-width: 1.1; stroke-dasharray: 3 3; opacity: 0.8; }
+    .ln-ghost { stroke: var(--ink-faint); stroke-width: 1; opacity: 0.22; }
     .ln-volta { stroke: var(--arch-volta); }
     .ln-ampere { stroke: var(--arch-ampere); }
     .ln-hopper { stroke: var(--arch-hopper); }
     .ln-h200 { stroke: var(--arch-h200); }
     .ln-blackwell { stroke: var(--arch-blackwell); }
-    .endlab { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; }
-    .lab-volta { fill: var(--arch-volta); }
-    .lab-ampere { fill: var(--arch-ampere); }
-    .lab-hopper { fill: var(--arch-hopper); }
-    .lab-h200 { fill: var(--arch-h200); }
-    .lab-blackwell { fill: var(--arch-blackwell); }
-    .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); }
-    .swatch { display: inline-block; width: 14px; height: 3px; margin-right: 5px; vertical-align: 3px; }
-    .sw-volta { background: var(--arch-volta); }
-    .sw-ampere { background: var(--arch-ampere); }
-    .sw-hopper { background: var(--arch-hopper); }
-    .sw-h200 { background: var(--arch-h200); }
-    .sw-blackwell { background: var(--arch-blackwell); }
-    .sw-dash { background: repeating-linear-gradient(90deg, var(--ink-dim) 0 3px, transparent 3px 6px); }
+    .lab-volta { color: var(--arch-volta); fill: var(--arch-volta); }
+    .lab-ampere { color: var(--arch-ampere); fill: var(--arch-ampere); }
+    .lab-hopper { color: var(--arch-hopper); fill: var(--arch-hopper); }
+    .lab-h200 { color: var(--arch-h200); fill: var(--arch-h200); }
+    .lab-blackwell { color: var(--arch-blackwell); fill: var(--arch-blackwell); }
+    .enddot { stroke: var(--surface); stroke-width: 1.2; }
+    .dot-volta { fill: var(--arch-volta); }
+    .dot-ampere { fill: var(--arch-ampere); }
+    .dot-hopper { fill: var(--arch-hopper); }
+    .dot-h200 { fill: var(--arch-h200); }
+    .dot-blackwell { fill: var(--arch-blackwell); }
     .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
     .tfoot a { color: var(--ink-dim); }
 
