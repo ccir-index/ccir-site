@@ -79,6 +79,18 @@ const payback = [
   { gen: 'B200', ga: 'Dec 2024', months: '15', cum: '$84,100', mult: '1.3×' },
 ];
 
+// Conservative elections: realization = 1/2 of posted (see /realized — filings
+// show realization well below rate cards); cash operating cost c = $0.75 per
+// TDP-kW-hr per chip (the chip-economics S04 worked-example election), chip
+// nameplate TDP. Same monthly panel arithmetic, recomputed under each.
+const scenarios = [
+  { gen: 'V100', a: '11', b: '20', c: '24' },
+  { gen: 'A100', a: '15', b: '29', c: '36' },
+  { gen: 'H100', a: '14', b: '26', c: '40' },
+  { gen: 'H200', a: '17', b: 'not yet (26mo window)', c: 'not yet' },
+  { gen: 'B200', a: '15', b: 'not yet (18mo window)', c: 'not yet' },
+];
+
 const ratioTable = [
   { gen: 'V100', entry: '1.08 (Oct 2017, launch-adjacent)', last: '0.37 (Apr 2026, age 8.6y)' },
   { gen: 'A100', entry: '1.44 (Nov 2020, launch week)', last: '0.63 (Jun 2026, age 6.1y)' },
@@ -113,7 +125,10 @@ const bwTable = [
         gross rental revenue passed its MSRP anchor within
         <strong>11 to 17 months</strong> of general availability — five
         generations, anchors from $18,600 to $64,400 per GPU, the same
-        result. And the ratio at entry is close to one: each generation has
+        result. That figure is an idealized ceiling by construction; §02
+        states every assumption and repeats the arithmetic under
+        conservative elections, where the answer is roughly two to three and
+        a half years. And the ratio at entry is close to one: each generation has
         arrived priced so that roughly a year of posted-rate hours equals the
         machine's own price. Companion notes: the
         <a href="/research/gpu-age-curve">cross-section</a> and the
@@ -204,8 +219,15 @@ const bwTable = [
     <section class="sec">
       <h2><span class="n">02</span> Months to Gross Recovery</h2>
       <p>
-        Cumulative posted-rate revenue — panel-median rate × hours, summed
-        from general availability — against the anchor:
+        The assumptions first, because the headline figure is a ceiling by
+        construction: the arithmetic below assumes <strong>100% utilization,
+        24 hours a day, at the posted panel-median list rate, with no cost
+        line</strong> — no discounting, no idle hours, no power, no
+        facility. It is gross revenue, not margin, and not a forward figure;
+        each window contains the demand episodes documented in the cohort
+        note. It answers one narrow question: at the prices providers
+        themselves posted, how long did a generation's gross rental stream
+        take to add up to its own MSRP anchor?
       </p>
       <div class="twrap">
         <table>
@@ -217,17 +239,42 @@ const bwTable = [
           </tbody>
         </table>
       </div>
+      <p class="tfoot">
+        100% utilization · 24×7 · posted list · before all costs. For nine
+        years, across a 3.5× range of anchors, the idealized answer has
+        stayed inside 11–17 months.
+      </p>
+      <h3 class="sub">The same arithmetic, conservatively</h3>
       <p>
-        What this arithmetic is: the posted panel-median rate, assumed earned
-        for every hour from general availability, summed. What it is not:
-        realized revenue — no utilization below 100%, no discounting off
-        list, no cost line — and not a forward figure; each window contains
-        the demand episodes documented in the cohort note, including the
-        2021–2023 firming and the current one. It answers one narrow
-        question: at the prices providers themselves posted, how long did a
-        generation's gross rental stream take to add up to its own MSRP
-        anchor? For nine years, across a 3.5× range of anchors, the answer
-        has stayed inside 11–17 months.
+        Two elections make the figure conservative rather than idealized,
+        both anchored to published CCIR work. First, a realization factor of
+        one-half — filings-based analysis on <a href="/realized/">/realized</a>
+        shows operators realizing well below their posted rate cards once
+        utilization, discounting, and mix are in the number. Second, a cash
+        operating cost of $0.75 per TDP-kW-hr per chip — the worked-example
+        election inside the cash band published on
+        <a href="/chip-economics">/chip-economics</a>, covering power and
+        facility. The same monthly panel arithmetic, recomputed under each:
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Generation</th><th class="num">Gross at posted</th><th class="num">At ½ realization</th><th class="num">At ½ realization, less cash cost</th></tr></thead>
+          <tbody>
+            {scenarios.map((s) => (
+              <tr><td class="gen">{s.gen}</td><td class="num dim">{s.a} mo</td><td class="num strong">{s.b}{s.b.length <= 2 ? ' mo' : ''}</td><td class="num strong">{s.c}{s.c.length <= 2 ? ' mo' : ''}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Under the conservative elections, the three generations with full
+        windows recover their anchors in roughly <strong>two to three and a
+        half years</strong> — a range that sits directly on top of the 3-to-
+        5-year amortization schedules lenders in this market actually write.
+        H200 and B200 have not yet been on the market long enough to cross
+        under conservative assumptions. These are elections, stated so the
+        arithmetic can be reproduced or re-elected; CCIR publishes the
+        prices, not the elections.
       </p>
     </section>
 
@@ -352,6 +399,13 @@ const bwTable = [
     .sec h2 { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
     .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
     .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec h3.sub {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      font-weight: var(--weight-display);
+      margin: 20px 0 10px;
+      letter-spacing: -0.005em;
+    }
     .sec strong, .standfirst strong { color: var(--accent); }
     .sec em { font-style: italic; }
 
