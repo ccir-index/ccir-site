@@ -8,12 +8,11 @@ import { meta } from '../../data/snapshot';
 // never revised in place. Clusters group them by theme, monitor first.
 interface Monitor { href: string; title: string; blurb: string }
 interface Note { href: string; date: string; title: string; blurb: string }
-interface Cluster { kicker: string; heading: string; standfirst: string; monitors: Monitor[]; notes: Note[] }
+interface Cluster { heading: string; standfirst: string; monitors: Monitor[]; notes: Note[] }
 
 const clusters: Cluster[] = [
   {
-    kicker: 'Asset economics',
-    heading: 'What a Chip Earns, and For How Long',
+    heading: 'Asset Economics',
     standfirst:
       'Earning power per spec-sheet unit, how it ages, and how it compares to what the hardware cost.',
     monitors: [
@@ -30,8 +29,7 @@ const clusters: Cluster[] = [
     ],
   },
   {
-    kicker: 'Term & price structure',
-    heading: 'How the Market Prices the Same Silicon',
+    heading: 'Term & Price Structure',
     standfirst:
       'On-demand is one point on a surface — the rate broken out by tenor and by where it actually transacts.',
     monitors: [
@@ -46,8 +44,7 @@ const clusters: Cluster[] = [
     ],
   },
   {
-    kicker: 'Demand & utilization',
-    heading: 'Who Is Renting, and How Hard the Fleet Works',
+    heading: 'Demand & Utilization',
     standfirst:
       'Rate cards are asks. These read demand composition and realized economics from filings and from the fleet itself.',
     monitors: [
@@ -62,8 +59,7 @@ const clusters: Cluster[] = [
     ],
   },
   {
-    kicker: 'Precedents & history',
-    heading: 'What Happened Last Time',
+    heading: 'Precedents & History',
     standfirst:
       'Prior markets that financed expensive, rapidly improving machines — documented from the contemporaneous record.',
     monitors: [],
@@ -74,9 +70,6 @@ const clusters: Cluster[] = [
   },
 ];
 
-const byDate: Note[] = clusters
-  .flatMap((c) => c.notes)
-  .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 ---
 <Base
   title="Research · CCIR"
@@ -92,7 +85,6 @@ const byDate: Note[] = clusters
     {clusters.map((c) => (
       <section class="cluster">
         <header class="cluster-head">
-          <div class="kicker">{c.kicker}</div>
           <h2>{c.heading}</h2>
           <p class="cluster-standfirst">{c.standfirst}</p>
         </header>
@@ -112,7 +104,6 @@ const byDate: Note[] = clusters
           <div class="note-list">
             {c.notes.map((n) => (
               <a class="note-row" href={n.href}>
-                <span class="note-date">{n.date}</span>
                 <span class="note-body">
                   <span class="note-title">{n.title}</span>
                   <span class="note-blurb">{n.blurb}</span>
@@ -123,21 +114,6 @@ const byDate: Note[] = clusters
         )}
       </section>
     ))}
-
-    <section class="cluster">
-      <header class="cluster-head">
-        <div class="kicker">Index</div>
-        <h2>All Notes by Date</h2>
-      </header>
-      <div class="date-index">
-        {byDate.map((n) => (
-          <a class="date-row" href={n.href}>
-            <span class="note-date">{n.date}</span>
-            <span class="note-title">{n.title}</span>
-          </a>
-        ))}
-      </div>
-    </section>
   </section>
 
   <style>
@@ -153,9 +129,15 @@ const byDate: Note[] = clusters
     .standfirst a { color: var(--accent); }
     .standfirst strong { color: var(--accent); }
 
-    .cluster { margin: 34px 0 0; }
+    .cluster { margin: 38px 0 0; }
     .cluster-head { max-width: 82ch; margin-bottom: 14px; }
-    .cluster-head h2 { font-size: var(--fs-2xl); margin: 4px 0 8px; }
+    .cluster-head h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      font-weight: var(--weight-display);
+      letter-spacing: -0.005em;
+      margin: 0 0 8px;
+    }
     .cluster-standfirst {
       font-family: var(--font-body);
       font-size: var(--fs-sm);
@@ -234,13 +216,6 @@ const byDate: Note[] = clusters
     }
     .note-row:last-child { border-bottom: none; }
     .note-row:hover { background: var(--surface-2); text-decoration: none; }
-    .note-date {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      color: var(--ink-faint);
-      white-space: nowrap;
-      letter-spacing: 0.03em;
-    }
     .note-body { display: flex; flex-direction: column; gap: 3px; }
     .note-title {
       font-family: var(--font-display);
@@ -254,26 +229,5 @@ const byDate: Note[] = clusters
       color: var(--ink-dim);
       line-height: 1.5;
     }
-    @media (max-width: 640px) {
-      .note-row { flex-direction: column; gap: 4px; }
-    }
-
-    .date-index {
-      border: 1px solid var(--rule);
-      background: var(--surface);
-      max-width: 880px;
-    }
-    .date-row {
-      display: flex;
-      gap: 18px;
-      padding: 10px 20px;
-      text-decoration: none;
-      color: var(--ink);
-      border-bottom: 1px solid var(--rule);
-      align-items: baseline;
-    }
-    .date-row:last-child { border-bottom: none; }
-    .date-row:hover { background: var(--surface-2); text-decoration: none; }
-    .date-row .note-title { font-size: var(--fs-sm); }
   </style>
 </Base>
