@@ -1,0 +1,398 @@
+---
+import Base from '../../layouts/Base.astro';
+import ratios from '../../data/rent_ratio_panels.json';
+
+// Ratio-by-age chart: annualized posted panel-median rent / launch anchor,
+// per generation, on an age axis. Solid where n>=3, dashed thinner (shown,
+// never used in any figure). Ratio of two posted prices throughout.
+const AGE_MAX = 106;
+const YMAX = 1.6;
+const CW = 720, CH = 340, PL = 44, PR = 118, PT = 18, PB = 36;
+const iw = CW - PL - PR, ih = CH - PT - PB;
+const cx = (a: number) => PL + (a / AGE_MAX) * iw;
+const cy = (v: number) => PT + ih * (1 - v / YMAX);
+
+type Pt = { m: string; age: number; med: number; n: number; ratio: number };
+function stepPaths(points: Pt[], want: (n: number) => boolean): string[] {
+  const segs: string[] = [];
+  let d: string | null = null;
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i]!;
+    const prev = points[i - 1];
+    const consec = !!prev && p.age - prev.age === 1;
+    if (want(p.n)) {
+      if (d === null) {
+        d = consec && prev
+          ? `M ${cx(prev.age).toFixed(1)} ${cy(prev.ratio).toFixed(1)} H ${cx(p.age).toFixed(1)} V ${cy(p.ratio).toFixed(1)}`
+          : `M ${cx(p.age).toFixed(1)} ${cy(p.ratio).toFixed(1)}`;
+      } else if (consec) {
+        d += ` H ${cx(p.age).toFixed(1)} V ${cy(p.ratio).toFixed(1)}`;
+      } else {
+        segs.push(d);
+        d = `M ${cx(p.age).toFixed(1)} ${cy(p.ratio).toFixed(1)}`;
+      }
+    } else if (d !== null) {
+      segs.push(d); d = null;
+    }
+  }
+  if (d !== null) segs.push(d);
+  return segs;
+}
+
+const CHIPS = [
+  { key: 'V100', cls: 'volta' },
+  { key: 'A100', cls: 'ampere' },
+  { key: 'H100', cls: 'hopper' },
+  { key: 'H200', cls: 'h200' },
+  { key: 'B200', cls: 'blackwell' },
+] as const;
+const series = CHIPS.map((c) => {
+  const pts = (ratios as any)[c.key].points as Pt[];
+  const lastDeep = [...pts].reverse().find((p) => p.n >= 3) ?? pts[pts.length - 1]!;
+  return {
+    ...c,
+    solid: stepPaths(pts, (n) => n >= 3),
+    thin: stepPaths(pts, (n) => n < 3),
+    endX: cx(lastDeep.age), endY: cy(lastDeep.ratio), endVal: lastDeep.ratio,
+  };
+});
+const yTicks = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5];
+const xTicks = [0, 12, 24, 36, 48, 60, 72, 84, 96];
+
+const anchors = [
+  { gen: 'V100', usd: '$18,625', basis: 'DGX-1V $149,000 ÷ 8 (2017-05, NVIDIA announce)', grade: 'A' },
+  { gen: 'A100', usd: '$24,875', basis: 'DGX A100 $199,000 ÷ 8 (2020-05, NVIDIA PR)', grade: 'A' },
+  { gen: 'H100', usd: '$33,600', basis: 'SemiAnalysis DGX teardown $269,000 ÷ 8 (2023-05)', grade: 'B' },
+  { gen: 'H200', usd: '$31,500', basis: 'Reseller guide midpoint (undated, ~2024)', grade: 'C' },
+  { gen: 'B200', usd: '$64,426', basis: 'DGX B200 reseller list $515,410 ÷ 8 (2024-10)', grade: 'B' },
+];
+
+const payback = [
+  { gen: 'V100', ga: 'Q3 2017', months: '11', cum: '$128,000', mult: '6.9×' },
+  { gen: 'A100', ga: 'May 2020', months: '15', cum: '$118,500', mult: '4.8×' },
+  { gen: 'H100', ga: 'Oct 2022', months: '14', cum: '$110,600', mult: '3.3×' },
+  { gen: 'H200', ga: 'Q2 2024', months: '17', cum: '$62,700', mult: '2.0×' },
+  { gen: 'B200', ga: 'Dec 2024', months: '15', cum: '$84,100', mult: '1.3×' },
+];
+
+const ratioTable = [
+  { gen: 'V100', entry: '1.08 (Oct 2017, launch-adjacent)', last: '0.37 (Apr 2026, age 8.6y)' },
+  { gen: 'A100', entry: '1.44 (Nov 2020, launch week)', last: '0.63 (Jun 2026, age 6.1y)' },
+  { gen: 'H100', entry: '1.11 (Jan 2023)', last: '0.95 (Apr 2026, age 3.5y)' },
+  { gen: 'H200', entry: '0.61 (Oct 2024, entered low)', last: '1.27 (Apr 2026, age 2.0y)' },
+  { gen: 'B200', entry: '1.09 (Mar 2025)', last: '0.91 (Apr 2026, age 1.3y)' },
+];
+
+const bwTable = [
+  { gen: 'V100', launch: '$20,700', rent: '0.43–0.61 (below the band)' },
+  { gen: 'A100', launch: '$12,400', rent: '0.90' },
+  { gen: 'H100', launch: '$10,000', rent: '0.96' },
+  { gen: 'H200', launch: '$6,600 [C]', rent: '0.87' },
+  { gen: 'B200', launch: '$8,100', rent: '0.87' },
+];
+---
+<Base
+  title="Rent and MSRP: Five Generations of Posted Prices · CCIR Research"
+  description="Posted GPU rental rates divided by MSRP anchors, 2017–2026: every generation's gross posted-rate revenue passed its MSRP anchor within 11–17 months, and each entered with a year of rental hours priced near the machine's cost."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · 2026-07-08 · window Oct 2017 – Jun 2026</div>
+      <h1>Rent and MSRP: Five Generations of Posted Prices</h1>
+      <p class="standfirst">
+        A rented GPU has two posted prices: what an hour of it rents for, and
+        what the hardware cost to acquire at launch. This note divides the
+        first by the second — a ratio of two posted prices, every input dated
+        and sourced — for five generations. Two regularities sit on the
+        surface. At posted on-demand rates, every generation's cumulative
+        gross rental revenue passed its MSRP anchor within
+        <strong>11 to 17 months</strong> of general availability — five
+        generations, anchors from $18,600 to $64,400 per GPU, the same
+        result. And the ratio at entry is close to one: each generation has
+        arrived priced so that roughly a year of posted-rate hours equals the
+        machine's own price. Companion notes: the
+        <a href="/research/gpu-age-curve">cross-section</a> and the
+        <a href="/research/rental-rates-by-generation">cohort histories</a>.
+      </p>
+    </header>
+
+    <figure class="chart-fig">
+      <div class="chart-box">
+        <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
+             aria-label="Annualized posted rent divided by MSRP anchor, by generation age in months. Five stepped lines: each generation enters near a ratio of one and decays with age; H200 rose above one during the current demand episode. Dashed segments mark months with fewer than three providers.">
+          {yTicks.map((t) => (
+            <g>
+              <line x1={PL} x2={CW - PR} y1={cy(t)} y2={cy(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
+              <text x={PL - 7} y={cy(t) + 3} class="tick" text-anchor="end">{t.toFixed(2)}</text>
+            </g>
+          ))}
+          <text x={CW - PR} y={cy(1) - 5} class="onelab" text-anchor="end">1.0 = a year of posted hours equals the MSRP anchor</text>
+          {xTicks.map((a) => (
+            <text x={cx(a)} y={CH - 14} class="tick" text-anchor="middle">{a}mo</text>
+          ))}
+          {series.map((s) => (
+            <g>
+              {s.thin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
+              {s.solid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
+              <text x={s.endX + 8} y={s.endY + 4} class={`endlab lab-${s.cls}`} text-anchor="start">
+                {s.key} {s.endVal.toFixed(2)}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+      <div class="chart-legend">
+        {CHIPS.map((c) => <span class="lg"><span class={`swatch sw-${c.cls}`}></span>{c.key}</span>)}
+        <span class="lg"><span class="swatch sw-dash"></span>dashed = month has n&lt;3 providers (shown, never fitted)</span>
+      </div>
+      <figcaption class="tfoot">
+        Annualized posted panel-median rent ÷ MSRP anchor, by generation
+        age in months from GA, Oct 2017 – Jun 2026. Sources and repair per
+        the <a href="/research/rental-rates-by-generation">cohort note</a>;
+        anchors per §01.
+      </figcaption>
+    </figure>
+
+    <section class="sec">
+      <h2><span class="n">01</span> The Anchors</h2>
+      <p>
+        NVIDIA publishes no MSRP for any datacenter GPU. The anchors here
+        are the closest documented equivalent — system prices divided by GPU
+        count, the best-documented grain available across all five
+        generations — with the confidence grade and the basis stated per
+        row:
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Generation</th><th class="num">Anchor</th><th>Basis</th><th>Grade</th></tr></thead>
+          <tbody>
+            {anchors.map((a) => (
+              <tr><td class="gen">{a.gen}</td><td class="num strong">{a.usd}</td><td class="dim basis-cell">{a.basis}</td><td class="dim">{a.grade}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        System-grain division embeds CPUs, memory, storage, networking, and
+        chassis — roughly 25–30% of the quotient is non-GPU content (the
+        H100 teardown puts the same silicon at $24,400 at bare-board grain).
+        Alternate grains move the figures in §02 proportionally: bare-board
+        anchors shorten the recovery months by about a quarter; all-in
+        installed capex (the IREN-disclosed $46–54K per Blackwell GPU)
+        lengthens them 15–40%. The system grain is used because it is the
+        only one documented for all five generations; the sensitivity is the
+        band, not a footnote.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Months to Gross Recovery</h2>
+      <p>
+        Cumulative posted-rate revenue — panel-median rate × hours, summed
+        from general availability — against the anchor:
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Generation</th><th>GA</th><th class="num">Months to pass anchor</th><th class="num">Cum. gross revenue to Jun 2026</th><th class="num">Multiple of anchor</th></tr></thead>
+          <tbody>
+            {payback.map((p) => (
+              <tr><td class="gen">{p.gen}</td><td class="dim">{p.ga}</td><td class="num strong">{p.months}</td><td class="num dim">{p.cum}</td><td class="num strong">{p.mult}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        What this arithmetic is: the posted panel-median rate, assumed earned
+        for every hour from general availability, summed. What it is not:
+        realized revenue — no utilization below 100%, no discounting off
+        list, no cost line — and not a forward figure; each window contains
+        the demand episodes documented in the cohort note, including the
+        2021–2023 firming and the current one. It answers one narrow
+        question: at the prices providers themselves posted, how long did a
+        generation's gross rental stream take to add up to its own MSRP
+        anchor? For nine years, across a 3.5× range of anchors, the answer
+        has stayed inside 11–17 months.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> The Ratio Through Time</h2>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Generation</th><th>Ratio at panel entry</th><th>Ratio at latest n≥3 point</th></tr></thead>
+          <tbody>
+            {ratioTable.map((r) => (
+              <tr><td class="gen">{r.gen}</td><td class="dim">{r.entry}</td><td class="dim">{r.last}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Entry ratios cluster near one across five generations and nine years
+        — posted pricing has repeatedly placed a new chip's annual rental
+        stream at approximately its launch price. The ratio then decays with
+        age at the cohort rates measured in the companion note, and rises
+        during demand episodes: H100's ratio today is roughly what it was at
+        launch, and H200's — which entered low — now sits above one. H200's
+        entry point reflects a single early repricer's aggressive list;
+        its anchor is also the weakest-documented of the five (§01).
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> Both Legs, 2023: One Generation, Two Posted Prices</h2>
+      <p>
+        For one generation the record captures the purchase leg and the
+        rental leg moving together, mid-life. Through 2023, A100 — then
+        roughly three years old — saw both of its posted prices firm. On the
+        rental leg, the repricing providers moved lists upward through 2023
+        into early 2024, and Lambda raised its A100 list outright on
+        January 1, 2024 (+17–19%, shown as side-by-side 2023/2024 columns on
+        the archived page). On the purchase leg, contemporaneous reporting
+        put the US "going price" near $10,000 while gray-market units in
+        China traded near $20,000 — "double the usual price," a premium
+        carrying an export-control confound the record cannot separate out.
+        Both legs are archived, both are posted or reported prices, and both
+        moved upward on an asset three years past launch. The episode ended
+        the way the cohort note documents: rental lists stepped back down
+        30–56% from their peaks across the following year.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> MSRP and Rent, per Unit of Bandwidth</h2>
+      <p>
+        The <a href="/chip-economics">chip-economics</a> tables show current
+        rents are flat per unit of memory bandwidth. The MSRP anchors are
+        not:
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Generation</th><th class="num">MSRP anchor $ per TB/s</th><th class="num">Posted rent $/TB/s-hr (Jul 2026)</th></tr></thead>
+          <tbody>
+            {bwTable.map((r) => (
+              <tr><td class="gen">{r.gen}</td><td class="num strong">{r.launch}</td><td class="num dim">{r.rent}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Acquisition cost per unit of bandwidth fell roughly 2.5× from A100
+        to the Hopper-refresh and Blackwell generations; posted rent per
+        unit of bandwidth did not follow it down. Stated both ways: the rent
+        band is not a constant markup over per-bandwidth acquisition cost,
+        and the per-bandwidth economics of renting out newer silicon have
+        improved relative to older silicon at current posted prices. This
+        note reports the two series; the mechanism — demand-side pricing
+        versus cost pass-through — is not adjudicated here.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">06</span> The Income Leg and the Resale Leg</h2>
+      <p>
+        Resale-side research (American Compute's
+        <a href="https://www.amcompute.com/blog/gpu-depreciation-residual-value-report-2026"
+        rel="noopener" target="_blank">2026 residual-value report</a>, built
+        on secondary-market transactions) reports H100 resale at 27–53% of
+        replacement in 2026 and documents the rental and resale legs
+        diverging. Nothing in this note is a residual value: the ratio here
+        is rent against the <em>primary-market</em> anchor — two new-market
+        prices — and the cumulative figures in §02 are gross revenue, not
+        value. The
+        two legs answer different questions, and moved independently in the
+        one episode where both are well-recorded (§04).
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">07</span> Limitations</h2>
+      <p>
+        Everything in the <a href="/research/rental-rates-by-generation">cohort
+        note's</a> limitations applies: posted asks, panel composition,
+        carry-forward repair, variant pooling, archive gaps. Additionally:
+        the anchors are graded B or C for three of five generations and embed
+        non-GPU content at system grain (§01); the recovery arithmetic
+        assumes continuous rental at the posted median, which no operator
+        realizes; and every window includes demand episodes — a recovery
+        period measured through a firming market is a property of that
+        window, not of the next one.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 16px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec strong, .standfirst strong { color: var(--accent); }
+    .sec em { font-style: italic; }
+
+    .top {
+      --arch-volta: #46688f;
+      --arch-ampere: #c11f57;
+      --arch-hopper: #b9770a;
+      --arch-h200: #7c9a3e;
+      --arch-blackwell: #0d9488;
+    }
+    :global(html[data-theme='terminal']) .top {
+      --arch-volta: #7ea8d8;
+      --arch-ampere: #ff4d84;
+      --arch-hopper: #ffb400;
+      --arch-h200: #b5d16a;
+      --arch-blackwell: #2dd4bf;
+    }
+    .chart-fig { margin: 0 0 18px; max-width: 780px; }
+    .chart-box { border: 1px solid var(--rule); background: var(--surface); }
+    .chart-box svg { display: block; width: 100%; height: auto; }
+    .grid { stroke: var(--rule); stroke-width: 1; }
+    .grid-one { stroke: var(--ink-dim); stroke-width: 1.1; stroke-dasharray: 1 3; }
+    .onelab { font-family: var(--font-mono); font-size: 9.5px; fill: var(--ink-faint); letter-spacing: 0.03em; }
+    .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+    .ln { fill: none; stroke-width: 1.8; }
+    .ln-thin { stroke-width: 1.1; stroke-dasharray: 3 3; opacity: 0.8; }
+    .ln-volta { stroke: var(--arch-volta); }
+    .ln-ampere { stroke: var(--arch-ampere); }
+    .ln-hopper { stroke: var(--arch-hopper); }
+    .ln-h200 { stroke: var(--arch-h200); }
+    .ln-blackwell { stroke: var(--arch-blackwell); }
+    .endlab { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; }
+    .lab-volta { fill: var(--arch-volta); }
+    .lab-ampere { fill: var(--arch-ampere); }
+    .lab-hopper { fill: var(--arch-hopper); }
+    .lab-h200 { fill: var(--arch-h200); }
+    .lab-blackwell { fill: var(--arch-blackwell); }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); }
+    .swatch { display: inline-block; width: 14px; height: 3px; margin-right: 5px; vertical-align: 3px; }
+    .sw-volta { background: var(--arch-volta); }
+    .sw-ampere { background: var(--arch-ampere); }
+    .sw-hopper { background: var(--arch-hopper); }
+    .sw-h200 { background: var(--arch-h200); }
+    .sw-blackwell { background: var(--arch-blackwell); }
+    .sw-dash { background: repeating-linear-gradient(90deg, var(--ink-dim) 0 3px, transparent 3px 6px); }
+    .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
+    .tfoot a { color: var(--ink-dim); }
+
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 12px; max-width: 780px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.gen { color: var(--ink); font-weight: var(--weight-strong); }
+    td.dim { color: var(--ink-dim); }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); }
+    td.basis-cell { white-space: normal; min-width: 34ch; }
+  </style>
+</Base>
