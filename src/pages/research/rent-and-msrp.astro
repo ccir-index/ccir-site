@@ -117,20 +117,29 @@ const bwTable = [
       <div class="kicker">Research · 2026-07-08 · window Oct 2017 – Apr 2026</div>
       <h1>Rent and MSRP: Five Generations of Posted Prices</h1>
       <p class="standfirst">
-        A rented GPU has two posted prices: what an hour of it rents for, and
-        what the hardware cost to acquire at launch. This note divides the
-        first by the second — a ratio of two posted prices, every input dated
-        and sourced — for five generations. Two regularities sit on the
-        surface. At posted on-demand rates, every generation's cumulative
-        gross rental revenue passed its MSRP anchor within
-        <strong>11 to 17 months</strong> of general availability — five
-        generations, anchors from $18,600 to $64,400 per GPU, the same
-        result. That figure is an idealized ceiling by construction; §02
-        states every assumption and repeats the arithmetic under
-        conservative elections, where the answer is roughly two to three and
-        a half years. And the ratio at entry is close to one: each generation has
-        arrived priced so that roughly a year of posted-rate hours equals the
-        machine's own price. Companion notes: the
+        This note divides each generation's posted rental rate by its MSRP
+        anchor — a ratio of two posted prices, every input dated and sourced
+        — for five generations, 2017–2026. Two regularities sit on the
+        surface:
+      </p>
+      <ul class="sf-list">
+        <li>
+          At posted on-demand rates, every generation's cumulative gross
+          rental revenue passed its MSRP anchor within <strong>11 to 17
+          months</strong> of general availability — anchors from $18,600 to
+          $64,400 per GPU, the same result. An idealized ceiling by
+          construction: §02 states every assumption and reruns the
+          arithmetic under conservative elections, where the answer is
+          roughly two to three and a half years.
+        </li>
+        <li>
+          The ratio at entry is close to one — each generation has arrived
+          priced so that roughly a year of posted-rate hours equals the
+          machine's own price.
+        </li>
+      </ul>
+      <p class="standfirst">
+        Companion notes: the
         <a href="/research/gpu-age-curve">cross-section</a> and the
         <a href="/research/rental-rates-by-generation">cohort histories</a>.
       </p>
@@ -400,6 +409,21 @@ const bwTable = [
     }
     /* Prose keeps its measure at the paragraph level; sections stay full
        width so tables can take their 880px without horizontal scroll. */
+    .sf-list {
+      max-width: 80ch;
+      margin: 0 0 14px;
+      padding-left: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .sf-list li {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    .sf-list strong { color: var(--accent); }
     .sec { margin: 28px 0; }
     .sec h2 { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
     .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
