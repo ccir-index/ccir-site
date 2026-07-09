@@ -398,10 +398,12 @@ const bwTable = [
       margin: 6px 0 14px;
       letter-spacing: -0.01em;
     }
-    .sec { margin: 28px 0; max-width: 80ch; }
+    /* Prose keeps its measure at the paragraph level; sections stay full
+       width so tables can take their 880px without horizontal scroll. */
+    .sec { margin: 28px 0; }
     .sec h2 { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
     .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
-    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; max-width: 80ch; }
     .sec h3.sub {
       font-family: var(--font-display);
       font-size: var(--fs-lg);
