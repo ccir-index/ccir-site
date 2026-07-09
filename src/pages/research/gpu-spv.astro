@@ -1,0 +1,465 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Dated primer, 2026-07-09. Research notes are not updated in place.
+// Sources: credit agreements and 8-Ks filed on SEC EDGAR, CoreWeave press
+// releases, and rating-agency releases. Credit-agreement excerpts verified
+// against the filed text on 2026-07-09. [*] marks are the registrant's
+// redactions, reproduced as filed.
+const DATED = '2026-07-09';
+
+const EDGAR = {
+  s1: 'https://www.sec.gov/Archives/edgar/data/1769628/000119312525044231/d899798ds1.htm',
+  ddtl2: 'https://www.sec.gov/Archives/edgar/data/1769628/000119312525044231/d899798dex1013.htm',
+  ddtl3: 'https://www.sec.gov/Archives/edgar/data/1769628/000176962825000033/crwv-20250728.htm',
+  ddtl3_ex: 'https://www.sec.gov/Archives/edgar/data/1769628/000176962825000033/coreweave30-ex101xtermlo.htm',
+  ddtl4_8k: 'https://www.sec.gov/Archives/edgar/data/1769628/000176962826000129/crwv-20260330.htm',
+  ddtl4_ex: 'https://www.sec.gov/Archives/edgar/data/1769628/000176962826000129/ex1011.htm',
+  ddtl4_pr: 'https://www.sec.gov/Archives/edgar/data/1769628/000176962826000129/ex991.htm',
+  ddtl5_8k: 'https://www.sec.gov/Archives/edgar/data/1769628/000176962826000236/crwv-20260515.htm',
+};
+const MOODYS = 'https://ratings.moodys.com/ratings-news/462400';
+const DBRS = 'https://dbrs.morningstar.com/research/478180';
+const KBRA = 'https://www.kbra.com/publications/BhxpJMrf/ai-compute-financings-evaluating-re-leasing-risk-for-gpus-and-tpus';
+const LAMBDA_PR = 'https://www.businesswire.com/news/home/20240402148086/en/';
+const DDTL1_PR = 'https://www.prnewswire.com/news-releases/coreweave-secures-2-3-billion-debt-financing-facility-led-by-magnetar-capital-and-blackstone-to-meet-surging-demand-and-ongoing-expansion-of-specialized-cloud-infrastructure-to-power-ai-301892706.html';
+
+const facilities = [
+  { name: 'DDTL 1.0', date: 'Aug 2023', size: '$2.3B', offtake: 'Contract book', pricing: '14.1% avg. actual (SOFR + 9.62%)', rating: 'unrated', url: 's1' },
+  { name: 'DDTL 2.0', date: 'May 2024', size: 'up to $7.5B', offtake: 'IG and non-IG contracts', pricing: 'undisclosed', rating: 'unrated', url: 'ddtl2' },
+  { name: 'DDTL 3.0', date: 'Jul 2025', size: '$2.6B', offtake: 'Single-customer MSA', pricing: 'SOFR + 4.00%', rating: '—', url: 'ddtl3' },
+  { name: 'DDTL 4.0', date: 'Mar 2026', size: '$8.5B', offtake: 'Take-or-pay MSA (Meta, per the rating releases)', pricing: 'SOFR + 2.25% / ~5.9% fixed', rating: 'A3 / A (low)', url: 'ddtl4_8k' },
+  { name: 'DDTL 5.0', date: 'May 2026', size: '$3.1B', offtake: 'Two non-investment-grade customers', pricing: 'SOFR + 4.50%', rating: 'Ba2 / BB+', url: 'ddtl5_8k' },
+];
+---
+<Base
+  title="The GPU SPV: How Lenders Take Compute as Collateral · CCIR Research"
+  description="A primer on GPU-backed SPV financings, read from the filed credit agreements: the collateral package, serial-number covenants, the cash controls, why the rating sits on the offtake contract, and the questions the documents leave open."
+  showTape={false}
+>
+  <nav class="apps-navband" aria-label="On this page">
+    <div class="wrap apps-nav-inner">
+      <a class="apps-nav-link" href="#structure">The structure</a>
+      <a class="apps-nav-link" href="#collateral">Collateral</a>
+      <a class="apps-nav-link" href="#covenants">Covenants</a>
+      <a class="apps-nav-link" href="#ratings">Ratings &amp; pricing</a>
+      <a class="apps-nav-link" href="#open-questions">Open questions</a>
+      <a class="apps-nav-link" href="#precedents">Precedents</a>
+      <a class="apps-nav-link" href="#sources">Sources</a>
+    </div>
+  </nav>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · primer · {DATED}</div>
+      <h1>The GPU SPV: How Lenders Take Compute as Collateral</h1>
+      <p class="standfirst">
+        The largest GPU financings do not lend to the operating company. They
+        lend to a special-purpose vehicle that owns the GPUs and holds the
+        customer contract — built so that lenders can reach the assets
+        without the parent's other creditors reaching them first. The credit
+        agreements behind CoreWeave's delayed-draw term loan facilities are
+        filed on SEC EDGAR, redactions and all. This primer reads the
+        structure out of the documents. Its companion,
+        <a href="/research/compute-contracts">The Compute Contract</a>, covers
+        the customer agreements these facilities are underwritten against.
+      </p>
+    </header>
+
+    <section class="sec" id="structure">
+      <h2><span class="n">01</span> The Structure</h2>
+      <p>
+        The pattern, from the DDTL 4.0 filing (March 30, 2026): the borrower
+        is CoreWeave Compute Acquisition Co. VIII, LLC — “CCAC VIII,” an
+        indirect subsidiary of CoreWeave, Inc. — and the $8.5 billion
+        facility exists “primarily to finance capital expenditures required
+        to perform a customer contract, including the acquisition of GPU
+        servers and related infrastructure.” The parent is not the borrower,
+        and in this facility its guarantee is limited to specified “bad
+        acts” — though the series varies on this point, and the variation
+        turns out to be informative (§04). Obligations are secured by
+        “substantially all assets of CCAC VIII and its subsidiaries and a
+        pledge of 100% of the equity interests in CCAC VIII held by CCAC
+        VIII Holdco LLC.” A collateral agent (U.S. Bank Trust Company, N.A.)
+        holds the security interests; a depositary bank holds the accounts.
+      </p>
+      <p>
+        Nor is the shape unique to one issuer: Lambda's April 2024 financing
+        vehicle — up to $500 million, Macquarie-led — was described by the
+        company in the same grammar, “an asset-based structure secured by
+        GPUs and supported by their cash flow generation.”
+      </p>
+      <div class="stack-fig">
+        <svg viewBox="0 0 860 430" role="img" aria-label="SPV structure diagram: CoreWeave parent above a Holdco whose SPV borrower holds GPUs, the customer contract, and datacenter leases; lenders hold a first-priority security interest through a collateral agent; the offtaker pays into controlled accounts.">
+          <g class="sg">
+            <rect x="30" y="18" width="360" height="58" class="bx" />
+            <text x="48" y="42" class="t1">CoreWeave, Inc. — parent</text>
+            <text x="48" y="60" class="t2">operator &amp; servicer · limited “bad acts” guarantee only</text>
+
+            <rect x="30" y="106" width="360" height="44" class="bx" />
+            <text x="48" y="126" class="t1">Holdco LLC</text>
+            <text x="48" y="142" class="t2">pledges 100% of borrower equity to lenders</text>
+
+            <rect x="30" y="180" width="360" height="150" class="bx bx-main" />
+            <text x="48" y="204" class="t1">SPV borrower — “CCAC VIII”</text>
+            <text x="48" y="224" class="t2">bankruptcy-remote Delaware LLC, owns:</text>
+            <text x="60" y="248" class="t2">· GPU servers (serial numbers reported to lenders)</text>
+            <text x="60" y="268" class="t2">· rights under the customer MSA</text>
+            <text x="60" y="288" class="t2">· datacenter lease rights</text>
+            <text x="60" y="308" class="t2">· collateral accounts (UCC §9-104 control)</text>
+
+            <rect x="470" y="180" width="360" height="70" class="bx" />
+            <text x="488" y="204" class="t1">Lenders · collateral agent</text>
+            <text x="488" y="222" class="t2">first-priority perfected security interest in</text>
+            <text x="488" y="238" class="t2">substantially all borrower assets + the equity pledge</text>
+
+            <rect x="470" y="290" width="360" height="58" class="bx" />
+            <text x="488" y="314" class="t1">Offtake customer</text>
+            <text x="488" y="332" class="t2">fixed committed payments → controlled accounts</text>
+
+            <rect x="30" y="370" width="800" height="40" class="bx bx-note" />
+            <text x="48" y="394" class="t2">Cash order per filings: operating costs → interest → scheduled amortization → reserves → only then distributions up</text>
+
+            <line x1="210" y1="76" x2="210" y2="106" class="ln" />
+            <line x1="210" y1="150" x2="210" y2="180" class="ln" />
+            <line x1="390" y1="215" x2="470" y2="215" class="ln ln-acc" />
+            <line x1="650" y1="290" x2="650" y2="250" class="ln ln-acc" />
+            <line x1="470" y1="319" x2="390" y2="300" class="ln" />
+          </g>
+        </svg>
+      </div>
+      <p class="tfoot">
+        Composite of the DDTL 2.0–4.0 filings; entity names per DDTL 4.0.
+        The operative security grants live in a Collateral Agreement and a
+        Parent Guarantee and Pledge Agreement that are not separately filed.
+      </p>
+    </section>
+
+    <section class="sec" id="collateral">
+      <h2><span class="n">02</span> The Collateral Package</h2>
+      <p>
+        Five elements recur across the filed agreements: (1) a first-priority
+        perfected security interest in substantially all assets of the
+        borrower — the GPU servers above all; (2) a pledge of 100% of the
+        borrower's equity, so lenders can foreclose on the entity, not just
+        the machines; (3) the borrower's rights under the customer contract,
+        including rights to payment; (4) the datacenter lease rights; and
+        (5) control of every bank account. From DDTL 2.0's “Collateral and
+        Guarantee Requirement”:
+      </p>
+      <figure class="doc-ex">
+        <div class="doc-ex-label">DDTL 2.0 Credit Agreement (May 16, 2024), Ex. 10.13 — collateral requirement, as filed</div>
+        <blockquote>
+          <p>“(c) the Obligations shall have been secured&hellip; by a
+          first-priority security interest&hellip; in all the Equity
+          Interests of the Borrower&hellip;</p>
+          <p>(e) the Obligations shall have been secured by a first-priority
+          perfected security interest in substantially all now owned or at
+          any time hereafter acquired tangible and intangible assets of the
+          Borrower&hellip;”</p>
+        </blockquote>
+        <figcaption>Source: <a href={EDGAR.ddtl2} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.13 to CoreWeave's Form S-1, accession 0001193125-25-044231.</figcaption>
+      </figure>
+      <p>
+        The GPU-specific covenants are the part with no precedent in
+        corporate lending and a long one in equipment finance. The borrower
+        must report the serial numbers of the machines each draw buys, and —
+        in the later facilities — pass through the manufacturer's own
+        per-GPU serial documentation:
+      </p>
+      <figure class="doc-ex">
+        <div class="doc-ex-label">DDTL 3.0 Credit Agreement (July 28, 2025), Ex. 10.1 — §5.22 Serial Numbers</div>
+        <blockquote>
+          <p>“(a) The Initial Borrower shall provide the Lenders within sixty
+          (60) days after the date of each Borrowing with the serial numbers
+          with respect to the applicable racks of the GPU Servers that were
+          acquired by the applicable Borrower with the proceeds of such
+          Borrowing. (b) To the extent that any Borrower receives a document
+          from NVIDIA corporation or Dell Marketing, L.P. that lists the
+          serial number of each individual GPU in each GPU Server that
+          constitutes Collateral, the Borrowers shall use commercially
+          reasonable efforts to deliver copies of such document to the
+          Administrative Agent.”</p>
+        </blockquote>
+        <figcaption>Source: <a href={EDGAR.ddtl3} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.1 to CoreWeave's Form 8-K, accession 0001769628-25-000033.</figcaption>
+      </figure>
+      <p>
+        Cash is trapped structurally rather than by covenant alone: every
+        deposit account of the borrower must sit under a control agreement
+        “sufficient to establish the Collateral Agent's control pursuant to
+        Section 9-104 of the UCC,” and collections are directed into named
+        collateral accounts — an Available Cash Account, an Other Proceeds
+        Account, a Distribution Reserve Account, a Liquidity Account. One
+        more filed detail worth the whole exhibit: DDTL 2.0's “GPU
+        Depreciated Amount” is computed assuming straight-line depreciation
+        over <strong>a useful life of six (6) years</strong> — a written,
+        binding useful-life election, of the kind surveyed across filers on
+        the <a href="/credit">credit ledger</a>.
+      </p>
+      <figure class="photo">
+        <img src="/img/research/h100-cards.jpg" width="1600" height="912"
+             alt="Four NVIDIA H100 accelerator cards standing upright against a black background." loading="lazy" />
+        <figcaption>
+          The collateral, at the unit the covenants track it: NVIDIA H100
+          accelerators, serial-numbered per device. Photo: 极客湾 Geekerwan,
+          <a href="https://commons.wikimedia.org/wiki/File:NVIDIA_H100_(%E6%9E%81%E5%AE%A2%E6%B9%BEGeekerwan)_025.png" rel="noopener" target="_blank">via Wikimedia Commons</a>
+          (<a href="https://creativecommons.org/licenses/by/3.0/" rel="noopener" target="_blank">CC BY 3.0</a>), cropped.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="sec" id="covenants">
+      <h2><span class="n">03</span> The Performance Covenants</h2>
+      <p>
+        The facilities amortize to zero and are tested monthly. DDTL 3.0
+        carries two financial covenants stated in full in the filed
+        agreement: a debt service coverage ratio — net operating income of
+        the borrowers over debt service, trailing three months — that may
+        not fall below 1.40:1.00 from April 2027, and a
+        <strong>contract realization ratio</strong> that may not fall below
+        0.85:1.00 from the first monthly date after closing: a covenant that
+        the customer contract is actually converting to cash at 85 cents on
+        the modeled dollar. DDTL 4.0's 8-K states a minimum debt service
+        coverage ratio of 1.15x once draws end; DDTL 5.0's, 1.35x. Interest-rate risk is
+        covenanted away too — DDTL 3.0 requires hedging within 45 days of
+        closing, with any rate-cap strike at 4.50% or lower. None of the
+        filed facilities references a market residual value for the
+        hardware; scheduled amortization carries the collateral to zero over
+        the loan's life, consistent with every disclosed instrument on the
+        <a href="/credit">credit ledger</a>.
+      </p>
+    </section>
+
+    <section class="sec" id="ratings">
+      <h2><span class="n">04</span> The Rating Sits on the Offtake</h2>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Facility</th><th>Closed</th><th class="num">Size</th><th>Offtake behind it</th><th class="num">Pricing</th><th>Rating</th></tr></thead>
+          <tbody>
+            {facilities.map((f) => (
+              <tr>
+                <td class="strong">{f.url ? <a href={EDGAR[f.url]} rel="noopener" target="_blank">{f.name}</a> : f.name}</td>
+                <td>{f.date}</td>
+                <td class="num">{f.size}</td>
+                <td>{f.offtake}</td>
+                <td class="num">{f.pricing}</td>
+                <td>{f.rating}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="tfoot">
+        Sizes, pricing, and guarantees per the linked filings; DDTL 1.0
+        pricing per the S-1 (average actual rate, 2023–24); DDTL 5.0
+        customers as described in its 8-K. Ratings: Moody's / Morningstar
+        DBRS (DDTL 4.0), Moody's / Fitch (DDTL 5.0).
+      </p>
+      <p>
+        The progression in the table is the market learning what it is
+        pricing. The 2023 facility carried an average actual rate of 14.1% —
+        a 9.62% margin over SOFR, per the S-1 — and was reported at the time
+        as the first large financing collateralized by H100s. By March 2026,
+        a facility over the same operator's fleet priced at SOFR + 2.25% on
+        the floating tranche and carried an A3 — six notches above the
+        parent's Ba3 corporate family rating — with CoreWeave calling it
+        “the first investment-grade rated financing secured by HPC
+        infrastructure and an associated customer contract.” Moody's tied
+        the rating to the offtake: fixed take-or-pay payments from Meta,
+        independent of usage, under a contract that cannot be terminated for
+        convenience; Morningstar DBRS assessed debt service coverage at
+        1.20x. Two months later, DDTL 5.0 — backed by two
+        non-investment-grade customers — priced 225 basis points wider and
+        five notches lower at Ba2, and unlike DDTL 4.0 it carries a full,
+        unconditional parent guarantee: more recourse, weaker rating. The
+        collateral is the same silicon. What moved is the credit standing
+        behind the committed payments: the rating travels with the offtake,
+        and the hardware is the recovery floor beneath it.
+      </p>
+    </section>
+
+    <section class="sec" id="open-questions">
+      <h2><span class="n">05</span> The Questions the Documents Leave Open</h2>
+      <p>
+        Three, each acknowledged in public commentary rather than resolved
+        in the filings. <strong>Separateness.</strong> “Bankruptcy remote” is
+        a structure, not an outcome: substantive-consolidation doctrine (the
+        line of cases running through <em>In re General Growth Properties</em>,
+        2009) is the standing caveat that an SPV's assets can, in
+        exceptional facts, be pulled back into a parent's estate.
+        <strong>The operator.</strong> The SPV owns machines; the parent runs
+        them. Foreclosing on CCAC VIII delivers serial-numbered servers and
+        an assigned contract that still needs an operator — which is exactly
+        why the customer-side substitute-operator mechanics in
+        <a href="/research/compute-contracts">the MSAs</a> exist.
+        <strong>Re-leasing.</strong> If the offtake fails, recovery depends
+        on re-renting or selling used accelerators — a market with a posted
+        price record but no foreclosure track record. KBRA, publishing on
+        exactly this question in June 2026, places these transactions “at
+        the intersection” of data-center and equipment finance — neither
+        one's precedents fully apply. The rental-price side
+        of that question is observable: nine years of per-generation posted
+        rates are documented in
+        <a href="/research/rental-rates-by-generation">GPU Rental Rates by
+        Generation</a>, and the pace at which rents age is the subject of
+        <a href="/research/gpu-age-curve">Rent and Age</a>. CCIR publishes
+        the prices; the recovery elections built on them belong to the
+        underwriter.
+      </p>
+    </section>
+
+    <section class="sec" id="precedents">
+      <h2><span class="n">06</span> Precedents with Public Document Suites</h2>
+      <p>
+        None of this machinery is new; what is new is the asset. Aircraft
+        enhanced equipment trust certificates put the full mechanics —
+        owner-trustee leases, lease assignments to an indenture trustee,
+        loan-to-value advance rates — into public 424B prospectuses decades
+        ago, and remain the closest public template for assigning a
+        long-dated payment obligation to a collateral agent. Data-center
+        securitizations supply the master-trust, anticipated-repayment-date,
+        and cash-sweep vocabulary the rating agencies now apply to compute.
+        And the cautionary precedent for financing rapidly improving
+        machines against assumed future values is documented at length in
+        <a href="/research/itel-1979">the Itel note</a>: the 1979 book
+        carried the machines' future value as an asset; the 2026 credit
+        agreements carry it at zero.
+      </p>
+    </section>
+
+    <section class="sec" id="sources">
+      <h2><span class="n">07</span> Sources</h2>
+      <ul class="src-list">
+        <li>DDTL 2.0 Credit Agreement (May 16, 2024) — <a href={EDGAR.ddtl2} rel="noopener" target="_blank">Ex. 10.13</a> to CoreWeave's Form S-1, accession 0001193125-25-044231</li>
+        <li>DDTL 3.0 Credit Agreement (July 28, 2025) — <a href={EDGAR.ddtl3} rel="noopener" target="_blank">Ex. 10.1</a> to Form 8-K, accession 0001769628-25-000033</li>
+        <li>DDTL 4.0 Credit Agreement and 8-K (March 30, 2026) — <a href={EDGAR.ddtl4_8k} rel="noopener" target="_blank">8-K body</a>, <a href={EDGAR.ddtl4_ex} rel="noopener" target="_blank">Ex. 10.1</a>, <a href={EDGAR.ddtl4_pr} rel="noopener" target="_blank">press release</a>, accession 0001769628-26-000129</li>
+        <li>DDTL 5.0 8-K and press release (May 15–18, 2026) — <a href={EDGAR.ddtl5_8k} rel="noopener" target="_blank">8-K body</a>, accession 0001769628-26-000236</li>
+        <li>DDTL 1.0 — <a href={DDTL1_PR} rel="noopener" target="_blank">CoreWeave press release</a> (Aug 3, 2023); pricing per the <a href={EDGAR.s1} rel="noopener" target="_blank">Form S-1</a>; H100-collateral characterization per Reuters (Aug 3, 2023)</li>
+        <li>Moody's Ratings — <a href={MOODYS} rel="noopener" target="_blank">A3 assignment, CoreWeave Compute Acquisition Co. VIII, LLC</a> (Mar 31, 2026; registration required); parent Ba3 corporate family rating per Moody's coverage</li>
+        <li>Morningstar DBRS — <a href={DBRS} rel="noopener" target="_blank">A (low), stable</a> (2026; registration required)</li>
+        <li>KBRA — <a href={KBRA} rel="noopener" target="_blank">AI Compute Financings: Evaluating Re-Leasing Risk for GPUs and TPUs</a> (June 22, 2026)</li>
+        <li>Lambda — <a href={LAMBDA_PR} rel="noopener" target="_blank">$500M GPU-backed facility announcement</a> (Apr 2, 2024)</li>
+      </ul>
+      <p class="tfoot">
+        Credit-agreement excerpts verified against the filed text on {DATED}.
+        DDTL 3.0 text is drawn from the filed exhibit's embedded text layer.
+        [*] marks are the registrant's redactions, reproduced as filed.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .apps-navband {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+    }
+    .apps-nav-inner {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
+    .apps-nav-inner::-webkit-scrollbar { display: none; }
+    .apps-nav-link {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
+    #structure, #collateral, #covenants, #ratings, #open-questions, #precedents, #sources { scroll-margin-top: 52px; }
+    .page-head { max-width: 82ch; margin-bottom: 18px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p, .sec ul {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 13px;
+    }
+    .sec strong { color: var(--accent); }
+    .sec em { font-style: italic; }
+
+    .doc-ex { margin: 18px 0 22px; max-width: 880px; border: 1px solid var(--rule); background: var(--surface); }
+    .doc-ex-label {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--rule);
+      padding: 8px 16px;
+    }
+    .doc-ex blockquote {
+      margin: 0;
+      padding: 16px 20px 8px;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: var(--fs-sm);
+      line-height: 1.7;
+      color: var(--ink);
+    }
+    .doc-ex blockquote p { margin: 0 0 12px; }
+    .doc-ex mark { background: transparent; color: var(--accent); font-weight: 700; }
+    .doc-ex strong { color: var(--accent); }
+    .doc-ex figcaption {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      padding: 0 20px 12px;
+      line-height: 1.5;
+    }
+    .doc-ex figcaption a { color: var(--ink-dim); }
+
+    .photo { margin: 18px 0 22px; max-width: 880px; }
+    .photo img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); filter: grayscale(0.1); }
+    .photo figcaption { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
+    .photo figcaption a { color: var(--ink-dim); }
+
+    .stack-fig { max-width: 880px; margin: 4px 0 8px; border: 1px solid var(--rule); background: var(--surface); }
+    .stack-fig svg { display: block; width: 100%; height: auto; }
+    .stack-fig .bx { fill: var(--surface-2); stroke: var(--rule); }
+    .stack-fig .bx-main { stroke: var(--accent); }
+    .stack-fig .bx-note { fill: var(--surface); }
+    .stack-fig .t1 { font-family: var(--font-mono); font-size: 15px; fill: var(--ink); font-weight: 600; }
+    .stack-fig .t2 { font-family: var(--font-mono); font-size: 12px; fill: var(--ink-dim); }
+    .stack-fig .ln { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
+    .stack-fig .ln-acc { stroke: var(--accent); stroke-dasharray: none; }
+
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 8px; max-width: 880px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); white-space: nowrap; }
+    td.strong a { color: var(--accent); }
+    .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-bottom: 18px; }
+    .src-list { list-style: none; padding: 0; }
+    .src-list li { margin-bottom: 8px; font-size: var(--fs-sm); }
+  </style>
+</Base>

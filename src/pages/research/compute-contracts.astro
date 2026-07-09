@@ -1,0 +1,511 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Dated primer, 2026-07-09. Research notes are not updated in place.
+// Every document quoted is public: CoreWeave's published Terms of Service,
+// and exhibits filed on SEC EDGAR under Reg S-K Item 601. All excerpts
+// verified against the filed text on 2026-07-09; [*] marks are the
+// registrant's own redactions, reproduced as filed.
+const DATED = '2026-07-09';
+
+const EDGAR = {
+  msft: 'https://www.sec.gov/Archives/edgar/data/1769628/000119312525044231/d899798dex1023.htm',
+  openai: 'https://www.sec.gov/Archives/edgar/data/1769628/000119312525052207/d899798dex1024.htm',
+  nvidia: 'https://www.sec.gov/Archives/edgar/data/1769628/000114036125036118/ny20053122x6_ex10-31.htm',
+  openai2: 'https://www.sec.gov/Archives/edgar/data/1769628/000114036125036118/ny20053122x6_ex10-32.htm',
+  apld8k: 'https://www.sec.gov/Archives/edgar/data/1144879/000164117225013199/form8-k.htm',
+  apldLease2: 'https://www.sec.gov/Archives/edgar/data/1144879/000164117225013199/ex10-1.htm',
+  apldLease3: 'https://www.sec.gov/Archives/edgar/data/1144879/000164117225013199/ex10-2.htm',
+  tos: 'https://docs.coreweave.com/policies/terms-of-service',
+};
+
+const spectrum = [
+  {
+    mode: 'On-demand',
+    tenor: 'Per second / per hour',
+    obligation: 'Pay for hours consumed; stop anytime',
+    capacity: 'Not guaranteed; interruptible tiers exist',
+    paper: 'Published terms of service — accepted, not negotiated',
+  },
+  {
+    mode: 'Reserved / committed',
+    tenor: 'One month to ~one year',
+    obligation: 'Pay for the reservation whether used or not',
+    capacity: 'Guaranteed for the term',
+    paper: 'Order form under standard terms',
+  },
+  {
+    mode: 'Committed MSA',
+    tenor: 'One to six years',
+    obligation: 'Fixed payments independent of usage; upfront payment common',
+    capacity: 'Dedicated clusters; hardware-failure and SLA relief',
+    paper: 'Negotiated master services agreement + order forms',
+  },
+];
+
+const msas = [
+  { cp: 'Microsoft', signed: 'Feb 22, 2023', filed: 'Ex. 10.23, Form S-1 (Mar 2025)', url: 'msft',
+    notable: 'Take-or-pay termination mechanics with remarketing offset; 2-day hardware-failure payment relief' },
+  { cp: 'NVIDIA', signed: 'Apr 10, 2023', filed: 'Ex. 10.31, Form S-4/A (Sep 2025)', url: 'nvidia',
+    notable: 'Capacity cap on NVIDIA’s own usage — the “[*] Rule,” size redacted' },
+  { cp: 'OpenAI', signed: 'Mar 7, 2025', filed: 'Ex. 10.24, Form S-1/A (Mar 2025)', url: 'openai',
+    notable: 'Substitute-operator assignment right; “Reportable Event” payment-distress covenant; $350M IPO share issuance' },
+  { cp: 'OpenAI (second)', signed: 'May 8, 2025', filed: 'Ex. 10.32, Form S-4/A (Sep 2025)', url: 'openai2',
+    notable: 'Separate later agreement; same bare-metal architecture' },
+];
+---
+<Base
+  title="The Compute Contract: From On-Demand Terms to Take-or-Pay · CCIR Research"
+  description="A primer on how GPU-hours are actually sold, read from the public record: published terms of service at the spot end, SEC-filed master services agreements at the committed end, and the datacenter leases underneath."
+  showTape={false}
+>
+  <nav class="apps-navband" aria-label="On this page">
+    <div class="wrap apps-nav-inner">
+      <a class="apps-nav-link" href="#spectrum">The spectrum</a>
+      <a class="apps-nav-link" href="#on-demand">On-demand terms</a>
+      <a class="apps-nav-link" href="#msa">The MSA</a>
+      <a class="apps-nav-link" href="#datacenter-lease">The lease beneath</a>
+      <a class="apps-nav-link" href="#redactions">The record</a>
+      <a class="apps-nav-link" href="#sources">Sources</a>
+    </div>
+  </nav>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · primer · {DATED}</div>
+      <h1>The Compute Contract: From On-Demand Terms to Take-or-Pay</h1>
+      <p class="standfirst">
+        A GPU-hour is sold under one of three kinds of paper: published terms
+        of service that any customer accepts as-is, reserved commitments of a
+        month to a year, and negotiated multi-year agreements with fixed
+        payment obligations. All three are now readable in primary documents —
+        the retail terms are published in full, and the large agreements are
+        filed, redacted, as material-contract exhibits on SEC EDGAR. This
+        primer walks the spectrum using the documents themselves. Its
+        companion, <a href="/research/gpu-spv">The GPU SPV</a>, follows the
+        same contracts into the credit agreements that borrow against them.
+      </p>
+    </header>
+
+    <section class="sec" id="spectrum">
+      <h2><span class="n">01</span> One Asset, Three Kinds of Paper</h2>
+      <p>
+        The same accelerator earns under very different contracts depending on
+        who is renting it and for how long. The rate cards CCIR tracks are the
+        posted-ask layer of this spectrum — on-demand rates and committed asks
+        by tenor (<a href="/term">/term</a>) — and the persistent gap between
+        the two ends is measured in
+        <a href="/research/od-vs-committed">The Commitment Discount</a>. What
+        follows is the contractual machinery behind those postings.
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Mode</th><th>Tenor</th><th>Payment obligation</th><th>Capacity</th><th>The paper</th></tr></thead>
+          <tbody>
+            {spectrum.map((r) => (
+              <tr>
+                <td class="strong">{r.mode}</td>
+                <td>{r.tenor}</td>
+                <td>{r.obligation}</td>
+                <td>{r.capacity}</td>
+                <td>{r.paper}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="sec" id="on-demand">
+      <h2><span class="n">02</span> The On-Demand End: Published Terms</h2>
+      <p>
+        At the retail end there is no negotiation — the contract is a document
+        on the provider's website, accepted at account creation. CoreWeave's
+        <a href={EDGAR.tos} rel="noopener" target="_blank">Terms of
+        Service</a> (last modified June 30, 2022) is representative and
+        published in full, with an Acceptable Use Policy, Data Processing
+        Agreement, and Privacy Policy incorporated by reference. The
+        commercial mechanics are ordinary trade credit: invoices under
+        $20,000 are charged to the customer's card, invoices of $20,000 or
+        more are payable by ACH or wire on Net 15 terms, and unpaid balances
+        accrue a finance charge of 1.5% per month. Non-payment carries an
+        operational remedy — suspension:
+      </p>
+      <figure class="doc-ex">
+        <div class="doc-ex-label">CoreWeave Terms of Service (published) — payment and suspension</div>
+        <blockquote>
+          <p>“CoreWeave reserves the right to deactivate, terminate, prevent
+          access to, disable services for, and/or suspend or delete a
+          Customer's account or access to any CoreWeave Services at any time
+          for nonpayment, late payment&hellip; If any amount of your Fees are past
+          due, we may suspend your API access after we provide you written
+          notice of late payment.”</p>
+          <p>“Any amounts due under this Agreement shall not be withheld or
+          offset by you against amounts due to you for any reason.”</p>
+        </blockquote>
+        <figcaption>Source: <a href={EDGAR.tos} rel="noopener" target="_blank">docs.coreweave.com</a>, retrieved {DATED}.</figcaption>
+      </figure>
+      <p>
+        Marketplace venues sit at the same end with a different seller: on a
+        marketplace the machines are listed by independent hosts, billing runs
+        per second, and there is no capacity commitment in either direction.
+        This is the fully interruptible, no-commitment end of the spectrum —
+        the prices posted here are the on-demand series in the
+        <a href="/rates">published rates</a>, and the clearing-type venues in
+        the <a href="/basis">basis monitor</a>.
+      </p>
+    </section>
+
+    <section class="sec" id="msa">
+      <h2><span class="n">03</span> The Committed End: The Master Services Agreement</h2>
+      <p>
+        The committed end runs on a two-layer architecture. The
+        <strong>master services agreement</strong> is the frame: definitions,
+        service obligations, payment mechanics, termination rights. The
+        commercial substance — chips, quantities, prices, dates — lives in
+        <strong>order forms</strong> executed under it. CoreWeave's MSAs with
+        Microsoft, OpenAI, and NVIDIA are filed on EDGAR; the order forms are
+        not, and within the filed MSAs the registrant's redactions, marked
+        [*], fall almost exactly where the commercial terms sit. The legal
+        architecture is fully readable.
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Counterparty</th><th>Signed</th><th>Filed as</th><th>Notable clause</th></tr></thead>
+          <tbody>
+            {msas.map((m) => (
+              <tr>
+                <td class="strong"><a href={EDGAR[m.url]} rel="noopener" target="_blank">{m.cp}</a></td>
+                <td>{m.signed}</td>
+                <td>{m.filed}</td>
+                <td class="wide">{m.notable}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="tfoot">
+        CoreWeave, Inc. (CIK 0001769628) exhibit filings; counterparty links
+        open the filed exhibit as verified on {DATED}.
+      </p>
+      <p>
+        The frame itself is compact — the Microsoft agreement runs thirteen
+        sections, and the finance-relevant machinery concentrates in four:
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>§</th><th>Section, as filed</th><th>What it carries</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td class="strong">Definitions</td><td class="wide">The units of the deal: Order Form, Reserved Instances, Bulk Credits, Hardware Failure. Everything downstream is built from these.</td></tr>
+            <tr><td class="num">2</td><td class="strong">Services</td><td class="wide">Access to the reserved capacity and the ordering mechanics. In the NVIDIA agreement, this is where the capacity-cap “[*] Rule” lives.</td></tr>
+            <tr><td class="num">3–7</td><td class="strong">Responsibilities · Data · IP · Confidentiality · Reps</td><td class="wide">Use restrictions, data processing, licenses, and the confidentiality clause that keeps order forms out of the public record.</td></tr>
+            <tr><td class="num">8–9</td><td class="strong">Limitation of Liability · Indemnification</td><td class="wide">Damages caps and consequential-damages waivers — the ceiling on what a service failure can cost the operator.</td></tr>
+            <tr><td class="num">10</td><td class="strong">Term and Termination</td><td class="wide">Cure periods, insolvency triggers, and the remarketing-and-damages formula quoted below — the take-or-pay skeleton.</td></tr>
+            <tr><td class="num">11</td><td class="strong">Payment of Fees</td><td class="wide">Net terms and early-payment discounts (percentages redacted), billing in arrears for on-demand use, no-offset mechanics.</td></tr>
+            <tr><td class="num">12</td><td class="strong">Availability of Service</td><td class="wide">SLAs and the hardware-failure clause: two consecutive business days of failure suspends the payment obligation.</td></tr>
+            <tr><td class="num">13</td><td class="strong">General</td><td class="wide">Assignment and governing law — the section any lender's collateral assignment, or a substitute operator, must pass through.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tfoot">Section titles as filed in Ex. 10.23; groupings 3–7 and 8–9 condensed. The OpenAI and NVIDIA agreements follow the same skeleton with counterparty-specific insertions.</p>
+      <p>
+        The defined terms do the structural work. A reservation is exclusive
+        use of hardware, not a quota of usage:
+      </p>
+      <figure class="doc-ex">
+        <div class="doc-ex-label">Master Services Agreement (Microsoft), Ex. 10.23 — definitions and redaction legend, as filed</div>
+        <blockquote>
+          <p class="legend">CERTAIN CONFIDENTIAL INFORMATION CONTAINED IN THIS
+          DOCUMENT, MARKED BY [*], HAS BEEN OMITTED BECAUSE IT IS NOT MATERIAL
+          AND WOULD LIKELY CAUSE COMPETITIVE HARM TO COREWEAVE, INC. IF
+          PUBLICLY DISCLOSED.</p>
+          <p>“<strong>Reserved Instances</strong>” means the exclusive use of a
+          specified amount and type of compute configuration as set forth in a
+          Reserved Instance Order Form.</p>
+          <p>“<strong>Hardware Failure</strong>” means breakage of a GPU node
+          that causes that node to fail.</p>
+          <p>After Customer accepts Services and receives a proper and
+          undisputed invoice, it will pay Fees and approved expenses&hellip;
+          Net 10 days less a <mark>[*]</mark>% discount on the invoiced
+          amount&hellip; or&hellip; Net 60 days with <mark>[*]</mark>.</p>
+        </blockquote>
+        <figcaption>Source: <a href={EDGAR.msft} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.23 to CoreWeave's Form S-1, accession 0001193125-25-044231.</figcaption>
+      </figure>
+      <p>
+        Payment relief is specified mechanically. Under the Microsoft
+        agreement, if a hardware failure persists for two consecutive
+        business days, the payment obligation for the affected services is
+        canceled until service is restored — downtime is priced into the
+        contract as suspended rent, not damages. And the termination clause
+        contains the market structure of the committed discount in remedy
+        form: if CoreWeave terminates for the customer's breach, it may
+        remarket the dedicated servers, credit the proceeds against what the
+        customer owes, and the customer's exposure is capped at the lesser of
+        the remaining contract fees net of those proceeds, or —
+      </p>
+      <figure class="doc-ex">
+        <div class="doc-ex-label">Master Services Agreement (Microsoft), Ex. 10.23 — §10(c), termination damages</div>
+        <blockquote>
+          <p>“&hellip;then Customer shall pay the lesser of (I) fees due for the
+          remainder of the term minus proceeds from CoreWeave's transfer or
+          sale of the Contract Servers, or (II) from the commencement date of
+          this Agreement through the termination date, <strong>the difference
+          between fees paid and fees charged at CoreWeave's on-demand
+          rates</strong>.”</p>
+        </blockquote>
+        <figcaption>Source: <a href={EDGAR.msft} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.23. Emphasis added.</figcaption>
+      </figure>
+      <p>
+        Read that limb (II) again: a committed customer who walks can be
+        re-rated as if it had bought every hour on demand. The spread between
+        committed and on-demand rates — the
+        <a href="/research/od-vs-committed">commitment discount</a> — is not
+        just a pricing observation; it is the unit in which this contract
+        computes damages.
+      </p>
+      <p>
+        Two counterparty-specific clauses show how far the negotiated end is
+        from the retail terms. The NVIDIA agreement caps how much of
+        CoreWeave's fleet NVIDIA itself may consume — the size of the cap is
+        redacted, the rule is not: “CoreWeave must not, at any point in time,
+        dedicate more than <mark>[*]</mark> of available customer capacity to
+        NVIDIA (the ‘<mark>[*]</mark> Rule’); such capacity being measured by
+        each server type.” The OpenAI agreement obliges the customer to
+        report, in advance, its own projected inability to pay (“a
+        ‘Reportable Event’ occurs when Customer becomes currently unable to
+        or is projected to be unable to, within the next four (4) month
+        period, pay the fees due”), and pre-arranges a <strong>substitute
+        operator</strong>: on certain CoreWeave insolvency-type events, the
+        customer may require assignment of the order forms, the agreement,
+        and the applicable data-center agreements to a third-party operator
+        of its choosing, within two business days of notice. The machinery a
+        lender would recognize as servicer-transfer provisions appears here
+        on the customer's side of the table.
+      </p>
+      <figure class="photo">
+        <img src="/img/research/summit-hall.jpg" width="1600" height="900"
+             alt="A long row of black supercomputer cabinets under yellow overhead cable trays in a machine hall." loading="lazy" />
+        <figcaption>
+          The committed end of the spectrum is physical: a dedicated,
+          single-tenant machine hall (Oak Ridge National Laboratory's Summit,
+          27,648 GPUs). Photo: Carlos Jones/ORNL,
+          <a href="https://commons.wikimedia.org/wiki/File:Summit_supercomputer_(31430045337).jpg" rel="noopener" target="_blank">via Wikimedia Commons</a>
+          (<a href="https://creativecommons.org/licenses/by/2.0/" rel="noopener" target="_blank">CC BY 2.0</a>).
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="sec" id="datacenter-lease">
+      <h2><span class="n">04</span> The Layer Beneath: The Datacenter Lease</h2>
+      <p>
+        A compute contract obliges the operator to run machines somewhere,
+        and that somewhere has its own filed paper. On May 28, 2025, two
+        Applied Digital subsidiaries signed datacenter leases with CoreWeave
+        for the full capacity of two buildings at the Ellendale, North Dakota
+        campus — 250 MW in aggregate. The leases themselves are filed as
+        exhibits, redacted with the same conventions as the MSAs. From the
+        8-K: each lease runs an initial approximately fifteen-year term with
+        three five-year extension options; expected total contract value is
+        approximately $3 billion for Building 2 and $4 billion for Building
+        3; the landlord owes customary service levels backed by service-level
+        credits; CoreWeave may terminate an affected lease outright — no
+        termination fee — if specified delivery dates are missed, and may
+        terminate for convenience at any time on notice with a specified
+        termination fee. Applied Digital guarantees its subsidiaries'
+        obligations, and issued CoreWeave a warrant alongside.
+      </p>
+      <p>
+        Stack the layers and the shape of the market is visible in the
+        paper: a customer's multi-year committed MSA sits on the operator's
+        fifteen-year datacenter lease, which sits on the landlord's power
+        infrastructure. Each layer is longer-dated than the one above it, and
+        each is a contract someone finances. The credit agreements that do so
+        take assignment of exactly these documents — the subject of
+        <a href="/research/gpu-spv">the companion primer</a>.
+      </p>
+      <div class="stack-fig">
+        <svg viewBox="0 0 860 300" role="img" aria-label="The contract stack: customer MSA on operator, datacenter lease on landlord, power beneath, with typical tenors lengthening down the stack.">
+          <g class="sg">
+            <rect x="30" y="18" width="560" height="52" class="bx" />
+            <text x="50" y="40" class="t1">Customer &nbsp;·&nbsp; frontier lab / hyperscaler</text>
+            <text x="50" y="58" class="t2">committed MSA + order forms · 1–6 yr · fixed payments</text>
+            <text x="640" y="48" class="t3">what /term prices</text>
+
+            <rect x="30" y="90" width="560" height="52" class="bx" />
+            <text x="50" y="112" class="t1">Operator &nbsp;·&nbsp; the GPU fleet</text>
+            <text x="50" y="130" class="t2">owns the machines · sells on-demand ↔ committed</text>
+            <text x="640" y="120" class="t3">what /credit finances</text>
+
+            <rect x="30" y="162" width="560" height="52" class="bx" />
+            <text x="50" y="184" class="t1">Landlord &nbsp;·&nbsp; datacenter REIT / developer</text>
+            <text x="50" y="202" class="t2">datacenter lease · ~15 yr + extensions · service-level credits</text>
+            <text x="640" y="192" class="t3">filed as 8-K exhibits</text>
+
+            <rect x="30" y="234" width="560" height="52" class="bx" />
+            <text x="50" y="256" class="t1">Power &nbsp;·&nbsp; utility / behind-the-meter</text>
+            <text x="50" y="274" class="t2">interconnection + supply · decades</text>
+
+            <line x1="310" y1="70" x2="310" y2="90" class="ln" />
+            <line x1="310" y1="142" x2="310" y2="162" class="ln" />
+            <line x1="310" y1="214" x2="310" y2="234" class="ln" />
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <section class="sec" id="redactions">
+      <h2><span class="n">05</span> What the Record Shows, and What It Withholds</h2>
+      <p>
+        The redactions are permitted by Regulation S-K Item 601(b)(10), and
+        registrants use them consistently: cure periods, discount
+        percentages, capacity caps, and — above all — prices and volumes are
+        omitted as “not material” and competitively harmful. What the filed
+        record establishes is the architecture: how a reservation is defined,
+        when payment stops, who may terminate and at what computed cost, and
+        which documents travel together when an operator is replaced. The
+        commercial terms inside the [*] marks are the part of this market
+        that only posted prices make observable — the series CCIR publishes
+        at <a href="/rates">/rates</a> are the unredacted layer.
+      </p>
+    </section>
+
+    <section class="sec" id="sources">
+      <h2><span class="n">06</span> Sources</h2>
+      <ul class="src-list">
+        <li>CoreWeave–Microsoft Master Services Agreement (Feb 22, 2023) — <a href={EDGAR.msft} rel="noopener" target="_blank">Ex. 10.23</a> to Form S-1, accession 0001193125-25-044231</li>
+        <li>CoreWeave–OpenAI Master Services Agreement, Bare Metal Environment (Mar 7, 2025) — <a href={EDGAR.openai} rel="noopener" target="_blank">Ex. 10.24</a> to Form S-1/A, accession 0001193125-25-052207</li>
+        <li>CoreWeave–NVIDIA Master Services Agreement (Apr 10, 2023) — <a href={EDGAR.nvidia} rel="noopener" target="_blank">Ex. 10.31</a> to Form S-4/A, accession 0001140361-25-036118</li>
+        <li>CoreWeave–OpenAI Master Services Agreement, second (May 8, 2025) — <a href={EDGAR.openai2} rel="noopener" target="_blank">Ex. 10.32</a> to Form S-4/A, accession 0001140361-25-036118</li>
+        <li>Applied Digital Form 8-K (June 2, 2025) with Building 2 and Building 3 Datacenter Leases — <a href={EDGAR.apld8k} rel="noopener" target="_blank">8-K body</a>, <a href={EDGAR.apldLease2} rel="noopener" target="_blank">Ex. 10.1</a>, <a href={EDGAR.apldLease3} rel="noopener" target="_blank">Ex. 10.2</a>, accession 0001641172-25-013199</li>
+        <li>CoreWeave Terms of Service (last modified June 30, 2022) — <a href={EDGAR.tos} rel="noopener" target="_blank">docs.coreweave.com</a></li>
+      </ul>
+      <p class="tfoot">
+        All excerpts verified against the filed text on {DATED}. [*] marks
+        are the registrants' redactions, reproduced as filed; emphasis, where
+        added, is noted.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .apps-navband {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+    }
+    .apps-nav-inner {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
+    .apps-nav-inner::-webkit-scrollbar { display: none; }
+    .apps-nav-link {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
+    #spectrum, #on-demand, #msa, #datacenter-lease, #redactions, #sources { scroll-margin-top: 52px; }
+    .page-head { max-width: 82ch; margin-bottom: 18px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p, .sec ul {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 13px;
+    }
+    .sec strong { color: var(--accent); }
+
+    .doc-ex { margin: 18px 0 22px; max-width: 880px; border: 1px solid var(--rule); background: var(--surface); }
+    .doc-ex-label {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--rule);
+      padding: 8px 16px;
+    }
+    .doc-ex blockquote {
+      margin: 0;
+      padding: 16px 20px 8px;
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: var(--fs-sm);
+      line-height: 1.7;
+      color: var(--ink);
+    }
+    .doc-ex blockquote p { margin: 0 0 12px; }
+    .doc-ex .legend {
+      font-size: calc(var(--fs-xs) - 1px);
+      letter-spacing: 0.02em;
+      color: var(--ink-dim);
+    }
+    .doc-ex mark {
+      background: transparent;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .doc-ex strong { color: var(--accent); }
+    .doc-ex figcaption {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      padding: 0 20px 12px;
+      line-height: 1.5;
+    }
+    .doc-ex figcaption a { color: var(--ink-dim); }
+
+    .photo { margin: 18px 0 22px; max-width: 880px; }
+    .photo img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); filter: grayscale(0.1); }
+    .photo figcaption { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
+    .photo figcaption a { color: var(--ink-dim); }
+
+    .stack-fig { max-width: 880px; margin: 4px 0 8px; border: 1px solid var(--rule); background: var(--surface); }
+    .stack-fig svg { display: block; width: 100%; height: auto; }
+    .stack-fig .bx { fill: var(--surface-2); stroke: var(--rule); }
+    .stack-fig .t1 { font-family: var(--font-mono); font-size: 15px; fill: var(--ink); font-weight: 600; }
+    .stack-fig .t2 { font-family: var(--font-mono); font-size: 12px; fill: var(--ink-dim); }
+    .stack-fig .t3 { font-family: var(--font-mono); font-size: 12px; fill: var(--accent); }
+    .stack-fig .ln { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
+
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 8px; max-width: 880px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); white-space: nowrap; }
+    td.strong a { color: var(--accent); }
+    td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    td.wide { font-family: var(--font-body); font-size: var(--fs-sm); line-height: 1.5; color: var(--ink-dim); }
+    .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-bottom: 18px; }
+    .src-list { list-style: none; padding: 0; }
+    .src-list li { margin-bottom: 8px; font-size: var(--fs-sm); }
+  </style>
+</Base>

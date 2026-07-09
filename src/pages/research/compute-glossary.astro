@@ -1,0 +1,416 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Dated primer, 2026-07-09. Research notes are not updated in place.
+// Definitional companion to /research/training-vs-inference: the units and
+// terms of art a finance reader meets in compute contracts, filings, and
+// rating reports, each tied to where it lands in published numbers.
+// Spec figures are deliberately coarse ("roughly"); exact per-chip values
+// live on the data pages.
+const DATED = '2026-07-09';
+---
+<Base
+  title="The Units of Compute: A Glossary for Finance Professionals · CCIR Research"
+  description="FLOPS, memory bandwidth, TDP, PUE, MFU, goodput, NVL72, training versus inference versus edge — the vocabulary of compute contracts and GPU-backed credit, defined in finance terms, with pointers to where each term lands in published series."
+  showTape={false}
+>
+  <nav class="apps-navband" aria-label="On this page">
+    <div class="wrap apps-nav-inner">
+      <a class="apps-nav-link" href="#machine">The machine</a>
+      <a class="apps-nav-link" href="#spec-sheet">Spec sheet</a>
+      <a class="apps-nav-link" href="#facility">Facility</a>
+      <a class="apps-nav-link" href="#utilization">Utilization</a>
+      <a class="apps-nav-link" href="#workloads">Workloads</a>
+      <a class="apps-nav-link" href="#reading">Reading the numbers</a>
+    </div>
+  </nav>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · primer · {DATED}</div>
+      <h1>The Units of Compute: A Glossary for Finance Professionals</h1>
+      <p class="standfirst">
+        Compute contracts, prospectuses, and rating reports are written in a
+        vocabulary imported from computer engineering, and the terms are load-bearing:
+        they are the units in which capacity is sold, covenants are tested,
+        and collateral is described. This glossary defines the ones that
+        matter for reading the paper — no machine-learning background
+        assumed — and points each at the published series where it shows up.
+        Companion primers:
+        <a href="/research/training-vs-inference">Training, Inference, and
+        What Compute Earns</a>,
+        <a href="/research/compute-contracts">The Compute Contract</a>, and
+        <a href="/research/gpu-spv">The GPU SPV</a>.
+      </p>
+    </header>
+
+    <section class="sec" id="machine">
+      <h2><span class="n">01</span> The Machine</h2>
+      <dl class="gloss">
+        <dt>GPU / accelerator</dt>
+        <dd>
+          The revenue-producing asset. Originally a graphics processor; in
+          this market, a chip built to run the dense linear algebra that
+          neural networks are made of. Datacenter GPUs are sold as
+          components, but they earn — and are collateralized — as parts of
+          assembled systems. When a filing says “GPU servers,” it means the
+          whole machine below.
+        </dd>
+
+        <dt>Generation / architecture</dt>
+        <dd>
+          NVIDIA names each chip generation for its underlying design:
+          Volta (V100, 2017), Ampere (A100, 2020), Hopper (H100/H200,
+          2022–24), Blackwell (B200/B300, GB200/GB300, 2024–26). A new
+          generation arrives roughly every two years, and each arrival
+          reprices the ones before it — the mechanism documented across nine
+          years of posted rates in
+          <a href="/research/rental-rates-by-generation">GPU Rental Rates by
+          Generation</a>. For a credit reader, the generation cadence is the
+          asset's obsolescence clock.
+        </dd>
+
+        <dt>SXM vs. PCIe (form factor)</dt>
+        <dd>
+          Two ways the same chip mounts into a server. PCIe cards slot in
+          like any peripheral; SXM modules solder onto a shared board with
+          much higher power delivery and direct chip-to-chip links. SXM is
+          the datacenter-committed form and rents at a premium — which is
+          why CCIR's headline series are split by form factor rather than
+          pooled.
+        </dd>
+
+        <dt>HGX baseboard / node</dt>
+        <dd>
+          The standard building block: eight SXM GPUs on one baseboard with
+          its host CPUs, memory, and network cards — one “node.” Large
+          deals are counted in nodes and racks, not individual chips, and
+          the serial-number covenants in GPU-backed credit agreements track
+          “GPU Servers” at exactly this unit.
+        </dd>
+        <dt class="dt-fig"></dt>
+        <dd class="dd-fig">
+          <figure class="photo">
+            <img src="/img/research/hgx-b200-tray.jpg" width="1400" height="1421"
+                 alt="An NVIDIA HGX B200 baseboard with eight GPU heatsink towers, displayed on a table." loading="lazy" />
+            <figcaption>
+              One node before the sheet metal: an 8-GPU NVIDIA HGX B200
+              baseboard. Photo: Pokiiri,
+              <a href="https://commons.wikimedia.org/wiki/File:Nvidia_DGX-B200-HGX.jpg" rel="noopener" target="_blank">via Wikimedia Commons</a>
+              (<a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">CC BY-SA 4.0</a>).
+            </figcaption>
+          </figure>
+        </dd>
+
+        <dt>NVLink, InfiniBand, and the fabric</dt>
+        <dd>
+          The wiring that makes many GPUs act as one computer. NVLink
+          connects chips within a node (and, in rack-scale systems, across a
+          rack); InfiniBand or specialized Ethernet connects nodes to each
+          other. The fabric is why identical chips rent at different prices
+          in different facilities: a training cluster is only as good as its
+          interconnect, and the tier structure in published rates largely
+          prices the fabric and the factory around the chip, not the chip
+          alone.
+        </dd>
+
+        <dt>Rack-scale: GB200 NVL72</dt>
+        <dd>
+          The current frontier packaging: 72 Blackwell GPUs and 36 Grace
+          CPUs cabled into a single rack that behaves as one machine, drawing
+          roughly 120 kW — ten times a conventional server rack — and
+          cooled by liquid, not air. Rack-scale systems collapse the
+          distinction between “server” and “datacenter”: the rack is the
+          unit of deployment, of pricing, and increasingly of collateral
+          description.
+        </dd>
+        <dt class="dt-fig"></dt>
+        <dd class="dd-fig">
+          <figure class="photo">
+            <img src="/img/research/gb200-nvl72.jpg" width="1600" height="1275"
+                 alt="An NVIDIA GB200 NVL72 rack system on display beside a liquid-to-air heat exchanger cabinet." loading="lazy" />
+            <figcaption>
+              The rack as the machine: a GB200 NVL72 system displayed beside
+              the liquid-to-air heat exchanger that cools it (COMPUTEX 2024).
+              Photo: 极客湾 Geekerwan,
+              <a href="https://commons.wikimedia.org/wiki/File:Eindr%C3%BCcke_von_der_COMPUTEX_2024_(_%E6%9E%81%E5%AE%A2%E6%B9%BEGeekerwan)_20.png" rel="noopener" target="_blank">via Wikimedia Commons</a>
+              (<a href="https://creativecommons.org/licenses/by/3.0/" rel="noopener" target="_blank">CC BY 3.0</a>), cropped.
+            </figcaption>
+          </figure>
+        </dd>
+      </dl>
+    </section>
+
+    <section class="sec" id="spec-sheet">
+      <h2><span class="n">02</span> What the Spec Sheet Sells</h2>
+      <dl class="gloss">
+        <dt>FLOPS</dt>
+        <dd>
+          Floating-point operations per second — raw arithmetic speed, the
+          headline spec. Scale prefixes do the marketing: a teraFLOPS is
+          10<sup>12</sup> operations per second, a petaFLOPS 10<sup>15</sup>,
+          an exaFLOPS 10<sup>18</sup>. Two cautions for the finance reader.
+          First, FLOPS figures are quoted at a stated <em>precision</em>
+          (FP16, FP8, FP4 — fewer bits per number means more operations per
+          second), so headline numbers across generations are frequently not
+          like-for-like. Second, peak FLOPS is a ceiling, not a forecast —
+          see MFU below. What a rented FLOPS actually earns, per generation,
+          is one of the four lenses at <a href="/chip-economics">/chip-economics</a>.
+        </dd>
+
+        <dt>Memory bandwidth (TB/s)</dt>
+        <dd>
+          How fast data moves between a GPU's memory and its compute —
+          terabytes per second. Inference work is usually limited by
+          bandwidth, not arithmetic, which is why older GPUs with
+          competitive bandwidth keep earning after their FLOPS have been
+          eclipsed. In the current cross-section, rent per unit of bandwidth
+          is roughly flat from A100 to B300 while rent per FLOPS falls
+          steeply with age (<a href="/research/gpu-age-curve">Rent and
+          Age</a>) — the single most useful spec-sheet fact in this market.
+        </dd>
+
+        <dt>HBM / VRAM (GB)</dt>
+        <dd>
+          The GPU's on-package high-bandwidth memory, in gigabytes. It
+          gates which models fit on the chip at all: a model that doesn't
+          fit must be split across more GPUs, multiplying the hardware bill.
+          Mid-generation refreshes are often memory upgrades wearing the
+          same architecture (H100 → H200), and they command a durable rent
+          premium.
+        </dd>
+
+        <dt>Tokens / $ per million tokens</dt>
+        <dd>
+          The retail unit one level up: models read and write text in
+          tokens (roughly three-quarters of a word each), and inference is
+          sold by the million tokens. Token prices are to GPU rental rates
+          what refined-product prices are to crude — the downstream margin
+          decides what the upstream capacity can charge.
+        </dd>
+      </dl>
+    </section>
+
+    <section class="sec" id="facility">
+      <h2><span class="n">03</span> What the Facility Measures</h2>
+      <dl class="gloss">
+        <dt>MW (megawatts)</dt>
+        <dd>
+          The unit large deals are actually denominated in. Datacenter
+          leases and hosting agreements contract for power capacity — “up
+          to an aggregate of 250 MW,” in the Applied Digital–CoreWeave
+          leases — because power, not floor space, is the scarce input. A
+          useful conversion for sizing: at roughly a kilowatt per
+          current-generation GPU all-in, a 100 MW building hosts on the
+          order of 70,000–100,000 GPUs.
+        </dd>
+
+        <dt>TDP (thermal design power)</dt>
+        <dd>
+          The chip's rated power draw in watts: roughly 700 W for an H100
+          SXM, 1,000 W for a B200, 1,400 W for a B300. TDP is the bridge
+          between the chip and the facility — it converts a GPU count into
+          the MW a lease must supply — and it denominates one of the
+          cross-generation lenses at
+          <a href="/chip-economics">/chip-economics</a>: rent per
+          TDP-kilowatt-hour, the earning power of a watt delivered to
+          silicon.
+        </dd>
+
+        <dt>PUE (power usage effectiveness)</dt>
+        <dd>
+          Total facility power divided by the power that reaches the IT
+          equipment. A PUE of 1.2 means 20% overhead for cooling and
+          distribution. Purpose-built AI facilities run roughly 1.1–1.3;
+          older enterprise sites run materially higher. For a finance
+          reader, PUE is an operating-margin term: every point of overhead
+          is power purchased but not resold as compute.
+        </dd>
+      </dl>
+    </section>
+
+    <section class="sec" id="utilization">
+      <h2><span class="n">04</span> What Utilization Actually Means</h2>
+      <dl class="gloss">
+        <dt>Utilization</dt>
+        <dd>
+          The share of a fleet that is rented rather than idle — occupancy,
+          in real-estate terms. Because a GPU-hour is non-storable, unsold
+          hours are revenue permanently foregone, not inventory. CCIR
+          publishes fleet utilization and venue availability at
+          <a href="/utilization">/utilization</a>.
+        </dd>
+
+        <dt>MFU (model FLOPs utilization)</dt>
+        <dd>
+          Of the arithmetic a GPU could theoretically perform, the share a
+          training run actually uses — commonly cited in the 30–50% range
+          for large runs. The gap is physics and plumbing: chips wait on
+          data, on each other, and on the network. MFU is why revenue
+          models built on peak-FLOPS arithmetic overstate what a cluster
+          delivers, in the same way nameplate capacity overstates a power
+          plant's output.
+        </dd>
+
+        <dt>Goodput</dt>
+        <dd>
+          Throughput that survives failures. Training runs on thousands of
+          GPUs checkpoint their progress and restart when hardware fails —
+          at scale, something is always failing — so useful output is what
+          remains after restarts and lost work. Goodput is the engineering
+          quantity behind the hardware-failure clauses in the
+          <a href="/research/compute-contracts">filed MSAs</a>, where two
+          days of persistent failure suspends the payment obligation.
+        </dd>
+
+        <dt>Availability / uptime SLA</dt>
+        <dd>
+          The contracted promise that capacity is up and reachable —
+          distinct from utilization (whether anyone is renting it) and from
+          MFU (what the renter extracts from it). SLAs convert downtime
+          into service credits; committed contracts convert extended
+          hardware failure into suspended rent. Availability is a covenant
+          term; utilization is a demand fact.
+        </dd>
+      </dl>
+    </section>
+
+    <section class="sec" id="workloads">
+      <h2><span class="n">05</span> The Workloads</h2>
+      <dl class="gloss">
+        <dt>Training</dt>
+        <dd>
+          Building the model: a project-style campaign running near
+          flat-out on thousands of the newest, fastest-interconnected GPUs
+          for months, procured by a handful of counterparties under
+          multi-year committed contracts. Training demand behaves like
+          construction backlog — lumpy, concentrated, contract-wrapped.
+        </dd>
+
+        <dt>Fine-tuning</dt>
+        <dd>
+          Adapting an existing model to a task with modest additional
+          training — days on dozens of GPUs rather than months on
+          thousands. It transacts at short tenors and populates the middle
+          of the market.
+        </dd>
+
+        <dt>Inference</dt>
+        <dd>
+          Running the model: every query, API call, and AI feature in
+          production. Recurring, usage-driven, latency-sensitive, diurnal —
+          and tolerant of older hardware, which is what keeps prior
+          generations earning. Inference demand behaves like utility load.
+          The full credit translation is the subject of
+          <a href="/research/training-vs-inference">its own primer</a>.
+        </dd>
+
+        <dt>Edge</dt>
+        <dd>
+          Inference that runs on the end device — phone, laptop, vehicle —
+          rather than in a datacenter. From a compute-market standpoint,
+          edge is demand that never rents a GPU-hour at all: capability
+          shipped in consumer silicon rather than sold by the hour. Its
+          growth shifts workload mix, not rental supply.
+        </dd>
+      </dl>
+    </section>
+
+    <section class="sec" id="reading">
+      <h2><span class="n">06</span> Reading the Numbers</h2>
+      <p>
+        Most of these terms exist on a spec sheet or in a facility plan;
+        what connects them to credit is always the same move — divide the
+        rent by the unit and watch the series. Rent per chip, per FLOPS,
+        per TB/s of bandwidth, and per TDP-kilowatt is published daily at
+        <a href="/chip-economics">/chip-economics</a>; rates by chip, term,
+        and geography at <a href="/rates">/rates</a>; what operators
+        actually realize per GPU-hour, from filings, at
+        <a href="/realized">/realized</a>.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .apps-navband {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+    }
+    .apps-nav-inner {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
+    .apps-nav-inner::-webkit-scrollbar { display: none; }
+    .apps-nav-link {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
+    #machine, #spec-sheet, #facility, #utilization, #workloads, #reading { scroll-margin-top: 52px; }
+    .page-head { max-width: 82ch; margin-bottom: 18px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 13px;
+    }
+    .sec strong { color: var(--accent); }
+    .sec em { font-style: italic; }
+
+    .gloss { margin: 0; }
+    .gloss dt {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      font-weight: var(--weight-display);
+      letter-spacing: -0.005em;
+      color: var(--accent);
+      margin: 20px 0 6px;
+    }
+    .gloss dt.dt-fig { margin: 0; }
+    .gloss dd {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+    .gloss dd.dd-fig { margin-top: 14px; }
+    .gloss sup { font-size: 0.7em; }
+
+    .photo { margin: 4px 0 10px; max-width: 640px; }
+    .photo img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); filter: grayscale(0.1); }
+    .photo figcaption { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
+    .photo figcaption a { color: var(--ink-dim); }
+  </style>
+</Base>
