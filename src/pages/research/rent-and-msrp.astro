@@ -177,7 +177,8 @@ const bwTable = [
           <div class="sm-key-body">
             <p><strong>Reading the panels.</strong> Each shows one
             generation's annualized posted rent ÷ its MSRP anchor, by age in
-            months from GA; the other four are ghosted for context.</p>
+            months from general availability; the other four are ghosted for
+            context.</p>
             <p>The emphasized line is <strong>1.0</strong> — a year of posted
             hours equals the MSRP anchor. Dashed segments = months with n&lt;3
             providers (shown, never fitted). Dot = latest n≥3 point.</p>
@@ -186,7 +187,7 @@ const bwTable = [
       </div>
       <figcaption class="tfoot">
         Annualized posted panel-median rent ÷ MSRP anchor, by generation age
-        in months from GA, Oct 2017 – Apr 2026 (the archive's edge — the
+        in months from general availability, Oct 2017 – Apr 2026 (the archive's edge — the
         live CCIR panel continues from there), shared scales across panels.
         Sources and repair per the
         <a href="/research/rental-rates-by-generation">cohort note</a>;
@@ -241,7 +242,7 @@ const bwTable = [
       </p>
       <div class="twrap">
         <table>
-          <thead><tr><th>Generation</th><th>GA</th><th class="num">Months to pass anchor</th><th class="num">Cum. gross revenue to Apr 2026</th><th class="num">Multiple of anchor</th></tr></thead>
+          <thead><tr><th>Generation</th><th>General availability</th><th class="num">Months to pass anchor</th><th class="num">Cum. gross revenue to Apr 2026</th><th class="num">Multiple of anchor</th></tr></thead>
           <tbody>
             {payback.map((p) => (
               <tr><td class="gen">{p.gen}</td><td class="dim">{p.ga}</td><td class="num strong">{p.months}</td><td class="num dim">{p.cum}</td><td class="num strong">{p.mult}</td></tr>
