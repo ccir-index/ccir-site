@@ -2,116 +2,286 @@
 import Base from '../../layouts/Base.astro';
 import { meta } from '../../data/snapshot';
 
-const notes = [
+// Research hub — the single destination for everything analytical (nav tab
+// "Research"; /intelligence 301s here). Two species, presented as such:
+// MONITORS are standing pages updated with the panel; NOTES are dated and
+// never revised in place. Clusters group them by theme, monitor first.
+interface Monitor { href: string; title: string; blurb: string }
+interface Note { href: string; date: string; title: string; blurb: string }
+interface Cluster { kicker: string; heading: string; standfirst: string; monitors: Monitor[]; notes: Note[] }
+
+const clusters: Cluster[] = [
   {
-    href: '/research/rent-and-launch-price',
-    date: '2026-07-08',
-    title: 'Rent and Launch Price: Five Generations of Posted Prices',
-    blurb:
-      'Posted rental rates divided by launch acquisition anchors, 2017–2026: ' +
-      'every generation’s gross posted-rate revenue passed its launch ' +
-      'price within 11–17 months, each entered with a year of rental hours ' +
-      'priced near the machine’s cost — and acquisition cost per unit of ' +
-      'bandwidth fell 2.5× while rent per unit of bandwidth did not.',
+    kicker: 'Asset economics',
+    heading: 'What a Chip Earns, and For How Long',
+    standfirst:
+      'Earning power per spec-sheet unit, how it ages, and how it compares to what the hardware cost.',
+    monitors: [
+      { href: '/chip-economics', title: 'Chip Economics',
+        blurb: 'The daily rate re-denominated per GB, per TB/s, per PFLOP, per kW. One lens makes the cross-section flat.' },
+    ],
+    notes: [
+      { href: '/research/rent-and-launch-price', date: '2026-07-08', title: 'Rent and Launch Price: Five Generations of Posted Prices',
+        blurb: 'Every generation’s gross posted-rate revenue passed its launch price within 11–17 months; acquisition cost per unit of bandwidth fell 2.5× while rent per unit did not.' },
+      { href: '/research/rental-rates-by-generation', date: '2026-07-08', title: 'GPU Rental Rates by Generation: Nine Years of Posted Prices',
+        blurb: 'Per-generation posted-rate histories, 2017–2026: declines arrive in steps set by the repricers, interrupted twice by demand — in 2021–23, and again from late 2025.' },
+      { href: '/research/gpu-age-curve', date: '2026-07-06', title: 'The GPU Age Curve: −26% per Year',
+        blurb: 'One date’s cross-section: ≈−26%/yr in dollars (R² 0.96) with age, flat per unit of memory bandwidth, banded per watt.' },
+    ],
   },
   {
-    href: '/research/rental-rates-by-generation',
-    date: '2026-07-08',
-    title: 'GPU Rental Rates by Generation: Nine Years of Posted Prices',
-    blurb:
-      'Per-generation posted-rate histories, Oct 2017 – Jun 2026, from dated ' +
-      'captures of providers’ own pricing pages: declines arrive in steps ' +
-      'set by the repricers, and demand has interrupted them twice — in ' +
-      '2021–23, and again from late 2025 as the AI buildout repriced ' +
-      'every generation still listed.',
+    kicker: 'Term & price structure',
+    heading: 'How the Market Prices the Same Silicon',
+    standfirst:
+      'On-demand is one point on a surface — the rate broken out by tenor and by where it actually transacts.',
+    monitors: [
+      { href: '/term', title: 'Committed Term Structure',
+        blurb: 'Posted committed asks by tenor — guaranteed capacity from one month to a year, per chip.' },
+      { href: '/basis', title: 'On-Demand vs Clearing Basis',
+        blurb: 'Posted on-demand asks against marketplace clearing — where list rates sit above what transacts.' },
+    ],
+    notes: [
+      { href: '/research/od-vs-committed', date: '2026-07-06', title: 'On-Demand vs Committed, Three Years',
+        blurb: 'Neocloud H100 posted prices, Oct 2023 – Jun 2026: a persistent committed discount, a $2.80 on-demand floor through 2025, a turn upward since December.' },
+    ],
   },
   {
-    href: '/research/itel-1979',
-    date: '2026-07-08',
-    title: 'The Company That Insured Itself Against Technological Change',
-    blurb:
-      'Itel, 1979: the largest independent computer lessor in the world, a ' +
-      'residual-value assumption insured at Lloyd’s, and the IBM 4300 — ' +
-      'a $433M loss (≈$2B today) recognized on the lease calendar, not the ' +
-      'market calendar. Historical record, from the contemporaneous filings ' +
-      'and wires.',
+    kicker: 'Demand & utilization',
+    heading: 'Who Is Renting, and How Hard the Fleet Works',
+    standfirst:
+      'Rate cards are asks. These read demand composition and realized economics from filings and from the fleet itself.',
+    monitors: [
+      { href: '/realized/', title: 'Realized vs Rate Card',
+        blurb: 'Per-GPU-hour realization estimated from public filings — well below posted rate cards.' },
+      { href: '/utilization', title: 'Utilization & Availability',
+        blurb: 'How much of the tracked fleet is rented versus idle, and how many venues have capacity.' },
+    ],
+    notes: [
+      { href: '/research/training-vs-inference', date: '2026-07-07', title: 'Training, Inference, and What Compute Earns',
+        blurb: 'A primer for credit readers: training demand behaves like construction backlog, inference like utility load — with the observables for each.' },
+    ],
   },
   {
-    href: '/research/training-vs-inference',
-    date: '2026-07-07',
-    title: 'Training, Inference, and What Compute Earns',
-    blurb:
-      'A primer for credit readers: training demand behaves like construction ' +
-      'backlog, inference like utility load — and the difference is already ' +
-      'visible in published series, in tenor structure, per-generation ' +
-      'pricing, and realized-versus-posted utilization.',
-  },
-  {
-    href: '/research/od-vs-committed',
-    date: '2026-07-06',
-    title: 'On-Demand vs Committed, Three Years',
-    blurb:
-      'Monthly neocloud H100 posted prices from an archived-page backfill, ' +
-      'Oct 2023 – Jun 2026: a persistent 20–50% committed discount, a $2.80 ' +
-      'on-demand floor through 2025, and a turn upward since December — with ' +
-      'the composition repair that makes the series honest.',
-  },
-  {
-    href: '/research/gpu-age-curve',
-    date: '2026-07-06',
-    title: 'The GPU Age Curve: −26% per Year',
-    blurb:
-      'GPU earning power by generation, three ways: raw rates decline ≈26%/yr (R² 0.96) ' +
-      'with age, but per unit of memory bandwidth datacenter silicon is flat — ' +
-      'and per watt it sorts into shell classes. What that says about an ' +
-      'inference-led market, with the markers to watch.',
+    kicker: 'Precedents & history',
+    heading: 'What Happened Last Time',
+    standfirst:
+      'Prior markets that financed expensive, rapidly improving machines — documented from the contemporaneous record.',
+    monitors: [],
+    notes: [
+      { href: '/research/itel-1979', date: '2026-07-08', title: 'The Company That Insured Itself Against Technological Change',
+        blurb: 'Itel, 1979: the largest independent computer lessor in the world, a residual-value assumption insured at Lloyd’s, and the IBM 4300 — a $433M loss ($2B today) recognized on the lease calendar, not the market calendar.' },
+    ],
   },
 ];
+
+const byDate: Note[] = clusters
+  .flatMap((c) => c.notes)
+  .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 ---
 <Base
   title="Research · CCIR"
-  description="CCIR research notes — analyses of observed compute prices: generation decline curves, normalizations, and market-structure findings."
-  showTape={false}
+  description="CCIR research — standing market monitors updated daily (term structure, chip economics, clearing basis, utilization) and dated research notes that are never revised in place."
+  ogImage="/og/home.png"
 >
   <section class="wrap top">
     <header class="page-head">
       <div class="kicker">Research · {meta.as_of_date}</div>
-      <h1>Research Notes</h1>
+      <h1>Research</h1>
       <p class="standfirst">
-        Dated analyses of observed prices from the CCIR panel. Every note works
-        only from published series and public filings, states its calibration
-        date, and lists what would falsify it. Notes are not updated in place —
-        follow-ups get new notes.
+        Everything analytical lives here, in two species. <strong>Monitors</strong>
+        are standing pages, recomputed as the panel updates — today's number is
+        the point. <strong>Notes</strong> are dated analyses, never revised in
+        place — follow-ups get new notes. The headline reference rates live on
+        <a href="/rates">/rates</a>; the full grain on <a href="/explorer">/explorer</a>;
+        credit-market coverage on <a href="/credit">/credit</a>.
       </p>
     </header>
 
-    <div class="note-list">
-      {notes.map((n) => (
-        <a class="note-card" href={n.href}>
-          <span class="note-date">{n.date}</span>
-          <h2 class="note-title">{n.title}</h2>
-          <p class="note-blurb">{n.blurb}</p>
-        </a>
-      ))}
-    </div>
+    {clusters.map((c) => (
+      <section class="cluster">
+        <header class="cluster-head">
+          <div class="kicker">{c.kicker}</div>
+          <h2>{c.heading}</h2>
+          <p class="cluster-standfirst">{c.standfirst}</p>
+        </header>
+        {c.monitors.length > 0 && (
+          <div class="card-grid">
+            {c.monitors.map((m) => (
+              <a class="mi-card" href={m.href}>
+                <span class="species species-monitor">Monitor · updated daily</span>
+                <h3 class="mi-title">{m.title}</h3>
+                <p class="mi-blurb">{m.blurb}</p>
+                <span class="mi-foot">Open →</span>
+              </a>
+            ))}
+          </div>
+        )}
+        {c.notes.length > 0 && (
+          <div class="note-list">
+            {c.notes.map((n) => (
+              <a class="note-row" href={n.href}>
+                <span class="note-date">{n.date}</span>
+                <span class="note-body">
+                  <span class="note-title">{n.title}</span>
+                  <span class="note-blurb">{n.blurb}</span>
+                </span>
+              </a>
+            ))}
+          </div>
+        )}
+      </section>
+    ))}
+
+    <section class="cluster">
+      <header class="cluster-head">
+        <div class="kicker">Index</div>
+        <h2>All Notes by Date</h2>
+      </header>
+      <div class="date-index">
+        {byDate.map((n) => (
+          <a class="date-row" href={n.href}>
+            <span class="note-date">{n.date}</span>
+            <span class="note-title">{n.title}</span>
+          </a>
+        ))}
+      </div>
+    </section>
   </section>
 
   <style>
     .top { padding-top: 32px; }
-    .page-head { max-width: 80ch; margin-bottom: 22px; }
+    .page-head { margin-bottom: 8px; max-width: 82ch; }
     .page-head h1 {
       font-family: var(--font-display);
-      font-size: var(--fs-hero);
+      font-size: var(--fs-3xl);
       line-height: var(--lh-display);
       font-weight: var(--weight-display);
-      margin: 6px 0 14px;
-      letter-spacing: -0.01em;
+      margin: 6px 0 12px;
     }
-    .note-list { display: flex; flex-direction: column; gap: 1px; background: var(--rule); border: 1px solid var(--rule); max-width: 880px; margin-bottom: 40px; }
-    .note-card { background: var(--surface); padding: 18px 22px; text-decoration: none; color: var(--ink); display: flex; flex-direction: column; gap: 6px; }
-    .note-card:hover { background: var(--surface-2); text-decoration: none; }
-    .note-date { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.04em; }
-    .note-title { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0; }
-    .note-blurb { font-family: var(--font-body); font-size: var(--fs-sm); color: var(--ink-dim); line-height: 1.6; margin: 0; max-width: 76ch; }
+    .standfirst a { color: var(--accent); }
+    .standfirst strong { color: var(--accent); }
+
+    .cluster { margin: 34px 0 0; }
+    .cluster-head { max-width: 82ch; margin-bottom: 14px; }
+    .cluster-head h2 { font-size: var(--fs-2xl); margin: 4px 0 8px; }
+    .cluster-standfirst {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.6;
+      margin: 0;
+      max-width: 78ch;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      max-width: 880px;
+    }
+    .mi-card {
+      background: var(--surface);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .mi-card:hover { background: var(--surface-2); text-decoration: none; }
+    .species {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      letter-spacing: var(--tracking-eye);
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .mi-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      font-weight: var(--weight-display);
+      letter-spacing: -0.005em;
+      margin: 0;
+    }
+    .mi-blurb {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.55;
+      margin: 0;
+    }
+    .mi-foot {
+      margin-top: auto;
+      padding-top: 6px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+
+    .note-list {
+      border: 1px solid var(--rule);
+      border-top: none;
+      background: var(--surface);
+      max-width: 880px;
+      display: flex;
+      flex-direction: column;
+    }
+    .cluster .note-list:first-of-type { border-top: 1px solid var(--rule); }
+    .note-row {
+      display: flex;
+      gap: 18px;
+      padding: 13px 20px;
+      text-decoration: none;
+      color: var(--ink);
+      border-bottom: 1px solid var(--rule);
+      align-items: baseline;
+    }
+    .note-row:last-child { border-bottom: none; }
+    .note-row:hover { background: var(--surface-2); text-decoration: none; }
+    .note-date {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-faint);
+      white-space: nowrap;
+      letter-spacing: 0.03em;
+    }
+    .note-body { display: flex; flex-direction: column; gap: 3px; }
+    .note-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-md);
+      font-weight: var(--weight-display);
+      letter-spacing: -0.005em;
+    }
+    .note-blurb {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+    @media (max-width: 640px) {
+      .note-row { flex-direction: column; gap: 4px; }
+    }
+
+    .date-index {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      max-width: 880px;
+    }
+    .date-row {
+      display: flex;
+      gap: 18px;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: var(--ink);
+      border-bottom: 1px solid var(--rule);
+      align-items: baseline;
+    }
+    .date-row:last-child { border-bottom: none; }
+    .date-row:hover { background: var(--surface-2); text-decoration: none; }
+    .date-row .note-title { font-size: var(--fs-sm); }
   </style>
 </Base>

@@ -5,11 +5,12 @@ import { meta } from '../data/snapshot';
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const nav = [
   { href: '/rates', label: 'Rates' },
-  // Market Intelligence is a hub — light it up on every piece it houses.
-  { href: '/intelligence', label: 'Market Intelligence',
-    match: ['/intelligence', '/term', '/basis', '/spreads', '/realized',
-            '/chip-economics', '/utilization', '/observatory', '/availability',
-            '/markets', '/marketplace', '/vast', '/research'] },
+  // Research is a hub (monitors + dated notes) — light it up on every piece
+  // it houses, including /research/* note subroutes.
+  { href: '/research', label: 'Research',
+    match: ['/research', '/intelligence', '/term', '/basis', '/spreads',
+            '/realized', '/chip-economics', '/utilization', '/observatory',
+            '/availability', '/markets', '/marketplace', '/vast'] },
   { href: '/credit', label: 'Credit Tracker' },
   { href: '/explorer', label: 'Explorer' },
   { href: '/applications', label: 'Applications' },
@@ -18,7 +19,7 @@ const nav = [
 
 function isActive(n: { href: string; match?: string[] }): boolean {
   const group = n.match ?? [n.href];
-  return group.includes(path);
+  return group.some((g) => path === g || path.startsWith(g + '/'));
 }
 
 // Format dateline like a broadsheet: "Sunday, April 26, 2026"
