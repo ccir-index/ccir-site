@@ -209,6 +209,16 @@ const msas = [
         </table>
       </div>
       <p class="tfoot">Section titles as filed in Ex. 10.23; groupings 3–7 and 8–9 condensed. The OpenAI and NVIDIA agreements follow the same skeleton with counterparty-specific insertions.</p>
+      <figure class="photo doc-shot">
+        <img src="/img/research/doc-msa-title.png" width="1100" height="760"
+             alt="The first page of the CoreWeave–Microsoft Master Services Agreement as filed on EDGAR, showing the redaction legend, Microsoft Corporation as customer, and the opening definitions." loading="lazy" />
+        <figcaption>
+          As filed: the first page of the CoreWeave–Microsoft Master Services
+          Agreement (<a href={EDGAR.msft} rel="noopener" target="_blank">Ex.
+          10.23</a>) — the redaction legend, the counterparty, and the
+          definitions the deal is built from.
+        </figcaption>
+      </figure>
       <p>
         The defined terms do the structural work. A reservation is exclusive
         use of hardware, not a quota of usage:
@@ -329,6 +339,17 @@ const msas = [
           under the MSA.”</p>
         </blockquote>
         <figcaption>Source: <a href={EDGAR.soluna} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.105 to Soluna Holdings' Form 10-Q, accession 0001493152-24-032123.</figcaption>
+      </figure>
+      <figure class="photo doc-shot">
+        <img src="/img/research/doc-soluna-pricing.png" width="1100" height="560"
+             alt="The pricing schedule from the Soluna–HPE statement of work as filed: GPU as-a-Service, NVIDIA H100 SXM, priced per GPU-hour over a 36-month term, with rates redacted and the upfront payment shown." loading="lazy" />
+        <figcaption>
+          As filed: the pricing schedule of the Soluna–HPE statement of work
+          (<a href={EDGAR.soluna} rel="noopener" target="_blank">Ex.
+          10.105</a>, §3.6) — GPU-as-a-Service, unit of measure the GPU-hour,
+          36-month term, rates redacted [***] with the upfront payment and
+          remaining balance left in.
+        </figcaption>
       </figure>
       <p>
         The record even carries the deal's full life: the agreement was
@@ -558,6 +579,7 @@ const msas = [
 
     .photo { margin: 18px 0 22px; max-width: 880px; }
     .photo img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); filter: grayscale(0.1); }
+    .doc-shot img { filter: none; background: #fff; }
     .photo figcaption { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
     .photo figcaption a { color: var(--ink-dim); }
 
