@@ -64,10 +64,13 @@ const xTicks = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026].map((y) =>
 const ep1 = { a: cx(mk('2021-01')), b: cx(mk('2023-12')) };
 const ep2 = { a: cx(mk('2025-12')), b: cx(X1) };
 
+// real = nominal log-linear fit minus the window's CPI-U inflation rate
+// (BLS CUUR0000SA0: Jun-2019 ~255.7 / Sep-2021 274.3 / Sep-2023 307.8 →
+// Apr-2026 333.0; 3.9 / 4.2 / 3.1 %/yr respectively).
 const fits = [
-  { gen: 'V100', win: 'Jun 2019 – Apr 2026 (6.8y)', fit: '−21.1%/yr', r2: '0.81', ep: '−16.1%/yr', path: '$2.69 → $0.81' },
-  { gen: 'A100', win: 'Sep 2021 – Apr 2026 (4.6y)', fit: '−7.0%/yr', r2: '0.49', ep: '−2.2%/yr', path: '$2.20 → $1.99' },
-  { gen: 'H100', win: 'Sep 2023 – Apr 2026 (2.6y)', fit: '−13.0%/yr', r2: '0.48', ep: '+1.5%/yr', path: '$3.50 → $3.64' },
+  { gen: 'V100', win: 'Jun 2019 – Apr 2026 (6.8y)', fit: '−21.1%/yr', real: '−25.0%/yr', r2: '0.81', ep: '−16.1%/yr', path: '$2.69 → $0.81' },
+  { gen: 'A100', win: 'Sep 2021 – Apr 2026 (4.6y)', fit: '−7.0%/yr', real: '−11.2%/yr', r2: '0.49', ep: '−2.2%/yr', path: '$2.20 → $1.99' },
+  { gen: 'H100', win: 'Sep 2023 – Apr 2026 (2.6y)', fit: '−13.0%/yr', real: '−16.1%/yr', r2: '0.48', ep: '+1.5%/yr', path: '$3.50 → $3.64' },
 ];
 
 ---
@@ -149,12 +152,13 @@ const fits = [
       </p>
       <div class="twrap">
         <table>
-          <thead><tr><th>Generation</th><th>Window (n≥3)</th><th class="num">Log-linear fit</th><th class="num">R²</th><th class="num">Endpoint CAGR</th><th class="num">Median, first → last</th></tr></thead>
+          <thead><tr><th>Generation</th><th>Window (n≥3)</th><th class="num">Log-linear fit</th><th class="num">Less CPI</th><th class="num">R²</th><th class="num">Endpoint CAGR</th><th class="num">Median, first → last</th></tr></thead>
           <tbody>
             {fits.map((f) => (
               <tr>
                 <td class="gen">{f.gen}</td><td class="dim">{f.win}</td>
-                <td class="num strong">{f.fit}</td><td class="num dim">{f.r2}</td>
+                <td class="num strong">{f.fit}</td><td class="num dim">{f.real}</td>
+                <td class="num dim">{f.r2}</td>
                 <td class="num strong">{f.ep}</td><td class="num dim">{f.path}</td>
               </tr>
             ))}
@@ -170,6 +174,13 @@ const fits = [
         endpoint, across four and a half years that also contained the 2022
         peak ($3.05) and the 2025 trough ($1.75). H100's posted median ends
         the window higher than it began it.
+      </p>
+      <p>
+        All prices are nominal, as posted. The "less CPI" column subtracts
+        each window's CPI-U inflation rate (3–4%/yr over these years) from
+        the fit — which matters most for A100: a path that is nearly flat in
+        posted dollars is a decline of roughly 6% per year in real terms,
+        endpoint to endpoint.
       </p>
     </section>
 
