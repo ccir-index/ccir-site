@@ -69,7 +69,6 @@ const series = CHIPS.map((c) => {
     crossG: xg ? { x: cx(xg.age), y: cy(xg.cg), mo: xg.age } : null,
     nSolid: stepPaths(pts, (n) => n >= 3, yNet),
     nThin: stepPaths(pts, (n) => n < 3, yNet),
-    nGhost: stepPaths(pts, () => true, yNet),
     nEndVal: last.cn,
     crossN: xn ? { x: cx(xn.age), y: cyN(xn.cn), mo: xn.age } : null,
   };
@@ -339,7 +338,7 @@ const bwTable = [
                 <span class="sm-val">net {s.nEndVal.toFixed(2)}× MSRP at {s.endAge}mo</span>
               </div>
               <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-                   aria-label={`Cumulative net revenue under the conservative elections divided by MSRP for ${s.key}, rising with age in months${s.crossN ? `; crosses full recovery at month ${s.crossN.mo}` : '; has not yet crossed full recovery'}. Dotted diagonals mark three-year and five-year straight-line recovery paces. Other generations ghosted.`}>
+                   aria-label={`Cumulative net revenue under the conservative elections divided by MSRP for ${s.key}, rising with age in months${s.crossN ? `; crosses full recovery at month ${s.crossN.mo}` : '; has not yet crossed full recovery'}. Dotted diagonals mark three-year and five-year straight-line recovery paces.`}>
                 {yTicksNet.map((t) => (
                   <g>
                     <line x1={PL} x2={CW - PR} y1={cyN(t)} y2={cyN(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
@@ -355,9 +354,6 @@ const bwTable = [
                 {xTicks.map((a) => (
                   <text x={cx(a)} y={CH - 8} class="tick" text-anchor="middle">{a}mo</text>
                 ))}
-                {series.filter((o) => o.key !== s.key).map((o) =>
-                  o.nGhost.map((d) => <path d={d} class="ln ln-ghost" />)
-                )}
                 {s.nThin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
                 {s.nSolid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
                 {s.crossN && (
