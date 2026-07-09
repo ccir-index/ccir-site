@@ -1,6 +1,6 @@
 ---
 // Two-state toggle. Flips the data-theme attribute on <html> between
-// "editorial" (default) and "terminal". Persisted in localStorage under
+// "terminal" (default) and "editorial". Persisted in localStorage under
 // the key `ccir-theme`.
 ---
 <button type="button" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
@@ -48,7 +48,7 @@
     if (!btn) return;
     btn.addEventListener('click', function () {
       var root = document.documentElement;
-      var current = root.getAttribute('data-theme') || 'editorial';
+      var current = root.getAttribute('data-theme') || 'terminal';
       var next = current === 'terminal' ? 'editorial' : 'terminal';
       root.setAttribute('data-theme', next);
       try { localStorage.setItem('ccir-theme', next); } catch (e) {}
