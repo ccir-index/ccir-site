@@ -13,6 +13,7 @@ const EDGAR = {
   openai: 'https://www.sec.gov/Archives/edgar/data/1769628/000119312525052207/d899798dex1024.htm',
   nvidia: 'https://www.sec.gov/Archives/edgar/data/1769628/000114036125036118/ny20053122x6_ex10-31.htm',
   openai2: 'https://www.sec.gov/Archives/edgar/data/1769628/000114036125036118/ny20053122x6_ex10-32.htm',
+  soluna: 'https://www.sec.gov/Archives/edgar/data/64463/000149315224032123/ex10-105.htm',
   apld8k: 'https://www.sec.gov/Archives/edgar/data/1144879/000164117225013199/form8-k.htm',
   apldLease2: 'https://www.sec.gov/Archives/edgar/data/1144879/000164117225013199/ex10-1.htm',
   apldLease3: 'https://www.sec.gov/Archives/edgar/data/1144879/000164117225013199/ex10-2.htm',
@@ -64,6 +65,7 @@ const msas = [
       <a class="apps-nav-link" href="#spectrum">The spectrum</a>
       <a class="apps-nav-link" href="#on-demand">On-demand terms</a>
       <a class="apps-nav-link" href="#msa">The MSA</a>
+      <a class="apps-nav-link" href="#middle-market">The middle market</a>
       <a class="apps-nav-link" href="#datacenter-lease">The lease beneath</a>
       <a class="apps-nav-link" href="#redactions">The record</a>
       <a class="apps-nav-link" href="#sources">Sources</a>
@@ -294,8 +296,76 @@ const msas = [
       </figure>
     </section>
 
+    <section class="sec" id="middle-market">
+      <h2><span class="n">04</span> The Middle of the Market</h2>
+      <p>
+        Between the click-through terms and the negotiated multi-billion
+        MSA sits the middle market — reserved capacity in the tens of
+        millions of dollars — and its paper reaches the public record by two
+        routes: standardized reserved-capacity agreements published in full
+        on providers' sites, and SEC exhibits when one party is a public
+        company small enough for the deal to be material.
+      </p>
+      <p>
+        The best filed specimen runs in the buying direction. In June 2024,
+        Soluna — a small-cap — contracted with HPE for NVIDIA H100
+        infrastructure-as-a-service: $34.0 million over 36 months, filed
+        complete as a statement of work with the full services agreement and
+        SLA attached. The mechanics are what a mid-market commitment
+        actually looks like: an initial pre-payment of $10,293,350.40 —
+        roughly 30% of the deal — a satisfactory credit check as a condition
+        of acceptance, a parent guaranty as credit support, and an express
+        right to resell the capacity onward:
+      </p>
+      <figure class="doc-ex">
+        <div class="doc-ex-label">Soluna–HPE GreenLake Statement of Work (June 2024), Ex. 10.105 — conditions and resale right</div>
+        <blockquote>
+          <p>“This SOW will become effective&hellip; upon&hellip; (c) acceptance of
+          such purchase order by Seller, which will require a satisfactory
+          credit check, and (d) receipt by Seller of the initial pre-payment
+          in the amount of $10,293,350.40 and <mark>[***]</mark>.”</p>
+          <p>“During the System Term&hellip; Purchaser may provide access to the
+          Services to its own customers, who will be considered End Users
+          under the MSA.”</p>
+        </blockquote>
+        <figcaption>Source: <a href={EDGAR.soluna} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.105 to Soluna Holdings' Form 10-Q, accession 0001493152-24-032123.</figcaption>
+      </figure>
+      <p>
+        The record even carries the deal's full life: the agreement was
+        terminated by 8-K in March 2025. Signing, prepayment, guaranty,
+        termination — a complete mid-market compute commitment, end to end,
+        in public documents.
+      </p>
+      <p>
+        The published templates carry the same economics in click-through
+        form. Voltage Park's Compute Services Agreement fixes fees “at the
+        price quoted at the time of purchase, for the Term of the applicable
+        Order,” provides that “payment obligations are non-cancelable and,
+        unless otherwise specified, Fees paid are non-refundable,” and
+        charges 1.5% per month on late amounts — the same finance charge as
+        the retail terms in §02. It also lets the customer “terminate any
+        Order for convenience at any time through our website”: the
+        termination button exists, and the payment obligation survives it.
+        Nebius's published services agreement defines a “Committed Volume of
+        Services” payable “regardless of whether actual consumption is below
+        the committed volume.” And the hyperscalers sell the same shape in
+        standardized units — AWS's Capacity Blocks for ML reserve GPU
+        capacity for one to 182 days, non-cancelable and non-modifiable once
+        purchased. At every size, committed capacity means the same thing:
+        the hours belong to the customer whether used or not.
+      </p>
+      <p>
+        One pattern in what is <em>not</em> public: smaller operators
+        disclose deal terms generously — sizes, tenors, prepayment
+        percentages arrive by press release — but the contract text itself
+        is rarely filed. The Soluna exhibit is the exception. For most of
+        the middle market, the posted rate card and the published template
+        are the observable layer.
+      </p>
+    </section>
+
     <section class="sec" id="datacenter-lease">
-      <h2><span class="n">04</span> The Layer Beneath: The Datacenter Lease</h2>
+      <h2><span class="n">05</span> The Layer Beneath: The Datacenter Lease</h2>
       <p>
         A compute contract obliges the operator to run machines somewhere,
         and that somewhere has its own filed paper. On May 28, 2025, two
@@ -353,7 +423,7 @@ const msas = [
     </section>
 
     <section class="sec" id="redactions">
-      <h2><span class="n">05</span> What the Record Shows, and What It Withholds</h2>
+      <h2><span class="n">06</span> What the Record Shows, and What It Withholds</h2>
       <p>
         The redactions are permitted by Regulation S-K Item 601(b)(10), and
         registrants use them consistently: cure periods, discount
@@ -369,12 +439,15 @@ const msas = [
     </section>
 
     <section class="sec" id="sources">
-      <h2><span class="n">06</span> Sources</h2>
+      <h2><span class="n">07</span> Sources</h2>
       <ul class="src-list">
         <li>CoreWeave–Microsoft Master Services Agreement (Feb 22, 2023) — <a href={EDGAR.msft} rel="noopener" target="_blank">Ex. 10.23</a> to Form S-1, accession 0001193125-25-044231</li>
         <li>CoreWeave–OpenAI Master Services Agreement, Bare Metal Environment (Mar 7, 2025) — <a href={EDGAR.openai} rel="noopener" target="_blank">Ex. 10.24</a> to Form S-1/A, accession 0001193125-25-052207</li>
         <li>CoreWeave–NVIDIA Master Services Agreement (Apr 10, 2023) — <a href={EDGAR.nvidia} rel="noopener" target="_blank">Ex. 10.31</a> to Form S-4/A, accession 0001140361-25-036118</li>
         <li>CoreWeave–OpenAI Master Services Agreement, second (May 8, 2025) — <a href={EDGAR.openai2} rel="noopener" target="_blank">Ex. 10.32</a> to Form S-4/A, accession 0001140361-25-036118</li>
+        <li>Soluna–HPE GreenLake Statement of Work, HPC &amp; AI Cloud Services Agreement, and SLA (June 2024) — <a href={EDGAR.soluna} rel="noopener" target="_blank">Ex. 10.105</a> to Soluna Holdings' Form 10-Q, accession 0001493152-24-032123; deal terms per the June 24, 2024 8-K (accession 0001493152-24-024845); termination per the March 28, 2025 8-K (accession 0001641172-25-001318)</li>
+        <li>Voltage Park Compute Services Agreement (last revised May 28, 2026) — <a href="https://www.voltagepark.com/computer-services-agreement" rel="noopener" target="_blank">voltagepark.com</a></li>
+        <li>Nebius Services Agreement — <a href="https://docs.nebius.com/legal/agreement" rel="noopener" target="_blank">docs.nebius.com</a>; AWS Capacity Blocks for ML — <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-capacity-blocks.html" rel="noopener" target="_blank">AWS documentation</a></li>
         <li>Applied Digital Form 8-K (June 2, 2025) with Building 2 and Building 3 Datacenter Leases — <a href={EDGAR.apld8k} rel="noopener" target="_blank">8-K body</a>, <a href={EDGAR.apldLease2} rel="noopener" target="_blank">Ex. 10.1</a>, <a href={EDGAR.apldLease3} rel="noopener" target="_blank">Ex. 10.2</a>, accession 0001641172-25-013199</li>
         <li>CoreWeave Terms of Service (last modified June 30, 2022) — <a href={EDGAR.tos} rel="noopener" target="_blank">docs.coreweave.com</a></li>
       </ul>
@@ -414,7 +487,7 @@ const msas = [
       white-space: nowrap;
     }
     .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
-    #spectrum, #on-demand, #msa, #datacenter-lease, #redactions, #sources { scroll-margin-top: 52px; }
+    #spectrum, #on-demand, #msa, #middle-market, #datacenter-lease, #redactions, #sources { scroll-margin-top: 52px; }
     .page-head { max-width: 82ch; margin-bottom: 18px; }
     .page-head h1 {
       font-family: var(--font-display);
