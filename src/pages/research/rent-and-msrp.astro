@@ -9,13 +9,15 @@ import ratios from '../../data/rent_ratio_panels.json';
 // behind for context and the 1.0 line emphasized. Shared scales.
 const AGE_MAX = 106;
 const YMAX = 1.6;
+const YMAX_NET = 0.65;
 const CW = 340, CH = 205, PL = 32, PR = 14, PT = 12, PB = 24;
 const iw = CW - PL - PR, ih = CH - PT - PB;
 const cx = (a: number) => PL + (a / AGE_MAX) * iw;
 const cy = (v: number) => PT + ih * (1 - v / YMAX);
+const cyN = (v: number) => PT + ih * (1 - v / YMAX_NET);
 
-type Pt = { m: string; age: number; med: number; n: number; ratio: number };
-function stepPaths(points: Pt[], want: (n: number) => boolean): string[] {
+type Pt = { m: string; age: number; med: number; n: number; ratio: number; rnet: number };
+function stepPaths(points: Pt[], want: (n: number) => boolean, yOf: (p: Pt) => number): string[] {
   const segs: string[] = [];
   let d: string | null = null;
   for (let i = 0; i < points.length; i++) {
@@ -25,13 +27,13 @@ function stepPaths(points: Pt[], want: (n: number) => boolean): string[] {
     if (want(p.n)) {
       if (d === null) {
         d = consec && prev
-          ? `M ${cx(prev.age).toFixed(1)} ${cy(prev.ratio).toFixed(1)} H ${cx(p.age).toFixed(1)} V ${cy(p.ratio).toFixed(1)}`
-          : `M ${cx(p.age).toFixed(1)} ${cy(p.ratio).toFixed(1)}`;
+          ? `M ${cx(prev.age).toFixed(1)} ${yOf(prev).toFixed(1)} H ${cx(p.age).toFixed(1)} V ${yOf(p).toFixed(1)}`
+          : `M ${cx(p.age).toFixed(1)} ${yOf(p).toFixed(1)}`;
       } else if (consec) {
-        d += ` H ${cx(p.age).toFixed(1)} V ${cy(p.ratio).toFixed(1)}`;
+        d += ` H ${cx(p.age).toFixed(1)} V ${yOf(p).toFixed(1)}`;
       } else {
         segs.push(d);
-        d = `M ${cx(p.age).toFixed(1)} ${cy(p.ratio).toFixed(1)}`;
+        d = `M ${cx(p.age).toFixed(1)} ${yOf(p).toFixed(1)}`;
       }
     } else if (d !== null) {
       segs.push(d); d = null;
@@ -48,19 +50,30 @@ const CHIPS = [
   { key: 'H200', cls: 'h200' },
   { key: 'B200', cls: 'blackwell' },
 ] as const;
+const yGross = (p: Pt) => cy(p.ratio);
+const yNet = (p: Pt) => cyN(p.rnet);
 const series = CHIPS.map((c) => {
   const pts = (ratios as any)[c.key].points as Pt[];
   const lastDeep = [...pts].reverse().find((p) => p.n >= 3) ?? pts[pts.length - 1]!;
   return {
     ...c,
-    solid: stepPaths(pts, (n) => n >= 3),
-    thin: stepPaths(pts, (n) => n < 3),
-    ghost: stepPaths(pts, () => true),
+    solid: stepPaths(pts, (n) => n >= 3, yGross),
+    thin: stepPaths(pts, (n) => n < 3, yGross),
+    ghost: stepPaths(pts, () => true, yGross),
     endX: cx(lastDeep.age), endY: cy(lastDeep.ratio),
     endVal: lastDeep.ratio, endAge: lastDeep.age,
+    nSolid: stepPaths(pts, (n) => n >= 3, yNet),
+    nThin: stepPaths(pts, (n) => n < 3, yNet),
+    nGhost: stepPaths(pts, () => true, yNet),
+    nEndX: cx(lastDeep.age), nEndY: cyN(lastDeep.rnet), nEndVal: lastDeep.rnet,
   };
 });
 const yTicks = [0.5, 1.0, 1.5];
+const yTicksNet = [0.2, 0.4, 0.6];
+const PACE = [
+  { v: 1 / 3, label: '3-yr pace' },
+  { v: 1 / 5, label: '5-yr pace' },
+];
 const xTicks = [0, 24, 48, 72, 96];
 
 const anchors = [
@@ -109,7 +122,7 @@ const bwTable = [
 ---
 <Base
   title="Rent and MSRP: Five Generations of Posted Prices · CCIR Research"
-  description="Posted GPU rental rates divided by MSRP anchors, 2017–2026: every generation's gross posted-rate revenue passed its MSRP anchor within 11–17 months, and each entered with a year of rental hours priced near the machine's cost."
+  description="Posted GPU rental rates divided by MSRPs, 2017–2026: every generation's gross posted-rate revenue passed its MSRP within 11–17 months, and each entered with a year of rental hours priced near the machine's cost."
   showTape={false}
 >
   <section class="wrap top">
@@ -118,15 +131,15 @@ const bwTable = [
       <h1>Rent and MSRP: Five Generations of Posted Prices</h1>
       <p class="standfirst">
         This note divides each generation's posted rental rate by its MSRP
-        anchor — a ratio of two posted prices, every input dated and sourced
+        MSRP — a ratio of two posted prices, every input dated and sourced
         — for five generations, 2017–2026. Two regularities sit on the
         surface:
       </p>
       <ul class="sf-list">
         <li>
           At posted on-demand rates, every generation's cumulative gross
-          rental revenue passed its MSRP anchor within <strong>11 to 17
-          months</strong> of general availability — anchors from $18,600 to
+          rental revenue passed its MSRP within <strong>11 to 17
+          months</strong> of general availability — MSRPs from $18,600 to
           $64,400 per GPU, the same result. An idealized ceiling by
           construction: §02 states every assumption and reruns the
           arithmetic under conservative elections, where the answer is
@@ -154,7 +167,7 @@ const bwTable = [
               <span class="sm-val">{s.endVal.toFixed(2)} at {s.endAge}mo</span>
             </div>
             <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-                 aria-label={`Annualized posted rent divided by MSRP anchor for ${s.key}, by age in months, with the other four generations shown faintly for context. Latest ratio ${s.endVal.toFixed(2)} at ${s.endAge} months. Dashed segments mark months with fewer than three providers.`}>
+                 aria-label={`Annualized posted rent divided by MSRP for ${s.key}, by age in months, with the other four generations shown faintly for context. Latest ratio ${s.endVal.toFixed(2)} at ${s.endAge} months. Dashed segments mark months with fewer than three providers.`}>
               {yTicks.map((t) => (
                 <g>
                   <line x1={PL} x2={CW - PR} y1={cy(t)} y2={cy(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
@@ -176,37 +189,37 @@ const bwTable = [
         <div class="sm-panel sm-key">
           <div class="sm-key-body">
             <p><strong>Reading the panels.</strong> Each shows one
-            generation's annualized posted rent ÷ its MSRP anchor, by age in
+            generation's annualized posted rent ÷ its MSRP, by age in
             months from general availability; the other four are ghosted for
             context.</p>
             <p>The emphasized line is <strong>1.0</strong> — a year of posted
-            hours equals the MSRP anchor. Dashed segments = months with n&lt;3
+            hours equals the MSRP. Dashed segments = months with n&lt;3
             providers (shown, never fitted). Dot = latest n≥3 point.</p>
           </div>
         </div>
       </div>
       <figcaption class="tfoot">
-        Annualized posted panel-median rent ÷ MSRP anchor, by generation age
+        Annualized posted panel-median rent ÷ MSRP, by generation age
         in months from general availability, Oct 2017 – Apr 2026 (the archive's edge — the
         live CCIR panel continues from there), shared scales across panels.
         Sources and repair per the
         <a href="/research/rental-rates-by-generation">cohort note</a>;
-        anchors per §01.
+        MSRP figures per §01.
       </figcaption>
     </figure>
 
     <section class="sec">
-      <h2><span class="n">01</span> The Anchors</h2>
+      <h2><span class="n">01</span> The MSRP Figures</h2>
       <p>
-        NVIDIA publishes no MSRP for any datacenter GPU. The anchors here
-        are the closest documented equivalent — system prices divided by GPU
+        NVIDIA publishes no MSRP for any datacenter GPU. The figures used
+        here are the closest documented equivalent — system prices divided by GPU
         count, the best-documented grain available across all five
         generations — with the confidence grade and the basis stated per
         row:
       </p>
       <div class="twrap">
         <table>
-          <thead><tr><th>Generation</th><th class="num">Anchor</th><th>Basis</th><th>Grade</th></tr></thead>
+          <thead><tr><th>Generation</th><th class="num">MSRP</th><th>Basis</th><th>Grade</th></tr></thead>
           <tbody>
             {anchors.map((a) => (
               <tr><td class="gen">{a.gen}</td><td class="num strong">{a.usd}</td><td class="dim basis-cell">{a.basis}</td><td class="dim">{a.grade}</td></tr>
@@ -214,12 +227,17 @@ const bwTable = [
           </tbody>
         </table>
       </div>
+      <p class="tfoot">
+        Grade = source confidence: A — vendor-documented (a published system
+        price or filing); B — contemporaneous credible press or a dated
+        reseller capture; C — secondary compilation or undated source.
+      </p>
       <p>
         System-grain division embeds CPUs, memory, storage, networking, and
         chassis — roughly 25–30% of the quotient is non-GPU content (the
         H100 teardown puts the same silicon at $24,400 at bare-board grain).
         Alternate grains move the figures in §02 proportionally: bare-board
-        anchors shorten the recovery months by about a quarter; all-in
+        figures shorten the recovery months by about a quarter; all-in
         installed capex (the IREN-disclosed $46–54K per Blackwell GPU)
         lengthens them 15–40%. The system grain is used because it is the
         only one documented for all five generations; the sensitivity is the
@@ -236,13 +254,14 @@ const bwTable = [
         line</strong> — no discounting, no idle hours, no power, no
         facility. It is gross revenue, not margin, and not a forward figure;
         each window contains the demand episodes documented in the cohort
-        note. It answers one narrow question: at the prices providers
-        themselves posted, how long did a generation's gross rental stream
-        take to add up to its own MSRP anchor?
+        note. It answers one narrow question — the one a payback calculation
+        asks of an initial outlay: at the prices providers themselves
+        posted, how long did a generation's gross rental stream take to add
+        up to its own MSRP?
       </p>
       <div class="twrap">
         <table>
-          <thead><tr><th>Generation</th><th>General availability</th><th class="num">Months to pass anchor</th><th class="num">Cum. gross revenue to Apr 2026</th><th class="num">Multiple of anchor</th></tr></thead>
+          <thead><tr><th>Generation</th><th>General availability</th><th class="num">Months to recover MSRP</th><th class="num">Cum. gross revenue to Apr 2026</th><th class="num">Multiple of MSRP</th></tr></thead>
           <tbody>
             {payback.map((p) => (
               <tr><td class="gen">{p.gen}</td><td class="dim">{p.ga}</td><td class="num strong">{p.months}</td><td class="num dim">{p.cum}</td><td class="num strong">{p.mult}</td></tr>
@@ -258,7 +277,7 @@ const bwTable = [
       <h3 class="sub">The same arithmetic, conservatively</h3>
       <p>
         Two elections make the figure conservative rather than idealized,
-        both anchored to published CCIR work. First, a realization factor of
+        both taken from published CCIR work. First, a realization factor of
         one-half — filings-based analysis on <a href="/realized/">/realized</a>
         shows operators realizing well below their posted rate cards once
         utilization, discounting, and mix are in the number. Second, a cash
@@ -279,7 +298,7 @@ const bwTable = [
       </div>
       <p>
         Under the conservative elections, the three generations with full
-        windows recover their anchors in roughly <strong>two to three and a
+        windows recover MSRP in roughly <strong>two to three and a
         half years</strong> — a range that sits directly on top of the 3-to-
         5-year amortization schedules lenders in this market actually write.
         H200 and B200 have not yet been on the market long enough to cross
@@ -287,6 +306,64 @@ const bwTable = [
         arithmetic can be reproduced or re-elected; CCIR publishes the
         prices, not the elections.
       </p>
+      <p>
+        The same panels, under the elections — net annualized revenue
+        (½ × posted, less cash cost) divided by MSRP. The dotted reference
+        lines are recovery paces: a line sitting on ⅓ recovers MSRP in
+        three years; on ⅕, in five.
+      </p>
+      <figure class="chart-fig">
+        <div class="sm-grid">
+          {series.map((s) => (
+            <div class="sm-panel">
+              <div class="sm-head">
+                <span class={`sm-chip lab-${s.cls}`}>{s.key}</span>
+                <span class="sm-val">{s.nEndVal.toFixed(2)} net at {s.endAge}mo</span>
+              </div>
+              <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
+                   aria-label={`Net annualized revenue under the conservative elections divided by MSRP for ${s.key}, by age in months, with the other four generations ghosted. Dotted lines mark three-year and five-year recovery paces. Latest net ratio ${s.nEndVal.toFixed(2)} at ${s.endAge} months.`}>
+                {yTicksNet.map((t) => (
+                  <g>
+                    <line x1={PL} x2={CW - PR} y1={cyN(t)} y2={cyN(t)} class="grid" />
+                    <text x={PL - 6} y={cyN(t) + 3} class="tick" text-anchor="end">{t.toFixed(1)}</text>
+                  </g>
+                ))}
+                {PACE.map((p) => (
+                  <g>
+                    <line x1={PL} x2={CW - PR} y1={cyN(p.v)} y2={cyN(p.v)} class="grid-one" />
+                    <text x={CW - PR - 2} y={cyN(p.v) - 4} class="pacelab" text-anchor="end">{p.label}</text>
+                  </g>
+                ))}
+                {xTicks.map((a) => (
+                  <text x={cx(a)} y={CH - 8} class="tick" text-anchor="middle">{a}mo</text>
+                ))}
+                {series.filter((o) => o.key !== s.key).map((o) =>
+                  o.nGhost.map((d) => <path d={d} class="ln ln-ghost" />)
+                )}
+                {s.nThin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
+                {s.nSolid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
+                <circle cx={s.nEndX} cy={s.nEndY} r="3" class={`enddot dot-${s.cls}`} />
+              </svg>
+            </div>
+          ))}
+          <div class="sm-panel sm-key">
+            <div class="sm-key-body">
+              <p><strong>Reading the panels.</strong> Net run-rate =
+              (½ × posted panel-median − cash operating cost) × hours,
+              divided by MSRP; elections per this section.</p>
+              <p>Dotted lines: <strong>⅓ = 3-year</strong> and
+              <strong>⅕ = 5-year</strong> recovery pace. Dashed segments =
+              months with n&lt;3 providers. Dot = window's edge.</p>
+            </div>
+          </div>
+        </div>
+        <figcaption class="tfoot">
+          Net-of-elections run-rate ÷ MSRP, by generation age in months from
+          general availability, Oct 2017 – Apr 2026, shared scales across
+          panels. Same panel data as the gross chart; the elections are
+          stated in this section and are not CCIR publications.
+        </figcaption>
+      </figure>
     </section>
 
     <section class="sec">
@@ -309,8 +386,8 @@ const bwTable = [
         during demand episodes: H100's ratio at the window's edge is roughly
         its level at launch, and H200's — which entered low — sits above
         one. H200's entry point reflects a single early repricer's
-        aggressive list; its anchor is also the weakest-documented of the
-        five (§01). The window ends at the archive's edge, April 2026; the
+        aggressive list; its MSRP figure is also the weakest-documented of
+        the five (§01). The window ends at the archive's edge, April 2026; the
         live CCIR panel is the continuation.
       </p>
     </section>
@@ -339,12 +416,12 @@ const bwTable = [
       <h2><span class="n">05</span> MSRP and Rent, per Unit of Bandwidth</h2>
       <p>
         The <a href="/chip-economics">chip-economics</a> tables show current
-        rents are flat per unit of memory bandwidth. The MSRP anchors are
+        rents are flat per unit of memory bandwidth. The MSRPs are
         not:
       </p>
       <div class="twrap">
         <table>
-          <thead><tr><th>Generation</th><th class="num">MSRP anchor $ per TB/s</th><th class="num">Posted rent $/TB/s-hr (Jul 2026)</th></tr></thead>
+          <thead><tr><th>Generation</th><th class="num">MSRP $ per TB/s</th><th class="num">Posted rent $/TB/s-hr (Jul 2026)</th></tr></thead>
           <tbody>
             {bwTable.map((r) => (
               <tr><td class="gen">{r.gen}</td><td class="num strong">{r.launch}</td><td class="num dim">{r.rent}</td></tr>
@@ -373,9 +450,8 @@ const bwTable = [
         on secondary-market transactions) reports H100 resale at 27–53% of
         replacement in 2026 and documents the rental and resale legs
         diverging. Nothing in this note is a residual value: the ratio here
-        is rent against the <em>primary-market</em> anchor — two new-market
-        prices — and the cumulative figures in §02 are gross revenue, not
-        value. The
+        is rent against MSRP — two <em>primary-market</em> prices — and the
+        cumulative figures in §02 are gross revenue, not value. The
         two legs answer different questions, and moved independently in the
         one episode where both are well-recorded (§04).
       </p>
@@ -387,7 +463,7 @@ const bwTable = [
         Everything in the <a href="/research/rental-rates-by-generation">cohort
         note's</a> limitations applies: posted asks, panel composition,
         carry-forward repair, variant pooling, archive gaps. Additionally:
-        the anchors are graded B or C for three of five generations and embed
+        the MSRP figures are graded B or C for three of five generations and embed
         non-GPU content at system grain (§01); the recovery arithmetic
         assumes continuous rental at the posted median, which no operator
         realizes; and every window includes demand episodes — a recovery
@@ -396,6 +472,22 @@ const bwTable = [
       </p>
     </section>
   </section>
+
+  <script is:inline>
+    // Click a panel to maximize; click again (or Escape) to restore.
+    document.querySelectorAll('.sm-panel:not(.sm-key)').forEach(function (p) {
+      p.addEventListener('click', function () {
+        var was = p.classList.contains('maxed');
+        document.querySelectorAll('.sm-panel.maxed').forEach(function (m) { m.classList.remove('maxed'); });
+        if (!was) p.classList.add('maxed');
+      });
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.sm-panel.maxed').forEach(function (m) { m.classList.remove('maxed'); });
+      }
+    });
+  </script>
 
   <style>
     .top { padding-top: 32px; }
@@ -462,6 +554,21 @@ const bwTable = [
       border: 1px solid var(--rule);
     }
     .sm-panel { background: var(--surface); padding: 10px 12px 8px; }
+    .sm-panel:not(.sm-key) { cursor: zoom-in; }
+    .sm-panel.maxed {
+      position: fixed;
+      inset: 6vh 8vw;
+      z-index: 60;
+      cursor: zoom-out;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 18px 80px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--rule-2);
+      padding: 24px 28px;
+    }
+    .sm-panel.maxed svg { max-height: 78vh; }
+    .pacelab { font-family: var(--font-mono); font-size: 8.5px; fill: var(--ink-dim); letter-spacing: 0.04em; text-transform: uppercase; }
     .sm-head {
       display: flex;
       justify-content: space-between;
