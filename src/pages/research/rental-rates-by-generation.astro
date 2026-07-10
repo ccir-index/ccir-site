@@ -92,13 +92,22 @@ const fitLines = CHIPS.map((c) => {
   const slope = sxy / sxx;
   const rate = (Math.exp(slope * 12) - 1) * 100;   // matches the table's fit column
   const yAt = (m: number) => Math.exp(ym + slope * (m - xm));
+  // Label placement per generation: V100/H100 sit above their line's start
+  // (clear space); A100's start is crowded by its own series, so its label
+  // stacks in the right margin under the series end label.
+  const LABEL: Record<string, { mode: 'start' | 'end'; dy: number }> = {
+    V100: { mode: 'start', dy: -6 },
+    A100: { mode: 'end', dy: 16 },
+    H100: { mode: 'start', dy: -17 },
+  };
+  const pos = LABEL[c.key]!;
   return {
     cls: c.cls,
     label: `fit ${rate.toFixed(1)}%/yr`,
     x1: cx(mk(a)), y1: cy(yAt(mk(a))),
     x2: cx(mk(b)), y2: cy(yAt(mk(b))),
-    // H100's label clears its own series' early-2024 peak
-    ly: cy(yAt(mk(a))) - (c.key === 'H100' ? 17 : 6),
+    lx: pos.mode === 'end' ? cx(mk(b)) + 8 : cx(mk(a)) + 4,
+    ly: (pos.mode === 'end' ? cy(yAt(mk(b))) : cy(yAt(mk(a)))) + pos.dy,
   };
 });
 
@@ -161,7 +170,7 @@ const fitLines = CHIPS.map((c) => {
             </g>
           ))}
           {fitLines.map((f) => (
-            <text x={f.x1 + 4} y={f.ly} class={`fitlab lab-${f.cls}`} text-anchor="start">{f.label}</text>
+            <text x={f.lx} y={f.ly} class={`fitlab lab-${f.cls}`} text-anchor="start">{f.label}</text>
           ))}
         </svg>
       </div>
