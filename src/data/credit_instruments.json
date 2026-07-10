@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "as_of": "2026-07-04",
+  "as_of": "2026-07-10",
   "compiled_from": [
    "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
    "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -997,7 +997,7 @@
    "maturity": "2030-05-07",
    "maturity_note": "Springing maturity pre-2030 convert",
    "seniority": "Senior secured (parent)",
-   "security": "Substantially all Company assets; minimum-liquidity covenant",
+   "security": "Substantially all Company assets; minimum-liquidity covenant. Context (8-K 2026-07-06): sub Raylan Data signed a 20-yr ~401 MW Hawesville lease with Anthropic (press ~$19B; payments ‘expected to be supported by an investment-grade credit’) — lessor-side offtake, tracked for the financing it will support, not as a ledger row; same 8-K: sold the 50.1% stake in Fluidstack JV FS CS I (Abernathy) to Fluidstack for ~$530M in three installments.",
    "lenders": [
     "MS Senior Funding (admin/collateral)"
    ],
@@ -4437,6 +4437,48 @@
    "as_of": "2026-07-02"
   },
   {
+   "id": "nscale-rcf-2026",
+   "issuer": "Nscale",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": null,
+   "name": "Revolving Credit Facility",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 900,
+   "size_note": "$900M senior RCF; fourth 2026 financing (after the Feb $1.4B DDTL and May Narvik project financing)",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": null
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Senior revolving credit facility",
+   "security": "Undisclosed; proceeds for US/Europe/APAC data-center buildout",
+   "lenders": [
+    "J.P. Morgan",
+    "Goldman Sachs",
+    "Morgan Stanley",
+    "MUFG",
+    "RBC Capital Markets",
+    "Bank of America",
+    "Crédit Agricole CIB",
+    "Deutsche Bank",
+    "Mizuho",
+    "SMBC",
+    "TD Securities",
+    "KeyBank"
+   ],
+   "status": "confirmed",
+   "issued": "2026-07-07",
+   "source": {
+    "doc": "Nscale release",
+    "date": "2026-07-07",
+    "url": "https://www.nscale.com/press-releases/revolving-credit-facility"
+   },
+   "as_of": "2026-07-10"
+  },
+  {
    "id": "mistral-essonne",
    "issuer": "Mistral AI",
    "ticker": null,
@@ -4772,6 +4814,39 @@
     "url": "https://www.businesswire.com/news/home/20260122439371/en/Sharon-AI-Secures-up-to-US$500M-Debt-Facility-from-USD.AI-to-Support-GPU-Backed-AI-Infrastructure-Expansion-in-Australia-and-Asia-Pacific"
    },
    "as_of": "2026-07-04"
+  },
+  {
+   "id": "sharonai-conv-2032",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+   "issuer": "Sharon AI",
+   "ticker": null,
+   "issuer_type": "public",
+   "entity": null,
+   "name": "4.75% Convertible Senior Notes due 2032",
+   "instrument_type": "convertible",
+   "size_usd_m": 700,
+   "size_note": "$700M converts within a ~$1.6B financing (~$900M equity/pre-funded warrants); anchors Situational Awareness LP and Oaktree; proceeds fund the six-year NVIDIA compute collaboration (up to 40,000 GB300). NVIDIA revenue-share backstop attached (press: ~$4.88B disclosed backstop value).",
+   "rate": {
+    "kind": "fixed",
+    "value": 4.75,
+    "note": null
+   },
+   "maturity": "2032",
+   "maturity_note": "Day not stated in the closing release",
+   "seniority": "Senior unsecured",
+   "security": null,
+   "lenders": [
+    "144A QIBs"
+   ],
+   "status": "confirmed",
+   "issued": "2026-06-29",
+   "source": {
+    "doc": "8-K EX-99.1 (acc. 0001493152-26-030417)",
+    "date": "2026-06-29",
+    "url": "https://www.sec.gov/Archives/edgar/data/2068385/000149315226030417/ex99-1.htm"
+   },
+   "as_of": "2026-07-10"
   },
   {
    "id": "usdai-quantum",
