@@ -25,6 +25,14 @@ const docs = [
       'Administrator identity, independence and conflicts posture, and how ' +
       'to raise a query or complaint about a published series.',
   },
+  {
+    href: '/documents/changelog',
+    title: 'Methodology Change Log',
+    blurb:
+      'The running record of versions, panel changes, and series notices — ' +
+      'pending changes announced with effective date, anticipated impact, ' +
+      'and a comment window.',
+  },
 ];
 ---
 <Base
@@ -79,11 +87,11 @@ const docs = [
     }
     .doc-list {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1px;
       background: var(--rule);
       border: 1px solid var(--rule);
-      max-width: 980px;
+      max-width: 760px;
     }
     @media (max-width: 860px) { .doc-list { grid-template-columns: 1fr; } }
     .doc-card {

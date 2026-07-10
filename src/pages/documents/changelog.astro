@@ -1,0 +1,160 @@
+---
+import Base from '../../layouts/Base.astro';
+import { meta } from '../../data/snapshot';
+
+// Methodology change log — the site-visible record of versions, panel
+// changes, and series notices. Entries are appended, never edited; the
+// notice for a pending change carries its comment window and effective
+// date. Non-material operational changes live in the public data
+// repository's log; this page carries what a reader of the series needs.
+
+const entries = [
+  {
+    date: '2026-07-10',
+    tag: 'Notice · pending',
+    title: 'Methodology v2.1.0 — panel addition: Lightning AI (effective 2026-07-15)',
+    body: [
+      `CCIR will add Lightning AI (its own bare-metal rate card, US) to the
+       rate panel effective with the 2026-07-15 daily fixing, and the
+       methodology version will increment from v2.0.0 to v2.1.0. Lightning AI
+       posts guaranteed on-demand and interruptible rates for H100 and B200
+       at single-node granularity. Only Lightning AI's own capacity is added:
+       capacity the platform re-sells for operators already on the panel is
+       excluded, so that each operator holds exactly one panel vote. Voltage
+       Park, which has announced a merger with Lightning AI, remains a
+       separate panel source while its own rate card remains posted; if
+       either card is withdrawn, its series ends rather than being spliced.`,
+      `Anticipated effect at announcement: the neocloud (T2) H100 on-demand
+       US panel deepens from 11 to 12 sources and the headline statistic
+       moves approximately +2% on the announcement-date panel. The realized
+       with/without decomposition will be published with the effective
+       fixing. No committed-term series is affected, and no prior print is
+       restated. Under the Change Management Policy this addition is below
+       the material-change threshold; it is announced in advance, with the
+       observation window published, as a matter of practice.`,
+      `Comments are invited to research@ccir.io through 2026-07-14.`,
+    ],
+  },
+  {
+    date: '2026-07-03',
+    tag: 'Composition note',
+    title: 'T1 H100 on-demand US — fourth source enters the panel',
+    body: [
+      `Google Cloud Platform's H100 on-demand US rows began flowing into the
+       panel on 2026-07-02/03, deepening the hyperscaler (T1) H100 US cell
+       from three sources to four. The published series stepped from $8.44 to
+       $9.15 on 2026-07-03. This is a composition effect — the arrival of a
+       fourth source's price level — not a repricing by any operator: no T1
+       source changed a posted on-demand rate on those dates. Readers citing
+       the T1 H100 US series across that boundary should treat the step
+       accordingly.`,
+    ],
+  },
+  {
+    date: '2026-04-26',
+    tag: 'Version',
+    title: 'Methodology v2.0.0 — first public version, effective',
+    body: [
+      `The v2.0.0 methodology took effect: chip × operator-class × geography
+       series grammar, operator-equal weighting, the published headline
+       statistic rule, and the panel roster freeze. Prior drafts are archived
+       in the methodology repository; every published row from this date
+       carries its methodology version.`,
+    ],
+  },
+];
+---
+<Base
+  title="Methodology Change Log · CCIR"
+  ogImage="/og/documents.png"
+  description="The running record of CCIR methodology versions, panel changes, and series notices — each change announced with its effective date, anticipated effect, and comment window."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Documents · Change Log · as published {meta.as_of_date}</div>
+      <h1>Methodology Change Log</h1>
+      <p class="standfirst">
+        The running record of changes to what the published series measure:
+        methodology versions, panel membership, and composition notes.
+        Entries are appended, never edited. Pending changes are announced
+        here before they take effect, with the anticipated impact stated and
+        a comment window to <a href="mailto:research@ccir.io">research@ccir.io</a>.
+        The <a href="/documents/change-management">Change Management Policy</a>
+        governs how changes are classified; non-material operational changes
+        are logged in the public data repository.
+      </p>
+    </header>
+
+    <div class="log">
+      {entries.map((e) => (
+        <section class="entry">
+          <div class="entry-head">
+            <span class="entry-date">{e.date}</span>
+            <span class="entry-tag">{e.tag}</span>
+          </div>
+          <h2 class="entry-title">{e.title}</h2>
+          {e.body.map((p) => <p class="entry-body">{p}</p>)}
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 80ch; margin-bottom: 26px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .standfirst {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+    }
+    .log { max-width: 80ch; margin-bottom: 48px; }
+    .entry {
+      border-top: 1px solid var(--rule);
+      padding: 18px 0 10px;
+    }
+    .entry-head {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 6px;
+    }
+    .entry-date {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+    .entry-tag {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      border: 1px solid var(--rule);
+      padding: 1px 8px;
+    }
+    .entry-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 10px;
+    }
+    .entry-body {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 12px;
+      max-width: 78ch;
+    }
+  </style>
+</Base>
