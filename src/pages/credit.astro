@@ -54,6 +54,13 @@ function fmtRate(rate: any): string {
 function rateTitle(rate: any): string {
   return rate.note ?? '';
 }
+// Sort key for the issued column: first ISO date inside the value (a few
+// rows carry prose like 'Assumed 2021' or 'Priced ~2026-04-16/17').
+const issuedSortKey = (v: any) => {
+  const m = String(v ?? '').match(/\d{4}(-\d{2}){0,2}/);
+  return m ? m[0] : '';
+};
+
 // Numeric sort key for the rate column: coupon or spread where filed.
 function rateSortKey(rate: any): number | null {
   return rate.value ?? rate.value_low ?? null;
@@ -714,6 +721,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
             <th class="sortable" data-key="type">Type</th>
             <th class="sortable sort-num" data-key="size">Size $M</th>
             <th class="sortable sort-num" data-key="rate">Rate</th>
+            <th class="sortable" data-key="issued">Issued</th>
             <th class="sortable" data-key="mat">Maturity</th>
             <th class="sortable" data-key="sen">Seniority</th>
             <th>Lenders / Agents</th>
@@ -731,6 +739,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
               data-status={i.status}
               data-size={i.size_usd_m ?? ''}
               data-rate={rateSortKey(i.rate) ?? ''}
+              data-issued={issuedSortKey(i.issued)}
               data-mat={i.maturity ?? ''}
               data-lenders={lenderTags(i).map(lenderSlug).join('|')}
             >
@@ -747,6 +756,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
               <td class="c-rate" title={rateTitle(i.rate)}>
                 <span class:list={{ dim: i.rate.kind === 'undisclosed' }}>{fmtRate(i.rate)}</span>
               </td>
+              <td class="c-issued mono" title={i.issued ?? ''}>{i.issued ?? '—'}</td>
               <td class="c-mat" title={i.maturity_note ?? ''}>{i.maturity ?? '—'}</td>
               <td class="c-sen" title={i.seniority ?? ''}>{senClass(i.seniority)}</td>
               <td class="c-lenders" title={(i.lenders ?? []).join(' · ')}>
@@ -1229,7 +1239,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     #credit-table tbody tr.stripe:not(:hover) td {
       background: color-mix(in srgb, var(--surface-2) 55%, transparent);
     }
-    .c-issuer, .c-name, .c-type, .c-rate, .c-mat, .c-sen, .c-lenders, .c-status, .c-src { text-align: left !important; }
+    .c-issuer, .c-name, .c-type, .c-rate, .c-issued { white-space: nowrap; max-width: 104px; overflow: hidden; text-overflow: ellipsis; }
+    .c-mat, .c-sen, .c-lenders, .c-status, .c-src { text-align: left !important; }
     .c-name { max-width: 300px; }
     .c-src { max-width: 180px; }
     .c-src a {
