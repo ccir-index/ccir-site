@@ -23,6 +23,8 @@ const EDGAR = {
 const spectrum = [
   {
     mode: 'On-demand',
+    href: '#on-demand',
+    jump: '§02 On-demand terms',
     tenor: 'Per second / per hour',
     obligation: 'Pay for hours consumed; stop anytime',
     capacity: 'Not guaranteed; interruptible tiers exist',
@@ -30,6 +32,8 @@ const spectrum = [
   },
   {
     mode: 'Reserved / committed',
+    href: '#middle-market',
+    jump: '§04 Middle market',
     tenor: 'One month to ~one year',
     obligation: 'Pay for the reservation whether used or not',
     capacity: 'Guaranteed for the term',
@@ -37,6 +41,8 @@ const spectrum = [
   },
   {
     mode: 'Committed MSA',
+    href: '#msa',
+    jump: '§03 The MSA',
     tenor: 'One to six years',
     obligation: 'Fixed payments independent of usage; upfront payment common',
     capacity: 'Dedicated clusters; hardware-failure and SLA relief',
@@ -100,21 +106,24 @@ const msas = [
         <a href="/research/od-vs-committed">The Commitment Discount</a>. What
         follows is the contractual machinery behind those postings.
       </p>
-      <div class="twrap">
-        <table>
-          <thead><tr><th>Mode</th><th>Tenor</th><th>Payment obligation</th><th>Capacity</th><th>The paper</th></tr></thead>
-          <tbody>
-            {spectrum.map((r) => (
-              <tr>
-                <td class="strong">{r.mode}</td>
-                <td>{r.tenor}</td>
-                <td>{r.obligation}</td>
-                <td>{r.capacity}</td>
-                <td>{r.paper}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div class="spec-axis" role="presentation" aria-hidden="true">
+        <span class="spec-axis-cap">no commitment</span>
+        <span class="spec-axis-cap cap-r">take-or-pay →</span>
+      </div>
+      <div class="spec-grid">
+        {spectrum.map((r) => (
+          <a class="spec-col" href={r.href}>
+            <span class="spec-dot" aria-hidden="true"></span>
+            <span class="spec-mode">{r.mode}</span>
+            <span class="spec-tenor">{r.tenor}</span>
+            <ul class="spec-bullets">
+              <li>{r.obligation}</li>
+              <li>{r.capacity}</li>
+              <li>{r.paper}</li>
+            </ul>
+            <span class="spec-jump">{r.jump} ↓</span>
+          </a>
+        ))}
       </div>
     </section>
 
@@ -593,6 +602,95 @@ const msas = [
     .stack-fig .ln { stroke: var(--ink-faint); stroke-dasharray: 3 3; }
 
     .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 8px; max-width: 880px; }
+
+    /* §01 spectrum — three modes on a left-to-right commitment axis */
+    .spec-axis {
+      position: relative;
+      max-width: 880px;
+      height: 1px;
+      background: var(--rule);
+      margin: 38px 0 0;
+    }
+    .spec-axis-cap {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      white-space: nowrap;
+    }
+    .spec-axis-cap.cap-r { left: auto; right: 0; }
+    .spec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; max-width: 880px; margin: 0 0 8px; }
+    .spec-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-decoration: none;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      padding: 0 14px 14px;
+    }
+    .spec-col:hover { border-color: var(--accent); text-decoration: none; }
+    .spec-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--bg);
+      align-self: center;
+      margin: -14px 0 10px;
+    }
+    .spec-mode {
+      align-self: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      font-weight: var(--weight-strong);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      text-align: center;
+    }
+    .spec-tenor {
+      align-self: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      margin: 3px 0 12px;
+      text-align: center;
+    }
+    .sec .spec-bullets {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .sec .spec-bullets li { padding-left: 14px; position: relative; }
+    .sec .spec-bullets li::before { content: '–'; position: absolute; left: 0; color: var(--ink-dim); }
+    .spec-jump {
+      margin-top: auto;
+      padding-top: 14px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .spec-col:hover .spec-jump { color: var(--accent); }
+    @media (max-width: 720px) {
+      .spec-axis { display: none; }
+      .spec-grid { grid-template-columns: 1fr; }
+      .spec-dot { display: none; }
+      .spec-col { padding-top: 14px; }
+    }
     table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
     th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
     thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
