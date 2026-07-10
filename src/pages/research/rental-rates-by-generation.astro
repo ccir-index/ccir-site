@@ -97,7 +97,7 @@ const fitLines = CHIPS.map((c) => {
   // stacks in the right margin under the series end label.
   const LABEL: Record<string, { mode: 'start' | 'end'; dy: number }> = {
     V100: { mode: 'start', dy: -6 },
-    A100: { mode: 'end', dy: 16 },
+    A100: { mode: 'start', dy: -23 },   // high enough to clear the early-2022 peak
     H100: { mode: 'start', dy: -17 },
   };
   const pos = LABEL[c.key]!;
