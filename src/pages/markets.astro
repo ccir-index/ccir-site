@@ -68,7 +68,7 @@ const windowEnd = listingsMeta?.window_end ?? '—';
 
     <header class="legend-head">
       <span class="sec-kicker-label">POSTED LIST-ASK RATES · $/GPU-HR</span>
-      <span class="sec-note">trailing {windowDays}d · daily snapshots · dates in ET</span>
+      <span class="sec-note">trailing {windowDays}d · daily snapshots · dates in Eastern Time (ET)</span>
     </header>
     <div class="chart-wrap chart-wrap-hero">
       <div class="chart-status" id="chart-status">Loading…</div>
@@ -105,7 +105,8 @@ const windowEnd = listingsMeta?.window_end ?? '—';
         drawn over the trailing {windowDays}-day window. Refreshed once daily
         at the morning publish. End-of-line figures show each line's latest
         value. History begins on the day this product launched — earlier
-        periods are not backfilled.
+        periods are not backfilled. Type badges: GTD = guaranteed ·
+        INT = interruptible.
       </p>
     </details>
   </section>

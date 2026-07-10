@@ -45,7 +45,7 @@ const spectrum = [
     jump: '§03 The MSA',
     tenor: 'One to six years',
     obligation: 'Fixed payments independent of usage; upfront payment common',
-    capacity: 'Dedicated clusters; hardware-failure and SLA relief',
+    capacity: 'Dedicated clusters; hardware-failure and service-level agreement (SLA) relief',
     paper: 'Negotiated master services agreement + order forms',
   },
 ];
@@ -56,7 +56,7 @@ const msas = [
   { cp: 'NVIDIA', signed: 'Apr 10, 2023', filed: 'Ex. 10.31, Form S-4/A (Sep 2025)', url: 'nvidia',
     notable: 'Capacity cap on NVIDIA’s own usage — the “[*] Rule,” size redacted' },
   { cp: 'OpenAI', signed: 'Mar 7, 2025', filed: 'Ex. 10.24, Form S-1/A (Mar 2025)', url: 'openai',
-    notable: 'Substitute-operator assignment right; “Reportable Event” payment-distress covenant; $350M IPO share issuance' },
+    notable: 'Substitute-operator assignment right; “Reportable Event” payment-distress covenant; $350M initial public offering (IPO) share issuance' },
   { cp: 'OpenAI (second)', signed: 'May 8, 2025', filed: 'Ex. 10.32, Form S-4/A (Sep 2025)', url: 'openai2',
     notable: 'Separate later agreement; same bare-metal architecture' },
 ];
@@ -88,7 +88,7 @@ const msas = [
         month to a year, and negotiated multi-year agreements with fixed
         payment obligations. All three are now readable in primary documents —
         the retail terms are published in full, and the large agreements are
-        filed, redacted, as material-contract exhibits on SEC EDGAR. This
+        filed, redacted, as material-contract exhibits on the U.S. Securities and Exchange Commission (SEC) EDGAR filing system. This
         primer walks the spectrum using the documents themselves. Its
         companion, <a href="/research/gpu-spv">The GPU SPV</a>, follows the
         same contracts into the credit agreements that borrow against them.
@@ -138,9 +138,9 @@ const msas = [
         Agreement, and Privacy Policy incorporated by reference. The
         commercial mechanics are ordinary trade credit: invoices under
         $20,000 are charged to the customer's card, invoices of $20,000 or
-        more are payable by ACH or wire on Net 15 terms, and unpaid balances
+        more are payable by automated clearing house (ACH) or wire on Net 15 terms, and unpaid balances
         accrue a finance charge of 1.5% per month. Non-payment carries an
-        operational remedy — suspension:
+        operational remedy — suspension of application programming interface (API) access:
       </p>
       <figure class="doc-ex">
         <div class="doc-ex-label">CoreWeave Terms of Service (published) — payment and suspension</div>
@@ -196,7 +196,7 @@ const msas = [
         </table>
       </div>
       <p class="tfoot">
-        CoreWeave, Inc. (CIK 0001769628) exhibit filings; counterparty links
+        CoreWeave, Inc. (SEC Central Index Key, or CIK, 0001769628) exhibit filings; counterparty links
         open the filed exhibit as verified on {DATED}.
       </p>
       <p>
@@ -380,7 +380,7 @@ const msas = [
         Nebius's published services agreement defines a “Committed Volume of
         Services” payable “regardless of whether actual consumption is below
         the committed volume.” And the hyperscalers sell the same shape in
-        standardized units — AWS's Capacity Blocks for ML reserve GPU
+        standardized units — Amazon Web Services (AWS) Capacity Blocks for ML (machine learning) reserve GPU
         capacity for one to 182 days, non-cancelable and non-modifiable once
         purchased. At every size, committed capacity means the same thing:
         the hours belong to the customer whether used or not.
@@ -451,6 +451,7 @@ const msas = [
           </g>
         </svg>
       </div>
+      <p class="tfoot">REIT: real estate investment trust.</p>
     </section>
 
     <section class="sec" id="redactions">

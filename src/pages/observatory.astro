@@ -143,7 +143,7 @@ const availMeta = (meta as any).availability;
         <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Each provider's min, median, and max per-GPU $/hr for the selected chip.
-          Wide bars mean broad SKU coverage; narrow bars mean a single configuration.
+          Wide bars mean broad stock-keeping unit (SKU) coverage; narrow bars mean a single configuration.
           The cross-provider gap measures list-ask dispersion at matched chip —
           the same chip has been listed at $1.95–$2.99/GPU/hr across nine venues
           for H100 SXM.
@@ -180,9 +180,9 @@ const availMeta = (meta as any).availability;
         <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Per-SKU configuration matrix. NVLink ✓ means the provider exposes
-          explicit NVLink topology — not just SXM form. Empty cells reflect
+          explicit NVLink topology — not just SXM (socketed) form. Empty cells reflect
           Shadeform's reporting; the underlying provider may have richer
-          config detail in their own API.
+          config detail in their own application programming interface (API).
         </p>
       </details>
     </section>

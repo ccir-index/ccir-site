@@ -82,7 +82,7 @@ const trajectory: TrajRow[] = trajPcts.map(({ month, pct, cure }) => {
 });
 
 const facilityTerms: { term: string; value: string }[] = [
-  { term: 'Borrower', value: 'A GPU-rich neocloud SPE (the "Borrower")' },
+  { term: 'Borrower', value: 'A GPU-rich neocloud special-purpose entity (SPE) (the "Borrower")' },
   { term: 'Facility type', value: 'Senior-secured term loan' },
   { term: 'Facility size', value: '$200,000,000' },
   { term: 'Tenor', value: '4 years, scheduled amortization with bullet at maturity' },
@@ -95,10 +95,10 @@ const facilityTerms: { term: string; value: string }[] = [
 
 const precedentRows: { feature: string; precedent: string }[] = [
   { feature: 'Reference rate naming convention (publication + administrator + field)', precedent: 'Modern oil-swap confirmations (Brent Dated / S&P Global Platts / Crude Oil Marketwire); ICE Dated Brent Future' },
-  { feature: '30-day arithmetic average lookback', precedent: 'Adapted from RBL 24-month forward-strip averages; SEC 12-month first-of-month averages' },
-  { feature: 'Tiered operating requirements driven by published price', precedent: 'RBL minimum hedging covenant (e.g., Amplify Energy 60% PDP hedge requirement scaled by price tier); high-yield indenture price-driven covenant suite' },
+  { feature: '30-day arithmetic average lookback', precedent: 'Adapted from RBL 24-month forward-strip averages; U.S. Securities and Exchange Commission (SEC) 12-month first-of-month averages' },
+  { feature: 'Tiered operating requirements driven by published price', precedent: 'RBL minimum hedging covenant (e.g., Amplify Energy 60% proved developed producing (PDP) hedge requirement scaled by price tier); high-yield indenture price-driven covenant suite' },
   { feature: 'Committed Revenue Coverage as functional analog to hedging', precedent: 'Adapted to GPU context where futures markets do not yet exist; hedging via committed customer contracts' },
-  { feature: 'Reserve Account funding triggered by price tier', precedent: 'E&P credit agreement reserve-account covenants; PDP ABS reserve account requirements' },
+  { feature: 'Reserve Account funding triggered by price tier', precedent: 'exploration and production (E&P) credit agreement reserve-account covenants; PDP asset-backed securities (ABS) reserve account requirements' },
   { feature: 'Cash sweep activation at price thresholds', precedent: 'Standard high-yield and leveraged loan cash sweep triggers, here keyed to a published commodity index rather than to leverage ratios' },
   { feature: 'Mandatory accelerated amortization at lowest tier', precedent: 'RBL borrowing-base deficiency cure mechanics in tail tiers; PDP ABS amortization triggers' },
   { feature: 'Disruption Events (Cessation / Administrator / Methodology / Publication)', precedent: 'ISDA 2018 Benchmarks Supplement; 2005 ISDA Commodity Definitions Market Disruption Events' },
@@ -185,8 +185,8 @@ const poolRate = poolRows.reduce((s, r) => s + r.weight * (r.rate as number), 0)
 const rolloverPrecedents: { feature: string; precedent: string }[] = [
   { feature: 'Lease Sweep Period triggered ahead of a major contract expiry', precedent: 'CMBS lease-sweep / specified-tenant sweep provisions (cash trap commencing 12-18 months before a major tenant lease expiration)' },
   { feature: 'Re-lease rate assumption drawn from a published market series', precedent: 'Aircraft ABS re-leasing assumptions keyed to appraiser-published lease-rate data; container ABS per-diem re-lease assumptions' },
-  { feature: 'Projected (look-forward) DSCR test on expiring capacity', precedent: 'CMBS underwritten rollover NOI; project-finance re-contracting cases in merchant power' },
-  { feature: 'Rollover Reserve sized in months of debt service', precedent: 'CMBS rollover/TI-LC reserves; aircraft ABS maintenance and remarketing reserves' },
+  { feature: 'Projected (look-forward) DSCR test on expiring capacity', precedent: 'CMBS underwritten rollover net operating income (NOI); project-finance re-contracting cases in merchant power' },
+  { feature: 'Rollover Reserve sized in months of debt service', precedent: 'CMBS rollover/tenant improvement and leasing commission (TI/LC) reserves; aircraft ABS maintenance and remarketing reserves' },
 ];
 
 // On-page contents — ids match the anchored use-case articles and section h3s.
@@ -286,13 +286,13 @@ const toc = [
     <article class="usecase" id="uc-01">
       <header class="uc-head">
         <span class="uc-kicker">Use case 01 · Senior-secured term loan</span>
-        <h2>Market Price Monitoring Covenant Tied to a CRI Rate</h2>
+        <h2>Market Price Monitoring Covenant Tied to a Compute Rate Index (CRI) Rate</h2>
         <p class="uc-lede">
           A worked drafting example showing how a CCIR rate would be cited in
           a senior-secured term loan facility as the trigger input to a
           tiered market price monitoring covenant. Modeled on the
           reserve-based lending minimum hedging covenant — a structure in
-          which falling NYMEX strip prices automatically tighten operational
+          which falling New York Mercantile Exchange (NYMEX) strip prices automatically tighten operational
           requirements (hedging floors, reserve funding, cash sweeps) without
           immediately triggering default. Drafting illustration, not a model
           form.
@@ -324,7 +324,7 @@ const toc = [
           published reference price (or a function of published prices)
           directly against contractually defined thresholds, with the price
           level itself driving the triggered consequence. It is functionally
-          distinct from a valuation covenant (such as an LTV maintenance
+          distinct from a valuation covenant (such as a loan-to-value (LTV) maintenance
           test), in which the published price is an input to a calculation
           and the test runs against the calculation rather than the price.
         </p>
@@ -374,7 +374,8 @@ const toc = [
           administrator, and the specific data field separately — is the
           same as in modern oil-swap confirmations referencing "Brent
           (Dated) as published by S&amp;P Global Platts" and in post-LIBOR
-          ARRC fallback language.
+          (the London Interbank Offered Rate) Alternative Reference Rates
+          Committee (ARRC) fallback language.
         </p>
         <pre class="cov-body">
 <span class="cov-h">"CRI Reference Rate"</span> means, as of any date of determination, the rate
@@ -538,9 +539,10 @@ Event has occurred and is continuing.</pre>
       <section class="sec">
         <h3 id="uc-01-s05"><span class="sec-n">05</span> Fallback Architecture</h3>
         <p>
-          The fallback waterfall draws from the ISDA 2018 Benchmarks
+          The fallback waterfall draws from the International Swaps and
+          Derivatives Association (ISDA) 2018 Benchmarks
           Supplement and the ARRC hardwired LIBOR transition language,
-          adapted to a PRA-style commodity index. The rate-disruption
+          adapted to a price reporting agency (PRA)-style commodity index. The rate-disruption
           mechanics are common to any covenant citing this rate.
         </p>
         <pre class="cov-body">
@@ -901,7 +903,8 @@ expirations) certified by a Responsible Officer.</pre>
           ladder) it would otherwise negotiate for separately, and no
           softening on the exposed slice. The variant also shares its inputs
           with Use case 02: the Effective Revenue Rate here and the Projected
-          Rollover DSCR there are the same computation at different horizons,
+          Rollover DSCR (debt-service coverage ratio) there are the same
+          computation at different horizons,
           so one covenant package runs on one data feed — the published
           series plus the borrower's contract ladder.
         </p>
@@ -917,7 +920,8 @@ expirations) certified by a Responsible Officer.</pre>
           problem in GPU-backed lending: a borrower's anchor customer
           contract expires mid-loan and the expiring capacity must be
           re-leased into the open market at then-prevailing rates. Modeled
-          on CMBS lease-sweep mechanics and the re-leasing assumptions used
+          on commercial mortgage-backed securities (CMBS) lease-sweep
+          mechanics and the re-leasing assumptions used
           in aircraft and container ABS. Drafting illustration, not a model
           form.
         </p>

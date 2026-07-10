@@ -73,6 +73,35 @@ const fits = [
   { gen: 'H100', win: 'Sep 2023 – Apr 2026 (2.6y)', fit: '−13.0%/yr', real: '−16.1%/yr', r2: '0.48', ep: '+1.5%/yr', path: '$3.50 → $3.64' },
 ];
 
+// Fitted-line overlay: the same OLS the fits table reports (log price on
+// month, n>=3 months inside each fit window), recomputed here from the
+// plotted points so line and table can never disagree. Straight on the log
+// axis; drawn over the fit window only — never extrapolated past the data.
+const FIT_WINS: Record<string, [string, string]> = {
+  V100: ['2019-06', '2026-04'], A100: ['2021-09', '2026-04'], H100: ['2023-09', '2026-04'],
+};
+const fitLines = CHIPS.map((c) => {
+  const [a, b] = FIT_WINS[c.key]!;
+  const pts = ((cohorts as any)[c.key].points as Pt[])
+    .filter((p) => p.n >= 3 && mk(p.m) >= mk(a) && mk(p.m) <= mk(b));
+  const xs = pts.map((p) => mk(p.m)), ys = pts.map((p) => Math.log(p.med));
+  const n = xs.length;
+  const xm = xs.reduce((s, v) => s + v, 0) / n, ym = ys.reduce((s, v) => s + v, 0) / n;
+  let sxy = 0, sxx = 0;
+  for (let i = 0; i < n; i++) { sxy += (xs[i]! - xm) * (ys[i]! - ym); sxx += (xs[i]! - xm) ** 2; }
+  const slope = sxy / sxx;
+  const rate = (Math.exp(slope * 12) - 1) * 100;   // matches the table's fit column
+  const yAt = (m: number) => Math.exp(ym + slope * (m - xm));
+  return {
+    cls: c.cls,
+    label: `fit ${rate.toFixed(1)}%/yr`,
+    x1: cx(mk(a)), y1: cy(yAt(mk(a))),
+    x2: cx(mk(b)), y2: cy(yAt(mk(b))),
+    // H100's label clears its own series' early-2024 peak
+    ly: cy(yAt(mk(a))) - (c.key === 'H100' ? 17 : 6),
+  };
+});
+
 ---
 <Base
   title="GPU Rental Rates by Generation: Nine Years of Posted Prices · CCIR Research"
@@ -105,7 +134,7 @@ const fits = [
     <figure class="chart-fig">
       <div class="chart-box">
         <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-             aria-label="Posted panel-median rental rate per GPU-hour by generation, monthly, October 2017 to June 2026, log scale. Stepped lines for V100, A100, and H100 decline unevenly, with firming in 2021 to 2023 and again from late 2025. Thin dashed segments mark months with fewer than three providers.">
+             aria-label="Posted panel-median rental rate per GPU-hour by generation, monthly, October 2017 to June 2026, log scale. Stepped lines for V100, A100, and H100 decline unevenly, with firming in 2021 to 2023 and again from late 2025. Thin dashed segments mark months with fewer than three providers. Straight dashed lines overlay each generation's fitted log-linear decline across its fit window: V100 minus 21.1 percent per year, A100 minus 7.0, H100 minus 13.0.">
           <rect x={ep1.a} y={PT} width={ep1.b - ep1.a} height={ih} class="episode" />
           <rect x={ep2.a} y={PT} width={ep2.b - ep2.a} height={ih} class="episode" />
           <text x={(ep1.a + ep1.b) / 2} y={PT + 12} class="eplab" text-anchor="middle">2021–23 firming</text>
@@ -119,6 +148,9 @@ const fits = [
           {xTicks.map((t) => (
             <text x={t.x} y={CH - 14} class="tick" text-anchor="middle">{t.y}</text>
           ))}
+          {fitLines.map((f) => (
+            <line x1={f.x1} y1={f.y1} x2={f.x2} y2={f.y2} class={`fitln ln-${f.cls}`} />
+          ))}
           {series.map((s) => (
             <g>
               {s.thin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
@@ -128,6 +160,9 @@ const fits = [
               </text>
             </g>
           ))}
+          {fitLines.map((f) => (
+            <text x={f.x1 + 4} y={f.ly} class={`fitlab lab-${f.cls}`} text-anchor="start">{f.label}</text>
+          ))}
         </svg>
       </div>
       <div class="chart-legend">
@@ -135,6 +170,7 @@ const fits = [
         <span class="lg"><span class="swatch sw-ampere"></span>A100</span>
         <span class="lg"><span class="swatch sw-hopper"></span>H100</span>
         <span class="lg"><span class="swatch sw-dash"></span>dashed = month has n&lt;3 providers (shown, never fitted)</span>
+        <span class="lg"><span class="swatch sw-fit"></span>straight dashes = the fitted declines below, over each fit window</span>
       </div>
       <figcaption class="tfoot">
         Posted panel-median guaranteed on-demand rate, $/GPU-hr, monthly, log
@@ -149,7 +185,7 @@ const fits = [
       <h2><span class="n">01</span> The Paths</h2>
       <p>
         Fitted annual rates of change on the panel median, months with n≥3
-        only:
+        only (the endpoint column is a compound annual growth rate, CAGR):
       </p>
       <div class="twrap">
         <table>
@@ -178,7 +214,8 @@ const fits = [
       </p>
       <p>
         All prices are nominal, as posted. The "less CPI" column subtracts
-        each window's CPI-U inflation rate (3–4%/yr over these years) from
+        each window's consumer price index (CPI) inflation rate — the CPI
+        for urban consumers (CPI-U) series (3–4%/yr over these years) — from
         the fit — which matters most for A100: a path that is nearly flat in
         posted dollars is a decline of roughly 6% per year in real terms,
         endpoint to endpoint.
@@ -239,7 +276,7 @@ const fits = [
         the carry-forward repair and per-point counts are disclosed, and thin
         months are excluded from fitted figures. A100 pools memory variants.
         Archive coverage is not uniform — notable gaps: RunPod from mid-2025,
-        OCI after 2023, OVHcloud's US-dollar pages in 2025. Step dates are
+        Oracle Cloud Infrastructure (OCI) after 2023, OVHcloud's US-dollar pages in 2025. Step dates are
         bounded by capture dates, not observed exactly: a raise "in spring
         2026" occurred between two dated captures. Methodology per the
         <a href="/documents/methodology">published documents</a>; the
@@ -254,7 +291,7 @@ const fits = [
         <p>
           <strong>Sources.</strong> Archived captures of provider pricing
           pages from the Internet Archive's Wayback Machine and from Common
-          Crawl WARC records. Providers: AWS, CoreWeave, DataCrunch (Verda
+          Crawl web-archive (WARC) records. Providers: Amazon Web Services (AWS), CoreWeave, DataCrunch (Verda
           from December 2025), Genesis Cloud, Lambda, OCI, OVHcloud,
           Paperspace, RunPod, with Common Crawl recoveries of Crusoe,
           Hyperstack, Together, and TensorDock. Every archived observation is
@@ -335,6 +372,9 @@ const fits = [
     .ln-ampere { stroke: var(--arch-ampere); }
     .ln-hopper { stroke: var(--arch-hopper); }
     .endlab { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; }
+    .fitln { fill: none; stroke-width: 1; stroke-dasharray: 7 5; opacity: 0.65; }
+    .fitlab { font-family: var(--font-mono); font-size: 10px; font-weight: 600; opacity: 0.9; }
+    .sw-fit { background: linear-gradient(90deg, var(--ink-dim) 60%, transparent 60%); }
     .lab-volta { fill: var(--arch-volta); }
     .lab-ampere { fill: var(--arch-ampere); }
     .lab-hopper { fill: var(--arch-hopper); }

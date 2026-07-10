@@ -435,7 +435,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       <p class="standfirst lede">
         The debt stack behind AI compute, as filed. {instruments.length}
         instruments across {issuers.length} issuers — public companies from
-        their SEC filings, private issuers from company, lender, or arranger
+        their U.S. Securities and Exchange Commission (SEC) filings, private
+        issuers from company, lender, or arranger
         statements. Of these, ${inScopeUsdB}B across {inScopeC.length} are
         secured directly by the GPUs — the issuance measure charted below;
         convertibles, unsecured notes, and data-center credit are tracked for
@@ -449,7 +450,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       </p>
       <div class="disclosure">
         <strong>Sourced as filed</strong>
-        Compiled from SEC EDGAR filings and issuer/lender releases as filed.
+        Compiled from filings in the SEC's EDGAR filing system and
+        issuer/lender releases as filed.
         Every row links its source document. Confirmation flags:
         <span class="chip chip-confirmed">confirmed</span> company/lender/arranger
         statement · <span class="chip chip-press">press</span> journalist-sourced,
@@ -480,15 +482,17 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <div>
           <div class="panel-title">GPU-collateral floating spreads — CoreWeave &amp; IREN</div>
           <div class="panel-sub">
-            Filed spread over SOFR at signing, coloured by what backs the loan ·
-            window Jul 2023 – Jun 2026 · CoreWeave DDTL vintages + IREN Hardware 3
+            Filed spread over the Secured Overnight Financing Rate (SOFR) at
+            signing, coloured by what backs the loan ·
+            window Jul 2023 – Jun 2026 · CoreWeave delayed-draw term loan
+            (DDTL) vintages + IREN Hardware 3
           </div>
         </div>
         <span class="badge">FILED TERMS</span>
       </div>
       <div class="legend">
         <div class="lg-line">
-          <span class="lg-head">By contract support · IG → none</span>
+          <span class="lg-head">By contract support · investment-grade (IG) → none</span>
           <span class="lg-item"><span class="lg-dot tier-strong"></span>IG contract-backed (e.g. Meta, Microsoft)</span>
           <span class="lg-item"><span class="lg-dot tier-mid"></span>Non-IG contract-backed</span>
           <span class="lg-item"><span class="lg-dot tier-weak"></span>Non-contract-backed (hardware only)</span>
@@ -554,7 +558,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
             the SOFR variant each filing names); vintage date = signing/close.
             DDTL 2.0 prints as a bar — +6.00–6.50% on IG contract loans, +13.00%
             (◆) non-IG. One caveat the level understates: DDTL 4.0 is only
-            ~$4.5B floating at +2.25%; ~$4.0B is a fixed UST-based tranche, so its
+            ~$4.5B floating at +2.25%; ~$4.0B is a fixed U.S. Treasury
+            (UST)-based tranche, so its
             all-in cost sits above the plotted spread (the ledger's effective-rate
             column runs ~7–11% across these facilities). Six of seven points are
             CoreWeave itself, so this is closer to one issuer's spread history
@@ -570,7 +575,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         <div>
           <div class="panel-title">Project-bond coupons — by offtake credit support</div>
           <div class="panel-sub">
-            Coupon at pricing/close, fixed-rate senior secured 144A, coloured by who
+            Coupon at pricing/close, fixed-rate senior secured Rule 144A, coloured by who
             backs the lease · window Oct 2025 – Jun 2026
           </div>
         </div>
@@ -634,7 +639,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
             The coupon fell because the offtake credit improved, not merely
             because time passed. The ~6% cluster (CIFR Black Pearl/Stingray,
             IREN, APLD ComputeCo 2) is backed by an investment-grade tenant —
-            Amazon, AWS, Microsoft, Oracle — or is an IG-rated bond (Hut 8's
+            Amazon, Amazon Web Services (AWS), Microsoft, Oracle — or is an
+            IG-rated bond (Hut 8's
             BBB− 2042s); the 7.1–7.75% band is Google-guaranteed paper where the
             tenant is unrated Fluidstack; and the 9.25% outlier (APLD ComputeCo 1)
             is leased to CoreWeave, itself a levered neocloud. Same coupon axis,
@@ -649,10 +655,12 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
             level. Structure: IREN 5.96% is Microsoft-*contract*-secured GPU
             financing under a common-terms agreement, structurally closer to the
             floating-rate facilities in the chart above than to a single-campus
-            lease bond. Meridian Arc 6.25% is SPV landlord paper on a Google-
+            lease bond. Meridian Arc 6.25% is special-purpose vehicle (SPV)
+            landlord paper on a Google-
             guaranteed Fluidstack lease — confirmed via issuer counsel (Latham)
             pricing release and Fitch's BB rating (on the Google guarantee;
-            Fluidstack unrated). The JV parents are private, so there is no SEC
+            Fluidstack unrated). The joint venture (JV) parents are private,
+            so there is no SEC
             filing.
           </p>
         </div>
@@ -774,7 +782,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
         Of the {inScopeC.length} GPU-collateralized instruments, {amortC.length}
         disclose amortization mechanics in their filed terms — depreciated-cost
         borrowing bases, scheduled quarterly or monthly amortization,
-        DSCR-targeted paydowns, amortization-plus-balloon structures. Every
+        debt-service coverage ratio (DSCR)-targeted paydowns,
+        amortization-plus-balloon structures. Every
         disclosed schedule points the same direction: collateral value is
         written down toward zero over the facility's life. No GPU-collateralized
         instrument on this ledger references a market residual value; the
@@ -802,7 +811,9 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       <h2>Sources &amp; method</h2>
       <p>
         This ledger is compiled from primary documents only: SEC EDGAR filings
-        (10-K/10-Q/8-K/20-F/6-K, prospectuses, indentures filed as exhibits)
+        (annual, quarterly, and current reports (10-K/10-Q/8-K),
+        foreign-issuer equivalents (20-F/6-K), prospectuses, indentures filed
+        as exhibits)
         for public issuers, and company, lender, or arranger releases for
         private issuers. Terms are reproduced as filed. Where a rate, size,
         maturity, or collateral description is not stated in any primary

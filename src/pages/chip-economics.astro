@@ -173,6 +173,8 @@ const SNAP_DATE = '2026-07-06';
         Neocloud (T2) guaranteed on-demand, US, generations on age (x, years) against each lens (y, from zero).
         Spread = (max − min) ÷ mean across the five generations. Example prints · {PRINT_DATE} · rates from the
         {SNAP_DATE} snapshot. Headline stat per published rule (mean where n ≥ 10, else median).
+        The compute lens is denominated in petaFLOPs (PFLOP, 10^15 floating-point operations per
+        second), dense, in the BF16 number format.
       </p>
 
       <p class="lede">
@@ -196,9 +198,9 @@ const SNAP_DATE = '2026-07-06';
         </table>
       </div>
       <p class="sid">
-        <b>CRI-T2-&#123;chip&#125;-&#123;form&#125;-GTD-OD-US-&#123;GB|BW|PF|KW&#125;</b> · derived series carry the underlying citable
+        <b>CRI-T2-&#123;chip&#125;-&#123;form&#125;-GTD-OD-US-&#123;GB|BW|PF|KW&#125;</b> · derived Compute Rate Index (CRI) series carry the underlying citable
         cell in the first seven segments; strip the lens suffix to reach the parent. $/GB-hr computed from
-        registry HBM capacity (80 / 80 / 141 / 180 / 288 GB).
+        registry high-bandwidth memory (HBM) capacity (80 / 80 / 141 / 180 / 288 GB).
       </p>
     </section>
 
@@ -346,7 +348,7 @@ const SNAP_DATE = '2026-07-06';
           </svg>
         </div>
         <figcaption class="tfoot">
-          Revenue per kW of nameplate TDP, by shell class — gross rent per unit of power envelope, not margin.
+          Revenue per kW of nameplate thermal design power (TDP), by shell class — gross rent per unit of power envelope, not margin.
           † H200 hosts in dense-air or liquid shells. ‡ L4 is an edge part — any air shell — and sits outside
           the datacenter air band. Marketplace rows (Mkt) are Marketplace-segment prints, indicative.
           Example prints · {PRINT_DATE} · rates from the {SNAP_DATE} snapshot.
@@ -388,7 +390,7 @@ const SNAP_DATE = '2026-07-06';
       </p>
 
       <div class="identity">
-        <b>Cost-side basis.</b> Chip TDP understates system draw: an 8×H100 HGX server draws
+        <b>Cost-side basis.</b> Chip TDP understates system draw: an 8×H100 server on NVIDIA's HGX server platform draws
         ≈10.2 kW against 5.6 kW of chip TDP — a ≈1.8× system factor (CPUs, NVSwitch, fans).
         Every cost rung below is restated per chip-TDP-kW through that factor, so both sides of the
         altimeter share the watt-rent lens's denominator. The factor is a disclosed election.
@@ -469,8 +471,10 @@ const SNAP_DATE = '2026-07-06';
           from disclosed elections (tinted), its components external reference data (outlined), cited inline.
           Whether power is metered inside or beside the colo rate varies by contract — the power-only floor
           and the colo asking band are therefore shown separately. All cost rungs per chip-TDP-kW via the
-          1.8× system factor. Example prints · {PRINT_DATE} · rates from the {SNAP_DATE} snapshot; cost
-          derivations verified 2026-07-07.
+          1.8× system factor. Component sources: CBRE (the commercial-real-estate services firm) for the
+          wholesale colo asking band; the U.S. Energy Information Administration (EIA) for the power
+          price, with a power usage effectiveness (PUE) of 1.4 elected. Example prints · {PRINT_DATE} ·
+          rates from the {SNAP_DATE} snapshot; cost derivations verified 2026-07-07.
         </figcaption>
       </figure>
 

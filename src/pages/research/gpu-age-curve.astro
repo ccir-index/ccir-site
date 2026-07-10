@@ -110,9 +110,10 @@ const wattTable = [
         A second boundary: every figure here is <strong>gross rental
         revenue</strong> — dollars per GPU-hour before power, cooling, space,
         and operations. The per-watt figures in Section 03 are revenue per
-        unit of power envelope, not margin. A cash-flow or DSCR model nets
+        unit of power envelope, not margin. A cash-flow or debt-service
+        coverage ratio (DSCR) model nets
         operating cost against this series; the cost side — power prices,
-        PUE, colocation rates — is published market data of its own and
+        power usage effectiveness (PUE), colocation rates — is published market data of its own and
         belongs in a separate note, as does the boundary it implies: the
         point at which a generation's gross rent meets its cash operating
         cost is its economic end-of-life.
@@ -210,7 +211,7 @@ const wattTable = [
         The two hollow points are the tell. <strong>RTX PRO 6000 is
         three-months-old Blackwell silicon priced at $1.97 — where
         5.7-year-old A100 trades</strong> — because its memory bandwidth
-        (~1.8 TB/s of GDDR7, no HBM, no NVLink) is A100-class. A brand-new
+        (~1.8 TB/s of GDDR7, no high-bandwidth memory (HBM), no NVLink) is A100-class. A brand-new
         chip prices at the old chip's level when it carries the old chip's
         bandwidth: age is not the priced variable. Section 03 makes that
         explicit.
@@ -223,7 +224,7 @@ const wattTable = [
       <p>
         Divide the Neocloud rate by the chip's capability and the curve
         splits. Per unit of <strong>memory bandwidth</strong> — the binding
-        resource for LLM serving:
+        resource for large language model (LLM) serving:
       </p>
       <div class="twrap">
         <table>
@@ -241,8 +242,8 @@ const wattTable = [
         bandwidth normalization there is essentially no age discount left.
       </p>
       <p>
-        Per unit of <strong>dense BF16 compute</strong> — the binding resource
-        for frontier training:
+        Per unit of <strong>dense compute in the BF16 number format</strong> —
+        the binding resource for frontier training:
       </p>
       <div class="twrap">
         <table>
@@ -265,7 +266,8 @@ const wattTable = [
         bandwidth-normalization does.
       </p>
       <p>
-        Per unit of <strong>nameplate power</strong> — the facility's
+        Per unit of <strong>nameplate power</strong> — thermal design power
+        (TDP), the facility's
         constraint, which determines which datacenters can physically host a
         chip:
       </p>
@@ -324,9 +326,10 @@ const wattTable = [
       <p>
         Single cross-section, not a cohort. List asks, not executed
         transactions. The headline stat mixes mean (deep panels) and median
-        (thin) per the published rule; form factor is pooled and the SXM/PCIe
-        mix differs by generation; bandwidth is a crude capability proxy
-        (ignores HBM capacity, interconnect domain, FP4 paths — the B300 BF16
+        (thin) per the published rule; form factor is pooled and the mix of
+        the SXM (socketed) and PCIe (slotted) form factors
+        differs by generation; bandwidth is a crude capability proxy
+        (ignores HBM capacity, interconnect domain, FP4 precision-format paths — the B300 BF16
         figure is approximate); the A100 Hyperscaler cell is a slow-moving
         rate card; thin cells (n&lt;3) are indicative. Sources and series per
         the <a href="/documents/methodology">Methodology</a>; underlying cells

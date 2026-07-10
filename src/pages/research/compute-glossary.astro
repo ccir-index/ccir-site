@@ -172,7 +172,8 @@ const DATED = '2026-07-09';
 
         <dt>HBM / VRAM (GB)</dt>
         <dd>
-          The GPU's on-package high-bandwidth memory, in gigabytes. It
+          The GPU's on-package high-bandwidth memory — VRAM (video
+          random-access memory) in the older usage — in gigabytes. It
           gates which models fit on the chip at all: a model that doesn't
           fit must be split across more GPUs, multiplying the hardware bill.
           Mid-generation refreshes are often memory upgrades wearing the
@@ -267,7 +268,8 @@ const DATED = '2026-07-09';
         <dd>
           The contracted promise that capacity is up and reachable —
           distinct from utilization (whether anyone is renting it) and from
-          MFU (what the renter extracts from it). SLAs convert downtime
+          MFU (what the renter extracts from it). Service-level agreements
+          (SLAs) convert downtime
           into service credits; committed contracts convert extended
           hardware failure into suspended rent. Availability is a covenant
           term; utilization is a demand fact.
@@ -297,7 +299,8 @@ const DATED = '2026-07-09';
 
         <dt>Inference</dt>
         <dd>
-          Running the model: every query, API call, and AI feature in
+          Running the model: every query, application programming interface
+          (API) call, and AI feature in
           production. Recurring, usage-driven, latency-sensitive, diurnal —
           and tolerant of older hardware, which is what keeps prior
           generations earning. Inference demand behaves like utility load.

@@ -26,7 +26,7 @@ const DDTL1_PR = 'https://www.prnewswire.com/news-releases/coreweave-secures-2-3
 
 const facilities = [
   { name: 'DDTL 1.0', date: 'Aug 2023', size: '$2.3B', offtake: 'Contract book', pricing: '14.1% avg. actual (SOFR + 9.62%)', rating: 'unrated', url: 's1' },
-  { name: 'DDTL 2.0', date: 'May 2024', size: 'up to $7.5B', offtake: 'IG and non-IG contracts', pricing: 'undisclosed', rating: 'unrated', url: 'ddtl2' },
+  { name: 'DDTL 2.0', date: 'May 2024', size: 'up to $7.5B', offtake: 'Investment-grade (IG) and non-IG contracts', pricing: 'undisclosed', rating: 'unrated', url: 'ddtl2' },
   { name: 'DDTL 3.0', date: 'Jul 2025', size: '$2.6B', offtake: 'Single-customer MSA', pricing: 'SOFR + 4.00%', rating: '—', url: 'ddtl3' },
   { name: 'DDTL 4.0', date: 'Mar 2026', size: '$8.5B', offtake: 'Take-or-pay MSA (Meta, per the rating releases)', pricing: 'SOFR + 2.25% / ~5.9% fixed', rating: 'A3 / A (low)', url: 'ddtl4_8k' },
   { name: 'DDTL 5.0', date: 'May 2026', size: '$3.1B', offtake: 'Two non-investment-grade customers', pricing: 'SOFR + 4.50%', rating: 'Ba2 / BB+', url: 'ddtl5_8k' },
@@ -59,7 +59,7 @@ const facilities = [
         customer contract — built so that lenders can reach the assets
         without the parent's other creditors reaching them first. The credit
         agreements behind CoreWeave's delayed-draw term loan facilities are
-        filed on SEC EDGAR, redactions and all. This primer reads the
+        filed on the U.S. Securities and Exchange Commission (SEC) EDGAR filing system, redactions and all. This primer reads the
         structure out of the documents. Its companion,
         <a href="/research/compute-contracts">The Compute Contract</a>, covers
         the customer agreements these facilities are underwritten against.
@@ -197,7 +197,7 @@ const facilities = [
         Cash is trapped structurally rather than by covenant alone: every
         deposit account of the borrower must sit under a control agreement
         “sufficient to establish the Collateral Agent's control pursuant to
-        Section 9-104 of the UCC,” and collections are directed into named
+        Section 9-104 of the UCC” — the Uniform Commercial Code — and collections are directed into named
         collateral accounts — an Available Cash Account, an Other Proceeds
         Account, a Distribution Reserve Account, a Liquidity Account. One
         more filed detail worth the whole exhibit: DDTL 2.0's “GPU
@@ -268,13 +268,14 @@ const facilities = [
       <p>
         The progression in the table is the market learning what it is
         pricing. The 2023 facility carried an average actual rate of 14.1% —
-        a 9.62% margin over SOFR, per the S-1 — and was reported at the time
+        a 9.62% margin over the Secured Overnight Financing Rate (SOFR), per the S-1 — and was reported at the time
         as the first large financing collateralized by H100s. By March 2026,
         a facility over the same operator's fleet priced at SOFR + 2.25% on
         the floating tranche and carried an A3 — six notches above the
         parent's Ba3 corporate family rating — with CoreWeave calling it
         “the first investment-grade rated financing secured by HPC
-        infrastructure and an associated customer contract.” Moody's tied
+        infrastructure and an associated customer contract” (HPC:
+        high-performance computing). Moody's tied
         the rating to the offtake: fixed take-or-pay payments from Meta,
         independent of usage, under a contract that cannot be terminated for
         convenience; Morningstar DBRS assessed debt service coverage at
@@ -301,10 +302,10 @@ const facilities = [
         them. Foreclosing on CCAC VIII delivers serial-numbered servers and
         an assigned contract that still needs an operator — which is exactly
         why the customer-side substitute-operator mechanics in
-        <a href="/research/compute-contracts">the MSAs</a> exist.
+        <a href="/research/compute-contracts">the master services agreements (MSAs)</a> exist.
         <strong>Re-leasing.</strong> If the offtake fails, recovery depends
         on re-renting or selling used accelerators — a market with a posted
-        price record but no foreclosure track record. KBRA, publishing on
+        price record but no foreclosure track record. Kroll Bond Rating Agency (KBRA), publishing on
         exactly this question in June 2026, places these transactions “at
         the intersection” of data-center and equipment finance — neither
         one's precedents fully apply. The rental-price side
