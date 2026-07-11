@@ -94,12 +94,14 @@ const anchors = [
   { gen: 'B200', usd: '$64,426', basis: 'DGX B200 reseller list $515,410 ÷ 8 (2024-10)', grade: 'B' },
 ];
 
+// Backfill assumption (2026-07-11): months between GA and archive entry
+// assume the first observed rate held from GA — applies to gross AND net.
 const payback = [
-  { gen: 'V100', ga: 'Q3 2017', months: '11', cum: '$127,200', mult: '6.8×' },
-  { gen: 'A100', ga: 'May 2020', months: '15', cum: '$116,600', mult: '4.7×' },
-  { gen: 'H100', ga: 'Oct 2022', months: '14', cum: '$101,800', mult: '3.0×' },
-  { gen: 'H200', ga: 'Q2 2024', months: '17', cum: '$54,600', mult: '1.7×' },
-  { gen: 'B200', ga: 'Dec 2024', months: '16', cum: '$67,900', mult: '1.1×' },
+  { gen: 'V100', ga: 'Q3 2017', months: '10', cum: '$129,000', mult: '6.9×' },
+  { gen: 'A100', ga: 'May 2020', months: '8', cum: '$134,500', mult: '5.4×' },
+  { gen: 'H100', ga: 'Oct 2022', months: '11', cum: '$111,200', mult: '3.3×' },
+  { gen: 'H200', ga: 'Q2 2024', months: '14', cum: '$64,200', mult: '2.0×' },
+  { gen: 'B200', ga: 'Dec 2024', months: '12', cum: '$85,500', mult: '1.3×' },
 ];
 
 // Net elections (hybrid lessee-basis model, restated 2026-07-11):
@@ -110,11 +112,11 @@ const payback = [
 // 6-K/20-F, IREN 10-Q). Research-note restatement — page kicker carries
 // the date; no changelog entry (changelog = benchmark series only).
 const scenarios = [
-  { gen: 'V100', a: '11', b: '20', c: '31' },
-  { gen: 'A100', a: '15', b: '29', c: '51' },
-  { gen: 'H100', a: '14', b: '26', c: 'not yet (0.76× at 42mo)' },
-  { gen: 'H200', a: '17', b: 'not yet (24mo window)', c: 'not yet' },
-  { gen: 'B200', a: '16', b: 'not yet (16mo window)', c: 'not yet' },
+  { gen: 'V100', a: '10', b: '19', c: '31' },
+  { gen: 'A100', a: '8', b: '19', c: '37' },
+  { gen: 'H100', a: '11', b: '22', c: 'not yet (0.83× at 42mo)' },
+  { gen: 'H200', a: '14', b: '24', c: 'not yet' },
+  { gen: 'B200', a: '12', b: 'not yet (16mo window)', c: 'not yet' },
 ];
 
 const ratioTable = [
@@ -136,7 +138,7 @@ const bwTable = [
 <Base
   title="Rent and MSRP: Five Generations of Posted Prices · CCIR Research"
   ogImage="/og/rent-and-msrp.png"
-  description="Posted GPU rental rates divided by MSRPs, 2017–2026. Net of realization, an imputed per-chip facility rent, and overhead from operator filings: V100 recovered MSRP in 31 months, A100 in 51, H100 not yet at 42. The gross ceiling at posted rates: 11–17 months."
+  description="Posted GPU rental rates divided by MSRPs, 2017–2026. Net of realization, an imputed per-chip facility rent, and overhead from operator filings: V100 recovered MSRP in 31 months, A100 in 37, H100 not yet at 42. The gross ceiling at posted rates: 8–14 months."
   showTape={false}
 >
   <section class="wrap top">
@@ -156,13 +158,13 @@ const bwTable = [
           posted rates, an imputed per-chip facility rent, and overhead at
           20% of realized revenue, from operator filings and published
           CCIR work — <strong>V100 recovered its MSRP in 31 months and
-          A100 in 51; H100, at 42 months, stands at 0.76× and has not yet
+          A100 in 37; H100, at 42 months, stands at 0.83× and has not yet
           crossed.</strong>
         </li>
         <li>
           At posted on-demand rates with no cost line — an idealized
           ceiling by construction — every generation's cumulative gross
-          revenue passed its MSRP within <strong>11 to 17 months</strong>
+          revenue passed its MSRP within <strong>8 to 14 months</strong>
           of general availability, MSRPs from $18,600 to $64,400 per GPU.
         </li>
         <li>
@@ -236,9 +238,9 @@ const bwTable = [
         months from general availability, Oct 2017 – Apr 2026 (the
         archive's edge — the live CCIR panel continues from there), shared
         scales across panels. Every series starts at general availability;
-        the flat run-in marks months before archive entry (one to six, per
-        §03), counted as zero revenue — recovery is understated by
-        construction. Elections per §02; sources and repair per the
+        dashed months before archive entry (one to six, per §03) assume
+        the first observed rate held from GA. Elections per §02; sources
+        and repair per the
         <a href="/research/rental-rates-by-generation">cohort note</a>;
         MSRP figures per §01.
       </figcaption>
@@ -306,9 +308,11 @@ const bwTable = [
         direct non-power costs plus unallocated corporate land in the same
         range; Nebius's scale-out spend sits above it). Costs exclude
         depreciation and financing; months where the net rate falls below
-        zero are floored at zero. The question a payback calculation asks
-        of an initial outlay: how long did each generation's net stream
-        take to add up to its own MSRP?
+        zero are floored at zero; months between general availability and
+        archive entry assume the first observed rate held from GA (drawn
+        dashed). The question a payback calculation asks of an initial
+        outlay: how long did each generation's net stream take to add up
+        to its own MSRP?
       </p>
       <div class="twrap">
         <table>
@@ -322,8 +326,8 @@ const bwTable = [
       </div>
       <p>
         Net of everything, <strong>V100 crossed at 31 months and stands at
-        1.82× its MSRP at the window's edge; A100 crossed at 51 months and
-        stands at 1.29×; H100, at 42 months old, stands at 0.76× and has
+        1.85× its MSRP at the window's edge; A100 crossed at 37 months and
+        stands at 1.53×; H100, at 42 months old, stands at 0.83× and has
         not yet crossed</strong> — paces at or inside the 3-to-5-year
         amortization schedules lenders in this market actually write, with
         only the two oldest generations through. H200 and B200 are 24 and
@@ -333,9 +337,9 @@ const bwTable = [
       </p>
       <p>
         Sensitivity. Across the published facility band ($0.64–0.87 per
-        TDP-kW-hr), V100 crosses at 30–33 months, A100 at 48–56, and H100
-        ends its window at 0.68–0.82×. A realization of 0.40 moves V100 to
-        45 months and leaves A100 at 0.92× at 71 months. Late in life the
+        TDP-kW-hr), V100 crosses at 29–32 months, A100 at 34–40, and H100
+        ends its window at 0.75–0.90×. A realization of 0.40 moves V100 to
+        43 months and A100 to 62. Late in life the
         facility floor binds — a chip's watts do not fall with its rent —
         and the oldest V100 months run near cash breakeven, visible as the
         flattening at the right edge of its panel.
@@ -348,8 +352,8 @@ const bwTable = [
         power, no facility. It is gross revenue, not margin, and not a
         forward figure; each window contains the demand episodes documented
         in the cohort note. It is the ceiling the elections above discount
-        — and the one figure on the page with no elections at all, a ratio
-        of two posted prices:
+        — and the figure with no cost elections, a ratio of two posted
+        prices (the pre-entry backfill assumption applies here too):
       </p>
       <div class="twrap">
         <table>
@@ -364,7 +368,7 @@ const bwTable = [
       <p class="tfoot">
         100% utilization · 24×7 · posted list · before all costs. For nine
         years, across a 3.5× range of anchors, the idealized answer has
-        stayed inside 11–17 months.
+        stayed inside 8–14 months.
       </p>
       <p>
         The same panels, gross — cumulative posted-rate revenue divided by

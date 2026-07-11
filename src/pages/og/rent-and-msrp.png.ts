@@ -16,12 +16,12 @@ const SPEC = {
     [
       "Net, all-in",
       "Realization, facility rent, and overhead per filings",
-      "V100 31mo · A100 51mo · H100 not yet"
+      "V100 31mo · A100 37mo · H100 not yet"
     ],
     [
       "Gross ceiling",
       "Posted-rate revenue passed MSRP, every generation",
-      "11–17 mo"
+      "8–14 mo"
     ],
     [
       "The rule",
