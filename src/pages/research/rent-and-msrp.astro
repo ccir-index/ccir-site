@@ -12,7 +12,7 @@ import ratios from '../../data/rent_ratio_panels.json';
 // the age axis; each has its own linear y scale.
 const AGE_MAX = 106;
 const YMAX = 7.2;
-const YMAX_NET = 2.7;
+const YMAX_NET = 1.8;
 const CW = 340, CH = 205, PL = 32, PR = 14, PT = 12, PB = 24;
 const iw = CW - PL - PR, ih = CH - PT - PB;
 const cx = (a: number) => PL + (a / AGE_MAX) * iw;
@@ -74,7 +74,7 @@ const series = CHIPS.map((c) => {
   };
 });
 const yTicks = [1, 3, 5, 7];
-const yTicksNet = [1, 2];
+const yTicksNet = [0.5, 1, 1.5];
 // Straight-line recovery paces on the net panels: cum = age/36 (3-yr) and
 // age/60 (5-yr) — straight diagonals on linear axes.
 const PACE = [
@@ -102,14 +102,18 @@ const payback = [
   { gen: 'B200', ga: 'Dec 2024', months: '16', cum: '$67,900', mult: '1.1×' },
 ];
 
-// Net elections, from published CCIR analysis: realization = 1/2 of posted (see /realized — filings
-// show realization well below rate cards); cash operating cost c = $0.75 per
-// TDP-kW-hr per chip (the chip-economics S04 worked-example election), chip
-// nameplate TDP. Same monthly panel arithmetic, recomputed under each.
+// Net elections (restated 2026-07-11), from filings-based analysis:
+// realization = 1/2 of posted (see /realized); all-in cash operating cost
+// = 1/2 of realized revenue (mid-point of the 40-55% cash-opex-to-revenue
+// band across disclosing operators — CRWV 10-K/10-Q, NBIS 6-K/20-F, IREN
+// 10-Q). Net cash = 0.25 x posted. Same monthly panel arithmetic.
+// Prior basis to 2026-07-11 ($0.75/TDP-kW-hr power+facility only, not
+// all-in): produced 24/36/40. Research-note restatement — page kicker
+// carries the date; no changelog entry (changelog = benchmark series only).
 const scenarios = [
-  { gen: 'V100', a: '11', b: '20', c: '24' },
-  { gen: 'A100', a: '15', b: '29', c: '36' },
-  { gen: 'H100', a: '14', b: '26', c: '40' },
+  { gen: 'V100', a: '11', b: '20', c: '40' },
+  { gen: 'A100', a: '15', b: '29', c: '60' },
+  { gen: 'H100', a: '14', b: '26', c: 'not yet (0.76× at 42mo)' },
   { gen: 'H200', a: '17', b: 'not yet (24mo window)', c: 'not yet' },
   { gen: 'B200', a: '16', b: 'not yet (16mo window)', c: 'not yet' },
 ];
@@ -133,29 +137,33 @@ const bwTable = [
 <Base
   title="Rent and MSRP: Five Generations of Posted Prices · CCIR Research"
   ogImage="/og/rent-and-msrp.png"
-  description="Posted GPU rental rates divided by MSRPs, 2017–2026: every generation's gross posted-rate revenue passed its MSRP within 11–17 months, and each entered with a year of rental hours priced near the machine's cost."
+  description="Posted GPU rental rates divided by MSRPs, 2017–2026. Net of realization and all-in cash operating costs from operator filings: V100 recovered MSRP in 40 months, A100 in 60, H100 not yet at 42. The gross ceiling at posted rates: 11–17 months."
   showTape={false}
 >
   <section class="wrap top">
     <header class="page-head">
-      <div class="kicker">Research · 2026-07-08 · window Oct 2017 – Apr 2026</div>
+      <div class="kicker">Research · 2026-07-08 · restated 2026-07-11 · window Oct 2017 – Apr 2026</div>
       <h1>Rent and MSRP: Five Generations of Posted Prices</h1>
       <p class="standfirst">
         This note divides each generation's posted rental rate by its
         manufacturer's suggested retail price (MSRP)
         — a ratio of two posted prices, every input dated and sourced
-        — for five generations, 2017–2026. Two regularities sit on the
+        — for five generations, 2017–2026. Three results sit on the
         surface:
       </p>
       <ul class="sf-list">
         <li>
-          At posted on-demand rates, every generation's cumulative gross
-          rental revenue passed its MSRP within <strong>11 to 17
-          months</strong> of general availability — MSRPs from $18,600 to
-          $64,400 per GPU, the same result. An idealized ceiling by
-          construction: §02 states every assumption and reruns the
-          arithmetic under the stated elections, where the answer is
-          roughly two to three and a half years.
+          Net of the elections stated in §02 — realization at half of
+          posted rates, and all-in cash operating costs at half of realized
+          revenue, both from operator filings — <strong>V100 recovered its
+          MSRP in 40 months and A100 in 60; H100, at 42 months, stands at
+          0.76× and has not yet crossed.</strong>
+        </li>
+        <li>
+          At posted on-demand rates with no cost line — an idealized
+          ceiling by construction — every generation's cumulative gross
+          revenue passed its MSRP within <strong>11 to 17 months</strong>
+          of general availability, MSRPs from $18,600 to $64,400 per GPU.
         </li>
         <li>
           The ratio at entry is close to one — each generation has arrived
@@ -176,28 +184,31 @@ const bwTable = [
           <div class="sm-panel">
             <div class="sm-head">
               <span class={`sm-chip lab-${s.cls}`}>{s.key}</span>
-              <span class="sm-val">{s.endVal.toFixed(1)}× MSRP recovered at {s.endAge}mo</span>
+              <span class="sm-val">net {s.nEndVal.toFixed(2)}× MSRP at {s.endAge}mo</span>
             </div>
             <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-                 aria-label={`Cumulative posted-rate revenue divided by MSRP for ${s.key}, rising with age in months; the 1.0 crossing marks gross payback${s.crossG ? ` at month ${s.crossG.mo}` : ''}. Ends at ${s.endVal.toFixed(1)} times MSRP at ${s.endAge} months. Other generations ghosted; dashed segments mark months with fewer than three providers.`}>
-              {yTicks.map((t) => (
+                 aria-label={`Cumulative net revenue under the stated elections divided by MSRP for ${s.key}, rising with age in months${s.crossN ? `; crosses full recovery at month ${s.crossN.mo}` : '; has not yet crossed full recovery'}. Dotted diagonals mark three-year and five-year straight-line recovery paces. Dashed segments mark months with fewer than three providers.`}>
+              {yTicksNet.map((t) => (
                 <g>
-                  <line x1={PL} x2={CW - PR} y1={cy(t)} y2={cy(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
-                  <text x={PL - 6} y={cy(t) + 3} class="tick" text-anchor="end">{t}×</text>
+                  <line x1={PL} x2={CW - PR} y1={cyN(t)} y2={cyN(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
+                  <text x={PL - 6} y={cyN(t) + 3} class="tick" text-anchor="end">{t}×</text>
+                </g>
+              ))}
+              {PACE.map((p) => (
+                <g>
+                  <line x1={p.x1} y1={p.y1} x2={p.x2} y2={p.y2} class="grid-pace" />
+                  <text x={p.x2 - 4} y={p.y2 + 12} class="pacelab" text-anchor="end">{p.label}</text>
                 </g>
               ))}
               {xTicks.map((a) => (
                 <text x={cx(a)} y={CH - 8} class="tick" text-anchor="middle">{a}mo</text>
               ))}
-              {series.filter((o) => o.key !== s.key).map((o) =>
-                o.ghost.map((d) => <path d={d} class="ln ln-ghost" />)
-              )}
-              {s.thin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
-              {s.solid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
-              {s.crossG && (
+              {s.nThin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
+              {s.nSolid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
+              {s.crossN && (
                 <g>
-                  <circle cx={s.crossG.x} cy={s.crossG.y} r="3.4" class={`enddot dot-${s.cls}`} />
-                  <text x={s.crossG.x + 7} y={s.crossG.y + 12} class={`crosslab lab-${s.cls}`} text-anchor="start">{s.crossG.mo}mo</text>
+                  <circle cx={s.crossN.x} cy={s.crossN.y} r="3.4" class={`enddot dot-${s.cls}`} />
+                  <text x={s.crossN.x + 7} y={s.crossN.y + 12} class={`crosslab lab-${s.cls}`} text-anchor="start">{s.crossN.mo}mo</text>
                 </g>
               )}
             </svg>
@@ -206,22 +217,24 @@ const bwTable = [
         <div class="sm-panel sm-key">
           <div class="sm-key-body">
             <p><strong>Reading the panels.</strong> The colored line is one
-            generation's cumulative posted-rate revenue divided by its MSRP,
-            rising with age in months from general availability. The other
-            four generations are ghosted for context.</p>
+            generation's cumulative net revenue — posted panel-median ×
+            ½ realization × (1 − cash-cost ratio) — divided by its MSRP,
+            rising with age in months from general availability. Elections
+            stated in §02.</p>
             <p>The emphasized line is <strong>1.0× — MSRP fully
-            recovered</strong>; the dot marks the crossing month, the gross
-            payback from the table below. Dashed segments = months with
+            recovered</strong>; the dot marks the net payback month. No dot
+            = not yet crossed within the window. Dotted diagonals =
+            <strong>3-year</strong> and <strong>5-year</strong>
+            straight-line recovery paces. Dashed segments = months with
             n&lt;3 providers.</p>
           </div>
         </div>
       </div>
       <figcaption class="tfoot">
-        Cumulative posted panel-median revenue ÷ MSRP (100% utilization,
-        posted list, before all costs — §02), by generation age in months
-        from general availability, Oct 2017 – Apr 2026 (the archive's edge —
-        the live CCIR panel continues from there), shared scales across
-        panels. Sources and repair per the
+        Cumulative net-of-elections revenue ÷ MSRP, by generation age in
+        months from general availability, Oct 2017 – Apr 2026 (the
+        archive's edge — the live CCIR panel continues from there), shared
+        scales across panels. Elections per §02; sources and repair per the
         <a href="/research/rental-rates-by-generation">cohort note</a>;
         MSRP figures per §01.
       </figcaption>
@@ -266,18 +279,65 @@ const bwTable = [
     </section>
 
     <section class="sec">
-      <h2><span class="n">02</span> Months to Gross Recovery</h2>
+      <h2><span class="n">02</span> Months to Recovery</h2>
       <p>
-        The assumptions first, because the headline figure is a ceiling by
-        construction: the arithmetic below assumes <strong>100% utilization,
-        24 hours a day, at the posted panel-median list rate, with no cost
-        line</strong> — no discounting, no idle hours, no power, no
-        facility. It is gross revenue, not margin, and not a forward figure;
-        each window contains the demand episodes documented in the cohort
-        note. It answers one narrow question — the one a payback calculation
-        asks of an initial outlay: at the prices providers themselves
-        posted, how long did a generation's gross rental stream take to add
-        up to its own MSRP?
+        The elections first. The net figures — the chart above and the
+        first column below — use two inputs, both from filings-based
+        analysis. First, a realization factor of one-half:
+        filings analyzed on <a href="/realized/">/realized</a> show
+        operators realizing well below their posted rate cards once
+        utilization, discounting, and mix are in the number. Second, an
+        all-in cash operating cost of one-half of realized revenue — the
+        mid-point of the 40–55% cash-cost-to-revenue band measured across
+        the operators whose filings disclose it: CoreWeave at 41–44%
+        (all-in cash, lease-heavy model), Nebius's AI-cloud segment at 55%
+        (scale-out spend included), IREN — which owns its sites — at 14%
+        direct cost with electricity alone at 5%. Costs exclude
+        depreciation and financing throughout. Net cash per posted dollar:
+        25 cents. The question a payback calculation asks of an initial
+        outlay: how long did each generation's net stream take to add up
+        to its own MSRP?
+      </p>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Generation</th><th class="num">Net, all-in elections</th><th class="num">At ½ realization only</th><th class="num">Gross at posted</th></tr></thead>
+          <tbody>
+            {scenarios.map((s) => (
+              <tr><td class="gen">{s.gen}</td><td class="num strong">{s.c}{s.c.length <= 2 ? ' mo' : ''}</td><td class="num dim">{s.b}{s.b.length <= 2 ? ' mo' : ''}</td><td class="num dim">{s.a} mo</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Net of everything, <strong>V100 crossed at 40 months and stands at
+        1.71× its MSRP at the window's edge; A100 crossed at 60 months and
+        stands at 1.17×; H100, at 42 months old, stands at 0.76× and has
+        not yet crossed</strong> — a pace inside the 3-to-5-year
+        amortization schedules lenders in this market actually write, but
+        not yet through them. H200 and B200 are 24 and 16 months into
+        their windows. These are elections, stated so the arithmetic can
+        be reproduced or re-elected; CCIR publishes the prices, not the
+        elections.
+      </p>
+      <p>
+        Sensitivity. At the lowest disclosed all-in ratio (CoreWeave's
+        ~41%), H100 reaches 0.91× by month 42; at the top of the band
+        (55%), V100 crosses at 47 months and A100 at 67. A realization of
+        0.40 at the mid-band cost leaves A100 at 0.94× at 71 months. One
+        structural caveat: a cost proportional to revenue understates the
+        fixed power floor on the oldest silicon — a chip's watts do not
+        fall with its rent.
+      </p>
+      <h3 class="sub">The ceiling by construction</h3>
+      <p>
+        The gross figure strips every cost and friction: <strong>100%
+        utilization, 24 hours a day, at the posted panel-median list rate,
+        with no cost line</strong> — no discounting, no idle hours, no
+        power, no facility. It is gross revenue, not margin, and not a
+        forward figure; each window contains the demand episodes documented
+        in the cohort note. It is the ceiling the elections above discount
+        — and the one figure on the page with no elections at all, a ratio
+        of two posted prices:
       </p>
       <div class="twrap">
         <table>
@@ -294,43 +354,9 @@ const bwTable = [
         years, across a 3.5× range of anchors, the idealized answer has
         stayed inside 11–17 months.
       </p>
-      <h3 class="sub">The same arithmetic, net</h3>
       <p>
-        Two elections, both taken from published CCIR work, restate the
-        figure on a net basis. First, a realization factor of
-        one-half — filings-based analysis on <a href="/realized/">/realized</a>
-        shows operators realizing well below their posted rate cards once
-        utilization, discounting, and mix are in the number. Second, a cash
-        operating cost of $0.75 per thermal-design-power (TDP) kW-hr per chip — the worked-example
-        election inside the cash band published on
-        <a href="/chip-economics">/chip-economics</a>, covering power and
-        facility. The same monthly panel arithmetic, recomputed under each:
-      </p>
-      <div class="twrap">
-        <table>
-          <thead><tr><th>Generation</th><th class="num">Gross at posted</th><th class="num">At ½ realization</th><th class="num">At ½ realization, less cash cost</th></tr></thead>
-          <tbody>
-            {scenarios.map((s) => (
-              <tr><td class="gen">{s.gen}</td><td class="num dim">{s.a} mo</td><td class="num strong">{s.b}{s.b.length <= 2 ? ' mo' : ''}</td><td class="num strong">{s.c}{s.c.length <= 2 ? ' mo' : ''}</td></tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p>
-        Under the stated elections, the three generations with full
-        windows recover MSRP in roughly <strong>two to three and a
-        half years</strong> — a range that sits directly on top of the 3-to-
-        5-year amortization schedules lenders in this market actually write.
-        H200 and B200 have not yet been on the market long enough to cross
-        on the net basis. These are elections, stated so the
-        arithmetic can be reproduced or re-elected; CCIR publishes the
-        prices, not the elections.
-      </p>
-      <p>
-        The same panels, under the elections — cumulative net revenue
-        (½ × posted, less cash cost) divided by MSRP. The dotted diagonals
-        are straight-line recovery paces: a fleet tracking the steeper one
-        recovers MSRP in three years; the shallower one, in five.
+        The same panels, gross — cumulative posted-rate revenue divided by
+        MSRP, the other generations ghosted for context:
       </p>
       <figure class="chart-fig">
         <div class="sm-grid">
@@ -338,31 +364,28 @@ const bwTable = [
             <div class="sm-panel">
               <div class="sm-head">
                 <span class={`sm-chip lab-${s.cls}`}>{s.key}</span>
-                <span class="sm-val">net {s.nEndVal.toFixed(2)}× MSRP at {s.endAge}mo</span>
+                <span class="sm-val">{s.endVal.toFixed(1)}× MSRP gross at {s.endAge}mo</span>
               </div>
               <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-                   aria-label={`Cumulative net revenue under the stated elections divided by MSRP for ${s.key}, rising with age in months${s.crossN ? `; crosses full recovery at month ${s.crossN.mo}` : '; has not yet crossed full recovery'}. Dotted diagonals mark three-year and five-year straight-line recovery paces.`}>
-                {yTicksNet.map((t) => (
+                   aria-label={`Cumulative posted-rate revenue divided by MSRP for ${s.key}, rising with age in months; the 1.0 crossing marks gross payback${s.crossG ? ` at month ${s.crossG.mo}` : ''}. Ends at ${s.endVal.toFixed(1)} times MSRP at ${s.endAge} months. Other generations ghosted; dashed segments mark months with fewer than three providers.`}>
+                {yTicks.map((t) => (
                   <g>
-                    <line x1={PL} x2={CW - PR} y1={cyN(t)} y2={cyN(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
-                    <text x={PL - 6} y={cyN(t) + 3} class="tick" text-anchor="end">{t}×</text>
-                  </g>
-                ))}
-                {PACE.map((p) => (
-                  <g>
-                    <line x1={p.x1} y1={p.y1} x2={p.x2} y2={p.y2} class="grid-pace" />
-                    <text x={p.x2 - 4} y={p.y2 + 12} class="pacelab" text-anchor="end">{p.label}</text>
+                    <line x1={PL} x2={CW - PR} y1={cy(t)} y2={cy(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
+                    <text x={PL - 6} y={cy(t) + 3} class="tick" text-anchor="end">{t}×</text>
                   </g>
                 ))}
                 {xTicks.map((a) => (
                   <text x={cx(a)} y={CH - 8} class="tick" text-anchor="middle">{a}mo</text>
                 ))}
-                {s.nThin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
-                {s.nSolid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
-                {s.crossN && (
+                {series.filter((o) => o.key !== s.key).map((o) =>
+                  o.ghost.map((d) => <path d={d} class="ln ln-ghost" />)
+                )}
+                {s.thin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
+                {s.solid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
+                {s.crossG && (
                   <g>
-                    <circle cx={s.crossN.x} cy={s.crossN.y} r="3.4" class={`enddot dot-${s.cls}`} />
-                    <text x={s.crossN.x + 7} y={s.crossN.y + 12} class={`crosslab lab-${s.cls}`} text-anchor="start">{s.crossN.mo}mo</text>
+                    <circle cx={s.crossG.x} cy={s.crossG.y} r="3.4" class={`enddot dot-${s.cls}`} />
+                    <text x={s.crossG.x + 7} y={s.crossG.y + 12} class={`crosslab lab-${s.cls}`} text-anchor="start">{s.crossG.mo}mo</text>
                   </g>
                 )}
               </svg>
@@ -370,22 +393,24 @@ const bwTable = [
           ))}
           <div class="sm-panel sm-key">
             <div class="sm-key-body">
-              <p><strong>Reading the panels.</strong> Cumulative net revenue
-              = (½ × posted panel-median − cash operating cost) × hours,
-              divided by MSRP; elections per this section. The <strong>1.0×
-              crossing</strong> (dot) is the net payback month from
-              the table above.</p>
-              <p>Dotted diagonals = <strong>3-year</strong> and
-              <strong>5-year</strong> straight-line recovery paces. Dashed
-              segments = months with n&lt;3 providers.</p>
+              <p><strong>Reading the panels.</strong> The colored line is
+              one generation's cumulative posted-rate revenue divided by
+              its MSRP, rising with age in months from general
+              availability. The other four generations are ghosted for
+              context.</p>
+              <p>The emphasized line is <strong>1.0× — MSRP fully
+              recovered</strong>; the dot marks the crossing month, the
+              gross payback from the table above. Dashed segments = months
+              with n&lt;3 providers.</p>
             </div>
           </div>
         </div>
         <figcaption class="tfoot">
-          Cumulative net-of-elections revenue ÷ MSRP, by generation age in
-          months from general availability, Oct 2017 – Apr 2026, shared
-          scales across panels. Same panel data as the gross chart; the
-          elections are stated in this section and are not CCIR publications.
+          Cumulative posted panel-median revenue ÷ MSRP (100% utilization,
+          posted list, before all costs), by generation age in months from
+          general availability, Oct 2017 – Apr 2026, shared scales across
+          panels. Same panel data as the net chart above; sources and
+          repair per the cohort note.
         </figcaption>
       </figure>
     </section>

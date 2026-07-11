@@ -6,22 +6,22 @@ export const prerender = true;
 // OG card for ccir.io/research/rent-and-msrp. Content mirrors the page; regenerate by editing here.
 const SPEC = {
   "kicker": "Research · note",
-  "right": "2026-07-08",
+  "right": "2026-07-08 · restated 07-11",
   "titleLines": [
     "Rent and MSRP: Five",
     "Generations of Posted Prices"
   ],
-  "sub": "Cumulative posted-rate revenue against the MSRP anchor, 2017–2026.",
+  "sub": "Cumulative rental revenue against the MSRP anchor, 2017–2026.",
   "rows": [
     [
-      "Gross",
-      "Posted-rate revenue passed MSRP, every generation",
-      "11–17 mo"
+      "Net, all-in",
+      "Realization and cash costs per operator filings",
+      "V100 40mo · A100 60mo · H100 not yet"
     ],
     [
-      "Net",
-      "Same arithmetic under stated elections",
-      "20–40 mo"
+      "Gross ceiling",
+      "Posted-rate revenue passed MSRP, every generation",
+      "11–17 mo"
     ],
     [
       "The rule",
