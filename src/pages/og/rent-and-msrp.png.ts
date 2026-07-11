@@ -19,7 +19,7 @@ const SPEC = {
       "11–17 mo"
     ],
     [
-      "Conservative",
+      "Net",
       "Same arithmetic under stated elections",
       "20–40 mo"
     ],

@@ -102,7 +102,7 @@ const payback = [
   { gen: 'B200', ga: 'Dec 2024', months: '16', cum: '$67,900', mult: '1.1×' },
 ];
 
-// Conservative elections: realization = 1/2 of posted (see /realized — filings
+// Net elections, from published CCIR analysis: realization = 1/2 of posted (see /realized — filings
 // show realization well below rate cards); cash operating cost c = $0.75 per
 // TDP-kW-hr per chip (the chip-economics S04 worked-example election), chip
 // nameplate TDP. Same monthly panel arithmetic, recomputed under each.
@@ -154,7 +154,7 @@ const bwTable = [
           months</strong> of general availability — MSRPs from $18,600 to
           $64,400 per GPU, the same result. An idealized ceiling by
           construction: §02 states every assumption and reruns the
-          arithmetic under conservative elections, where the answer is
+          arithmetic under the stated elections, where the answer is
           roughly two to three and a half years.
         </li>
         <li>
@@ -294,10 +294,10 @@ const bwTable = [
         years, across a 3.5× range of anchors, the idealized answer has
         stayed inside 11–17 months.
       </p>
-      <h3 class="sub">The same arithmetic, conservatively</h3>
+      <h3 class="sub">The same arithmetic, net</h3>
       <p>
-        Two elections make the figure conservative rather than idealized,
-        both taken from published CCIR work. First, a realization factor of
+        Two elections, both taken from published CCIR work, restate the
+        figure on a net basis. First, a realization factor of
         one-half — filings-based analysis on <a href="/realized/">/realized</a>
         shows operators realizing well below their posted rate cards once
         utilization, discounting, and mix are in the number. Second, a cash
@@ -317,12 +317,12 @@ const bwTable = [
         </table>
       </div>
       <p>
-        Under the conservative elections, the three generations with full
+        Under the stated elections, the three generations with full
         windows recover MSRP in roughly <strong>two to three and a
         half years</strong> — a range that sits directly on top of the 3-to-
         5-year amortization schedules lenders in this market actually write.
         H200 and B200 have not yet been on the market long enough to cross
-        under conservative assumptions. These are elections, stated so the
+        on the net basis. These are elections, stated so the
         arithmetic can be reproduced or re-elected; CCIR publishes the
         prices, not the elections.
       </p>
@@ -341,7 +341,7 @@ const bwTable = [
                 <span class="sm-val">net {s.nEndVal.toFixed(2)}× MSRP at {s.endAge}mo</span>
               </div>
               <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-                   aria-label={`Cumulative net revenue under the conservative elections divided by MSRP for ${s.key}, rising with age in months${s.crossN ? `; crosses full recovery at month ${s.crossN.mo}` : '; has not yet crossed full recovery'}. Dotted diagonals mark three-year and five-year straight-line recovery paces.`}>
+                   aria-label={`Cumulative net revenue under the stated elections divided by MSRP for ${s.key}, rising with age in months${s.crossN ? `; crosses full recovery at month ${s.crossN.mo}` : '; has not yet crossed full recovery'}. Dotted diagonals mark three-year and five-year straight-line recovery paces.`}>
                 {yTicksNet.map((t) => (
                   <g>
                     <line x1={PL} x2={CW - PR} y1={cyN(t)} y2={cyN(t)} class={t === 1 ? 'grid grid-one' : 'grid'} />
@@ -373,7 +373,7 @@ const bwTable = [
               <p><strong>Reading the panels.</strong> Cumulative net revenue
               = (½ × posted panel-median − cash operating cost) × hours,
               divided by MSRP; elections per this section. The <strong>1.0×
-              crossing</strong> (dot) is the conservative payback month from
+              crossing</strong> (dot) is the net payback month from
               the table above.</p>
               <p>Dotted diagonals = <strong>3-year</strong> and
               <strong>5-year</strong> straight-line recovery paces. Dashed
