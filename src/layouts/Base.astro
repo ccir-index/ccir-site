@@ -11,6 +11,8 @@ interface Props {
   showTape?: boolean;
   ogImage?: string;
   noindex?: boolean;
+  /** Research-note structured data: ISO dates; renders Article JSON-LD. */
+  article?: { published: string; modified?: string };
 }
 
 const {
@@ -23,6 +25,7 @@ const {
   showTape = false,
   ogImage = '/og-default.png',
   noindex = false,
+  article,
 } = Astro.props;
 
 const SITE = 'https://ccir.io';
@@ -32,6 +35,35 @@ const canonicalPath = Astro.url.pathname
   .replace(/\/$/, '') || '/';
 const canonical = new URL(canonicalPath, SITE).href;
 const ogImageUrl = ogImage ? new URL(ogImage, SITE).href : undefined;
+
+// Structured data. Organization + WebSite sitewide; Article on research
+// notes that pass the `article` prop (dateModified carries restatements).
+const ORG = {
+  '@type': 'Organization',
+  '@id': `${SITE}/#org`,
+  name: 'CCIR',
+  url: SITE,
+  logo: `${SITE}/favicon-192.png`,
+  description: 'Independent reference rates and research for the GPU compute market.',
+};
+const siteGraphLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [ORG, { '@type': 'WebSite', name: 'CCIR', url: SITE, publisher: { '@id': `${SITE}/#org` } }],
+});
+const articleLd = article
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: title,
+      description,
+      datePublished: article.published,
+      ...(article.modified ? { dateModified: article.modified } : {}),
+      author: { '@id': `${SITE}/#org` },
+      publisher: { '@id': `${SITE}/#org` },
+      mainEntityOfPage: canonical,
+      ...(ogImageUrl ? { image: ogImageUrl } : {}),
+    })
+  : null;
 ---
 <!doctype html>
 <html lang="en" data-theme="terminal">
@@ -52,6 +84,9 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE).href : undefined;
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
   {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+  <script is:inline type="application/ld+json" set:html={siteGraphLd} />
+  {articleLd && <script is:inline type="application/ld+json" set:html={articleLd} />}
+  <slot name="head" />
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />

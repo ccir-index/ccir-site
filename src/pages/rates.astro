@@ -54,6 +54,18 @@ function cellTitle(c: Rate): string {
   description="Daily guaranteed on-demand reference rates for GPU compute — Hyperscaler, Neocloud, and Marketplace median rates per chip."
   ogImage="/og/home.png"
 >
+  <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'CCIR GPU Compute Reference Rates',
+    description: 'Daily reference rates for GPU compute rental — chip × deployment class × interruptibility × commitment term × region — computed from publicly posted rates across a fixed provider panel under a published methodology.',
+    url: 'https://ccir.io/rates',
+    creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
+    temporalCoverage: '2026-04/..',
+    spatialCoverage: 'United States, European Union',
+    keywords: ['GPU rental rates', 'compute pricing', 'H100', 'H200', 'B200', 'reference rates', 'GPU-backed financing', 'AI infrastructure'],
+    isAccessibleForFree: true,
+  })} />
   <section class="wrap top">
     <header class="page-head">
       <div class="kicker">Reference Rates · US · {meta.as_of_date}</div>
