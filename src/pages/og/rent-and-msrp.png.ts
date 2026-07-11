@@ -15,8 +15,8 @@ const SPEC = {
   "rows": [
     [
       "Net, all-in",
-      "Realization and cash costs per operator filings",
-      "V100 40mo · A100 60mo · H100 not yet"
+      "Realization, facility rent, and overhead per filings",
+      "V100 31mo · A100 51mo · H100 not yet"
     ],
     [
       "Gross ceiling",

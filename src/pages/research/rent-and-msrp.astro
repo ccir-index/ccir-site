@@ -12,7 +12,7 @@ import ratios from '../../data/rent_ratio_panels.json';
 // the age axis; each has its own linear y scale.
 const AGE_MAX = 106;
 const YMAX = 7.2;
-const YMAX_NET = 1.8;
+const YMAX_NET = 2.0;
 const CW = 340, CH = 205, PL = 32, PR = 14, PT = 12, PB = 24;
 const iw = CW - PL - PR, ih = CH - PT - PB;
 const cx = (a: number) => PL + (a / AGE_MAX) * iw;
@@ -102,17 +102,16 @@ const payback = [
   { gen: 'B200', ga: 'Dec 2024', months: '16', cum: '$67,900', mult: '1.1×' },
 ];
 
-// Net elections (restated 2026-07-11), from filings-based analysis:
-// realization = 1/2 of posted (see /realized); all-in cash operating cost
-// = 1/2 of realized revenue (mid-point of the 40-55% cash-opex-to-revenue
-// band across disclosing operators — CRWV 10-K/10-Q, NBIS 6-K/20-F, IREN
-// 10-Q). Net cash = 0.25 x posted. Same monthly panel arithmetic.
-// Prior basis to 2026-07-11 ($0.75/TDP-kW-hr power+facility only, not
-// all-in): produced 24/36/40. Research-note restatement — page kicker
-// carries the date; no changelog entry (changelog = benchmark series only).
+// Net elections (hybrid lessee-basis model, restated 2026-07-11):
+// net/hr = max(1/2 posted x (1 - 20% overhead) - $0.75/TDP-kW-hr x chip
+// TDP, 0). Realization per /realized; facility = imputed rent, mid of the
+// chip-economics cash band, per chip nameplate TDP (owner-lessee
+// normalization); overhead = filings ex-lease (CRWV 10-K/10-Q, NBIS
+// 6-K/20-F, IREN 10-Q). Research-note restatement — page kicker carries
+// the date; no changelog entry (changelog = benchmark series only).
 const scenarios = [
-  { gen: 'V100', a: '11', b: '20', c: '40' },
-  { gen: 'A100', a: '15', b: '29', c: '60' },
+  { gen: 'V100', a: '11', b: '20', c: '31' },
+  { gen: 'A100', a: '15', b: '29', c: '51' },
   { gen: 'H100', a: '14', b: '26', c: 'not yet (0.76× at 42mo)' },
   { gen: 'H200', a: '17', b: 'not yet (24mo window)', c: 'not yet' },
   { gen: 'B200', a: '16', b: 'not yet (16mo window)', c: 'not yet' },
@@ -137,7 +136,7 @@ const bwTable = [
 <Base
   title="Rent and MSRP: Five Generations of Posted Prices · CCIR Research"
   ogImage="/og/rent-and-msrp.png"
-  description="Posted GPU rental rates divided by MSRPs, 2017–2026. Net of realization and all-in cash operating costs from operator filings: V100 recovered MSRP in 40 months, A100 in 60, H100 not yet at 42. The gross ceiling at posted rates: 11–17 months."
+  description="Posted GPU rental rates divided by MSRPs, 2017–2026. Net of realization, an imputed per-chip facility rent, and overhead from operator filings: V100 recovered MSRP in 31 months, A100 in 51, H100 not yet at 42. The gross ceiling at posted rates: 11–17 months."
   showTape={false}
 >
   <section class="wrap top">
@@ -154,10 +153,11 @@ const bwTable = [
       <ul class="sf-list">
         <li>
           Net of the elections stated in §02 — realization at half of
-          posted rates, and all-in cash operating costs at half of realized
-          revenue, both from operator filings — <strong>V100 recovered its
-          MSRP in 40 months and A100 in 60; H100, at 42 months, stands at
-          0.76× and has not yet crossed.</strong>
+          posted rates, an imputed per-chip facility rent, and overhead at
+          20% of realized revenue, from operator filings and published
+          CCIR work — <strong>V100 recovered its MSRP in 31 months and
+          A100 in 51; H100, at 42 months, stands at 0.76× and has not yet
+          crossed.</strong>
         </li>
         <li>
           At posted on-demand rates with no cost line — an idealized
@@ -217,10 +217,11 @@ const bwTable = [
         <div class="sm-panel sm-key">
           <div class="sm-key-body">
             <p><strong>Reading the panels.</strong> The colored line is one
-            generation's cumulative net revenue — posted panel-median ×
-            ½ realization × (1 − cash-cost ratio) — divided by its MSRP,
-            rising with age in months from general availability. Elections
-            stated in §02.</p>
+            generation's cumulative net revenue — ½ realization of the
+            posted panel-median, less an imputed facility rent scaled to
+            the chip's power draw and overhead at 20% of realized —
+            divided by its MSRP, rising with age in months from general
+            availability. Elections stated in §02.</p>
             <p>The emphasized line is <strong>1.0× — MSRP fully
             recovered</strong>; the dot marks the net payback month. No dot
             = not yet crossed within the window. Dotted diagonals =
@@ -285,21 +286,29 @@ const bwTable = [
       <h2><span class="n">02</span> Months to Recovery</h2>
       <p>
         The elections first. The net figures — the chart above and the
-        first column below — use two inputs, both from filings-based
-        analysis. First, a realization factor of one-half:
-        filings analyzed on <a href="/realized/">/realized</a> show
-        operators realizing well below their posted rate cards once
+        first column below — use three inputs. First, a realization factor
+        of one-half: filings analyzed on <a href="/realized/">/realized</a>
+        show operators realizing well below their posted rate cards once
         utilization, discounting, and mix are in the number. Second, an
-        all-in cash operating cost of one-half of realized revenue — the
-        mid-point of the 40–55% cash-cost-to-revenue band measured across
-        the operators whose filings disclose it: CoreWeave at 41–44%
-        (all-in cash, lease-heavy model), Nebius's AI-cloud segment at 55%
-        (scale-out spend included), IREN — which owns its sites — at 14%
-        direct cost with electricity alone at 5%. Costs exclude
-        depreciation and financing throughout. Net cash per posted dollar:
-        25 cents. The question a payback calculation asks of an initial
-        outlay: how long did each generation's net stream take to add up
-        to its own MSRP?
+        imputed facility rent per chip — $0.75 per thermal-design-power
+        (TDP) kW-hr, the mid-point of the cash band published on
+        <a href="/chip-economics">/chip-economics</a>, times each chip's
+        nameplate power draw. Operator cost bases differ by facility
+        strategy — a lessee's building is cash rent while an owner's is
+        capitalized and invisible to a cash measure — so every chip is
+        charged its facility at arm's length whether its operator owns or
+        rents: the owner-lessee normalization equity analysts applied to
+        airlines for decades, run in reverse because the outlay here is
+        the chip, not the fleet. Third, overhead at 20% of realized
+        revenue — the cash operating cost that remains once facility
+        payments are stripped from the filings that disclose it
+        (CoreWeave's cash opex ex-lease runs 19–20% of revenue; IREN's
+        direct non-power costs plus unallocated corporate land in the same
+        range; Nebius's scale-out spend sits above it). Costs exclude
+        depreciation and financing; months where the net rate falls below
+        zero are floored at zero. The question a payback calculation asks
+        of an initial outlay: how long did each generation's net stream
+        take to add up to its own MSRP?
       </p>
       <div class="twrap">
         <table>
@@ -312,24 +321,24 @@ const bwTable = [
         </table>
       </div>
       <p>
-        Net of everything, <strong>V100 crossed at 40 months and stands at
-        1.71× its MSRP at the window's edge; A100 crossed at 60 months and
-        stands at 1.17×; H100, at 42 months old, stands at 0.76× and has
-        not yet crossed</strong> — a pace inside the 3-to-5-year
-        amortization schedules lenders in this market actually write, but
-        not yet through them. H200 and B200 are 24 and 16 months into
-        their windows. These are elections, stated so the arithmetic can
-        be reproduced or re-elected; CCIR publishes the prices, not the
-        elections.
+        Net of everything, <strong>V100 crossed at 31 months and stands at
+        1.82× its MSRP at the window's edge; A100 crossed at 51 months and
+        stands at 1.29×; H100, at 42 months old, stands at 0.76× and has
+        not yet crossed</strong> — paces at or inside the 3-to-5-year
+        amortization schedules lenders in this market actually write, with
+        only the two oldest generations through. H200 and B200 are 24 and
+        16 months into their windows. These are elections, stated so the
+        arithmetic can be reproduced or re-elected; CCIR publishes the
+        prices, not the elections.
       </p>
       <p>
-        Sensitivity. At the lowest disclosed all-in ratio (CoreWeave's
-        ~41%), H100 reaches 0.91× by month 42; at the top of the band
-        (55%), V100 crosses at 47 months and A100 at 67. A realization of
-        0.40 at the mid-band cost leaves A100 at 0.94× at 71 months. One
-        structural caveat: a cost proportional to revenue understates the
-        fixed power floor on the oldest silicon — a chip's watts do not
-        fall with its rent.
+        Sensitivity. Across the published facility band ($0.64–0.87 per
+        TDP-kW-hr), V100 crosses at 30–33 months, A100 at 48–56, and H100
+        ends its window at 0.68–0.82×. A realization of 0.40 moves V100 to
+        45 months and leaves A100 at 0.92× at 71 months. Late in life the
+        facility floor binds — a chip's watts do not fall with its rent —
+        and the oldest V100 months run near cash breakeven, visible as the
+        flattening at the right edge of its panel.
       </p>
       <h3 class="sub">The ceiling by construction</h3>
       <p>
