@@ -67,8 +67,7 @@ const series = CHIPS.map((c) => {
     ghost: stepPaths(pts, () => true, yGross),
     endVal: last.cg, endAge: last.age,
     crossG: xg ? { x: cx(xg.age), y: cy(xg.cg), mo: xg.age } : null,
-    nSolid: stepPaths(pts, (n) => n >= 3, yNet),
-    nThin: stepPaths(pts, (n) => n < 3, yNet),
+    nFull: stepPaths(pts, () => true, yNet),
     nEndVal: last.cn,
     crossN: xn ? { x: cx(xn.age), y: cyN(xn.cn), mo: xn.age } : null,
   };
@@ -205,8 +204,7 @@ const bwTable = [
               {xTicks.map((a) => (
                 <text x={cx(a)} y={CH - 8} class="tick" text-anchor="middle">{a}mo</text>
               ))}
-              {s.nThin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
-              {s.nSolid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
+              {s.nFull.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
               {s.crossN && (
                 <g>
                   <circle cx={s.crossN.x} cy={s.crossN.y} r="3.4" class={`enddot dot-${s.cls}`} />
@@ -228,8 +226,7 @@ const bwTable = [
             recovered</strong>; the dot marks the net payback month. No dot
             = not yet crossed within the window. Dotted diagonals =
             <strong>3-year</strong> and <strong>5-year</strong>
-            straight-line recovery paces. Dashed segments = months with
-            n&lt;3 providers.</p>
+            straight-line recovery paces.</p>
           </div>
         </div>
       </div>
@@ -238,8 +235,8 @@ const bwTable = [
         months from general availability, Oct 2017 – Apr 2026 (the
         archive's edge — the live CCIR panel continues from there), shared
         scales across panels. Every series starts at general availability;
-        dashed months before archive entry (one to six, per §03) assume
-        the first observed rate held from GA. Elections per §02; sources
+        months before archive entry (one to six, per §03) assume the
+        first observed rate held from GA. Elections per §02; sources
         and repair per the
         <a href="/research/rental-rates-by-generation">cohort note</a>;
         MSRP figures per §01.
@@ -309,10 +306,9 @@ const bwTable = [
         range; Nebius's scale-out spend sits above it). Costs exclude
         depreciation and financing; months where the net rate falls below
         zero are floored at zero; months between general availability and
-        archive entry assume the first observed rate held from GA (drawn
-        dashed). The question a payback calculation asks of an initial
-        outlay: how long did each generation's net stream take to add up
-        to its own MSRP?
+        archive entry assume the first observed rate held from GA. The
+        question a payback calculation asks of an initial outlay: how long
+        did each generation's net stream take to add up to its own MSRP?
       </p>
       <div class="twrap">
         <table>
@@ -396,8 +392,7 @@ const bwTable = [
                 {series.filter((o) => o.key !== s.key).map((o) =>
                   o.ghost.map((d) => <path d={d} class="ln ln-ghost" />)
                 )}
-                {s.thin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
-                {s.solid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
+                {s.ghost.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
                 {s.crossG && (
                   <g>
                     <circle cx={s.crossG.x} cy={s.crossG.y} r="3.4" class={`enddot dot-${s.cls}`} />
@@ -416,8 +411,7 @@ const bwTable = [
               context.</p>
               <p>The emphasized line is <strong>1.0× — MSRP fully
               recovered</strong>; the dot marks the crossing month, the
-              gross payback from the table above. Dashed segments = months
-              with n&lt;3 providers.</p>
+              gross payback from the table above.</p>
             </div>
           </div>
         </div>
