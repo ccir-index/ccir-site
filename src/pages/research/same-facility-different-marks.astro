@@ -230,21 +230,6 @@ const f2Ticks = [0, 1, 2, 3, 4];
         holder's method; they do state these arithmetic facts.
       </p>
       <p>
-        <strong>The maturity columns disagree because the instrument doesn't
-        have one maturity.</strong> On the same CoreWeave facility, Great Elm
-        files 5/16/2030, PIMCO 5/16/2029, Carlyle 5/22/2029; the borrower's
-        own filings carry an August 2030 facility date with five-year,
-        per-draw terms. On Nscale's GPU-backed delayed-draw loan, Blue Owl
-        funds file a 2/2031 maturity while eighteen PIMCO registered funds
-        file 8/11/2032 for the same instrument — the first date is five years
-        from signing, the second five years from the draw window's close. A
-        delayed-draw facility whose every draw carries its own tenor and
-        amortization schedule has a signing date, a draw-window close, a
-        per-draw maturity and a facility final — and a single-date disclosure
-        column forces each reporting system to choose. The dates differ by
-        convention, not by error, and no primary document reconciles them.
-      </p>
-      <p>
         <strong>The rate context is moving fast under the paper.</strong>
         Disclosed spreads on new GPU-collateralized facilities have stepped
         from SOFR + 9.62 (July 2023) to a +1.75 to +2.25 cluster (spring
@@ -254,10 +239,85 @@ const f2Ticks = [0, 1, 2, 3, 4];
         spread, expected to live months rather than years, puts most of its
         present value in assumptions a filing does not disclose.
       </p>
+      <p class="footnote">
+        Holders also file different maturity dates for the same facilities
+        (on the CoreWeave facility: 5/16/2029, 5/22/2029, and 5/16/2030) —
+        a reporting-convention artifact of delayed-draw structures, whose
+        draws carry their own tenors; no primary document reconciles the
+        dates, and they do not explain the mark ordering.
+      </p>
     </section>
 
     <section class="sec">
-      <h2><span class="n">04</span> Method &amp; Limitations</h2>
+      <h2><span class="n">04</span> The Anatomy of the Mark</h2>
+      <p>
+        Why can honest valuations of the same loan sit four points apart? A
+        fair-value measurement on a performing private loan is, under the
+        accounting standard, an exit price — and in practice it is usually
+        produced by an income approach: discount the loan's remaining
+        contractual cash flows at the yield a market participant would
+        require today, over the loan's expected remaining life, calibrated to
+        the price the fund actually paid at entry. Observable transactions in
+        the same instrument, where they exist, take precedence over any
+        model. Three inputs, then: a market yield, an expected life, and a
+        calibration basis. Each is a place two valuation processes can
+        diverge while both remain defensible.
+      </p>
+      <p>
+        <strong>The market yield needs comparables, and compute has few.</strong>
+        An adviser marking a syndicated loan calibrates against a quoted
+        market; the liquid controls show what that anchor does — Zayo's five
+        holders land on two values 14 basis points apart, and one files the
+        position at Level 1/2 rather than Level 3. Compute credit has no
+        quoted market, and its primary prints are few and fast-moving:
+        disclosed spreads at signing fell from SOFR + 9.62 to a +1.75–2.25
+        cluster in under three years. Two comp sets drawn honestly from that
+        record can imply discount rates a point or more apart — which, on
+        multi-year paper, is points of price.
+      </p>
+      <p>
+        <strong>The expected life is the biggest single lever.</strong> A
+        loan paying an above-market coupon is worth more than par only for
+        as long as the coupon survives, and prepayable paper caps the upside
+        at par the day the borrower refinances. The CoreWeave facility pays
+        roughly three points a year over where new compute paper prints; at
+        that rate, one year of assumed remaining life is approximately the
+        entire gap between the lowest and highest filed marks. And expected
+        life is genuinely uncertain here: documented compute facilities have
+        resolved at a median of seven months from signing, with one issuer
+        refinancing three consecutive facilities inside sixteen months.
+        Whether a coupon survives to 2029 or to next spring is exactly the
+        kind of assumption a filing does not disclose and a model must make.
+      </p>
+      <p>
+        <strong>The calibration basis is visible in the arithmetic.</strong>
+        Valuation practice permits carrying a position at its calibrated
+        entry price absent evidence of change, and requires observable
+        transactions to be weighed when they occur. Both patterns appear in
+        this sample's filed numbers — fair value equal to amortized cost to
+        the dollar at some holders, quarter over quarter; fair value re-set
+        away from cost at others, including at the one holder that sold
+        during the period. The filings do not state any fund's method, and
+        this note does not infer one. What the coexistence of both patterns
+        on identical paper does establish is the absence of a shared
+        observable input that would force them together: in the quoted
+        controls, the anchor does that work; here there is nothing to anchor
+        to.
+      </p>
+      <p>
+        None of this requires a view on the collateral. Every mark in the
+        compute sample sits between 98 and 104, every position is
+        performing, and — as the ledger's collateral-treatment record shows —
+        every disclosed GPU schedule amortizes its collateral toward zero, so
+        a performing mark never has to price the hardware at all. The
+        disagreement is about the price of money against this collateral
+        class: the right spread, and how long the paper lives. Those are
+        precisely the two quantities this market does not yet publish.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> Method &amp; Limitations</h2>
       <p>
         Marks are reproduced from schedules of investments in 10-Q filings for
         the period ended 3/31/2026 (one 10-K), read July 2026; a mark is fair
@@ -336,5 +396,12 @@ const f2Ticks = [0, 1, 2, 3, 4];
     .range-line { stroke: var(--ink-faint); stroke-width: 2; opacity: 0.8; }
     .disp-label { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; fill: var(--accent); }
     .data-note { font-size: var(--fs-sm); color: var(--ink-dim); }
+    .footnote {
+      font-size: var(--fs-sm);
+      color: var(--ink-faint);
+      border-top: 1px solid var(--rule);
+      padding-top: 8px;
+      max-width: 74ch;
+    }
   </style>
 </Base>
