@@ -95,11 +95,11 @@ const f2Ticks = [0, 1, 2, 3, 4];
         a fair-value mark on every loan they hold. Where several unaffiliated
         managers hold the same facility, the filings put their marks side by
         side. At March 31, 2026, four advisers carried one GPU-backed CoreWeave
-        facility at 99.0, 100.0, 102.0 and 103.1 percent of par. A control set
-        of sixteen cross-held tranches across five sectors shows what is
-        normal: performing credit agrees to about a quarter of a point;
-        disagreement past three points appears only after a restructuring or
-        bankruptcy — and, in this sample, on performing compute paper.
+        facility at 99.0, 100.0, 102.0 and 103.1 percent of par. Sixteen
+        cross-held tranches across five sectors set the baseline. Performing
+        credit agrees to about a quarter of a point, and disagreement past
+        three points follows a restructuring or a bankruptcy. The exception
+        is performing compute paper.
       </p>
     </header>
 
@@ -292,7 +292,47 @@ const f2Ticks = [0, 1, 2, 3, 4];
     </section>
 
     <section class="sec">
-      <h2><span class="n">04</span> Method &amp; Limitations</h2>
+      <h2><span class="n">04</span> What Narrows the Range</h2>
+      <p>
+        Mark dispersion is not a permanent feature of a credit market; it is
+        a feature of a market's age. Each of the missing inputs above has a
+        known delivery mechanism, and each is visible in filings when it
+        arrives.
+      </p>
+      <p>
+        <strong>Anchors arrive with transactions.</strong> A trade in the
+        instrument outranks any model, and one is already visible in this
+        sample: the quarter's only seller files the group's only below-par
+        mark. A loan-level secondary market, syndication into quoted
+        markets, or securitization would generalize that effect — the
+        controls show both endpoints. Zayo's holders, with a quote to anchor
+        to, land within 14 basis points; and data-center lending, compute's
+        nearest predecessor, no longer appears as cross-held Level 3 loans
+        at all — it refinanced into rated, quoted securitization classes,
+        and the marks question left the loan books with it. GPU-backed
+        securitization has begun; each deal that prices converts a modeled
+        input into an observed one.
+      </p>
+      <p>
+        <strong>Inputs densify with the record.</strong> Every new signing
+        adds a spread comparable — the 2026 cluster at +1.75 to +2.25 is
+        already a tighter calibration set than the sparse 2023–2024 prints —
+        and every documented resolution adds an expected-life observation,
+        narrowing the assumption that currently accounts for the largest
+        share of the gap. Rating coverage, where it extends to this
+        collateral, adds a shared spread reference of its own.
+      </p>
+      <p>
+        Because each mechanism surfaces in public filings, the dispersion
+        itself is measurable quarter by quarter: the same facilities will be
+        marked again next quarter, by the same holders, on a growing record.
+        Whether the range narrows is not a matter of argument — it will be
+        on the record, one filing season at a time.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> Method &amp; Limitations</h2>
       <p>
         Marks are reproduced from schedules of investments in 10-Q filings for
         the period ended 3/31/2026 (one 10-K), read July 2026; a mark is fair
