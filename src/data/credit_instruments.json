@@ -4374,19 +4374,19 @@
    "issuer": "Nscale",
    "ticker": null,
    "issuer_type": "private",
-   "entity": null,
+   "entity": "Nscale Services UK Ltd",
    "name": "GPU-backed delayed-draw term loan (DDTL)",
    "instrument_type": "credit_facility",
    "size_usd_m": 1400,
-   "size_note": "Oversubscribed",
+   "size_note": "Oversubscribed. EDGAR-visible slices at 3/31/2026: Blue Owl BDC commitments $400M (OBDC $40M / OCIC $160M / OTF $200M; $16.6M par funded), PIMCO registered funds $350M par across 18 NPORT-P filers (Level 3, carried at par); LuminArx slice and remainder not EDGAR-visible. Draw window expires 8/2027 per Blue Owl 10-Qs",
    "rate": {
-    "kind": "undisclosed",
-    "value": null,
-    "note": null
+    "kind": "sofr_spread",
+    "value": 5,
+    "note": "3M SOFR + 5.00% as disclosed in Blue Owl BDC Q1-2026 10-Qs (OBDC acc 0001655888-26-000033, OCIC 0001812554-26-000027, OTF 0001747777-26-000019)"
    },
-   "maturity": "Undisclosed",
-   "maturity_note": null,
-   "seniority": "GPU-backed DDTL",
+   "maturity": "2031-02",
+   "maturity_note": "Per Blue Owl BDC Q1-2026 10-Qs (2/2031). Conflict reproduced as disclosed: 18 PIMCO fund NPORT-P filings (period 2026-03-31) report maturity 2032-08-11 for the same instrument (CUSIP BA000WQD0); no primary document reconciles the two",
+   "seniority": "First lien senior secured DDTL (per Blue Owl BDC Q1-2026 10-Qs)",
    "security": "Backed by GPUs, drawn as hardware deploys; funds clusters with signed customer contracts + pipeline (Norway, Portugal, Iceland, UK)",
    "lenders": [
     "Funds managed by PIMCO, Blue Owl, LuminArx + unnamed asset managers/banks",
@@ -4395,11 +4395,11 @@
    "status": "confirmed",
    "issued": "2026-02-12",
    "source": {
-    "doc": "Nscale release; Bloomberg",
+    "doc": "Nscale release; Bloomberg; terms from Blue Owl BDC Q1-2026 10-Qs and PIMCO NPORT-P filings",
     "date": "2026-02-12",
     "url": "https://www.nscale.com/press-releases/nscale-signs-1-4bn-delayed-draw-term-loan"
    },
-   "as_of": "2026-07-02"
+   "as_of": "2026-07-12"
   },
   {
    "id": "nscale-narvik",
