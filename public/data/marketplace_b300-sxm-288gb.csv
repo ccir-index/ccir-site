@@ -1,16 +1,4 @@
 as_of_date,collected_at,collection_window_id,source_name,source_display_name,silicon_id,gpu_model,form_factor,commitment_term,interruptibility,region,cheapest_usd_hour,median_usd_hour,n_listings,methodology_version
-2026-07-05,2026-07-05T10:59:54.190638+00:00,2026-07-04-1800,runpod_cluster,RunPod · Cluster,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,8.8680,,,v2.0.0
-2026-07-05,2026-07-05T10:59:54.190638+00:00,2026-07-04-1800,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.0.0
-2026-07-05,2026-07-05T10:59:54.190638+00:00,2026-07-04-1800,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.0.0
-2026-07-05,2026-07-05T13:14:29.595435+00:00,2026-07-05-0600,runpod_cluster,RunPod · Cluster,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,8.8680,,,v2.0.0
-2026-07-05,2026-07-05T13:14:29.595435+00:00,2026-07-05-0600,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.0.0
-2026-07-05,2026-07-05T13:14:29.595435+00:00,2026-07-05-0600,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.0.0
-2026-07-05,2026-07-05T16:01:43.013579+00:00,2026-07-05-1000,runpod_cluster,RunPod · Cluster,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,8.8680,,,v2.0.0
-2026-07-05,2026-07-05T16:01:43.013579+00:00,2026-07-05-1000,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.0.0
-2026-07-05,2026-07-05T16:01:43.013579+00:00,2026-07-05-1000,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.0.0
-2026-07-05,2026-07-05T19:04:48.434626+00:00,2026-07-05-1400,runpod_cluster,RunPod · Cluster,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,8.8680,,,v2.0.0
-2026-07-05,2026-07-05T19:04:48.434626+00:00,2026-07-05-1400,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.0.0
-2026-07-05,2026-07-05T19:04:48.434626+00:00,2026-07-05-1400,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.0.0
 2026-07-06,2026-07-06T07:04:46.730284+00:00,2026-07-05-1800,runpod_cluster,RunPod · Cluster,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,8.8680,,,v2.0.0
 2026-07-06,2026-07-06T07:04:46.730284+00:00,2026-07-05-1800,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.0.0
 2026-07-06,2026-07-06T07:04:46.730284+00:00,2026-07-05-1800,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.0.0
@@ -101,3 +89,6 @@ as_of_date,collected_at,collection_window_id,source_name,source_display_name,sil
 2026-07-11,2026-07-12T01:59:02.288244+00:00,2026-07-11-1800,runpod_cluster,RunPod · Cluster,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,8.8680,,,v2.0.0
 2026-07-11,2026-07-12T01:59:02.288244+00:00,2026-07-11-1800,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.0.0
 2026-07-11,2026-07-12T01:59:02.288244+00:00,2026-07-11-1800,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.0.0
+2026-07-12,2026-07-12T08:04:04.881197+00:00,2026-07-11-1800,runpod_cluster,RunPod · Cluster,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,8.8680,,,v2.0.0
+2026-07-12,2026-07-12T08:04:04.881197+00:00,2026-07-11-1800,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.0.0
+2026-07-12,2026-07-12T08:04:04.881197+00:00,2026-07-11-1800,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.0.0
