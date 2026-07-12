@@ -54,6 +54,14 @@ const panel = (head: string, sub: string, rows: [string, string, string][]) =>
     ),
   ]);
 
+// Same derivation as credit.astro so the card date can't drift from the page.
+const AS_OF =
+  creditData.instruments
+    .map((i: any) => i.as_of)
+    .filter(Boolean)
+    .sort()
+    .at(-1) ?? creditData._meta.as_of;
+
 export const GET: APIRoute = async () => {
   const nInstruments = creditData.instruments.length;
   const nIssuers = new Set(creditData.instruments.map((i: any) => i.issuer)).size;
@@ -71,7 +79,7 @@ export const GET: APIRoute = async () => {
     'Compute Credit Tracker',
     'The debt stack behind AI compute, as filed — every row links its filing.',
     body,
-    creditData._meta.as_of,
+    AS_OF,
   ));
   return new Response(png as BodyInit, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=3600' } });
 };

@@ -19,9 +19,17 @@ import Base from '../layouts/Base.astro';
 import creditData from '../data/credit_instruments.json';
 import CreditIssuanceChart from '../components/CreditIssuanceChart.astro';
 
-const AS_OF = creditData._meta.as_of;
 const instruments = creditData.instruments;
 const retired = creditData.retired;
+
+// "As of" = latest row-level verification date, so the kicker tracks the
+// ledger itself; _meta.as_of is only a fallback if rows ever lack the field.
+const AS_OF =
+  instruments
+    .map((i: any) => i.as_of)
+    .filter(Boolean)
+    .sort()
+    .at(-1) ?? creditData._meta.as_of;
 
 const byId = new Map(instruments.map((i: any) => [i.id, i]));
 function inst(id: string): any {
