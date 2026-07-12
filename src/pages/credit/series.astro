@@ -1,0 +1,586 @@
+---
+/*
+  /credit/series — Credit Reference Series (v1, launch bundle 2026-07-12).
+
+  The derived layer of the credit house: everything computed from the
+  instrument tracker (/credit) and from lender filings. Three series:
+    01 Spread at signing — disclosed spreads on GPU-collateralized
+       instruments, by signing date (the primary-market series).
+    02 Refi velocity — how long compute facilities actually stay
+       outstanding before resolution (documented dates only).
+    03 Filed marks — each SEC-reporting holder's fair-value mark on the
+       same facility, reproduced as filed; dispersion shown when two or
+       more unaffiliated advisers hold identical paper.
+
+  Boundary (load-bearing): CCIR reproduces filed numbers and computes only
+  arithmetic on them (a ratio, a month count, a max−min). Nothing on this
+  page is a CCIR valuation, estimate, or opinion of value.
+*/
+import Base from '../../layouts/Base.astro';
+import creditData from '../../data/credit_instruments.json';
+import filedMarks from '../../data/filed_marks.json';
+import refiVelocity from '../../data/refi_velocity.json';
+
+const instruments = creditData.instruments;
+
+// as-of: latest row-level as_of across tracker + marks period (same
+// derivation rule as /credit — the data, not the build clock).
+const AS_OF =
+  [
+    ...instruments.map((i: any) => i.as_of).filter(Boolean),
+    (filedMarks as any)._meta.period,
+  ].sort().at(-1);
+
+// --- 01 spread at signing ---------------------------------------------------
+// GPU-collateralized in-scope rows (tracker's issuance criterion) that
+// disclose a SOFR spread and a signing date.
+const inScope = instruments.filter(
+  (i: any) => !i.exclude_from_issuance && typeof i.size_usd_m === 'number' && i.size_usd_m > 0
+);
+const spreadRows = inScope
+  .filter((i: any) => i.rate?.kind === 'sofr_spread' && i.rate.value != null && /^\d{4}/.test(i.issued ?? ''))
+  .map((i: any) => ({
+    issued: i.issued,
+    issuer: i.issuer,
+    name: i.name,
+    spread: i.rate.value,
+    size: i.size_usd_m,
+    url: i.source?.url,
+    status: i.status,
+  }))
+  .sort((a: any, b: any) => a.issued.localeCompare(b.issued));
+
+// --- 02 refi velocity --------------------------------------------------------
+const refiRows = (refiVelocity as any).rows ?? [];
+const refiInsufficient = (refiVelocity as any).insufficient ?? [];
+function median(xs: number[]): number | null {
+  if (!xs.length) return null;
+  const s = [...xs].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+const refiMonthsAll = refiRows.map((r: any) => r.months_outstanding).filter((x: any) => typeof x === 'number');
+const refiMonthsNonBridge = refiRows
+  .filter((r: any) => r.resolution_type !== 'bridge_takeout')
+  .map((r: any) => r.months_outstanding)
+  .filter((x: any) => typeof x === 'number');
+const refiMedianAll = median(refiMonthsAll);
+const refiMedianNonBridge = median(refiMonthsNonBridge);
+
+// --- 03 filed marks ----------------------------------------------------------
+const marks = (filedMarks as any).marks;
+const byId = new Map(instruments.map((i: any) => [i.id, i]));
+
+// facility grouping: mapped rows group by ledger instrument; unmapped rows
+// group by borrower + economics (rate + maturity), never by each holder's
+// own instrument label — labels differ across filers for identical paper.
+function facilityKey(m: any): string {
+  if (m.ccir_instrument_id) return m.ccir_instrument_id;
+  const t = m.tranche ?? {};
+  const entity = m.borrower_entity.split('(')[0].trim().toLowerCase().replace(/,? (llc|inc|ltd|corp).*$/, '');
+  const rate = t.rate_kind === 'fixed' ? `fx${t.all_in_pct}` : `fl${t.spread_pct}`;
+  return `${entity}|${rate}|${(t.maturity_as_filed ?? '').slice(0, 7)}`;
+}
+function facilityLabel(m: any): string {
+  const row = m.ccir_instrument_id ? byId.get(m.ccir_instrument_id) : null;
+  if (row) return `${row.issuer} — ${row.name}`;
+  const entity = m.borrower_entity.split('(')[0].trim().replace(/,$/, '');
+  const inst = (m.tranche?.instrument ?? '').split(';')[0].trim();
+  return inst ? `${entity} — ${inst}` : entity;
+}
+const facilityOrder: string[] = [];
+const facilities = new Map<string, any[]>();
+for (const m of marks) {
+  const k = facilityKey(m);
+  if (!facilities.has(k)) {
+    facilities.set(k, []);
+    facilityOrder.push(k);
+  }
+  facilities.get(k)!.push(m);
+}
+function dispersion(rows: any[]): { n: number; spread: number } | null {
+  const byAdviser = new Map<string, number>();
+  for (const r of rows) {
+    if (r.mark_pct == null || !r.funded) continue;
+    // one mark per adviser: principal-weighted not needed at this n; last write wins
+    // is avoided by averaging.
+    const prev = byAdviser.get(r.adviser);
+    byAdviser.set(r.adviser, prev == null ? r.mark_pct : (prev + r.mark_pct) / 2);
+  }
+  if (byAdviser.size < 2) return null;
+  const vals = [...byAdviser.values()];
+  return { n: byAdviser.size, spread: Math.max(...vals) - Math.min(...vals) };
+}
+function fmtK(x: number | null): string {
+  if (x == null) return '—';
+  return x.toLocaleString('en-US', { maximumFractionDigits: 1 });
+}
+function fmtMark(x: number | null): string {
+  return x == null ? '—' : x.toFixed(2);
+}
+function rateText(t: any): string {
+  if (!t) return '—';
+  if (t.rate_kind === 'fixed') return `${t.all_in_pct?.toFixed(2)}% fixed`;
+  if (t.spread_pct != null)
+    return `${t.reference ?? 'SOFR'} + ${t.spread_pct.toFixed(2)}%${t.all_in_pct != null ? ` (${t.all_in_pct.toFixed(2)}%)` : ''}`;
+  return '—';
+}
+const marksPeriod = (filedMarks as any)._meta.period;
+const nHolders = new Set(marks.map((m: any) => m.holder)).size;
+---
+
+<Base
+  title="Credit Reference Series — CCIR"
+  description="Derived reference series for compute credit: spread at signing, refi velocity, and lender-filed fair-value marks — computed only from filed numbers."
+>
+  <nav class="apps-navband" aria-label="credit section">
+    <div class="wrap apps-nav-inner">
+      <span class="hub-group">
+        <a class="apps-nav-link hub-link" href="/credit">Instruments</a>
+        <span class="hub-sep" aria-hidden="true">·</span>
+        <span class="apps-nav-link hub-link hub-on">Series</span>
+      </span>
+      <span class="hub-divider" aria-hidden="true"></span>
+      <a class="apps-nav-link" href="#spreads">Spread at signing</a>
+      <a class="apps-nav-link" href="#refi-velocity">Refi velocity</a>
+      <a class="apps-nav-link" href="#filed-marks">Filed marks</a>
+      <a class="apps-nav-link" href="#methodology">Method</a>
+    </div>
+  </nav>
+
+  <section class="wrap top">
+    <div class="hero-solo">
+      <div class="kicker">Market Intelligence · Compute Credit · as of {AS_OF}</div>
+      <h1>Credit Reference Series</h1>
+      <p class="standfirst lede">
+        The derived layer of the credit record. The
+        <a href="/credit">instrument tracker</a> reproduces each facility as
+        filed; this page computes from it — and from the schedules of
+        investments of SEC-reporting funds that hold the same paper. Three
+        series: the spread each GPU-collateralized facility signed at, how
+        long facilities actually stay outstanding, and the fair-value marks
+        different lenders file on identical instruments. Every number here is
+        either reproduced from a primary document or is arithmetic on two
+        filed figures — a ratio, a month count, a max−min.
+        <em>Nothing on this page is a CCIR valuation.</em>
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= 01 SPREAD AT SIGNING ================= -->
+  <section class="wrap" id="spreads">
+    <h2><span class="n">01</span> Spread at Signing</h2>
+    <p class="sec-lede">
+      Disclosed spreads on GPU-collateralized instruments, ordered by signing
+      date — the primary-market series. Of the {inScope.length} instruments in
+      the tracker's issuance scope, {spreadRows.length} disclose a floating
+      spread and a signing date; the rest are fixed-coupon (see the
+      <a href="/credit#coupons">coupon section</a> of the tracker) or file the
+      rate as undisclosed, and undisclosed stays undisclosed.
+      <a class="csv-link" href="/credit/series/spreads.csv">series CSV ↓</a>
+    </p>
+    <div class="table-scroll">
+      <table class="series-table">
+        <thead>
+          <tr>
+            <th>Signed</th><th>Issuer</th><th>Instrument</th>
+            <th class="num">Spread (pp over SOFR)</th><th class="num">Size ($M)</th><th>Status</th><th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          {spreadRows.map((r: any) => (
+            <tr>
+              <td class="mono">{r.issued}</td>
+              <td>{r.issuer}</td>
+              <td class="c-inst">{r.name}</td>
+              <td class="num mono">+{r.spread.toFixed(2)}</td>
+              <td class="num mono">{r.size.toLocaleString('en-US')}</td>
+              <td><span class={`chip chip-${r.status}`}>{r.status}</span></td>
+              <td class="c-srclink">{r.url && <a href={r.url} target="_blank" rel="noopener noreferrer">doc ↗</a>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="tbl-note">
+      Spreads are at signing, as disclosed — this series does not restate,
+      interpolate, or update a spread after the signing document. Amendments
+      that reprice a facility appear as their own disclosed events.
+    </p>
+  </section>
+
+  <!-- ================= 02 REFI VELOCITY ================= -->
+  <section class="wrap" id="refi-velocity">
+    <h2><span class="n">02</span> Refi Velocity</h2>
+    <p class="sec-lede">
+      How long compute-sector facilities actually stay outstanding. Each row
+      is a resolved facility where both the signing date and the resolution
+      date are documented in primary sources; months outstanding is the count
+      between the two. Borrower-side resolutions only — a fund selling its
+      position is not a resolution. Bridges are reported but carry their
+      design tenor, so the headline median excludes them.
+    </p>
+    {refiRows.length === 0 ? (
+      <p class="pending">Evidence table in final verification — publishing with the launch build.</p>
+    ) : (
+      <>
+        <div class="stat-line">
+          <span class="stat">
+            <span class="stat-num">{refiMedianNonBridge?.toFixed(0)}</span>
+            <span class="stat-label">median months outstanding, ex-bridges (n={refiMonthsNonBridge.length})</span>
+          </span>
+          <span class="stat">
+            <span class="stat-num">{refiMedianAll?.toFixed(0)}</span>
+            <span class="stat-label">median incl. bridges (n={refiMonthsAll.length})</span>
+          </span>
+        </div>
+        <div class="table-scroll">
+          <table class="series-table">
+            <thead>
+              <tr>
+                <th>Facility</th><th>Issuer</th><th class="num">Size ($M)</th>
+                <th>Signed</th><th>Resolved</th><th class="num">Months</th>
+                <th>Resolution</th><th>Taken out by</th><th>Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              {refiRows.map((r: any) => (
+                <tr>
+                  <td class="c-inst">{r.facility}</td>
+                  <td>{r.issuer}</td>
+                  <td class="num mono">{r.size_usd_m ? r.size_usd_m.toLocaleString('en-US') : '—'}</td>
+                  <td class="mono">{r.issued}</td>
+                  <td class="mono">{r.resolved}</td>
+                  <td class="num mono">{r.months_outstanding}</td>
+                  <td class="mono res-type">{(r.resolution_type ?? '').replace(/_/g, ' ')}</td>
+                  <td class="c-inst">{r.takeout_instrument ?? '—'}</td>
+                  <td class="c-srclink">{r.sources?.[0]?.url && <a href={r.sources[0].url} target="_blank" rel="noopener noreferrer">doc ↗</a>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {refiInsufficient.length > 0 && (
+          <p class="tbl-note">
+            {refiInsufficient.length} additional resolved facilities are excluded
+            because one of the two dates cannot yet be documented; they are
+            listed in the method note rather than estimated.
+          </p>
+        )}
+      </>
+    )}
+  </section>
+
+  <!-- ================= 03 FILED MARKS ================= -->
+  <section class="wrap" id="filed-marks">
+    <h2><span class="n">03</span> Filed Marks</h2>
+    <p class="sec-lede">
+      Fair-value marks filed by SEC-reporting funds on compute-credit
+      facilities, reproduced from each holder's schedule of investments
+      (period {marksPeriod}; {nHolders} holders). Where two or more
+      unaffiliated advisers hold the same facility, the panel shows the
+      max−min spread of their filed marks. The mark column is the ratio of
+      two filed numbers — fair value over principal — and nothing more.
+      Marks are each fund's own, determined by its valuation designee under
+      its own policies; conflicting filed terms across holders are reproduced,
+      not reconciled.
+    </p>
+    {facilityOrder.map((k) => {
+      const rows = facilities.get(k)!;
+      const disp = dispersion(rows);
+      const notes = [...new Set(rows.map((r: any) => r.notes).filter(Boolean))];
+      return (
+        <div class="facility">
+          <div class="facility-head">
+            <span class="facility-name">{facilityLabel(rows[0])}</span>
+            <span class="facility-rate mono">{rateText(rows[0].tranche)}</span>
+            {disp && (
+              <span class="facility-disp mono">
+                {disp.spread.toFixed(2)} pts max−min · {disp.n} advisers
+              </span>
+            )}
+          </div>
+          <div class="table-scroll">
+            <table class="series-table marks-table">
+              <thead>
+                <tr>
+                  <th>Holder</th><th>Filing</th>
+                  <th class="num">Principal ($k)</th><th class="num">Cost ($k)</th>
+                  <th class="num">Fair value ($k)</th><th class="num">Mark (% of par)</th>
+                  <th>Flags</th><th>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((m: any) => (
+                  <tr>
+                    <td class="c-holder">{m.holder}</td>
+                    <td class="mono">{m.filing.form} · {m.filing.period_end}</td>
+                    <td class="num mono">{fmtK(m.principal_k)}</td>
+                    <td class="num mono">{fmtK(m.cost_k)}</td>
+                    <td class="num mono">{fmtK(m.fair_value_k)}</td>
+                    <td class="num mono mark-cell">{fmtMark(m.mark_pct)}</td>
+                    <td class="c-flags">
+                      {m.level3 && <span class="chip chip-l3">level 3</span>}
+                      {m.transacted_qtr && <span class="chip chip-transacted">transacted</span>}
+                      {!m.funded && <span class="chip chip-unfunded">unfunded</span>}
+                      {m.funded && m.unfunded_k != null && <span class="chip chip-unfunded">part-drawn</span>}
+                    </td>
+                    <td class="c-srclink"><a href={m.filing.url} target="_blank" rel="noopener noreferrer">10-Q ↗</a></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {notes.length > 0 && (
+            <ul class="facility-notes">
+              {notes.map((n) => <li>{n}</li>)}
+            </ul>
+          )}
+        </div>
+      );
+    })}
+    <p class="tbl-note">
+      Coverage is holders that file schedules of investments with the SEC
+      (business development companies and registered funds); bank and private
+      lenders do not publish marks. Marks refresh with each quarterly filing
+      cycle.
+    </p>
+  </section>
+
+  <!-- ================= METHOD ================= -->
+  <section class="wrap" id="methodology">
+    <h2>Sources &amp; method</h2>
+    <div class="method">
+      <p>
+        <strong>Derivation boundary.</strong> Every value on this page is
+        either reproduced verbatim from a primary document (an SEC filing or
+        an issuer/lender release, linked on the row) or is arithmetic on two
+        such values: mark = fair value ÷ principal; months outstanding =
+        resolution date − signing date; dispersion = maximum − minimum of
+        filed marks. CCIR does not estimate, interpolate, model, or opine on
+        value. Where holders file conflicting terms for the same facility,
+        both are reproduced and the conflict is noted.
+      </p>
+      <p>
+        <strong>Spread at signing.</strong> Instruments from the
+        <a href="/credit">tracker's</a> issuance scope (GPU-collateralized,
+        disclosed size) whose signing documents state a floating spread.
+        Spreads are not updated after signing; repricings enter as new
+        disclosed events.
+      </p>
+      <p>
+        <strong>Refi velocity.</strong> A facility enters only when both its
+        signing and resolution dates are documented; facilities missing one
+        date are counted and named but not estimated. Resolution types are
+        taken from the resolving document. Bridge facilities are shown but
+        excluded from the headline median, since their tenor is by design.
+      </p>
+      <p>
+        <strong>Filed marks.</strong> Rows are reproduced from schedules of
+        investments in holder 10-Qs/10-Ks, at each filing's stated period end
+        and units. One row per holder per tranche; positions held through
+        joint-venture vehicles are flagged, as their marks may not be
+        independent of the venture partners. Marks on facilities with large
+        undrawn commitments can embed netted fees and original-issue discount
+        in a small funded balance — those rows are flagged rather than
+        adjusted. Fund-level exits (a holder selling its position) appear as
+        <span class="chip chip-transacted">transacted</span> flags here and do
+        not enter refi velocity.
+      </p>
+      <p>
+        <strong>Cadence.</strong> The marks panel refreshes with the quarterly
+        BDC/registered-fund filing cycle; spread and refi series update as
+        signing or resolving documents are filed. This page carries
+        reference-series governance: series definitions do not change without
+        a dated method note.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .top { padding-top: 28px; }
+
+  .apps-navband {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: var(--bg);
+    border-bottom: 1px solid var(--rule);
+  }
+  .apps-nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+  .apps-nav-inner::-webkit-scrollbar { display: none; }
+  .apps-nav-link {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    color: var(--ink-dim);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
+  .hub-group { display: inline-flex; align-items: center; gap: 10px; }
+  .hub-link { font-weight: var(--weight-strong); }
+  .hub-on { color: var(--accent); }
+  .hub-sep { color: var(--ink-faint); }
+  .hub-divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--rule-2);
+    flex-shrink: 0;
+  }
+  #spreads, #refi-velocity, #filed-marks, #methodology { scroll-margin-top: 52px; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: var(--fs-hero);
+    line-height: var(--lh-display);
+    font-weight: var(--weight-display);
+    margin: 6px 0 14px;
+    letter-spacing: -0.01em;
+  }
+  h2 { font-size: var(--fs-2xl); margin: 0 0 10px; }
+  h2 .n { color: var(--accent); margin-right: 10px; font-family: var(--font-mono); font-size: 0.8em; }
+  .lede { font-size: var(--fs-lg); }
+  .lede em { font-style: italic; color: var(--accent); }
+  .hero-solo { margin-bottom: 26px; max-width: 84ch; }
+
+  section.wrap { margin-bottom: 44px; }
+  .sec-lede {
+    max-width: 84ch;
+    color: var(--ink-dim);
+    line-height: 1.55;
+    margin: 0 0 14px;
+  }
+  .csv-link {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+  .pending {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--ink-faint);
+    border: 1px dashed var(--rule-2);
+    padding: 14px 16px;
+    max-width: 84ch;
+  }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--rule); }
+  .series-table { width: 100%; border-collapse: collapse; min-width: 880px; }
+  .series-table th {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-dim);
+    text-align: left;
+    padding: 8px 10px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule-2);
+    white-space: nowrap;
+  }
+  .series-table td {
+    font-size: var(--fs-sm);
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  .series-table tbody tr:last-child td { border-bottom: none; }
+  .series-table tbody tr:hover td { background: color-mix(in srgb, var(--surface-2) 70%, transparent); }
+  .series-table .num { text-align: right; }
+  .mono { font-family: var(--font-mono); }
+  .c-inst { max-width: 300px; }
+  .c-holder { white-space: nowrap; }
+  .c-srclink a { white-space: nowrap; }
+  .res-type { white-space: nowrap; }
+  .mark-cell { font-weight: var(--weight-strong); }
+
+  .stat-line { display: flex; gap: 36px; flex-wrap: wrap; margin: 4px 0 14px; }
+  .stat { display: flex; align-items: baseline; gap: 10px; }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: var(--fs-2xl);
+    font-weight: var(--weight-display);
+    color: var(--accent);
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .facility { margin-bottom: 26px; }
+  .facility-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .facility-name {
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    font-weight: var(--weight-display);
+  }
+  .facility-rate { font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.03em; }
+  .facility-disp {
+    margin-left: auto;
+    font-size: var(--fs-xs);
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    padding: 2px 8px;
+    white-space: nowrap;
+  }
+  .facility-notes {
+    margin: 8px 0 0;
+    padding-left: 18px;
+    max-width: 100ch;
+  }
+  .facility-notes li {
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    line-height: 1.5;
+    margin-bottom: 3px;
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border: 1px solid;
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+  .chip-confirmed { color: var(--pos); border-color: color-mix(in srgb, var(--pos) 55%, transparent); }
+  .chip-press { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 55%, transparent); }
+  .chip-rumored { color: var(--neutral); border-color: color-mix(in srgb, var(--neutral) 55%, transparent); }
+  .chip-l3 { color: var(--neutral); border-color: color-mix(in srgb, var(--neutral) 55%, transparent); }
+  .chip-transacted { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+  .chip-unfunded { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 55%, transparent); }
+
+  .tbl-note {
+    font-size: var(--fs-xs);
+    font-family: var(--font-mono);
+    color: var(--ink-faint);
+    margin-top: 8px;
+    max-width: 100ch;
+    line-height: 1.5;
+  }
+  .method p { max-width: 84ch; line-height: 1.6; margin: 0 0 12px; }
+</style>

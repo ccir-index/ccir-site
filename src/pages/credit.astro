@@ -436,6 +436,12 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
 >
   <nav class="apps-navband" aria-label="On this page">
     <div class="wrap apps-nav-inner">
+      <span class="hub-group">
+        <span class="apps-nav-link hub-link hub-on">Instruments</span>
+        <span class="hub-sep" aria-hidden="true">·</span>
+        <a class="apps-nav-link hub-link" href="/credit/series">Series</a>
+      </span>
+      <span class="hub-divider" aria-hidden="true"></span>
       <a class="apps-nav-link" href="#issuance">Issuance</a>
       <a class="apps-nav-link" href="#spreads">Spreads</a>
       <a class="apps-nav-link" href="#coupons">Coupons</a>
@@ -1020,6 +1026,17 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       white-space: nowrap;
     }
     .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
+    .apps-nav-inner { align-items: center; }
+    .hub-group { display: inline-flex; align-items: center; gap: 10px; }
+    .hub-link { font-weight: var(--weight-strong); }
+    .hub-on { color: var(--accent); }
+    .hub-sep { color: var(--ink-faint); }
+    .hub-divider {
+      width: 1px;
+      align-self: stretch;
+      background: var(--rule-2);
+      flex-shrink: 0;
+    }
     #issuance, #spreads, #coupons, #ledger,
     #collateral-treatment, #methodology { scroll-margin-top: 52px; }
     h1 {
