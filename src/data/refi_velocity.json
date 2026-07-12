@@ -1,0 +1,385 @@
+{
+  "_meta": {
+    "title": "Refi velocity — compute-sector debt facilities: documented time outstanding before borrower-side resolution",
+    "generated": "2026-07-12",
+    "discipline": "As-filed. Every row sources BOTH the issue/closing date and the resolution date to a primary document (SEC filing or company/lender release). Nothing estimated. Borrower-side resolutions only — holder exits excluded.",
+    "months_convention": "months_outstanding = whole months between documented dates. For day-precise pairs: complete calendar months elapsed (floored). When either date is month-precision: calendar-month difference, with the possible whole-month range stated in notes. null when the resolution date is only bracketed (see row notes).",
+    "scope_notes": [
+      "Design-tenor bridges are legitimate observations (stated tenor is noted per row); medians are reported with and without them.",
+      "Partial repurchases (IREN) are included as borrower-side resolutions of the repurchased principal and flagged partial.",
+      "Distressed settlements/exchanges (Soluna NYDIG/Additional Secured Notes, IREN NYDIG SPV, Hut 8 NYDIG) are out of scope for refi velocity and listed under insufficient_or_excluded.",
+      "MSD Partners' CoreWeave DDTL unfunded commitment expired 2026-03-31 with ~$10.2M drawn during Q1-2026 — a draw event / commitment expiry, not a resolution; excluded by rule and noted here."
+    ],
+    "medians_months": {
+      "all_resolutions": 5,
+      "gpu_or_dc_secured_only": 3,
+      "excluding_design_tenor_bridges": 7,
+      "basis": "14 rows with numeric months (Trinity/Crusoe row excluded from medians — bracketed resolution date). Bridges excluded in the third cut: TeraWulf Raylan (1) and Core Scientific MS/JPM (2), both stated 364-day."
+    }
+  },
+  "rows": [
+    {
+      "facility": "2024 Term Loan Facility (JPMorgan admin; $229M secured + $771M unsecured tranches)",
+      "issuer": "CoreWeave, Inc.",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 1000,
+      "rate_as_disclosed": "Term SOFR + 5.25% (first 180d) / 5.75% (next 90d) / 6.25% thereafter; 9.65% all-in at 12/31/24; 12% EFFECTIVE rate per debt table (not a 12% coupon)",
+      "issued": "2024-12-16",
+      "original_maturity_or_tenor": "2025-12-16 (12 months); mandatory prepayment from IPO proceeds",
+      "resolved": "2025-04-11",
+      "months_outstanding": 3,
+      "resolution_type": "repaid_at_ipo",
+      "takeout_instrument": "IPO primary proceeds (~$1.0B of net proceeds)",
+      "sources": [
+        {"doc": "424B4 (IPO prospectus), Note 10 + Description of Material Indebtedness — entry 12/16/24, drawn in full same day", "date": "2025-03-31", "url": "https://www.sec.gov/Archives/edgar/data/1769628/000119312525067651/d899798d424b4.htm"},
+        {"doc": "Q1-2025 10-Q, Note 10 + MD&A — maturity accelerated to 4/14/25 in connection with IPO; repaid in full 4/11/25 with IPO proceeds", "date": "2025-05-15", "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000014/crwv-20250331.htm"}
+      ],
+      "notes": "116 days outstanding. Only the $229M tranche was secured ('substantially all of our assets and the assets of our subsidiary guarantors' — general lien on a GPU-cloud operator, not chip-specific); $771M unsecured. Ledger's '12% term loan' is the filed effective rate, not the coupon. Accelerated due date 4/14/25 vs actual repayment 4/11/25 — same 10-Q, consistent (repaid 3 days early)."
+    },
+    {
+      "facility": "Convertible promissory notes issued as Monolith AI acquisition consideration",
+      "issuer": "CoreWeave, Inc.",
+      "gpu_or_dc_secured": false,
+      "size_usd_m": 172,
+      "rate_as_disclosed": "0% coupon (non-interest-bearing); 7% effective per debt table (accretion from $167M issuance fair value)",
+      "issued": "2025-11-05",
+      "original_maturity_or_tenor": "2026-04-24 if share-settled / 2026-05-05 if cash-settled (~5.6-month design tenor)",
+      "resolved": "2026-04",
+      "months_outstanding": 5,
+      "resolution_type": "matured",
+      "takeout_instrument": "Class A common stock — settled in full at $106.61/share conversion price at scheduled maturity",
+      "sources": [
+        {"doc": "FY2025 10-K, Part II Item 5 (unregistered sales: $185M notes issued 11/5/25 at Monolith AI closing; $13M vesting-conditioned) + debt note ($172M debt-classified, mature April 2026)", "date": "2026-03-02", "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm"},
+        {"doc": "Q1-2026 10-Q, Note 10 — 'In April 2026, the Company settled in full the convertible promissory notes at a conversion price of $106.61 per share' (shares issued)", "date": "2026-05-08", "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000222/crwv-20260331.htm"}
+      ],
+      "notes": "Resolution month-precision ('In April 2026'); contractual share-settlement maturity was 4/24/26 per the 10-K but the settlement day is not confirmed in any filing. Not W&B (that consideration was cash+stock+RSUs). Equity-settled at design maturity — ran full (short) tenor; not an early takeout. Unsecured."
+    },
+    {
+      "facility": "2021 Convertible Senior Secured Notes due 2025 (Magnetar; up to $50M + $5M PIK)",
+      "issuer": "CoreWeave, Inc.",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 55,
+      "rate_as_disclosed": "10.00% first 3 yrs (cash or PIK), stepping to 16.00% absent a qualified public-company event within 3 yrs; 16% IRR redemption backstop; 17% effective per debt table",
+      "issued": "2021-10",
+      "original_maturity_or_tenor": "2025-10-18 (~4-year tenor)",
+      "resolved": "2024-09-17",
+      "months_outstanding": 35,
+      "resolution_type": "equitized",
+      "takeout_instrument": "24,543,980 common shares ($1.1B settlement-date fair value) + $2M cash for accrued interest/fractional shares; holder-elected conversion under original terms",
+      "sources": [
+        {"doc": "424B4, Note 10 + related-party section — issuance agreement executed October 2021 ($20M drawn at execution, $30M April 2022; $5M PIK Apr/Oct 2023); investors elected to convert all outstanding notes 9/17/24; extinguishment, $6M loss", "date": "2025-03-31", "url": "https://www.sec.gov/Archives/edgar/data/1769628/000119312525067651/d899798d424b4.htm"}
+      ],
+      "notes": "Issue date month-precision (October 2021; the 10/18/25 maturity implies but does not state 10/18/21) — whole months 34-35. Secured by company property/equipment and other assets EXCLUDING DDTL-financed GPU collateral (general lien on GPU-cloud operator). Converted pre-IPO by holder election on original conversion terms — borrower debt extinguished, so included; NOT repaid at IPO."
+    },
+    {
+      "facility": "Raylan Data delayed-draw senior secured bridge (Morgan Stanley Senior Funding; Hawesville KY data-center project)",
+      "issuer": "TeraWulf Inc.",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 500,
+      "rate_as_disclosed": "Term SOFR (0% floor) + 2.75% (or base rate + 1.75%); stated 6.4% / effective 7.9% at 3/31/26; $7.4M upfront fees",
+      "issued": "2026-03-13",
+      "original_maturity_or_tenor": "364 days (stated design tenor)",
+      "resolved": "2026-04-16",
+      "months_outstanding": 1,
+      "resolution_type": "bridge_takeout",
+      "takeout_instrument": "Common equity — underwritten offering of 54,510,000 shares at $19.00 (~$1,004.3M net, Morgan Stanley lead), closed 4/16/26",
+      "sources": [
+        {"doc": "8-K Items 1.01/2.03 (event 3/13/26) — Delayed-Draw Bridge Credit Agreement, Raylan Data LLC borrower, MSSF admin/collateral agent, $500M 364-day", "date": "2026-03-16", "url": "https://www.sec.gov/Archives/edgar/data/1083301/000095014226000720/eh260751501_8k.htm"},
+        {"doc": "8-K (equity offering closed 4/16/26; PR: proceeds include 'repayment in full of amounts outstanding under its bridge credit facility')", "date": "2026-04-16", "url": "https://www.sec.gov/Archives/edgar/data/1083301/000110465926044387/tm2611661d9_8k.htm"},
+        {"doc": "Q1-2026 10-Q — 'On April 16, 2026, the Company repaid the outstanding $100.0 million principal... and terminated the Bridge Credit Agreement'; $7.3M extinguishment loss in Q2", "date": "2026-05-08", "url": "https://www.sec.gov/Archives/edgar/data/1083301/000108330126000092/wulf-20260331.htm"}
+      ],
+      "notes": "34 days outstanding. $500M was the commitment; only $100.0M was ever drawn and repaid. Funds the HAWESVILLE, KY campus (not Abernathy TX — ledger/working-memory correction). Senior secured, real-estate guarantor (Justified DataPower LLC) — data-center project security, not GPUs."
+    },
+    {
+      "facility": "Delayed-Draw Bridge Credit Agreement (MSSF agent; JPM incremental lender via Amendment No. 1)",
+      "issuer": "Core Scientific, Inc.",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 1000,
+      "rate_as_disclosed": "Term SOFR (0% floor) + 2.50%; up to $7.5M commitment/exit fees + delayed-syndication fees from day 106",
+      "issued": "2026-03-04",
+      "original_maturity_or_tenor": "364 days from 3/4/26 closing (stated design tenor)",
+      "resolved": "2026-05-06",
+      "months_outstanding": 2,
+      "resolution_type": "bridge_takeout",
+      "takeout_instrument": "$3.3B 7.750% Senior Secured Notes due 2031 (Core Scientific Finance I LLC), priced 99.250, closed 5/6/26",
+      "sources": [
+        {"doc": "8-K (event 3/4/26) — credit agreement closed 3/4/26, $500M drawn 3/5/26; first-priority lien on substantially all assets; 364-day maturity", "date": "2026-03-06", "url": "https://www.sec.gov/Archives/edgar/data/1839341/000162828026015622/core-20260304.htm"},
+        {"doc": "8-K (event 3/18/26) — Amendment No. 1: JPM $500M incremental, total $1.0B, drawn same day", "date": "2026-03-23", "url": "https://www.sec.gov/Archives/edgar/data/1839341/000162828026020327/core-20260318.htm"},
+        {"doc": "8-K Item 1.02 — 'On May 6, 2026, Core Scientific repaid, with proceeds from the issuance and sale of the Notes, all of the borrowings outstanding under the Delayed-Draw Bridge Credit Agreement... released, discharged and satisfied in full'", "date": "2026-05-06", "url": "https://www.sec.gov/Archives/edgar/data/1839341/000119312526208905/d47435d8k.htm"}
+      ],
+      "notes": "63 days from initial closing; the JPM $500M incremental tranche (closed/drawn 3/18/26) was outstanding 49 days. Two closings — the 'March 2026 $1.0B bridge' did not reach $1.0B until 3/18/26. Fully drawn. First-priority lien on substantially all assets of the DC operator and guarantors — not GPU-specific. Purpose clause: data-center development, expressly excluding debt repayment."
+    },
+    {
+      "facility": "CIM Group promissory note (CIM APLD Lender Holdings; Ellendale HPC buildout)",
+      "issuer": "Applied Digital Corporation",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 125,
+      "rate_as_disclosed": "12.0% initial, payable quarterly in arrears (per press release; rate not in 8-K body); + warrants for 9,265,366 shares @ $4.8005",
+      "issued": "2024-06-07",
+      "original_maturity_or_tenor": "3-year term (~June 2027); $15M drawn at close, up to $110M subsequent + $75M accordion",
+      "resolved": "2024-11-27",
+      "months_outstanding": 5,
+      "resolution_type": "refinanced",
+      "takeout_instrument": "Macquarie ELN-02 $150M promissory note (proceeds used 'to prepay in full and terminate' the CIM Note)",
+      "sources": [
+        {"doc": "8-K — promissory note entered 6/7/24, $15M drawn same day (8-K/A 6/10/24 attached guaranty/collateral agreement; press release in same accession has rate/term)", "date": "2024-06-07", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487924000151/apld-20240607.htm"},
+        {"doc": "8-K (Macquarie ELN-02) — proceeds to prepay in full and terminate the CIM Note dated 6/7/24", "date": "2024-12-02", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315224048226/form8-k.htm"},
+        {"doc": "FQ2 FY25 10-Q — 'On November 27, 2024... we repaid the CIM Promissory Note in full'", "date": "2025-01-14", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487925000006/apld-20241130.htm"}
+      ],
+      "notes": "173 days outstanding. Fully drawn ($125M) by 11/30/24 per FQ2 FY25 10-Q. Collateral: substantially-all-assets security interest + first/second priority mortgages (Ellendale HPC project) — data-center, not GPUs. Link 1 of the APLD Polaris Forge 1 refinancing chain (CIM -> Macquarie ELN-02 -> SMBC -> 9.25% notes)."
+    },
+    {
+      "facility": "Macquarie ELN-02 promissory note (Macquarie Equipment Capital; Ellendale/Polaris Forge 1)",
+      "issuer": "Applied Digital Corporation",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 150,
+      "rate_as_disclosed": "0.25% stated coupon + MOIC return hurdle 1.11x (<=4 mo) / 1.20x (4-7 mo) / 1.35x (>7 mo and at maturity) + warrants for 1,035,197 shares @ $9.66 ($16.5M MOIC liability recorded at close)",
+      "issued": "2024-11-27",
+      "original_maturity_or_tenor": "2026-05-27 (18 months); mandatory prepay if ELN-02 project incomplete by 12/6/25",
+      "resolved": "2025-02-11",
+      "months_outstanding": 2,
+      "resolution_type": "refinanced",
+      "takeout_instrument": "SMBC $375M Credit and Guaranty Agreement (proceeds used 'to prepay in full and terminate' the Macquarie note, incl. MOIC)",
+      "sources": [
+        {"doc": "8-K — note entered and fully drawn 11/27/24", "date": "2024-12-02", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315224048226/form8-k.htm"},
+        {"doc": "8-K (SMBC closing) — SMBC proceeds to prepay in full and terminate the 11/27/24 Macquarie note", "date": "2025-02-12", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315225006049/form8-k.htm"},
+        {"doc": "FQ3 FY25 10-Q — 'On February 11, 2025... the Company repaid the Macquarie Promissory Note in full, including... multiple on invested capital'", "date": "2025-04-14", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000162828025017684/apld-20250228.htm"}
+      ],
+      "notes": "76 days outstanding — repaid inside the 1.11x MOIC window, consistent with a designed-for-speed instrument. Collateral: ELN-02 entity all-assets security interest, equity pledge, mortgages (data-center project). Naming: press release says 'Macquarie Capital senior secured note'; legal lender is Macquarie Equipment Capital, Inc. Link 2 of the APLD chain."
+    },
+    {
+      "facility": "SMBC $375M Credit and Guaranty Agreement (APLD HPC Holdings; Polaris Forge 1 interim financing)",
+      "issuer": "Applied Digital Corporation",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 375,
+      "rate_as_disclosed": "Daily Simple SOFR + 3.50% (to 6 mo) / 4.50% (6-12 mo) / 5.50% (after 12 mo) — designed step-up; Base Rate option +2.50%/3.50%/4.50%",
+      "issued": "2025-02-11",
+      "original_maturity_or_tenor": "18 months (August 2026); explicitly interim — 'plans to replace this interim SMBC loan with a permanent project financing'",
+      "resolved": "2025-11-20",
+      "months_outstanding": 9,
+      "resolution_type": "refinanced",
+      "takeout_instrument": "9.250% Senior Secured Notes due 2030 ($2.35B, APLD ComputeCo LLC) — repaid concurrently with notes closing",
+      "sources": [
+        {"doc": "8-K — Credit and Guaranty Agreement closed 2/11/25, $375M fully available at close (8-K/A 2/13/25 attached credit agreement/CASDA/pledge/guarantee)", "date": "2025-02-12", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315225006049/form8-k.htm"},
+        {"doc": "8-K (9.25% notes) — proceeds to repay principal + accrued interest under the 2/11/25 SMBC agreement", "date": "2025-11-20", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315225024479/form8-k.htm"},
+        {"doc": "FQ2 FY26 10-Q — 'SMBC Loan Extinguishment: Concurrently with the closing of the Notes Offering, we repaid in full...'; FQ3 FY26 debt table shows $0", "date": "2026-01-08", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000006/apld-20251130.htm"}
+      ],
+      "notes": "282 days outstanding. Resolution date 11/20/25 derived from the notes' closing date ('concurrently with the closing') — effectively day-precise. Ledger correction: issued 2/11/25, not mid-2025. Collateral: all-assets CASDA + 100% equity pledge + SMBC mortgages over Ellendale properties — data-center project, not GPUs. Link 3 of the APLD chain; takeout = permanent 144A project notes."
+    },
+    {
+      "facility": "Macquarie FAR-01 promissory note (APLD FAR-01 LLC; Polaris Forge 2, Harwood ND)",
+      "issuer": "Applied Digital Corporation",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 50,
+      "rate_as_disclosed": "8.0% (PIK capitalized monthly first 12 months, cash thereafter) + 1.10x minimum return hurdle on prepayment and at maturity",
+      "issued": "2025-09-09",
+      "original_maturity_or_tenor": "Earliest of acceleration / 2026-02-01 (if 200MW lease not executed by 10/31/25) / 2027-09-09; mandatory prepayment within 90 days of 200MW lease execution",
+      "resolved": "2025-11-28",
+      "months_outstanding": 2,
+      "resolution_type": "prepaid",
+      "takeout_instrument": "Not disclosed — no filing names the funding source (mandatory prepay was triggered by the 10/20/25 200MW Polaris Forge 2 lease execution; the 9.25% notes were ring-fenced to Polaris Forge 1 and the 6.75% notes closed later, 3/10/26, into escrow)",
+      "sources": [
+        {"doc": "8-K — note entered and $50M drawn 9/9/25 (+up to $25M by mutual consent)", "date": "2025-09-12", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315225013210/form8-k.htm"},
+        {"doc": "FQ2 FY26 10-Q — 'On November 28, 2025, the Company repaid the Promissory Note in full, including... rate of return' ($1.4M interest+return capitalized to CIP); repeated in FQ3 FY26 10-Q", "date": "2026-01-08", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000006/apld-20251130.htm"}
+      ],
+      "notes": "80 days outstanding. Ledger correction: FAR-01 is Polaris Forge 2 (Harwood, ND), not Ellendale. Collateral: FAR-01/FAR-02/FAR Holdings substantially-all-assets pledges + mortgages — data-center land/transformers, not GPUs. Takeout instrument undocumented — flagged, do not infer."
+    },
+    {
+      "facility": "Coinbase Credit BTC-collateralized credit facility (Hut 8 Holdings/Hut 8 Mining Corp. borrower)",
+      "issuer": "Hut 8 Corp.",
+      "gpu_or_dc_secured": false,
+      "size_usd_m": 200,
+      "rate_as_disclosed": "Original: greater of (fed funds, 3.25%) + 5.0%; +6.0% from 2nd A&R (6/17/24); 9.00% fixed from 3rd A&R (6/16/25)",
+      "issued": "2023-06-26",
+      "original_maturity_or_tenor": "364 days after first borrowing (original); serially extended — final maturity 2026-06-16 per 3rd A&R",
+      "resolved": "2026-05",
+      "months_outstanding": 35,
+      "resolution_type": "refinanced",
+      "takeout_instrument": "FalconX Charlie, Inc. $200M BTC-collateralized term loan, 7.00% fixed, maturing April 2027 (Master Lending Agreement dated 5/1/26) — 'used to simultaneously pay off the loan with Coinbase'",
+      "sources": [
+        {"doc": "8-K (merger closing; credit agreement as Ex-10.1) — original $50M Coinbase Credit agreement dated 6/26/23", "date": "2023-12-01", "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465923122902/tm2331643d4_8k.htm"},
+        {"doc": "8-K — 1st A&R 1/12/24: +$15M loan D facility (to $65M)", "date": "2024-01-19", "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465924005229/tm243483d1_8k.htm"},
+        {"doc": "8-K — 2nd A&R 6/17/24: maturity extended 364 days, rate to max(FFR,3.25%)+6.0%", "date": "2024-06-24", "url": "https://www.sec.gov/Archives/edgar/data/1964789/000155837024009445/hut-20240617x8k.htm"},
+        {"doc": "8-K — 3rd A&R 6/16/25: maturity to 6/16/26, size to $130M, rate to 9.00% fixed, recourse limited to BTC collateral", "date": "2025-06-23", "url": "https://www.sec.gov/Archives/edgar/data/1964789/000155837025008803/hut-20250616x8k.htm"},
+        {"doc": "8-K — 4th A&R 12/22/25: size to $200M, borrowed in full same day", "date": "2025-12-31", "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465925125613/hut-20251222x8k.htm"},
+        {"doc": "Q1-2026 10-Q Notes 9/19 + Ex-10.2 (FalconX MLA 5/1/26) — 'In May 2026, the Company paid off the outstanding balance of the Coinbase credit facility with proceeds from a term loan with FalconX'", "date": "2026-05-06", "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465926055891/hut-20260331x10q.htm"}
+      ],
+      "notes": "Resolution month-precision ('In May 2026'); FalconX agreement dated 5/1/26 and payoff 'simultaneous', but the day is not filed — whole months 34-35 (calendar diff 35 shown). Size path $50M -> $65M (1/12/24) -> $130M + 9.00% (6/16/25) -> $200M (12/22/25); an 8/1/25 amendment exists only as a recital, terms undocumented. Collateral: BTC in Coinbase Custody — NOT GPU/DC. Original facility was legacy Hut 8's, not USBTC's. A serially-extended 364-day facility: design tenor never exceeded ~1 year even though the relationship ran ~35 months. Conflict: EDGAR filing date of the Q1-26 10-Q is 2026-05-06, not 5/15 as in the ledger source note."
+    },
+    {
+      "facility": "Anchorage Lending Refinanced Loan Agreement (USBTC; Loan, Guaranty and Security Agreement of 2/3/23)",
+      "issuer": "Hut 8 Corp.",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 49,
+      "rate_as_disclosed": "Not captured from the 8-K recital reviewed (agreement filed as Ex-10.2 to the 12/1/23 8-K); repaid monthly from mining profits",
+      "issued": "2023-02-03",
+      "original_maturity_or_tenor": "5-year term; balloon on or before 2028-02-02",
+      "resolved": "2024-09-27",
+      "months_outstanding": 19,
+      "resolution_type": "equitized",
+      "takeout_instrument": "2,313,435 Hut 8 common shares at $16.395/share in satisfaction of $37,928,768.53 principal + accrued interest and all other obligations (Debt Repayment Agreement)",
+      "sources": [
+        {"doc": "8-K (merger closing) — recites Original Loan Agreements of 3/31/22 and 4/26/22 ($50.0M advanced) restructured into the 2/3/23 Loan, Guaranty and Security Agreement (~$49.0M owed at 2/3/23); Hut 8 Corp. joinder 11/30/23", "date": "2023-12-01", "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465923122902/tm2331643d4_8k.htm"},
+        {"doc": "8-K (event 9/27/24) — Debt Repayment Agreement: shares issued 9/27/24 in exchange for satisfaction of all obligations under the 2/3/23 Loan Agreement", "date": "2024-10-01", "url": "https://www.sec.gov/Archives/edgar/data/1964789/000155837024013100/hut-20240927x8k.htm"}
+      ],
+      "notes": "602 days outstanding (Feb 3, 2023 agreement -> Sep 27, 2024 equitization). Collateral: 23,500 USBTC miners + the Niagara Falls, NY facility — ASIC/mining-DC assets, not GPUs (flagged true as compute/DC collateral). Antecedent: the 2/3/23 agreement itself restructured the 3/31/22 + 4/26/22 $50M Anchorage equipment loans (~10-11 months outstanding), but the recital does not state whether that restructuring was performing or distressed — not counted as a separate row."
+    },
+    {
+      "facility": "Bitmain Future Sales and Purchase Agreement — deferred miner-payment obligations",
+      "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
+      "gpu_or_dc_secured": false,
+      "size_usd_m": 120.2,
+      "rate_as_disclosed": "Non-interest-bearing deferred purchase obligation (final 20% due within 9 months of Sep/Oct 2024 delivery); settled at 10% discount",
+      "issued": "2023-12-16",
+      "original_maturity_or_tenor": "Payment schedule under 12/16/23 agreement as supplemented 6/5/24 ($134.3M total price); deferred tail due May-November 2025",
+      "resolved": "2025-05",
+      "months_outstanding": 17,
+      "resolution_type": "prepaid",
+      "takeout_instrument": "Lump-sum prepayment of $108,192,217.75 (10% reduction from $120,213,575.28 due), funded in connection with the $172.5M 1.75% Convertible Senior Notes due 2030 (issued 5/22/25; use-of-proceeds: 'purchasing at a discount the remaining balance of mining rigs')",
+      "sources": [
+        {"doc": "8-K — Supplemental Agreement 6/5/24 to Future Sales and Purchase Agreement dated 12/16/23 (deposit paid 12/12/23); $134,287,826.40 price; 20% tail due within 9 months of delivery", "date": "2024-06-10", "url": "https://www.sec.gov/Archives/edgar/data/1819989/000119312524158407/d846288d8k.htm"},
+        {"doc": "424B5 — 2025 Amendment and Deed of Novation (5/16/25): Revised Payment Amount $108,192,217.75 vs $120,213,575.28 due, payable within 14 days", "date": "2025-05-20", "url": "https://www.sec.gov/Archives/edgar/data/1819989/000119312525123231/d920705d424b5.htm"},
+        {"doc": "8-K — $172.5M 1.75% converts due 2030 issued 5/22/25", "date": "2025-05-22", "url": "https://www.sec.gov/Archives/edgar/data/1819989/000119312525125152/d86394d8k.htm"},
+        {"doc": "Q2-2025 10-Q — 'By prepaying those obligations that would come due between May and November, we reduced the cost of miners purchased for Phase I of the Black Pearl data center'; payment completed", "date": "2025-08-07", "url": "https://www.sec.gov/Archives/edgar/data/1819989/000181998925000081/cifr-20250630.htm"}
+      ],
+      "notes": "Vendor financing, not a bank facility — obligation dates to the 12/16/23 Original Agreement; the deferred tail largely crystallized on Sep/Oct 2024 delivery. Resolution month-precision: payment contractually due within 14 days of the 5/16/25 amendment (by ~5/30/25); exact payment day not filed. 17 whole months from agreement date. Ledger correction: origination is Dec 2023, not 2024. Unsecured purchase obligation (miners)."
+    },
+    {
+      "facility": "3.25% Convertible Senior Notes due 2030 — PARTIAL repurchase ($227.7M of $440M)",
+      "issuer": "IREN Limited",
+      "gpu_or_dc_secured": false,
+      "size_usd_m": 227.7,
+      "rate_as_disclosed": "3.25%",
+      "issued": "2024-12-06",
+      "original_maturity_or_tenor": "2030-06-15 (~5.5-year tenor)",
+      "resolved": "2025-12-08",
+      "months_outstanding": 12,
+      "resolution_type": "refinanced",
+      "takeout_instrument": "Cash repurchase (~$608.2M incl. accrued interest) funded by concurrent 0.25% converts due 2032 / 1.00% converts due 2033 issuance (net ~$2,270.0M) + registered direct placement of 39,699,102 shares at $41.12",
+      "sources": [
+        {"doc": "6-K — $440M 3.25% converts due 2030 issued 12/6/24 (Closing Date), incl. $40M greenshoe", "date": "2024-12-06", "url": "https://www.sec.gov/Archives/edgar/data/1878848/000114036124048698/ef20039649_6k.htm"},
+        {"doc": "8-K — Repurchases agreed 12/2/25: ~$227.7M principal of 2030 converts for ~$608.2M; 'completed on or about December 8, 2025'", "date": "2025-12-08", "url": "https://www.sec.gov/Archives/edgar/data/1878848/000114036125044888/ef20060782_8k.htm"},
+        {"doc": "8-K Ex-99.1 (pricing PR) — Repurchase 'for cash', funded by concurrent equity offering + new converts", "date": "2025-12-03", "url": "https://www.sec.gov/Archives/edgar/data/1878848/000114036125044095/ny20060080x4_ex99-1.htm"}
+      ],
+      "notes": "PARTIAL resolution — $212.3M principal remained outstanding. Settlement 'on or about December 8, 2025' (agreed 12/2/25); 12 whole months (367 days to 12/8). Filed term is 'the Repurchases', FOR CASH — ledger's 'repurchased/equitized' and '(cash+shares)' framing is not supported as consideration to holders (shares were sold separately to fund the cash). Repurchase at ~2.67x principal reflects conversion value, not distress. Unsecured."
+    },
+    {
+      "facility": "3.50% Convertible Senior Notes due 2029 — PARTIAL repurchase ($316.6M of $550M)",
+      "issuer": "IREN Limited",
+      "gpu_or_dc_secured": false,
+      "size_usd_m": 316.6,
+      "rate_as_disclosed": "3.50%",
+      "issued": "2025-06-13",
+      "original_maturity_or_tenor": "2029-12-15 (~4.5-year tenor)",
+      "resolved": "2025-12-08",
+      "months_outstanding": 5,
+      "resolution_type": "refinanced",
+      "takeout_instrument": "Cash repurchase (~$1,024.2M incl. accrued interest) funded by concurrent new converts (2032/2033) + registered direct equity placement",
+      "sources": [
+        {"doc": "6-K — $550M 3.50% converts due 2029 issued 6/13/25 (Closing Date), incl. $50M greenshoe", "date": "2025-06-13", "url": "https://www.sec.gov/Archives/edgar/data/1878848/000114036125022454/ef20050570_6k.htm"},
+        {"doc": "8-K — Repurchases agreed 12/2/25: ~$316.6M principal of 2029 converts for ~$1,024.2M; 'completed on or about December 8, 2025'", "date": "2025-12-08", "url": "https://www.sec.gov/Archives/edgar/data/1878848/000114036125044888/ef20060782_8k.htm"}
+      ],
+      "notes": "PARTIAL resolution — $233.4M principal remained outstanding. 178 days (5 whole months) from issue to settlement — over half the issue repurchased at ~3.2x principal within 6 months of issuance. Same cash-repurchase mechanics and funding as the 2030-notes row. Unsecured."
+    },
+    {
+      "facility": "Trinity Capital equipment financing to Crusoe Energy (holdings-side observation from lender SOI)",
+      "issuer": "Crusoe Energy Systems",
+      "gpu_or_dc_secured": true,
+      "size_usd_m": 8.1,
+      "rate_as_disclosed": "Not captured from SOI extract",
+      "issued": "2024-03-01",
+      "original_maturity_or_tenor": "2029-03-01 (5-year design tenor)",
+      "resolved": "2025",
+      "months_outstanding": null,
+      "resolution_type": "prepaid",
+      "takeout_instrument": "Not disclosed",
+      "sources": [
+        {"doc": "Trinity Capital Inc. FY2024 10-K, Schedule of Investments as of 12/31/2024 — Crusoe Energy equipment financing, $8.1M, investment date 3/1/2024, maturity 3/1/2029 (CIK 1786108, acc. 0000950170-25-027341)", "date": "2025-02-26", "url": "https://www.sec.gov/Archives/edgar/data/1786108/000095017025027341/trin-20241231.htm"},
+        {"doc": "Trinity Capital Inc. FY2025 10-K, Schedule of Investments as of 12/31/2025 — position ABSENT (acc. 0001193125-26-068600)", "date": "2026-02-25", "url": "https://www.sec.gov/Archives/edgar/data/1786108/000119312526068600/trin-20251231.htm"}
+      ],
+      "notes": "RESOLUTION DATE IMPRECISE — bracketed as calendar 2025 (on the 12/31/24 SOI, absent from the 12/31/25 SOI): 10-22 whole months outstanding, ~3.5 years before design maturity; excluded from medians. Caveat: SOI absence is consistent with borrower repayment, but a lender-side sale/transfer of the position cannot be fully excluded from the SOIs alone — retained per instruction with this flag. Equipment financing (compute/energy equipment) — marked GPU/DC-secured."
+    }
+  ],
+  "insufficient": [
+    {
+      "facility": "Goldman Sachs ELN-04 $300M senior secured bridge (Polaris Forge 1, Ellendale)",
+      "issuer": "Applied Digital Corporation",
+      "known": "Announced closed via company PR dated 5/4/26 ($300M, 364-day, SOFR+275bp, prepayable anytime, secured by project assets, GS-led); absent from FQ3 FY26 10-Q (filed 4/8/26) so closed between ~4/8 and 5/4/26. 8-K of 6/16/26 (7.000% Senior Secured Notes due 2031, $1.59B): Issuer 'intends to use the net proceeds... to repay' the GS bridge.",
+      "missing": "No 8-K was filed for the bridge closing — exact closing date not in any SEC filing (PR day precision only for the announcement, not the close); repayment is intent-at-closing language only — no filed confirmation of actual extinguishment yet (expect FY26 10-K, ~late July 2026). If both hold, ~1.5 months outstanding.",
+      "sources": [
+        {"doc": "PR — Applied Digital Announces $300 Million Senior Secured Bridge Facility", "date": "2026-05-04", "url": "https://www.globenewswire.com/news-release/2026/05/04/3286626/0/en/applied-digital-announces-300-million-senior-secured-bridge-facility.html"},
+        {"doc": "8-K — 7.000% notes closed 6/16/26; proceeds intended to repay the GS bridge", "date": "2026-06-16", "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315226028899/form8-k.htm"}
+      ]
+    },
+    {
+      "facility": "Luxor Technology BTC borrowings (98.57 BTC, 95-day amortization, + Q1-25 add-ons)",
+      "issuer": "Cipher Mining Inc.",
+      "known": "Initial borrowing 12/13/24 (FY24 10-K, filed 2/25/25, acc. 0001819989-25-000005): 98.57 BTC repaid ~1.06 BTC/day over 95 days (~100.38 BTC total); 80.30 BTC ($7.3M) owed at 12/31/24; 128.2 BTC ($10.5M) owed at 3/31/25 under 'these agreements' (plural); zero balance at 6/30/25 and every later balance date (Q2-25 10-Q filed 8/7/25, acc. 0001819989-25-000081).",
+      "missing": "Repayment date is quarter-precision only (zero by 6/30/25 — better than the ledger's 'by YE2025' but not a date); issue dates and sizes of the Q1-25 incremental borrowings are undisclosed. No months figure can be honestly computed for the composite balance."
+    },
+    {
+      "facility": "FNBO $65M revolver (SOFR+2.75%, Nov 2025; $61.9M LCs outstanding at 2/28/26)",
+      "issuer": "Applied Digital Corporation",
+      "known": "Ledger flags as likely superseded (probably by the $430M RCF of 5/29/26).",
+      "missing": "No terminating filing exists — resolution date and mechanism undocumented (ledger's own UNVERIFIED flag stands)."
+    },
+    {
+      "facility": "8% US$15M convertible debentures (U.S. Global Investors)",
+      "issuer": "HIVE Digital Technologies Ltd.",
+      "known": "Ledger: retired FY26 (fiscal year ended 3/31/26).",
+      "missing": "Neither issue date nor retirement date documented to a primary filing in this pass (Canadian filer; likely SEDAR+ and/or 40-F/6-K exhibits). Year/fiscal-year precision only."
+    },
+    {
+      "facility": "Zunz S.A. $31M loan",
+      "issuer": "HIVE Digital Technologies Ltd.",
+      "known": "Ledger: retired FY26 (likely tied to the Paraguay/Yguazu acquisition, ~Jan 2025).",
+      "missing": "Both dates undocumented to primary filings in this pass; fiscal-year precision only."
+    },
+    {
+      "facility": "Navitas loan",
+      "issuer": "Soluna Holdings, Inc.",
+      "known": "Ledger: paid off 2025.",
+      "missing": "Both issue date and payoff date undocumented to primary filings in this pass; year precision only."
+    },
+    {
+      "facility": "October 2021 secured convertible notes",
+      "issuer": "Soluna Holdings, Inc.",
+      "known": "Ledger: fully converted.",
+      "missing": "Conversion date(s) undocumented; conversion was likely piecemeal — no single resolution date exists as filed."
+    }
+  ],
+  "excluded": [
+    {
+      "facility": "2025 Term Loan Facility ($300M, Morgan Stanley Senior Funding, unsecured)",
+      "issuer": "CoreWeave, Inc.",
+      "reason": "NEVER DRAWN — terminated undrawn 'in connection with the IPO' (contractual earlier-of 4/7/25 or IPO closing, ~3/31/25; exact day not filed). Entered 3/7/25 per 424B4; termination per Q1-25 10-Q Note 10. An IPO backstop with no outstanding balance is not a velocity observation.",
+      "sources": [
+        {"doc": "424B4 — entered 3/7/25; SOFR+1.75% + 2.25% lender fee; maturity 12/16/25", "date": "2025-03-31", "url": "https://www.sec.gov/Archives/edgar/data/1769628/000119312525067651/d899798d424b4.htm"},
+        {"doc": "Q1-2025 10-Q Note 10 — 'no borrowings... terminated and all unfunded commitments of the lenders were terminated'", "date": "2025-05-15", "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000014/crwv-20250331.htm"}
+      ]
+    },
+    {
+      "facility": "MSD Partners — CoreWeave DDTL unfunded commitment",
+      "issuer": "CoreWeave, Inc. (holdings-side)",
+      "reason": "Commitment expired 3/31/26 with ~$10.2M drawn during Q1-26 — a draw event / commitment expiry, not a borrower-side resolution. Excluded by rule; noted per task instruction."
+    },
+    {
+      "facility": "Post-default settlements (out of scope for refi velocity)",
+      "issuer": "Soluna Holdings (NYDIG settled Sep 2025; Jul 2024 Additional Secured Notes extinguished at 60% of face); IREN Limited (NYDIG SPV financings settled Aug 2025); Hut 8 Corp. (NYDIG, 2023)",
+      "reason": "Distressed settlements/exchanges resolve defaulted or impaired obligations — they measure workout timelines, not refinancing velocity. None fits the resolution_type enum; excluded rather than force-fit."
+    }
+  ],
+  "date_conflicts_and_corrections": [
+    "CoreWeave 2024 TL: ledger's '12%' is the filed EFFECTIVE rate, not the coupon (stated SOFR+5.25-6.25% step-up; 9.65% all-in at 12/31/24).",
+    "CoreWeave 2024 TL: accelerated due date 4/14/25 vs actual repayment 4/11/25 — same 10-Q, consistent (early by 3 days), not a conflict.",
+    "CoreWeave $172M converts: issued for Monolith AI (not Weights & Biases); $185M issued of which $13M vesting-conditioned -> $172M debt-classified.",
+    "TeraWulf Raylan bridge funds Hawesville, KY — not Abernathy, TX.",
+    "Core Scientific bridge: 'March 2026 $1.0B' was two closings — $500M on 3/4/26 (drawn 3/5) + JPM $500M incremental on 3/18/26.",
+    "APLD SMBC: closed 2/11/25, not mid-2025 as previously assumed.",
+    "APLD FAR-01 is Polaris Forge 2 (Harwood, ND), not Ellendale.",
+    "Hut 8 Q1-26 10-Q EDGAR filing date is 2026-05-06, not 2026-05-15 as in the ledger source note (same accession/URL).",
+    "Hut 8 Coinbase: no single amendment created the '$200M 9.00%' facility — 9.00% arrived at the 3rd A&R (6/16/25, $130M), $200M at the 4th A&R (12/22/25); an 8/1/25 amendment exists only as a recital with undocumented terms.",
+    "Cipher Bitmain: Original Agreement dated 12/16/23 (deposit 12/12/23) — 2023, not 2024.",
+    "IREN Dec-2025 transaction: filed term is 'the Repurchases', FOR CASH; ledger's 'repurchased/equitized' and any '(cash+shares)' characterization of holder consideration is not supported — the 39.7M shares at $41.12 were a separate registered direct placement that FUNDED the cash. Agreed 12/2/25; completed 'on or about' 12/8/25."
+  ]
+}

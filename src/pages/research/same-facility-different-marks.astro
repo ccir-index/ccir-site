@@ -1,0 +1,422 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/*
+  Dated research note — frozen to the Q1-2026 filing window (schedules of
+  investments for period 2026-03-31, read July 2026). Research notes are
+  dated, not updated in place; the living surface is /credit/series.
+  All numbers below are hardcoded from the study record
+  (filed_marks seed + control extraction, 2026-07-11/12) — this page must
+  not import the live datasets.
+*/
+const AS_OF = '2026-07-12';
+
+// Same-tranche filed marks, % of par, one value per unaffiliated adviser
+// (principal-weighted within an adviser). Compute facilities:
+const COMPUTE = [
+  { label: 'CoreWeave DDTL 2.0 (S+6.00)', marks: [{ a: 'Carlyle', m: 99.0 }, { a: 'MSD', m: 100.0 }, { a: 'Great Elm', m: 102.0 }, { a: 'PIMCO CapSol BDC', m: 103.06 }] },
+  { label: 'Crusoe 13% fixed 2029', marks: [{ a: 'Monroe', m: 98.37 }, { a: 'LAGO', m: 102.52 }] },
+  { label: 'CoreWeave DDTL 1.0 (S+9.62)', marks: [{ a: 'Carlyle', m: 101.0 }, { a: 'Great Elm', m: 102.0 }] },
+  { label: 'Applied Digital equip. 19%', marks: [{ a: 'Trinity', m: 101.48 }, { a: 'Eagle Point Trinity', m: 102.06 }] },
+  { label: 'Crusoe 15% fixed 2029', marks: [{ a: 'Monroe', m: 101.34 }, { a: 'LAGO', m: 101.64 }] },
+];
+
+// Control cohorts — per-tranche mean pairwise absolute difference (pwMAD)
+// across unaffiliated advisers, same date, term-loan core only.
+const REGIMES = [
+  {
+    name: 'Performing conventional & hard-asset',
+    items: [
+      { f: 'Zayo TL 2030 (quoted)', n: 5, mad: 0.14 },
+      { f: 'Integrity Marketing 2028', n: 11, mad: 0.16 },
+      { f: 'Agiliti TLB 2030', n: 6, mad: 0.25 },
+      { f: 'Higginbotham 2031', n: 6, mad: 0.25 },
+      { f: 'STS Aviation 2031', n: 2, mad: 0.26 },
+      { f: 'West Star Aviation 2032', n: 5, mad: 0.29 },
+      { f: 'AmeriLife 2029', n: 7, mad: 0.35 },
+      { f: 'Galway 2028', n: 7, mad: 0.94 },
+    ],
+  },
+  {
+    name: 'Post-restructuring / post-bankruptcy',
+    items: [
+      { f: 'PetVet TL 2030', n: 8, mad: 2.82 },
+      { f: 'Hornblower TL 2029', n: 2, mad: 3.94 },
+      { f: '48Forty 2031', n: 7, mad: 4.23 },
+    ],
+  },
+  {
+    name: 'Compute (performing)',
+    items: [
+      { f: 'Crusoe 15% 2029', n: 2, mad: 0.3 },
+      { f: 'Applied Digital equip. 19%', n: 2, mad: 0.58 },
+      { f: 'CoreWeave DDTL 1.0', n: 2, mad: 0.99 },
+      { f: 'CoreWeave DDTL 2.0', n: 4, mad: 2.37 },
+      { f: 'Crusoe 13% 2029', n: 2, mad: 4.15 },
+    ],
+  },
+];
+
+// --- fig 1: marks strip (compute facilities) --------------------------------
+const F1W = 760, F1GL = 208, F1GR = 64, F1TOP = 30, F1ROW = 48;
+const f1Domain = [97, 104];
+const f1x = (v: number) => F1GL + ((v - f1Domain[0]) / (f1Domain[1] - f1Domain[0])) * (F1W - F1GL - F1GR);
+const F1H = F1TOP + COMPUTE.length * F1ROW + 8;
+const f1Ticks = [97, 98, 99, 100, 101, 102, 103, 104];
+const f1rows = COMPUTE.map((f, i) => {
+  const vals = f.marks.map((d) => d.m);
+  return {
+    ...f,
+    cy: F1TOP + i * F1ROW + F1ROW / 2,
+    lo: Math.min(...vals),
+    hi: Math.max(...vals),
+    disp: Math.max(...vals) - Math.min(...vals),
+  };
+});
+
+// --- fig 2: dispersion by regime ---------------------------------------------
+const F2W = 760, F2GL = 232, F2GR = 18, F2TOP = 26, F2ROW = 64;
+const f2max = 4.6;
+const f2x = (v: number) => F2GL + (v / f2max) * (F2W - F2GL - F2GR);
+const F2H = F2TOP + REGIMES.length * F2ROW + 6;
+const f2Ticks = [0, 1, 2, 3, 4];
+---
+<Base
+  title="Same Facility, Different Marks: Compute Credit in Lender Filings · CCIR Research"
+  description="At 3/31/2026, SEC-reporting funds file marks from 99 to 103 on the same compute facility. A 16-tranche cross-sector control shows performing credit normally agrees within a quarter point; compute paper is marked like performing credit and dispersed like stressed credit."
+  article={{ published: '2026-07-12' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {AS_OF} · window: schedules of investments for period 2026-03-31</div>
+      <h1>Same Facility, Different Marks: Compute Credit in Lender Filings</h1>
+      <p class="standfirst">
+        Business development companies and registered funds file, each quarter,
+        a fair-value mark on every loan they hold. Where several unaffiliated
+        managers hold the same facility, the filings put their marks side by
+        side. At March 31, 2026, four advisers carried one GPU-backed CoreWeave
+        facility at 99.0, 100.0, 102.0 and 103.1 percent of par. Sixteen
+        cross-held tranches across five sectors set the baseline. Performing
+        credit agrees to about a quarter of a point, and disagreement past
+        three points follows a restructuring or a bankruptcy. The exception
+        is performing compute paper.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> The Observed Marks: Compute-Backed Facilities</h2>
+      <p>
+        Five compute-collateralized facilities in Q1-2026 schedules of
+        investments are held by two or more unaffiliated advisers. The widest
+        is the CoreWeave Compute Acquisition Co. IV first-lien delayed-draw
+        facility (SOFR + 6.00%): Carlyle funds file 99.0, MSD Investment Corp.
+        100.0, Great Elm 102.0, and PIMCO Capital Solutions BDC 103.1 — a
+        <strong>4.06-point spread on identical first-lien paper at the same
+        date</strong>, with two of the four holders' pieces identical to the
+        dollar of principal. The second-widest pair is Crusoe Energy Systems'
+        13% fixed tranche: Monroe Capital, which reduced its position roughly
+        83% during the quarter, files 98.4; LAGO Evergreen, which held, files
+        102.5 — equal to its amortized cost, in both quarters it has reported.
+      </p>
+      <figure class="chart-fig">
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${F1W} ${F1H}`} role="img" aria-label="Filed marks as percent of par by facility and holder, March 31 2026">
+            {f1Ticks.map((t) => (
+              <>
+                <line class={t === 100 ? 'par-line' : 'grid'} x1={f1x(t)} x2={f1x(t)} y1={F1TOP - 5} y2={F1H - 6} />
+                <text class="tick" text-anchor="middle" x={f1x(t)} y={F1TOP - 10}>{t}</text>
+              </>
+            ))}
+            {f1rows.map((f) => (
+              <g>
+                <text class="row-label" x="0" y={f.cy + 4}>{f.label}</text>
+                <line class="range-line" x1={f1x(f.lo)} x2={f1x(f.hi)} y1={f.cy} y2={f.cy} />
+                {f.marks.map((d) => (
+                  <circle class="pt pt-ring" cx={f1x(d.m)} cy={f.cy} r="4.5">
+                    <title>{d.a}: {d.m.toFixed(2)}% of par</title>
+                  </circle>
+                ))}
+                <text class="disp-label" x={F1W - 2} y={f.cy + 4} text-anchor="end">{f.disp.toFixed(2)} pts</text>
+              </g>
+            ))}
+          </svg>
+        </div>
+        <figcaption>
+          Filed fair-value marks, % of par, at 3/31/2026. One dot per
+          unaffiliated adviser; dashed line at par. Right margin: max−min.
+          Hover a dot for the holder.
+        </figcaption>
+      </figure>
+      <p>
+        Every mark shown is Level 3 (significant unobservable inputs) as
+        flagged in its own filing, on paper that is current and performing in
+        every holder's schedule. The marks are each fund's own, determined by
+        its valuation designee under its own policies.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> The Wider Market, Relative to Compute</h2>
+      <p>
+        Is four points a lot? Sixteen cross-held tranches from the same filing
+        season, matched the same way (same borrower, same tranche economics,
+        same date; one mark per unaffiliated adviser; term-loan core only),
+        give the baseline. The dispersion statistic is the mean pairwise
+        absolute difference (pwMAD) between advisers' marks — a measure that
+        does not grow mechanically with the number of holders, so an
+        11-adviser facility and a 2-adviser facility compare fairly.
+      </p>
+      <figure class="chart-fig">
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${F2W} ${F2H}`} role="img" aria-label="Same-facility mark dispersion by regime: performing conventional, post-restructuring, and compute tranches">
+            {f2Ticks.map((t) => (
+              <>
+                <line class="grid" x1={f2x(t)} x2={f2x(t)} y1={F2TOP - 4} y2={F2H - 4} />
+                <text class="tick" text-anchor="middle" x={f2x(t)} y={F2TOP - 9}>{t}</text>
+              </>
+            ))}
+            {REGIMES.map((r, i) => {
+              const cy = F2TOP + i * F2ROW + F2ROW / 2;
+              return (
+                <g>
+                  <text class="row-label" x="0" y={cy - 8}>{r.name}</text>
+                  <text class="row-sub" x="0" y={cy + 8}>{r.items.length} tranches</text>
+                  {r.items.map((it) => (
+                    <circle class={i === 2 ? 'pt pt-ring' : 'pt-ctx pt-ring'} cx={f2x(it.mad)} cy={cy} r="4.5">
+                      <title>{it.f}: pwMAD {it.mad.toFixed(2)} pts (n={it.n} advisers)</title>
+                    </circle>
+                  ))}
+                </g>
+              );
+            })}
+            <text class="tick" x={f2x(f2Ticks.at(-1)!) + 6} y={F2H - 4}>pts of par</text>
+          </svg>
+        </div>
+        <figcaption>
+          Per-tranche pwMAD across unaffiliated advisers, 3/31/2026. Accent
+          dots: compute tranches. Hover a dot for the facility.
+        </figcaption>
+      </figure>
+      <p>
+        The pattern is regime, not sector. Every performing conventional or
+        hard-asset tranche — syndicated fiber, medical-equipment rental,
+        aviation MRO, and unitranche facilities with as many as eleven
+        unaffiliated holders — lands between 0.14 and 0.94 points, median
+        0.26. Dispersion past two points appears in exactly two places:
+        credits that have been through a restructuring or bankruptcy (PetVet
+        2.8; Hornblower 3.9; 48Forty 4.2, where six advisers mark fresh
+        post-restructuring paper at par and one marks it 85), and
+        <strong>performing compute paper</strong> (CoreWeave DDTL 2.0 at 2.4;
+        Crusoe's 13% tranche at 4.2). Compute is also the only cohort in the
+        sample whose disagreement straddles par: holders differ on how much
+        <em>more</em> than face the paper is worth, not how much less.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> The Anatomy of a Mark</h2>
+      <p>
+        Why can honest valuations of the same loan sit four points apart? A
+        fair-value measurement on a performing private loan is, under the
+        accounting standard, an exit price — and in practice it is usually
+        produced by an income approach: discount the loan's remaining
+        contractual cash flows at the yield a market participant would
+        require today, over the loan's expected remaining life, calibrated to
+        the price the fund actually paid at entry. Observable transactions in
+        the same instrument, where they exist, take precedence over any
+        model. Three inputs, then: a market yield, an expected life, and a
+        calibration basis. Each is a place two valuation processes can
+        diverge while both remain defensible.
+      </p>
+      <p>
+        <strong>The market yield needs comparables, and compute has few.</strong>
+        An adviser marking a syndicated loan calibrates against a quoted
+        market; the liquid controls show what that anchor does — Zayo's five
+        holders land on two values 14 basis points apart, and one files the
+        position at Level 1/2 rather than Level 3. Compute credit has no
+        quoted market, and its primary prints are few and fast-moving:
+        disclosed spreads at signing fell from SOFR + 9.62 to a +1.75–2.25
+        cluster in under three years. Two comp sets drawn honestly from that
+        record can imply discount rates a point or more apart — which, on
+        multi-year paper, is points of price.
+      </p>
+      <p>
+        <strong>The expected life is the biggest single lever.</strong> A
+        loan paying an above-market coupon is worth more than par only for
+        as long as the coupon survives, and prepayable paper caps the upside
+        at par the day the borrower refinances. The CoreWeave facility pays
+        roughly three points a year over where new compute paper prints; at
+        that rate, one year of assumed remaining life is approximately the
+        entire gap between the lowest and highest filed marks. And expected
+        life is genuinely uncertain here: documented compute facilities have
+        resolved at a median of seven months from signing, with one issuer
+        refinancing three consecutive facilities inside sixteen months.
+        Whether a coupon survives to 2029 or to next spring is exactly the
+        kind of assumption a filing does not disclose and a model must make.
+      </p>
+      <p>
+        <strong>The calibration basis is visible in the arithmetic.</strong>
+        Valuation practice permits carrying a position at its calibrated
+        entry price absent evidence of change, and requires observable
+        transactions to be weighed when they occur. Both patterns appear in
+        this sample's filed numbers. On the CoreWeave facility, Carlyle's
+        fair value sits within a tenth of a point of its amortized cost,
+        while Great Elm and PIMCO carry fair value about three points above
+        theirs; on Crusoe, LAGO's fair value equals its amortized cost to
+        the dollar in both quarters it has filed, while Monroe — the one
+        holder that transacted during the period — files the only mark below
+        par in the group. The filings do not state any fund's method, and
+        this note does not infer one; they do state these arithmetic facts.
+        What the coexistence of both patterns on identical paper establishes
+        is the absence of a shared observable input that would force them
+        together: in the quoted controls, the anchor does that work; here
+        there is nothing to anchor to.
+      </p>
+      <p>
+        None of this requires a view on the collateral. Every mark in the
+        compute sample sits between 98 and 104, every position is
+        performing, and — as the ledger's collateral-treatment record shows —
+        every disclosed GPU schedule amortizes its collateral toward zero, so
+        a performing mark never has to price the hardware at all. The
+        disagreement is about the price of money against this collateral
+        class: the right spread, and how long the paper lives. Those are
+        precisely the two quantities this market does not yet publish.
+      </p>
+      <p class="footnote">
+        Holders also file different maturity dates for the same facilities
+        (on the CoreWeave facility: 5/16/2029, 5/22/2029, and 5/16/2030) —
+        a reporting-convention artifact of delayed-draw structures, whose
+        draws carry their own tenors; no primary document reconciles the
+        dates, and they do not explain the mark ordering.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> What Narrows the Range</h2>
+      <p>
+        Mark dispersion is not a permanent feature of a credit market; it is
+        a feature of a market's age. Each of the missing inputs above has a
+        known delivery mechanism, and each is visible in filings when it
+        arrives.
+      </p>
+      <p>
+        <strong>Anchors arrive with transactions.</strong> A trade in the
+        instrument outranks any model, and one is already visible in this
+        sample: the quarter's only seller files the group's only below-par
+        mark. A loan-level secondary market, syndication into quoted
+        markets, or securitization would generalize that effect — the
+        controls show both endpoints. Zayo's holders, with a quote to anchor
+        to, land within 14 basis points; and data-center lending, compute's
+        nearest predecessor, no longer appears as cross-held Level 3 loans
+        at all — it refinanced into rated, quoted securitization classes,
+        and the marks question left the loan books with it. GPU-backed
+        securitization has begun; each deal that prices converts a modeled
+        input into an observed one.
+      </p>
+      <p>
+        <strong>Inputs densify with the record.</strong> Every new signing
+        adds a spread comparable — the 2026 cluster at +1.75 to +2.25 is
+        already a tighter calibration set than the sparse 2023–2024 prints —
+        and every documented resolution adds an expected-life observation,
+        narrowing the assumption that currently accounts for the largest
+        share of the gap. Rating coverage, where it extends to this
+        collateral, adds a shared spread reference of its own.
+      </p>
+      <p>
+        Because each mechanism surfaces in public filings, the dispersion
+        itself is measurable quarter by quarter: the same facilities will be
+        marked again next quarter, by the same holders, on a growing record.
+        Whether the range narrows is not a matter of argument — it will be
+        on the record, one filing season at a time.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> Method &amp; Limitations</h2>
+      <p>
+        Marks are reproduced from schedules of investments in 10-Q filings for
+        the period ended 3/31/2026 (one 10-K), read July 2026; a mark is fair
+        value divided by principal, both as filed. Tranches match on borrower
+        plus tranche economics (rate and maturity month); advisers are
+        counted once per complex, with affiliated vehicles collapsed.
+        Excluded: revolver and delayed-draw rows whose filed values net
+        unfunded-commitment fees (not comparable as filed); positions held
+        through joint-venture vehicles where flagged; one tower-securitization
+        pair whose coupons indicate different classes of the same program;
+        rows filed at millions precision where rounding exceeds the measured
+        dispersion.
+      </p>
+      <p>
+        Limits. Compute tranches have two to four unaffiliated holders each —
+        the finding is the table, not a statistic, and one quarter's filings
+        are one observation of each mark. Coverage is funds that file
+        schedules of investments; banks and private funds, which hold most
+        compute credit, publish no marks. One holder files identical marks on
+        both of its CoreWeave tranches, consistent with position-level rather
+        than tranche-level marking. Marks are each filer's own fair-value
+        determinations; nothing here estimates, adjusts, or opines on any of
+        them.
+      </p>
+      <p class="data-note">
+        Underlying rows, with links to every source filing, are maintained on
+        the <a href="/credit/series">credit reference series</a> page; the
+        instrument record is the <a href="/credit">compute credit tracker</a>.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec strong { color: var(--accent); }
+    .sec em { font-style: italic; }
+
+    .chart-fig { margin: 0 0 12px; max-width: 820px; }
+    .chart-box { border: 1px solid var(--rule); background: var(--surface); overflow: hidden; }
+    .chart-box svg { display: block; width: 100%; height: auto; padding: 4px 8px; }
+    figcaption {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-faint);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .grid { stroke: var(--rule); stroke-width: 1; }
+    .par-line { stroke: var(--ink-dim); stroke-width: 1.2; stroke-dasharray: 4 3; }
+    .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+    .row-label { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); }
+    .row-sub { font-family: var(--font-mono); font-size: 9.5px; fill: var(--ink-faint); }
+    .pt { fill: var(--accent); }
+    .pt-ctx { fill: var(--ink-faint); }
+    .pt-ring { stroke: var(--surface); stroke-width: 1.8; }
+    .range-line { stroke: var(--ink-faint); stroke-width: 2; opacity: 0.8; }
+    .disp-label { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; fill: var(--accent); }
+    .data-note { font-size: var(--fs-sm); color: var(--ink-dim); }
+    .footnote {
+      font-size: var(--fs-sm);
+      color: var(--ink-faint);
+      border-top: 1px solid var(--rule);
+      padding-top: 8px;
+      max-width: 74ch;
+    }
+  </style>
+</Base>
