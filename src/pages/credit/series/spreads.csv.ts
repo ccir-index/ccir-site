@@ -11,12 +11,15 @@ export const prerender = true;
 */
 const rows = (creditData.instruments as any[])
   .filter((i) => !i.exclude_from_issuance && typeof i.size_usd_m === 'number' && i.size_usd_m > 0)
-  .filter((i) => i.rate?.kind === 'sofr_spread' && i.rate.value != null && /^\d{4}/.test(i.issued ?? ''))
+  .filter((i) => i.rate?.kind === 'sofr_spread' && (i.rate.value != null || i.rate.value_low != null) && /^\d{4}/.test(i.issued ?? ''))
   .map((i) => ({
     signed: i.issued,
     issuer: i.issuer,
     instrument: i.name,
-    spread_pp_over_sofr: i.rate.value,
+    // flat facilities fill spread_pp; grid-priced ones fill low/high instead
+    spread_pp: i.rate.value ?? '',
+    spread_pp_low: i.rate.value ?? i.rate.value_low,
+    spread_pp_high: i.rate.value ?? i.rate.value_high,
     size_usd_m: i.size_usd_m,
     status: i.status,
     source_url: i.source?.url ?? '',
@@ -29,8 +32,8 @@ const esc = (v: unknown) => {
 };
 
 export const GET: APIRoute = () => {
-  const header = 'signed,issuer,instrument,spread_pp_over_sofr,size_usd_m,status,source_url';
-  const body = rows.map((r) => [r.signed, r.issuer, r.instrument, r.spread_pp_over_sofr, r.size_usd_m, r.status, r.source_url].map(esc).join(','));
+  const header = 'signed,issuer,instrument,spread_pp,spread_pp_low,spread_pp_high,size_usd_m,status,source_url';
+  const body = rows.map((r) => [r.signed, r.issuer, r.instrument, r.spread_pp, r.spread_pp_low, r.spread_pp_high, r.size_usd_m, r.status, r.source_url].map(esc).join(','));
   return new Response([header, ...body].join('\n') + '\n', {
     headers: { 'Content-Type': 'text/csv; charset=utf-8' },
   });

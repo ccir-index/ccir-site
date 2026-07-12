@@ -38,12 +38,22 @@ const inScope = instruments.filter(
   (i: any) => !i.exclude_from_issuance && typeof i.size_usd_m === 'number' && i.size_usd_m > 0
 );
 const spreadRows = inScope
-  .filter((i: any) => i.rate?.kind === 'sofr_spread' && i.rate.value != null && /^\d{4}/.test(i.issued ?? ''))
+  .filter(
+    (i: any) =>
+      i.rate?.kind === 'sofr_spread' &&
+      (i.rate.value != null || i.rate.value_low != null) &&
+      /^\d{4}/.test(i.issued ?? '')
+  )
   .map((i: any) => ({
     issued: i.issued,
     issuer: i.issuer,
     name: i.name,
-    spread: i.rate.value,
+    // grid-priced facilities disclose a spread range — carried as a range,
+    // never collapsed to a point
+    spreadText:
+      i.rate.value != null
+        ? `+${i.rate.value.toFixed(2)}`
+        : `+${i.rate.value_low.toFixed(2)}–${i.rate.value_high.toFixed(2)}`,
     size: i.size_usd_m,
     url: i.source?.url,
     status: i.status,
@@ -193,7 +203,7 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
               <td class="mono">{r.issued}</td>
               <td>{r.issuer}</td>
               <td class="c-inst">{r.name}</td>
-              <td class="num mono">+{r.spread.toFixed(2)}</td>
+              <td class="num mono">{r.spreadText}</td>
               <td class="num mono">{r.size.toLocaleString('en-US')}</td>
               <td><span class={`chip chip-${r.status}`}>{r.status}</span></td>
               <td class="c-srclink">{r.url && <a href={r.url} target="_blank" rel="noopener noreferrer">doc ↗</a>}</td>
