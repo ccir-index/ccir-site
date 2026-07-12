@@ -993,6 +993,84 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
           row.classList.add('flash');
         });
       });
+
+      // --- resizable columns -------------------------------------------------
+      // Fixed layout with measured initial widths; a grip on each header edge
+      // drags its column. Column width then governs truncation instead of the
+      // per-cell max-width caps (lifted via the .resizable class). Widths
+      // persist per browser in localStorage.
+      (function () {
+        var table = document.getElementById('credit-table');
+        if (!table) return;
+        var ths = table.querySelectorAll('thead th');
+        var KEY = 'credit-col-widths-v1';
+        var saved = null;
+        try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+        if (saved && saved.length !== ths.length) saved = null;
+
+        var colgroup = document.createElement('colgroup');
+        var cols = [];
+        ths.forEach(function (th, i) {
+          var w = (saved && saved[i]) || th.getBoundingClientRect().width;
+          var col = document.createElement('col');
+          col.style.width = Math.round(w) + 'px';
+          colgroup.appendChild(col);
+          cols.push(col);
+        });
+        table.insertBefore(colgroup, table.firstChild);
+        table.classList.add('resizable');
+        table.style.tableLayout = 'fixed';
+        function totalWidth() {
+          return cols.reduce(function (s, c) { return s + parseFloat(c.style.width); }, 0);
+        }
+        table.style.width = totalWidth() + 'px';
+        table.style.minWidth = '0';
+
+        function persist() {
+          try {
+            localStorage.setItem(KEY, JSON.stringify(cols.map(function (c) { return parseFloat(c.style.width); })));
+          } catch (e) {}
+        }
+
+        ths.forEach(function (th, i) {
+          var grip = document.createElement('span');
+          grip.className = 'col-grip';
+          grip.setAttribute('aria-hidden', 'true');
+          th.appendChild(grip);
+          grip.addEventListener('click', function (e) { e.stopPropagation(); });
+          grip.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var startX = e.clientX;
+            var startW = parseFloat(cols[i].style.width);
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            function move(ev) {
+              var w = Math.max(44, startW + (ev.clientX - startX));
+              cols[i].style.width = Math.round(w) + 'px';
+              table.style.width = totalWidth() + 'px';
+            }
+            function up() {
+              document.removeEventListener('mousemove', move);
+              document.removeEventListener('mouseup', up);
+              document.body.style.cursor = '';
+              document.body.style.userSelect = '';
+              persist();
+            }
+            document.addEventListener('mousemove', move);
+            document.addEventListener('mouseup', up);
+          });
+          // double-click a grip: reset that column to its natural width
+          grip.addEventListener('dblclick', function (e) {
+            e.stopPropagation();
+            cols[i].style.width = '';
+            var natural = ths[i].getBoundingClientRect().width;
+            cols[i].style.width = Math.round(natural) + 'px';
+            table.style.width = totalWidth() + 'px';
+            persist();
+          });
+        });
+      })();
     })();
   </script>
 
@@ -1246,6 +1324,46 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     }
     .table-scroll { overflow-x: auto; border: 1px solid var(--rule); }
     #credit-table { min-width: 1240px; }
+
+    /* --- resizable columns ------------------------------------------------ */
+    #credit-table th { position: relative; }
+    .col-grip {
+      position: absolute;
+      top: 0;
+      right: -4px;
+      width: 9px;
+      height: 100%;
+      cursor: col-resize;
+      z-index: 2;
+    }
+    .col-grip::after {
+      content: '';
+      position: absolute;
+      top: 20%;
+      bottom: 20%;
+      right: 4px;
+      width: 1px;
+      background: var(--rule-2);
+    }
+    .col-grip:hover::after {
+      background: var(--accent);
+      width: 2px;
+    }
+    /* under fixed layout the col width governs truncation — lift the
+       hardcoded per-cell caps and let every cell ellipsize to its column */
+    #credit-table.resizable td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #credit-table.resizable .c-issuer,
+    #credit-table.resizable .c-name,
+    #credit-table.resizable .c-type,
+    #credit-table.resizable .c-rate,
+    #credit-table.resizable .c-issued,
+    #credit-table.resizable .c-src,
+    #credit-table.resizable .c-lenders { max-width: none; }
+    #credit-table.resizable .c-lenders .lender-first,
+    #credit-table.resizable .c-src a { max-width: 100%; }
     #credit-table td { font-size: var(--fs-sm); }
     #credit-table th.sortable {
       cursor: pointer;
