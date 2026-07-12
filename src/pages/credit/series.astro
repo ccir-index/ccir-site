@@ -54,11 +54,68 @@ const spreadRows = inScope
       i.rate.value != null
         ? `+${i.rate.value.toFixed(2)}`
         : `+${i.rate.value_low.toFixed(2)}–${i.rate.value_high.toFixed(2)}`,
+    lo: i.rate.value ?? i.rate.value_low,
+    hi: i.rate.value ?? i.rate.value_high,
     size: i.size_usd_m,
     url: i.source?.url,
     status: i.status,
   }))
   .sort((a: any, b: any) => a.issued.localeCompare(b.issued));
+
+// --- chart: spread at signing (dot chart over time; grid pricing = range bar).
+// Discrete signings — dots, never a connecting line: a line would imply a
+// continuous curve between deals that doesn't exist.
+const SW = 960, SH = 330, SL = 46, SRp = 14, STp = 16, SBp = 34;
+const monthIdx = (d: string) => +d.slice(0, 4) * 12 + (+d.slice(5, 7) || 1);
+const mMin = monthIdx('2023-05');
+const mMax = monthIdx('2026-09');
+const sx = (d: string) => SL + ((monthIdx(d) - mMin) / (mMax - mMin)) * (SW - SL - SRp);
+const sy = (v: number) => STp + (1 - v / 10) * (SH - STp - SBp);
+const yTicks = [0, 2, 4, 6, 8, 10];
+const xTicks = ['2024-01', '2025-01', '2026-01'].map((d) => ({ x: sx(d), label: d.slice(0, 4) }));
+function shortName(r: any): string {
+  if (/^DDTL/.test(r.name)) return `CRWV ${r.name.split(' (')[0]}`;
+  return r.issuer.replace(/,.*$/, '').replace(/ (Inc\.|Ltd\.?|Limited|Corporation|Holdings.*)$/, '').split(' ').slice(0, 2).join(' ');
+}
+const spreadPts = spreadRows.map((r: any) => ({
+  ...r,
+  cx: sx(r.issued),
+  cyLo: sy(r.lo),
+  cyHi: sy(r.hi),
+  isRange: r.lo !== r.hi,
+  short: shortName(r),
+}));
+// selective direct labels, greedy placement: candidates above / below /
+// beside each point, rejected on collision with ANY dot or already-placed
+// label. Points that can't fit a label keep the hover title only.
+type Rect = { x0: number; x1: number; y0: number; y1: number };
+const dotRects: Rect[] = spreadPts.flatMap((p: any) => [
+  { x0: p.cx - 7, x1: p.cx + 7, y0: p.cyHi - 7, y1: p.cyHi + 7 },
+  { x0: p.cx - 7, x1: p.cx + 7, y0: p.cyLo - 7, y1: p.cyLo + 7 },
+]);
+const labelRects: Rect[] = [];
+const placedLabels: { x: number; y: number; text: string; anchor: string }[] = [];
+const overlaps = (a: Rect, b: Rect) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
+for (const p of spreadPts) {
+  const text = `${p.short} ${p.spreadText}`;
+  const w = text.length * 6.2;
+  const midY = (p.cyLo + p.cyHi) / 2;
+  const cands: { x: number; y: number; anchor: string }[] = [
+    { x: p.cx, y: p.cyHi - 11, anchor: 'middle' },
+    { x: p.cx, y: p.cyLo + 19, anchor: 'middle' },
+    { x: p.cx + 10, y: midY + 3.5, anchor: 'start' },
+    { x: p.cx - 10, y: midY + 3.5, anchor: 'end' },
+  ];
+  for (const c of cands) {
+    const x0 = c.anchor === 'start' ? c.x : c.anchor === 'end' ? c.x - w : c.x - w / 2;
+    const rect: Rect = { x0, x1: x0 + w, y0: c.y - 9, y1: c.y + 3 };
+    if (rect.x0 < 2 || rect.x1 > SW - 2 || rect.y0 < STp - 12 || rect.y1 > SH - SBp) continue;
+    if (dotRects.some((d) => overlaps(rect, d)) || labelRects.some((l) => overlaps(rect, l))) continue;
+    labelRects.push(rect);
+    placedLabels.push({ x: c.x, y: c.y, text, anchor: c.anchor });
+    break;
+  }
+}
 
 // --- 02 refi velocity --------------------------------------------------------
 const refiRows = (refiVelocity as any).rows ?? [];
@@ -121,6 +178,37 @@ function dispersion(rows: any[]): { n: number; spread: number } | null {
   const vals = [...byAdviser.values()];
   return { n: byAdviser.size, spread: Math.max(...vals) - Math.min(...vals) };
 }
+// --- chart: filed-marks dispersion (dot strip per facility, min–max
+// connector, emphasized par line). Only facilities with a cross-adviser
+// pair chart; single-holder facilities stay table-only.
+function chartShortLabel(rows: any[]): string {
+  const m = rows[0];
+  const row = m.ccir_instrument_id ? byId.get(m.ccir_instrument_id) : null;
+  if (row) return `${row.issuer.replace(/,.*$/, '')} ${row.name.split(' (')[0]}`;
+  const entity = m.borrower_entity.split('(')[0].trim().replace(/,? (LLC|Inc\.?|Ltd|Corp).*$/i, '');
+  const t = m.tranche ?? {};
+  const rate = t.rate_kind === 'fixed' ? `${t.all_in_pct}% fixed` : `S+${t.spread_pct}`;
+  return `${entity} ${rate}`;
+}
+const MW = 960, MGL = 236, MGR = 84, MTOP = 34, MROW = 56;
+const mDomain = [97, 104];
+const mx = (v: number) => MGL + ((v - mDomain[0]) / (mDomain[1] - mDomain[0])) * (MW - MGL - MGR);
+const marksChart = facilityOrder
+  .map((k) => {
+    const rows = facilities.get(k)!;
+    const disp = dispersion(rows);
+    if (!disp) return null;
+    const dots = rows
+      .filter((r: any) => r.funded && r.mark_pct != null)
+      .map((r: any) => ({ holder: r.holder, mark: r.mark_pct, x: mx(r.mark_pct) }));
+    const lo = Math.min(...dots.map((d) => d.mark));
+    const hi = Math.max(...dots.map((d) => d.mark));
+    return { label: chartShortLabel(rows), dots, lo, hi, disp };
+  })
+  .filter(Boolean) as any[];
+const MH = MTOP + marksChart.length * MROW + 10;
+const mTicks = [97, 98, 99, 100, 101, 102, 103, 104];
+
 function fmtK(x: number | null): string {
   if (x == null) return '—';
   return x.toLocaleString('en-US', { maximumFractionDigits: 1 });
@@ -189,6 +277,54 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       rate as undisclosed, and undisclosed stays undisclosed.
       <a class="csv-link" href="/credit/series/spreads.csv">series CSV ↓</a>
     </p>
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Disclosed spread at signing, GPU-collateralized facilities</div>
+          <div class="panel-sub">PP OVER SOFR · EACH DOT ONE SIGNING · BAR = DISCLOSED GRID RANGE · JUL 2023 – JUN 2026</div>
+        </div>
+        <span class="badge">{spreadRows.length} SIGNINGS</span>
+      </div>
+      <svg viewBox={`0 0 ${SW} ${SH}`} role="img" aria-label="Disclosed spread over SOFR at signing for GPU-collateralized facilities, July 2023 to June 2026">
+        {yTicks.map((t) => (
+          <>
+            <line class="grid" x1={SL} x2={SW - SRp} y1={sy(t)} y2={sy(t)} />
+            <text class="tick tick-y" x={SL - 8} y={sy(t) + 3}>+{t}</text>
+          </>
+        ))}
+        {xTicks.map((t) => (
+          <>
+            <line class="grid" x1={t.x} x2={t.x} y1={STp} y2={SH - SBp} />
+            <text class="tick tick-x" x={t.x} y={SH - SBp + 16}>{t.label}</text>
+          </>
+        ))}
+        <line class="axis" x1={SL} x2={SW - SRp} y1={SH - SBp} y2={SH - SBp} />
+        {spreadPts.map((p: any) => (
+          <g>
+            <title>{p.issuer} — {p.name} · signed {p.issued} · {p.spreadText} pp over SOFR</title>
+            {p.isRange ? (
+              <>
+                <line class="range-bar" x1={p.cx} x2={p.cx} y1={p.cyLo} y2={p.cyHi} />
+                <circle class="pt" cx={p.cx} cy={p.cyLo} r="4.5" />
+                <circle class="pt" cx={p.cx} cy={p.cyHi} r="4.5" />
+              </>
+            ) : (
+              <circle class="pt" cx={p.cx} cy={p.cyLo} r="4.5" />
+            )}
+          </g>
+        ))}
+        {placedLabels.map((l) => (
+          <text class="pt-label" x={l.x} y={l.y} text-anchor={l.anchor}>{l.text}</text>
+        ))}
+      </svg>
+      <div class="panel-foot">
+        <p>
+          Spreads as disclosed in each signing document; grid-priced facilities
+          show their disclosed range. Hover a dot for the instrument. Window:
+          the tracker's full GPU-collateralized record, July 2023 – June 2026.
+        </p>
+      </div>
+    </div>
     <div class="table-scroll">
       <table class="series-table">
         <thead>
@@ -295,6 +431,50 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       its own policies; conflicting filed terms across holders are reproduced,
       not reconciled.
     </p>
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Same facility, different filed marks</div>
+          <div class="panel-sub">% OF PAR AT {marksPeriod} · ONE DOT PER HOLDER · LINE SPANS MIN–MAX · FACILITIES WITH ≥2 UNAFFILIATED ADVISERS</div>
+        </div>
+        <span class="badge">PAR = 100</span>
+      </div>
+      <svg viewBox={`0 0 ${MW} ${MH}`} role="img" aria-label="Filed fair-value marks as percent of par, by facility and holder">
+        {mTicks.map((t) => (
+          <>
+            <line class={t === 100 ? 'par-line' : 'grid'} x1={mx(t)} x2={mx(t)} y1={MTOP - 6} y2={MH - 8} />
+            <text class="tick tick-x" x={mx(t)} y={MTOP - 12}>{t}</text>
+          </>
+        ))}
+        {marksChart.map((f: any, i: number) => {
+          const cy = MTOP + i * MROW + MROW / 2;
+          return (
+            <g>
+              <text class="row-label" x="0" y={cy + 4}>{f.label}</text>
+              <line class="range-line" x1={mx(f.lo)} x2={mx(f.hi)} y1={cy} y2={cy} />
+              {f.dots.map((d: any) => (
+                <circle class="pt pt-ring" cx={d.x} cy={cy} r="5">
+                  <title>{d.holder}: {d.mark.toFixed(2)}% of par</title>
+                </circle>
+              ))}
+              <text class="val-label" x={mx(f.lo)} y={cy + 22} text-anchor="middle">{f.lo.toFixed(f.lo % 1 ? 1 : 0)}</text>
+              {f.hi - f.lo > 0.25 && (
+                <text class="val-label" x={mx(f.hi)} y={cy + 22} text-anchor="middle">{f.hi.toFixed(f.hi % 1 ? 1 : 0)}</text>
+              )}
+              <text class="disp-label" x={MW - 4} y={cy + 4} text-anchor="end">{f.disp.spread.toFixed(2)} pts</text>
+            </g>
+          );
+        })}
+      </svg>
+      <div class="panel-foot">
+        <p>
+          Each dot is one holder's filed mark; the line spans the lowest to
+          highest mark on the same facility at the same date. The par line is
+          drawn at 100. Hover a dot for the holder. Right margin: max−min in
+          points of par.
+        </p>
+      </div>
+    </div>
     {facilityOrder.map((k) => {
       const rows = facilities.get(k)!;
       const disp = dispersion(rows);
@@ -486,6 +666,89 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
     padding: 14px 16px;
     max-width: 84ch;
   }
+
+  /* --- chart panels (same idiom as /credit) ----------------------------- */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    margin-bottom: 18px;
+  }
+  .panel-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: var(--pad-panel) var(--pad-panel) 8px;
+  }
+  .panel-title {
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    font-weight: var(--weight-display);
+  }
+  .panel-sub {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-dim);
+    margin-top: 4px;
+    letter-spacing: 0.03em;
+  }
+  .badge {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: var(--tracking-eye);
+    color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    padding: 3px 8px;
+  }
+  .panel svg { display: block; width: 100%; height: auto; padding: 0 6px; }
+  .panel-foot {
+    padding: 4px var(--pad-panel) var(--pad-panel);
+    font-size: var(--fs-sm);
+    color: var(--ink-dim);
+    line-height: 1.5;
+    max-width: 100ch;
+  }
+  .panel-foot p { margin: 0; }
+
+  /* svg marks */
+  .grid { stroke: color-mix(in srgb, var(--rule) 70%, transparent); stroke-width: 1; }
+  .axis { stroke: var(--rule-2); stroke-width: 1; }
+  .par-line {
+    stroke: var(--ink-dim);
+    stroke-width: 1.2;
+    stroke-dasharray: 4 3;
+  }
+  .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+  .tick-y { text-anchor: end; }
+  .tick-x { text-anchor: middle; }
+  .pt { fill: var(--accent); }
+  .pt-ring { stroke: var(--surface); stroke-width: 2; }
+  .range-bar { stroke: var(--accent); stroke-width: 2.5; opacity: 0.7; }
+  .range-line { stroke: var(--ink-faint); stroke-width: 2; opacity: 0.8; }
+  .pt-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    fill: var(--ink);
+  }
+  .row-label {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    fill: var(--ink);
+  }
+  .val-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--ink-dim);
+  }
+  .disp-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--accent);
+  }
+  .pt:hover { opacity: 0.75; cursor: default; }
 
   .table-scroll { overflow-x: auto; border: 1px solid var(--rule); }
   .series-table { width: 100%; border-collapse: collapse; min-width: 880px; }
