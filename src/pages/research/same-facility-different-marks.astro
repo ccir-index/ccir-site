@@ -104,7 +104,7 @@ const f2Ticks = [0, 1, 2, 3, 4];
     </header>
 
     <section class="sec">
-      <h2><span class="n">01</span> The Observation</h2>
+      <h2><span class="n">01</span> The Observed Marks: Compute-Backed Facilities</h2>
       <p>
         Five compute-collateralized facilities in Q1-2026 schedules of
         investments are held by two or more unaffiliated advisers. The widest
@@ -156,7 +156,7 @@ const f2Ticks = [0, 1, 2, 3, 4];
     </section>
 
     <section class="sec">
-      <h2><span class="n">02</span> The Control</h2>
+      <h2><span class="n">02</span> The Wider Market, Relative to Compute</h2>
       <p>
         Is four points a lot? Sixteen cross-held tranches from the same filing
         season, matched the same way (same borrower, same tranche economics,
@@ -214,42 +214,7 @@ const f2Ticks = [0, 1, 2, 3, 4];
     </section>
 
     <section class="sec">
-      <h2><span class="n">03</span> What the Filings Themselves Show</h2>
-      <p>
-        The filings carry more than the marks; read together, they show where
-        the disagreement sits.
-      </p>
-      <p>
-        <strong>The cost columns split the holders in two.</strong> On the
-        CoreWeave facility, Carlyle's fair value sits within a tenth of a
-        point of its amortized cost; Great Elm and PIMCO both carry fair value
-        about three points above theirs. On Crusoe, LAGO's fair value equals
-        its amortized cost to the dollar in both quarters it has filed, while
-        Monroe — the one holder that transacted during the quarter — files the
-        only mark below par in the group. The filings do not state any
-        holder's method; they do state these arithmetic facts.
-      </p>
-      <p>
-        <strong>The rate context is moving fast under the paper.</strong>
-        Disclosed spreads on new GPU-collateralized facilities have stepped
-        from SOFR + 9.62 (July 2023) to a +1.75 to +2.25 cluster (spring
-        2026), and the sector's documented facilities resolve quickly — a
-        median of seven months from signing to refinancing or repayment among
-        resolutions with both dates on the record. A loan paying yesterday's
-        spread, expected to live months rather than years, puts most of its
-        present value in assumptions a filing does not disclose.
-      </p>
-      <p class="footnote">
-        Holders also file different maturity dates for the same facilities
-        (on the CoreWeave facility: 5/16/2029, 5/22/2029, and 5/16/2030) —
-        a reporting-convention artifact of delayed-draw structures, whose
-        draws carry their own tenors; no primary document reconciles the
-        dates, and they do not explain the mark ordering.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">04</span> The Anatomy of a Mark</h2>
+      <h2><span class="n">03</span> The Anatomy of a Mark</h2>
       <p>
         Why can honest valuations of the same loan sit four points apart? A
         fair-value measurement on a performing private loan is, under the
@@ -294,15 +259,18 @@ const f2Ticks = [0, 1, 2, 3, 4];
         Valuation practice permits carrying a position at its calibrated
         entry price absent evidence of change, and requires observable
         transactions to be weighed when they occur. Both patterns appear in
-        this sample's filed numbers — fair value equal to amortized cost to
-        the dollar at some holders, quarter over quarter; fair value re-set
-        away from cost at others, including at the one holder that sold
-        during the period. The filings do not state any fund's method, and
-        this note does not infer one. What the coexistence of both patterns
-        on identical paper does establish is the absence of a shared
-        observable input that would force them together: in the quoted
-        controls, the anchor does that work; here there is nothing to anchor
-        to.
+        this sample's filed numbers. On the CoreWeave facility, Carlyle's
+        fair value sits within a tenth of a point of its amortized cost,
+        while Great Elm and PIMCO carry fair value about three points above
+        theirs; on Crusoe, LAGO's fair value equals its amortized cost to
+        the dollar in both quarters it has filed, while Monroe — the one
+        holder that transacted during the period — files the only mark below
+        par in the group. The filings do not state any fund's method, and
+        this note does not infer one; they do state these arithmetic facts.
+        What the coexistence of both patterns on identical paper establishes
+        is the absence of a shared observable input that would force them
+        together: in the quoted controls, the anchor does that work; here
+        there is nothing to anchor to.
       </p>
       <p>
         None of this requires a view on the collateral. Every mark in the
@@ -314,10 +282,17 @@ const f2Ticks = [0, 1, 2, 3, 4];
         class: the right spread, and how long the paper lives. Those are
         precisely the two quantities this market does not yet publish.
       </p>
+      <p class="footnote">
+        Holders also file different maturity dates for the same facilities
+        (on the CoreWeave facility: 5/16/2029, 5/22/2029, and 5/16/2030) —
+        a reporting-convention artifact of delayed-draw structures, whose
+        draws carry their own tenors; no primary document reconciles the
+        dates, and they do not explain the mark ordering.
+      </p>
     </section>
 
     <section class="sec">
-      <h2><span class="n">05</span> Method &amp; Limitations</h2>
+      <h2><span class="n">04</span> Method &amp; Limitations</h2>
       <p>
         Marks are reproduced from schedules of investments in 10-Q filings for
         the period ended 3/31/2026 (one 10-K), read July 2026; a mark is fair
