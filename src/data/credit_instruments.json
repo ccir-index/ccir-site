@@ -3035,10 +3035,10 @@
    "issued": "2026-05-01",
    "source": {
     "doc": "Q1-26 10-Q Note 19 + Ex. 10.2",
-    "date": "2026-05-15",
+    "date": "2026-05-06",
     "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465926055891/hut-20260331x10q.htm"
    },
-   "as_of": "2026-05-15"
+   "as_of": "2026-07-12"
   },
   {
    "id": "hut-coatue-conv",
@@ -3068,10 +3068,10 @@
    "issued": "2024-06-28",
    "source": {
     "doc": "Q1-26 10-Q Note 9",
-    "date": "2026-05-15",
+    "date": "2026-05-06",
     "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465926055891/hut-20260331x10q.htm"
    },
-   "as_of": "2026-03-31"
+   "as_of": "2026-07-12"
   },
   {
    "id": "hut-tzrc-note",
@@ -3099,10 +3099,10 @@
    "issued": "2022-12-06",
    "source": {
     "doc": "Q1-26 10-Q Note 9",
-    "date": "2026-05-15",
+    "date": "2026-05-06",
     "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465926055891/hut-20260331x10q.htm"
    },
-   "as_of": "2026-03-31"
+   "as_of": "2026-07-12"
   },
   {
    "id": "hut-twoprime-revolver",
@@ -3130,10 +3130,10 @@
    "issued": "2025-08-25",
    "source": {
     "doc": "Q1-26 10-Q Note 9",
-    "date": "2026-05-15",
+    "date": "2026-05-06",
     "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465926055891/hut-20260331x10q.htm"
    },
-   "as_of": "2026-03-31"
+   "as_of": "2026-07-12"
   },
   {
    "id": "hut-safe",
@@ -3163,10 +3163,10 @@
    "issued": "2025-02",
    "source": {
     "doc": "Q1-26 10-Q Note 9",
-    "date": "2026-05-15",
+    "date": "2026-05-06",
     "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465926055891/hut-20260331x10q.htm"
    },
-   "as_of": "2026-03-31"
+   "as_of": "2026-07-12"
   },
   {
    "id": "btbt-conv-2030",
@@ -4981,9 +4981,9 @@
   {
    "issuer": "CoreWeave, Inc.",
    "items": [
-    "2024 $1.0B 12% term loan (repaid at IPO)",
+    "2024 $1.0B term loan, SOFR+5.25-6.25% step-up (~12% effective; JPMorgan admin) - repaid at IPO Apr 2025",
     "2025 $300M term loan",
-    "$172M acquisition converts (equity-settled Apr 2026)",
+    "$172M Monolith AI acquisition converts ($185M issued incl. $13M vesting-conditioned; equity-settled Apr 2026)",
     "2021 secured converts",
     "Core Scientific merger terminated Oct 30, 2025 — no assumed debt"
    ]
@@ -4997,7 +4997,7 @@
   {
    "issuer": "TeraWulf Inc.",
    "items": [
-    "$500M Raylan Data bridge (MS, SOFR+2.75%, Mar 2026) repaid Apr 16, 2026",
+    "$500M Raylan Data bridge, Hawesville KY (MS, SOFR+2.75%, Mar 2026; $100M drawn) - repaid Apr 16, 2026",
     "Legacy LGSA loans/miner financings at $0"
    ]
   },
@@ -5005,8 +5005,8 @@
    "issuer": "Applied Digital Corporation",
    "items": [
     "CIM $125M",
-    "Macquarie ELN-02 $150M + FAR-01 $50M",
-    "SMBC $375M (repaid Nov 2025)",
+    "Macquarie ELN-02 $150M (Ellendale / Polaris Forge 1) + FAR-01 $50M (Polaris Forge 2 / Harwood)",
+    "SMBC $375M (closed 2/11/25; repaid Nov 2025 with 9.250% notes proceeds)",
     "GS ELN-04 bridge (Jun 2026)",
     "Excluded: Macquarie $900M 12.75% PIK preferred in HPC TopCo 2 = redeemable NCI, not debt",
     "UNVERIFIED: status of Nov 2025 FNBO $65M revolver (SOFR+2.75%, $61.9M LCs at 2/28/26 — likely superseded, no terminating filing)"
@@ -5015,14 +5015,14 @@
   {
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
    "items": [
-    "Bitmain future-sales obligations (prepaid May 2025)",
+    "Bitmain future-sales obligations (Original Agreement 12/16/23; prepaid May 2025 at 10% discount)",
     "Luxor BTC borrowings (repaid by YE2025)"
    ]
   },
   {
    "issuer": "IREN Limited",
    "items": [
-    "Dec 2, 2025: ~$544.3M of 2029/2030 converts repurchased/equitized for ~$1,632.4M",
+    "Dec 2, 2025: ~$544.3M of 2029/2030 converts repurchased for cash ~$1,632.4M (funded in part by a concurrent 39.7M-share placement)",
     "Dell purchase agreements ($2.3B + $1.2B + $1.6B) = purchase commitments, not debt",
     "NYDIG SPV financings settled Aug 2025"
    ]
@@ -5030,7 +5030,7 @@
   {
    "issuer": "Core Scientific, Inc.",
    "items": [
-    "$1.0B MS/JPM 364-day bridge (SOFR+2.50%, Mar 2026) repaid with secured-notes proceeds May 6, 2026",
+    "$1.0B MS/JPM 364-day bridge (SOFR+2.50%; two closings: $500M 3/4/26 + $500M JPM incremental 3/18/26) - repaid with secured-notes proceeds May 6, 2026",
     "All bankruptcy-exit debt extinguished 2024",
     "Pending (not debt): ~$421M Polaris DS cash acquisition"
    ]
@@ -5038,7 +5038,7 @@
   {
    "issuer": "Hut 8 Corp.",
    "items": [
-    "Coinbase $200M 9.00% BTC facility (repaid May 2026 with FalconX proceeds)",
+    "Coinbase 9.00% BTC facility ($130M Jun 2025, upsized to $200M Dec 2025) - repaid May 2026 with FalconX proceeds",
     "Anchorage (equitized 2024)",
     "NYDIG (2023)",
     "No Vega project debt exists in any filing (Bitmain hosting arrangement)",
