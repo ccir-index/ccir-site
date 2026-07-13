@@ -485,6 +485,18 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
           drawn at 100. Hover a dot for the holder. Right margin: max−min in
           points of par.
         </p>
+        <p>
+          In yield terms: translated at a common facility maturity —
+          quarterly discounting of the contractual payments, bullet repayment
+          at par, floating coupons held at the filed all-in rate — the widest
+          panel at 3/31/2026 (99.0 / 100.0 / 102.0 / 103.1) implies yields to
+          maturity of 9.96, 9.66, 9.12, and 8.86 percent: roughly 110 basis
+          points of dispersion in required return on identical paper, about
+          27 basis points per point of par. The translation is arithmetic on
+          filed numbers under the stated convention, not a valuation; every
+          implied yield falls within its own holder's filed Level 3
+          unobservable-input range for the corresponding asset class.
+        </p>
       </div>
     </div>
     {facilityOrder.map((k) => {
