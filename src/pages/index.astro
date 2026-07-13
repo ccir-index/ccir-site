@@ -40,15 +40,36 @@ const ladder = chips
   .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, odCell(t, chip)])) as Record<Tier, Rate | undefined> }))
   .filter((row) => TIERS.some((t) => row.cells[t]));
 
-// --- market-intelligence pieces (same set as /intelligence) ----------------
-const miPieces: { href: string; title: string; blurb: string }[] = [
+// --- research grid: 3 pinned + 6 rotating (3×3) -----------------------------
+// Rotation is deterministic per build: seeded by as_of_date, so the daily
+// data-sync rebuild advances the selection and every visitor sees the same
+// grid on a given day. Step 5 is coprime with the pool size, so consecutive
+// days share few cards and the full pool cycles through.
+type MiPiece = { href: string; title: string; blurb: string };
+const MI_PINNED: MiPiece[] = [
+  { href: '/chip-economics', title: 'Chip Economics', blurb: 'Earning power per spec-sheet unit — one lens is flat.' },
+  { href: '/utilization', title: 'Utilization & Availability', blurb: 'How much of the fleet is working.' },
+  { href: '/research/same-facility-different-marks', title: 'Same Facility, Different Marks', blurb: 'Four funds file 99 to 103 on one GPU-backed loan — dispersion by regime.' },
+];
+const MI_POOL: MiPiece[] = [
   { href: '/term', title: 'Committed Term Structure', blurb: 'Guaranteed capacity priced by tenor.' },
   { href: '/basis', title: 'On-Demand vs Clearing Basis', blurb: 'List asks vs where it transacts.' },
-  { href: '/chip-economics', title: 'Chip Economics', blurb: 'Earning power per spec-sheet unit — one lens is flat.' },
   { href: '/realized/', title: 'Realized vs Rate Card', blurb: 'What clouds actually earn per GPU-hr.' },
-  { href: '/utilization', title: 'Utilization & Availability', blurb: 'How much of the fleet is working.' },
   { href: '/research/od-vs-committed', title: 'The Commitment Discount', blurb: 'On-demand vs committed H100 posted prices, Oct 2023 – Jun 2026.' },
   { href: '/research/gpu-age-curve', title: 'Rent and Age', blurb: 'Five generations on July 6, 2026 — how the market prices chip age.' },
+  { href: '/research/rent-and-msrp', title: 'Rent and MSRP', blurb: 'Rent passed the MSRP anchor within 11–17 months, every generation.' },
+  { href: '/research/rental-rates-by-generation', title: 'Rates by Generation', blurb: 'Nine years of posted prices — declines arrive in steps.' },
+  { href: '/research/itel-1979', title: 'Itel, 1979', blurb: 'Residual insurance, the IBM 4300, and a $2B lesson.' },
+  { href: '/research/compute-contracts', title: 'The Compute Contract', blurb: 'How GPU-hours are sold, from terms of service to take-or-pay.' },
+  { href: '/research/gpu-spv', title: 'The GPU SPV', blurb: 'How lenders take compute as collateral.' },
+  { href: '/research/training-vs-inference', title: 'Training vs Inference', blurb: 'Backlog vs load — a primer for credit readers.' },
+  { href: '/research/compute-glossary', title: 'Compute Glossary', blurb: 'The vocabulary of compute paper, in finance terms.' },
+];
+const miDay = Math.floor(Date.parse(`${meta.as_of_date}T00:00:00Z`) / 86_400_000);
+const miStart = ((miDay * 5) % MI_POOL.length + MI_POOL.length) % MI_POOL.length;
+const miPieces: MiPiece[] = [
+  ...MI_PINNED,
+  ...Array.from({ length: 6 }, (_, i) => MI_POOL[(miStart + i) % MI_POOL.length]),
 ];
 ---
 <Base
