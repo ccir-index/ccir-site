@@ -353,6 +353,12 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       interpolate, or update a spread after the signing document. Amendments
       that reprice a facility appear as their own disclosed events.
     </p>
+    <p class="cite-as">
+      Cite as: Compute Credit Index Research (CCIR), “Spread at Signing —
+      GPU-Collateralized Facilities,” as of {AS_OF}.
+      ccir.io/credit/series#spreads · <a href="#methodology">method</a> ·
+      every row links its source document.
+    </p>
   </section>
 
   <!-- ================= 02 REFI VELOCITY ================= -->
@@ -413,6 +419,12 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
             listed in the method note rather than estimated.
           </p>
         )}
+        <p class="cite-as">
+          Cite as: Compute Credit Index Research (CCIR), “Refi Velocity —
+          Compute-Sector Facilities,” as of {AS_OF}.
+          ccir.io/credit/series#refi-velocity · <a href="#methodology">method</a> ·
+          every row links its resolving document.
+        </p>
       </>
     )}
   </section>
@@ -536,6 +548,12 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       cycle. For a cross-sector comparison of same-facility marks, see the
       dated note <a href="/research/same-facility-different-marks">Same
       Facility, Different Marks</a>.
+    </p>
+    <p class="cite-as">
+      Cite as: Compute Credit Index Research (CCIR), “Filed Marks — Compute
+      Credit,” period {marksPeriod}. ccir.io/credit/series#filed-marks ·
+      <a href="#methodology">method</a> · marks reproduced as filed; each row
+      links its filing.
     </p>
   </section>
 
@@ -849,6 +867,16 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
   .chip-transacted { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
   .chip-unfunded { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 55%, transparent); }
 
+  .cite-as {
+    font-size: var(--fs-xs);
+    font-family: var(--font-mono);
+    color: var(--ink-dim);
+    margin-top: 10px;
+    max-width: 100ch;
+    line-height: 1.5;
+    border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    padding-left: 10px;
+  }
   .tbl-note {
     font-size: var(--fs-xs);
     font-family: var(--font-mono);
