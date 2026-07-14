@@ -122,7 +122,6 @@ const miPieces: MiPiece[] = [
           </tbody>
         </table>
       </div>
-      <p class="block-foot">USD per GPU-hour · guaranteed on-demand, US series only · mean where the panel is deep (n≥10), median below · a dash means no published US series · same series as <a href="/rates">/rates</a>.</p>
     </section>
 
     <!-- Layer 2 — market intelligence -->
@@ -178,7 +177,7 @@ const miPieces: MiPiece[] = [
       gap: 12px;
       margin-bottom: 10px;
     }
-    .block-link, .block-foot a { color: var(--accent); }
+    .block-link { color: var(--accent); }
     .block-link {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
@@ -218,14 +217,6 @@ const miPieces: MiPiece[] = [
     table.ladder-table th.tier-col-t2 { color: var(--accent); }
     table.ladder-table td.tier-pos-t1, table.ladder-table td.tier-pos-t3 { color: var(--ink); }
     table.ladder-table td.empty { color: var(--ink-faint); }
-    .block-foot {
-      margin: 10px 0 0;
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-faint);
-      letter-spacing: 0.02em;
-    }
-
     .mi-block { margin: 0 0 32px; }
     .mi-grid {
       display: grid;

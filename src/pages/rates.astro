@@ -111,10 +111,6 @@ function cellTitle(c: Rate): string {
         </tbody>
       </table>
     </div>
-    <p class="table-foot">
-      USD per GPU-hour · guaranteed on-demand, US series only · mean where the panel is deep (n≥10), median below that · a dash means no published US series for that cell · hover a rate for both stats, interquartile range (IQR), and panel depth.
-    </p>
-
     <section class="defs-section">
       <TierDefinitions headerless={true} />
     </section>
@@ -176,16 +172,6 @@ function cellTitle(c: Rate): string {
     table.ladder-table th.tier-col-t2 { color: var(--accent); }
     table.ladder-table td.tier-pos-t1, table.ladder-table td.tier-pos-t3 { color: var(--ink); }
     table.ladder-table td.empty { color: var(--ink-faint); }
-
-    .table-foot {
-      margin: 10px 0 0;
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-faint);
-      letter-spacing: 0.02em;
-      line-height: 1.7;
-      max-width: 90ch;
-    }
 
     .defs-section { margin: 32px 0 0; }
   </style>
