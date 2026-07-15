@@ -10,8 +10,35 @@ import { meta } from '../../data/snapshot';
 
 const entries = [
   {
+    date: '2026-07-15',
+    tag: 'Effective · realized',
+    title: 'Methodology v2.1.0 effective — Lightning AI panel addition, realized decomposition',
+    body: [
+      `Methodology v2.1.0 took effect with the 2026-07-15 daily fixing, as
+       announced on 2026-07-10. Lightning AI's own bare-metal rate card
+       entered the rate panel (RATE_PANEL version 2026-07-15); its
+       guaranteed on-demand H100 print on the effective fixing was $4.50
+       per GPU-hour, matching the level cited at announcement.`,
+      `Realized effect, computed with/without on the effective fixing's own
+       panel: the neocloud (T2) H100 guaranteed on-demand US cell printed
+       $3.60 (mean, n = 12 sources); the identical fixing computed without
+       Lightning AI is $3.52 (n = 11) — a composition effect of +2.3%,
+       against approximately +2% anticipated at announcement. Decomposing
+       the day-over-day move: the published headline rose +1.0% from
+       2026-07-14 ($3.57 → $3.60); the composition leg contributed +2.3%
+       and the underlying market leg −1.3%. The day-over-day change in this
+       cell across 2026-07-14/15 is a composition event first and a market
+       move second; series consumers comparing across the boundary should
+       use the without-addition figure ($3.52) for the market leg. No other
+       series was materially affected; no prior print is restated.`,
+      `One comment window note: no comments were received by the 2026-07-14
+       close. The methodology document (v2.1.0) and the archived v2.0.0 are
+       published in the public data repository.`,
+    ],
+  },
+  {
     date: '2026-07-10',
-    tag: 'Notice · pending',
+    tag: 'Notice · realized 2026-07-15',
     title: 'Methodology v2.1.0 — panel addition: Lightning AI (effective 2026-07-15)',
     body: [
       `CCIR will add Lightning AI (its own bare-metal rate card, US) to the
