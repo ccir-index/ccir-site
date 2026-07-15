@@ -1,0 +1,771 @@
+---
+import Base from '../layouts/Base.astro';
+import hw from '../data/hardware_panels.json';
+
+// Secondary-market hardware price tape — observed executed prices (eBay
+// sold record, human-captured via Seller Hub research; see Method) paired
+// with current multi-source posted asks. CCIR publishes observed PRICES;
+// it does not publish residual value opinions.
+const fmtUsd = (v: number | null | undefined, dp = 0) =>
+  v == null ? '—' : '$' + v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+
+type Pt = { m: string; med: number | null; n: number; units: number; med3: number | null; n3: number };
+const charted = hw.models.filter((m) => m.charted);
+
+// General availability, month grain (quarter-approximate where the launch
+// was a window, flagged in the caption). Sources: vendor announcements as
+// compiled in the rent-and-msrp launch-price research.
+const GA: Record<string, string> = {
+  'V100-16': '2017-09', 'V100-32': '2018-03',
+  'A100-40': '2020-05', 'A100-80-SXM4': '2020-11', 'A100-80-PCIE': '2021-06',
+  'H100-80-SXM5': '2022-10', 'H100-80-PCIE': '2022-10', 'H100-94-NVL': '2023-09',
+  'H200-141': '2024-04', 'L40S-48': '2023-08', 'RTXA6000-48': '2020-12',
+};
+
+// ---- chart geometry ----
+const mk = (s: string) => { const [y, mo] = s.split('-').map(Number); return y! * 12 + (mo! - 1); };
+const X0 = mk('2023-07'), X1 = mk('2026-07');
+const CW = 960, CH = 400, PL = 56, PR = 88, PT = 20, PB = 34;
+const fmtK = (v: number) => v >= 1000 ? '$' + (v / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : '$' + Math.round(v);
+const iw = CW - PL - PR, ih = CH - PT - PB;
+const cx = (m: number) => PL + ((m - X0) / (X1 - X0)) * iw;          // calendar x (chart 1)
+const AGE_MAX = 9.5 * 12;
+const ax = (age: number) => PL + (age / AGE_MAX) * iw;               // age x (chart 2)
+
+function mkCy(ymin: number, ymax: number) {
+  return (v: number) => PT + ih * (1 - (Math.log(v) - Math.log(ymin)) / (Math.log(ymax) - Math.log(ymin)));
+}
+// Chart 1 is log (declared on-chart): the dollar-gap story lives in the
+// ladder above; this chart's job is each generation's path, and linear
+// pins the V100s into an unreadable floor line.
+const cy1 = mkCy(150, 40000);
+const y1Ticks = [200, 500, 1000, 2000, 5000, 10000, 20000];
+const cy2 = mkCy(0.8, 60);
+const y2Ticks = [1, 2, 5, 10, 20, 50];
+
+// Smooth line segments over the 3-month rolling median (med3). Solid
+// throughout: every point is sourced executed sales (methodology ruling
+// 2026-07-14 — sample depth is disclosed via the volume bars and the
+// per-month n in the series CSV, not by line style; archived-ask lanes
+// are retained in the dataset but not charted — ruling 2026-07-15).
+const N3_SOLID = 1;
+function linePaths(pts: Pt[], xf: (p: Pt) => number, yf: (p: Pt) => number,
+                   want: (p: Pt) => boolean): string[] {
+  const segs: string[] = [];
+  let d: string | null = null;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i]!;
+    if (p.med3 == null) { if (d) { segs.push(d); d = null; } continue; }
+    const prev = pts[i - 1];
+    const consec = !!prev && prev.med3 != null && mk(p.m) - mk(prev.m) === 1;
+    if (want(p)) {
+      if (d === null) {
+        d = consec && prev
+          ? `M ${xf(prev).toFixed(1)} ${yf(prev).toFixed(1)} L ${xf(p).toFixed(1)} ${yf(p).toFixed(1)}`
+          : `M ${xf(p).toFixed(1)} ${yf(p).toFixed(1)}`;
+      } else if (consec) {
+        d += ` L ${xf(p).toFixed(1)} ${yf(p).toFixed(1)}`;
+      } else {
+        segs.push(d);
+        d = `M ${xf(p).toFixed(1)} ${yf(p).toFixed(1)}`;
+      }
+    } else if (d !== null) {
+      // carry one dashed->solid joint so segments meet
+      segs.push(d); d = null;
+    }
+  }
+  if (d !== null) segs.push(d);
+  return segs;
+}
+
+const series = charted.map((c) => {
+  const pts = c.monthly as Pt[];
+  const ga = GA[c.key]!;
+  const gaYear = ga.slice(0, 4);
+  const basis = (c as any).basis?.usd as number | undefined;
+  const lastDeep = [...pts].reverse().find((p) => p.n3 >= N3_SOLID && p.med3 != null)
+    ?? [...pts].reverse().find((p) => p.med3 != null)!;
+  const x1f = (p: Pt) => cx(mk(p.m));
+  const x2f = (p: Pt) => ax(mk(p.m) - mk(ga));
+  return {
+    key: c.key, label: c.label, gaYear, cls: c.cls,
+    solid1: linePaths(pts, x1f, (p) => cy1(p.med3!), (p) => p.n3 >= N3_SOLID),
+    thin1: linePaths(pts, x1f, (p) => cy1(p.med3!), (p) => p.n3 < N3_SOLID),
+    solid2: basis ? linePaths(pts, x2f, (p) => cy2(100 * p.med3! / basis), (p) => p.n3 >= N3_SOLID) : [],
+    thin2: basis ? linePaths(pts, x2f, (p) => cy2(100 * p.med3! / basis), (p) => p.n3 < N3_SOLID) : [],
+    end1X: cx(mk(lastDeep.m)), end1Y: cy1(lastDeep.med3!),
+    end2X: basis ? ax(mk(lastDeep.m) - mk(ga)) : 0,
+    end2Y: basis ? cy2(100 * lastDeep.med3! / basis) : 0,
+    endVal: lastDeep.med3!,
+    endPct: basis ? 100 * lastDeep.med3! / basis : null,
+    askMed: (c as any).ask?.med as number | null,
+  };
+});
+
+const xTicks = [2024, 2025, 2026].map((y) => ({ y, x: cx(y * 12) }));
+const ageTicks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((y) => ({ y, x: ax(y * 12) }));
+
+// ---- small multiples: calendar time × % of launch basis ----
+// One panel per model with a locked launch basis; x = the executed
+// record's own three-year calendar window (shared across panels),
+// y = % of the evidence-graded basis, log. Ordered newest first, like
+// the ladder and table. Two layers only (ruling 2026-07-15): the
+// executed line and the current posted-ask median as a single
+// open-circle marker at the right edge — archived ask lanes and
+// contemporary-report dots are retained in the dataset but not charted.
+const NOW_DEC = 2026 + (7 - 0.5) / 12;
+const PW = 470, PH = 300, pPL = 46, pPR = 14, pPT = 10, pPB = 26;
+const piw = PW - pPL - pPR, pih = PH - pPT - pPB;
+// Per-panel y-scales: each chip gets the range its own data needs (log),
+// padded ~1.5x each side so lines sit inside the frame, clear of the
+// label zones. Ticks picked from a 1-2-5 ladder inside the range.
+const TICK_LADDER = [0.5, 1, 2, 3, 5, 10, 20, 30, 50, 100];
+// Shared calendar domain: start of the executed record to now, with a
+// small right margin so the ask marker sits inside the frame.
+const PX0 = 2023.5, PX1 = NOW_DEC + 0.15;
+const px2 = (t: number) => pPL + ((t - PX0) / (PX1 - PX0)) * piw;
+const panelXTicks = [2024, 2025, 2026].map((y) => ({ x: px2(y), label: String(y) }));
+
+const NINE = [
+  { key: 'H100-80-SXM5', cls: 'hopper' },
+  { key: 'RTXA6000-48', cls: 'other' },
+  { key: 'A100-40', cls: 'a10040' },
+  { key: 'V100-32', cls: 'volta' },
+  { key: 'V100-16', cls: 'v10016' },
+].map((p) => {
+  const m: any = hw.models.find((x) => x.key === p.key)!;
+  const basis = m.basis.usd as number;
+  const pct = (v: number) => 100 * v / basis;
+  const askNow = m.ask?.med != null
+    ? { t: NOW_DEC, v: pct(m.ask.med), usd: m.ask.med as number, n: m.ask.n as number }
+    : null;
+  const execPts = (m.monthly as Pt[]).filter((q) => q.med3 != null)
+    .map((q) => ({ t: Number(q.m.slice(0, 4)) + (Number(q.m.slice(5, 7)) - 0.5) / 12, v: pct(q.med3!) }));
+  // Per-panel log y-range from this chip's own values, padded.
+  const vals = [...execPts, ...(askNow ? [askNow] : [])].map((q: any) => q.v);
+  const yLo = Math.min(...vals) / 1.6;
+  const yHi = Math.max(...vals) * 1.6;
+  const py = (v: number) => pPT + pih * (1 - (Math.log(v) - Math.log(yLo)) / (Math.log(yHi) - Math.log(yLo)));
+  let pyTicksP = TICK_LADDER.filter((t) => t > yLo && t < yHi);
+  while (pyTicksP.length > 5) pyTicksP = pyTicksP.filter((_, i) => i % 2 === 0);
+  const execPath = execPts
+    .map((q, i) => `${i === 0 ? 'M' : 'L'} ${px2(q.t).toFixed(1)} ${py(q.v).toFixed(1)}`).join(' ');
+  return {
+    ...p, label: m.label, ga: GA[p.key]!.slice(0, 4), basisGrade: m.basis.grade,
+    askNow, execPath, py, pyTicksP,
+  };
+});
+
+// ---- "the tape today" ladder: executed vs ask per model, one log axis ----
+// Sorted newest introduction first — the page reads down the product cycle.
+const ROWH = 32, LPL = 190, LPR = 110, LPT = 34, LPB = 36;
+const ladderRows = hw.models
+  .map((m) => ({
+    key: m.key, label: m.label, ga: GA[m.key]!.slice(0, 4), gaM: mk(GA[m.key]!),
+    exec: m.t90.med as number | null, execN: m.t90.n,
+    ask: m.ask.med as number | null, askN: m.ask.n,
+  }))
+  .filter((r) => r.exec != null || r.ask != null)
+  .sort((a, b) => (b.gaM - a.gaM) || ((b.exec ?? b.ask)! - (a.exec ?? a.ask)!));
+const LH = LPT + ladderRows.length * ROWH + LPB;
+const LW = 960;
+const liw = LW - LPL - LPR;
+const LMIN = 180, LMAX = 45000;
+const lx = (v: number) => LPL + ((Math.log(v) - Math.log(LMIN)) / (Math.log(LMAX) - Math.log(LMIN))) * liw;
+const lTicks = [200, 1000, 5000, 20000];
+
+// Volume strip (chart 1 companion): monthly sold units across charted models.
+const volByMonth = new Map<string, number>();
+for (const c of charted) for (const p of c.monthly as Pt[]) {
+  volByMonth.set(p.m, (volByMonth.get(p.m) ?? 0) + p.units);
+}
+const VH = 104, VPT = 8, VPB = 30;
+const vih = VH - VPT - VPB;
+const volMax = Math.max(...volByMonth.values());
+const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
+  x: cx(mk(m)) - 2.5, w: 5, h: Math.max(1, (u / volMax) * vih), u, m,
+}));
+
+---
+<Base
+  title="Used GPU Prices — H100, A100, V100 Secondary Market · CCIR"
+  description="What used datacenter GPUs sell for and are listed at over time — H100, H200, A100, V100, L40S, RTX A6000. A three-year executed sales record with current multi-source posted asks. Observed prices, not residual value opinions."
+  ogImage="/og/hardware.png"
+>
+  <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'CCIR Secondary-Market Hardware Prices',
+    description: 'Executed secondary-market sale prices and current posted asks for datacenter GPUs (H100, H200, A100, V100, L40S, RTX A6000) — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons. Observed prices with provenance, not residual value opinions.',
+    url: 'https://ccir.io/hardware',
+    creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
+    temporalCoverage: '2023-07/..',
+    spatialCoverage: 'United States, United Kingdom',
+    keywords: [
+      'used H100 price', 'H100 resale price', 'used A100 price',
+      'A100 secondary market', 'used V100 price', 'GPU secondary market',
+      'datacenter GPU prices', 'GPU price history', 'H200 resale price',
+      'RTX A6000 used price', 'L40S price', 'GPU hardware price index',
+      'what does a used H100 cost',
+      'GPU collateral value', 'GPU residual value data', 'GPU value retention',
+      'H100 depreciation', 'GPU depreciation data', 'GPU recovery value',
+      'GPU-backed lending collateral', 'datacenter GPU useful life',
+      'GPU secondary market liquidity', 'GPU price benchmark',
+      'Manheim for GPUs',
+      'GPU asset-based lending', 'GPU advance rate data',
+      'GPU borrowing base', 'sizing GPU-backed facilities',
+    ],
+    isAccessibleForFree: true,
+    distribution: [{
+      '@type': 'DataDownload',
+      encodingFormat: 'text/csv',
+      contentUrl: 'https://ccir.io/hardware/series.csv',
+    }],
+  })} />
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Secondary-Market Hardware Prices · beta · window {hw.window} · as of {hw.as_of}</div>
+      <h1>The Secondary Market</h1>
+      <p class="subhead">What GPUs are listed at — and execute at — over time.</p>
+      <p class="standfirst">
+        Compute credit is moving from offtake-backed toward asset-based.
+        Offtake underwriting prices the contract; asset-based underwriting
+        prices the machine — and pricing the machine requires a neutral
+        record of what machines sell for and are offered at. This page is
+        that record being built: executed sales and posted asks, kept in
+        separate lanes and never blended, every figure carrying its count,
+        its window, and its provenance. CCIR publishes no residual value
+        opinions. The record is the product.
+      </p>
+    </header>
+
+    <section class="sec forward">
+      <h2><span class="n">§</span> The record from here</h2>
+      <p>
+        From July 2026 forward the record is collected directly: executed
+        sales captured weekly; posted asks captured on a daily and weekly
+        cadence across an official marketplace API and a dealer cohort;
+        every capture archived at collection time under the same
+        provenance rules. What accumulates is the series the parties to a
+        facility can size against — executed medians as recovery evidence,
+        the ask panel as replacement cost and market depth between sales,
+        and the spread between the two lanes as an observed liquidity
+        haircut. Today, credit documents overwhelmingly amortize GPU
+        collateral to zero — not because the hardware is worthless, but
+        because no reference existed. As the record deepens, lenders and
+        borrowers get the same neutral data points to size against.
+      </p>
+      <div class="cta-box">
+        <p>
+          <strong>Contribute to the record.</strong> If you buy, sell,
+          broker, finance, or insure this hardware and hold executed price
+          records — dealer sales, disposal and auction results, broker
+          quotes, portfolio liquidations — CCIR accepts contributed data
+          under the evidence-grading and provenance rules that govern
+          every row on this page. Contributions are held
+          source-confidential and enter published statistics only in
+          aggregate, with their evidence grade disclosed.
+        </p>
+        <p>
+          <strong>Underwriting against GPU collateral?</strong> If you
+          need a series observed — a model, a venue, a spread —
+          <a href="/contact">get in touch</a>.
+        </p>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">§</span> Available today</h2>
+      <p class="secintro">
+        The reconstruction below is the runway; the collected panel is the
+        tape. Three years of executed sales (July 2023 – July 2026; 3,564
+        sold listings, 15,155 units, $28.9M documented) beside the asks
+        posted today across an official marketplace API and a named dealer
+        cohort — the rental market prices an hour of compute; this page
+        prices the machine itself.
+      </p>
+    </section>
+
+    <figure class="chart-fig">
+      <div class="fig-title">The tape today · executed vs posted ask</div>
+      <div class="chart-box">
+        <svg viewBox={`0 0 ${LW} ${LH}`} role="img"
+             aria-label="Current price ladder per model, log scale: filled dots mark the trailing 90-day executed median, open circles the current posted-ask median. Asks sit above executed on every model; the gap is widest on H100 SXM5 at about two times and narrowest on V100 and RTX A6000 at 1.2 to 1.4 times.">
+          {lTicks.map((t) => (
+            <g>
+              <line x1={lx(t)} x2={lx(t)} y1={LPT - 8} y2={LH - LPB + 6} class="grid" />
+              <text x={lx(t)} y={LH - LPB + 18} class="tick" text-anchor="middle">{t >= 1000 ? '$' + t / 1000 + 'k' : '$' + t}</text>
+            </g>
+          ))}
+          <text x={LW - LPR + 10} y={LPT - 12} class="scaletag" text-anchor="start">log scale</text>
+          {ladderRows.map((r, i) => {
+            const y = LPT + i * ROWH + ROWH / 2;
+            const ratio = r.exec && r.ask ? (r.ask / r.exec).toFixed(1) + '×' : '';
+            return (
+              <g>
+                <text x={LPL - 10} y={y + 3.5} class="rowlab" text-anchor="end">{r.label} ('{r.ga.slice(2)})</text>
+                {r.exec != null && r.ask != null && (
+                  <line x1={lx(r.exec)} x2={lx(r.ask)} y1={y} y2={y} class="dumbline" />
+                )}
+                {r.exec != null && (
+                  <circle cx={lx(r.exec)} cy={y} r="4" class="execpt">
+                    <title>{r.label} — executed median, trailing 90d: {fmtUsd(r.exec)} (n={r.execN} sold listings)</title>
+                  </circle>
+                )}
+                {r.ask != null && (
+                  <circle cx={lx(r.ask)} cy={y} r="4" class="askpt2">
+                    <title>{r.label} — posted ask median, current: {fmtUsd(r.ask)} (n={r.askN} asks)</title>
+                  </circle>
+                )}
+                <text x={lx(Math.max(r.exec ?? 0, r.ask ?? 0)) + 10} y={y + 3.5} class="rowval" text-anchor="start">{ratio}</text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+      <div class="chart-legend">
+        <span class="lg"><span class="dot-exec"></span>executed median, trailing 90d</span>
+        <span class="lg"><span class="swatch-dot"></span>posted ask median, current (multi-source)</span>
+        <span class="lg">n× = ask over executed — the posted premium</span>
+      </div>
+      <figcaption>
+        <details class="tfoot-details">
+          <summary>Chart notes</summary>
+          <p class="tfoot">
+            Per-GPU prices, log scale, as of {hw.as_of}. Executed dots require
+            ≥3 sold listings in the window (models without one show ask only).
+            The gap between dots is the posted premium; it narrows as a model
+            commoditizes — ~2× on H100, ~1.2× on V100.
+          </p>
+        </details>
+      </figcaption>
+    </figure>
+
+    <figure class="chart-fig">
+      <div class="fig-title">Price over the executed record · % of launch basis · Jul 2023 – Jul 2026</div>
+      <div class="nine-grid">
+        {NINE.map((p) => (
+          <div class="chart-box nine-panel">
+            <svg viewBox={`0 0 ${PW} ${PH}`} role="img"
+                 aria-label={`${p.label}, introduced ${p.ga}: the executed sales record as a percent of the launch basis over July 2023 to July 2026, with the current posted-ask median marked as an open circle at the right edge. Log scale fitted per panel.`}>
+              {p.pyTicksP.map((t) => (
+                <g>
+                  <line x1={pPL} x2={PW - pPR} y1={p.py(t)} y2={p.py(t)} class="grid" />
+                  <text x={pPL - 6} y={p.py(t) + 3} class="tick" text-anchor="end">{t}%</text>
+                </g>
+              ))}
+              {panelXTicks.map((t) => (
+                <text x={t.x} y={PH - 8} class="tick" text-anchor="middle">{t.label}</text>
+              ))}
+              <path d={p.execPath} class={`ln ln-exec ln-${p.cls}`} />
+              {p.askNow && (
+                <g>
+                  <circle cx={px2(p.askNow.t)} cy={p.py(p.askNow.v)} r="4" class="askpt2">
+                    <title>{p.label} — posted ask median, current: {fmtUsd(p.askNow.usd)} (n={p.askNow.n} asks)</title>
+                  </circle>
+                  <text x={px2(p.askNow.t) - 8} y={p.py(p.askNow.v) + 3.5} class="asklab" text-anchor="end">ask</text>
+                </g>
+              )}
+              <text x={pPL + 8} y={PH - pPB - 10} class={`panel-lab lab-${p.cls}`} text-anchor="start">{p.label} ('{p.ga.slice(2)})</text>
+            </svg>
+          </div>
+        ))}
+      </div>
+      <div class="chart-legend">
+        <span class="lg"><span class="swatch sw-execk"></span>executed sales record (solid)</span>
+        <span class="lg"><span class="swatch-dot"></span>posted ask median, current (multi-source)</span>
+      </div>
+      <div class="chart-box vol-box">
+        <svg viewBox={`0 0 ${CW} ${VH}`} role="img"
+             aria-label="Monthly sold units across the charted models. Volume rises from a handful of units per month in 2023 to over a thousand per month in 2026.">
+          <line x1={PL} x2={CW - PR} y1={VH - VPB} y2={VH - VPB} class="grid" />
+          {volBars.map((b) => (
+            <rect x={b.x} y={VH - VPB - b.h} width={b.w} height={b.h} class="vbar" />
+          ))}
+          {xTicks.map((t) => (
+            <text x={t.x} y={VH - 8} class="tick" text-anchor="middle">{t.y}</text>
+          ))}
+          <text x={CW - PR - 6} y={VPT + 10} class="scaletag" text-anchor="end">units sold / month · peak {volMax.toLocaleString('en-US')}</text>
+        </svg>
+      </div>
+      <figcaption>
+        <details class="tfoot-details">
+          <summary>Chart notes</summary>
+          <p class="tfoot">
+            One panel per model with a locked launch-price basis; x = the
+            executed record's calendar window, July 2023 – July 2026,
+            shared across panels; y = percent of the evidence-graded
+            launch basis, log scale fitted per panel to that chip's own
+            range — panels are not directly overlayable by eye; the table
+            carries the comparable levels (bases: V100 $18,625 [A] · A100
+            $24,875 [A] · H100 $33,600 [B] · RTX A6000 $4,650 [B] —
+            system-price, teardown, and announced-price bases; NVIDIA
+            publishes no datacenter MSRP). The line is the executed
+            sales record, 3-month rolling median of sold listings —
+            every point sourced sales; thin months can
+            move on few sales (the early-2025 H100 notch is a single
+            month's 7-unit quantity liquidation, not a market level).
+            The open circle at each panel's right edge marks the CURRENT
+            posted-ask median (multi-source; the ladder above carries the
+            levels and counts). Asks lead and overstate executed prices —
+            roughly 1.2–2× — and the lanes are never blended. Archived
+            ask history and dated contemporary reports are collected and
+            retained in the dataset but not charted: sticky catalog
+            prices and carried-forward quotes describe dealer posture,
+            not the market's path. Executed levels before mid-2023 are
+            not observed.
+            Bars below: units sold per month across the executed record,
+            calendar time. Models with thin or young records (H200, H100
+            NVL, A100 80GB) and L40S are tracked in the table but not
+            paneled — a rolling median through one-listing months would
+            whipsaw, and no L40S launch basis meets the evidence bar.
+          </p>
+        </details>
+      </figcaption>
+    </figure>
+
+    <figure class="chart-fig">
+      <div class="fig-title">Generations overlaid · executed only · % of launch vs age</div>
+      <div class="chart-box">
+        <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
+             aria-label="Executed medians as a percent of each generation's launch basis, all generations overlaid against age since introduction, log scale. Where curves overlap in age, newer generations sit far higher: H100 holds above 30 percent at ages three to four where V100 data at the same ages is absent, and A100 holds near 20 to 35 percent at five to six years where V100 had already fallen below 10.">
+          {y2Ticks.map((t) => (
+            <g>
+              <line x1={PL} x2={CW - PR} y1={cy2(t)} y2={cy2(t)} class="grid" />
+              <text x={PL - 7} y={cy2(t) + 3} class="tick" text-anchor="end">{t}%</text>
+            </g>
+          ))}
+          {ageTicks.map((t) => (
+            <text x={t.x} y={CH - 10} class="tick" text-anchor="middle">{t.y}y</text>
+          ))}
+          <text x={PL + 2} y={PT + 12} class="scaletag" text-anchor="start">% of launch basis · log scale · age since GA</text>
+          {series.map((s) => (
+            <g>
+              {s.thin2.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
+              {s.solid2.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
+            </g>
+          ))}
+          <g>
+            {series.map((s, i) => (
+              <g>
+                <line x1={CW - PR - 168} x2={CW - PR - 148} y1={PT + 16 + i * 19} y2={PT + 16 + i * 19} class={`ln ln-${s.cls}`} />
+                <text x={CW - PR - 140} y={PT + 20 + i * 19} class={`leglab lab-${s.cls}`} text-anchor="start">{s.label} ('{s.gaYear.slice(2)})</text>
+              </g>
+            ))}
+          </g>
+        </svg>
+      </div>
+      <figcaption>
+        <details class="tfoot-details">
+          <summary>Chart notes</summary>
+          <p class="tfoot">
+            The comparison view: executed 3-month rolling medians only (no
+            ask lanes), every generation on one age axis and one shared
+            log scale, so a newer chip's position can be read against an
+            older chip's history at the same age. Bases as in the panels
+            above. Each curve covers only the ages the executed record
+            observes (from Jul 2023). The generations do not collapse onto
+            one aging curve: that is the finding, not a defect.
+          </p>
+        </details>
+      </figcaption>
+    </figure>
+
+    <div class="twrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th class="num">Intro</th>
+            <th class="num">Age</th>
+            <th class="num">Executed median (90d)</th>
+            <th class="num">n</th>
+            <th class="num">Posted ask median</th>
+            <th class="num">n · src</th>
+            <th class="num">Ask / executed</th>
+            <th class="num">% of launch</th>
+            <th class="num">3-yr units</th>
+            <th class="num">3-yr $ volume</th>
+          </tr>
+        </thead>
+        <tbody>
+          {[...hw.models].sort((a, b) => mk(GA[b.key]!) - mk(GA[a.key]!)).map((m) => {
+            const t90 = m.t90.med;
+            const ask = m.ask.med;
+            const ratio = t90 && ask ? (ask / t90).toFixed(2) + '×' : '—';
+            const pct = (m as any).pct_of_launch != null
+              ? (m as any).pct_of_launch.toFixed(1) + '%' + ((m as any).basis.grade !== 'A' ? ` [${(m as any).basis.grade}]` : '')
+              : '—';
+            const ga = GA[m.key]!;
+            const ageYr = ((mk(hw.as_of.slice(0, 7)) - mk(ga)) / 12).toFixed(1);
+            return (
+              <tr>
+                <td class="gen">{m.label}</td>
+                <td class="num dim">{ga.slice(0, 4)}</td>
+                <td class="num dim">{ageYr}y</td>
+                <td class="num strong">{fmtUsd(t90)}</td>
+                <td class="num dim">{m.t90.n}</td>
+                <td class="num">{fmtUsd(ask)}</td>
+                <td class="num dim">{m.ask.n} · {m.ask.sources}</td>
+                <td class="num">{ratio}</td>
+                <td class="num">{pct}</td>
+                <td class="num dim">{m.vol3y.units.toLocaleString()}</td>
+                <td class="num dim">${(m.vol3y.usd / 1e6).toFixed(2)}M</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <details class="tfoot-details">
+      <summary>Table notes</summary>
+      <p class="table-note">
+      Executed = median sale price across sold listings, trailing 90 days;
+      cells with fewer than 3 sold listings show a dash. Posted ask = median
+      current single-GPU ask across an official marketplace API and dealer
+      catalogs in the US and UK (source count shown per row; named, with
+      currency and VAT treatment, in Method). Hopper-class dealer pages are
+      largely quote-gated, which is why source counts vary by model. Asks
+      are opening prices, never pooled with executed;
+      ask/executed is the posted premium — it narrows as a model
+      commoditizes. % of launch uses the evidence-graded basis in Method
+      ([B]/[C] = non-vendor basis). 3-yr volume counts all hardware forms
+      of the model (cards, lots, servers); accessories and mislabeled items
+      excluded and tallied. Intro = general availability; age as of
+      {hw.as_of}.
+      </p>
+    </details>
+
+    <section class="sec">
+      <h2><span class="n">§</span> Method</h2>
+      <p>
+        <strong>Executed record.</strong> Dated, human-captured snapshots of
+        the eBay sold-listing research record (Seller Hub product research),
+        July 2023 – July 2026: 3,564 sold listings, 15,155 units, $28.9M.
+        Every row carries listing title, average sale price, sale count,
+        dollar volume, format, and date last sold; every capture is archived.
+        Rows are classified by title into single cards, multi-unit lots,
+        servers, bare baseboards, converted cards (e.g. SXM-to-PCIe
+        conversions — tracked, never banded), accessories, and mislabeled
+        SKUs (V100S, L40, H100i and kin — excluded and tallied). Of the full
+        record, 11,388 units and $26.0M are hardware of the models tracked
+        here — the figures this page reports; the remainder is the excluded
+        tally. Multi-sale listings count once at their average price; their
+        sale history carries a date-last-sold only, so month assignment for
+        those listings is approximate. Chart lines are 3-month rolling
+        medians across sold listings, drawn solid throughout — every point
+        is sourced sales; per-month listing counts ship in the series CSV,
+        and thin months can move on few sales.
+      </p>
+      <p>
+        <strong>Posted asks.</strong> Current single-GPU asks from the eBay
+        Browse API (official, keyed) and dealer catalogs collected under
+        each source's terms: IT Creations and UnixSurplus (USD), Bargain
+        Hardware and ETB Technologies (GBP, ex-VAT basis, converted at the
+        ECB reference rate of the observation date — {hw.fx.gbpusd} as of
+        {hw.fx.date}). Additional dealers are tracked quote-gated
+        (presence, no price). Collected sources are named; data contributed
+        through the channel below is held source-confidential with its
+        evidence grade disclosed. Asks are a stock of open offers — they
+        lead and overstate executed prices and are shown only beside them,
+        never blended.
+      </p>
+      <p>
+        <strong>For credit and valuation work.</strong> Lenders writing
+        advance rates against GPU collateral, rating agencies testing
+        value-retention and useful-life assumptions, insurers underwriting
+        residual value, and borrowers negotiating either side of those
+        terms all face the same gap: no citable, neutral record of what
+        datacenter hardware actually sells for. Today, credit documents
+        overwhelmingly amortize GPU collateral to zero — not because the
+        hardware is worthless, but because no reference existed. This page
+        is the record: observed secondary-market prices with provenance —
+        executed levels, posted asks, volumes, and the spread between them —
+        the raw inputs from which recovery evidence, depreciation
+        assumptions, or residual analyses can be independently derived by
+        the parties who own those judgments.
+      </p>
+      <p>
+        <strong>The record from here.</strong> The history above is
+        reconstructed from dated captures and archives; it ends where the
+        archives end. Collection terms, cadence, and the contribution
+        lane are at the top of this page.
+      </p>
+      <p>
+        <strong>What this is not.</strong> CCIR publishes observed
+        secondary-market prices with provenance. It does not publish
+        residual value opinions, forecasts, or depreciation schedules, and
+        no figure on this page is one. Statistics follow the methodology's
+        stat policy: medians shown with n on every cell; thin cells gated;
+        windows labeled on every display.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { margin-bottom: 20px; max-width: 84ch; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-3xl);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 12px;
+    }
+    .standfirst a { color: var(--accent); }
+    .forward { margin-top: 6px; }
+    .secintro { max-width: 72ch; color: var(--ink-dim); }
+    .cta-box {
+      border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent);
+      background: var(--surface);
+      padding: 14px 18px;
+      max-width: 72ch;
+      margin: 14px 0 6px;
+    }
+    .cta-box p { margin: 0 0 10px; }
+    .cta-box p:last-child { margin-bottom: 0; }
+    .cta-box a { color: var(--accent); }
+    .subhead {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      color: var(--ink-dim);
+      font-style: italic;
+      margin: -4px 0 10px;
+    }
+
+    .top {
+      --arch-volta: #46688f;
+      --arch-v10016: #0e9888;
+      --arch-ampere: #c11f57;
+      --arch-a10040: #7b52ab;
+      --arch-hopper: #b9770a;
+      --arch-other: #6e6c66;
+    }
+    :global(html[data-theme='terminal']) .top {
+      --arch-volta: #7ea8d8;
+      --arch-v10016: #4fc3c3;
+      --arch-ampere: #ff4d84;
+      --arch-a10040: #b183e0;
+      --arch-hopper: #ffb400;
+      --arch-other: #cfcdc6;
+    }
+
+    .nine-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+    @media (max-width: 760px) { .nine-grid { grid-template-columns: 1fr; } }
+    .nine-panel { border: 0; }
+    .ln-other { stroke: var(--arch-other); }
+    .lab-other { fill: var(--arch-other); }
+    .ln-exec { stroke-width: 2.6; }
+    .asklab { font-family: var(--font-sans); font-size: 10px; fill: var(--ink-dim); letter-spacing: 0.04em; }
+    .panel-lab { font-family: var(--font-sans); font-size: 13px; font-weight: 600; }
+    .sw-execk { background: var(--ink); height: 4px; }
+
+    .chart-fig { margin: 0 0 22px; max-width: 962px; }
+    .fig-title {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      font-weight: var(--weight-strong);
+      margin: 0 0 6px;
+    }
+    .rowlab { font-family: var(--font-sans); font-size: 12.5px; fill: var(--ink); font-weight: 600; letter-spacing: 0.01em; }
+    .rowval { font-family: var(--font-sans); font-size: 11.5px; fill: var(--ink-dim); }
+    .dumbline { stroke: var(--ink-faint); stroke-width: 1.2; opacity: 0.7; }
+    .execpt { fill: var(--accent); }
+    .askpt2 { fill: var(--surface); stroke: var(--ink-dim); stroke-width: 1.6; }
+    .dot-exec { display: inline-block; width: 8px; height: 8px; margin-right: 5px; background: var(--accent); border-radius: 50%; vertical-align: -1px; }
+    .chart-box { border: 1px solid var(--rule); background: var(--surface); }
+    .chart-box svg { display: block; width: 100%; max-width: 960px; height: auto; text-rendering: optimizeLegibility; }
+    .vol-box { border-top: 0; }
+    .grid { stroke: var(--rule); stroke-width: 1; opacity: 0.7; }
+    .episode { fill: var(--accent); opacity: 0.07; }
+    .eplab {
+      font-family: var(--font-sans);
+      font-size: 10px;
+      fill: var(--ink-faint);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .tick { font-family: var(--font-sans); font-size: 11.5px; fill: var(--ink-faint); }
+    .ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+    .ln-thin { stroke-width: 1.2; stroke-dasharray: 3 4; opacity: 0.75; }
+    .ln-volta { stroke: var(--arch-volta); }
+    .ln-v10016 { stroke: var(--arch-v10016); }
+    .ln-ampere { stroke: var(--arch-ampere); }
+    .ln-a10040 { stroke: var(--arch-a10040); }
+    .ln-hopper { stroke: var(--arch-hopper); }
+    .lab-volta { fill: var(--arch-volta); }
+    .lab-v10016 { fill: var(--arch-v10016); }
+    .lab-ampere { fill: var(--arch-ampere); }
+    .lab-a10040 { fill: var(--arch-a10040); }
+    .lab-hopper { fill: var(--arch-hopper); }
+    .askpt { fill: var(--surface); stroke-width: 1.6; }
+    .ap-volta { stroke: var(--arch-volta); }
+    .ap-v10016 { stroke: var(--arch-v10016); }
+    .ap-ampere { stroke: var(--arch-ampere); }
+    .ap-a10040 { stroke: var(--arch-a10040); }
+    .ap-hopper { stroke: var(--arch-hopper); }
+    .leglab { font-family: var(--font-sans); font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
+    .scaletag {
+      font-family: var(--font-sans);
+      font-size: 10.5px;
+      fill: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .vbar { fill: var(--ink-faint); opacity: 0.45; }
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); }
+    .swatch { display: inline-block; width: 14px; height: 3px; margin-right: 5px; vertical-align: 3px; }
+    .swatch-dot { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border: 1.6px solid var(--ink-dim); border-radius: 50%; vertical-align: -1px; }
+    .sw-volta { background: var(--arch-volta); }
+    .sw-v10016 { background: var(--arch-v10016); }
+    .sw-ampere { background: var(--arch-ampere); }
+    .sw-a10040 { background: var(--arch-a10040); }
+    .sw-hopper { background: var(--arch-hopper); }
+    .sw-dash { background: repeating-linear-gradient(90deg, var(--ink-dim) 0 3px, transparent 3px 6px); }
+    .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin: 6px 0 0; line-height: 1.5; max-width: 96ch; }
+    .tfoot-details { margin-top: 6px; }
+    .tfoot-details summary {
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      user-select: none;
+    }
+    .tfoot-details summary:hover { color: var(--ink-dim); }
+
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 6px 0 0; max-width: 1120px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.gen { color: var(--ink); font-weight: var(--weight-strong); }
+    td.dim { color: var(--ink-dim); }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); }
+    .table-note {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      line-height: 1.6;
+      margin: 10px 0 0;
+      max-width: 96ch;
+    }
+
+    .sec { margin: 30px 0; max-width: 84ch; }
+    .sec h2 { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec strong { color: var(--accent); }
+  </style>
+</Base>
