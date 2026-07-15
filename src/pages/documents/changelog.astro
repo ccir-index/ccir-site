@@ -8,151 +8,134 @@ import { meta } from '../../data/snapshot';
 // date. Non-material operational changes live in the public data
 // repository's log; this page carries what a reader of the series needs.
 
+// Announcement fields: id (YYMMDD-N), announced, effective, type,
+// restatement (CCIR series are forward-only — always "None"), impact
+// (estimated at announcement; realized appended), summary. Providers are
+// not named; membership is disclosed at class/count grain.
 const entries = [
   {
+    id: '260715-4',
     date: '2026-07-15',
-    tag: 'Release · v2.2.0',
-    title: 'Methodology v2.2.0 — committed-term reference panel (effective with the 2026-07-16 fixing)',
+    effective: '2026-07-16',
+    type: 'New series',
+    restatement: 'None',
+    impact: 'None to on-demand series',
+    title: 'v2.2.0 — two sources added to committed-term cells',
     body: [
-      `Two venues join the committed-term cells: CloudRift (1/3-month
-       durations) and Paperspace (3-year commitments; separate venue
-       per the pending notice below). Their on-demand rows enter no
-       on-demand cell. CCIR also begins enhanced per-region capture of
-       Azure reservation pricing (1/3/5-yr) and Google Cloud CUDs
-       (1/3-yr) as cross-check surfaces — Azure and GCP already
-       contribute reserved-term rows through their existing panel
-       membership, so the new captures hold no separate vote. No
-       on-demand series is affected. Effective with the 2026-07-16
-       fixing. Comments: research@ccir.io.`,
+      `Two sources with firm published term prices (1/3-month and
+       3-year tenors) join the committed-term cells. Enhanced
+       per-region capture of hyperscaler reservation pricing (1/3/5-yr)
+       begins as a cross-check surface with no separate panel vote.
+       On-demand rows from term sources enter no on-demand cell.`,
     ],
   },
   {
+    id: '260715-3',
     date: '2026-07-15',
-    tag: 'Notice · pending · comments open',
-    title: 'Methodology v2.2.1 — panel additions: Deep Infra and Paperspace (on-demand rate panel, effective 2026-07-23)',
+    effective: '2026-07-23',
+    type: 'Provider change · pending',
+    restatement: 'None',
+    impact: 'T2 H100 OD US: n 12 → 14, est. ≈ +1.9%',
+    title: 'v2.2.1 — two sources proposed for the on-demand rate panel',
     body: [
-      `CCIR proposes adding Deep Infra and Paperspace to the on-demand
-       rate panel, effective with the 2026-07-23 fixing. Paperspace
-       (DigitalOcean-owned) is admitted as a separate venue under the
-       v2.1.0 two-live-cards rule: no splice. Both classify T2.
-       Anticipated: T2 H100 on-demand US deepens 12 → 14 sources,
-       ≈ +1.9% net (Deep Infra $2.20, −3.0% alone; Paperspace $5.95,
-       promo-footnoted, +5.0% alone). Realized with/without publishes
-       at the effective fixing. No prior print restated. Comments
-       through 2026-07-22: research@ccir.io.`,
+      `Two neocloud-class sources are proposed for the on-demand rate
+       panel. One is a subsidiary of an existing member with a
+       materially different live rate card, admitted as a separate
+       venue (no splice). Estimated impact: the two entries largely
+       offset (−3.0% and +5.0% alone). Realized with/without publishes
+       at the effective fixing. Comments through 2026-07-22:
+       research@ccir.io.`,
     ],
   },
   {
+    id: '260715-2',
     date: '2026-07-15',
-    tag: 'Note · no panel change',
-    title: 'Candidate-source observation begins for forthcoming methodology proposals',
+    effective: '—',
+    type: 'Note',
+    restatement: 'None',
+    impact: 'None',
+    title: 'Candidate-source observation begins',
     body: [
-      `CCIR began capture-only observation of candidate sources —
-       posted rate cards, committed-term surfaces, marketplace feeds —
-       under the same provenance rules as panel sources. No candidate
-       is a panel member; no published series is affected. Proposed
-       additions follow the Change Management Policy (notice,
-       anticipated effect, comment period, realized decomposition).`,
+      `Capture-only observation of candidate sources (rate cards,
+       committed-term surfaces, marketplace feeds) began under panel
+       provenance rules. No candidate holds a panel vote; proposals
+       follow the Change Management Policy.`,
     ],
   },
   {
+    id: '260715-1',
     date: '2026-07-15',
-    tag: 'Effective · realized',
-    title: 'Methodology v2.1.0 effective — Lightning AI panel addition, realized decomposition',
+    effective: '2026-07-15',
+    type: 'Provider change · realized',
+    restatement: 'None',
+    impact: 'Realized +2.3% (est. ≈ +2%) · T2 H100 OD US n 11 → 12',
+    title: 'v2.1.0 effective — realized decomposition',
     body: [
-      `Methodology v2.1.0 took effect with the 2026-07-15 daily fixing, as
-       announced on 2026-07-10. Lightning AI's own bare-metal rate card
-       entered the rate panel (RATE_PANEL version 2026-07-15); its
-       guaranteed on-demand H100 print on the effective fixing was $4.50
-       per GPU-hour, matching the level cited at announcement.`,
-      `Realized effect, computed with/without on the effective fixing's own
-       panel: the neocloud (T2) H100 guaranteed on-demand US cell printed
-       $3.60 (mean, n = 12 sources); the identical fixing computed without
-       Lightning AI is $3.52 (n = 11) — a composition effect of +2.3%,
-       against approximately +2% anticipated at announcement. Decomposing
-       the day-over-day move: the published headline rose +1.0% from
-       2026-07-14 ($3.57 → $3.60); the composition leg contributed +2.3%
-       and the underlying market leg −1.3%. The day-over-day change in this
-       cell across 2026-07-14/15 is a composition event first and a market
-       move second; series consumers comparing across the boundary should
-       use the without-addition figure ($3.52) for the market leg. No other
-       series was materially affected; no prior print is restated.`,
-      `One comment window note: no comments were received by the 2026-07-14
-       close. The methodology document (v2.1.0) and the archived v2.0.0 are
-       published in the public data repository.`,
+      `The addition announced 2026-07-10 took effect. Realized
+       with/without on the effective fixing: $3.60 with (n = 12) vs
+       $3.52 without (n = 11), +2.3% composition. Day-over-day +1.0% =
+       +2.3% composition − 1.3% market; use $3.52 for the market leg
+       across the boundary. No comments were received by the close.`,
     ],
   },
   {
+    id: '260710-2',
     date: '2026-07-10',
-    tag: 'Notice · realized 2026-07-15',
-    title: 'Methodology v2.1.0 — panel addition: Lightning AI (effective 2026-07-15)',
+    effective: '2026-07-15',
+    type: 'Provider change · realized 2026-07-15',
+    restatement: 'None',
+    impact: 'T2 H100 OD US: n 11 → 12, est. ≈ +2%',
+    title: 'v2.1.0 — one source added to the on-demand rate panel',
     body: [
-      `CCIR will add Lightning AI (its own bare-metal rate card, US) to the
-       rate panel effective with the 2026-07-15 daily fixing, and the
-       methodology version will increment from v2.0.0 to v2.1.0. Lightning AI
-       posts guaranteed on-demand and interruptible rates for H100 and B200
-       at single-node granularity. Only Lightning AI's own capacity is added:
-       capacity the platform re-sells for operators already on the panel is
-       excluded, so that each operator holds exactly one panel vote. Voltage
-       Park, which has announced a merger with Lightning AI, remains a
-       separate panel source while its own rate card remains posted; if
-       either card is withdrawn, its series ends rather than being spliced.`,
-      `Anticipated effect at announcement: the neocloud (T2) H100 on-demand
-       US panel deepens from 11 to 12 sources and the headline statistic
-       moves approximately +2% on the announcement-date panel. The realized
-       with/without decomposition will be published with the effective
-       fixing. No committed-term series is affected, and no prior print is
-       restated. Under the Change Management Policy this addition is below
-       the material-change threshold; it is announced in advance, with the
-       observation window published, as a matter of practice.`,
-      `Comments are invited to research@ccir.io through 2026-07-14.`,
+      `One source posting guaranteed on-demand and interruptible H100
+       and B200 rates joins the neocloud panel. Its own capacity only:
+       re-sold capacity of existing members is excluded, one operator
+       one vote. A corporate affiliate remains a separate panel source
+       while both rate cards stay live; no splice. Comments were open
+       through 2026-07-14.`,
     ],
   },
   {
+    id: '260710-1',
     date: '2026-07-10',
-    tag: 'Composition note',
-    title: 'July 1–2 panel expansion — eleven sources entered; several cells stepped',
+    effective: '2026-07-01',
+    type: 'Composition note',
+    restatement: 'None',
+    impact: 'T2 A100 US $2.70 → $1.81 · T2 H200 US $5.14 → $4.29 · T1 H100 US $8.44 → $9.15',
+    title: 'July 1–2 panel expansion — collection panel 31 → 41 sources',
     body: [
-      `The 2026-07-01/02 coverage expansion took the collection panel from
-       31 to 41 sources (qubrid, sesterce, atlas_cloud, gcore, seeweb,
-       upcloud, civo, oblivus on 07-01; ionet, spheron, hyperbolic on
-       07-02), and Google Cloud Platform's H100 on-demand US rows began
-       flowing in the same deploy window. Published medians stepped where
-       the new panelists' price levels entered existing cells — among
-       them the neocloud (T2) A100 US on-demand series ($2.70 → $1.81),
-       the T2 H200 US series ($5.14 → $4.29), and the hyperscaler (T1)
-       H100 US series ($8.44 → $9.15, covered in the 2026-07-03 note
-       below, which this entry extends). These steps are composition
-       effects — panel deepening — not repricing by any operator;
-       readers citing week-over-week changes in the affected series across
-       the July 1–2 boundary should treat them accordingly.`,
+      `Eleven sources entered over 2026-07-01/02 and several cells
+       stepped where new price levels entered. The steps are
+       composition effects, not repricing; treat week-over-week
+       comparisons across the boundary accordingly.`,
     ],
   },
   {
+    id: '260703-1',
     date: '2026-07-03',
-    tag: 'Composition note',
-    title: 'T1 H100 on-demand US — fourth source enters the panel',
+    effective: '2026-07-03',
+    type: 'Composition note',
+    restatement: 'None',
+    impact: 'T1 H100 OD US: $8.44 → $9.15, n 3 → 4',
+    title: 'Fourth source enters the hyperscaler H100 US cell',
     body: [
-      `Google Cloud Platform's H100 on-demand US rows began flowing into the
-       panel on 2026-07-02/03, deepening the hyperscaler (T1) H100 US cell
-       from three sources to four. The published series stepped from $8.44 to
-       $9.15 on 2026-07-03. This is a composition effect — the arrival of a
-       fourth source's price level — not a repricing by any operator: no T1
-       source changed a posted on-demand rate on those dates. Readers citing
-       the T1 H100 US series across that boundary should treat the step
-       accordingly.`,
+      `A fourth source's on-demand H100 US rows began flowing
+       2026-07-02/03. The step is a composition effect — no panel
+       source changed a posted rate on those dates.`,
     ],
   },
   {
+    id: '260426-1',
     date: '2026-04-26',
-    tag: 'Version',
-    title: 'Methodology v2.0.0 — first public version, effective',
+    effective: '2026-04-26',
+    type: 'Methodology version',
+    restatement: 'None',
+    impact: 'First public version',
+    title: 'v2.0.0 — first public methodology',
     body: [
-      `The v2.0.0 methodology took effect: chip × operator-class × geography
-       series grammar, operator-equal weighting, the published headline
-       statistic rule, and the panel roster freeze. Prior drafts are archived
-       in the methodology repository; every published row from this date
-       carries its methodology version.`,
+      `Chip × operator-class × geography series grammar, operator-equal
+       weighting, published headline-statistic rule, frozen panel
+       roster. Every published row carries its methodology version.`,
     ],
   },
 ];
@@ -168,16 +151,13 @@ const entries = [
       <div class="kicker">Documents · Change Log · as published {meta.as_of_date}</div>
       <h1>Methodology Change Log</h1>
       <p class="standfirst">
-        The running record of changes to what the published series measure:
-        methodology versions, panel membership, and composition notes.
-        Entries are appended, never edited. Pending changes are announced
-        here before they take effect, with the anticipated impact stated and
-        a comment window to <a href="mailto:research@ccir.io">research@ccir.io</a>;
-        the realized impact is appended at the effective fixing, so each
-        change carries both the estimate and the outcome.
-        The <a href="/documents/change-management">Change Management Policy</a>
-        governs how changes are classified; non-material operational changes
-        are logged in the public data repository.
+        The record of changes to what the published series measure.
+        Pending changes are announced with an estimated impact and a
+        comment window; the realized impact is appended at the effective
+        fixing. CCIR series are forward-only — no restatements. The
+        <a href="/documents/change-management">Change Management Policy</a>
+        governs classification. Comments:
+        <a href="mailto:research@ccir.io">research@ccir.io</a>.
       </p>
     </header>
 
@@ -185,10 +165,16 @@ const entries = [
       {entries.map((e) => (
         <section class="entry">
           <div class="entry-head">
-            <span class="entry-date">{e.date}</span>
-            <span class="entry-tag">{e.tag}</span>
+            <span class="entry-date">{e.id}</span>
+            <span class="entry-tag">{e.type}</span>
           </div>
           <h2 class="entry-title">{e.title}</h2>
+          <dl class="entry-meta">
+            <div><dt>Announced</dt><dd>{e.date}</dd></div>
+            <div><dt>Effective</dt><dd>{e.effective}</dd></div>
+            <div><dt>Restatement</dt><dd>{e.restatement}</dd></div>
+            <div><dt>Est. impact</dt><dd>{e.impact}</dd></div>
+          </dl>
           {e.body.map((p) => <p class="entry-body">{p}</p>)}
         </section>
       ))}
@@ -242,6 +228,29 @@ const entries = [
       font-family: var(--font-display);
       font-size: var(--fs-xl);
       margin: 0 0 10px;
+    }
+    .entry-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 26px;
+      margin: 0 0 10px;
+      padding: 8px 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .entry-meta div { display: flex; gap: 8px; align-items: baseline; }
+    .entry-meta dt {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .entry-meta dd {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--ink);
     }
     .entry-body {
       font-family: var(--font-body);
