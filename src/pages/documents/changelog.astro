@@ -11,6 +11,48 @@ import { meta } from '../../data/snapshot';
 const entries = [
   {
     date: '2026-07-15',
+    tag: 'Notice · pending · comments open',
+    title: 'Methodology v2.2.1 — panel additions: Deep Infra and Paperspace (on-demand rate panel, effective 2026-07-23)',
+    body: [
+      `CCIR proposes adding two sources to the on-demand rate panel,
+       effective with the 2026-07-23 daily fixing: Deep Infra (its own
+       GPU-instance rate card — a first-party fleet distinct from the
+       Deep Infra token-price capture CCIR already publishes nothing
+       against) and Paperspace (its own rate card). Paperspace is owned
+       by DigitalOcean, an existing panel member; the two rate cards are
+       materially different and both remain live, so Paperspace is
+       admitted as a separate venue under the same rule applied to
+       Voltage Park and Lightning AI in v2.1.0 — if either card is
+       withdrawn its series ends rather than being spliced, and
+       identical prints for 30 consecutive days trigger a dedupe
+       review. Both sources classify to the neocloud (T2) class on the
+       operator-class rationale documented in the event record;
+       classification follows the ingested venue, and price level is
+       not a classification input.`,
+      `Anticipated effect on the announcement-date panel: the T2 H100
+       guaranteed on-demand US cell deepens from 12 to 14 sources and
+       the headline statistic moves approximately +1.9% — the two
+       additions largely offset (Deep Infra posts $2.20, below the
+       panel mean, moving the cell −3.0% alone; Paperspace posts $5.95,
+       above it, +5.0% alone; the Paperspace price carries a
+       promotional footnote on the source page, disclosed in the row
+       record). Adjacent T2 cells (H200, B200, A100, B300) each deepen
+       by one source with smaller anticipated moves under the median
+       rule. The realized with/without decomposition will be published
+       at the effective fixing. No committed-term series is affected;
+       no prior print is restated.`,
+      `This addition follows the v2.2 release (a committed-term
+       reference panel — new tenor series only, with no composition
+       change to any existing series), which will be announced
+       separately and takes effect first. If the v2.2 effective date
+       moves, this addition moves with it and the notice is
+       republished. Candidate observation for both sources has been
+       live since 2026-07-15 under the note below.`,
+      `Comments are invited to research@ccir.io through 2026-07-22.`,
+    ],
+  },
+  {
+    date: '2026-07-15',
     tag: 'Note · no panel change',
     title: 'Candidate-source observation begins for forthcoming methodology proposals',
     body: [
