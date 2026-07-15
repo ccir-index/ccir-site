@@ -11,40 +11,58 @@ import { meta } from '../../data/snapshot';
 const entries = [
   {
     date: '2026-07-15',
-    tag: 'Notice · pending · comments open',
-    title: 'Methodology v2.2.0 — committed-term reference panel + two on-demand panel additions (effective 2026-07-20)',
+    tag: 'Release · v2.2.0',
+    title: 'Methodology v2.2.0 — committed-term reference panel (effective with the 2026-07-16 fixing)',
     body: [
-      `CCIR will release methodology v2.2.0 with the 2026-07-20 daily
-       fixing. It carries two changes, announced together. (This notice
-       supersedes an earlier same-day draft that staged the same
-       changes as two events.)`,
-      `First, a committed-term reference panel. CCIR begins publishing
-       committed-term series — new tenor cells from one month to five
-       years — built from firm published term prices: Azure GPU
-       reservation pricing (1/3/5-year, per region), Google Cloud
-       committed-use discounts (1/3-year; GPU-component-only rates,
-       disclosed as such), Paperspace 3-year commitments, CloudRift
-       1/3-month durations, and the AWS Capacity Blocks capture already
-       running. These are NEW series: no existing published series
-       changes composition, level, or history as a result. Term points
-       are computed within-provider (the same operator's own on-demand
-       leg), never as cross-panel differences.`,
-      `Second, two additions to the on-demand rate panel: Deep Infra
-       (its own GPU-instance rate card, first-party fleet — distinct
-       from its token-price surface) and Paperspace (its own rate card;
+      `CCIR releases a committed-term reference panel: new tenor series
+       from one month to five years, built from firm published term
+       prices — Azure GPU reservation pricing (1/3/5-year, per region),
+       Google Cloud committed-use discounts (1/3-year; GPU-component-only
+       rates, disclosed as such), Paperspace 3-year commitments,
+       CloudRift 1/3-month durations, and the AWS Capacity Blocks
+       capture already running. Term sources feed committed-term cells
+       ONLY: their on-demand rows do not enter any on-demand cell (a
+       separate pending notice below governs on-demand additions).
+       Term points are computed within-provider — the same operator's
+       own on-demand leg — never as cross-panel differences.`,
+      `These are NEW series. No existing published series changes
+       composition, level, or history; the on-demand ladder is
+       untouched. Because the release creates new series only, it takes
+       effect without a pending window, effective with the 2026-07-16
+       daily fixing; comments remain welcome at research@ccir.io on an
+       ongoing basis. First prints publish as the cells clear the
+       standard source-count and confidence gates.`,
+    ],
+  },
+  {
+    date: '2026-07-15',
+    tag: 'Notice · pending · comments open',
+    title: 'Methodology v2.2.1 — panel additions: Deep Infra and Paperspace (on-demand rate panel, effective 2026-07-23)',
+    body: [
+      `CCIR proposes adding two sources to the on-demand rate panel,
+       effective with the 2026-07-23 daily fixing: Deep Infra (its own
+       GPU-instance rate card, first-party fleet — distinct from its
+       token-price surface) and Paperspace (its own rate card;
        DigitalOcean-owned, admitted as a separate venue under the
        two-live-cards rule applied to Voltage Park and Lightning AI in
-       v2.1.0 — no-splice, 30-day identical-print dedupe review). Both
-       classify neocloud (T2) on the documented operator-class
-       rationale. Anticipated effect on the announcement-date panel:
-       the T2 H100 guaranteed on-demand US cell deepens from 12 to 14
-       sources, headline ≈ +1.9% — the additions largely offset (Deep
-       Infra $2.20, −3.0% alone; Paperspace $5.95 with a promotional
-       footnote disclosed, +5.0% alone). Adjacent T2 cells deepen by
-       one source with smaller anticipated moves under the median rule.
-       The realized with/without decomposition will be published at the
-       effective fixing. No prior print is restated.`,
-      `Comments are invited to research@ccir.io through 2026-07-19.`,
+       v2.1.0 — if either card is withdrawn its series ends rather than
+       being spliced, and identical prints for 30 consecutive days
+       trigger a dedupe review). Both classify neocloud (T2) on the
+       operator-class rationale documented in the event record;
+       price level is not a classification input.`,
+      `Anticipated effect on the announcement-date panel: the T2 H100
+       guaranteed on-demand US cell deepens from 12 to 14 sources and
+       the headline statistic moves approximately +1.9% — the two
+       additions largely offset (Deep Infra posts $2.20, below the
+       panel mean, −3.0% alone; Paperspace posts $5.95, above it,
+       +5.0% alone; the Paperspace price carries a promotional footnote
+       on the source page, disclosed in the row record). Adjacent T2
+       cells (H200, B200, A100, B300) each deepen by one source with
+       smaller anticipated moves under the median rule. The realized
+       with/without decomposition will be published at the effective
+       fixing. No committed-term series is affected; no prior print is
+       restated.`,
+      `Comments are invited to research@ccir.io through 2026-07-22.`,
     ],
   },
   {
