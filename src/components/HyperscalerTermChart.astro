@@ -1,0 +1,390 @@
+---
+/*
+  Hyperscaler reserved curve, US — /term section 02 (added 2026-07-16).
+  Server-rendered inline SVG, same geometry system as TermCurveChart.
+
+  CONSTRUCTION — deliberately different from the Neocloud chart above and
+  disclosed in the notes: these are the PUBLISHED T1 US reference cells
+  plotted directly (OD / 1Y / 3Y), not within-provider implied levels. The
+  T1 US panel is substantially the same three-to-four operators at every
+  tenor (their own reservation schedules), so cell-to-cell comparison does
+  not carry the composition bias that forced the within-provider design on
+  the thin, shifting Neocloud committed panel. % vs OD in labels/hover is
+  cell-median-vs-cell-median with n disclosed.
+
+  Tenors: only OD/1Y/3Y print for T1 US today (Azure also lists 5Y but no
+  5Y series prints — the roster gate). Chips: H100/H200/A100 (the T1 US
+  committed set). Same series colors as the chart above — same chip, same
+  hue, page-consistent.
+*/
+import { t1CommittedCellUS, tierOdCell, headlineValue, headlineStatOf, meta } from '../data/snapshot';
+import type { Rate, Term } from '../data/types';
+
+const fmt = (n: number, dp = 2) => n.toFixed(dp);
+
+// --- geometry (mirrors TermCurveChart) -------------------------------------
+const W = 920;
+const H = 430;
+const MARGIN = { top: 28, right: 158, bottom: 38, left: 46 };
+const x0 = MARGIN.left;
+const x1 = W - MARGIN.right;
+const y0 = MARGIN.top;
+const y1 = H - MARGIN.bottom;
+const innerW = x1 - x0;
+const innerH = y1 - y0;
+
+const MAX_MONTHS = 36;
+const xOf = (months: number) =>
+  x0 + innerW * (Math.sqrt(months) / Math.sqrt(MAX_MONTHS));
+
+const Y_MIN = 0;
+const Y_MAX = 10;
+const yOf = (v: number) => y0 + innerH * ((Y_MAX - v) / (Y_MAX - Y_MIN));
+const yTicks = [0, 2, 4, 6, 8, 10];
+
+const TENORS: { term: Term; months: number }[] = [
+  { term: '1Y', months: 12 },
+  { term: '3Y', months: 36 },
+];
+const X_TICKS = [{ label: 'OD', months: 0 }, { label: '1Y', months: 12 }, { label: '3Y', months: 36 }];
+
+// OD | committed divider at the sqrt-space midpoint between OD and 1Y.
+const odDividerX = x0 + innerW * (Math.sqrt(12) / 2 / Math.sqrt(MAX_MONTHS));
+
+const CHIPS = [
+  { chip: 'H100', cls: 'h100' },
+  { chip: 'H200', cls: 'h200' },
+  { chip: 'A100', cls: 'a100' },
+];
+
+interface Pt {
+  x: number;
+  y: number;
+  months: number;
+  value: number;
+  prov: boolean;
+  title: string;
+}
+interface SeriesView {
+  chip: string;
+  cls: string;
+  path: string;
+  pts: Pt[];
+  end: Pt;
+  endPct: string | null;
+  oneYPct: string | null;
+}
+
+const pctVs = (v: number, od: number) => {
+  const pct = (v / od - 1) * 100;
+  return `${pct > 0 ? '+' : '−'}${Math.round(Math.abs(pct))}%`;
+};
+
+function cellPoint(chip: string, cell: Rate | undefined, months: number, od: number | null): Pt | null {
+  if (!cell) return null;
+  const v = headlineValue(cell);
+  const tenorTxt = months === 0 ? 'on-demand' : months === 12 ? '1Y reserved' : '3Y reserved';
+  const vsOd = months > 0 && od ? ` · ${pctVs(v, od)} vs the OD cell` : '';
+  return {
+    x: xOf(months),
+    y: yOf(v),
+    months,
+    value: v,
+    prov: cell.promotion_status === 'Provisional',
+    title: `${chip} · ${tenorTxt} (Hyperscaler, US, guaranteed) · ${headlineStatOf(cell)} $${fmt(v)} · ${cell.n_sources} sources / ${cell.n_observations} obs · ${cell.promotion_status}${vsOd}`,
+  };
+}
+
+const series: SeriesView[] = CHIPS.flatMap(({ chip, cls }) => {
+  const odCell = tierOdCell('T1', chip, 'US');
+  if (!odCell) return [];
+  const odV = headlineValue(odCell);
+  const pts = [
+    cellPoint(chip, odCell, 0, null),
+    ...TENORS.map((t) => cellPoint(chip, t1CommittedCellUS(chip, t.term), t.months, odV)),
+  ].filter((p): p is Pt => p !== null);
+  if (pts.length < 2) return [];
+  const path = pts
+    .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+    .join(' ');
+  const end = pts[pts.length - 1]!;
+  const oneY = pts.find((p) => p.months === 12);
+  return [{
+    chip, cls, path, pts, end,
+    endPct: end.months > 0 ? `${pctVs(end.value, odV)} vs OD` : null,
+    oneYPct: end.months > 12 && oneY ? `1Y ${pctVs(oneY.value, odV)}` : null,
+  }];
+});
+
+// End-label collision handling (same scheme as the chart above).
+const LBL_GAP = 15;
+const endLabels = (() => {
+  const items = series
+    .map((s) => ({ s, y: s.end.y }))
+    .sort((a, b) => a.y - b.y);
+  for (let i = 1; i < items.length; i++) {
+    const prev = items[i - 1]!;
+    const cur = items[i]!;
+    if (cur.y - prev.y < LBL_GAP) cur.y = prev.y + LBL_GAP;
+  }
+  const over = items.length ? items[items.length - 1]!.y - (y1 - 2) : 0;
+  if (over > 0) {
+    for (let i = items.length - 1; i >= 0; i--) {
+      items[i]!.y -= over;
+      if (i > 0 && items[i]!.y - items[i - 1]!.y >= LBL_GAP) break;
+    }
+  }
+  return items.map(({ s, y }) => ({ s, y, leader: Math.abs(y - s.end.y) > 2 }));
+})();
+
+// Inline 1Y tags for lines that continue to 3Y — mirrors the chart above.
+const oneYearTags = series.flatMap((s) => {
+  if (!s.oneYPct) return [];
+  const p = s.pts.find((pt) => pt.months === 12);
+  if (!p) return [];
+  return [{ x: p.x, y: p.y + 16, txt: s.oneYPct }];
+});
+
+const chipNames = series.map((s) => s.chip).join(', ');
+const ariaLabel =
+  `Hyperscaler reserved curve, US region, as of ${meta.as_of_date}: USD per GPU-hour for ${chipNames}. ` +
+  `Each line runs from the on-demand cell through the published 1-year and 3-year reservation cells; ` +
+  `lines carry an inline tag with the 1-year level's percentage versus on-demand, and end labels give the 3-year rate and its percentage versus on-demand. ` +
+  `These are published reference cells plotted directly (cell median versus cell median; the US hyperscaler panel is substantially the same operators at every tenor). ` +
+  `Hollow points are Provisional cells; hover any point for sources, observations and status.`;
+---
+<figure class="htc" aria-describedby="htc-caption">
+  <div class="htc-head">
+    <span class="htc-kicker">Hyperscaler reserved · US · USD per GPU-hr</span>
+    <span class="htc-asof">as of {meta.as_of_date}</span>
+  </div>
+
+  <div class="htc-scroll">
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      role="img"
+      aria-label={ariaLabel}
+      class="htc-svg"
+    >
+      {yTicks.map((v) => (
+        <line
+          class:list={['grid', { baseline: v === Y_MIN }]}
+          x1={x0} x2={x1} y1={yOf(v)} y2={yOf(v)}
+        />
+      ))}
+      {yTicks.map((v) => (
+        <text class="ytick" x={x0 - 8} y={yOf(v) + 3.5}>${v}</text>
+      ))}
+
+      <line class="divider" x1={odDividerX} x2={odDividerX} y1={y0} y2={y1} />
+
+      {X_TICKS.map((t) => (
+        <>
+          <line class="xtickmark" x1={xOf(t.months)} x2={xOf(t.months)} y1={y1} y2={y1 + 4} />
+          <text class="xtick" x={xOf(t.months)} y={y1 + 17}>{t.label}</text>
+        </>
+      ))}
+
+      {series.map((s) => (
+        <path class={`ln s-${s.cls}`} d={s.path} />
+      ))}
+
+      {series.map((s) => s.pts.map((p) => (
+        <circle
+          class:list={['pt', `s-${s.cls}`, { prov: p.prov }]}
+          cx={p.x} cy={p.y} r={4.5}
+        />
+      )))}
+
+      {oneYearTags.map((t) => (
+        <text class="yr1-tag" x={t.x} y={t.y}>{t.txt}</text>
+      ))}
+
+      {series.map((s) => s.pts.map((p) => (
+        <circle class="hit" cx={p.x} cy={p.y} r={13}>
+          <title>{p.title}</title>
+        </circle>
+      )))}
+
+      {endLabels.map(({ s, y, leader }) => (
+        <>
+          {leader && (
+            <line class="leader" x1={s.end.x + 6} y1={s.end.y} x2={s.end.x + 9} y2={y} />
+          )}
+          <text class="lbl" x={s.end.x + 11} y={y + 3.5}>
+            <tspan class="lbl-name">{s.chip}</tspan>
+            <tspan class="lbl-val" dx="5">{fmt(s.end.value)}</tspan>
+            {s.endPct && <tspan class="lbl-spd" dx="6">{s.endPct}</tspan>}
+          </text>
+        </>
+      ))}
+    </svg>
+  </div>
+
+  <figcaption class="htc-foot" id="htc-caption">
+    <span class="htc-note">
+      Published reservation schedules · Hyperscaler (T1) · US · guaranteed ·
+      as of {meta.as_of_date}
+    </span>
+    <details class="htc-details">
+      <summary>Chart notes</summary>
+      <ul class="htc-notes-list">
+        <li>Published T1 US reference cells plotted directly — the operators'
+        own posted reservation schedules at on-demand, 1-year and 3-year
+        terms. US region only; this section does not pool geographies.</li>
+        <li><strong>Different construction from the Neocloud chart above</strong>
+        (disclosed on purpose): % vs OD here is cell-median vs cell-median.
+        The T1 US panel is substantially the same three-to-four operators at
+        every tenor, so cell-to-cell comparison does not carry the
+        composition bias that forces the within-provider design on the
+        Neocloud panel.</li>
+        <li>A reservation price is a fixed schedule — the posted price of a
+        commitment starting today, held for its term. Not a forecast of
+        future on-demand rates.</li>
+        <li>Hollow points = Provisional cells (thin panels; n on hover).
+        Azure lists 5-year reservations but no 5-year series prints yet —
+        the tenor joins when it clears the series gate.</li>
+      </ul>
+    </details>
+  </figcaption>
+</figure>
+
+<style>
+  /* Same series tokens as TermCurveChart — same chip, same hue. */
+  .htc {
+    --series-h100: #cc7d00;
+    --series-h200: #00829e;
+    --series-a100: #5f7fd9;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    padding: 12px 14px 12px;
+    margin: 0 0 20px;
+  }
+  :global(html[data-theme="editorial"]) .htc {
+    --series-h100: #a3660f;
+    --series-h200: #0d96b6;
+    --series-a100: #4d5fc0;
+  }
+
+  .htc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 9px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .htc-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: var(--weight-strong);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    color: var(--ink-dim);
+  }
+  .htc-asof {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .htc-scroll { overflow-x: auto; }
+  .htc-svg { display: block; width: 100%; min-width: 680px; height: auto; }
+
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .grid.baseline { stroke: var(--rule-2); }
+  .divider { stroke: var(--rule-2); stroke-width: 1; }
+  .xtickmark { stroke: var(--rule-2); stroke-width: 1; }
+
+  .ytick, .xtick {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    fill: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .ytick { text-anchor: end; }
+  .xtick { text-anchor: middle; }
+
+  .yr1-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--ink-faint);
+    text-anchor: middle;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ln {
+    fill: none;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .ln.s-h100 { stroke: var(--series-h100); }
+  .ln.s-h200 { stroke: var(--series-h200); }
+  .ln.s-a100 { stroke: var(--series-a100); }
+
+  .pt { stroke: var(--surface); stroke-width: 2; }
+  .pt.s-h100 { fill: var(--series-h100); }
+  .pt.s-h200 { fill: var(--series-h200); }
+  .pt.s-a100 { fill: var(--series-a100); }
+  .pt.prov { fill: var(--surface); }
+  .pt.prov.s-h100 { stroke: var(--series-h100); }
+  .pt.prov.s-h200 { stroke: var(--series-h200); }
+  .pt.prov.s-a100 { stroke: var(--series-a100); }
+
+  .hit { fill: transparent; cursor: help; }
+  .leader { stroke: var(--ink-faint); stroke-width: 1; }
+
+  .lbl {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+  .lbl-name { fill: var(--ink); font-weight: var(--weight-strong); letter-spacing: 0.04em; }
+  .lbl-val { fill: var(--ink-dim); }
+  .lbl-spd { fill: var(--ink-faint); font-size: 10px; }
+
+  .htc-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+  }
+  .htc-note {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+  }
+
+  .htc-details { margin-top: 2px; }
+  .htc-details summary {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: fit-content;
+  }
+  .htc-notes-list {
+    margin: 6px 0 2px;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .htc-notes-list li {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+  }
+</style>

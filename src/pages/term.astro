@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import TermCurveChart from '../components/TermCurveChart.astro';
+import HyperscalerTermChart from '../components/HyperscalerTermChart.astro';
 import { meta } from '../data/snapshot';
 // Implied-forwards section CUT (John 2026-07-02): with the par curve's OD
 // anchor moving to the pooled NEOCLOUD band OD (apples-to-apples), the
@@ -39,11 +40,12 @@ import { meta } from '../data/snapshot';
       tenor levels are implied off the on-demand anchor by that median spread
       (method in the chart notes).
       <strong>Geographic scope:</strong> unlike the US-only headline series on
-      <a href="/rates">/rates</a>, this page pools postings across all regions
-      (US, EU, APAC) — committed tenors are thin, and pooling preserves panel
-      depth. The on-demand anchor charted here uses the same pooled panel, so
-      the committed-vs-on-demand comparison stays like-for-like; it therefore
-      reads below the US-only headline when European postings price lower.
+      <a href="/rates">/rates</a>, the Neocloud curve below pools postings
+      across all regions (US, EU, APAC) — committed tenors are thin, and
+      pooling preserves panel depth. Its on-demand anchor uses the same pooled
+      panel, so the committed-vs-on-demand comparison stays like-for-like; it
+      therefore reads below the US-only headline when European postings price
+      lower. The hyperscaler section is US-only.
     </aside>
 
     <section class="curve-section">
@@ -53,6 +55,21 @@ import { meta } from '../data/snapshot';
       </header>
 
       <TermCurveChart />
+    </section>
+
+    <section class="curve-section">
+      <header class="sec-head">
+        <div class="kicker">Section 02 · Hyperscaler reserved · US</div>
+        <h2>The Hyperscaler Reserved Curve</h2>
+        <p class="sec-lede">
+          The published reservation schedules of the hyperscalers' own price
+          lists — on-demand, one-year and three-year terms, US region,
+          plotted directly from the reference cells. The deepest committed
+          names at the tenors term underwriting reads.
+        </p>
+      </header>
+
+      <HyperscalerTermChart />
     </section>
 
     <aside class="mi-more">

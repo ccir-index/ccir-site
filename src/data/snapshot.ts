@@ -165,6 +165,19 @@ export function t1ifCommittedCell(chip: string, term: Term): Rate | undefined {
     .sort((a, b) => variantRank(a) - variantRank(b) || (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
 }
 
+// T1 (Hyperscaler) committed cell, US region — the /term hyperscaler-reserved
+// curve (added 2026-07-16). Firm published reservation schedules; thin panels
+// (n 2-4) surface with their Provisional status, never silently.
+export function t1CommittedCellUS(chip: string, term: Term): Rate | undefined {
+  return t1ifCommittedRates
+    .filter(
+      (r) => r.gpu_model === chip && r.commitment_term === term &&
+             r.form_factor === 'ALL' && r.region === 'US' &&
+             r.interruptibility === 'GTD' && r.promotion_status !== 'Shadow',
+    )
+    .sort((a, b) => variantRank(a) - variantRank(b) || (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+}
+
 // Every tenor with at least one non-Shadow band cell, in curve order.
 export function committedBandTenors(): Term[] {
   const order: Term[] = ['1M', '3M', '6M', '1Y', '2Y', '3Y', '5Y'];
