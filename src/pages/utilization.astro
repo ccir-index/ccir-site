@@ -26,10 +26,21 @@ const AVAIL_CHIPS = [
 const DEFAULT_CHIP = 'h100-sxm';
 ---
 <Base
-  title="Utilization & Availability · CCIR"
-  description="CCIR — measured marketplace utilization (the share of listed GPUs rented, supply-normalized) charted over time, alongside the Availability Index: how many genuine-capacity GPU venues (X of Y) show launchable stock."
+  title="GPU Availability & Marketplace Utilization · CCIR"
+  description="GPU availability and utilization, measured — the share of listed marketplace GPUs actually rented (supply-normalized), plus the Availability Index: how many genuine-capacity GPU venues show launchable stock."
   ogImage="/og-utilization.png"
 >
+  <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'CCIR GPU Availability & Utilization',
+    description: 'Measured GPU marketplace utilization (share of listed GPUs rented, supply-normalized) and the Availability Index — how many genuine-capacity GPU venues show launchable stock, per chip.',
+    url: 'https://ccir.io/utilization',
+    creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
+    keywords: ['GPU availability', 'H100 availability', 'GPU utilization rate', 'GPU shortage', 'GPU capacity', 'cloud GPU availability'],
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    isAccessibleForFree: true,
+  })} />
   <section class="wrap ai-page">
     <div class="kicker">CCIR · SUPPLY OBSERVATORY <span class="mi-tag">Market&nbsp;Intelligence</span></div>
     <h1>Utilization &amp; Availability</h1>

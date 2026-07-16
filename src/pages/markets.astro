@@ -11,10 +11,21 @@ const totalRows = listingsMeta?.total_rows ?? 0;
 const windowEnd = listingsMeta?.window_end ?? '—';
 ---
 <Base
-  title="Providers · CCIR"
+  title="GPU Prices by Provider — 25+ Clouds Tracked Daily · CCIR"
   ogImage="/og/markets.png"
-  description="Per-provider list-ask time series for GPU compute across 25+ neoclouds, hyperscalers, and marketplaces. Daily snapshots across premium chip generations."
+  description="GPU price history by provider — per-provider list-ask time series across 25+ neoclouds, hyperscalers, and marketplaces, snapshotted daily across premium chip generations."
 >
+  <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'CCIR GPU Prices by Provider',
+    description: 'Per-provider GPU price history — daily list-ask time series across 25+ neoclouds, hyperscalers, and marketplaces, per premium chip generation.',
+    url: 'https://ccir.io/markets',
+    creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
+    keywords: ['GPU prices by provider', 'GPU price history', 'H100 price history', 'cloud GPU price comparison', 'neocloud pricing', 'GPU price chart'],
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    isAccessibleForFree: true,
+  })} />
   <section class="wrap top vast-page markets-page">
     <div class="kicker">PROVIDERS · DAILY LIST-ASK TIME-SERIES</div>
     <h1>Providers</h1>

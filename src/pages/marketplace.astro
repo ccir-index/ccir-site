@@ -11,10 +11,21 @@ const nSources = mktMeta?.sources?.length ?? 5;
 const windowEnd = mktMeta?.window_end ?? '—';
 ---
 <Base
-  title="Marketplace · CCIR"
+  title="Cheapest Available GPU Rentals — Marketplace Floor, 3-Hourly · CCIR"
+  description="The least-expensive available GPU rentals right now — H100, H200, B200, A100 marketplace floor prices refreshed every three hours, with seven days of per-cycle history."
   ogImage="/og/marketplace.png"
-  description="Intraday least-expensive available rates from GPU compute marketplaces, refreshed every three hours. Seven-day window with per-cycle history."
 >
+  <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'CCIR GPU Marketplace Floor Prices',
+    description: 'The least-expensive available GPU rentals across marketplace venues — H100, H200, B200, A100 floor prices refreshed every three hours with per-cycle history.',
+    url: 'https://ccir.io/marketplace',
+    creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
+    keywords: ['cheapest GPU rental', 'cheapest H100', 'GPU marketplace prices', 'H100 spot price', 'GPU floor price', 'rent H100 cheap', 'A100 rental price'],
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    isAccessibleForFree: true,
+  })} />
   <section class="wrap top vast-page marketplace-page">
     <div class="kicker">MARKETPLACES · INTRADAY LEAST-EXPENSIVE AVAILABLE</div>
     <h1>Marketplace</h1>

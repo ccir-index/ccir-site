@@ -228,9 +228,21 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
 ---
 
 <Base
-  title="Credit Reference Series — CCIR"
-  description="Derived reference series for compute credit: spread at signing, refi velocity, and lender-filed fair-value marks — computed only from filed numbers."
+  title="Compute Credit Spreads & Lender Marks — Reference Series · CCIR"
+  description="Credit reference series for GPU-backed lending: spread at signing on GPU-backed loans, refinancing velocity, and lender-filed fair-value marks — computed only from filed numbers."
 >
+  <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'CCIR Credit Reference Series',
+    description: 'Derived reference series for GPU-backed lending: spread at signing, refinancing velocity, and lender-filed fair-value marks on compute credit — computed only from filed numbers, with a CSV endpoint.',
+    url: 'https://ccir.io/credit/series',
+    creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
+    keywords: ['GPU-backed loan spreads', 'compute credit spreads', 'GPU loan pricing', 'BDC marks compute', 'GPU-backed lending data', 'refinancing velocity'],
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    isAccessibleForFree: true,
+    distribution: [{ '@type': 'DataDownload', encodingFormat: 'text/csv', contentUrl: 'https://ccir.io/credit/series/spreads.csv' }],
+  })} />
   <nav class="apps-navband" aria-label="credit section">
     <div class="wrap apps-nav-inner">
       <span class="hub-group">

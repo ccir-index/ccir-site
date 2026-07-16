@@ -16,10 +16,27 @@ import { meta } from '../data/snapshot';
 // reinstating is one import + one tag.
 ---
 <Base
-  title="Committed Term Structure · CCIR"
-  description="Committed-term GPU compute rates by tenor, one month to three years — posted committed asks and the discount to on-demand, charted against the on-demand anchor. A CCIR market-intelligence series, updated daily."
+  title="GPU Reserved & Committed Pricing — 1M to 3Y Term Structure · CCIR"
+  description="Reserved and committed GPU pricing by tenor, one month to three years — posted committed asks and each operator's discount to on-demand, updated daily. The term structure of GPU compute."
   ogImage="/og/term-structure-2026-07.png"
 >
+  <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'CCIR GPU Committed Term Structure',
+    description: 'Reserved and committed GPU pricing by tenor, one month to three years — posted committed asks and within-provider discounts to on-demand, computed daily as the operator-equal median of each operator’s committed ask against its own on-demand rate.',
+    url: 'https://ccir.io/term',
+    creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
+    temporalCoverage: '2026-05/..',
+    keywords: [
+      'GPU reserved pricing', 'committed GPU pricing', 'GPU term structure',
+      'H100 1 year price', 'H100 3 year reserved', 'GPU commitment discount',
+      'reserved instance GPU pricing', 'long-term GPU rental rates',
+      'GPU lease rates', 'multi-year GPU contract pricing',
+    ],
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    isAccessibleForFree: true,
+  })} />
   <section class="wrap top">
     <header class="page-head">
       <div class="kicker">Market Intelligence · {meta.as_of_date}</div>
