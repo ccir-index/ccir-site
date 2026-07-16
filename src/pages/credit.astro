@@ -430,10 +430,29 @@ const B_TICKS_X = [
 const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed(1)}`).join(' ');
 ---
 <Base
-  title="Compute Credit Tracker · CCIR"
-  description="GPU-backed lending and compute-infrastructure financing, tracked as filed — every debt instrument across the capital stack, from SEC filings and issuer or lender releases, with the source linked on every row."
+  title="Compute Credit Tracker — GPU-Backed Loans & Financing, As Filed · CCIR"
+  description="Track GPU-backed credit as it is filed: every GPU-backed loan, DDTL, and compute-infrastructure financing across the capital stack — coupons, spreads, collateral, and lenders from SEC filings and issuer or lender releases, source linked on every row."
   ogImage="/og/credit.png"
 >
+  <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'CCIR Compute Credit Tracker',
+    description: 'GPU-backed loans and compute-infrastructure financing tracked as filed — every debt instrument across the capital stack with coupons, spreads, collateral, and lenders as disclosed in SEC filings and issuer or lender releases, plus derived credit reference series (spread at signing, refi velocity, lender-filed marks).',
+    url: 'https://ccir.io/credit',
+    creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
+    temporalCoverage: '2023-01/..',
+    spatialCoverage: 'United States',
+    keywords: [
+      'GPU-backed credit', 'GPU-backed loans', 'GPU-backed lending',
+      'GPU-backed financing', 'track GPU-backed credit', 'GPU financing',
+      'compute credit', 'compute infrastructure financing', 'GPU collateral',
+      'AI infrastructure debt', 'GPU DDTL', 'delayed draw term loan GPU',
+      'CoreWeave debt', 'GPU securitization', 'compute credit spreads',
+    ],
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    isAccessibleForFree: true,
+  })} />
   <nav class="apps-navband" aria-label="On this page">
     <div class="wrap apps-nav-inner">
       <span class="hub-group">
@@ -455,7 +474,8 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       <div class="kicker">Market Intelligence · Compute Credit · as of {AS_OF}</div>
       <h1>Compute Credit Tracker</h1>
       <p class="standfirst lede">
-        The debt stack behind AI compute, as filed. {instruments.length}
+        The debt stack behind AI compute — GPU-backed loans and the credit
+        around them — tracked as filed. {instruments.length}
         instruments across {issuers.length} issuers — public companies from
         their U.S. Securities and Exchange Commission (SEC) filings, private
         issuers from company, lender, or arranger
