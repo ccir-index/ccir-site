@@ -1,7 +1,12 @@
 ---
 import Base from '../layouts/Base.astro';
 import TermCurveChart from '../components/TermCurveChart.astro';
-import HyperscalerTermChart from '../components/HyperscalerTermChart.astro';
+// HyperscalerTermChart PULLED same-day it shipped (John, 2026-07-16): T1 US
+// cells are n=2-4 and cell-to-cell %s manufactured a fake H200 "1Y −26%"
+// (within-provider truth: −7%). Replacement = per-provider reservation
+// schedules (Azure/GCP/AWS own ladders, named) — needs a listings-grain
+// export lane; queue with the azure/gcp leg-replacement decision (07-23).
+// Component stays in src/components; reinstating is one import + one tag.
 import { meta } from '../data/snapshot';
 // Implied-forwards section CUT (John 2026-07-02): with the par curve's OD
 // anchor moving to the pooled NEOCLOUD band OD (apples-to-apples), the
@@ -45,7 +50,7 @@ import { meta } from '../data/snapshot';
       pooling preserves panel depth. Its on-demand anchor uses the same pooled
       panel, so the committed-vs-on-demand comparison stays like-for-like; it
       therefore reads below the US-only headline when European postings price
-      lower. The hyperscaler section is US-only.
+      lower.
     </aside>
 
     <section class="curve-section">
@@ -55,21 +60,6 @@ import { meta } from '../data/snapshot';
       </header>
 
       <TermCurveChart />
-    </section>
-
-    <section class="curve-section">
-      <header class="sec-head">
-        <div class="kicker">Section 02 · Hyperscaler reserved · US</div>
-        <h2>The Hyperscaler Reserved Curve</h2>
-        <p class="sec-lede">
-          The published reservation schedules of the hyperscalers' own price
-          lists — on-demand, one-year and three-year terms, US region,
-          plotted directly from the reference cells. The deepest committed
-          names at the tenors term underwriting reads.
-        </p>
-      </header>
-
-      <HyperscalerTermChart />
     </section>
 
     <aside class="mi-more">

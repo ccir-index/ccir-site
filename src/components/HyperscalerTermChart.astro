@@ -3,14 +3,16 @@
   Hyperscaler reserved curve, US — /term section 02 (added 2026-07-16).
   Server-rendered inline SVG, same geometry system as TermCurveChart.
 
-  CONSTRUCTION — deliberately different from the Neocloud chart above and
-  disclosed in the notes: these are the PUBLISHED T1 US reference cells
-  plotted directly (OD / 1Y / 3Y), not within-provider implied levels. The
-  T1 US panel is substantially the same three-to-four operators at every
-  tenor (their own reservation schedules), so cell-to-cell comparison does
-  not carry the composition bias that forced the within-provider design on
-  the thin, shifting Neocloud committed panel. % vs OD in labels/hover is
-  cell-median-vs-cell-median with n disclosed.
+  CONSTRUCTION — published T1 US reference cells plotted directly as
+  DOLLAR LEVELS ONLY. No % vs OD anywhere on this chart (John's catch,
+  2026-07-16, same day as ship): the OD cell has more members (n=4) than
+  the term cells (n=2-3), so a cell-to-cell % differences two different
+  panels — the H200 "1Y −26%" it produced was mostly composition (the
+  within-provider H200 1Y discount is −7%, n=2 pairs; Azure's own H100
+  book runs −36% at 1Y while the cross-cell read said −9%). Within-
+  provider spreads live on the Neocloud chart above; this chart shows
+  what each cell PRINTS, and the OD dot is a detached reference, not a
+  connected point on the curve.
 
   Tenors: only OD/1Y/3Y print for T1 US today (Azure also lists 5Y but no
   5Y series prints — the roster gate). Chips: H100/H200/A100 (the T1 US
@@ -75,45 +77,36 @@ interface SeriesView {
   oneYPct: string | null;
 }
 
-const pctVs = (v: number, od: number) => {
-  const pct = (v / od - 1) * 100;
-  return `${pct > 0 ? '+' : '−'}${Math.round(Math.abs(pct))}%`;
-};
-
-function cellPoint(chip: string, cell: Rate | undefined, months: number, od: number | null): Pt | null {
+function cellPoint(chip: string, cell: Rate | undefined, months: number): Pt | null {
   if (!cell) return null;
   const v = headlineValue(cell);
-  const tenorTxt = months === 0 ? 'on-demand' : months === 12 ? '1Y reserved' : '3Y reserved';
-  const vsOd = months > 0 && od ? ` · ${pctVs(v, od)} vs the OD cell` : '';
+  const tenorTxt = months === 0 ? 'on-demand (reference cell — broader panel than the term cells; not on the curve)' : months === 12 ? '1Y reserved' : '3Y reserved';
   return {
     x: xOf(months),
     y: yOf(v),
     months,
     value: v,
     prov: cell.promotion_status === 'Provisional',
-    title: `${chip} · ${tenorTxt} (Hyperscaler, US, guaranteed) · ${headlineStatOf(cell)} $${fmt(v)} · ${cell.n_sources} sources / ${cell.n_observations} obs · ${cell.promotion_status}${vsOd}`,
+    title: `${chip} · ${tenorTxt} (Hyperscaler, US, guaranteed) · ${headlineStatOf(cell)} $${fmt(v)} · ${cell.n_sources} sources / ${cell.n_observations} obs · ${cell.promotion_status}`,
   };
 }
 
 const series: SeriesView[] = CHIPS.flatMap(({ chip, cls }) => {
-  const odCell = tierOdCell('T1', chip, 'US');
-  if (!odCell) return [];
-  const odV = headlineValue(odCell);
   const pts = [
-    cellPoint(chip, odCell, 0, null),
-    ...TENORS.map((t) => cellPoint(chip, t1CommittedCellUS(chip, t.term), t.months, odV)),
+    cellPoint(chip, tierOdCell('T1', chip, 'US'), 0),
+    ...TENORS.map((t) => cellPoint(chip, t1CommittedCellUS(chip, t.term), t.months)),
   ].filter((p): p is Pt => p !== null);
   if (pts.length < 2) return [];
-  const path = pts
+  // The line covers the RESERVED tenors only — the OD dot is a detached
+  // reference (its cell has more members than the term cells; connecting
+  // them would imply a within-book path that isn't in the data).
+  const linePts = pts.filter((p) => p.months > 0);
+  if (!linePts.length) return [];
+  const path = linePts
     .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
     .join(' ');
   const end = pts[pts.length - 1]!;
-  const oneY = pts.find((p) => p.months === 12);
-  return [{
-    chip, cls, path, pts, end,
-    endPct: end.months > 0 ? `${pctVs(end.value, odV)} vs OD` : null,
-    oneYPct: end.months > 12 && oneY ? `1Y ${pctVs(oneY.value, odV)}` : null,
-  }];
+  return [{ chip, cls, path, pts, end, endPct: null, oneYPct: null }];
 });
 
 // End-label collision handling (same scheme as the chart above).
@@ -147,10 +140,10 @@ const oneYearTags = series.flatMap((s) => {
 
 const chipNames = series.map((s) => s.chip).join(', ');
 const ariaLabel =
-  `Hyperscaler reserved curve, US region, as of ${meta.as_of_date}: USD per GPU-hour for ${chipNames}. ` +
-  `Each line runs from the on-demand cell through the published 1-year and 3-year reservation cells; ` +
-  `lines carry an inline tag with the 1-year level's percentage versus on-demand, and end labels give the 3-year rate and its percentage versus on-demand. ` +
-  `These are published reference cells plotted directly (cell median versus cell median; the US hyperscaler panel is substantially the same operators at every tenor). ` +
+  `Hyperscaler reserved levels, US region, as of ${meta.as_of_date}: USD per GPU-hour for ${chipNames}. ` +
+  `Each line connects the published 1-year and 3-year reservation cells; the on-demand cell is drawn as a detached reference dot ` +
+  `because it has more panel members than the term cells — no percentage comparisons are drawn between cells for that reason. ` +
+  `Within-provider term discounts are on the Neocloud chart above. ` +
   `Hollow points are Provisional cells; hover any point for sources, observations and status.`;
 ---
 <figure class="htc" aria-describedby="htc-caption">
@@ -229,15 +222,17 @@ const ariaLabel =
     <details class="htc-details">
       <summary>Chart notes</summary>
       <ul class="htc-notes-list">
-        <li>Published T1 US reference cells plotted directly — the operators'
-        own posted reservation schedules at on-demand, 1-year and 3-year
-        terms. US region only; this section does not pool geographies.</li>
-        <li><strong>Different construction from the Neocloud chart above</strong>
-        (disclosed on purpose): % vs OD here is cell-median vs cell-median.
-        The T1 US panel is substantially the same three-to-four operators at
-        every tenor, so cell-to-cell comparison does not carry the
-        composition bias that forces the within-provider design on the
-        Neocloud panel.</li>
+        <li>Published T1 US reference cells plotted directly as dollar
+        levels — the operators' own posted reservation schedules at
+        on-demand, 1-year and 3-year terms. US region only; this section
+        does not pool geographies.</li>
+        <li><strong>No % vs on-demand is shown, deliberately.</strong> The
+        on-demand cell carries more panel members than the term cells, so a
+        cell-to-cell percentage would difference two different panels and
+        overstate or understate any operator's actual discount. The OD dot
+        is drawn detached from the curve for the same reason. Within-provider
+        term discounts — each operator's committed ask against its own
+        on-demand rate — are the chart above.</li>
         <li>A reservation price is a fixed schedule — the posted price of a
         commitment starting today, held for its term. Not a forecast of
         future on-demand rates.</li>
