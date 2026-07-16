@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { noteCardPng } from '../../lib/og-note';
+import { noteCardPng, CT } from '../../lib/og-note';
 
 export const prerender = true;
 
@@ -31,6 +31,7 @@ const SPEC = {
 };
 
 export const GET: APIRoute = async () => {
-  const png = await noteCardPng(SPEC);
+  // Terminal (dark) card — John 2026-07-16; the rest of the OG fleet stays editorial.
+  const png = await noteCardPng({ ...SPEC, palette: CT });
   return new Response(png as BodyInit, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=3600' } });
 };
