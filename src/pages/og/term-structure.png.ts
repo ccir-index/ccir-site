@@ -9,21 +9,21 @@ const SPEC = {
   "titleLines": [
     "Committed Term Structure"
   ],
-  "sub": "Posted committed asks by tenor — guaranteed capacity, one month to a year.",
+  "sub": "Posted committed asks by tenor — guaranteed capacity, one month to three years.",
   "rows": [
     [
       "On-demand",
-      "The spot end of the curve",
+      "The anchor end of the curve",
       ""
     ],
     [
-      "1–12 months",
+      "1M – 3Y",
       "Committed asks per chip and tenor",
       ""
     ],
     [
       "The discount",
-      "Commitment priced against the spot rate, daily",
+      "Each operator's committed ask vs its own on-demand rate, daily",
       ""
     ]
   ],

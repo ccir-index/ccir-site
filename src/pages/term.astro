@@ -11,7 +11,7 @@ import { meta } from '../data/snapshot';
 ---
 <Base
   title="Committed Term Structure · CCIR"
-  description="Committed-term GPU compute rates by tenor — the pooled neocloud committed band charted against the on-demand headline. A CCIR market-intelligence series, updated daily."
+  description="Committed-term GPU compute rates by tenor, one month to three years — posted committed asks and the discount to on-demand, charted against the on-demand anchor. A CCIR market-intelligence series, updated daily."
   ogImage="/og/term-structure.png"
 >
   <section class="wrap top">
@@ -20,8 +20,8 @@ import { meta } from '../data/snapshot';
       <h1>Committed Term Structure</h1>
       <p class="standfirst">
         The price of guaranteed capacity, by tenor. Posted committed asks from
-        one month out to one year — the term axis the on-demand headline
-        can't see.
+        one month to three years, and the discount each tenor carries to
+        on-demand — the term axis the on-demand headline can't see.
       </p>
     </header>
 
@@ -29,6 +29,15 @@ import { meta } from '../data/snapshot';
       <strong>A market-intelligence series on committed-term pricing.</strong>
       Committed-term cells are a descriptive market-intelligence product. Panel depth is
       disclosed on every point (hover); thin cells render hollow (Provisional).
+      A committed price is a <strong>fixed schedule</strong> — the posted price of a
+      commitment starting today, held for its term. It is not a forecast of
+      future on-demand rates, and the curve below is not a forward curve.
+      <strong>Construction:</strong> tenor spreads are computed <strong>within
+      provider</strong> — each operator's committed ask against its <em>own</em>
+      on-demand rate — and published as the <strong>operator-equal median</strong>
+      (one vote per operator), not a raw pool of posted discounts. The plotted
+      tenor levels are implied off the on-demand anchor by that median spread
+      (method in the chart notes).
       <strong>Geographic scope:</strong> unlike the US-only headline series on
       <a href="/rates">/rates</a>, this page pools US and EU postings —
       committed tenors are thin, and pooling preserves panel depth. The

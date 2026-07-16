@@ -9,8 +9,11 @@
   as 6M→1Y). sqrt(months) keeps order and a sense of elapsed time while
   giving the dense short end room to read. Disclosed in the caption.
 
-  Display is capped at the 1Y anchor tenor: 2Y/3Y band cells exist in the
-  snapshot but this page plots OD → 1Y only (page-level cap, 2026-07-01).
+  Tenor extent: OD → 3Y (extended 2026-07-16, John's call, reversing the
+  2026-07-01 OD→1Y display cap — the committed-term panel now prints 1M-3Y
+  and the multi-year tenors carry the credit story). The 1Y anchor-tenor
+  emphasis stays: 1Y remains the reference tenor. Points render only at
+  published tenors — a chip with no 2Y row draws 1Y→3Y directly.
 
   Series colors are chart-local custom properties defined for BOTH themes
   and validated with the dataviz six-checks script against each theme's
@@ -38,14 +41,17 @@ const y1 = H - MARGIN.bottom;
 const innerW = x1 - x0;
 const innerH = y1 - y0;
 
-const MAX_MONTHS = 12;
+const MAX_MONTHS = 36;
 const xOf = (months: number) =>
   x0 + innerW * (Math.sqrt(months) / Math.sqrt(MAX_MONTHS));
 
-const Y_MIN = 1;
+// Y floor at $0 (was $1 under the 1Y cap): 3Y implied levels reach below
+// $1 — A100 3Y ≈ $0.79 on the 2026-07-16 print — and clipping them would
+// misstate the curve.
+const Y_MIN = 0;
 const Y_MAX = 7;
 const yOf = (v: number) => y0 + innerH * ((Y_MAX - v) / (Y_MAX - Y_MIN));
-const yTicks = [1, 2, 3, 4, 5, 6, 7];
+const yTicks = [0, 1, 2, 3, 4, 5, 6, 7];
 
 // Tenor floor at 3M (John 2026-07-02): the 1M point both crowded the short
 // end and escaped the y-domain — B200's 1M committed carries a scarcity
@@ -55,6 +61,8 @@ const TENORS: { term: Term; months: number }[] = [
   { term: '3M', months: 3 },
   { term: '6M', months: 6 },
   { term: '1Y', months: 12 },
+  { term: '2Y', months: 24 },
+  { term: '3Y', months: 36 },
 ];
 const X_TICKS = [{ label: 'OD', months: 0 }, ...TENORS.map((t) => ({ label: t.term as string, months: t.months }))];
 
@@ -121,7 +129,7 @@ function odPoint(chip: string): Pt | null {
 // vs −21% within-provider, 2026-07-02). A signed spread, not a "discount"
 // (committed can price above spot). Null when the chip has no
 // within-provider row at its end tenor — the label then omits the %.
-const TERM_OF_MONTHS: Record<number, Term> = { 1: '1M', 3: '3M', 6: '6M', 12: '1Y' };
+const TERM_OF_MONTHS: Record<number, Term> = { 1: '1M', 3: '3M', 6: '6M', 12: '1Y', 24: '2Y', 36: '3Y' };
 
 function spreadVsOd(chip: string, months: number): { txt: string; title: string } | null {
   const term = TERM_OF_MONTHS[months];
@@ -209,7 +217,7 @@ const endLabels = (() => {
 const chipNames = series.map((s) => s.chip).join(', ');
 const ariaLabel =
   `Committed par curve, as of ${meta.as_of_date}: USD per GPU-hour by tenor for ${chipNames}. ` +
-  `Each line runs from the on-demand anchor through committed asks at 1, 3 and 6 months to the 1-year anchor tenor where published. ` +
+  `Each line runs from the on-demand anchor through committed asks at 3 and 6 months, 1 year (the anchor tenor), 2 years and 3 years where published. ` +
   `End labels give each chip's terminal rate and its within-provider signed spread — that chip's committed asks versus the same operators' own on-demand rates, aggregated operator-equal. ` +
   `Hollow points are thin panels (fewer than 3 provider pairs); hover any point for the spread and pair count.`;
 ---
@@ -312,7 +320,12 @@ const ariaLabel =
         discount (H100 1Y: −24% cross-panel vs −12% within-provider). The plotted
         tenor levels are therefore OD-consistent implied levels, not raw medians.</li>
         <li>Hollow points = thin (fewer than 3 provider pairs). Hover any point
-        for the spread and pair count.</li>
+        for the spread and pair count. Points render only at published tenors —
+        a line with no 2Y point runs 1Y to 3Y directly.</li>
+        <li>A committed price is a <strong>fixed schedule</strong> — the posted
+        price of a commitment starting today for its full term. It is not a
+        forecast of future on-demand rates, and this chart is not a forward
+        curve.</li>
         <li>Term axis compressed (√months) so the short end reads · 1-day snapshots ·
         B300 joins as its committed panel clears the gate.</li>
       </ul>
