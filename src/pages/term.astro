@@ -33,24 +33,12 @@ import { meta } from '../data/snapshot';
 
     <aside class="mi-banner" role="note">
       <strong>A market-intelligence series on committed-term pricing.</strong>
-      Committed-term cells are a descriptive market-intelligence product. Panel depth is
-      disclosed on every point (hover); thin cells render hollow (Provisional).
-      A committed price is a <strong>fixed schedule</strong> — the posted price of a
-      commitment starting today, held for its term. It is not a forecast of
-      future on-demand rates, and the curve below is not a forward curve.
-      <strong>Construction:</strong> tenor spreads are computed <strong>within
-      provider</strong> — each operator's committed ask against its <em>own</em>
-      on-demand rate — and published as the <strong>operator-equal median</strong>
-      (one vote per operator), not a raw pool of posted discounts. The plotted
-      tenor levels are implied off the on-demand anchor by that median spread
-      (method in the chart notes).
-      <strong>Geographic scope:</strong> unlike the US-only headline series on
-      <a href="/rates">/rates</a>, the Neocloud curve below pools postings
-      across all regions (US, EU, APAC) — committed tenors are thin, and
-      pooling preserves panel depth. Its on-demand anchor uses the same pooled
-      panel, so the committed-vs-on-demand comparison stays like-for-like; it
-      therefore reads below the US-only headline when European postings price
-      lower.
+      Committed-term cells are a descriptive market-intelligence product, not
+      a citable reference rate. A committed price is a <strong>fixed
+      schedule</strong> — the posted price of a commitment starting today,
+      held for its term — not a forecast of future on-demand rates.
+      Construction, geographic scope, and panel-depth conventions are in the
+      chart notes beneath the figure.
     </aside>
 
     <section class="curve-section">

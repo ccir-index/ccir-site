@@ -331,11 +331,17 @@ const ariaLabel =
       <summary>Chart notes</summary>
       <ul class="tcv-notes-list">
         <li>OD anchor = the observed Neocloud (operator-tier T2) guaranteed
-        on-demand rate.</li>
+        on-demand rate, <strong>pooled across all regions (US, EU, APAC)</strong> —
+        the same pooled panel as the committed tenors, so the
+        committed-vs-on-demand step is like-for-like. Committed tenors are
+        thin; pooling preserves panel depth. Unlike the US-only headline on
+        /rates, this anchor reads below it when European postings price
+        lower.</li>
         <li>Each tenor = the OD anchor stepped down by the <strong>within-provider
         term spread</strong> — each operator's committed ask vs its <em>own</em>
-        on-demand rate, aggregated operator-equal. So the line's drop equals the
-        end-label at every tenor.</li>
+        on-demand rate, published as the <strong>operator-equal median</strong>
+        (one vote per operator), never a raw pool of posted discounts. So the
+        line's drop equals the end-label at every tenor.</li>
         <li>This avoids the composition bias in a raw committed-vs-OD median,
         which differences two different provider panels and overstates the
         discount (H100 1Y: −24% cross-panel vs −12% within-provider). The plotted
