@@ -11,9 +11,11 @@
 
   Tenor extent: OD → 3Y (extended 2026-07-16, John's call, reversing the
   2026-07-01 OD→1Y display cap — the committed-term panel now prints 1M-3Y
-  and the multi-year tenors carry the credit story). The 1Y anchor-tenor
-  emphasis stays: 1Y remains the reference tenor. Points render only at
-  published tenors — a chip with no 2Y row draws 1Y→3Y directly.
+  and the multi-year tenors carry the credit story). 1Y remains the
+  reference tenor, marked by the inline "1Y −N%" tag on every line that
+  continues past it (the vertical anchor line was cut same day — furniture
+  once the axis ran to 3Y). Points render only at published tenors — a chip
+  with no 2Y row draws 1Y→3Y directly.
 
   Series colors are chart-local custom properties defined for BOTH themes
   and validated with the dataviz six-checks script against each theme's
@@ -68,8 +70,11 @@ const X_TICKS = [{ label: 'OD', months: 0 }, ...TENORS.map((t) => ({ label: t.te
 
 // Divider between the on-demand anchor and the committed region — placed at
 // the sqrt-space midpoint between OD (0) and the first committed tenor (3M).
+// (The 1Y anchor line + accent tick were removed with the 3Y extension —
+// John 2026-07-16: with the axis running to 3Y the vertical rule read as
+// chart furniture. 1Y stays visible instead via the inline "1Y −N%" tag on
+// every line that continues past it.)
 const odDividerX = x0 + innerW * (Math.sqrt(3) / 2 / Math.sqrt(MAX_MONTHS));
-const anchorX = xOf(12); // 1Y — the anchor tenor
 
 // --- data -----------------------------------------------------------------
 // Vertical order on the plot (B200 top … A100 bottom) is the palette's
@@ -165,7 +170,7 @@ function tenorPoint(chip: string, term: Term, months: number, odValue: number): 
     months,
     value: v,
     prov: sp.n_pairs < 3,
-    anchor: months === 12,
+    anchor: false,
     title: `${chip} · ${term} committed vs own OD: ${pctTxt} — within-provider spread (${sp.n_pairs} provider pairs) → $${fmt(v)} implied off the $${fmt(odValue)} on-demand rate`,
   };
 }
@@ -214,10 +219,28 @@ const endLabels = (() => {
   }));
 })();
 
+// Inline 1Y tags — the 1-year tenor is the reference tenor and its discount
+// must stay readable even when a line runs on to 2Y/3Y (the end label then
+// carries the END tenor's %). One small muted tag below each 1Y point, for
+// series whose line continues past 12 months.
+const oneYearTags = series.flatMap((s) => {
+  if (s.end.months <= 12) return [];
+  const p = s.pts.find((pt) => pt.months === 12);
+  if (!p) return [];
+  const sp = wpSpread(s.chip, '1Y');
+  if (!sp) return [];
+  const pct = sp.spread * 100;
+  return [{
+    x: p.x,
+    y: p.y + 16,
+    txt: `1Y ${pct > 0 ? '+' : '−'}${Math.round(Math.abs(pct))}%`,
+  }];
+});
+
 const chipNames = series.map((s) => s.chip).join(', ');
 const ariaLabel =
   `Committed par curve, as of ${meta.as_of_date}: USD per GPU-hour by tenor for ${chipNames}. ` +
-  `Each line runs from the on-demand anchor through committed asks at 3 and 6 months, 1 year (the anchor tenor), 2 years and 3 years where published. ` +
+  `Each line runs from the on-demand anchor through committed asks at 3 and 6 months, 1, 2 and 3 years where published; lines extending past one year carry an inline tag with their 1-year discount. ` +
   `End labels give each chip's terminal rate and its within-provider signed spread — that chip's committed asks versus the same operators' own on-demand rates, aggregated operator-equal. ` +
   `Hollow points are thin panels (fewer than 3 provider pairs); hover any point for the spread and pair count.`;
 ---
@@ -248,19 +271,11 @@ const ariaLabel =
       {/* OD | committed divider */}
       <line class="divider" x1={odDividerX} x2={odDividerX} y1={y0} y2={y1} />
 
-      {/* 1Y anchor tenor — subtle emphasis */}
-      <line class="anchor-line" x1={anchorX} x2={anchorX} y1={y0} y2={y1} />
-      <text class="anchor-cap" x={anchorX} y={y0 - 10}>1Y anchor</text>
-
       {/* x ticks */}
       {X_TICKS.map((t) => (
         <>
           <line class="xtickmark" x1={xOf(t.months)} x2={xOf(t.months)} y1={y1} y2={y1 + 4} />
-          <text
-            class:list={['xtick', { 'xtick-anchor': t.months === 12 }]}
-            x={xOf(t.months)}
-            y={y1 + 17}
-          >{t.label}</text>
+          <text class="xtick" x={xOf(t.months)} y={y1 + 17}>{t.label}</text>
         </>
       ))}
 
@@ -269,13 +284,19 @@ const ariaLabel =
         <path class={`ln s-${s.cls}`} d={s.path} />
       ))}
 
-      {/* marks — filled = Published, hollow = Provisional; 1Y slightly larger */}
+      {/* marks — filled = Published, hollow = Provisional */}
       {series.map((s) => s.pts.map((p) => (
         <circle
           class:list={['pt', `s-${s.cls}`, { prov: p.prov }]}
-          cx={p.x} cy={p.y} r={p.anchor ? 5.5 : 4.5}
+          cx={p.x} cy={p.y} r={4.5}
         />
       )))}
+
+      {/* inline 1Y tags — the reference tenor's discount stays visible on
+          lines that continue to 2Y/3Y */}
+      {oneYearTags.map((t) => (
+        <text class="yr1-tag" x={t.x} y={t.y}>{t.txt}</text>
+      ))}
 
       {/* hover targets — generous hit area, n disclosed via title */}
       {series.map((s) => s.pts.map((p) => (
@@ -391,16 +412,6 @@ const ariaLabel =
   .divider { stroke: var(--rule-2); stroke-width: 1; }
   .xtickmark { stroke: var(--rule-2); stroke-width: 1; }
 
-  .anchor-line { stroke: var(--accent); stroke-width: 1; opacity: 0.3; }
-  .anchor-cap {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    fill: var(--accent);
-    text-anchor: middle;
-  }
-
   .ytick, .xtick {
     font-family: var(--font-mono);
     font-size: 10.5px;
@@ -409,7 +420,15 @@ const ariaLabel =
   }
   .ytick { text-anchor: end; }
   .xtick { text-anchor: middle; }
-  .xtick-anchor { fill: var(--accent); font-weight: var(--weight-strong); }
+
+  /* inline 1Y discount tag — muted, below the 1Y point on lines that run on */
+  .yr1-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--ink-faint);
+    text-anchor: middle;
+    font-variant-numeric: tabular-nums;
+  }
 
   /* marks */
   .ln {
