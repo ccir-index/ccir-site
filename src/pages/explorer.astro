@@ -214,8 +214,29 @@ const rows = source.map((r) => ({
         document.querySelectorAll('#filters select').forEach(function (s) { s.value = ''; });
         document.getElementById('f-search').value = '';
         F = { tier: '', chip: '', form: '', interrupt: '', region: '', search: '' };
+        if (history.replaceState) history.replaceState(null, '', location.pathname);
         render();
       });
+      // Deep-linkable filters: /explorer?chip=H100&interrupt=INT&region=US
+      // pre-selects the matching filters, so notes and external citations can
+      // point at a specific cut. Unknown values are ignored (select stays '').
+      (function initFromQuery() {
+        var qs = new URLSearchParams(location.search);
+        document.querySelectorAll('#filters select').forEach(function (s) {
+          var key = s.getAttribute('data-filter');
+          var v = key && qs.get(key);
+          if (!v) return;
+          for (var i = 0; i < s.options.length; i++) {
+            if (s.options[i].value.toLowerCase() === v.toLowerCase()) {
+              s.value = s.options[i].value;
+              F[key] = s.options[i].value;
+              break;
+            }
+          }
+        });
+        var q = qs.get('search');
+        if (q) { document.getElementById('f-search').value = q; F.search = q; }
+      })();
       render();
     })();
   </script>

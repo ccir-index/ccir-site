@@ -1,0 +1,227 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/*
+  Dated research note — frozen to the 2026-07-17 daily print (methodology
+  v2.2.0). Research notes are dated, not updated in place; the living
+  surfaces are /rates, /term, /basis, /credit, /realized. All numbers are
+  hardcoded from the 2026-07-17 rates_daily + committed_mi publication —
+  this page must not import the live datasets.
+*/
+const AS_OF = '2026-07-17';
+---
+<Base
+  title="The Basis Layer, Measured: What a GPU-Hour's Price Depends On · CCIR Research"
+  description="A GPU-hour is not one price. On one day's print the same H100-hour posts at $9.15, $3.63, and $2.89 by operator segment; −25% by region; −2% to −56% by commitment term. The five basis components, measured — and the ones with no public price yet."
+  ogImage="/og/basis-layer-measured.png"
+  article={{ published: '2026-07-17' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {AS_OF} · window: the 2026-07-17 daily print, methodology v2.2.0</div>
+      <h1>The Basis Layer, Measured: What a GPU-Hour's Price Depends On</h1>
+      <p class="standfirst">
+        &ldquo;GPU-hour&rdquo; reads like a standardized unit. On any day's
+        print it is the beginning of a description: the same-name chip, the
+        same day, posts at prices that differ by multiples depending on who
+        operates it, where it sits, how long the commitment runs, and whether
+        the capacity can be interrupted. Each of those differences is a basis
+        — a spread against whatever reference price a contract, covenant, or
+        collateral mark chooses. This note freezes one day's cross-section of
+        the spreads we measure daily, and names the components that today
+        have no public price at all.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> Five Components, One Day's Print</h2>
+      <p>
+        Every figure below is from the July 17, 2026 daily publication:
+        posted, publicly accessible rates from the fixed provider panel,
+        guaranteed on-demand unless stated, panel depth (n = contributing
+        providers) disclosed per cell. Statistics follow the published
+        methodology; thin cells are labeled.
+      </p>
+      <div class="table-wrap">
+        <table class="basis-table">
+          <thead>
+            <tr><th>Basis component</th><th>Measured as</th><th>2026-07-17 print</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Silicon</td>
+              <td>Chip axis, within one segment (Neocloud, guaranteed on-demand, US) · <a href="/explorer?tier=T2&interrupt=GTD&region=US">open this cut</a></td>
+              <td>H100 $3.63 (n=12) · H200 $4.29 (n=7) · B200 $7.65 (n=4) — a 2.1&times; span across three current-generation chips</td>
+            </tr>
+            <tr>
+              <td>Configuration &amp; operator class</td>
+              <td>Operator-segment axis, same chip (H100, guaranteed on-demand, US) · <a href="/explorer?chip=H100&interrupt=GTD&region=US">open this cut</a></td>
+              <td>Hyperscaler $9.15 (n=4) · Neocloud $3.63 (n=12) · Marketplace $2.89 (n=8) — <strong>3.2&times; on the same-name chip, same region, same term</strong></td>
+            </tr>
+            <tr>
+              <td>Location</td>
+              <td>Region axis, same chip and segment (Neocloud, guaranteed on-demand) · <a href="/explorer?tier=T2&interrupt=GTD">open this cut</a></td>
+              <td>EU posts below US: H100 −25% ($2.74 vs $3.63) · H200 −12% ($3.78 vs $4.29) · B200 −21% ($6.06 vs $7.65)</td>
+            </tr>
+            <tr>
+              <td>Commitment term</td>
+              <td>Within-provider committed schedules vs the same provider's on-demand · <a href="/term">open the curve</a></td>
+              <td>Neocloud H100: −2% at 1M (n=3) · −10% at 1Y (n=7) · −39% at 3Y (n=4). Hyperscaler H100 3Y: −56% (n=2). Posted fixed schedules, not a forecast</td>
+            </tr>
+            <tr>
+              <td>Interruptibility</td>
+              <td>Guaranteed vs interruptible, same chip (H100, US) · <a href="/explorer?chip=H100&interrupt=INT">open this cut</a></td>
+              <td>Hyperscaler −66% ($3.09 vs $9.15; n=2, thin) · Marketplace −19% ($2.34 vs $2.89; n=3, thin)</td>
+            </tr>
+            <tr>
+              <td>Counterparty</td>
+              <td>No posted price — observed in credit documents instead</td>
+              <td>Filed spreads at signing on GPU-collateralized facilities run +2.25 to +9.62 over SOFR by contract support; unaffiliated holders of one facility file marks from 99.0 to 103.1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Two properties of this table matter more than any single number.
+        First, the spreads are not noise around a true price — they are
+        persistent, they have signs that survive day to day, and several are
+        larger than the level moves the market debates. Second, each row is a
+        published daily series, not a one-off study: every cell above — and
+        every grain this note does not show (each chip &times; segment &times;
+        region &times; term &times; interruptibility combination the panel
+        supports) — is browsable on the
+        <a href="/explorer">series explorer</a>, and the cross-section can be
+        recomputed for any publication date from the archived record.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> What Has No Posted Price</h2>
+      <p>
+        The table's honesty requires its complement: components of the
+        physical market that today have no public price, here or anywhere.
+      </p>
+      <p>
+        <strong>Facility-grain configuration.</strong> Our operator-segment
+        axis carries much of the configuration difference — interconnect
+        fabric and form factor are identifiable at the listing level (SXM vs
+        PCIe, InfiniBand-class fabrics) — but a specific cluster's topology,
+        oversubscription, and storage attachment do not post prices. The
+        segment spread bounds this basis; it does not decompose it.
+      </p>
+      <p>
+        <strong>Power and facility terms.</strong> Posted GPU-hour rates
+        bundle power, cooling, and facility cost. No provider posts the
+        pass-through separately, so the power component of the location
+        spread is not separable from the posted price alone.
+      </p>
+      <p>
+        <strong>Service terms.</strong> Uptime guarantees, support
+        obligations, replacement rights, and scheduling restrictions change
+        what a buyer receives at the same headline rate. These live in
+        contracts and terms-of-service documents, not in posted prices.
+      </p>
+      <p>
+        <strong>Delivered versus posted.</strong> Every rate above is a
+        posted, publicly accessible ask — by design, and disclosed
+        throughout the methodology. What large committed deals sign at is
+        not public; the nearest public evidence is filings-based realization,
+        tracked on the <a href="/realized/">realized vs rate card</a> monitor.
+      </p>
+      <p>
+        <strong>Counterparty standing.</strong> The one component priced in
+        credit documents rather than rate cards. The
+        <a href="/credit">compute credit tracker</a> reproduces those terms
+        as filed; it is a record, not a price.
+      </p>
+      <p>
+        In commodity markets, differentials that mattered eventually acquired
+        published assessments; differentials that did not stayed inside
+        bilateral negotiations. Which of the unpriced components above
+        crosses that line is an empirical question this record is built to
+        answer.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> Sources &amp; Method</h2>
+      <p>
+        All rates are from the CCIR daily publication of July 17, 2026
+        (methodology v2.2.0): publicly posted, provider-operated pricing
+        pages captured from a fixed panel, one provider one vote, statistics
+        and panel depth published per cell. Term spreads are within-provider
+        — each provider's committed schedule against its own on-demand rate
+        — never a ratio between cells of different panel composition.
+        Credit figures are reproduced from SEC filings and issuer or lender
+        releases as filed. Cells with n&le;2 are labeled thin and should be
+        read as indicative.
+      </p>
+      <p class="data-note">
+        Living surfaces: <a href="/rates">reference rates</a> ·
+        <a href="/explorer">series explorer (every grain)</a> ·
+        <a href="/term">committed term structure</a> ·
+        <a href="/basis">on-demand vs clearing basis</a> ·
+        <a href="/credit">compute credit tracker</a> ·
+        <a href="/realized/">realized vs rate card</a>. The full daily series
+        behind every row is downloadable from the
+        <a href="/data/rates_daily.csv">rates CSV</a>.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec strong { color: var(--accent); }
+    .table-wrap { overflow-x: auto; margin: 0 0 13px; }
+    .basis-table {
+      border-collapse: collapse;
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      line-height: 1.5;
+      min-width: 640px;
+    }
+    .basis-table th {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-faint);
+      text-align: left;
+      padding: 8px 14px 8px 0;
+      border-bottom: 1px solid var(--ink-dim);
+    }
+    .basis-table td {
+      padding: 10px 14px 10px 0;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+      color: var(--ink);
+    }
+    .basis-table td:first-child {
+      font-family: var(--font-display);
+      font-weight: var(--weight-display);
+      white-space: nowrap;
+    }
+    .basis-table td:nth-child(2) { color: var(--ink-dim); }
+    .data-note { font-size: var(--fs-sm); color: var(--ink-dim); }
+  </style>
+</Base>
