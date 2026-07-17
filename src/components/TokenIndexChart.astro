@@ -1,0 +1,312 @@
+---
+/*
+  Fixed-basket token index — the flagship chart for /tokens. Server-rendered
+  inline SVG, same build-time idiom as TermCurveChart (no client library).
+
+  Two SEPARATE series (John ruling 2026-07-16): the input leg and the output
+  leg of the same frozen 5-model basket. Never blended — the legs reprice
+  independently (the 07-14 step hit both, but the audit window shows
+  single-leg moves too).
+
+  X axis: calendar days since the series start (2026-07-03 — capture went
+  live that day; no backcast). The window is short at launch and the axis
+  says so — the label carries the day count, per the label-the-window rule.
+
+  Series colors reuse two of the term chart's validated per-theme tokens
+  (amber/cyan pass the six-checks adjacency test on both theme surfaces
+  at ΔE comfortably above threshold as the only two series on the plot).
+
+  Posted LIST prices. A step means a provider repriced a basket model —
+  every step is attributable via the per-member audit JSON in the CSV.
+*/
+import { tokenIndex, tokenMeta } from '../data/tokens';
+
+const fmt = (n: number, dp = 3) => n.toFixed(dp);
+
+// --- geometry -------------------------------------------------------------
+const W = 920;
+const H = 380;
+const MARGIN = { top: 24, right: 132, bottom: 36, left: 52 };
+const x0 = MARGIN.left;
+const x1 = W - MARGIN.right;
+const y0 = MARGIN.top;
+const y1 = H - MARGIN.bottom;
+const innerW = x1 - x0;
+const innerH = y1 - y0;
+
+const days = tokenIndex;
+const nDays = days.length;
+
+// Day-index x scale (daily cadence, no gaps by construction — a basket gap
+// day emits no row and would show as a visible break in the line).
+const xOf = (i: number) => x0 + (nDays > 1 ? innerW * (i / (nDays - 1)) : innerW / 2);
+
+// Y domain: zero-floored so the legs' distance from free reads honestly;
+// headroom above the output leg. Both legs sit well under $1.50 today.
+const yMaxData = Math.max(...days.map((d) => d.output_usd_per_mtok), 0.01);
+const Y_MAX = Math.max(1.25, Math.ceil(yMaxData * 5) / 4);
+const Y_MIN = 0;
+const yOf = (v: number) => y0 + innerH * ((Y_MAX - v) / (Y_MAX - Y_MIN));
+const yTicks = [0, 0.25, 0.5, 0.75, 1.0, 1.25].filter((t) => t <= Y_MAX);
+
+// X ticks: first day, then every ~4th, always the last.
+const xTickIdx = (() => {
+  if (nDays <= 1) return [0];
+  const step = Math.max(1, Math.round(nDays / 5));
+  const idx = new Set<number>([0, nDays - 1]);
+  for (let i = step; i < nDays - 1; i += step) idx.add(i);
+  return [...idx].sort((a, b) => a - b);
+})();
+const mmdd = (iso: string) => iso.slice(5).replace('-', '/');
+
+interface Leg {
+  key: 'output' | 'input';
+  cls: string;
+  label: string;
+  path: string;
+  pts: { x: number; y: number; title: string }[];
+  endY: number;
+  endVal: number;
+}
+
+function leg(key: 'output' | 'input', cls: string, label: string): Leg {
+  const field = key === 'output' ? 'output_usd_per_mtok' : 'input_usd_per_mtok';
+  const pts = days.map((d, i) => ({
+    x: xOf(i),
+    y: yOf(d[field]),
+    title:
+      `${d.as_of_date} · ${label} $${fmt(d[field], 4)}/Mtok · ` +
+      `${d.n_models}-model basket ${d.basket_version} · thinnest member panel n=${d.min_provider_n}`,
+  }));
+  const path = pts
+    .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+    .join(' ');
+  const last = days[nDays - 1]!;
+  return { key, cls, label, path, pts, endY: pts[pts.length - 1]!.y, endVal: last[field] };
+}
+
+const legs: Leg[] = nDays ? [leg('output', 'out', 'Output'), leg('input', 'in', 'Input')] : [];
+
+// End labels — push apart on collision (the legs sit far apart today, but
+// the domain is data-driven).
+const LBL_GAP = 15;
+const endLabels = (() => {
+  const items = legs.map((l) => ({ l, y: l.endY })).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < items.length; i++) {
+    const prev = items[i - 1]!;
+    const cur = items[i]!;
+    if (cur.y - prev.y < LBL_GAP) cur.y = prev.y + LBL_GAP;
+  }
+  return items;
+})();
+
+const ariaLabel = tokenMeta
+  ? `Fixed-basket token price index since ${tokenMeta.seriesStart} (${tokenMeta.nDays} days): ` +
+    `USD per million tokens for the input and output legs of a frozen five-model basket. ` +
+    `Latest: output $${fmt(tokenMeta.latestOutput)}, input $${fmt(tokenMeta.latestInput)} per million tokens. ` +
+    `Steps mark a provider repricing a basket model; hover any point for the date, level, and panel depth.`
+  : 'Fixed-basket token price index — no data in this snapshot yet.';
+---
+{tokenMeta && (
+<figure class="tix" aria-describedby="tix-caption">
+  <div class="tix-head">
+    <span class="tix-kicker">Fixed-basket composite · USD per Mtoken · posted prices</span>
+    <span class="tix-asof">since {tokenMeta.seriesStart} · {tokenMeta.nDays} days</span>
+  </div>
+
+  <div class="tix-scroll">
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ariaLabel} class="tix-svg">
+      {yTicks.map((v) => (
+        <line
+          class:list={['grid', { baseline: v === Y_MIN }]}
+          x1={x0} x2={x1} y1={yOf(v)} y2={yOf(v)}
+        />
+      ))}
+      {yTicks.map((v) => (
+        <text class="ytick" x={x0 - 8} y={yOf(v) + 3.5}>${v.toFixed(2)}</text>
+      ))}
+
+      {xTickIdx.map((i) => (
+        <>
+          <line class="xtickmark" x1={xOf(i)} x2={xOf(i)} y1={y1} y2={y1 + 4} />
+          <text class="xtick" x={xOf(i)} y={y1 + 17}>{mmdd(days[i]!.as_of_date)}</text>
+        </>
+      ))}
+
+      {legs.map((l) => (
+        <path class={`ln s-${l.cls}`} d={l.path} />
+      ))}
+
+      {legs.map((l) => l.pts.map((p) => (
+        <circle class={`pt s-${l.cls}`} cx={p.x} cy={p.y} r={3} />
+      )))}
+
+      {legs.map((l) => l.pts.map((p) => (
+        <circle class="hit" cx={p.x} cy={p.y} r={11}>
+          <title>{p.title}</title>
+        </circle>
+      )))}
+
+      {endLabels.map(({ l, y }) => (
+        <text class="lbl" x={x1 + 10} y={y + 3.5}>
+          <tspan class="lbl-name">{l.label}</tspan>
+          <tspan class="lbl-val" dx="5">${fmt(l.endVal)}</tspan>
+        </text>
+      ))}
+    </svg>
+  </div>
+
+  <figcaption class="tix-foot" id="tix-caption">
+    <span class="tix-note">
+      Equal-weight composite of a frozen 5-model basket ({tokenMeta.basketVersion}) ·
+      window: since {tokenMeta.seriesStart} ({tokenMeta.nDays} days) ·
+      a market-intelligence series
+    </span>
+    <details class="tix-details">
+      <summary>Chart notes</summary>
+      <ul class="tix-notes-list">
+        <li><strong>Input and output are separate series</strong>, never
+        blended — providers price the legs independently and they move
+        independently. A single "$/token" number hides which leg moved.</li>
+        <li>The basket is <strong>fixed</strong>: five open-weight models,
+        one per lab, membership frozen and versioned. Each model is priced
+        as the <strong>operator-equal median</strong> (one provider, one
+        vote) across the providers serving it that day; the composite is the
+        equal-weight average across the five models, per leg. Membership
+        changes are announced events, never silent swaps.</li>
+        <li>A day on which any basket member loses coverage publishes
+        <strong>no print</strong> rather than a re-averaged one — a
+        four-model basket is a different good.</li>
+        <li>All values are <strong>posted list prices</strong> ($ per million
+        tokens) captured daily from provider price pages and APIs. A step
+        means a provider repriced a basket model; per-member levels ride in
+        the published CSV so every step is attributable.</li>
+        <li>Series starts {tokenMeta.seriesStart} (first day of capture) —
+        no backcast. The window is short and grows daily.</li>
+      </ul>
+    </details>
+  </figcaption>
+</figure>
+)}
+
+<style>
+  /* Series colors — reuse the term chart's validated per-theme pair
+     (amber = output, the mover; cyan = input). Two series only. */
+  .tix {
+    --series-out: #cc7d00;
+    --series-in: #00829e;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+    padding: 12px 14px 12px;
+    margin: 0 0 20px;
+  }
+  :global(html[data-theme="editorial"]) .tix {
+    --series-out: #a3660f;
+    --series-in: #0d96b6;
+  }
+
+  .tix-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 9px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .tix-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: var(--weight-strong);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    color: var(--ink-dim);
+  }
+  .tix-asof {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .tix-scroll { overflow-x: auto; }
+  .tix-svg { display: block; width: 100%; min-width: 680px; height: auto; }
+
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .grid.baseline { stroke: var(--rule-2); }
+  .xtickmark { stroke: var(--rule-2); stroke-width: 1; }
+
+  .ytick, .xtick {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    fill: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .ytick { text-anchor: end; }
+  .xtick { text-anchor: middle; }
+
+  .ln {
+    fill: none;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .ln.s-out { stroke: var(--series-out); }
+  .ln.s-in { stroke: var(--series-in); }
+
+  .pt { stroke: var(--surface); stroke-width: 1.5; }
+  .pt.s-out { fill: var(--series-out); }
+  .pt.s-in { fill: var(--series-in); }
+
+  .hit { fill: transparent; cursor: help; }
+
+  .lbl {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+  }
+  .lbl-name { fill: var(--ink); font-weight: var(--weight-strong); letter-spacing: 0.04em; }
+  .lbl-val { fill: var(--ink-dim); }
+
+  .tix-foot {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+  }
+  .tix-note {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+  }
+
+  .tix-details { margin-top: 2px; }
+  .tix-details summary {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-dim);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: fit-content;
+  }
+  .tix-notes-list {
+    margin: 6px 0 2px;
+    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .tix-notes-list li {
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    color: var(--ink-faint);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+  }
+</style>
