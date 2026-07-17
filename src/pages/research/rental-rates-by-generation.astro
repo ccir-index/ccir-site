@@ -40,6 +40,31 @@ function stepPaths(points: Pt[], want: (n: number) => boolean): string[] {
   return segs;
 }
 
+// Smoothed overlay: centered 3-month rolling median over n>=3 months,
+// gap-aware (the window never crosses a coverage gap; 2-point edge windows
+// average). PRESENTATION ONLY — the fits, the table, and the end labels
+// stay computed from the raw monthly medians, and the raw steps remain
+// drawn (faint) underneath.
+function smoothPaths(points: Pt[]): string[] {
+  const deep = points.filter((p) => p.n >= 3);
+  const runs: Pt[][] = [];
+  let cur: Pt[] = [];
+  for (const p of deep) {
+    if (cur.length && mk(p.m) - mk(cur[cur.length - 1]!.m) !== 1) { runs.push(cur); cur = []; }
+    cur.push(p);
+  }
+  if (cur.length) runs.push(cur);
+  return runs.filter((run) => run.length >= 2).map((run) => {
+    const sm = run.map((_, i) => {
+      const win = run.slice(Math.max(0, i - 1), Math.min(run.length, i + 2)).map((q) => q.med);
+      if (win.length === 3) return [...win].sort((a, b) => a - b)[1]!;
+      return win.reduce((s, v) => s + v, 0) / win.length;
+    });
+    return run.map((p, i) =>
+      `${i ? 'L' : 'M'} ${cx(mk(p.m)).toFixed(1)} ${cy(sm[i]!).toFixed(1)}`).join(' ');
+  });
+}
+
 const CHIPS = [
   { key: 'V100', cls: 'volta', label: 'V100' },
   { key: 'A100', cls: 'ampere', label: 'A100' },
@@ -54,6 +79,7 @@ const series = CHIPS.map((c) => {
     ...c,
     solid: stepPaths(pts, (n) => n >= 3),
     thin: stepPaths(pts, (n) => n < 3),
+    smooth: smoothPaths(pts),
     endX: cx(mk(lastDeep.m)), endY: cy(lastDeep.med), endVal: lastDeep.med,
   };
 });
@@ -143,7 +169,7 @@ const fitLines = CHIPS.map((c) => {
     <figure class="chart-fig">
       <div class="chart-box">
         <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-             aria-label="Posted panel-median rental rate per GPU-hour by generation, monthly, October 2017 to June 2026, log scale. Stepped lines for V100, A100, and H100 decline unevenly, with firming in 2021 to 2023 and again from late 2025. Thin dashed segments mark months with fewer than three providers. Straight dashed lines overlay each generation's fitted log-linear decline across its fit window: V100 minus 21.1 percent per year, A100 minus 7.0, H100 minus 13.0.">
+             aria-label="Posted panel-median rental rate per GPU-hour by generation, monthly, October 2017 to June 2026, log scale. Solid smoothed lines (3-month rolling median) for V100, A100, and H100 decline unevenly over faint raw monthly steps, with firming in 2021 to 2023 and again from late 2025. Thin dashed segments mark months with fewer than three providers. Straight dashed lines overlay each generation's fitted log-linear decline across its fit window: V100 minus 21.1 percent per year, A100 minus 7.0, H100 minus 13.0.">
           <rect x={ep1.a} y={PT} width={ep1.b - ep1.a} height={ih} class="episode" />
           <rect x={ep2.a} y={PT} width={ep2.b - ep2.a} height={ih} class="episode" />
           <text x={(ep1.a + ep1.b) / 2} y={PT + 12} class="eplab" text-anchor="middle">2021–23 firming</text>
@@ -163,7 +189,8 @@ const fitLines = CHIPS.map((c) => {
           {series.map((s) => (
             <g>
               {s.thin.map((d) => <path d={d} class={`ln ln-thin ln-${s.cls}`} />)}
-              {s.solid.map((d) => <path d={d} class={`ln ln-${s.cls}`} />)}
+              {s.solid.map((d) => <path d={d} class={`ln ln-step ln-${s.cls}`} />)}
+              {s.smooth.map((d) => <path d={d} class={`ln-smooth ln-${s.cls}`} />)}
               <text x={s.endX + 8} y={s.endY + 4} class={`endlab lab-${s.cls}`} text-anchor="start">
                 {s.label} ${s.endVal.toFixed(2)}
               </text>
@@ -180,13 +207,17 @@ const fitLines = CHIPS.map((c) => {
         <span class="lg"><span class="swatch sw-hopper"></span>H100</span>
         <span class="lg"><span class="swatch sw-dash"></span>dashed = month has n&lt;3 providers (shown, never fitted)</span>
         <span class="lg"><span class="swatch sw-fit"></span>straight dashes = the fitted declines below, over each fit window</span>
+        <span class="lg">solid = 3-month rolling median · faint steps = the raw monthly repricing path</span>
       </div>
       <figcaption class="tfoot">
         Posted panel-median guaranteed on-demand rate, $/GPU-hr, monthly, log
         scale, Oct 2017 – Apr 2026 (the archive's edge — one uniform right
         edge for every generation; the live CCIR panel continues from there).
-        Step-function repair: posted prices carry forward ≤6 months between
-        captures. Shaded bands are the two demand episodes described in §02.
+        Solid lines are a centered 3-month rolling median (display smoothing
+        only — fits, labels, and the table below are computed on the raw
+        monthly medians, drawn as the faint steps). Step-function repair:
+        posted prices carry forward ≤6 months between captures. Shaded bands
+        are the two demand episodes described in §02.
       </figcaption>
     </figure>
 
@@ -377,7 +408,9 @@ const fitLines = CHIPS.map((c) => {
     .episode { fill: var(--accent); opacity: 0.07; }
     .eplab { font-family: var(--font-mono); font-size: 9.5px; fill: var(--ink-faint); letter-spacing: 0.04em; text-transform: uppercase; }
     .ln { fill: none; stroke-width: 1.8; }
-    .ln-thin { stroke-width: 1.1; stroke-dasharray: 3 3; opacity: 0.8; }
+    .ln-step { stroke-width: 1.2; opacity: 0.28; }
+    .ln-smooth { fill: none; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+    .ln-thin { stroke-width: 1.1; stroke-dasharray: 3 3; opacity: 0.45; }
     .ln-volta { stroke: var(--arch-volta); }
     .ln-ampere { stroke: var(--arch-ampere); }
     .ln-hopper { stroke: var(--arch-hopper); }
