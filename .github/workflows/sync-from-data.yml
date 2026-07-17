@@ -253,10 +253,6 @@ jobs:
         run: |
           set -euo pipefail
           cp .sync/rates_daily.csv      src/data/rates_daily.csv
-          # Public download copies — the footer / documents pages link these
-          # directly (the upstream data repo is private).
-          cp .sync/rates_daily.csv      public/data/rates_daily.csv
-          cp .sync/indices_history.csv  public/data/rates_history.csv 2>/dev/null || true
           cp .sync/rates_shadow.csv     src/data/rates_shadow.csv
           cp .sync/rates_daily_prev.csv src/data/rates_daily_prev.csv
           # Overlay CSV — leave the previous copy in place if this snapshot lacked it.
@@ -430,6 +426,19 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/build_indices_history.py
+
+      - name: Build public download CSVs (operator-tier only, page vocabulary)
+        if: steps.fetch.outputs.have_snapshot == 'true'
+        run: |
+          set -euo pipefail
+          # Public rates_daily.csv / rates_history.csv are derived from the
+          # canonical bundled copies: operator-tier series only (the legacy
+          # factory-class rows stay internal for /explorer), factory_type
+          # column dropped, segment labels matching /rates. Runs after the
+          # history rebuild so the public history is current — the previous
+          # `cp .sync/indices_history.csv || true` fetched a file that never
+          # existed and left the public history frozen.
+          python3 scripts/build_public_rates_csv.py
 
       - name: Commit + push if changed
         if: steps.fetch.outputs.have_snapshot == 'true'
