@@ -8,8 +8,8 @@ const SPEC = {
   "kicker": "Research · rating action",
   "right": "2026-07-17",
   "titleLines": [
-    "Fitch's BB+ on CoreWeave's DDTL 5.5:",
-    "The GPU Lease-Rate Assumption"
+    "A GPU Lease Rate Enters the Rating Case:",
+    "Fitch's BB+ on CoreWeave's DDTL 5.5"
   ],
   "sub": "The leading rating-case assumption is new with this action: renewal at favorable GPU lease rates.",
   "rows": [
