@@ -24,23 +24,25 @@ const AS_OF = '2026-07-17';
         &ldquo;GPU-hour&rdquo; reads like a standardized unit. On any day's
         print it is the beginning of a description: the same-name chip, the
         same day, posts at prices that differ by multiples depending on who
-        operates it, where it sits, how long the commitment runs, and whether
-        the capacity can be interrupted. Each of those differences is a basis
-        — a spread against whatever reference price a contract, covenant, or
-        collateral mark chooses. This note freezes one day's cross-section of
-        the spreads we measure daily, and names the components that today
-        have no public price at all.
+        operates it, where it sits, and what the buyer can rely on. Those
+        differences — not the visible ones between chips or tenors — are the
+        basis layer: spreads between nominally identical units, against
+        whatever reference a contract, covenant, or collateral mark chooses.
+        This note freezes one day's cross-section of the spreads we measure
+        daily, separates them from the axes often mistaken for basis, and
+        names the components that today have no public price at all.
       </p>
     </header>
 
     <section class="sec">
-      <h2><span class="n">01</span> Five Components, One Day's Print</h2>
+      <h2><span class="n">01</span> The Same-Name Chip, Four Different Prices</h2>
       <p>
-        Every figure below is from the July 17, 2026 daily publication:
-        posted, publicly accessible rates from the fixed provider panel,
-        guaranteed on-demand unless stated, panel depth (n = contributing
-        providers) disclosed per cell. Statistics follow the published
-        methodology; thin cells are labeled.
+        Basis, properly used, is a spread between nominally identical units —
+        the same good, delivered differently. Every figure below is from the
+        July 17, 2026 daily publication: posted, publicly accessible rates
+        from the fixed provider panel, guaranteed on-demand unless stated,
+        panel depth (n = contributing providers) disclosed per cell; thin
+        cells are labeled.
       </p>
       <div class="table-wrap">
         <table class="basis-table">
@@ -49,29 +51,19 @@ const AS_OF = '2026-07-17';
           </thead>
           <tbody>
             <tr>
-              <td>Silicon</td>
-              <td>Chip axis, within one segment (Neocloud, guaranteed on-demand, US) · <a href="/explorer?tier=T2&interrupt=GTD&region=US">open this cut</a></td>
-              <td>H100 $3.63 (n=12) · H200 $4.29 (n=7) · B200 $7.65 (n=4) — a 2.1&times; span across three current-generation chips</td>
-            </tr>
-            <tr>
               <td>Configuration &amp; operator class</td>
               <td>Operator-segment axis, same chip (H100, guaranteed on-demand, US) · <a href="/explorer?chip=H100&interrupt=GTD&region=US">open this cut</a></td>
-              <td>Hyperscaler $9.15 (n=4) · Neocloud $3.63 (n=12) · Marketplace $2.89 (n=8) — <strong>3.2&times; on the same-name chip, same region, same term</strong></td>
+              <td>Hyperscaler $9.15 (n=4) · Neocloud $3.63 (n=12) · Marketplace $2.89 (n=8) — <strong>3.2&times; on the same-name chip, same region, same term</strong>. The bundle differs — fabric, ops plane, support — and the segment spread is where that difference prices</td>
             </tr>
             <tr>
               <td>Location</td>
               <td>Region axis, same chip and segment (Neocloud, guaranteed on-demand) · <a href="/explorer?chip=H100&tier=T2&interrupt=GTD">open this cut</a></td>
-              <td>EU posts below US: H100 −25% ($2.74 vs $3.63) · H200 −12% ($3.78 vs $4.29) · B200 −21% ($6.06 vs $7.65)</td>
-            </tr>
-            <tr>
-              <td>Commitment term</td>
-              <td>Within-provider committed schedules vs the same provider's on-demand · <a href="/term">open the curve</a></td>
-              <td>Neocloud H100: −2% at 1M (n=3) · −10% at 1Y (n=7) · −39% at 3Y (n=4). Hyperscaler H100 3Y: −56% (n=2). Posted fixed schedules, not a forecast</td>
+              <td>EU posts below US: H100 −25% ($2.74 vs $3.63) · H200 −12% ($3.78 vs $4.29) · B200 −21% ($6.06 vs $7.65) — identical products, persistent regional discount</td>
             </tr>
             <tr>
               <td>Interruptibility</td>
               <td>Guaranteed vs interruptible, same chip (H100, US) · <a href="/explorer?chip=H100&interrupt=INT">open this cut</a></td>
-              <td>Hyperscaler −66% ($3.09 vs $9.15; n=2, thin) · Marketplace −19% ($2.34 vs $2.89; n=3, thin)</td>
+              <td>Hyperscaler −66% ($3.09 vs $9.15; n=2, thin) · Marketplace −19% ($2.34 vs $2.89; n=3, thin) — the price of the delivery right alone, on otherwise identical capacity</td>
             </tr>
             <tr>
               <td>Counterparty</td>
@@ -83,20 +75,48 @@ const AS_OF = '2026-07-17';
       </div>
       <p>
         Two properties of this table matter more than any single number.
-        First, the spreads are not noise around a true price — they are
-        persistent, they have signs that survive day to day, and several are
-        larger than the level moves the market debates. Second, each row is a
-        published daily series, not a one-off study: every cell above — and
-        every grain this note does not show (each chip &times; segment &times;
-        region &times; term &times; interruptibility combination the panel
-        supports) — is browsable on the
+        First, these spreads are not noise around a true price — they are
+        persistent, they have signs that survive day to day, and the largest
+        of them exceeds the level moves the market debates. Second, each row
+        is a published daily series, not a one-off study: every cell above —
+        and every grain this note does not show — is browsable on the
         <a href="/explorer">series explorer</a>, and the cross-section can be
         recomputed for any publication date from the archived record.
       </p>
     </section>
 
     <section class="sec">
-      <h2><span class="n">02</span> What Has No Posted Price</h2>
+      <h2><span class="n">02</span> Two Axes Often Mistaken for Basis</h2>
+      <p>
+        <strong>The chip axis is relative value, not basis.</strong> Within
+        one segment on the same day, H100 posts $3.63 (n=12), H200 $4.29
+        (n=7), B200 $7.65 (n=4) — a 2.1&times; span. But an H100-hour and a
+        B200-hour are different goods, the way crude and natural gas are
+        different goods: the spread between them is a relative-value
+        relationship with its own dynamics (generation turnover, workload
+        migration), not a deviation from a common reference.
+      </p>
+      <p>
+        <strong>The term axis is the curve, not basis.</strong> Within one
+        provider, committed schedules step down from on-demand: Neocloud
+        H100 −2% at 1M (n=3), −10% at 1Y (n=7), −39% at 3Y (n=4);
+        hyperscaler H100 3Y −56% (n=2). These are posted fixed schedules —
+        the time dimension of the same product, tracked on the
+        <a href="/term">committed term structure</a> monitor — not a spread
+        between simultaneous units.
+      </p>
+      <p>
+        The distinction is not pedantry. A reference contract can specify
+        the chip and the tenor — those are contract terms. What it cannot
+        specify away is everything in the table above: whoever holds
+        physical capacity against a reference price holds the configuration,
+        location, delivery-right, and counterparty spreads whether or not
+        anyone prices them.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> What Has No Posted Price</h2>
       <p>
         The table's honesty requires its complement: components of the
         physical market that today have no public price, here or anywhere.
@@ -144,7 +164,7 @@ const AS_OF = '2026-07-17';
     </section>
 
     <section class="sec">
-      <h2><span class="n">03</span> Sources &amp; Method</h2>
+      <h2><span class="n">04</span> Sources &amp; Method</h2>
       <p>
         All rates are from the CCIR daily publication of July 17, 2026
         (methodology v2.2.0): publicly posted, provider-operated pricing
