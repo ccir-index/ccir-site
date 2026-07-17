@@ -71,17 +71,6 @@ jobs:
             echo "no committed_mi.csv at $DATE — /term keeps previous"
             : > .sync/committed_mi.csv
           fi
-          # Token price CSVs power /tokens (fixed-basket index + per-model
-          # table). Graceful: snapshots predating the token export won't
-          # carry them.
-          for fname in token_index_daily.csv token_models_latest.csv; do
-            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$fname" "$BASE/$fname"; then
-              echo "fetched $fname"
-            else
-              echo "no $fname at $DATE — /tokens keeps previous"
-              : > ".sync/$fname"
-            fi
-          done
           # Prior-day CSV powers the ticker's day-over-day arrows. Graceful
           # skip if the prior date isn't published (e.g. holidays, gaps).
           if curl -fsSL -H "Authorization: token $GH_PAT" -o .sync/rates_daily_prev.csv "$PREV_BASE/rates_daily.csv"; then
@@ -278,12 +267,6 @@ jobs:
           if [ -s .sync/committed_mi.csv ]; then
             cp .sync/committed_mi.csv src/data/committed_mi.csv
           fi
-          # Token price CSVs — same leave-previous rule (bundled at build).
-          for fname in token_index_daily.csv token_models_latest.csv; do
-            if [ -s ".sync/$fname" ]; then
-              cp ".sync/$fname" "src/data/$fname"
-            fi
-          done
           # listings_history CSVs land in public/data so the /markets page
           # can fetch them client-side at runtime (they're too large to
           # bundle at build time — ~1-2 MB each).
@@ -407,7 +390,6 @@ jobs:
               'vast': m.get('vast'),
               'availability': m.get('availability'),
               'utilization': m.get('utilization'),
-              'tokens': m.get('tokens'),
           }
           with open('src/data/meta.json', 'w') as f:
               json.dump(meta, f, indent=2)
@@ -457,7 +439,7 @@ jobs:
           set -euo pipefail
           git config user.email "ccir-pipeline@ccir.io"
           git config user.name  "CCIR Pipeline"
-          git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/rates_daily_prev.csv src/data/indices_history.csv src/data/meta.json src/data/vast_basis.csv src/data/committed_mi.csv src/data/token_index_daily.csv src/data/token_models_latest.csv
+          git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/rates_daily_prev.csv src/data/indices_history.csv src/data/meta.json src/data/vast_basis.csv src/data/committed_mi.csv
           # public/data/listings_history_*.csv only exists once the upstream
           # pipeline starts emitting these files; -A on a missing dir is fine.
           if [ -d public/data ]; then
