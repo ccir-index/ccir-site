@@ -1,0 +1,130 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/*
+  Dated research note — frozen to the 2026-07-16 Fitch rating action on
+  CoreWeave's proposed DDTL 5.5. Research notes are dated, not updated in
+  place; the living surfaces are /credit (instrument ledger), /term and
+  /rates (reference rates). Sources: Fitch rating action commentaries of
+  2026-04-30 (DDTL 5.0 assignment), 2026-05-15 (affirmation), and
+  2026-07-16 (DDTL 5.5 assignment) — all three on file. This page must
+  not import the live datasets.
+*/
+const AS_OF = '2026-07-17';
+---
+<Base
+  title="What Does Fitch's BB+ on CoreWeave's DDTL 5.5 Assume About Future GPU Lease Rates? · CCIR Research"
+  description="Fitch's rating case for CoreWeave's proposed $2.6B DDTL 5.5 leads with a new assumption: expiring customer contracts are renewed or replaced at favorable GPU lease rates. The reference rates to track it against."
+  ogImage="/og/fitch-coreweave-ddtl-5-5.png"
+  article={{ published: '2026-07-17' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {AS_OF} · rating action of 2026-07-16</div>
+      <h1>What Does Fitch's BB+ on CoreWeave's DDTL 5.5 Assume About Future GPU Lease Rates?</h1>
+      <p class="standfirst">
+        On July 16, 2026, Fitch assigned a BB+ rating to CoreWeave's proposed
+        $2.6 billion delayed-draw term loan, DDTL 5.5. The facility funds GPU
+        purchases for newly signed take-or-pay customer contracts and is in
+        syndication. This note records one feature of the structure, and the
+        sentence in which the rating agency prices it.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> The Contracts Can Expire Before the Debt Matures</h2>
+      <p>
+        The customer contracts behind the facility can expire before the debt
+        matures. CoreWeave's customer contracts generally run three to five
+        years, per Fitch, while the facility will mature later. The capacity
+        must be re-contracted before the facility matures.
+      </p>
+      <p>
+        Fitch states this directly. The first item under its Key Rating-Case
+        Assumptions reads:
+      </p>
+      <blockquote class="quote">
+        &ldquo;CoreWeave is able to renew or replace customer contracts that
+        expire before the new DDTL 5.5 matures at favorable GPU lease
+        rates.&rdquo;
+      </blockquote>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> The Language Is New</h2>
+      <p>
+        This language is new. It did not appear in Fitch's April action
+        assigning DDTL 5.0 its rating, or in the May affirmation. Renewal
+        risk has been discussed in the rating drivers since Fitch's first
+        CoreWeave rating; with this action it enters the rating case itself,
+        as the leading assumption.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> The Reference Rates</h2>
+      <p>
+        The rate that will be available at renewal is not knowable today.
+        What is knowable is where GPU lease pricing stands now, and how it
+        moves. We benchmark and publish the
+        <a href="/term">committed-term rates providers are offering across
+        chips and tenors</a>, and
+        <a href="/rates">on-demand benchmark reference rates</a>, daily.
+      </p>
+      <p class="data-note">
+        The instrument record for this and every tracked GPU-backed facility
+        is the <a href="/credit">compute credit tracker</a>; derived series
+        are on the <a href="/credit/series">credit reference series</a> page.
+      </p>
+      <p class="footnote">
+        Sources: Fitch Ratings rating action commentaries of April 30, 2026
+        (DDTL 5.0 assignment), May 15, 2026 (affirmation), and July 16, 2026
+        (DDTL 5.5 assignment). The quoted sentence is reproduced verbatim
+        from the July 16 commentary.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .quote {
+      font-family: var(--font-body);
+      font-size: var(--fs-lg);
+      line-height: 1.6;
+      color: var(--ink);
+      border-left: 3px solid var(--accent);
+      background: var(--surface);
+      margin: 0 0 13px;
+      padding: 14px 18px;
+      max-width: 70ch;
+    }
+    .data-note { font-size: var(--fs-sm); color: var(--ink-dim); }
+    .footnote {
+      font-size: var(--fs-sm);
+      color: var(--ink-faint);
+      border-top: 1px solid var(--rule);
+      padding-top: 8px;
+      max-width: 74ch;
+    }
+  </style>
+</Base>
