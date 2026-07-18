@@ -1,6 +1,6 @@
 cloud,cloud_display,n_skus,n_distinct_skus,n_available,median_per_gpu_dph,min_per_gpu_dph,max_per_gpu_dph,median_boot_min_seconds,median_boot_max_seconds
 excesssupply,Excess Supply?,14,5,0,4.51625,2.25,4.63,60.0,300.0
-verda,Verda,8,4,0,4.3075,4.205,4.615,120.0,240.0
+verda,Verda,8,4,3,4.3075,4.205,4.615,120.0,240.0
 nebius,Nebius,6,2,0,4.573125,4.51625,4.63,120.0,360.0
 digitalocean,DigitalOcean,4,2,2,3.44,3.44,3.44,60.0,390.0
 boostrun,BoostRun?,2,1,0,2.45,2.45,2.45,60.0,180.0
