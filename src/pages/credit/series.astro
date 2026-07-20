@@ -62,6 +62,14 @@ const spreadRows = inScope
   }))
   .sort((a: any, b: any) => a.issued.localeCompare(b.issued));
 
+// Window label — data-driven from the first/last signing so it never goes
+// stale as new signings land (e.g. Nebius, Jul 2026).
+const _MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const fmtLong = (d: string) => `${_MONTHS[(+d.slice(5, 7)) - 1]} ${d.slice(0, 4)}`;
+const fmtShort = (d: string) => `${_MONTHS[(+d.slice(5, 7)) - 1].slice(0, 3).toUpperCase()} ${d.slice(0, 4)}`;
+const spreadRangeLong = spreadRows.length ? `${fmtLong(spreadRows[0].issued)} – ${fmtLong(spreadRows[spreadRows.length - 1].issued)}` : '';
+const spreadRangeShort = spreadRows.length ? `${fmtShort(spreadRows[0].issued)} – ${fmtShort(spreadRows[spreadRows.length - 1].issued)}` : '';
+
 // --- chart: spread at signing (dot chart over time; grid pricing = range bar).
 // Discrete signings — dots, never a connecting line: a line would imply a
 // continuous curve between deals that doesn't exist.
@@ -293,11 +301,11 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       <div class="panel-head">
         <div>
           <div class="panel-title">Disclosed spread at signing, GPU-collateralized facilities</div>
-          <div class="panel-sub">PP OVER SOFR · EACH DOT ONE SIGNING · BAR = DISCLOSED GRID RANGE · JUL 2023 – JUN 2026</div>
+          <div class="panel-sub">PP OVER SOFR · EACH DOT ONE SIGNING · BAR = DISCLOSED GRID RANGE · {spreadRangeShort}</div>
         </div>
         <span class="badge">{spreadRows.length} SIGNINGS</span>
       </div>
-      <svg viewBox={`0 0 ${SW} ${SH}`} role="img" aria-label="Disclosed spread over SOFR at signing for GPU-collateralized facilities, July 2023 to June 2026">
+      <svg viewBox={`0 0 ${SW} ${SH}`} role="img" aria-label={`Disclosed spread over SOFR at signing for GPU-collateralized facilities, ${spreadRangeLong}`}>
         {yTicks.map((t) => (
           <>
             <line class="grid" x1={SL} x2={SW - SRp} y1={sy(t)} y2={sy(t)} />
@@ -333,7 +341,7 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
         <p>
           Spreads as disclosed in each signing document; grid-priced facilities
           show their disclosed range. Hover a dot for the instrument. Window:
-          the tracker's full GPU-collateralized record, July 2023 – June 2026.
+          the tracker's full GPU-collateralized record, {spreadRangeLong}.
         </p>
       </div>
     </div>
