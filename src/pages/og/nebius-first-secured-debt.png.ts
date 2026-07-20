@@ -10,19 +10,19 @@ const SPEC = {
   "right": "2026-07-20",
   "titleLines": [
     "Nebius's First Secured Debt:",
-    "A $775M GPU-Backed Term Loan"
+    "A $775M GPU-Backed Facility"
   ],
   "sub": "The company's first secured debt — after a debt history made up entirely of convertible notes.",
   "rows": [
     [
       "Facility",
-      "$775M senior secured term loan, SOFR+2.50%, due 2030",
+      "~$775M senior secured facility, SOFR+2.50%, due 2030",
       "FIRST SECURED"
     ],
     [
       "Security",
-      "Deployed GPUs + contracted cash flows",
-      "1.15x DSCR"
+      "GPU infrastructure + contracted cash flows (IG customer)",
+      ""
     ],
     [
       "Was",
@@ -35,7 +35,7 @@ const SPEC = {
       "ccir.io/credit"
     ]
   ],
-  "foot": "FROM NEBIUS PRESS RELEASE + FORM 6-K · JUL 10 / JUL 17, 2026",
+  "foot": "FROM NEBIUS COMPANY RELEASE / FORM 6-K EX-99.1 · JUL 17, 2026",
   "url": "ccir.io/research/nebius-first-secured-debt"
 };
 

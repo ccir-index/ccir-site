@@ -621,10 +621,10 @@
    "ticker": "NBIS",
    "issuer_type": "public",
    "entity": "US and Finnish subsidiaries (borrowers)",
-   "name": "$775M senior secured term loan (first secured debt in company history)",
+   "name": "$775M senior secured debt facility (first secured debt in company history)",
    "instrument_type": "credit_facility",
    "size_usd_m": 775,
-   "size_note": "Nebius's first-ever secured debt; entered 2026-07-10. Company describes the financing framework as extensible to >$40B of contracted revenue",
+   "size_note": "Nebius's first-ever secured debt; announced 2026-07-17 (company release furnished as Form 6-K EX-99.1). Company frames it as a repeatable structure for >$40B of additional contracted revenue (IG customers such as Microsoft and Meta)",
    "rate": {
     "kind": "sofr_spread",
     "value": 2.50,
@@ -633,23 +633,24 @@
    "maturity": "2030-10-31",
    "maturity_note": null,
    "seniority": "Senior secured",
-   "security": "Deployed GPU infrastructure + contracted cash flows from an unnamed investment-grade customer; 1.15x DSCR and minimum-liquidity covenants",
+   "security": "Deployed GPU infrastructure and contracted cash flows from an unnamed investment-grade customer; together with those cash flows the facility covers >100% of the underlying GPU capex (per the company release)",
    "lenders": [
-    "MUFG (lead)",
+    "MUFG (structuring agent, sole bookrunner, underwriter; MLA)",
     "ABN AMRO",
     "Bank of America",
     "Deutsche Bank",
     "HSBC",
-    "Citigroup (senior lead arranger)",
-    "Crédit Agricole (senior lead arranger)",
+    "Citi (senior lead arranger)",
+    "Crédit Agricole CIB (senior lead arranger)",
     "ING (senior lead arranger)",
-    "Morgan Stanley (senior lead arranger)"
+    "Morgan Stanley (senior lead arranger)",
+    "Goldman Sachs (participant)"
    ],
    "status": "confirmed",
-   "issued": "2026-07-10",
+   "issued": "2026-07-17",
    "source": {
-    "doc": "Form 6-K (acc. 0001104659-26-084452); Nebius release 'raises $775 million in first secured debt financing'",
-    "date": "2026-07-10",
+    "doc": "Form 6-K EX-99.1 (acc. 0001104659-26-084452); Nebius company release 'raises $775 million in first secured debt financing'",
+    "date": "2026-07-17",
     "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926084452/tm2620683d1_6k.htm"
    },
    "as_of": "2026-07-20"
@@ -5097,7 +5098,7 @@
   {
    "issuer": "Nebius Group N.V.",
    "items": [
-    "Verified negative: no bank/secured debt through 6/16/26; the Microsoft-contract-secured financing flagged Sep 2025 was not entered into as of 6/16/26 — SUPERSEDED 2026-07-10 by the $775M senior secured term loan, now tracked as instrument nbis-secured-tl-775"
+    "Verified negative: no bank/secured debt through 6/16/26; the Microsoft-contract-secured financing flagged Sep 2025 was not entered into as of 6/16/26 — SUPERSEDED 2026-07-17 by the $775M senior secured debt facility, now tracked as instrument nbis-secured-tl-775"
    ]
   },
   {

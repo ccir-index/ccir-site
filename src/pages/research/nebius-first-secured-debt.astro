@@ -2,51 +2,55 @@
 import Base from '../../layouts/Base.astro';
 
 /*
-  Dated research note — frozen to Nebius Group's $775M senior secured term
-  loan, announced 2026-07-10 (Form 6-K furnished 2026-07-17). Research notes
-  are dated, not updated in place; the living surface is /credit (instrument
-  ledger). Sources: Nebius press release "Nebius raises $775 million in first
-  secured debt financing" (2026-07-10); Form 6-K acc. 0001104659-26-084452
-  (2026-07-17); The Next Web (2026-07). Convertible figures from Nebius's
-  Q1 2026 disclosures. This page must not import the live datasets.
+  Dated research note — frozen to Nebius Group's ~$775M senior secured debt
+  facility, announced by company release 2026-07-17 (furnished as Exhibit 99.1
+  to a Form 6-K the same day). Research notes are dated, not updated in place;
+  the living surface is /credit (instrument ledger). Every figure traces to a
+  Nebius primary source only:
+    - Facility: company release "Nebius raises $775 million in first secured
+      debt financing" (2026-07-17) = Form 6-K EX-99.1, acc 0001104659-26-084452.
+    - Convertibles: Form 6-K, March 2026, acc 0001104659-26-029863.
+  This page must not import the live datasets.
 */
 const AS_OF = '2026-07-20';
+const RELEASE_URL = 'https://nebius.com/newsroom/nebius-raises-775-million-in-first-secured-debt-financing-to-accelerate-global-buildout';
 ---
 <Base
-  title="Nebius's First Secured Debt: A $775M GPU-Backed Term Loan · CCIR Research"
-  description="On July 10, 2026, Nebius closed a $775M senior secured term loan — its first secured debt, after a debt history made up entirely of convertible notes. The facility, its bank syndicate, and the change of instrument."
+  title="Nebius's First Secured Debt: A $775M GPU-Backed Facility · CCIR Research"
+  description="In July 2026, Nebius entered its first senior secured debt facility, ~$775M — its first secured debt, after a debt history made up entirely of convertible notes. The facility, its bank syndicate, and the change of instrument."
   ogImage="/og/nebius-first-secured-debt.png"
   article={{ published: '2026-07-20' }}
 >
   <section class="wrap top">
     <header class="page-head">
       <div class="kicker">Research · {AS_OF} · new issuance</div>
-      <h1>Nebius's First Secured Debt: A $775M GPU-Backed Term Loan</h1>
+      <h1>Nebius's First Secured Debt: A $775M GPU-Backed Facility</h1>
       <p class="standfirst">
-        On July 10, 2026, Nebius Group closed a $775 million senior secured
-        term loan — its first secured debt, after a debt history made up
-        entirely of convertible notes. This note records the facility and the
-        change of instrument.
+        On July 17, 2026, Nebius Group announced it had entered into its first
+        senior secured debt facility, for approximately $775 million — its
+        first secured debt, after a debt history made up entirely of
+        convertible notes. This note records the facility and the change of
+        instrument.
       </p>
     </header>
 
     <section class="sec">
       <h2><span class="n">01</span> The Facility</h2>
       <p>
-        The facility is a $775 million senior secured term loan, priced at
-        SOFR plus 2.50% (roughly 6.8% at current rates) and maturing
-        October 31, 2030. It is secured on Nebius's deployed GPU
-        infrastructure and the contracted cash flows those assets produce,
-        with a 1.15x debt-service-coverage covenant and a minimum-liquidity
-        covenant.
+        The facility is a senior secured debt facility of approximately
+        $775 million, priced at SOFR plus 2.50% and maturing October 31, 2030.
+        Nebius describes it as senior secured debt backed by deployed GPU
+        infrastructure and the contracted cash flows from an agreement with an
+        investment-grade customer; together with those cash flows, the facility
+        is stated to cover more than 100% of the capital expenditure required
+        to deploy the underlying GPU infrastructure.
       </p>
       <p>
-        MUFG acted as structuring agent and sole bookrunner; ABN AMRO, Bank of
-        America, Deutsche Bank and HSBC as mandated lead arrangers; Citi,
-        Crédit Agricole, ING and Morgan Stanley as senior lead arrangers, with
-        Goldman Sachs also participating. Nebius reported that the facility was
-        oversubscribed and that it covers more than 100% of the capital
-        expenditure on the underlying infrastructure.
+        The transaction was significantly oversubscribed. MUFG acted as
+        structuring agent, sole bookrunner and underwriter; MUFG, ABN AMRO,
+        Bank of America, Deutsche Bank and HSBC as mandated lead arrangers;
+        Citi, Crédit Agricole CIB, ING and Morgan Stanley as senior lead
+        arrangers, with Goldman Sachs also participating in the syndicate.
       </p>
     </section>
 
@@ -57,15 +61,14 @@ const AS_OF = '2026-07-20';
         borrowings to date had been convertibles — senior unsecured notes
         carrying an equity conversion option, a low coupon, a bullet maturity,
         and light covenants, held by equity-linked investors with nothing
-        pledged. As recently as this year the company priced $4.0 billion of
-        convertible notes in two series.
+        pledged. As recently as March 2026 the company priced $4.0 billion of
+        convertible senior notes in two series.
       </p>
       <p>
-        The term loan is a different instrument with a different lender base: a
+        The facility is a different instrument with a different lender base: a
         first-lien claim held by a commercial-bank syndicate, with scheduled
-        terms and a coverage covenant running to 2030. The move is from
-        convertible notes to secured bank debt — the first time Nebius has
-        funded on that basis.
+        terms running to 2030. The move is from convertible notes to secured
+        bank debt — the first time Nebius has funded on that basis.
       </p>
     </section>
 
@@ -79,10 +82,13 @@ const AS_OF = '2026-07-20';
         reference series</a> page.
       </p>
       <p class="footnote">
-        Sources: Nebius Group press release, "Nebius raises $775 million in
-        first secured debt financing," July 10, 2026; Form 6-K furnished
-        July 17, 2026 (accession 0001104659-26-084452); The Next Web,
-        July 2026. Convertible-note figures from Nebius's Q1 2026 disclosures.
+        Sources: Nebius Group N.V., <a href={RELEASE_URL}>"Nebius raises
+        $775 million in first secured debt financing"</a> (company release,
+        July 17, 2026), furnished as Exhibit 99.1 to Form 6-K (SEC accession
+        0001104659-26-084452). Convertible-note figures: Nebius Group N.V.,
+        Form 6-K, March 2026 — pricing of $4.0 billion of convertible senior
+        notes ($2.25 billion 1.250% due 2031; $1.75 billion 2.625% due 2033),
+        SEC accession 0001104659-26-029863.
       </p>
     </section>
   </section>
@@ -116,5 +122,6 @@ const AS_OF = '2026-07-20';
       padding-top: 8px;
       max-width: 74ch;
     }
+    .footnote a { color: var(--accent); }
   </style>
 </Base>
