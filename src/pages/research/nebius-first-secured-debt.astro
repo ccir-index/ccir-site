@@ -1,0 +1,120 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/*
+  Dated research note — frozen to Nebius Group's $775M senior secured term
+  loan, announced 2026-07-10 (Form 6-K furnished 2026-07-17). Research notes
+  are dated, not updated in place; the living surface is /credit (instrument
+  ledger). Sources: Nebius press release "Nebius raises $775 million in first
+  secured debt financing" (2026-07-10); Form 6-K acc. 0001104659-26-084452
+  (2026-07-17); The Next Web (2026-07). Convertible figures from Nebius's
+  Q1 2026 disclosures. This page must not import the live datasets.
+*/
+const AS_OF = '2026-07-20';
+---
+<Base
+  title="Nebius's First Secured Debt: A $775M GPU-Backed Term Loan · CCIR Research"
+  description="On July 10, 2026, Nebius closed a $775M senior secured term loan — its first secured debt, after a debt history made up entirely of convertible notes. The facility, its bank syndicate, and the change of instrument."
+  ogImage="/og/nebius-first-secured-debt.png"
+  article={{ published: '2026-07-20' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {AS_OF} · new issuance</div>
+      <h1>Nebius's First Secured Debt: A $775M GPU-Backed Term Loan</h1>
+      <p class="standfirst">
+        On July 10, 2026, Nebius Group closed a $775 million senior secured
+        term loan — its first secured debt, after a debt history made up
+        entirely of convertible notes. This note records the facility and the
+        change of instrument.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> The Facility</h2>
+      <p>
+        The facility is a $775 million senior secured term loan, priced at
+        SOFR plus 2.50% (roughly 6.8% at current rates) and maturing
+        October 31, 2030. It is secured on Nebius's deployed GPU
+        infrastructure and the contracted cash flows those assets produce,
+        with a 1.15x debt-service-coverage covenant and a minimum-liquidity
+        covenant.
+      </p>
+      <p>
+        MUFG acted as structuring agent and sole bookrunner; ABN AMRO, Bank of
+        America, Deutsche Bank and HSBC as mandated lead arrangers; Citi,
+        Crédit Agricole, ING and Morgan Stanley as senior lead arrangers, with
+        Goldman Sachs also participating. Nebius reported that the facility was
+        oversubscribed and that it covers more than 100% of the capital
+        expenditure on the underlying infrastructure.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> The Change of Instrument</h2>
+      <p>
+        It is the first secured debt in the company's history. Nebius's
+        borrowings to date had been convertibles — senior unsecured notes
+        carrying an equity conversion option, a low coupon, a bullet maturity,
+        and light covenants, held by equity-linked investors with nothing
+        pledged. As recently as this year the company priced $4.0 billion of
+        convertible notes in two series.
+      </p>
+      <p>
+        The term loan is a different instrument with a different lender base: a
+        first-lien claim held by a commercial-bank syndicate, with scheduled
+        terms and a coverage covenant running to 2030. The move is from
+        convertible notes to secured bank debt — the first time Nebius has
+        funded on that basis.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> The Record</h2>
+      <p>
+        We record every GPU-backed facility we can trace to a primary
+        document in the <a href="/credit">compute credit tracker</a>, and this
+        facility is entered there. Derived series — spread at signing and
+        lender-filed marks — are on the <a href="/credit/series">credit
+        reference series</a> page.
+      </p>
+      <p class="footnote">
+        Sources: Nebius Group press release, "Nebius raises $775 million in
+        first secured debt financing," July 10, 2026; Form 6-K furnished
+        July 17, 2026 (accession 0001104659-26-084452); The Next Web,
+        July 2026. Convertible-note figures from Nebius's Q1 2026 disclosures.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .footnote {
+      font-size: var(--fs-sm);
+      color: var(--ink-faint);
+      border-top: 1px solid var(--rule);
+      padding-top: 8px;
+      max-width: 74ch;
+    }
+  </style>
+</Base>
