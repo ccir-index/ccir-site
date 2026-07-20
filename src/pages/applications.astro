@@ -256,6 +256,10 @@ const toc = [
       here is the Neocloud H100 guaranteed on-demand rate for the United
       States: a lender anchors to the CCIR series matching the operator
       segment, silicon, and geography of the collateral it lends against.
+      The operator segment is a peer group defined by capability and service
+      level — operators offering comparable fabric, interconnect, and service
+      are benchmarked against one another — so a borrower is marked against
+      its true peers rather than against differently-specified capacity.
       CCIR publishes observed posted prices; the lender owns the credit
       judgment built on them. The documents these examples cite — the
       published <a href="/documents/methodology">Methodology</a>, the
@@ -951,15 +955,24 @@ expirations) certified by a Responsible Officer.</pre>
       <section class="sec">
         <h3 id="uc-02-s01"><span class="sec-n">01</span> Why Rollover Is the Central Credit Question</h3>
         <p>
-          Compute is not storable. An expiring contract does not leave the
-          borrower holding inventory it can warehouse until prices recover —
-          every unsold GPU-hour perishes at the moment it is not rented. When
-          an anchor contract rolls off, the expiring capacity reprices at the
-          then-prevailing committed-term curve, immediately and in full. The
-          credit question is therefore not whether the borrower's current
-          contract covers debt service, but what the same capacity earns when
-          it is re-leased — and that is an observable number, published
-          daily, not a negotiation position.
+          The debt outlives the contracts that service it. Customer contracts
+          run three to five years; the facility matures later, so the capacity
+          behind the loan has to be re-contracted at least once before the
+          debt is repaid — at a rate no one has locked today, with no forward
+          market to hedge it. What that capacity earns when it is re-leased is
+          the credit question, and it is an observable number, published
+          daily.
+        </p>
+        <p>
+          When an anchor contract rolls off, the operator chooses how to
+          redeploy the freed capacity: re-contract it along the committed-term
+          curve, or sell it on the on-demand market at a higher headline rate
+          that carries no occupancy guarantee. Each path clears at
+          then-prevailing rates, so if the market has repriced below the
+          expiring vintage contract, coverage erodes regardless of which the
+          operator takes. The drafting below references the 1-year committed
+          rate as the reference point for that choice set — the tenor renters
+          will actually sign, priced for the occupancy the debt relies on.
         </p>
         <p>
           This is the same rollover problem that CMBS underwriting prices
