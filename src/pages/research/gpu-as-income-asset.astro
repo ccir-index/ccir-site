@@ -1,0 +1,132 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/*
+  Standing primer (evergreen — updated in place, NOT a dated event note). The
+  "why" behind the credit surfaces: a GPU's earning power is an observable lease
+  rate, that rate is the variable under every GPU-credit question, and a citeable
+  reference is what lets earning power enter the credit document. Publishes PRICE
+  (the rate), never VALUE — the lender owns the valuation built on it.
+*/
+---
+<Base
+  title="The GPU as an Income Asset: Why Credit References a Lease Rate · CCIR Research"
+  description="A GPU's earning power is an observable market lease rate — the variable under renewal, collateral, and coverage. Why GPU-backed credit references a published rate, as oil references NYMEX and shipping the Baltic."
+  ogImage="/og/gpu-as-income-asset.png"
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · Primer</div>
+      <h1>The GPU as an Income Asset: Why Credit References a Lease Rate</h1>
+      <p class="standfirst">
+        A GPU is an income-producing asset, and the earning power of an income
+        asset is a market rate — the lease rate it commands per hour. That rate
+        is the variable sitting under every GPU-backed credit question. This
+        primer explains why a published, citeable lease rate belongs in the
+        credit document.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> An asset priced by what it earns</h2>
+      <p>
+        A GPU earns by being rented. Like any income-producing asset — a
+        drilling rig, an aircraft, a data center — its worth is the stream of
+        rents it can command over its useful life, discounted, and declining as
+        newer silicon arrives. That stream is not a fixed number: it is a market
+        rate that moves with demand and with age. The rate <em>is</em> the
+        asset's earning power, expressed per GPU-hour.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Every credit question is that rate</h2>
+      <p>
+        GPU-backed lending keeps returning to the same variable under different
+        names:
+      </p>
+      <ul>
+        <li>
+          <strong>Renewal.</strong> When a customer contract expires before the
+          debt matures, the freed capacity re-leases at the then-prevailing
+          rate. Rating cases turn on it — Fitch's leading assumption for
+          CoreWeave's DDTL 5.5 is renewal "at favorable GPU lease rates."
+        </li>
+        <li>
+          <strong>Collateral.</strong> What the fleet is worth on a re-lease or
+          in a workout is the present value of its future rents — the rate,
+          carried forward.
+        </li>
+        <li>
+          <strong>Coverage.</strong> Revenue is the rate times utilization;
+          debt service is tested against it.
+        </li>
+      </ul>
+      <p>One observable — the lease rate — sits under all three.</p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> Why the rate is missing from the documents today</h2>
+      <p>
+        Most GPU-backed credit amortizes its collateral toward zero and assumes
+        no residual. That is not because the earning power is irrelevant; it is
+        because there has been no trusted, citeable way to price it. Faced with
+        an un-referable rate, a lender does the conservative thing — writes the
+        asset down to nothing rather than underwrite a residual it could not
+        defend in a workout. The renewal bet does not go away; it is simply
+        taken blind.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> What a reference rate changes</h2>
+      <p>
+        Other asset classes solved this by adopting a published rate. Oil credit
+        references the New York Mercantile Exchange (NYMEX) strip; shipping
+        references the Baltic indices; auto lending references Manheim; aircraft
+        leases are underwritten to appraiser-published lease rates. The
+        published rate does not value the asset — it prices the earning power,
+        and the lender builds the credit judgment on top: a covenant that
+        tightens as the rate falls, a re-lease assumption sized to the curve, a
+        residual with a number behind it.
+      </p>
+      <p>
+        The compute market now has the same primitive. CCIR publishes GPU lease
+        rates — by chip, operator segment, tenor, and geography — from public
+        and posted sources, daily. We publish the rate; the lender owns the
+        valuation and the credit judgment built on it. The worked drafting
+        mechanics are at <a href="/applications">/applications</a>; the
+        instruments that already reference these structures are tracked at
+        <a href="/credit">/credit</a>; the rate itself is on
+        <a href="/rates">/rates</a> and <a href="/term">/term</a>.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec ul { margin: 0 0 13px; padding-left: 20px; max-width: 78ch; }
+    .sec li { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.6; margin: 0 0 9px; }
+    .sec a { color: var(--accent); }
+  </style>
+</Base>
