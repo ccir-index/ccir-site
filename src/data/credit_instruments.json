@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "as_of": "2026-07-10",
+  "as_of": "2026-07-20",
   "compiled_from": [
    "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
    "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -616,6 +616,45 @@
    "as_of": "2026-03-31"
   },
   {
+   "id": "nbis-secured-tl-775",
+   "issuer": "Nebius Group N.V.",
+   "ticker": "NBIS",
+   "issuer_type": "public",
+   "entity": "US and Finnish subsidiaries (borrowers)",
+   "name": "$775M senior secured term loan (first secured debt in company history)",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 775,
+   "size_note": "Nebius's first-ever secured debt; entered 2026-07-10. Company describes the financing framework as extensible to >$40B of contracted revenue",
+   "rate": {
+    "kind": "sofr_spread",
+    "value": 2.50,
+    "note": "SOFR + 2.50%"
+   },
+   "maturity": "2030-10-31",
+   "maturity_note": null,
+   "seniority": "Senior secured",
+   "security": "Deployed GPU infrastructure + contracted cash flows from an unnamed investment-grade customer; 1.15x DSCR and minimum-liquidity covenants",
+   "lenders": [
+    "MUFG (lead)",
+    "ABN AMRO",
+    "Bank of America",
+    "Deutsche Bank",
+    "HSBC",
+    "Citigroup (senior lead arranger)",
+    "Crédit Agricole (senior lead arranger)",
+    "ING (senior lead arranger)",
+    "Morgan Stanley (senior lead arranger)"
+   ],
+   "status": "confirmed",
+   "issued": "2026-07-10",
+   "source": {
+    "doc": "Form 6-K (acc. 0001104659-26-084452); Nebius release 'raises $775 million in first secured debt financing'",
+    "date": "2026-07-10",
+    "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926084452/tm2620683d1_6k.htm"
+   },
+   "as_of": "2026-07-20"
+  },
+  {
    "id": "nbis-conv-2029",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
@@ -997,7 +1036,7 @@
    "maturity": "2030-05-07",
    "maturity_note": "Springing maturity pre-2030 convert",
    "seniority": "Senior secured (parent)",
-   "security": "Substantially all Company assets; minimum-liquidity covenant. Context (8-K 2026-07-06): sub Raylan Data signed a 20-yr ~401 MW Hawesville lease with Anthropic (press ~$19B; payments ‘expected to be supported by an investment-grade credit’) — lessor-side offtake, tracked for the financing it will support, not as a ledger row; same 8-K: sold the 50.1% stake in Fluidstack JV FS CS I (Abernathy, TX — 168 MW; distinct campus and financing from the Meridian Arc/Indiana structure) to Fluidstack-led purchasers for ~$530M in three installments. Watch: Abernathy project debt ($1.3B of Fluidstack lease obligations Google-backstopped per Oct-2025 8-K) has not publicly priced — a future row when it does.",
+   "security": "Substantially all Company assets; minimum-liquidity covenant. Context (8-K 2026-07-06): sub Raylan Data signed a 20-yr ~401 MW Hawesville lease with Anthropic (press ~$19B; payments ‘expected to be supported by an investment-grade credit’) — lessor-side offtake, tracked for the financing it will support, not as a ledger row; same 8-K: sold the 50.1% stake in Fluidstack JV FS CS I (Abernathy, TX — 168 MW; distinct campus and financing from the Meridian Arc/Indiana structure) to Fluidstack-led purchasers for ~$530M in three installments. Watch: Abernathy project debt ($1.3B of Fluidstack lease obligations Google-backstopped per Oct-2025 8-K) has not publicly priced — a future row when it does. Update (2026-07-20, per KBW): the investment-grade credit backstop for Anthropic's Hawesville payments is not yet finalized — Anthropic has not selected hardware (NVIDIA GPU vs AWS Trainium vs Google TPU) and the backstop provider is expected to follow that choice (decision expected within ~4 months). TeraWulf is reported (Bloomberg) to plan a ~$3.5B debt raise for the campus; if it prices before hardware is chosen, or if Anthropic selects TPUs/Trainium, the financing would fall outside strict GPU-collateral scope (same basis as the excluded Meta campus SPVs).",
    "lenders": [
     "MS Senior Funding (admin/collateral)"
    ],
@@ -2990,7 +3029,7 @@
    "rate": {
     "kind": "fixed",
     "value": 6.129,
-    "note": "Amortizing from May 30, 2030; investment-grade rated"
+    "note": "Amortizing from May 30, 2030; investment-grade rated (Moody's Baa2; S&P and Fitch preliminary BBB)"
    },
    "maturity": "2042-11-30",
    "maturity_note": null,
@@ -4754,15 +4793,82 @@
    "as_of": "2026-07-02"
   },
   {
-   "id": "usdai-qumulus",
-   "issuer": "QumulusAI",
+   "id": "apollo-blackstone-anthropic-tpu-spv",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Out of strict GPU scope: collateral is Google/Broadcom-designed TPUs (not GPUs) leased to Anthropic via an SPV; carried as market context, same treatment class as the Meta campus SPVs. Press-sourced, not an issuer/lender release.",
+   "issuer": "Apollo / Blackstone-led private-credit SPV (Anthropic TPU lease)",
    "ticker": null,
    "issuer_type": "private",
+   "entity": "SPV purchasing Google/Broadcom-designed TPUs; leases hardware to Anthropic",
+   "name": "Private-credit facility — Anthropic TPU lease SPV",
+   "instrument_type": "other",
+   "size_usd_m": 36000,
+   "size_note": "~$36B across three tranches (~$6B A1 / ~$25B A2 / ~$4.5B B); Broadcom residual-value guarantee on the ~$31B senior (A1+A2). ~16 delayed-draw releases over ~13 months. Reported May–June 2026 (NOT in the 07-10→07-20 sweep window; surfaced as ongoing coverage) and closed alongside Anthropic's $65B Series H. Largest reported private-credit / chip-financing deal on record",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": "Press pricing: ~5.75% on the Broadcom-guaranteed $25B A2 tranche; ~8–9% on the un-guaranteed B tranche"
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Senior secured (SPV); A1 + A2 (~$31B) carry a Broadcom residual-value guarantee, B tranche unguaranteed",
+   "security": "Google/Broadcom-designed TPUs leased to Anthropic; Broadcom residual-value support on the A1/A2 senior tranches (press)",
+   "lenders": [
+    "Apollo (lead, press)",
+    "Blackstone (press)"
+   ],
+   "status": "press",
+   "issued": null,
+   "source": {
+    "doc": "Bloomberg (2026-05-28; Broadcom backing 2026-06-02); Axios (2026-06-10) — press",
+    "date": "2026-06-02",
+    "url": "https://www.bloomberg.com/news/articles/2026-05-28/apollo-shops-36-billion-debt-deal-to-buy-google-chips-for-anthropic"
+   },
+   "as_of": "2026-07-20"
+  },
+  {
+   "id": "general-compute-upper90-sambanova",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Out of strict GPU scope: collateral is SambaNova SN50 inference ASICs (non-GPU AI silicon), not GPUs. Carried as a new-asset-class context row pending any curator decision to widen scope. Press-sourced.",
+   "issuer": "General Compute",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": null,
+   "name": "Upper90 loan collateralized by SambaNova SN50 inference ASICs",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 400,
+   "size_note": "$100M initial commitment scaling to a $400M ceiling (draw-as-you-go, sized to customer demand). Reported as the first loan collateralized by non-GPU AI inference silicon. Lender Upper90 pioneered chip-backed lending via its 2021 Crusoe loan; General Compute is an inference neocloud built on SambaNova SN50 silicon",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": null
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Secured; asset-level",
+   "security": "SambaNova SN50 inference ASICs",
+   "lenders": [
+    "Upper90"
+   ],
+   "status": "press",
+   "issued": "2026-07-17",
+   "source": {
+    "doc": "TechCrunch; SiliconANGLE (press)",
+    "date": "2026-07-17",
+    "url": "https://techcrunch.com/2026/07/17/why-the-first-gpu-financiers-are-turning-to-inference-chips-in-a-400-million-deal/"
+   },
+   "as_of": "2026-07-20"
+  },
+  {
+   "id": "usdai-qumulus",
+   "issuer": "QumulusAI",
+   "ticker": "QMLS",
+   "issuer_type": "public",
    "entity": null,
    "name": "USD.AI non-recourse GPU financing facility",
    "instrument_type": "credit_facility",
    "size_usd_m": 500,
-   "size_note": "$500M guidance facility; finances up to 70% LTV on approved GPU deployments, drawn as hardware deploys",
+   "size_note": "$500M guidance facility; finances up to 70% LTV on approved GPU deployments, drawn as hardware deploys. Borrower QumulusAI completed a Nasdaq direct listing 2026-07-16 (ticker QMLS); S-1/424B4 disclosures indicate ~12% APR on the facility",
    "rate": {
     "kind": "undisclosed",
     "value": null,
@@ -4991,7 +5097,7 @@
   {
    "issuer": "Nebius Group N.V.",
    "items": [
-    "Verified negative: no bank/secured debt through 6/16/26; the Microsoft-contract-secured financing flagged Sep 2025 was not entered into as of 6/16/26"
+    "Verified negative: no bank/secured debt through 6/16/26; the Microsoft-contract-secured financing flagged Sep 2025 was not entered into as of 6/16/26 — SUPERSEDED 2026-07-10 by the $775M senior secured term loan, now tracked as instrument nbis-secured-tl-775"
    ]
   },
   {
