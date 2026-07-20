@@ -41,14 +41,29 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE).href : undefined;
 const ORG = {
   '@type': 'Organization',
   '@id': `${SITE}/#org`,
-  name: 'CCIR',
+  name: 'Compute Credit Index Research',
+  alternateName: 'CCIR',
+  legalName: 'Compute Credit Index Research LLC',
   url: SITE,
   logo: `${SITE}/favicon-192.png`,
   description: 'Independent reference rates and research for the GPU compute market.',
+  sameAs: [
+    'https://www.linkedin.com/company/compute-credit-index-research/',
+    'https://x.com/CCIR_IO',
+  ],
 };
 const siteGraphLd = JSON.stringify({
   '@context': 'https://schema.org',
-  '@graph': [ORG, { '@type': 'WebSite', name: 'CCIR', url: SITE, publisher: { '@id': `${SITE}/#org` } }],
+  '@graph': [
+    ORG,
+    {
+      '@type': 'WebSite',
+      name: 'Compute Credit Index Research',
+      alternateName: 'CCIR',
+      url: SITE,
+      publisher: { '@id': `${SITE}/#org` },
+    },
+  ],
 });
 const articleLd = article
   ? JSON.stringify({
