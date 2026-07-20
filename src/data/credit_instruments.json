@@ -1019,6 +1019,8 @@
   },
   {
    "id": "wulf-rcf",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Corporate parent revolving credit facility secured by substantially all Company assets, not a GPU-asset-backed facility — out of the GPU-collateralized spread/issuance scope (2026-07-20).",
    "issuer": "TeraWulf Inc.",
    "ticker": "WULF",
    "issuer_type": "public",
@@ -1373,6 +1375,8 @@
   },
   {
    "id": "apld-rcf",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Secured revolver on certain non-data-center project assets, not GPU-collateral — out of the GPU-collateralized spread/issuance scope (2026-07-20).",
    "issuer": "Applied Digital Corporation",
    "ticker": "APLD",
    "issuer_type": "public",
@@ -1571,6 +1575,8 @@
   },
   {
    "id": "cifr-rcf",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Corporate parent revolving credit facility secured by substantially all Company assets (undrawn at 3/31/26), not a GPU-asset-backed facility — out of the GPU-collateralized spread/issuance scope (2026-07-20).",
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
    "ticker": "CIFR",
    "issuer_type": "public",
@@ -3793,6 +3799,8 @@
   },
   {
    "id": "slnh-generate-c",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Wind-farm project financing (Briscoe 149.85 MW, TX), not GPU-collateral — out of the GPU-collateralized spread/issuance scope (2026-07-20).",
    "issuer": "Soluna Holdings, Inc.",
    "ticker": "SLNH",
    "issuer_type": "public",
