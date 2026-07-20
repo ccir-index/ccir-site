@@ -26,8 +26,8 @@ export const GET: APIRoute = async () => {
   ]);
 
   const title = el('div', { display: 'flex', flexDirection: 'column', marginBottom: 10, gap: 2 }, [
-    el('div', { display: 'flex', color: C.ink, fontSize: 44, fontWeight: 600, letterSpacing: 0.5 }, 'The Company That Insured Itself'),
-    el('div', { display: 'flex', color: C.ink, fontSize: 44, fontWeight: 600, letterSpacing: 0.5 }, 'Against Technological Change'),
+    el('div', { display: 'flex', color: C.ink, fontSize: 44, fontWeight: 600, letterSpacing: 0.5 }, 'Betting on the Residual'),
+    el('div', { display: 'flex', color: C.ink, fontSize: 30, fontWeight: 600, letterSpacing: 0.5 }, 'Itel and the IBM 4300, 1979'),
   ]);
 
   const sub = el('div', { display: 'flex', color: C.dim, fontSize: 17, marginBottom: 24 },

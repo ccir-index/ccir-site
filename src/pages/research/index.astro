@@ -2,296 +2,402 @@
 import Base from '../../layouts/Base.astro';
 import { meta } from '../../data/snapshot';
 
-// Research hub — the single destination for everything analytical (nav tab
-// "Research"; /intelligence 301s here). Two species, presented as such:
-// MONITORS are standing pages updated with the panel; NOTES are dated and
-// never revised in place. Clusters group them by theme, monitor first.
-interface Monitor { href: string; title: string; blurb: string }
-interface Note { href: string; date: string; title: string; blurb: string }
-interface Cluster { heading: string; standfirst: string; monitors: Monitor[]; notes: Note[] }
+// Research hub — re-planed into three species as the primary axis, so a reader
+// lands on an on-ramp, not a wall:
+//   PRIMERS    — evergreen; the model the rest runs on (flagship = the why)
+//   MONITORS   — standing pages updated daily with the panel (live data)
+//   DISPATCHES — dated notes, never revised in place; newest first, theme-tagged
+interface Card { href: string; title: string; blurb: string }
+interface Primer extends Card { flagship?: boolean }
+interface MonitorGroup { theme: string; items: Card[] }
+interface Dispatch extends Card { date: string; tag: string }
 
-const clusters: Cluster[] = [
-  {
-    heading: 'Asset Economics',
-    standfirst:
-      'Earning power per spec-sheet unit, how it ages, and how it compares to what the hardware cost.',
-    monitors: [
-      { href: '/chip-economics', title: 'Chip Economics',
-        blurb: 'The daily rate re-denominated per GB, per TB/s, per petaFLOP (PFLOP, 10^15 floating-point operations per second), per kW. One lens makes the cross-section flat.' },
-    ],
-    notes: [
-      { href: '/research/rent-and-msrp', date: '2026-07-08', title: 'Rent and MSRP: Five Generations of Posted Prices',
-        blurb: 'Every generation’s gross posted-rate revenue passed its manufacturer’s suggested retail price (MSRP) anchor within 11–17 months; acquisition cost per unit of bandwidth fell 2.5× while rent per unit did not.' },
-      { href: '/research/rental-rates-by-generation', date: '2026-07-08', title: 'GPU Rental Rates by Generation: Nine Years of Posted Prices',
-        blurb: 'Per-generation posted-rate histories, 2017–2026: declines arrive in steps set by the repricers, interrupted twice by demand — in 2021–23, and again from late 2025.' },
-      { href: '/research/gpu-age-curve', date: '2026-07-06', title: 'Rent and Age: Five Generations',
-        blurb: 'The July 6, 2026 cross-section: ≈−26%/yr in dollars (R² 0.96) with age, flat per unit of memory bandwidth, banded per watt.' },
-    ],
-  },
-  {
-    heading: 'Term & Price Structure',
-    standfirst:
-      'On-demand is one point on a surface — the rate broken out by tenor and by where it actually transacts.',
-    monitors: [
-      { href: '/term', title: 'Committed Term Structure',
-        blurb: 'Posted committed asks by tenor — guaranteed capacity from one month to a year, per chip.' },
-      { href: '/basis', title: 'On-Demand vs Clearing Basis',
-        blurb: 'Posted on-demand asks against marketplace clearing — where list rates sit above what transacts.' },
-    ],
-    notes: [
-      { href: '/research/od-vs-committed', date: '2026-07-06', title: 'The Commitment Discount: Three Years of H100 Posted Prices',
-        blurb: 'Neocloud H100 posted prices, Oct 2023 – Jun 2026: a persistent committed discount, a $2.80 on-demand floor through 2025, a turn upward since December.' },
-    ],
-  },
-  {
-    heading: 'Demand & Utilization',
-    standfirst:
-      'Rate cards are asks. These read demand composition and realized economics from filings and from the fleet itself.',
-    monitors: [
-      { href: '/realized/', title: 'Realized vs Rate Card',
-        blurb: 'Per-GPU-hour realization estimated from public filings — well below posted rate cards.' },
-      { href: '/utilization', title: 'Utilization & Availability',
-        blurb: 'How much of the tracked fleet is rented versus idle, and how many venues have capacity.' },
-    ],
-    notes: [
-      { href: '/research/training-vs-inference', date: '2026-07-07', title: 'Training, Inference, and What Compute Earns',
-        blurb: 'A primer for credit readers: training demand behaves like construction backlog, inference like utility load — with the observables for each.' },
-    ],
-  },
-  {
-    heading: 'Contracts & Credit Structure',
-    standfirst:
-      'The paper behind the prices — what a compute contract binds, how lenders ring-fence the fleet, and the vocabulary both are written in. Read alongside the credit ledger.',
-    monitors: [
-      { href: '/credit', title: 'GPU-Backed Credit',
-        blurb: 'The debt stack behind AI compute, as filed — every instrument traced to a public document.' },
-      { href: '/credit/series', title: 'Credit Reference Series',
-        blurb: 'The derived layer: spread at signing, refi velocity, and lender-filed fair-value marks — arithmetic on filed numbers only.' },
-    ],
-    notes: [
-      { href: '/research/gpu-as-income-asset', date: '2026-07-20', title: 'The GPU as an Income Asset: Why Credit References a Lease Rate',
-        blurb: 'Primer: a GPU’s earning power is an observable lease rate, and that rate is the variable under renewal, collateral, and coverage — why a citeable benchmark belongs in the credit agreement, as oil references NYMEX and shipping the Baltic.' },
-      { href: '/research/nebius-first-secured-debt', date: '2026-07-20', title: 'Nebius’s First Secured Debt: A $775M GPU-Backed Facility',
-        blurb: 'Nebius entered its first senior secured debt facility on July 17 — ~$775M, its first secured debt, after a debt history made up entirely of convertible notes. The facility’s terms, its bank syndicate, and the change of instrument.' },
-      { href: '/research/fitch-coreweave-ddtl-5-5', date: '2026-07-17', title: 'A GPU Lease Rate Enters the Rating Case: Fitch’s BB+ on CoreWeave’s DDTL 5.5',
-        blurb: 'Fitch’s July 16 rating case for the proposed $2.6B facility leads with a new assumption: customer contracts that expire before the debt matures are renewed or replaced at favorable GPU lease rates — language absent from the April and May actions.' },
-      { href: '/research/same-facility-different-marks', date: '2026-07-12', title: 'Same Facility, Different Marks: Compute Credit in Lender Filings',
-        blurb: 'Four advisers file 99.0 / 100.0 / 102.0 / 103.1 on one GPU-backed facility at the same date. A 16-tranche cross-sector control shows performing credit normally agrees within a quarter point — compute paper is marked like performing credit and dispersed like stressed credit.' },
-      { href: '/research/gpu-spv', date: '2026-07-09', title: 'The GPU SPV: How Lenders Take Compute as Collateral',
-        blurb: 'The filed credit agreements behind the largest GPU special-purpose vehicle (SPV) financings: serial-number covenants, Uniform Commercial Code (UCC) account control, contract-realization tests — and a rating that travels with the offtake, six notches above the parent.' },
-      { href: '/research/compute-contracts', date: '2026-07-09', title: 'The Compute Contract: From On-Demand Terms to Take-or-Pay',
-        blurb: 'How GPU-hours are actually sold, from published terms of service to U.S. Securities and Exchange Commission (SEC)-filed master services agreements — including the termination formula that computes damages in the on-demand spread.' },
-      { href: '/research/compute-glossary', date: '2026-07-09', title: 'A Compute Glossary for Finance Professionals',
-        blurb: 'FLOPS, bandwidth, TDP, PUE, MFU, goodput, NVL72, training vs. inference vs. edge — the vocabulary of compute paper, defined in finance terms.' },
-    ],
-  },
-  {
-    heading: 'Precedents & History',
-    standfirst:
-      'Prior markets that financed expensive, rapidly improving machines — documented from the contemporaneous record.',
-    monitors: [],
-    notes: [
-      { href: '/research/itel-1979', date: '2026-07-08', title: 'The Company That Insured Itself Against Technological Change',
-        blurb: 'Itel, 1979: the largest independent computer lessor in the world, residual-dependent leases insured at Lloyd’s, and the IBM 4300 — a $433M loss ($2B today). That era’s structures were far more aggressive than today’s: GPU credit amortizes its collateral to zero and references no market residual.' },
-    ],
-  },
+const thesis =
+  "What compute earns, what it's worth as collateral, and how that shows up in " +
+  'credit — worked from public filings and posted prices.';
+
+const primers: Primer[] = [
+  { href: '/research/gpu-as-income-asset', flagship: true,
+    title: 'The GPU as an Income Asset',
+    blurb: 'Earning power, collateral, and the reference rate — the model the rest of this research runs on, and why a lease rate sits under every GPU-credit question.' },
+  { href: '/research/compute-contracts', title: 'The Compute Contract',
+    blurb: 'How GPU-hours are sold, from terms of service to SEC-filed take-or-pay master agreements — including the termination formula that prices the on-demand spread.' },
+  { href: '/research/gpu-spv', title: 'The GPU SPV',
+    blurb: 'How lenders take compute as collateral: serial-number covenants, UCC account control, contract-realization tests, and a rating that travels with the offtake.' },
+  { href: '/research/training-vs-inference', title: 'Training, Inference, and What Compute Earns',
+    blurb: 'For credit readers: training demand behaves like construction backlog, inference like utility load — with the observables for each.' },
+  { href: '/research/compute-glossary', title: 'A Compute Glossary for Finance',
+    blurb: 'FLOPS, bandwidth, TDP, PUE, MFU, NVL72, training vs. inference — the vocabulary of compute paper, defined in finance terms.' },
 ];
 
+const monitors: MonitorGroup[] = [
+  { theme: 'Credit', items: [
+    { href: '/credit', title: 'GPU-Backed Credit',
+      blurb: 'The debt stack behind AI compute, as filed — every instrument traced to a public document.' },
+    { href: '/credit/series', title: 'Credit Reference Series',
+      blurb: 'Spread at signing, refinancing velocity, and lender-filed fair-value marks — arithmetic on filed numbers only.' },
+  ] },
+  { theme: 'Term & Price', items: [
+    { href: '/term', title: 'Committed Term Structure',
+      blurb: 'Posted committed asks by tenor — one month to a year, per chip.' },
+    { href: '/basis', title: 'On-Demand vs Clearing Basis',
+      blurb: 'Posted on-demand asks against marketplace clearing.' },
+  ] },
+  { theme: 'Demand & Utilization', items: [
+    { href: '/realized/', title: 'Realized vs Rate Card',
+      blurb: 'Per-GPU-hour realization from public filings — well below posted rate cards.' },
+    { href: '/utilization', title: 'Utilization & Availability',
+      blurb: 'How much of the tracked fleet is rented versus idle, and how many venues have capacity.' },
+  ] },
+  { theme: 'Asset Economics', items: [
+    { href: '/chip-economics', title: 'Chip Economics',
+      blurb: 'The daily rate re-denominated per GB, per TB/s, per PFLOP, per kW.' },
+  ] },
+];
+
+const dispatches: Dispatch[] = [
+  { href: '/research/nebius-first-secured-debt', date: '2026-07-20', tag: 'Credit',
+    title: 'Nebius’s First Secured Debt: A $775M GPU-Backed Facility',
+    blurb: 'Nebius entered its first senior secured debt facility on July 17 — its first secured debt after a history of nothing but convertibles.' },
+  { href: '/research/fitch-coreweave-ddtl-5-5', date: '2026-07-17', tag: 'Credit',
+    title: 'A GPU Lease Rate Enters the Rating Case',
+    blurb: 'Fitch’s July 16 rating case for CoreWeave’s DDTL 5.5 leads with a new assumption: expiring contracts renew “at favorable GPU lease rates.”' },
+  { href: '/research/same-facility-different-marks', date: '2026-07-12', tag: 'Credit',
+    title: 'Same Facility, Different Marks',
+    blurb: 'Four advisers file 99.0 / 100.0 / 102.0 / 103.1 on one GPU-backed facility at one date — marked like performing credit, dispersed like stressed.' },
+  { href: '/research/rent-and-msrp', date: '2026-07-08', tag: 'Asset economics',
+    title: 'Rent and MSRP: Five Generations of Posted Prices',
+    blurb: 'Every generation’s gross posted-rate revenue passed its MSRP within 11–17 months; acquisition cost per unit of bandwidth fell 2.5×, rent per unit did not.' },
+  { href: '/research/rental-rates-by-generation', date: '2026-07-08', tag: 'Asset economics',
+    title: 'GPU Rental Rates by Generation: Nine Years of Posted Prices',
+    blurb: 'Per-generation histories, 2017–2026: declines arrive in steps set by the repricers, interrupted twice by demand.' },
+  { href: '/research/itel-1979', date: '2026-07-08', tag: 'Precedent',
+    title: 'Betting on the Residual: Itel and the IBM 4300, 1979',
+    blurb: 'The largest independent computer lessor in the world, residual-dependent leases, and the machine that obsoleted the inventory — a $433M loss ($2B today).' },
+  { href: '/research/gpu-age-curve', date: '2026-07-06', tag: 'Asset economics',
+    title: 'Rent and Age: Five Generations',
+    blurb: 'The cross-section: ≈−26%/yr in dollars (R² 0.96) with age, flat per unit of memory bandwidth, banded per watt.' },
+  { href: '/research/od-vs-committed', date: '2026-07-06', tag: 'Term',
+    title: 'The Commitment Discount: Three Years of H100 Posted Prices',
+    blurb: 'Neocloud H100, Oct 2023 – Jun 2026: a persistent committed discount, a $2.80 on-demand floor through 2025, a turn upward since December.' },
+];
+
+const tagClass = (t: string) => 'tag-' + t.split(' ')[0].toLowerCase();
+const flagship = primers.find((p) => p.flagship);
+const restPrimers = primers.filter((p) => !p.flagship);
 ---
 <Base
   title="Research · CCIR"
-  description="CCIR research — standing market monitors updated daily (term structure, chip economics, clearing basis, utilization) and dated research notes that are never revised in place."
+  description="CCIR research — primers on how compute is priced and financed, standing market monitors updated daily, and dated dispatches that are never revised in place."
   ogImage="/og/research.png"
 >
   <section class="wrap top">
     <header class="page-head">
       <div class="kicker">Research · {meta.as_of_date}</div>
       <h1>Research</h1>
+      <p class="thesis">{thesis}</p>
     </header>
 
-    {clusters.map((c) => (
-      <section class="cluster">
-        <header class="cluster-head">
-          <h2>{c.heading}</h2>
-          <p class="cluster-standfirst">{c.standfirst}</p>
-        </header>
-        {c.monitors.length > 0 && (
-          <div class="card-grid">
-            {c.monitors.map((m) => (
-              <a class="mi-card" href={m.href}>
-                <span class="species species-monitor">Monitor · updated daily</span>
-                <h3 class="mi-title">{m.title}</h3>
-                <p class="mi-blurb">{m.blurb}</p>
-                <span class="mi-foot">Open →</span>
-              </a>
-            ))}
-          </div>
-        )}
-        {c.notes.length > 0 && (
-          <div class="note-list">
-            {c.notes.map((n) => (
-              <a class="note-row" href={n.href}>
-                <span class="note-body">
-                  <span class="note-title">{n.title}</span>
-                  <span class="note-blurb">{n.blurb}</span>
-                </span>
-              </a>
-            ))}
-          </div>
-        )}
-      </section>
-    ))}
-  </section>
+    <!-- PRIMERS -->
+    <section class="tier">
+      <div class="tier-head">
+        <h2>Start here</h2>
+        <span class="tier-tag">Primers · the model</span>
+      </div>
+      {flagship && (
+        <a class="flagship" href={flagship.href}>
+          <span class="fl-eye">Start here</span>
+          <span class="fl-title">{flagship.title}</span>
+          <span class="fl-blurb">{flagship.blurb}</span>
+          <span class="fl-go">Read the primer →</span>
+        </a>
+      )}
+      <div class="primer-grid">
+        {restPrimers.map((p) => (
+          <a class="primer" href={p.href}>
+            <span class="p-title">{p.title}</span>
+            <span class="p-blurb">{p.blurb}</span>
+          </a>
+        ))}
+      </div>
+    </section>
 
-  <script is:inline>
-    // Reveal clusters as they scroll into view; no-op under reduced motion
-    // (the CSS gate keeps everything visible there).
-    (function () {
-      var els = document.querySelectorAll('.cluster');
-      if (!('IntersectionObserver' in window)) return;
-      document.documentElement.classList.add('reveal-on');
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-          if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-        });
-      }, { rootMargin: '0px 0px -8% 0px' });
-      els.forEach(function (e) { io.observe(e); });
-    })();
-  </script>
+    <!-- MONITORS -->
+    <section class="tier">
+      <div class="tier-head">
+        <h2>Monitors</h2>
+        <span class="tier-tag">Updated daily · live data</span>
+      </div>
+      <div class="monitor-cols">
+        {monitors.map((g) => (
+          <div class="mcol">
+            <div class="mcol-head">{g.theme}</div>
+            {g.items.map((m) => (
+              <a class="monitor" href={m.href}>
+                <span class="m-title">{m.title}</span>
+                <span class="m-blurb">{m.blurb}</span>
+              </a>
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- DISPATCHES -->
+    <section class="tier">
+      <div class="tier-head">
+        <h2>Dispatches</h2>
+        <span class="tier-tag">Dated · newest first</span>
+      </div>
+      <div class="dispatch-list">
+        {dispatches.map((d) => (
+          <a class="dispatch" href={d.href}>
+            <span class="d-date">{d.date}</span>
+            <span class="d-body">
+              <span class="d-title">{d.title}<span class={`d-tag ${tagClass(d.tag)}`}>{d.tag}</span></span>
+              <span class="d-blurb">{d.blurb}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </section>
 
   <style>
     .top { padding-top: 32px; }
-    .page-head { margin-bottom: 8px; max-width: 82ch; }
+    .page-head { max-width: 82ch; margin-bottom: 8px; }
     .page-head h1 {
       font-family: var(--font-display);
       font-size: var(--fs-3xl);
       line-height: var(--lh-display);
       font-weight: var(--weight-display);
-      margin: 6px 0 12px;
+      margin: 6px 0 10px;
     }
-    .standfirst a { color: var(--accent); }
-    .standfirst strong { color: var(--accent); }
-
-    .cluster { margin: 38px 0 0; }
-    @media (prefers-reduced-motion: no-preference) {
-      :global(html.reveal-on) .cluster { opacity: 0; transform: translateY(12px); transition: opacity 0.45s ease, transform 0.45s ease; }
-      :global(html.reveal-on) .cluster.in { opacity: 1; transform: none; }
-    }
-    .cluster-head { max-width: 82ch; margin-bottom: 14px; }
-    .cluster-head h2 {
-      font-family: var(--font-display);
-      font-size: var(--fs-2xl);
-      font-weight: var(--weight-display);
-      letter-spacing: -0.005em;
-      margin: 0 0 8px;
-    }
-    .cluster-standfirst {
+    .thesis {
       font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-size: var(--fs-md);
       color: var(--ink-dim);
       line-height: 1.6;
       margin: 0;
-      max-width: 78ch;
+      max-width: 74ch;
     }
 
-    .card-grid {
+    .tier { margin: 40px 0 0; }
+    .tier-head {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    .tier-head h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      font-weight: var(--weight-display);
+      margin: 0;
+    }
+    .tier-tag {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      letter-spacing: var(--tracking-eye);
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    /* ---- Primers ---- */
+    .flagship {
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent);
+      padding: 20px 24px;
+      margin-bottom: 1px;
+      text-decoration: none;
+      color: var(--ink);
+      transition: background 0.18s ease, box-shadow 0.18s ease;
+      max-width: 880px;
+    }
+    .flagship:hover {
+      background: var(--surface-2);
+      text-decoration: none;
+      box-shadow: inset 0 0 0 1px var(--accent), 0 0 22px -10px var(--accent);
+    }
+    .fl-eye {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      letter-spacing: var(--tracking-eye);
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .fl-title {
+      display: block;
+      font-family: var(--font-display);
+      font-size: var(--fs-2xl);
+      font-weight: var(--weight-display);
+      letter-spacing: -0.01em;
+      margin-bottom: 7px;
+    }
+    .flagship:hover .fl-title { color: var(--accent); }
+    .fl-title, .fl-blurb, .p-title, .m-title, .d-title { transition: color 0.18s ease; }
+    .fl-blurb {
+      display: block;
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink-dim);
+      line-height: 1.55;
+      max-width: 72ch;
+    }
+    .fl-go {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      letter-spacing: var(--tracking-eye);
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .primer-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
       gap: 1px;
       background: var(--rule);
       border: 1px solid var(--rule);
+      border-top: none;
       max-width: 880px;
     }
-    .mi-card {
+    .primer {
       background: var(--surface);
-      padding: 16px 20px;
+      padding: 15px 18px;
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 5px;
       text-decoration: none;
       color: var(--ink);
       transition: background 0.18s ease, box-shadow 0.18s ease;
     }
-    .mi-card:hover {
+    .primer:hover {
       background: var(--surface-2);
       text-decoration: none;
-      box-shadow: inset 0 0 0 1px var(--accent), 0 0 18px -8px var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
       z-index: 1;
     }
-    .mi-card:hover .mi-title { color: var(--accent); }
-    .mi-title { transition: color 0.18s ease; }
-    .species {
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      letter-spacing: var(--tracking-eye);
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .mi-title {
-      font-family: var(--font-display);
-      font-size: var(--fs-lg);
-      font-weight: var(--weight-display);
-      letter-spacing: -0.005em;
-      margin: 0;
-    }
-    .mi-blurb {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
-      color: var(--ink-dim);
-      line-height: 1.55;
-      margin: 0;
-    }
-    .mi-foot {
-      margin-top: auto;
-      padding-top: 6px;
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-eye);
-    }
-
-    .note-list {
-      border: 1px solid var(--rule);
-      border-top: none;
-      background: var(--surface);
-      max-width: 880px;
-      display: flex;
-      flex-direction: column;
-    }
-    .cluster .note-list:first-of-type { border-top: 1px solid var(--rule); }
-    .note-row {
-      display: flex;
-      gap: 18px;
-      padding: 13px 20px;
-      text-decoration: none;
-      color: var(--ink);
-      border-bottom: 1px solid var(--rule);
-      align-items: baseline;
-    }
-    .note-row:last-child { border-bottom: none; }
-    .note-row {
-      transition: background 0.18s ease, box-shadow 0.18s ease;
-    }
-    .note-row:hover {
-      background: var(--surface-2);
-      text-decoration: none;
-      box-shadow: inset 3px 0 0 0 var(--accent);
-    }
-    .note-row:hover .note-title { color: var(--accent); }
-    .note-title { transition: color 0.18s ease; }
-    .note-body { display: flex; flex-direction: column; gap: 3px; }
-    .note-title {
+    .primer:hover .p-title { color: var(--accent); }
+    .p-title {
       font-family: var(--font-display);
       font-size: var(--fs-md);
       font-weight: var(--weight-display);
       letter-spacing: -0.005em;
     }
-    .note-blurb {
+    .p-blurb {
       font-family: var(--font-body);
       font-size: var(--fs-sm);
       color: var(--ink-dim);
       line-height: 1.5;
+    }
+
+    /* ---- Monitors ---- */
+    .monitor-cols {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      max-width: 1000px;
+    }
+    .mcol { background: var(--surface); display: flex; flex-direction: column; }
+    .mcol-head {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      letter-spacing: var(--tracking-eye);
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      padding: 10px 16px 4px;
+    }
+    .monitor {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 16px 12px;
+      text-decoration: none;
+      color: var(--ink);
+      transition: background 0.16s ease, box-shadow 0.16s ease;
+    }
+    .monitor:hover {
+      background: var(--surface-2);
+      text-decoration: none;
+      box-shadow: inset 2px 0 0 0 var(--accent);
+    }
+    .monitor:hover .m-title { color: var(--accent); }
+    .m-title { font-family: var(--font-display); font-size: var(--fs-sm); font-weight: var(--weight-display); }
+    .m-blurb { font-family: var(--font-body); font-size: var(--fs-xs); color: var(--ink-dim); line-height: 1.45; }
+
+    /* ---- Dispatches ---- */
+    .dispatch-list {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+    }
+    .dispatch {
+      display: flex;
+      gap: 16px;
+      padding: 13px 18px;
+      text-decoration: none;
+      color: var(--ink);
+      border-bottom: 1px solid var(--rule);
+      transition: background 0.16s ease, box-shadow 0.16s ease;
+    }
+    .dispatch:last-child { border-bottom: none; }
+    .dispatch:hover {
+      background: var(--surface-2);
+      text-decoration: none;
+      box-shadow: inset 3px 0 0 0 var(--accent);
+    }
+    .dispatch:hover .d-title { color: var(--accent); }
+    .d-date {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-faint);
+      white-space: nowrap;
+      padding-top: 2px;
+      min-width: 74px;
+    }
+    .d-body { display: flex; flex-direction: column; gap: 3px; }
+    .d-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-md);
+      font-weight: var(--weight-display);
+      letter-spacing: -0.005em;
+    }
+    .d-tag {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 2px);
+      letter-spacing: var(--tracking-eye);
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      padding: 1px 5px;
+      margin-left: 9px;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .d-tag.tag-credit { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--rule)); }
+    .d-blurb {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .dispatch { flex-direction: column; gap: 4px; }
+      .d-date { min-width: 0; }
     }
   </style>
 </Base>
