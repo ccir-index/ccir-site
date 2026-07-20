@@ -85,8 +85,9 @@ function shortName(r: any): string {
   if (/^DDTL/.test(r.name)) return `CRWV ${r.name.split(' (')[0]}`;
   return r.issuer.replace(/,.*$/, '').replace(/ (Inc\.|Ltd\.?|Limited|Corporation|Holdings.*)$/, '').split(' ').slice(0, 2).join(' ');
 }
-const spreadPts = spreadRows.map((r: any) => ({
+const spreadPts = spreadRows.map((r: any, i: number) => ({
   ...r,
+  n: i + 1,
   cx: sx(r.issued),
   cyLo: sy(r.lo),
   cyHi: sy(r.hi),
@@ -104,25 +105,32 @@ const dotRects: Rect[] = spreadPts.flatMap((p: any) => [
 const labelRects: Rect[] = [];
 const placedLabels: { x: number; y: number; text: string; anchor: string }[] = [];
 const overlaps = (a: Rect, b: Rect) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0;
+// Number every dot (keyed to the table below), not the full provider label —
+// the record is too dense on the right for on-chart names. Greedy placement
+// avoids collisions; a fallback guarantees every dot still shows its number.
 for (const p of spreadPts) {
-  const text = `${p.short} ${p.spreadText}`;
-  const w = text.length * 6.2;
+  const text = `${p.n}`;
+  const w = text.length * 7 + 3;
   const midY = (p.cyLo + p.cyHi) / 2;
   const cands: { x: number; y: number; anchor: string }[] = [
-    { x: p.cx, y: p.cyHi - 11, anchor: 'middle' },
-    { x: p.cx, y: p.cyLo + 19, anchor: 'middle' },
-    { x: p.cx + 10, y: midY + 3.5, anchor: 'start' },
-    { x: p.cx - 10, y: midY + 3.5, anchor: 'end' },
+    { x: p.cx, y: p.cyHi - 9, anchor: 'middle' },
+    { x: p.cx + 8, y: p.cyHi - 5, anchor: 'start' },
+    { x: p.cx + 8, y: p.cyLo + 12, anchor: 'start' },
+    { x: p.cx, y: p.cyLo + 16, anchor: 'middle' },
+    { x: p.cx - 8, y: midY + 3.5, anchor: 'end' },
   ];
+  let placed = false;
   for (const c of cands) {
     const x0 = c.anchor === 'start' ? c.x : c.anchor === 'end' ? c.x - w : c.x - w / 2;
-    const rect: Rect = { x0, x1: x0 + w, y0: c.y - 9, y1: c.y + 3 };
+    const rect: Rect = { x0, x1: x0 + w, y0: c.y - 8, y1: c.y + 3 };
     if (rect.x0 < 2 || rect.x1 > SW - 2 || rect.y0 < STp - 12 || rect.y1 > SH - SBp) continue;
     if (dotRects.some((d) => overlaps(rect, d)) || labelRects.some((l) => overlaps(rect, l))) continue;
     labelRects.push(rect);
     placedLabels.push({ x: c.x, y: c.y, text, anchor: c.anchor });
+    placed = true;
     break;
   }
+  if (!placed) placedLabels.push({ x: p.cx + 7, y: p.cyHi - 5, text, anchor: 'start' });
 }
 
 // --- 02 refi velocity --------------------------------------------------------
@@ -340,8 +348,9 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       <div class="panel-foot">
         <p>
           Spreads as disclosed in each signing document; grid-priced facilities
-          show their disclosed range. Hover a dot for the instrument. Window:
-          the tracker's full GPU-collateralized record, {spreadRangeLong}.
+          show their disclosed range. Each dot is numbered to the table below;
+          hover for detail. Window: the tracker's full GPU-collateralized
+          record, {spreadRangeLong}.
         </p>
       </div>
     </div>
@@ -349,13 +358,14 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       <table class="series-table">
         <thead>
           <tr>
-            <th>Signed</th><th>Issuer</th><th>Instrument</th>
+            <th class="num">#</th><th>Signed</th><th>Issuer</th><th>Instrument</th>
             <th class="num">Spread (pp over SOFR)</th><th class="num">Size ($M)</th><th>Status</th><th>Source</th>
           </tr>
         </thead>
         <tbody>
-          {spreadRows.map((r: any) => (
+          {spreadRows.map((r: any, i: number) => (
             <tr>
+              <td class="num mono">{i + 1}</td>
               <td class="mono">{r.issued}</td>
               <td>{r.issuer}</td>
               <td class="c-inst">{r.name}</td>
