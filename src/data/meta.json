@@ -1,8 +1,8 @@
 {
-  "as_of_date": "2026-07-20",
-  "published_at_ct": "2026-07-20T05:05:30-05:00",
-  "published_at_utc": "2026-07-20T10:05:30+00:00",
-  "run_id": "export-20260720T100445Z-755bed85",
+  "as_of_date": "2026-07-21",
+  "published_at_ct": "2026-07-21T04:27:29-05:00",
+  "published_at_utc": "2026-07-21T09:27:29+00:00",
+  "run_id": "export-20260721T092712Z-c667856f",
   "methodology_version": "v2.2.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 61,
@@ -19,10 +19,10 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 16859,
+    "total_rows": 17329,
     "window_days": 90,
-    "window_end": "2026-07-20",
-    "window_start": "2026-04-22"
+    "window_end": "2026-07-21",
+    "window_start": "2026-04-23"
   },
   "marketplace_history": {
     "chips": [
@@ -43,57 +43,13 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 1168,
+    "total_rows": 1038,
     "window_days": 7,
-    "window_end": "2026-07-20",
-    "window_start": "2026-07-14"
+    "window_end": "2026-07-21",
+    "window_start": "2026-07-15"
   },
-  "vast": {
-    "chips_observed": [
-      "A100 PCIE",
-      "A100 SXM4",
-      "B200",
-      "H100 SXM",
-      "H200",
-      "L40",
-      "L40S",
-      "RTX 3090",
-      "RTX 4090",
-      "RTX 5090",
-      "RTX 6000Ada",
-      "RTX A6000"
-    ],
-    "latest_collected_at_utc": "2026-07-21 04:03:12.888877+00:00",
-    "n_chips": 12,
-    "n_offers_latest_cycle": 1843,
-    "status": "ok",
-    "summary_file": "vast_summary.csv",
-    "window_days": 30,
-    "window_end": "2026-07-20",
-    "window_start": "2026-06-21"
-  },
-  "availability": {
-    "chips_observed": [
-      "a100-pcie-80gb",
-      "a100-sxm-80gb",
-      "b300",
-      "gh200",
-      "h100-pcie",
-      "h100-sxm",
-      "h200-sxm",
-      "l40s",
-      "rtx-pro-6000"
-    ],
-    "latest_collected_at_utc": "2026-07-21 04:04:07.126951+00:00",
-    "n_available_latest_cycle": 57,
-    "n_chips": 9,
-    "n_sku_regions_latest_cycle": 301,
-    "status": "ok",
-    "summary_file": "shadeform_summary.csv",
-    "window_days": 30,
-    "window_end": "2026-07-20",
-    "window_start": "2026-06-21"
-  },
+  "vast": null,
+  "availability": null,
   "utilization": {
     "chips": [
       "h100-sxm",
@@ -115,7 +71,7 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 228,
+    "occupancy_cycles": 232,
     "occupancy_series_start": "2026-05-13",
     "runpod_occupancy_chips": [],
     "runpod_occupancy_cycles": 0,
