@@ -1,13 +1,77 @@
 ---
 import Base from '../layouts/Base.astro';
 import hw from '../data/hardware_panels.json';
+import ivRatesRaw from '../data/rates_daily.csv?raw';
+import ivCmiRaw from '../data/committed_mi.csv?raw';
 
 // Secondary-market hardware price tape — observed executed prices (eBay
 // sold record, human-captured via Seller Hub research; see Method) paired
-// with current multi-source posted asks. CCIR publishes observed PRICES;
-// it does not publish residual value opinions.
+// with current multi-source posted asks, and — per the 2026-07-22 ruling —
+// an INCOME-DERIVED, model-implied value per deployed chip (going-concern
+// lens for lenders), computed at build time from the CRI rate + committed
+// term curve, with the two tapes shown as corroboration and LGD floor.
 const fmtUsd = (v: number | null | undefined, dp = 0) =>
   v == null ? '—' : '$' + v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+
+// --- Income-derived value (model-implied) -----------------------------------
+// Base case and the alternatives grid are DISCLOSED on the page; the value is
+// a model output, never presented as a transacted price.
+const ivParse = (raw: string) => {
+  const [head, ...lines] = raw.trim().split(/\r?\n/);
+  const cols = head!.split(',');
+  return lines.map((l) => {
+    const cells = l.split(',');
+    return Object.fromEntries(cols.map((c, i) => [c, cells[i] ?? ''])) as Record<string, string>;
+  });
+};
+const ivRates = ivParse(ivRatesRaw);
+const ivCmi = ivParse(ivCmiRaw);
+const IV_HOURS = 8766;
+const IV_BASE = { u: 0.75, m: 0.65, r: 0.15, g: 0.30, life: 6 };
+const IV_NOW = 2026 + (7 - 0.5) / 12;
+const IV_SPEC = [
+  { key: 'H100-80-SXM5', label: 'H100 SXM', model: 'H100', silicon: 'h100-sxm-80gb', vintage: 2023 + 2 / 12 },
+  { key: 'H200-141', label: 'H200', model: 'H200', silicon: 'h200-sxm-141gb', vintage: 2024 + 5 / 12 },
+  { key: 'A100-80-SXM4', label: 'A100 80GB', model: 'A100', silicon: 'a100-sxm-80gb', vintage: 2021 + 5 / 12 },
+];
+function ivValue(spot: number, d: Record<string, number>, r: number, life: number, age: number,
+                 g = IV_BASE.g, u = IV_BASE.u, m = IV_BASE.m): number {
+  const c = (T: string) => spot * (1 - d[T]!);
+  // Bootstrap yearly average rates off the committed curve.
+  const y1 = d['1Y'] != null ? c('1Y') : spot;
+  const y2 = d['2Y'] != null ? 2 * c('2Y') - y1 : d['3Y'] != null ? (3 * c('3Y') - y1) / 2 : y1;
+  const y3 = d['3Y'] != null && d['2Y'] != null ? 3 * c('3Y') - 2 * c('2Y') : y2;
+  const rem = Math.max(0, life - age);
+  const full = Math.floor(rem), frac = rem - full;
+  let pv = 0;
+  for (let i = 0; i < full + (frac > 0 ? 1 : 0); i++) {
+    const rate = i === 0 ? y1 : i === 1 ? y2 : i === 2 ? y3 : y3 * Math.pow(1 - g, i - 2);
+    const fy = i < full ? 1 : frac;
+    pv += (rate * IV_HOURS * fy * u * m) / Math.pow(1 + r, i + 0.5);
+  }
+  return pv;
+}
+const ivCards = IV_SPEC.map((s) => {
+  const rrow = ivRates.find((r) => r['series_id'] === `CRI-T2-${s.model}-ALL-GTD-OD-US`);
+  const spot = rrow ? Number(rrow['price_headline']) : NaN;
+  const d: Record<string, number> = {};
+  for (const r of ivCmi)
+    if (r['band'] === 'NEOCLOUD' && r['silicon_id'] === s.silicon && r['metric'] === 'spread_to_spot')
+      d[r['tenor']!] = -Number(r['value']);
+  const hwm = hw.models.find((m: any) => m.key === s.key) as any;
+  if (!rrow || !Number.isFinite(spot) || d['3Y'] == null || !hwm) return null;
+  const age = IV_NOW - s.vintage;
+  const base = ivValue(spot, d, IV_BASE.r, IV_BASE.life, age);
+  const combos: number[] = [];
+  for (const rr of [0.10, 0.15, 0.25]) for (const lf of [5, 6, 7]) combos.push(ivValue(spot, d, rr, lf, age));
+  return {
+    ...s, spot, base, lo: Math.min(...combos), hi: Math.max(...combos),
+    remaining: Math.max(0, IV_BASE.life - age),
+    ask: hwm.ask?.med ?? null, askN: hwm.ask?.n ?? null, askSources: hwm.ask?.sources ?? null,
+    t90: hwm.t90?.med ?? null, t90N: hwm.t90?.n ?? null,
+    basis: hwm.basis?.usd ?? null, rateAsOf: rrow['as_of_date'],
+  };
+}).filter((x): x is NonNullable<typeof x> => x != null);
 
 type Pt = { m: string; med: number | null; n: number; units: number; med3: number | null; n3: number };
 const charted = hw.models.filter((m) => m.charted);
@@ -196,7 +260,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: 'CCIR Secondary-Market Hardware Prices',
-    description: 'Executed secondary-market sale prices and current posted asks for datacenter GPUs (H100, H200, A100, V100, L40S, RTX A6000) — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons. Observed prices with provenance, not residual value opinions.',
+    description: 'Income-derived, model-implied values for deployed datacenter GPUs (H100, H200, A100) computed from the CRI rental rate and committed term curve with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
     url: 'https://ccir.io/hardware',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2023-07/..',
@@ -226,18 +290,70 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
   <section class="wrap top">
     <header class="page-head">
       <h1>The Secondary Market</h1>
-      <p class="subhead">What GPUs are listed at — and execute at — over time.</p>
+      <p class="subhead">What a deployed GPU is worth as an earning asset — and what machines list and sell for.</p>
       <p class="standfirst">
-        Compute credit is moving from offtake-backed toward asset-based.
-        Offtake underwriting prices the contract; asset-based underwriting
-        prices the machine — and pricing the machine requires a neutral
-        record of what machines sell for and are offered at. This page is
-        that record being built: executed sales and posted asks, kept in
-        separate lanes and never blended, every figure carrying its count,
-        its window, and its provenance. CCIR publishes no residual value
-        opinions. The record is the product.
+        Compute credit is moving from offtake-backed toward asset-based, and
+        asset-based underwriting needs two numbers. The first is a
+        going-concern value: what the machine is worth deployed and earning,
+        disposed at volume through business channels. CCIR derives that
+        number from its own benchmark — the CRI rental rate and committed
+        term curve price the income a deployed GPU can contract for, and an
+        income approach over that curve yields a <strong>model-implied
+        value</strong>, every assumption disclosed below. The second is a
+        loss-given-default floor: what hardware clears at when it must be
+        sold. That number stays observational — executed sales and posted
+        asks, kept in separate lanes, every figure carrying its count, its
+        window, and its provenance. The model is corroborated by the tape;
+        where they diverge, the divergence itself is the credit information.
       </p>
     </header>
+
+    <section class="sec iv">
+      <h2><span class="n">§</span> Income-derived value</h2>
+      <p class="secintro">
+        Model-implied value of a deployed unit, derived from the CRI T2
+        (neocloud) US guaranteed on-demand rate and the neocloud committed
+        term curve as of {ivCards[0]?.rateAsOf}. Not a transacted price —
+        the corroborating tapes are beside each figure.
+      </p>
+      <div class="ivgrid">
+        {ivCards.map((v) => (
+          <div class="ivcard">
+            <div class="ivchip">{v.label}</div>
+            <div class="ivval">{fmtUsd(v.base)}</div>
+            <div class="ivrange">{v.lo > 0
+              ? `sensitivity ${fmtUsd(v.lo)} – ${fmtUsd(v.hi)} · disc 10–25% × life 5–7yr`
+              : `sensitivity up to ${fmtUsd(v.hi)} · $0 at a 5-yr life`}</div>
+            <table class="ivcorr">
+              <tr>
+                <td>B2B channel ask</td>
+                <td>{fmtUsd(v.ask)}</td>
+                <td>{v.ask ? (v.base / v.ask).toFixed(2) + '× model/ask' : ''}</td>
+              </tr>
+              <tr>
+                <td>Executed, 90d</td>
+                <td>{fmtUsd(v.t90)}</td>
+                <td>{v.t90 && v.basis ? Math.round((100 * v.t90) / v.basis) + '% of launch basis' : `n=${v.t90N}`}</td>
+              </tr>
+            </table>
+            <div class="ivmeta">rate leg ${v.spot.toFixed(2)}/hr · {v.remaining.toFixed(1)}yr remaining at 6yr service life</div>
+          </div>
+        ))}
+      </div>
+      <p class="ivnote">
+        Base case: year 1 at the 1Y committed rate, years 2–3 bootstrapped
+        from the 2Y/3Y committed curve, 30%/yr decay beyond the curve; 75%
+        utilization; 65% net margin after power, colocation, and operations;
+        15% discount rate; 6-year service life from volume availability.
+        The sensitivity band re-runs the model over discount rates of
+        10–25% crossed with service lives of 5–7 years and shows the
+        min–max; utilization, margin, and decay are held at base.
+        Recomputed on every data refresh. The executed
+        lane <em>informs</em> a loss-given-default floor rather than being
+        one: single-unit retail clearings can sit above or below a bulk
+        disposition, and no current tape measures market impact at volume.
+      </p>
+    </section>
 
     <section class="sec forward">
       <h2><span class="n">§</span> The record from here</h2>
@@ -539,6 +655,21 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     <section class="sec">
       <h2><span class="n">§</span> Method</h2>
       <p>
+        <strong>Income approach (model-implied).</strong> The headline value
+        is a discounted-cash-flow over the income a deployed unit can
+        contract for, with every leg either observable or disclosed. The
+        observable legs: the CRI T2 US guaranteed on-demand headline as the
+        spot rate, and the neocloud committed term curve (1Y/2Y/3Y
+        per-operator median discounts) pricing years one through three —
+        the market's own price for locked duration, not a forecast. The
+        assumed legs are printed with the figure: decay beyond the curve,
+        utilization, net margin, discount rate, service life. It is a model
+        output and is labeled as one everywhere it appears; the tapes below
+        corroborate it, and the model-to-ask ratio and executed floor are
+        shown beside every figure so the reader holds all three numbers at
+        once.
+      </p>
+      <p>
         <strong>Executed record.</strong> Dated, human-captured snapshots of
         the eBay sold-listing research record (Seller Hub product research),
         July 2023 – July 2026: 3,564 sold listings, 15,155 units, $28.9M.
@@ -592,18 +723,61 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         lane are at the top of this page.
       </p>
       <p>
-        <strong>What this is not.</strong> CCIR publishes observed
-        secondary-market prices with provenance. It does not publish
-        residual value opinions, forecasts, or depreciation schedules, and
-        no figure on this page is one. Statistics follow the methodology's
-        stat policy: medians shown with n on every cell; thin cells gated;
-        windows labeled on every display.
+        <strong>What is model and what is observed.</strong> Exactly one
+        figure on this page is a model output — the income-derived value —
+        and it is labeled model-implied wherever it appears, with its
+        assumption set printed beside it. Everything else is an observed
+        price with provenance. CCIR publishes no forecasts and no
+        depreciation schedules; the model prices today's curve, not a
+        predicted one. Statistics follow the methodology's stat policy:
+        medians shown with n on every cell; thin cells gated; windows
+        labeled on every display.
       </p>
     </section>
   </section>
 
   <style>
     .top { padding-top: 32px; }
+    .iv .ivgrid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 16px; margin: 18px 0 14px;
+    }
+    .iv .ivcard {
+      border: 1px solid var(--rule); background: var(--surface);
+      padding: 16px 18px 12px;
+    }
+    .iv .ivchip {
+      font-family: var(--font-mono); font-size: var(--fs-sm);
+      letter-spacing: 0.04em; color: var(--ink-dim);
+      text-transform: uppercase;
+    }
+    .iv .ivval {
+      font-family: var(--font-display); font-size: var(--fs-2xl);
+      font-weight: var(--weight-display); margin: 2px 0 0;
+    }
+    .iv .ivrange {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-dim); margin-bottom: 10px;
+    }
+    .iv .ivcorr {
+      width: 100%; border-collapse: collapse; font-size: var(--fs-sm);
+      table-layout: fixed;
+    }
+    .iv .ivcorr td {
+      padding: 4px 0; border-top: 1px solid var(--rule);
+      white-space: normal; overflow-wrap: anywhere;
+    }
+    .iv .ivcorr td:nth-child(1) { width: 44%; padding-right: 8px; }
+    .iv .ivcorr td:nth-child(2) { width: 24%; text-align: right; font-family: var(--font-mono); }
+    .iv .ivcorr td:nth-child(3) {
+      width: 32%; text-align: right; color: var(--ink-dim);
+      font-size: var(--fs-xs); padding-left: 10px;
+    }
+    .iv .ivmeta {
+      margin-top: 8px; font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-faint); line-height: 1.5;
+    }
+    .iv .ivnote { font-size: var(--fs-sm); color: var(--ink-dim); max-width: 84ch; }
     .page-head { margin-bottom: 20px; max-width: 84ch; }
     .page-head h1 {
       font-family: var(--font-display);
