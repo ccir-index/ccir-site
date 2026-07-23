@@ -55,7 +55,7 @@ const C4 = [
   { t: 'Mar-26', v: 28.4, est: false },
   { t: 'Apr-26', v: 43.7, est: true },
 ];
-const C4W = 700, C4H = 230, C4L = 56, C4R = 20, C4T = 18, C4B = 30;
+const C4W = 700, C4H = 258, C4L = 56, C4R = 20, C4T = 48, C4B = 30;
 const c4y = (v: number) => C4T + (1 - v / 48) * (C4H - C4T - C4B);
 const c4bw = 64;
 const c4x = (i: number) => C4L + 40 + i * 150;
@@ -285,7 +285,7 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
               </g>
             ))}
             <line x1={C4L} y1={c4y(0)} x2={C4W - C4R} y2={c4y(0)} class="axis" />
-            <g transform={`translate(${C4L + 4}, ${C4T + 4})`}>
+            <g transform={`translate(${C4L + 4}, 18)`}>
               <rect x="0" y="-9" width="10" height="10" class="colA" />
               <text x="16" y="0" class="ckey">quarter-end notional (10-K/10-Q)</text>
               <rect x="230" y="-9" width="10" height="10" class="colEst" />
@@ -303,26 +303,22 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         </figcaption>
       </figure>
       <p>
-        Meta's version of the same function runs through an unconsolidated
-        joint venture. Its Louisiana data-center venture — 20% owned,
-        equity-method, not consolidated because Meta "do[es] not have the
-        power to direct the activities that most significantly impact the
-        Venture's economic performance" — carries lease commitments
-        commencing 2029, and <strong>residual value guarantees with an
-        aggregate threshold of approximately $28 billion</strong>, for
-        which "no liability has been recorded to date" because payment is
-        judged not probable. Meta's disclosed maximum exposure to loss on
-        the venture is $46.0 billion. Oracle's pipeline contains a
-        smaller specimen: a lease within its $260 billion for which it
-        "guaranteed up to $3.3 billion of the lessor's borrowing." Same
-        economic act, three treatments: a fair-valued derivative with a
-        published notional, an RVG at zero, a guarantee inside a lease
-        footnote.
+        The same function appears in two other forms: Meta's Louisiana
+        data-center venture — unconsolidated, 20%-owned — carries
+        <strong>residual value guarantees with an aggregate threshold of
+        approximately $28 billion</strong> at zero recorded liability
+        (disclosed maximum exposure to loss: $46.0 billion), and Oracle's
+        lease pipeline includes a facility for which it "guaranteed up to
+        $3.3 billion of the lessor's borrowing." Same economic act, three
+        treatments — a fair-valued derivative, an RVG at zero, a guarantee
+        inside a lease footnote. These notionals are small next to the
+        $1.65 trillion; they matter because they are the purest form of
+        the pattern the next section documents at scale.
       </p>
     </section>
 
     <section class="sec">
-      <h2><span class="n">05</span> The other side of the same contracts</h2>
+      <h2><span class="n">05</span> The other side — and who owes it</h2>
       <p>
         A purchase commitment is a two-sided object, and four of the five
         companies also sell compute at scale. Their disclosed revenue
@@ -331,9 +327,8 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         Oracle $638 billion (from $138 billion a year earlier), Microsoft
         $633 billion, Alphabet $467.6 billion, Amazon $364 billion. In
         aggregate, the five companies' contracted future revenues exceed
-        their contracted future spending. The aggregate, once again,
-        conceals the dispersion — which is the actual analytical content
-        of the number:
+        their contracted future spending — the arithmetic that makes the
+        commitments look covered:
       </p>
       <figure class="chart-fig">
         <div class="fig-title">Commitments vs revenue backlog (RPO) · latest filings · $B</div>
@@ -373,18 +368,48 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         </figcaption>
       </figure>
       <p>
-        The same filings also show the two sides beginning to interlock.
-        Amazon's backlog includes an expanded OpenAI commitment of $138
-        billion — while Amazon separately reports a $15 billion investment
-        in OpenAI, a $35 billion equity commitment letter, and a financing
-        facility of up to $20 billion for Anthropic that unlocks "as we
-        reach certain delivery milestones of compute capacity." Alphabet
-        discloses agreements to supply "multiple gigawatts of TPU
-        hardware" — revenue in its backlog — while providing "credit
-        backstops to support third-party data centers and power
-        infrastructure" around those same deployments. The seller
-        financing its buyer, and the seller guaranteeing the facilities
-        its product runs in, are both now disclosed structures.
+        The comfort in that arithmetic depends entirely on who owes the
+        $2.1 trillion — and here the two sides of the ledger are not
+        symmetric. The commitments are owed <em>by</em> five of the
+        largest, most creditworthy balance sheets in existence, in
+        language they themselves describe as non-cancelable, unconditional,
+        or take-or-pay. The backlog is owed <em>to</em> them, and the
+        filings say less about by whom — but what they do say points the
+        same direction. Amazon is the only one that names a counterparty:
+        its backlog growth is driven by an OpenAI arrangement expanded by
+        $100 billion to $138 billion — while Amazon separately reports a
+        $15 billion investment in OpenAI, a $35 billion equity commitment
+        letter, and a financing facility of up to $20 billion for
+        Anthropic that unlocks "as we reach certain delivery milestones of
+        compute capacity." Oracle attributes its $500 billion backlog jump
+        to "certain significant cloud contracts," unnamed, expects only
+        12% of the total to convert to revenue within twelve months, and
+        states that returns on its infrastructure "are dependent on
+        customer demand and the ability of our key customers to meet
+        their contractual obligations." Microsoft's commercial backlog
+        grew 99% in the year it recapitalized its OpenAI relationship —
+        an equity-method stake with continuing revenue-sharing — and
+        Alphabet's includes "a limited number of agreements" to supply
+        multiple gigawatts of TPU hardware, around which Alphabet itself
+        provides the credit backstops of the previous section.
+      </p>
+      <p>
+        One disclosure mechanic keeps this concentration off the standard
+        screens: customer-concentration tests run on <em>recognized</em>
+        revenue. Oracle can state, accurately, that no customer accounted
+        for 10% or more of its total revenues in fiscal 2026 — while
+        attributing a $500 billion backlog increase to a small number of
+        contracts that have not begun converting. Backlog concentration
+        only surfaces in the concentration disclosures as the contracts
+        turn into revenue. So the honest restatement of the "hidden debt"
+        number is this: the obligations are disclosed, unconditional, and
+        owed by the strongest credits in the market; the receivables
+        covering them are concentrated in a limited number of
+        counterparties that are private, unrated, and — in the cases the
+        filings themselves disclose — financed in part by the sellers.
+        What the aggregate measures is not concealment but credit
+        transformation, and its scale is set by the weakest link in that
+        chain, not the strongest.
       </p>
       <figure class="chart-fig">
         <div class="fig-title">Commitments as a multiple of operating cash flow · trailing twelve months</div>
@@ -411,38 +436,23 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         </figcaption>
       </figure>
       <p>
-        The cross-section is the honest summary of the whole exercise.
-        Meta is the one pure buyer: the strongest commitment language of
-        the five, no compute revenue backlog against it, coverage running
-        entirely through advertising cash flow. Oracle carries the
-        largest lease pipeline, the longest terms, and the highest
-        commitment-to-cash-flow multiple, against the largest backlog —
-        its position is a contracted bet on that backlog converting.
-        Microsoft, Alphabet, and Amazon hold commitments matched or
-        exceeded by contracted revenue plus the largest operating cash
-        flows in corporate history. One aggregate number describes five
-        different balance sheets.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">06</span> Why a compute-credit record cares</h2>
-      <p>
-        These footnotes are not a sideshow to compute credit; they are its
-        collateral. The GPU-backed and offtake-backed facilities recorded
-        in the <a href="/credit">compute credit tracker</a> lend, in
-        substantial part, against exactly the commitments decomposed
-        above — a neocloud's contracted cash flows from an
-        investment-grade customer are that customer's purchase commitment
-        seen from the other end. The market already prices the
-        distinction this note draws: facilities backed by
-        investment-grade counterparty contracts have signed at materially
-        tighter spreads than facilities backed by unrated counterparties,
-        a gap visible in the instrument-level record. When a lender, a
-        rating agency, or an insurer asks what stands behind a compute
-        facility's revenue, the answer is one of the commitment categories
-        above — with its exact language, its conditionality, and now, in
-        Alphabet's case, a market-facing fair value.
+        The cross-section, then, is the honest summary. Meta is the one
+        pure buyer: the strongest commitment language of the five and no
+        contracted revenue against it — its coverage is advertising cash
+        flow, and its exposure is a return-on-investment question rather
+        than a counterparty one. Oracle is the concentrated
+        transformation trade: the largest lease pipeline, the longest
+        terms, and the highest commitment-to-cash-flow multiple, covered
+        by the largest and least-seasoned backlog. Microsoft, Alphabet,
+        and Amazon hold commitments matched or exceeded by contracted
+        revenue plus the largest operating cash flows in corporate
+        history — with their exposure concentrated in how much of the
+        backlog traces to the same few counterparties. One aggregate
+        number describes five different balance sheets. These same
+        commitments are the collateral of the compute-credit market —
+        the facilities in the <a href="/credit">compute credit
+        tracker</a> lend against exactly these promises, and price their
+        quality — which is why this record keeps them in view.
       </p>
       <p class="footnote">
         Sources — all figures from SEC filings, verified against the
