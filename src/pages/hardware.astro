@@ -348,18 +348,18 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
               <div class="ivband" style={`left:${p(v.lo)}%;width:${p(v.hi) - p(v.lo)}%`}></div>
               <div class="ivdot" style={`left:${p(v.base)}%`} title={`model ${fmtUsd(v.base)}`}></div>
               {v.ask != null && <div class="ivtick" style={`left:${p(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
-              {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)}`}></div>}
+              {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)} (n=${v.t90N})`}></div>}
               <span class="ivs0">0</span><span class="ivs1">{fmtK(v.smax)}</span>
             </div>
             {v.modeledOnly ? (
               <>
                 <div class="ivrow dim">not triangulated — no ask or executed lane yet</div>
-                <div class="ivrow dim">curve to {v.curveTo} · {v.rateStatus === 'Provisional' ? `provisional headline (n=${v.rateN})` : `n=${v.rateN}`} · vintage assumed</div>
+                <div class="ivrow dim">curve to {v.curveTo}{v.rateStatus === 'Provisional' ? ' · provisional headline' : ''} · vintage assumed</div>
               </>
             ) : (
               <>
                 <div class="ivrow"><span class="g g-ask"></span>ask {fmtUsd(v.ask)}<span class="dim"> · {v.ask ? (v.base / v.ask).toFixed(2) + '× model/ask' : ''}</span></div>
-                <div class="ivrow"><span class="g g-t90"></span>sold 90d {fmtUsd(v.t90)}<span class="dim"> · n={v.t90N}</span></div>
+                <div class="ivrow"><span class="g g-t90"></span>sold 90d {fmtUsd(v.t90)}</div>
               </>
             )}
             <div class="ivmeta">rate leg ${v.spot.toFixed(2)}/hr · {v.remaining.toFixed(1)}yr remaining at 6yr service life</div>
@@ -383,7 +383,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The sensitivity band re-runs the model over discount rates of
         10–25% crossed with service lives of 5–7 years and shows the
         min–max; utilization, margin, and decay are held at base. The
-        discount-rate band can be read against observed GPU-asset-backed
+        discount-rate band is anchored to observed GPU-asset-backed
         financing yields in CCIR's <a href="/credit">credit ledger</a> —
         see Method below.
         The executed
@@ -756,14 +756,15 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       </p>
       <p>
         <strong>Discount rate.</strong> The 15% base and the 10–25% band
-        are assumptions, disclosed rather than derived. They can be read
-        against CCIR's <a href="/credit">credit ledger</a>:
-        GPU-asset-backed facilities on record have signed at effective
-        all-in yields from roughly 15% (2023) to 7% (2026, rated). A
-        going-concern discount rate sits at or above the secured debt cost
-        of the same collateral, and the observed record skews to the
-        sector's largest, highest-rated borrowers — a floor on the
-        sector's cost of capital, not a typical operator's rate.
+        are anchored to observed pricing in CCIR's
+        <a href="/credit">credit ledger</a>: GPU-asset-backed facilities
+        on record have signed at effective all-in yields from roughly 15%
+        (2023) to 7% (2026, rated). A going-concern discount rate sits at
+        or above the secured debt cost of the same collateral. The
+        observed record skews to the sector's largest, highest-rated
+        borrowers — a floor on the sector's cost of capital — and the
+        band's width above that floor carries the equity premium and the
+        typical operator's higher funding cost.
       </p>
       <p>
         <strong>What is model and what is observed.</strong> Exactly one
@@ -773,8 +774,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         price with provenance. CCIR publishes no forecasts and no
         depreciation schedules; the model prices today's curve, not a
         predicted one. Statistics follow the methodology's stat policy:
-        medians shown with n on every cell; thin cells gated; windows
-        labeled on every display.
+        counts ship with every median in the series data; thin cells
+        gated; windows labeled on every display.
       </p>
     </section>
   </section>
