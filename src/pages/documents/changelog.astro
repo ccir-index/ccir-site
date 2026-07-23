@@ -14,10 +14,37 @@ import { meta } from '../../data/snapshot';
 // not named; membership is disclosed at class/count grain.
 const entries = [
   {
+    id: '260723-1',
+    date: '2026-07-23',
+    effective: '2026-07-23',
+    type: 'Provider change · realized',
+    restatement: 'None',
+    impact: 'Realized +1.8% (est. ≈ +1.9%) · T2 H100 OD US n 12 → 14',
+    title: 'v2.2.1 effective — realized decomposition',
+    body: [
+      `The additions announced 2026-07-15 took effect. Realized
+       with/without on the effective fixing: $3.68 with (n = 14) vs
+       $3.62 without (n = 12), +1.8% composition. Day-over-day +1.6% =
+       +1.8% composition − 0.3% market; use $3.62 for the market leg
+       across the boundary. The retirement contributed 0.0% by
+       construction. No comments were received by the close.`,
+      `Amended 2026-07-23: one flagged row — a price block whose
+       hardware identity rested on page-markup inference — entered two
+       A100 cells at this fixing contrary to the announcement's terms.
+       Published headlines were unaffected (median-rule cells); the
+       affected cells' count and maximum fields carried the row for one
+       fixing. Rows carrying that flag are excluded from every cell
+       from the 2026-07-24 fixing, forward-only. The operator's parent
+       publishes an operational rate table that disambiguates the
+       block's identity; the A100-80G on-demand rate enters from that
+       surface at the venue-labeled price from 2026-07-24.`,
+    ],
+  },
+  {
     id: '260715-4',
     date: '2026-07-15',
     effective: '2026-07-23',
-    type: 'Provider change · pending',
+    type: 'Provider change · realized 2026-07-23',
     restatement: 'None',
     impact: 'T2 H100 OD US: n 12 → 14, est. ≈ +1.9%; retirement: none',
     title: 'v2.2.1 — two sources proposed for the on-demand rate panel; one member retired',
