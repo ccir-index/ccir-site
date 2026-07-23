@@ -30,22 +30,33 @@ const IV_HOURS = 8766;
 const IV_BASE = { u: 0.75, m: 0.65, r: 0.15, g: 0.30, life: 6 };
 const IV_NOW = 2026 + (7 - 0.5) / 12;
 const IV_SPEC = [
-  { key: 'H100-80-SXM5', label: 'H100 SXM', model: 'H100', silicon: 'h100-sxm-80gb', vintage: 2023 + 2 / 12 },
-  { key: 'H200-141', label: 'H200', model: 'H200', silicon: 'h200-sxm-141gb', vintage: 2024 + 5 / 12 },
-  { key: 'A100-80-SXM4', label: 'A100 80GB', model: 'A100', silicon: 'a100-sxm-80gb', vintage: 2021 + 5 / 12 },
+  { key: 'H100-80-SXM5', label: 'H100 SXM', model: 'H100', silicon: 'h100-sxm-80gb', vintage: 2023 + 2 / 12, modeledOnly: false },
+  { key: 'H200-141', label: 'H200', model: 'H200', silicon: 'h200-sxm-141gb', vintage: 2024 + 5 / 12, modeledOnly: false },
+  { key: 'A100-80-SXM4', label: 'A100 80GB', model: 'A100', silicon: 'a100-sxm-80gb', vintage: 2021 + 5 / 12, modeledOnly: false },
+  // Modeled-only: no secondary-market tape lane exists for this chip yet, so
+  // the value is published without ask/executed triangulation (disclosed on
+  // the card and in Method). Committed curve observed to 1Y only — decay
+  // applies from the end of the observed curve. Vintage = volume
+  // availability, stated as assumed.
+  { key: 'B200-180-SXM6', label: 'B200 SXM', model: 'B200', silicon: 'b200-sxm-180gb', vintage: 2025 + 2 / 12, modeledOnly: true },
 ];
 function ivValue(spot: number, d: Record<string, number>, r: number, life: number, age: number,
                  g = IV_BASE.g, u = IV_BASE.u, m = IV_BASE.m): number {
   const c = (T: string) => spot * (1 - d[T]!);
-  // Bootstrap yearly average rates off the committed curve.
+  // Bootstrap yearly average rates off the committed curve; decay applies
+  // beyond the LAST OBSERVED tenor (year 3 where the curve reaches 3Y,
+  // year 1 where it stops at 1Y) — never a flat extension of missing tenors.
   const y1 = d['1Y'] != null ? c('1Y') : spot;
   const y2 = d['2Y'] != null ? 2 * c('2Y') - y1 : d['3Y'] != null ? (3 * c('3Y') - y1) / 2 : y1;
   const y3 = d['3Y'] != null && d['2Y'] != null ? 3 * c('3Y') - 2 * c('2Y') : y2;
+  const lastYr = d['3Y'] != null ? 3 : d['2Y'] != null ? 2 : 1;
+  const yObs = [y1, y2, y3];
   const rem = Math.max(0, life - age);
   const full = Math.floor(rem), frac = rem - full;
   let pv = 0;
   for (let i = 0; i < full + (frac > 0 ? 1 : 0); i++) {
-    const rate = i === 0 ? y1 : i === 1 ? y2 : i === 2 ? y3 : y3 * Math.pow(1 - g, i - 2);
+    const yr = i + 1;
+    const rate = yr <= lastYr ? yObs[i]! : yObs[lastYr - 1]! * Math.pow(1 - g, yr - lastYr);
     const fy = i < full ? 1 : frac;
     pv += (rate * IV_HOURS * fy * u * m) / Math.pow(1 + r, i + 0.5);
   }
@@ -59,7 +70,8 @@ const ivCards = IV_SPEC.map((s) => {
     if (r['band'] === 'NEOCLOUD' && r['silicon_id'] === s.silicon && r['metric'] === 'spread_to_spot')
       d[r['tenor']!] = -Number(r['value']);
   const hwm = hw.models.find((m: any) => m.key === s.key) as any;
-  if (!rrow || !Number.isFinite(spot) || d['3Y'] == null || !hwm) return null;
+  if (!rrow || !Number.isFinite(spot) || d['1Y'] == null) return null;
+  if (!s.modeledOnly && (d['3Y'] == null || !hwm)) return null;
   const age = IV_NOW - s.vintage;
   const base = ivValue(spot, d, IV_BASE.r, IV_BASE.life, age);
   const combos: number[] = [];
@@ -67,9 +79,12 @@ const ivCards = IV_SPEC.map((s) => {
   return {
     ...s, spot, base, lo: Math.min(...combos), hi: Math.max(...combos),
     remaining: Math.max(0, IV_BASE.life - age),
-    ask: hwm.ask?.med ?? null, askN: hwm.ask?.n ?? null, askSources: hwm.ask?.sources ?? null,
-    t90: hwm.t90?.med ?? null, t90N: hwm.t90?.n ?? null,
-    basis: hwm.basis?.usd ?? null, rateAsOf: rrow['as_of_date'],
+    ask: hwm?.ask?.med ?? null, askN: hwm?.ask?.n ?? null, askSources: hwm?.ask?.sources ?? null,
+    t90: hwm?.t90?.med ?? null, t90N: hwm?.t90?.n ?? null,
+    basis: hwm?.basis?.usd ?? null, rateAsOf: rrow['as_of_date'],
+    curveTo: d['3Y'] != null ? '3Y' : d['2Y'] != null ? '2Y' : '1Y',
+    rateN: Number(rrow['n_sources']) || null,
+    rateStatus: rrow['promotion_status'] ?? '',
   };
 }).filter((x): x is NonNullable<typeof x> => x != null);
 
@@ -260,7 +275,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: 'CCIR Secondary-Market Hardware Prices',
-    description: 'Income-derived, model-implied values for deployed datacenter GPUs (H100, H200, A100) computed from the CRI rental rate and committed term curve with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
+    description: 'Income-derived, model-implied values for deployed datacenter GPUs (H100, H200, A100, and B200 modeled-only) computed from the CRI rental rate and committed term curve with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a tape lane exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
     url: 'https://ccir.io/hardware',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2023-07/..',
@@ -318,33 +333,49 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       </p>
       <div class="ivgrid">
         {ivCards.map((v) => (
-          <div class="ivcard">
-            <div class="ivchip">{v.label}</div>
+          <div class={'ivcard' + (v.modeledOnly ? ' ivmodelonly' : '')}>
+            <div class="ivchip">{v.label}{v.modeledOnly && <span class="ivtag">modeled only</span>}</div>
             <div class="ivval">{fmtUsd(v.base)}</div>
             <div class="ivrange">{v.lo > 0
               ? `sensitivity ${fmtUsd(v.lo)} – ${fmtUsd(v.hi)} · disc 10–25% × life 5–7yr`
               : `sensitivity up to ${fmtUsd(v.hi)} · $0 at a 5-yr life`}</div>
-            <table class="ivcorr">
-              <tr>
-                <td>B2B channel ask</td>
-                <td>{fmtUsd(v.ask)}</td>
-                <td>{v.ask ? (v.base / v.ask).toFixed(2) + '× model/ask' : ''}</td>
-              </tr>
-              <tr>
-                <td>Executed, 90d</td>
-                <td>{fmtUsd(v.t90)}</td>
-                <td>{v.t90 && v.basis ? Math.round((100 * v.t90) / v.basis) + '% of launch basis' : `n=${v.t90N}`}</td>
-              </tr>
-            </table>
+            {v.modeledOnly ? (
+              <p class="ivonly">
+                Not triangulated: no secondary-market tape lane exists for
+                this chip yet — no ask panel, no executed record. Committed
+                curve observed to {v.curveTo} (decay applies beyond it);
+                rate leg is {v.rateStatus === 'Provisional' ? 'a provisional headline' : 'the headline'} (n={v.rateN}).
+                Volume-availability vintage assumed.
+              </p>
+            ) : (
+              <table class="ivcorr">
+                <tr>
+                  <td>B2B channel ask</td>
+                  <td>{fmtUsd(v.ask)}</td>
+                  <td>{v.ask ? (v.base / v.ask).toFixed(2) + '× model/ask' : ''}</td>
+                </tr>
+                <tr>
+                  <td>Executed, 90d</td>
+                  <td>{fmtUsd(v.t90)}</td>
+                  <td>{v.t90 && v.basis ? Math.round((100 * v.t90) / v.basis) + '% of launch basis' : `n=${v.t90N}`}</td>
+                </tr>
+              </table>
+            )}
             <div class="ivmeta">rate leg ${v.spot.toFixed(2)}/hr · {v.remaining.toFixed(1)}yr remaining at 6yr service life</div>
           </div>
         ))}
       </div>
       <p class="ivnote">
         Base case: year 1 at the 1Y committed rate, years 2–3 bootstrapped
-        from the 2Y/3Y committed curve, 30%/yr decay beyond the curve; 75%
+        from the 2Y/3Y committed curve, 30%/yr decay beyond the last
+        observed tenor of each chip's curve; 75%
         utilization; 65% net margin after power, colocation, and operations;
         15% discount rate; 6-year service life from volume availability.
+        Where a chip's committed curve ends short of year 3 (B200: 1Y),
+        decay applies from the end of its observed curve — missing tenors
+        are never extended flat. A chip with no secondary-market tape lane
+        is published <em>modeled only</em>, so marked, and carries no
+        ask or executed corroboration until one exists.
         The sensitivity band re-runs the model over discount rates of
         10–25% crossed with service lives of 5–7 years and shows the
         min–max; utilization, margin, and decay are held at base.
@@ -667,7 +698,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         output and is labeled as one everywhere it appears; the tapes below
         corroborate it, and the model-to-ask ratio and executed floor are
         shown beside every figure so the reader holds all three numbers at
-        once.
+        once. Where no tape lane exists for a chip (B200), the value is
+        published modeled-only and marked as such on its card: it is not
+        triangulated against asks or executed sales, its committed curve is
+        observed to 1Y with decay applied beyond, its rate leg is a
+        provisional headline, and its volume-availability vintage is
+        assumed rather than sourced. It graduates to the corroborated
+        treatment when a tape lane exists.
       </p>
       <p>
         <strong>Executed record.</strong> Dated, human-captured snapshots of
@@ -750,6 +787,16 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       font-family: var(--font-mono); font-size: var(--fs-sm);
       letter-spacing: 0.04em; color: var(--ink-dim);
       text-transform: uppercase;
+    }
+    .iv .ivtag {
+      font-family: var(--font-mono); font-size: 0.72em;
+      letter-spacing: 0.06em; color: var(--ink-dim);
+      border: 1px solid var(--rule); padding: 1px 6px;
+      margin-left: 8px; vertical-align: 1px;
+    }
+    .iv .ivonly {
+      font-size: var(--fs-sm); color: var(--ink-dim);
+      margin: 10px 0 8px; line-height: 1.45;
     }
     .iv .ivval {
       font-family: var(--font-display); font-size: var(--fs-2xl);
