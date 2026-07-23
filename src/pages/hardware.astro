@@ -328,8 +328,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <p class="secintro">
         Model-implied value of a deployed unit, derived from the CRI T2
         (neocloud) US guaranteed on-demand rate and the neocloud committed
-        term curve as of {ivCards[0]?.rateAsOf}. Not a transacted price —
-        the corroborating tapes are beside each figure.
+        term curve, recomputed on each daily data refresh. Not a transacted
+        price — the corroborating tapes are beside each figure.
       </p>
       <div class="ivgrid">
         {ivCards.map((v) => (
@@ -379,7 +379,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The sensitivity band re-runs the model over discount rates of
         10–25% crossed with service lives of 5–7 years and shows the
         min–max; utilization, margin, and decay are held at base.
-        Recomputed on every data refresh. The executed
+        The executed
         lane <em>informs</em> a loss-given-default floor rather than being
         one: single-unit retail clearings can sit above or below a bulk
         disposition, and no current tape measures market impact at volume.
