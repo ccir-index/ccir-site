@@ -25,6 +25,18 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
   title="AI Commitments Monitor — Big Tech Off-Balance-Sheet Obligations · CCIR"
   description="A filings-season tracker of Big Tech's AI infrastructure commitments: leases not yet commenced, purchase obligations, remaining performance obligations (RPO), and credit-support instruments for Meta, Alphabet, Microsoft, Oracle, and Amazon — every figure windowed and traced to its SEC accession."
 >
+  <nav class="apps-navband" aria-label="credit section">
+    <div class="wrap apps-nav-inner">
+      <span class="hub-group">
+        <a class="apps-nav-link hub-link" href="/credit">Instruments</a>
+        <span class="hub-sep" aria-hidden="true">·</span>
+        <a class="apps-nav-link hub-link" href="/credit/series">Series</a>
+        <span class="hub-sep" aria-hidden="true">·</span>
+        <span class="apps-nav-link hub-link hub-on">Commitments</span>
+      </span>
+    </div>
+  </nav>
+
   <section class="wrap top">
     <header class="page-head">
       <div class="kicker">Credit · living surface · updated each filing season</div>
@@ -149,6 +161,26 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
 
   <style>
     .top { padding-top: 32px; }
+    .apps-navband {
+      position: sticky; top: 0; z-index: 40;
+      background: var(--bg); border-bottom: 1px solid var(--rule);
+    }
+    .apps-nav-inner {
+      display: flex; align-items: center; gap: 24px;
+      overflow-x: auto; scrollbar-width: none;
+      padding-top: 9px; padding-bottom: 9px;
+    }
+    .apps-nav-inner::-webkit-scrollbar { display: none; }
+    .apps-nav-link {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      text-transform: uppercase; letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim); text-decoration: none; white-space: nowrap;
+    }
+    .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
+    .hub-group { display: inline-flex; align-items: center; gap: 10px; }
+    .hub-link { font-weight: var(--weight-strong); }
+    .hub-on { color: var(--accent); }
+    .hub-sep { color: var(--ink-faint); }
     .page-head { max-width: 84ch; margin-bottom: 16px; }
     .page-head h1 {
       font-family: var(--font-display);
