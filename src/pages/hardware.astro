@@ -307,19 +307,17 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <h1>The Secondary Market</h1>
       <p class="subhead">What a deployed GPU is worth as an earning asset — and what machines list and sell for.</p>
       <p class="standfirst">
-        Compute credit is moving from offtake-backed toward asset-based, and
-        asset-based underwriting needs two numbers. The first is a
-        going-concern value: what the machine is worth deployed and earning,
-        disposed at volume through business channels. CCIR derives that
-        number from its own benchmark — the CRI rental rate and committed
-        term curve price the income a deployed GPU can contract for, and an
-        income approach over that curve yields a <strong>model-implied
-        value</strong>, every assumption disclosed below. The second is a
+        Underwriting hardware takes two numbers. The first is a
+        going-concern value: what a machine is worth deployed and earning,
+        disposed at volume through business channels. CCIR derives it from
+        its own benchmark — an income approach over the CRI rental rate and
+        committed term curve, yielding a <strong>model-implied value</strong>
+        with every assumption disclosed below. The second is a
         loss-given-default floor: what hardware clears at when it must be
         sold. That number stays observational — executed sales and posted
-        asks, kept in separate lanes, every figure carrying its count, its
-        window, and its provenance. The model is corroborated by the tape;
-        where they diverge, the divergence itself is the credit information.
+        asks, kept in separate lanes with count, window, and provenance.
+        Where the model and the tape diverge, the divergence is the credit
+        information.
       </p>
     </header>
 
