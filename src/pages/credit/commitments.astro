@@ -49,7 +49,7 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
       <div class="tile"><div class="tlab">Revenue backlog (RPO), four sellers</div><div class="tval">{fmtB(sumR, 0)}</div></div>
     </div>
 
-    <section class="sec">
+    <section class="sec monwide">
       <h2><span class="n">§</span> The monitor</h2>
       <div class="tblwrap">
         <table class="mon">
@@ -167,7 +167,11 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
     .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
     .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; max-width: 80ch; }
     .tblwrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
-    table.mon { width: 100%; min-width: 860px; border-collapse: collapse; font-size: var(--fs-sm); }
+    .sec.monwide { max-width: none; }
+    table.mon { width: 100%; min-width: 1120px; border-collapse: collapse; font-size: var(--fs-sm); }
+    table.mon th:nth-child(1) { width: 13%; }
+    table.mon th:nth-child(2), table.mon th:nth-child(3), table.mon th:nth-child(4) { width: 24%; }
+    table.mon th:nth-child(5) { width: 15%; }
     table.mon th { text-align: left; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); border-bottom: 1px solid var(--rule); padding: 10px 12px; }
     table.mon td { vertical-align: top; border-bottom: 1px solid var(--rule); padding: 10px 12px; line-height: 1.45; }
     table.mon td.co { font-weight: var(--weight-strong); white-space: nowrap; }
