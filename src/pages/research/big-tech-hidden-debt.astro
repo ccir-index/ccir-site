@@ -504,11 +504,14 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
     .cval { font-size: 12px; fill: var(--ink); }
     .ckey { font-size: 11px; fill: var(--ink-dim); }
     .cmeta { font-size: 10.5px; fill: var(--ink-faint); }
-    table.spec { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); margin: 6px 0 14px; }
+    table.spec { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: var(--fs-sm); margin: 6px 0 14px; }
     table.spec th { text-align: left; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); border-bottom: 1px solid var(--rule); padding: 6px 10px 6px 0; }
-    table.spec td { vertical-align: top; border-bottom: 1px solid var(--rule); padding: 8px 10px 8px 0; line-height: 1.5; }
-    table.spec td:first-child { white-space: nowrap; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink); }
-    table.spec td:last-child { white-space: nowrap; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); }
+    table.spec th:nth-child(1), table.spec td:nth-child(1) { width: 21%; }
+    table.spec th:nth-child(2), table.spec td:nth-child(2) { width: 63%; }
+    table.spec th:nth-child(3), table.spec td:nth-child(3) { width: 16%; }
+    table.spec td { vertical-align: top; border-bottom: 1px solid var(--rule); padding: 8px 10px 8px 0; line-height: 1.5; overflow-wrap: break-word; }
+    table.spec td:first-child { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink); }
+    table.spec td:last-child { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); }
     .footnote {
       font-size: var(--fs-sm);
       color: var(--ink-faint);
@@ -517,8 +520,5 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
       max-width: 74ch;
     }
     .footnote a { color: var(--accent); }
-    @media (max-width: 640px) {
-      table.spec td:first-child, table.spec td:last-child { white-space: normal; }
-    }
   </style>
 </Base>
