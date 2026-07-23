@@ -76,17 +76,22 @@ const ivCards = IV_SPEC.map((s) => {
   const base = ivValue(spot, d, IV_BASE.r, IV_BASE.life, age);
   const combos: number[] = [];
   for (const rr of [0.10, 0.15, 0.25]) for (const lf of [5, 6, 7]) combos.push(ivValue(spot, d, rr, lf, age));
+  const ask = hwm?.ask?.med ?? null;
+  const t90 = hwm?.t90?.med ?? null;
+  // Strip scale: zero-anchored so mark positions read as magnitudes.
+  const smax = Math.max(...combos, base, ask ?? 0, t90 ?? 0) * 1.06;
   return {
-    ...s, spot, base, lo: Math.min(...combos), hi: Math.max(...combos),
+    ...s, spot, base, lo: Math.min(...combos), hi: Math.max(...combos), smax,
     remaining: Math.max(0, IV_BASE.life - age),
-    ask: hwm?.ask?.med ?? null, askN: hwm?.ask?.n ?? null, askSources: hwm?.ask?.sources ?? null,
-    t90: hwm?.t90?.med ?? null, t90N: hwm?.t90?.n ?? null,
+    ask, askN: hwm?.ask?.n ?? null, askSources: hwm?.ask?.sources ?? null,
+    t90, t90N: hwm?.t90?.n ?? null,
     basis: hwm?.basis?.usd ?? null, rateAsOf: rrow['as_of_date'],
     curveTo: d['3Y'] != null ? '3Y' : d['2Y'] != null ? '2Y' : '1Y',
     rateN: Number(rrow['n_sources']) || null,
     rateStatus: rrow['promotion_status'] ?? '',
   };
-}).filter((x): x is NonNullable<typeof x> => x != null);
+}).filter((x): x is NonNullable<typeof x> => x != null)
+  .sort((a, b) => b.base - a.base);
 
 type Pt = { m: string; med: number | null; n: number; units: number; med3: number | null; n3: number };
 const charted = hw.models.filter((m) => m.charted);
@@ -332,39 +337,38 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         price — the corroborating tapes are beside each figure.
       </p>
       <div class="ivgrid">
-        {ivCards.map((v) => (
+        {ivCards.map((v) => {
+          const p = (x: number) => (100 * x) / v.smax;
+          return (
           <div class={'ivcard' + (v.modeledOnly ? ' ivmodelonly' : '')}>
             <div class="ivchip">{v.label}{v.modeledOnly && <span class="ivtag">modeled only</span>}</div>
             <div class="ivval">{fmtUsd(v.base)}</div>
-            <div class="ivrange">{v.lo > 0
-              ? `sensitivity ${fmtUsd(v.lo)} – ${fmtUsd(v.hi)} · disc 10–25% × life 5–7yr`
-              : `sensitivity up to ${fmtUsd(v.hi)} · $0 at a 5-yr life`}</div>
+            <div class="ivrange">sensitivity {fmtK(v.lo)} – {fmtK(v.hi)}</div>
+            <div class="ivstrip" aria-hidden="true">
+              <div class="ivband" style={`left:${p(v.lo)}%;width:${p(v.hi) - p(v.lo)}%`}></div>
+              <div class="ivdot" style={`left:${p(v.base)}%`} title={`model ${fmtUsd(v.base)}`}></div>
+              {v.ask != null && <div class="ivtick" style={`left:${p(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
+              {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)}`}></div>}
+              <span class="ivs0">0</span><span class="ivs1">{fmtK(v.smax)}</span>
+            </div>
             {v.modeledOnly ? (
-              <p class="ivonly">
-                Not triangulated: no secondary-market tape lane exists for
-                this chip yet — no ask panel, no executed record. Committed
-                curve observed to {v.curveTo} (decay applies beyond it);
-                rate leg is {v.rateStatus === 'Provisional' ? 'a provisional headline' : 'the headline'} (n={v.rateN}).
-                Volume-availability vintage assumed.
-              </p>
+              <>
+                <div class="ivrow dim">not triangulated — no ask or executed lane yet</div>
+                <div class="ivrow dim">curve to {v.curveTo} · {v.rateStatus === 'Provisional' ? `provisional headline (n=${v.rateN})` : `n=${v.rateN}`} · vintage assumed</div>
+              </>
             ) : (
-              <table class="ivcorr">
-                <tr>
-                  <td>B2B channel ask</td>
-                  <td>{fmtUsd(v.ask)}</td>
-                  <td>{v.ask ? (v.base / v.ask).toFixed(2) + '× model/ask' : ''}</td>
-                </tr>
-                <tr>
-                  <td>Executed, 90d</td>
-                  <td>{fmtUsd(v.t90)}</td>
-                  <td>{v.t90 && v.basis ? Math.round((100 * v.t90) / v.basis) + '% of launch basis' : `n=${v.t90N}`}</td>
-                </tr>
-              </table>
+              <>
+                <div class="ivrow"><span class="g g-ask"></span>ask {fmtUsd(v.ask)}<span class="dim"> · {v.ask ? (v.base / v.ask).toFixed(2) + '× model/ask' : ''}</span></div>
+                <div class="ivrow"><span class="g g-t90"></span>sold 90d {fmtUsd(v.t90)}<span class="dim"> · n={v.t90N}</span></div>
+              </>
             )}
             <div class="ivmeta">rate leg ${v.spot.toFixed(2)}/hr · {v.remaining.toFixed(1)}yr remaining at 6yr service life</div>
           </div>
-        ))}
+          );
+        })}
       </div>
+      <details class="ivnote-d">
+      <summary>Model assumptions & sensitivity</summary>
       <p class="ivnote">
         Base case: year 1 at the 1Y committed rate, years 2–3 bootstrapped
         from the 2Y/3Y committed curve, 30%/yr decay beyond the last
@@ -384,27 +388,14 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         one: single-unit retail clearings can sit above or below a bulk
         disposition, and no current tape measures market impact at volume.
       </p>
+      </details>
     </section>
 
     <section class="sec forward">
-      <h2><span class="n">§</span> The record from here</h2>
-      <p>
-        From July 2026 forward the record is collected directly: executed
-        sales captured weekly; posted asks captured on a daily and weekly
-        cadence across an official marketplace API and a dealer cohort;
-        every capture archived at collection time under the same
-        provenance rules. What accumulates is the series the parties to a
-        facility can size against — executed medians as recovery evidence,
-        the ask panel as replacement cost and market depth between sales,
-        and the spread between the two lanes as an observed liquidity
-        haircut. Today, credit documents overwhelmingly amortize GPU
-        collateral to zero — not because the hardware is worthless, but
-        because no reference existed. As the record deepens, lenders and
-        borrowers get the same neutral data points to size against.
-      </p>
+      <h2><span class="n">§</span> Contribute to the record</h2>
       <div class="cta-box">
         <p>
-          <strong>Contribute to the record.</strong> If you buy, sell,
+          If you buy, sell,
           broker, finance, or insure this hardware and hold executed price
           records — dealer sales, disposal and auction results, broker
           quotes, portfolio liquidations — CCIR accepts contributed data
@@ -424,8 +415,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     <section class="sec">
       <h2><span class="n">§</span> Available today</h2>
       <p class="secintro">
-        The reconstruction below is the runway; the collected panel is the
-        tape. Three years of executed sales (July 2023 – July 2026; 3,564
+        Three years of executed sales (July 2023 – July 2026; 3,564
         sold listings, 15,155 units, $28.9M documented) beside the asks
         posted today across an official marketplace API and a named dealer
         cohort — the rental market prices an hour of compute; this page
@@ -756,8 +746,21 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <p>
         <strong>The record from here.</strong> The history above is
         reconstructed from dated captures and archives; it ends where the
-        archives end. Collection terms, cadence, and the contribution
-        lane are at the top of this page.
+        archives end. From July 2026 forward the record is collected
+        directly — executed sales weekly, posted asks on a daily and
+        weekly cadence — with every capture archived at collection time
+        under the same provenance rules. The contribution lane is above.
+      </p>
+      <p>
+        <strong>Discount rate.</strong> The 15% base and the 10–25% band
+        are assumptions, disclosed rather than derived. They can be read
+        against CCIR's <a href="/credit">credit ledger</a>:
+        GPU-asset-backed facilities on record have signed at effective
+        all-in yields from roughly 15% (2023) to 7% (2026, rated). A
+        going-concern discount rate sits at or above the secured debt cost
+        of the same collateral, and the observed record skews to the
+        sector's largest, highest-rated borrowers — a floor on the
+        sector's cost of capital, not a typical operator's rate.
       </p>
       <p>
         <strong>What is model and what is observed.</strong> Exactly one
@@ -794,37 +797,71 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       border: 1px solid var(--rule); padding: 1px 6px;
       margin-left: 8px; vertical-align: 1px;
     }
-    .iv .ivonly {
-      font-size: var(--fs-sm); color: var(--ink-dim);
-      margin: 10px 0 8px; line-height: 1.45;
-    }
     .iv .ivval {
       font-family: var(--font-display); font-size: var(--fs-2xl);
       font-weight: var(--weight-display); margin: 2px 0 0;
     }
     .iv .ivrange {
       font-family: var(--font-mono); font-size: var(--fs-xs);
-      color: var(--ink-dim); margin-bottom: 10px;
+      color: var(--ink-dim); margin-bottom: 2px;
     }
-    .iv .ivcorr {
-      width: 100%; border-collapse: collapse; font-size: var(--fs-sm);
-      table-layout: fixed;
+    /* Triangulation strip: zero-anchored dollar scale — band = sensitivity,
+       dot = model base, tick = posted ask, diamond = executed 90d. */
+    .iv .ivstrip { position: relative; height: 30px; margin: 4px 0 10px; }
+    .iv .ivstrip::before {
+      content: ''; position: absolute; left: 0; right: 0; top: 9px;
+      height: 1px; background: var(--rule);
     }
-    .iv .ivcorr td {
-      padding: 4px 0; border-top: 1px solid var(--rule);
-      white-space: normal; overflow-wrap: anywhere;
+    .iv .ivband {
+      position: absolute; top: 6px; height: 7px; border-radius: 3.5px;
+      background: var(--accent); opacity: 0.16;
     }
-    .iv .ivcorr td:nth-child(1) { width: 44%; padding-right: 8px; }
-    .iv .ivcorr td:nth-child(2) { width: 24%; text-align: right; font-family: var(--font-mono); }
-    .iv .ivcorr td:nth-child(3) {
-      width: 32%; text-align: right; color: var(--ink-dim);
-      font-size: var(--fs-xs); padding-left: 10px;
+    .iv .ivdot {
+      position: absolute; top: 9.5px; width: 9px; height: 9px;
+      border-radius: 50%; background: var(--accent);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 2px var(--surface);
+    }
+    .iv .ivtick {
+      position: absolute; top: 3px; width: 2px; height: 13px;
+      background: var(--ink); transform: translateX(-50%);
+    }
+    .iv .ivdia {
+      position: absolute; top: 9.5px; width: 7px; height: 7px;
+      background: var(--ink-dim);
+      transform: translate(-50%, -50%) rotate(45deg);
+      box-shadow: 0 0 0 2px var(--surface);
+    }
+    .iv .ivs0, .iv .ivs1 {
+      position: absolute; top: 17px; font-family: var(--font-mono);
+      font-size: 10px; color: var(--ink-faint);
+    }
+    .iv .ivs0 { left: 0; }
+    .iv .ivs1 { right: 0; }
+    .iv .ivrow {
+      font-size: var(--fs-sm); padding: 3px 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .iv .ivrow .dim, .iv .ivrow.dim { color: var(--ink-dim); }
+    .iv .ivrow.dim { font-family: var(--font-mono); font-size: var(--fs-xs); }
+    .iv .g {
+      display: inline-block; margin-right: 7px; vertical-align: -1px;
+    }
+    .iv .g-ask { width: 2px; height: 11px; background: var(--ink); }
+    .iv .g-t90 {
+      width: 7px; height: 7px; background: var(--ink-dim);
+      transform: rotate(45deg); vertical-align: 0;
     }
     .iv .ivmeta {
       margin-top: 8px; font-family: var(--font-mono); font-size: var(--fs-xs);
       color: var(--ink-faint); line-height: 1.5;
     }
-    .iv .ivnote { font-size: var(--fs-sm); color: var(--ink-dim); max-width: 84ch; }
+    .iv .ivnote { font-size: var(--fs-sm); color: var(--ink-dim); max-width: 84ch; margin-top: 10px; }
+    .iv .ivnote-d summary {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-dim); cursor: pointer; letter-spacing: 0.03em;
+    }
+    .iv .ivnote-d summary:hover { color: var(--ink); }
     .page-head { margin-bottom: 20px; max-width: 84ch; }
     .page-head h1 {
       font-family: var(--font-display);
