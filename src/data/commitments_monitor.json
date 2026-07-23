@@ -1,0 +1,61 @@
+{
+  "as_of": "2026-07-22",
+  "next_expected": "Microsoft 10-K FY2026 (fiscal year ended June 30, 2026), expected late July 2026",
+  "companies": [
+    {
+      "key": "meta",
+      "name": "Meta",
+      "latest_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001628280-26-028526",
+      "prior_filing": "10-K FY2025 (period 2025-12-31), acc 0001628280-26-003942",
+      "leases_nyc": { "v": 182.88, "w": "Mar-26", "pv": 103.77, "pw": "Dec-25" },
+      "purchase": { "v": 237.67, "w": "Mar-26", "pv": 131.05, "pw": "Dec-25", "note": "non-cancelable; +~$24B added Apr-26 (subsequent event); excludes $14.72B contingent cloud capacity" },
+      "rpo": { "v": null, "w": "Mar-26", "pv": null, "pw": "Dec-25", "note": "no compute revenue backlog" },
+      "support": { "v": 28.0, "w": "Mar-26", "label": "RVG threshold, unconsolidated Louisiana venture (recorded liability $0; max exposure $46.0B)" },
+      "ocf_ttm": 124.0
+    },
+    {
+      "key": "alphabet",
+      "name": "Alphabet",
+      "latest_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001652044-26-000048",
+      "prior_filing": "10-K FY2025 (period 2025-12-31), acc 0001652044-26-000018",
+      "leases_nyc": { "v": 75.6, "w": "Mar-26", "pv": 58.5, "pw": "Dec-25" },
+      "purchase": { "v": 332.4, "w": "Mar-26", "pv": 149.1, "pw": "Dec-25", "note": "MD&A total incl. open purchase orders; $138.0B short-term; note-level fixed/minimum supply+energy+content = $232.7B" },
+      "rpo": { "v": 467.6, "w": "Mar-26", "pv": 242.8, "pw": "Dec-25", "note": "$462.3B Google Cloud; Q1-26 definition change adds ≤1-yr contracts (~$7.3B); incl. multi-gigawatt TPU supply agreements" },
+      "support": { "v": 28.4, "w": "Mar-26", "label": "data-center backstops as credit derivatives, notional (was $16.9B Dec-25, $0 Dec-24); +~$15.3B Apr-26; framework up to $33.3B; separately $9.0B energy financial guarantees" },
+      "ocf_ttm": 174.4
+    },
+    {
+      "key": "microsoft",
+      "name": "Microsoft",
+      "latest_filing": "10-Q Q3 FY2026 (period 2026-03-31), acc 0001193125-26-191507",
+      "prior_filing": "10-K FY2025 (period 2025-06-30), acc 0000950170-25-100235",
+      "leases_nyc": { "v": 196.6, "w": "Mar-26", "pv": 92.7, "pw": "Jun-25" },
+      "purchase": { "v": 142.05, "w": "Jun-25", "pv": null, "pw": "", "note": "$109.95B purchase (take-or-pay + open POs) + $32.1B construction; 10-K table only — first refresh lands with the FY26 10-K" },
+      "rpo": { "v": 633.0, "w": "Mar-26", "pv": 375.0, "pw": "Jun-25", "note": "$627B commercial (+99% y/y), weighted-avg duration ~2.5 yrs" },
+      "support": { "v": null, "w": "", "label": "none disclosed as a separate category" },
+      "ocf_ttm": 170.2
+    },
+    {
+      "key": "oracle",
+      "name": "Oracle",
+      "latest_filing": "10-K FY2026 (period 2026-05-31), acc 0001193125-26-277521",
+      "prior_filing": "10-K FY2022 (period 2022-05-31), acc 0001564590-22-023675 — earliest comparable for leases",
+      "leases_nyc": { "v": 260.0, "w": "May-26", "pv": 4.1, "pw": "May-22", "note": "terms 15–19 yrs, commencing FY27–FY29; includes a lease with $3.3B guarantee of the lessor's borrowing (matures Sep-26)" },
+      "purchase": { "v": 13.31, "w": "May-26", "pv": null, "pw": "", "note": "unconditional, primarily data-center power; +$19B cloud-infrastructure purchase commitments signed after year-end (subsequent event)" },
+      "rpo": { "v": 638.0, "w": "May-26", "pv": 138.0, "pw": "May-25", "note": "~12% expected to convert to revenue within 12 months; increase attributed to 'certain significant cloud contracts,' unnamed" },
+      "support": { "v": 3.3, "w": "May-26", "label": "guarantee of a lessor's borrowing within the lease pipeline" },
+      "ocf_ttm": 32.0
+    },
+    {
+      "key": "amazon",
+      "name": "Amazon",
+      "latest_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001018724-26-000014",
+      "prior_filing": "10-K FY2025 (period 2025-12-31), acc 0001018724-26-000004",
+      "leases_nyc": { "v": 106.35, "w": "Mar-26", "pv": 96.37, "pw": "Dec-25" },
+      "purchase": { "v": 122.58, "w": "Mar-26", "pv": 103.64, "pw": "Dec-25", "note": "$103.77B unconditional purchase obligations + $18.81B other commitments" },
+      "rpo": { "v": 364.0, "w": "Mar-26", "pv": 244.0, "pw": "Dec-25", "note": "AWS, contracts >1 yr, weighted-avg life 5.5 yrs; growth driven by OpenAI arrangement expanded $100B to $138B" },
+      "support": { "v": null, "w": "", "label": "none disclosed as backstop/guarantee; related: $20B milestone-linked Anthropic financing facility, $35B OpenAI equity commitment letter" },
+      "ocf_ttm": 148.5
+    }
+  ]
+}

@@ -77,7 +77,8 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
       <div class="kicker">Research · {AS_OF} · filings</div>
       <h1>Breaking Down Big Tech's $1.65 Trillion "Hidden Debt"</h1>
       <p class="standfirst">
-        A widely covered Nikkei study put the off-balance-sheet AI
+        A widely covered <a href="https://asia.nikkei.com/business/technology/five-us-tech-giants-hidden-debts-soar-to-1.65tn-on-opaque-ai-funding">Nikkei
+        study</a> put the off-balance-sheet AI
         commitments of Alphabet, Amazon, Meta, Microsoft, and Oracle at
         $1.65 trillion — 122% of their reported debt — under the headline
         of "hidden debts." This note rebuilds that number from the five
@@ -99,7 +100,12 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         <strong>${(SUM_T / 1000).toFixed(2)} trillion</strong>: about
         ${SUM_L.toFixed(0)} billion of leases signed but not yet
         commenced, and about ${SUM_P.toFixed(0)} billion of purchase and
-        other contractual commitments. The aggregate is real, and none of
+        other contractual commitments. In plain terms: the first bucket is
+        rent — signed leases on data centers still under construction,
+        with payments that begin when the buildings are delivered. The
+        second is bills — contracts to buy chips, power, and cloud
+        capacity, counted at the minimums the companies cannot walk away
+        from. The aggregate is real, and none of
         it is hidden in any ordinary sense — every figure in this note
         comes from the commitments and leases notes of documents filed
         with the SEC, where the accounting standards require them to be
@@ -452,7 +458,10 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         commitments are the collateral of the compute-credit market —
         the facilities in the <a href="/credit">compute credit
         tracker</a> lend against exactly these promises, and price their
-        quality — which is why this record keeps them in view.
+        quality — which is why this record keeps them in view. This note
+        is dated; the quantities it decomposes are maintained, filing by
+        filing, on the <a href="/credit/commitments">AI commitments
+        monitor</a>.
       </p>
       <p class="footnote">
         Sources — all figures from SEC filings, verified against the
@@ -464,9 +473,10 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         March 31, 2026 (0001193125-26-191507) and 10-K FY2025
         (0000950170-25-100235); Oracle 10-K FY2026 (0001193125-26-277521)
         and 10-K FY2022 (0001564590-22-023675). The $1.65 trillion
-        aggregate and "hidden debts" characterization: Nikkei Asia, "Five
-        US tech giants' hidden debts soar to $1.65tn on opaque AI
-        funding" (July 2026). Quotations are verbatim from the filings.
+        aggregate and "hidden debts" characterization:
+        <a href="https://asia.nikkei.com/business/technology/five-us-tech-giants-hidden-debts-soar-to-1.65tn-on-opaque-ai-funding">Nikkei
+        Asia, "Five US tech giants' hidden debts soar to $1.65tn on
+        opaque AI funding"</a> (July 2026). Quotations are verbatim from the filings.
         Nothing here is a solvency opinion, a forecast, or investment
         advice; CCIR publishes reference data and records.
       </p>

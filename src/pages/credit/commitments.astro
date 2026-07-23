@@ -1,0 +1,183 @@
+---
+import Base from '../../layouts/Base.astro';
+import mon from '../../data/commitments_monitor.json';
+
+/*
+  Living surface — the AI commitments monitor. Tracks, per filing season,
+  the demand-side commitment quantities that back compute credit: leases
+  signed but not yet commenced, purchase/other commitments, remaining
+  performance obligations (revenue backlog), and disclosed support
+  instruments (backstops, RVGs, guarantees) for the five largest AI
+  buyers. Data lives in src/data/commitments_monitor.json — update that
+  file each 10-Q/10-K and this page recomputes. Launch analysis:
+  /research/big-tech-hidden-debt (dated note, 2026-07-22).
+*/
+const fmtB = (v: number | null | undefined, dp = 1) =>
+  v == null ? '—' : '$' + v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: dp }) + 'B';
+const delta = (m: any) =>
+  m.v != null && m.pv != null ? (m.v >= m.pv ? '+' : '−') + Math.abs(m.v - m.pv).toFixed(1) : null;
+
+const sumL = mon.companies.reduce((s, c) => s + (c.leases_nyc.v ?? 0), 0);
+const sumP = mon.companies.reduce((s, c) => s + (c.purchase.v ?? 0), 0);
+const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
+---
+<Base
+  title="AI Commitments Monitor — Big Tech Off-Balance-Sheet Obligations · CCIR"
+  description="A filings-season tracker of Big Tech's AI infrastructure commitments: leases not yet commenced, purchase obligations, remaining performance obligations (RPO), and credit-support instruments for Meta, Alphabet, Microsoft, Oracle, and Amazon — every figure windowed and traced to its SEC accession."
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Credit · living surface · updated each filing season</div>
+      <h1>AI Commitments Monitor</h1>
+      <p class="standfirst">
+        The demand-side commitments that back compute credit, tracked from
+        the SEC filings of the five largest AI buyers. Two footnote
+        quantities — in plain terms, <em>rent</em> (leases signed on data
+        centers still under construction) and <em>bills</em> (contracts to
+        buy chips, power, and capacity at stated minimums) — plus the
+        revenue backlog on the other side of the same contracts, and the
+        support instruments written around them. Every figure carries its
+        window and traces to an accession number. As of {mon.as_of};
+        next expected update: {mon.next_expected}.
+      </p>
+    </header>
+
+    <div class="tiles">
+      <div class="tile"><div class="tlab">Leases not yet commenced</div><div class="tval">{fmtB(sumL, 0)}</div></div>
+      <div class="tile"><div class="tlab">Purchase &amp; other commitments</div><div class="tval">{fmtB(sumP, 0)}</div></div>
+      <div class="tile"><div class="tlab">Combined</div><div class="tval">{fmtB(sumL + sumP, 0)}</div></div>
+      <div class="tile"><div class="tlab">Revenue backlog (RPO), four sellers</div><div class="tval">{fmtB(sumR, 0)}</div></div>
+    </div>
+
+    <section class="sec">
+      <h2><span class="n">§</span> The monitor</h2>
+      <div class="tblwrap">
+        <table class="mon">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Leases not yet commenced</th>
+              <th>Purchase &amp; other commitments</th>
+              <th>Revenue backlog (RPO)</th>
+              <th>Support instruments</th>
+            </tr>
+          </thead>
+          <tbody>
+            {mon.companies.map((c) => (
+              <tr>
+                <td class="co">{c.name}<div class="fil">{c.latest_filing}</div></td>
+                <td>
+                  <span class="v">{fmtB(c.leases_nyc.v)}</span> <span class="w">{c.leases_nyc.w}</span>
+                  {delta(c.leases_nyc) && <div class="d">{delta(c.leases_nyc)} vs {c.leases_nyc.pw} ({fmtB(c.leases_nyc.pv)})</div>}
+                  {'note' in c.leases_nyc && c.leases_nyc.note && <div class="nt">{c.leases_nyc.note}</div>}
+                </td>
+                <td>
+                  <span class="v">{fmtB(c.purchase.v)}</span> <span class="w">{c.purchase.w}</span>
+                  {delta(c.purchase) && <div class="d">{delta(c.purchase)} vs {c.purchase.pw} ({fmtB(c.purchase.pv)})</div>}
+                  {c.purchase.note && <div class="nt">{c.purchase.note}</div>}
+                </td>
+                <td>
+                  <span class="v">{fmtB(c.rpo.v)}</span> {c.rpo.v != null && <span class="w">{c.rpo.w}</span>}
+                  {delta(c.rpo) && <div class="d">{delta(c.rpo)} vs {c.rpo.pw} ({fmtB(c.rpo.pv)})</div>}
+                  {c.rpo.note && <div class="nt">{c.rpo.note}</div>}
+                </td>
+                <td>
+                  {c.support.v != null && <span class="v">{fmtB(c.support.v)}</span>} {c.support.v != null && <span class="w">{c.support.w}</span>}
+                  <div class="nt">{c.support.label}</div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="tblnote">
+        $B, undiscounted, as disclosed. Windows differ where issuers'
+        fiscal calendars and disclosure practices differ and are labeled
+        on every cell; deltas are shown only against the same issuer's
+        prior disclosure of the same quantity. Microsoft's purchase and
+        construction commitments update annually (10-K only). Oracle's
+        prior lease figure is fiscal 2022, the earliest comparable
+        disclosure.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">§</span> What these quantities are</h2>
+      <p>
+        <strong>Leases signed but not yet commenced</strong> are rental
+        agreements on facilities — overwhelmingly data centers — that have
+        not been delivered. Nothing appears on the balance sheet until the
+        landlord hands over the building; at commencement, a lease
+        liability and right-of-use asset are recognized. The footnote is
+        therefore a forward calendar of balance-sheet lease liabilities,
+        with terms disclosed as long as 30 years.
+        <strong>Purchase and other commitments</strong> are contracts to
+        buy goods and services — cloud capacity, chips and servers, power —
+        reported at the non-cancelable portion or contractual minimum,
+        in the issuers' own language: "non-cancelable," "take-or-pay,"
+        "unconditional… enforceable and legally binding."
+        <strong>Remaining performance obligations</strong> are the same
+        class of contract seen from the seller's side: contracted future
+        revenue not yet recognized. <strong>Support instruments</strong>
+        are credit support written around other parties' financings —
+        payment backstops (Alphabet accounts for these as credit
+        derivatives at fair value), residual value guarantees, and
+        guarantees of lessors' borrowings.
+      </p>
+      <p>
+        Why a compute-credit record tracks them: these commitments are the
+        collateral of the offtake-backed lane of the
+        <a href="/credit">compute credit tracker</a> — a compute
+        provider's contracted cash flows from an investment-grade customer
+        are that customer's purchase commitment seen from the other end,
+        and the market prices their quality. The launch analysis, with the
+        full decomposition, conditionality language, and counterparty
+        detail, is
+        <a href="/research/big-tech-hidden-debt">Breaking Down Big Tech's
+        $1.65 Trillion "Hidden Debt"</a>.
+      </p>
+      <p class="footnote">
+        Sources: latest and prior filings per issuer as listed in each
+        row, verified against the documents on EDGAR. This page is
+        updated within days of each new 10-Q/10-K from the covered
+        issuers; figures are as-disclosed and are not restated between
+        filings. Nothing here is a solvency opinion, a forecast, or
+        investment advice.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 84ch; margin-bottom: 16px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 6px 0 22px; max-width: 900px; }
+    .tile { border: 1px solid var(--rule); background: var(--surface); padding: 12px 14px; }
+    .tlab { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.03em; }
+    .tval { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--weight-display); margin-top: 2px; }
+    .sec { margin: 26px 0; max-width: 96ch; }
+    .sec h2 { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; max-width: 80ch; }
+    .tblwrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+    table.mon { width: 100%; min-width: 860px; border-collapse: collapse; font-size: var(--fs-sm); }
+    table.mon th { text-align: left; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); border-bottom: 1px solid var(--rule); padding: 10px 12px; }
+    table.mon td { vertical-align: top; border-bottom: 1px solid var(--rule); padding: 10px 12px; line-height: 1.45; }
+    table.mon td.co { font-weight: var(--weight-strong); white-space: nowrap; }
+    table.mon .fil { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-faint); font-weight: normal; white-space: normal; max-width: 20ch; margin-top: 3px; }
+    table.mon .v { font-family: var(--font-mono); font-weight: var(--weight-strong); }
+    table.mon .w { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); }
+    table.mon .d { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); margin-top: 2px; }
+    table.mon .nt { font-size: var(--fs-xs); color: var(--ink-faint); margin-top: 4px; max-width: 34ch; }
+    .tblnote { font-size: var(--fs-xs); color: var(--ink-faint); margin-top: 8px; max-width: 84ch; line-height: 1.5; }
+    .footnote { font-size: var(--fs-sm); color: var(--ink-faint); border-top: 1px solid var(--rule); padding-top: 8px; max-width: 74ch; }
+    .footnote a, .sec a { color: var(--accent); }
+  </style>
+</Base>
