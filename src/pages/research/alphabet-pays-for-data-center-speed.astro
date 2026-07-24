@@ -20,7 +20,7 @@ const C1 = [
   { t: 'Jun 2026', b: 519.5, r: 99.2, ratio: '5.2×', rl: '$99B ann.' },
 ];
 const C1W = 700, C1H = 300, C1T = 46, C1B = 26, C1L = 54, C1R = 16;
-const C1BW = 52, C1PG = 6;
+const C1BW = 62, C1PG = 6;
 const c1y = (v: number) => C1T + (1 - v / 560) * (C1H - C1T - C1B);
 const c1x = (i: number) => C1L + 36 + i * 152;
 
@@ -91,9 +91,9 @@ const c3x = (v: number) => (v / 2.1) * (C3W - C3L - C3R);
                 <g>
                   <rect x={xb} y={yb} width={C1BW} height={y0 - yb} class="segA" />
                   <rect x={xb + C1BW + C1PG} y={yr} width={C1BW} height={y0 - yr} class="segB" />
-                  <text x={xb + C1BW / 2} y={yb - 8} text-anchor="middle" class="cval">${c.b.toFixed(0)}B</text>
+                  <text x={xb + C1BW + C1PG / 2} y={yb - 8} text-anchor="middle" class="cval">${c.b.toFixed(0)}B</text>
                   <text x={xb + C1BW + C1PG + C1BW / 2} y={yr - 8} text-anchor="middle" class="ckey">{c.rl}</text>
-                  <text x={xb + C1BW + C1PG / 2} y={yb - 28} text-anchor="middle" class="cratio">{c.ratio}</text>
+                  <text x={xb + C1BW + C1PG / 2} y={yb - 30} text-anchor="middle" class="cratio">{c.ratio}</text>
                   <text x={xb + C1BW + C1PG / 2} y={C1H - 8} text-anchor="middle" class="clab">{c.t}</text>
                 </g>
               );
@@ -107,15 +107,18 @@ const c3x = (v: number) => (v / 2.1) * (C3W - C3L - C3R);
             </g>
           </svg>
         </div>
-        <figcaption>
-          Backlog is remaining performance obligations at period end —
-          signed, non-cancelable contracts not yet delivered or recognized —
-          essentially all Google Cloud; pre-2026 figures exclude contracts
-          of one year or less (definition widened in Q1 2026, ~$7.3B).
-          Revenue is the calendar year's Cloud segment revenue; 2026 is the
-          second quarter annualized. Multiples are backlog over annualized
-          revenue.
-        </figcaption>
+        <details class="fignotes">
+          <summary>Chart notes &amp; definitions</summary>
+          <p>
+            Backlog is remaining performance obligations at period end —
+            signed, non-cancelable contracts not yet delivered or
+            recognized — essentially all Google Cloud; pre-2026 figures
+            exclude contracts of one year or less (definition widened in
+            Q1 2026, ~$7.3B). Revenue is the calendar year's Cloud segment
+            revenue; 2026 is the second quarter annualized. Multiples are
+            backlog over annualized revenue.
+          </p>
+        </details>
       </figure>
     </section>
 
@@ -193,12 +196,15 @@ const c3x = (v: number) => (v / 2.1) * (C3W - C3L - C3R);
             <line x1={C2L} y1={c2y(0)} x2={C2W - C2R} y2={c2y(0)} class="axis" />
           </svg>
         </div>
-        <figcaption>
-          Notional = maximum potential future payments under the backstops
-          in specified default scenarios, as disclosed. The pending
-          extension is Alphabet's estimate of further backstops agreed with
-          data-center providers, subject to finalization of terms.
-        </figcaption>
+        <details class="fignotes">
+          <summary>Chart notes</summary>
+          <p>
+            Notional = maximum potential future payments under the
+            backstops in specified default scenarios, as disclosed. The
+            pending bar is Alphabet's estimate of further backstops agreed
+            with data-center providers, subject to finalization of terms.
+          </p>
+        </details>
       </figure>
     </section>
 
@@ -226,12 +232,15 @@ const c3x = (v: number) => (v / 2.1) * (C3W - C3L - C3R);
             })}
           </svg>
         </div>
-        <figcaption>
-          Fair value of credit-derivative liabilities divided by notional:
-          $69M / $16.9B and $815M / $43.8B. Level 3,
-          probability-weighted models; inputs disclosed include counterparty
-          risk and credit default rates.
-        </figcaption>
+        <details class="fignotes">
+          <summary>Chart notes</summary>
+          <p>
+            Fair value of credit-derivative liabilities divided by
+            notional: $69M / $16.9B and $815M / $43.8B. Level 3,
+            probability-weighted models; inputs disclosed include
+            counterparty risk and credit default rates.
+          </p>
+        </details>
       </figure>
       <p>
         The composition of the move is disclosed. Only about $77 million
@@ -318,6 +327,23 @@ const c3x = (v: number) => (v / 2.1) * (C3W - C3L - C3R);
     .segB { fill: var(--accent); opacity: 0.4; }
     .colA { fill: var(--accent); }
     .colEst { fill: var(--accent); opacity: 0.3; }
+    /* terminal (dark) theme: the social-card palette — gold series,
+       blue comparator — instead of accent-at-40%, which reads muddy
+       on the dark surface */
+    :global(html[data-theme="terminal"]) .segA { fill: #f5b301; }
+    :global(html[data-theme="terminal"]) .segB { fill: #4d9fff; opacity: 1; }
+    :global(html[data-theme="terminal"]) .colA { fill: #f5b301; }
+    :global(html[data-theme="terminal"]) .colEst { fill: #f5b301; opacity: 0.3; }
+    .fignotes { margin-top: 6px; }
+    .fignotes summary {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-faint); cursor: pointer; user-select: none;
+    }
+    .fignotes summary:hover { color: var(--ink-dim); }
+    .fignotes p {
+      font-size: var(--fs-xs); color: var(--ink-faint);
+      line-height: 1.5; margin: 6px 0 0; max-width: 74ch;
+    }
     .axis { stroke: var(--rule); stroke-width: 1; }
     .clab, .cval, .ckey, .cmeta, .cratio { font-family: var(--font-mono); }
     .clab { font-size: 13px; fill: var(--ink); }
