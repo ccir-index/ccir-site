@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-07-22",
+  "as_of": "2026-07-23",
   "next_expected": "Microsoft 10-K FY2026 (fiscal year ended June 30, 2026), expected late July 2026",
   "companies": [
     {
@@ -16,13 +16,13 @@
     {
       "key": "alphabet",
       "name": "Alphabet",
-      "latest_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001652044-26-000048",
-      "prior_filing": "10-K FY2025 (period 2025-12-31), acc 0001652044-26-000018",
-      "leases_nyc": { "v": 75.6, "w": "Mar-26", "pv": 58.5, "pw": "Dec-25" },
-      "purchase": { "v": 332.4, "w": "Mar-26", "pv": 149.1, "pw": "Dec-25", "note": "MD&A total incl. open purchase orders; $138.0B short-term; note-level fixed/minimum supply+energy+content = $232.7B" },
-      "rpo": { "v": 467.6, "w": "Mar-26", "pv": 242.8, "pw": "Dec-25", "note": "$462.3B Google Cloud; Q1-26 definition change adds ≤1-yr contracts (~$7.3B); incl. multi-gigawatt TPU supply agreements" },
-      "support": { "v": 28.4, "w": "Mar-26", "label": "data-center backstops as credit derivatives, notional (was $16.9B Dec-25, $0 Dec-24); +~$15.3B Apr-26; framework up to $33.3B; separately $9.0B energy financial guarantees" },
-      "ocf_ttm": 174.4
+      "latest_filing": "10-Q Q2 2026 (period 2026-06-30), acc 0001652044-26-000071",
+      "prior_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001652044-26-000048",
+      "leases_nyc": { "v": 85.2, "w": "Jun-26", "pv": 75.6, "pw": "Mar-26", "note": "commencing 2026–2031, terms 1–26 yrs; separately, a short-term lease signed Jun-26 with a non-cancelable commitment of ~$5.8B, commencing Q3-26" },
+      "purchase": { "v": 811.0, "w": "Jun-26", "pv": 332.4, "pw": "Mar-26", "note": "MD&A total incl. open purchase orders; $200.7B short-term; note-level fixed/guaranteed supply+energy+content = $707.0B — supply agreements generally fulfilled through 2030, energy take-or-pay obligations through 2054" },
+      "rpo": { "v": 519.5, "w": "Jun-26", "pv": 467.6, "pw": "Mar-26", "note": "$513.9B Google Cloud; definition includes ≤1-yr contracts since Q1-26; 'limited number' of TPU-system supply agreements began recognizing revenue in Q2-26, significant majority expected in 2027" },
+      "support": { "v": 43.8, "w": "Jun-26", "label": "data-center backstops as credit derivatives, notional (was $28.4B Mar-26, $16.9B Dec-25, $0 Dec-24); fair-value liability $815M vs $69M Dec-25; further ~$24.1B of backstops agreed, terms pending; separately $7.6B energy financial guarantees (terms through Sep-26) and a $20.0B milestone-contingent funding commitment to an unnamed private company, booked as an equity derivative" },
+      "ocf_ttm": 185.7
     },
     {
       "key": "microsoft",
