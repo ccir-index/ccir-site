@@ -1,0 +1,337 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/*
+  Dated research note — frozen to Alphabet's Q2 2026 10-Q
+  (acc 0001652044-26-000071, filed 2026-07-23) plus prior Alphabet filings
+  for the series; press-reported deal facts attributed inline. Companion to
+  the LinkedIn/X posts of 2026-07-25; the quantities are maintained on
+  /credit/commitments. Research notes are dated, not updated in place.
+*/
+const AS_OF = '2026-07-27';
+
+// ---- chart 1: Google Cloud backlog vs revenue, grouped vertical bars ----
+// backlog = RPO at period end (essentially all Google Cloud); revenue =
+// that calendar year's Cloud segment revenue; 2026 = Q2 annualized.
+const C1 = [
+  { t: 'YE 2023', b: 74.1, r: 33.1, ratio: '2.2×', rl: '$33B' },
+  { t: 'YE 2024', b: 93.2, r: 43.2, ratio: '2.2×', rl: '$43B' },
+  { t: 'YE 2025', b: 242.8, r: 58.7, ratio: '4.1×', rl: '$59B' },
+  { t: 'Jun 2026', b: 519.5, r: 99.2, ratio: '5.2×', rl: '$99B ann.' },
+];
+const C1W = 700, C1H = 300, C1T = 46, C1B = 26, C1L = 54, C1R = 16;
+const C1BW = 52, C1PG = 6;
+const c1y = (v: number) => C1T + (1 - v / 560) * (C1H - C1T - C1B);
+const c1x = (i: number) => C1L + 36 + i * 152;
+
+// ---- chart 2: backstop notional ladder + agreed-pending extension ----
+const C2 = [
+  { t: 'Dec-24', v: 0 },
+  { t: 'Dec-25', v: 16.9 },
+  { t: 'Mar-26', v: 28.4 },
+  { t: 'Jun-26', v: 43.8 },
+];
+const C2PEND = 24.1;
+const C2W = 700, C2H = 258, C2T = 42, C2B = 28, C2L = 54, C2R = 16;
+const C2BW = 64;
+const c2y = (v: number) => C2T + (1 - v / 72) * (C2H - C2T - C2B);
+const c2x = (i: number) => C2L + 44 + i * 150;
+
+// ---- chart 3: booked fair value per $100 of exposure ----
+const C3 = [
+  { t: 'Dec-25', v: 0.41, lab: '41¢' },
+  { t: 'Jun-26', v: 1.86, lab: '$1.86' },
+];
+const C3W = 700, C3BH = 24, C3GAP = 18, C3L = 96, C3R = 80, C3T = 12;
+const C3H = C3T + C3.length * (C3BH + C3GAP) + 8;
+const c3x = (v: number) => (v / 2.1) * (C3W - C3L - C3R);
+---
+<Base
+  title="Buying, Building, Renting, Guaranteeing: How Alphabet Pays for Data-Center Speed · CCIR Research"
+  description="Alphabet's Q2 2026 10-Q read as a capacity story: a $519.5B cloud backlog now equal to five years of revenue, four supply channels running at once, and $43.8B of data-center payment backstops whose booked cost rose from 41¢ to $1.86 per $100 in six months."
+  ogImage="/og/alphabet-pays-for-data-center-speed.png"
+  article={{ published: '2026-07-27' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {AS_OF} · filings + attributed press</div>
+      <h1>Buying, Building, Renting, Guaranteeing: How Alphabet Pays for Data-Center Speed</h1>
+      <p class="standfirst">
+        Alphabet's second-quarter 10-Q, filed July 23, describes a company
+        that cannot get data-center capacity fast enough. This note reads
+        the filing's demand side against its supply side, and prices the
+        instrument doing the most unusual work: the payment backstops
+        Alphabet writes around other companies' data centers. Figures are
+        from the filing unless attributed; the quantities are maintained,
+        filing by filing, on the <a href="/credit/commitments">AI
+        commitments monitor</a>.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> The demand side</h2>
+      <p>
+        Customers have signed <strong>$519.5 billion</strong> of
+        non-cancelable contracts Alphabet has not yet delivered —
+        essentially all of it Google Cloud. Alphabet expects just over half
+        to convert to revenue within 24 months: a contracted pace of
+        roughly $130 billion a year against a current run-rate near $99
+        billion. For years the backlog held at about two years of Cloud
+        revenue at the then-current pace. It now equals about five —
+        against revenue that itself grew 82% year over year.
+      </p>
+      <figure class="chart-fig">
+        <div class="fig-title">Google Cloud: contracted backlog vs revenue · $B</div>
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${C1W} ${C1H}`} role="img" aria-label="Grouped bars of Google Cloud revenue backlog versus revenue at four period ends. Backlog 74 billion at year-end 2023 against 33 billion of revenue, 93 versus 43 in 2024, 243 versus 59 in 2025, and 519 versus an annualized 99 at June 2026 — the ratio moving from 2.2 times to 5.2 times.">
+            {C1.map((c, i) => {
+              const xb = c1x(i);
+              const yb = c1y(c.b), yr = c1y(c.r), y0 = c1y(0);
+              return (
+                <g>
+                  <rect x={xb} y={yb} width={C1BW} height={y0 - yb} class="segA" />
+                  <rect x={xb + C1BW + C1PG} y={yr} width={C1BW} height={y0 - yr} class="segB" />
+                  <text x={xb + C1BW / 2} y={yb - 8} text-anchor="middle" class="cval">${c.b.toFixed(0)}B</text>
+                  <text x={xb + C1BW + C1PG + C1BW / 2} y={yr - 8} text-anchor="middle" class="ckey">{c.rl}</text>
+                  <text x={xb + C1BW + C1PG / 2} y={yb - 28} text-anchor="middle" class="cratio">{c.ratio}</text>
+                  <text x={xb + C1BW + C1PG / 2} y={C1H - 8} text-anchor="middle" class="clab">{c.t}</text>
+                </g>
+              );
+            })}
+            <line x1={C1L} y1={c1y(0)} x2={C1W - C1R} y2={c1y(0)} class="axis" />
+            <g transform={`translate(${C1L}, ${C1T - 24})`}>
+              <rect x="0" y="-9" width="10" height="10" class="segA" />
+              <text x="16" y="0" class="ckey">revenue backlog (RPO)</text>
+              <rect x="216" y="-9" width="10" height="10" class="segB" />
+              <text x="232" y="0" class="ckey">Cloud revenue</text>
+            </g>
+          </svg>
+        </div>
+        <figcaption>
+          Backlog is remaining performance obligations at period end —
+          signed, non-cancelable contracts not yet delivered or recognized —
+          essentially all Google Cloud; pre-2026 figures exclude contracts
+          of one year or less (definition widened in Q1 2026, ~$7.3B).
+          Revenue is the calendar year's Cloud segment revenue; 2026 is the
+          second quarter annualized. Multiples are backlog over annualized
+          revenue.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> The supply response</h2>
+      <p>The same filing shows four channels running at once:</p>
+      <p>
+        <strong>Building.</strong> A record ~$45 billion of capital
+        expenditure in the quarter; full-year guidance raised to $195–205
+        billion.
+      </p>
+      <p>
+        <strong>Buying.</strong> Intersect, a renewable-energy developer,
+        acquired outright for $5.9 billion — buying the power pipeline
+        rather than waiting in it.
+      </p>
+      <p>
+        <strong>Renting.</strong> A single lease signed in June:
+        non-cancelable, approximately $5.8 billion, with a term of 12
+        months or less — roughly $480 million a month for temporary
+        capacity, a structure consistent with renting bulk compute rather
+        than property. Management described expanded use of third-party
+        capacity as a <a href="https://seekingalpha.com/news/4617114-alphabet-signals-195b-205b-2026-capex-while-expanding-third-party-capacity-as-a-bridge">"bridge"
+        on the earnings call</a>. The counterparty is not identified.
+      </p>
+      <p>
+        <strong>Guaranteeing.</strong> $7.6 billion of financial guarantees
+        so energy counterparties can order long-lead power equipment on
+        Alphabet's credit — and $43.8 billion of payment backstops on other
+        companies' data centers, accounted for as credit derivatives.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> The backstops</h2>
+      <p>
+        What the buildout is short of is not money, land, or chips — it is
+        grid power. The backstops show it. The reported arrangements
+        include developers who already hold the one input capital cannot
+        fast-track: <a href="https://www.coindesk.com/business/2025/09/27/crypto-miner-terawulf-to-raise-usd3b-in-google-backed-debt-deal-to-expand-data-centers">TeraWulf</a>
+        and <a href="https://fortune.com/crypto/2025/09/25/google-fluidstack-cipher-mining-bitcoin-miner-ai-data-centers/">Cipher</a>,
+        former bitcoin miners whose defining asset is an existing grid
+        connection. The disclosed book is several times the sum of the
+        individually reported arrangements; the named deals are the visible
+        portion.
+      </p>
+      <p>
+        The structure, per the filing: these developers cannot finance a
+        build on their own credit, so Alphabet backstops their payment
+        obligations — and with that promise, lenders fund the projects. In
+        return, Alphabet's obligations "may be partially offset by equity
+        or cash receipts from counterparties" — the reported deals carried
+        equity stakes in the developers — and upon a default, Alphabet
+        retains the right to assume the underlying data-center leases for
+        its own use or to sublease. Terms run as long as 15 years.
+      </p>
+      <figure class="chart-fig">
+        <div class="fig-title">Alphabet data-center backstops · credit-derivative notional · $B</div>
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${C2W} ${C2H}`} role="img" aria-label="Bars showing Alphabet's data-center backstop notional rising from zero in December 2024 to 16.9 billion dollars in December 2025, 28.4 billion in March 2026, and 43.8 billion in June 2026, with a further approximately 24.1 billion agreed and pending shown as a translucent extension.">
+            {C2.map((c, i) => {
+              const x = c2x(i);
+              const y = c2y(c.v), y0 = c2y(0);
+              return (
+                <g>
+                  {c.v > 0 && <rect x={x} y={y} width={C2BW} height={y0 - y} class="colA" />}
+                  <text x={x + C2BW / 2} y={y - 8} text-anchor="middle" class="cval">{c.v === 0 ? '$0' : `$${c.v.toFixed(1)}B`}</text>
+                  <text x={x + C2BW / 2} y={C2H - 8} text-anchor="middle" class="clab">{c.t}</text>
+                </g>
+              );
+            })}
+            <rect x={c2x(3)} y={c2y(43.8 + C2PEND)} width={C2BW} height={c2y(43.8) - c2y(43.8 + C2PEND)} class="colEst" />
+            <text x={c2x(3) + C2BW + 10} y={c2y(43.8 + C2PEND) + 12} class="ckey">+~$24.1B agreed,</text>
+            <text x={c2x(3) + C2BW + 10} y={c2y(43.8 + C2PEND) + 28} class="ckey">terms pending</text>
+            <line x1={C2L} y1={c2y(0)} x2={C2W - C2R} y2={c2y(0)} class="axis" />
+          </svg>
+        </div>
+        <figcaption>
+          Notional = maximum potential future payments under the backstops
+          in specified default scenarios, as disclosed. The pending
+          extension is Alphabet's estimate of further backstops agreed with
+          data-center providers, subject to finalization of terms.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> The price</h2>
+      <p>
+        The booked fair value of the obligations — Alphabet's own estimate
+        of what the promises may cost — went from $69 million in December
+        to $815 million in June: from about <strong>41 cents to $1.86 per
+        $100 of exposure</strong> in six months.
+      </p>
+      <figure class="chart-fig">
+        <div class="fig-title">Booked fair value per $100 of backstop exposure</div>
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${C3W} ${C3H}`} role="img" aria-label="Two horizontal bars: booked fair value per 100 dollars of backstop exposure at 41 cents in December 2025 and 1 dollar 86 in June 2026.">
+            {C3.map((c, i) => {
+              const y = C3T + i * (C3BH + C3GAP);
+              return (
+                <g>
+                  <text x={C3L - 8} y={y + C3BH / 2 + 4} text-anchor="end" class="clab">{c.t}</text>
+                  <rect x={C3L} y={y} width={c3x(c.v)} height={C3BH} class="segA" />
+                  <text x={C3L + c3x(c.v) + 8} y={y + C3BH / 2 + 4} class="cval">{c.lab}</text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+        <figcaption>
+          Fair value of credit-derivative liabilities divided by notional:
+          $69M / $16.9B and $815M / $43.8B. Level 3,
+          probability-weighted models; inputs disclosed include counterparty
+          risk and credit default rates.
+        </figcaption>
+      </figure>
+      <p>
+        The composition of the move is disclosed. Only about $77 million
+        ran through the income statement as losses on the existing book;
+        the remainder arrived with newly written backstops. Holding the
+        original book near its December mark, the arithmetic places the
+        2026 vintage near seven times the per-dollar rate of the first —
+        consistent with reportedly smaller counterparties and a
+        data-center credit market that has repriced wider since December.
+        The seven-times figure is arithmetic under a stated assumption,
+        not a disclosure.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> Read against the credit record</h2>
+      <p>
+        On the <a href="/credit">compute-credit record</a>, standalone
+        data-center and GPU-backed borrowers fund at spreads of several
+        hundred basis points, and the observed gap between anchor-supported
+        and unsupported paper has run near 225 basis points. Alphabet's
+        booked $1.86 per $100 across terms as long as 15 years is a small
+        fraction of what the same credit costs unsupported. The difference
+        is what the guarantee is worth — and the lease-assumption right is
+        why Alphabet can carry it at marks no lender could: its recovery on
+        a default is the capacity itself.
+      </p>
+      <p>
+        Writing more of these promises at a rising booked cost is what it
+        looks like when waiting for powered capacity costs more than paying
+        to skip the wait. The fair value per dollar of exposure is, to our
+        knowledge, the only quarterly, filed price on hyperscaler-adjacent
+        data-center credit. <strong>CCIR will publish this figure with each
+        Alphabet 10-Q</strong> as part of the
+        <a href="/credit/commitments">AI commitments monitor</a>.
+      </p>
+      <p class="footnote">
+        Sources — Alphabet Form 10-Q for the quarter ended June 30, 2026
+        (acc. 0001652044-26-000071), with prior-period figures from
+        Alphabet's 10-K FY2025 (0001652044-26-000018) and earlier filings;
+        quotations are verbatim from the filings. Press-reported deal
+        facts as attributed in-text:
+        <a href="https://www.coindesk.com/business/2025/09/27/crypto-miner-terawulf-to-raise-usd3b-in-google-backed-debt-deal-to-expand-data-centers">CoinDesk
+        (Sep 2025)</a> on the TeraWulf arrangement and
+        <a href="https://fortune.com/crypto/2025/09/25/google-fluidstack-cipher-mining-bitcoin-miner-ai-data-centers/">Fortune
+        (Sep 2025)</a> on the Cipher arrangement. The backlog-vs-revenue
+        series and the five-issuer context are maintained on the
+        <a href="/credit/commitments">AI commitments monitor</a>. Nothing
+        here is a solvency opinion, a forecast, or investment advice; CCIR
+        publishes reference data and records.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec a { color: var(--accent); }
+    .chart-fig { margin: 18px 0 22px; max-width: 700px; }
+    .chart-box { border: 1px solid var(--rule); background: var(--surface); }
+    .chart-box svg { display: block; width: 100%; height: auto; }
+    .fig-title { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.03em; margin-bottom: 6px; }
+    figcaption { font-size: var(--fs-xs); color: var(--ink-faint); margin-top: 6px; line-height: 1.5; }
+    .segA { fill: var(--accent); }
+    .segB { fill: var(--accent); opacity: 0.4; }
+    .colA { fill: var(--accent); }
+    .colEst { fill: var(--accent); opacity: 0.3; }
+    .axis { stroke: var(--rule); stroke-width: 1; }
+    .clab, .cval, .ckey, .cmeta, .cratio { font-family: var(--font-mono); }
+    .clab { font-size: 13px; fill: var(--ink); }
+    .cval { font-size: 12px; fill: var(--ink); }
+    .cratio { font-size: 14px; font-weight: 700; fill: var(--ink); }
+    .ckey { font-size: 11px; fill: var(--ink-dim); }
+    .cmeta { font-size: 10.5px; fill: var(--ink-faint); }
+    .footnote {
+      font-size: var(--fs-sm);
+      color: var(--ink-faint);
+      border-top: 1px solid var(--rule);
+      padding-top: 8px;
+      max-width: 74ch;
+    }
+    .footnote a { color: var(--accent); }
+  </style>
+</Base>
