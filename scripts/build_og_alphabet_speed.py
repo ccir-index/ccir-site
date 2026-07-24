@@ -32,7 +32,7 @@ f_lab = ImageFont.truetype(MONO, 24)
 f_val = ImageFont.truetype(MONO_B, 26)
 f_key = ImageFont.truetype(MONO, 22)
 
-d.text((70, 54), "CCIR RESEARCH · FILINGS · 2026-07-27", font=f_kicker, fill=ACCENT)
+d.text((70, 54), "CCIR RESEARCH · FILINGS · 2026-07-24", font=f_kicker, fill=ACCENT)
 d.text((66, 100), "Buying, Building, Renting, Guaranteeing:", font=f_title, fill=INK)
 d.text((66, 158), "How Alphabet Pays for Data-Center Speed", font=f_title, fill=INK)
 
