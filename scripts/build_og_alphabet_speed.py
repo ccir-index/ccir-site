@@ -27,14 +27,14 @@ img = Image.new("RGB", (W, H), BG)
 d = ImageDraw.Draw(img, "RGBA")
 
 f_kicker = ImageFont.truetype(MONO_B, 26)
-f_title = ImageFont.truetype(SERIF_B, 46)
+f_title = ImageFont.truetype(SERIF_B, 42)
 f_lab = ImageFont.truetype(MONO, 24)
 f_val = ImageFont.truetype(MONO_B, 26)
 f_key = ImageFont.truetype(MONO, 22)
 
 d.text((70, 54), "CCIR RESEARCH · FILINGS · 2026-07-24", font=f_kicker, fill=ACCENT)
-d.text((66, 100), "Buying, Building, Renting, Guaranteeing:", font=f_title, fill=INK)
-d.text((66, 158), "How Alphabet Pays for Data-Center Speed", font=f_title, fill=INK)
+d.text((66, 102), "Buying, Building, Renting, Guaranteeing:", font=f_title, fill=INK)
+d.text((66, 156), "How Alphabet Pays to Get Compute Capacity Faster", font=f_title, fill=INK)
 
 # backstop ladder (chart 2 of the note); pending drawn as its own bar
 bars = [("Dec-24", 0.0, False), ("Dec-25", 16.9, False),
