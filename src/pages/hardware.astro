@@ -9,7 +9,9 @@ import ivCmiRaw from '../data/committed_mi.csv?raw';
 // with current multi-source posted asks, and — per the 2026-07-22 ruling —
 // an INCOME-DERIVED, model-implied value per deployed chip (going-concern
 // lens for lenders), computed at build time from the CRI rate + committed
-// term curve, with the two tapes shown as corroboration and LGD floor.
+// term curve, with the two tapes shown as corroboration and disposition
+// record (never "LGD floor" — retired 2026-07-24: LGD is transaction-level
+// and single-unit retail is not a lower bound on bulk recovery).
 const fmtUsd = (v: number | null | undefined, dp = 0) =>
   v == null ? '—' : '$' + v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
 
@@ -318,10 +320,11 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         derives it from its own benchmark — an income approach over the CRI
         rental rate and committed term curve, yielding a
         <strong>model-implied value</strong>
-        with every assumption disclosed below. The second is a
-        loss-given-default floor: what hardware clears at when it must be
-        sold. That number stays observational — executed sales and posted
-        asks, kept in separate lanes with count, window, and provenance.
+        with every assumption disclosed below. The second is
+        observational: what hardware clears at when it is sold — executed
+        sales and posted asks, kept in separate lanes with count, window,
+        and provenance. Those are inputs to recovery analysis, not a
+        recovery estimate.
         Where the record allows, the page shows each value three ways —
         model-implied, posted ask, executed sale — independent methods
         triangulating a figure none could validate alone.
@@ -387,9 +390,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         financing yields in CCIR's <a href="/credit">credit ledger</a> —
         see Method below.
         The executed
-        lane <em>informs</em> a loss-given-default floor rather than being
-        one: single-unit retail clearings can sit above or below a bulk
+        lane is an observed disposition record, not a recovery estimate:
+        single-unit retail clearings can sit above or below a bulk
         disposition, and no current tape measures market impact at volume.
+        Loss-given-default is a transaction-level parameter — lien
+        position, priority, workout cost, timing, pool composition — and
+        belongs to the party doing the recovery analysis; this tape is one
+        of its inputs.
       </p>
       </details>
     </section>
@@ -689,7 +696,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         assumed legs are printed with the figure: decay beyond the curve,
         utilization, net margin, discount rate, service life. It is a model
         output and is labeled as one everywhere it appears; the tapes below
-        corroborate it, and the model-to-ask ratio and executed floor are
+        corroborate it, and the model-to-ask ratio and executed price are
         shown beside every figure so the reader holds all three numbers at
         once. Where no tape lane exists for a chip (B200), the value is
         published modeled-only and marked as such on its card: it is not
@@ -771,9 +778,11 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         figure on this page is a model output — the income-derived value —
         and it is labeled model-implied wherever it appears, with its
         assumption set printed beside it. Everything else is an observed
-        price with provenance. CCIR publishes no forecasts and no
-        depreciation schedules; the model prices today's curve, not a
-        predicted one. Statistics follow the methodology's stat policy:
+        price with provenance. Rate inputs are observed prices out to the
+        last observed tenor; beyond it, a stated decay assumption applies
+        and is disclosed with the figure. CCIR publishes no depreciation
+        schedule as a product; the model prices today's curve plus those
+        stated assumptions, not a predicted market. Statistics follow the methodology's stat policy:
         counts ship with every median in the series data; thin cells
         gated; windows labeled on every display.
       </p>
