@@ -1,0 +1,412 @@
+---
+import Base from '../../layouts/Base.astro';
+import { meta } from '../../data/snapshot';
+
+type Status = 'addressed' | 'design' | 'na' | 'part' | 'gap';
+
+const STATUS_LABEL: Record<Status, string> = {
+  addressed: 'Addressed',
+  design: 'Addressed by design',
+  na: 'Not applicable',
+  part: 'Addressed in part',
+  gap: 'Disclosed gap',
+};
+
+interface Row {
+  n: number;
+  name: string;
+  status: Status;
+  body: string;
+}
+
+interface Group {
+  title: string;
+  rows: Row[];
+}
+
+const groups: Group[] = [
+  {
+    title: 'Governance',
+    rows: [
+      {
+        n: 1,
+        name: 'Overall Responsibility of the Administrator',
+        status: 'addressed',
+        body:
+          'Compute Credit Index Research LLC administers every stage of ' +
+          'determination and publication — collection, aggregation, ' +
+          'publication, and restatement — under the published Methodology. ' +
+          'No stage is delegated.',
+      },
+      {
+        n: 2,
+        name: 'Oversight of Third Parties',
+        status: 'na',
+        body:
+          'No calculation agents, submission channels, or third-party ' +
+          'determination functions exist. Collection runs on ' +
+          'administrator-operated automated infrastructure against ' +
+          'providers’ public pricing surfaces.',
+      },
+      {
+        n: 3,
+        name: 'Conflicts of Interest',
+        status: 'addressed',
+        body:
+          'The administrator operates no marketplace, runs no trading desk, ' +
+          'and holds no positions in the markets it measures. No revenue is ' +
+          'tied to the level of any published series. See Governance & ' +
+          'Complaints.',
+      },
+      {
+        n: 4,
+        name: 'Control Framework',
+        status: 'addressed',
+        body:
+          'Determination is fully automated under the published Methodology: ' +
+          'validation gates on ingestion, panel-composition guards, drift ' +
+          'monitoring, and daily verification of the print. Defects follow ' +
+          'the published restatement process.',
+      },
+      {
+        n: 5,
+        name: 'Internal Oversight',
+        status: 'gap',
+        body:
+          'Governance is administrator-controlled; there is currently no ' +
+          'external oversight committee. An independent oversight function ' +
+          'will be added as adoption of the series warrants it, and the ' +
+          'Governance page will be updated when it is.',
+      },
+    ],
+  },
+  {
+    title: 'Quality of the Benchmark',
+    rows: [
+      {
+        n: 6,
+        name: 'Benchmark Design',
+        status: 'addressed',
+        body:
+          'Series grammar is chip × operator segment × form factor ' +
+          '× interruptibility × commitment term × region, with ' +
+          'operator-equal weighting — one provider, one vote per cell — ' +
+          'and published composition-stability windows.',
+      },
+      {
+        n: 7,
+        name: 'Data Sufficiency',
+        status: 'design',
+        body:
+          'The interest measured is defined as the publicly posted list-ask ' +
+          'rate — not transacted levels, which the series never ' +
+          'represent. Every cell publishes its source count, observation ' +
+          'count, and interquartile range, so sufficiency is inspectable per ' +
+          'cell per day.',
+      },
+      {
+        n: 8,
+        name: 'Hierarchy of Data Inputs',
+        status: 'design',
+        body:
+          'A single input class: publicly observable list asks collected ' +
+          'automatically. No solicited quotes, no broker marks, no expert ' +
+          'judgment, no discretionary adjustments. The pooling fallback ' +
+          'ladder is published in the Methodology.',
+      },
+      {
+        n: 9,
+        name: 'Transparency of Benchmark Determinations',
+        status: 'addressed',
+        body:
+          'Each published row carries its methodology version; per-cell ' +
+          'source counts and dispersion publish alongside every headline. ' +
+          'Restatements are republished in full under the current version, ' +
+          'with the defect recorded in the change log.',
+      },
+      {
+        n: 10,
+        name: 'Periodic Review',
+        status: 'addressed',
+        body:
+          'The methodology is reviewed continuously and versioned; every ' +
+          'material review outcome is a logged methodology event with an ' +
+          'effective date and a comment window, recorded in the change log.',
+      },
+    ],
+  },
+  {
+    title: 'Quality of the Methodology',
+    rows: [
+      {
+        n: 11,
+        name: 'Content of the Methodology',
+        status: 'addressed',
+        body:
+          'The Methodology is published in full: segment definitions, ' +
+          'aggregation statistics (mean where a panel has ten or more ' +
+          'sources, median below), window rules, series grammar, and ' +
+          'restatement policy.',
+      },
+      {
+        n: 12,
+        name: 'Changes to the Methodology',
+        status: 'addressed',
+        body:
+          'The published Change Management Policy governs changes: advance ' +
+          'notice in the change log with effective date and anticipated ' +
+          'impact, a comment window, and version stamps on every historical ' +
+          'row.',
+      },
+      {
+        n: 13,
+        name: 'Transition',
+        status: 'part',
+        body:
+          'Source-level transition has executed public precedent: panel ' +
+          'members are retired by versioned notice with an event record ' +
+          'under the Change Management Policy, which also distinguishes ' +
+          'restatements from series breaks. Worked fallback and replacement ' +
+          'language for documents that reference CCIR series is published on ' +
+          'the Applications page.',
+      },
+      {
+        n: 14,
+        name: 'Submitter Code of Conduct',
+        status: 'na',
+        body:
+          'There are no submitters. No party can submit, quote, or ' +
+          'contribute a price into any CCIR determination; inputs are ' +
+          'observed from public surfaces only. The submission channel this ' +
+          'Principle addresses does not exist in CCIR’s design.',
+      },
+      {
+        n: 15,
+        name: 'Internal Controls over Data Collection',
+        status: 'addressed',
+        body:
+          'Collection is automated and logged end to end: raw payloads ' +
+          'archived at ingestion, schema and validity guards, source-registry ' +
+          'admission control, and coverage-drift monitoring with alerting.',
+      },
+    ],
+  },
+  {
+    title: 'Accountability',
+    rows: [
+      {
+        n: 16,
+        name: 'Complaints Procedures',
+        status: 'addressed',
+        body:
+          'Published on the Governance page: anyone may challenge a value at ' +
+          'research@ccir.io; substantive challenges are acknowledged within ' +
+          'five business days and answered against the underlying ' +
+          'observation data, with verified defects corrected under the ' +
+          'Change Management Policy and outcomes logged.',
+      },
+      {
+        n: 17,
+        name: 'Audits',
+        status: 'gap',
+        body:
+          'No external audit or assurance engagement has been performed. The ' +
+          'determination chain is internally reproducible from archived ' +
+          'inputs and versioned methodology. Independent external assurance ' +
+          '— the convention established by commodity price-reporting ' +
+          'agencies — will be sought when adoption warrants it.',
+      },
+      {
+        n: 18,
+        name: 'Audit Trail',
+        status: 'addressed',
+        body:
+          'Append-only history with per-row methodology version stamps, raw ' +
+          'source archives from first collection, and full retention since ' +
+          'inception — prospectively exceeding the five-year records ' +
+          'expectation.',
+      },
+      {
+        n: 19,
+        name: 'Cooperation with Regulatory Authorities',
+        status: 'addressed',
+        body:
+          'Records sufficient to reconstruct any published determination are ' +
+          'retained and would be made available to relevant authorities on ' +
+          'request.',
+      },
+    ],
+  },
+];
+
+const counts = groups
+  .flatMap((g) => g.rows)
+  .reduce<Record<Status, number>>(
+    (acc, r) => ({ ...acc, [r.status]: (acc[r.status] ?? 0) + 1 }),
+    { addressed: 0, design: 0, na: 0, part: 0, gap: 0 },
+  );
+---
+<Base
+  title="IOSCO Principles Self-Assessment · CCIR"
+  ogImage="/og/documents.png"
+  description="A principle-by-principle self-assessment of CCIR's published practice against the IOSCO Principles for Financial Benchmarks (FR07/13, July 2013). Not a compliance claim; gaps are stated."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Documents · Standards · as published {meta.as_of_date}</div>
+      <h1>IOSCO Principles Self&#8209;Assessment</h1>
+      <p class="standfirst">
+        CCIR designs and operates its series with reference to the IOSCO
+        <em>Principles for Financial Benchmarks</em> (FR07/13, July 2013).
+        The crosswalk below maps each of the nineteen Principles to CCIR&rsquo;s
+        published practice, document by document.
+      </p>
+    </header>
+
+    <aside class="basis">
+      <p>
+        <strong>This is a self-assessment.</strong> CCIR does not claim
+        assured compliance, and no independent external assurance has been
+        obtained. Gaps are stated as gaps. The assessment is reviewed on
+        every methodology version change; it references the published
+        <a href="/documents/methodology">Methodology</a>,
+        <a href="/documents/change-management">Change Management Policy</a>,
+        <a href="/documents/governance">Governance &amp; Complaints</a>, and
+        <a href="/documents/changelog">Change Log</a>.
+      </p>
+      <p class="tally">
+        {counts.addressed} addressed · {counts.design} addressed by design ·
+        {counts.part} addressed in part · {counts.na} not applicable ·
+        {counts.gap} disclosed gaps
+      </p>
+    </aside>
+
+    {groups.map((g) => (
+      <section class="grp">
+        <h2 class="grp-title">{g.title}</h2>
+        <div class="rows">
+          {g.rows.map((r) => (
+            <article class="row" id={`principle-${r.n}`}>
+              <div class="row-head">
+                <span class="pn">{String(r.n).padStart(2, '0')}</span>
+                <h3 class="pname">{r.name}</h3>
+                <span class={`pill pill-${r.status}`}>{STATUS_LABEL[r.status]}</span>
+              </div>
+              <p class="pbody">{r.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <p class="foot-note">
+      Questions on any row: <a href="mailto:research@ccir.io">research@ccir.io</a>.
+      Substantive challenges follow the complaints procedure on the
+      <a href="/documents/governance">Governance</a> page.
+    </p>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 80ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .basis {
+      max-width: 76ch;
+      margin: 18px 0 30px;
+      padding: 16px 20px;
+      border: 1px solid var(--rule);
+      background: var(--surface);
+    }
+    .basis p {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 10px;
+    }
+    .basis .tally {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .basis strong { color: var(--accent); }
+    .grp { margin: 34px 0; max-width: 82ch; }
+    .grp-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 4px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .rows { display: flex; flex-direction: column; }
+    .row { padding: 16px 0 14px; border-bottom: 1px solid var(--rule-2); }
+    .row-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .pn {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+    .pname {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      margin: 0;
+      flex: 1;
+      min-width: 200px;
+    }
+    .pill {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      padding: 3px 10px;
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      white-space: nowrap;
+      color: var(--ink-dim);
+    }
+    .pill-addressed, .pill-design { color: var(--accent); border-color: var(--accent); }
+    .pill-part { color: var(--ink); }
+    .pill-na { color: var(--ink-dim); }
+    .pill-gap {
+      color: var(--warn, #d08700);
+      border-color: var(--warn, #d08700);
+      font-weight: var(--weight-strong);
+    }
+    .pbody {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0;
+      max-width: 76ch;
+    }
+    .foot-note {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.65;
+      max-width: 76ch;
+      margin: 30px 0 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule-2);
+    }
+  </style>
+</Base>
