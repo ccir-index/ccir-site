@@ -80,7 +80,7 @@ export const GET: APIRoute = async () => {
   );
 
   const footer = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0, marginTop: 'auto', paddingTop: 12, borderTop: `1px solid ${T.rule2}` }, [
-    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 14, color: T.dim }, 'No positions. Published prices, not privately negotiated deals.'),
+    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 14, color: T.dim }, 'No positions. Public prices, citable.'),
     el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 15, fontWeight: 600, letterSpacing: 1, color: T.accent }, 'ccir.io'),
   ]);
 
