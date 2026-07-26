@@ -11,6 +11,9 @@ import { join } from 'node:path';
 const fontDir = join(process.cwd(), 'node_modules/@fontsource/ibm-plex-mono/files');
 const mono400 = readFileSync(join(fontDir, 'ibm-plex-mono-latin-400-normal.woff'));
 const mono600 = readFileSync(join(fontDir, 'ibm-plex-mono-latin-600-normal.woff'));
+const serifDir = join(process.cwd(), 'node_modules/@fontsource/ibm-plex-serif/files');
+const serif400 = readFileSync(join(serifDir, 'ibm-plex-serif-latin-400-normal.woff'));
+const serif600 = readFileSync(join(serifDir, 'ibm-plex-serif-latin-600-normal.woff'));
 
 export const C = {
   bg: '#f5f1e8', surface: '#fbf7ee', head: '#efeadd', rule: '#d4d0c4', rule2: '#b8b3a4',
@@ -103,6 +106,8 @@ export async function toPng(root: unknown): Promise<Buffer> {
     fonts: [
       { name: 'IBM Plex Mono', data: mono400, weight: 400, style: 'normal' },
       { name: 'IBM Plex Mono', data: mono600, weight: 600, style: 'normal' },
+      { name: 'IBM Plex Serif', data: serif400, weight: 400, style: 'normal' },
+      { name: 'IBM Plex Serif', data: serif600, weight: 600, style: 'normal' },
     ],
   });
   return new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } }).render().asPng();
