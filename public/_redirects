@@ -1,0 +1,3 @@
+# Cloudflare Pages redirects. /home exists as a clean cache-busting alias
+# for the homepage in social links (X caches link cards per URL).
+/home / 301
