@@ -243,10 +243,16 @@ const researchGroups: ResearchGroup[] = [
     .ladder-row {
       display: grid;
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      gap: 24px;
+      gap: 36px;
       align-items: start;
     }
-    @media (max-width: 900px) { .ladder-row { grid-template-columns: 1fr; } }
+    /* Articulate the gutter — one hairline makes the two panels read as
+       columns of the same page instead of cards adrift. */
+    .term-col { border-left: 1px solid var(--rule); padding-left: 36px; }
+    @media (max-width: 900px) {
+      .ladder-row { grid-template-columns: 1fr; }
+      .term-col { border-left: 0; padding-left: 0; }
+    }
 
     .table-wrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; }
     .table-head {
@@ -284,7 +290,7 @@ const researchGroups: ResearchGroup[] = [
     .table-foot .tf-body { padding: 0 16px 8px; line-height: 1.6; }
     table.ladder-table, table.term-table { width: 100%; border-collapse: collapse; }
     table.ladder-table th.chip-col { text-align: left; width: 18%; }
-    table.ladder-table th.tier-col { text-align: right; padding: 10px 16px; }
+    table.ladder-table th.tier-col { text-align: center; padding: 10px 16px; }
     table.ladder-table th.tier-col-t1 { color: var(--tier-t1); }
     table.ladder-table th.tier-col-t2 { color: var(--tier-t2); }
     table.ladder-table th.tier-col-t3 { color: var(--tier-t3); }
@@ -305,6 +311,9 @@ const researchGroups: ResearchGroup[] = [
       font-size: var(--fs-md);
       font-variant-numeric: tabular-nums;
     }
+    /* Ladder rates sit centered under their tier heads — uniform X.XX widths
+       make decimal alignment moot, and centering keeps each column a unit. */
+    table.ladder-table td.num { text-align: center; padding-right: 0; }
     table.ladder-table td.posted,
     table.term-table td.posted { font-weight: var(--weight-strong); cursor: help; }
     table.term-table td.disc {

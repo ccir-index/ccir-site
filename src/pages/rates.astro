@@ -179,7 +179,7 @@ function cellTitle(c: Rate): string {
     .table-foot .tf-body { padding: 0 16px 8px; line-height: 1.6; }
     table.ladder-table { width: 100%; border-collapse: collapse; }
     table.ladder-table th.chip-col { text-align: left; width: 30%; }
-    table.ladder-table th.tier-col { text-align: right; padding: 10px 18px; }
+    table.ladder-table th.tier-col { text-align: center; padding: 10px 18px; }
     table.ladder-table th.tier-col-t1 { color: var(--tier-t1); }
     table.ladder-table th.tier-col-t2 { color: var(--tier-t2); }
     table.ladder-table th.tier-col-t3 { color: var(--tier-t3); }
@@ -192,8 +192,7 @@ function cellTitle(c: Rate): string {
       letter-spacing: 0.04em;
     }
     table.ladder-table td.num {
-      text-align: right;
-      padding-right: 18px;
+      text-align: center;
       font-family: var(--font-mono);
       font-size: var(--fs-lg);
       font-variant-numeric: tabular-nums;

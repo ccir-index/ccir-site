@@ -6,19 +6,20 @@ import { TIERS, PREMIUM_CHIPS } from '../../data/types';
 
 export const prerender = true;
 
-// Dedicated broadsheet layout for the home share card (the other OG routes
-// keep the shared tierTable). Same cell selection and value rule as the
-// homepage ladder (homeOdCell / headlineValue) — the card and the page it
-// links to can never disagree. No panel-depth column, no boxed grid:
-// hairline rules, serif headline, small-caps column heads.
+// Assessment-sheet layout for the home share card (other OG routes keep the
+// shared tierTable). Same cell selection and value rule as the homepage
+// ladder (homeOdCell / headlineValue) — card and page can never disagree.
+// Design register: market-infrastructure price sheet — navy masthead band,
+// product title + date block, disciplined rules, featured column tinted.
 
 const SEGMENTS: Record<string, string> = {
   T1: 'Hyperscaler', T2: 'Neocloud', T3: 'Marketplace',
 };
-const PAD = 60;
-// Wide value columns pull the first figure toward the chip labels — a
-// narrow label column + long empty gulf reads worse than generous columns.
-const COL_W = 300;
+const PAD = 56;
+const COL_W = 292;
+const CREAM = C.bg;
+const CREAM_DIM = 'rgba(245, 241, 232, 0.72)';
+const T2_BAND = 'rgba(20, 48, 85, 0.07)';
 
 export const GET: APIRoute = async () => {
   const live = premiumChipsList();
@@ -27,51 +28,63 @@ export const GET: APIRoute = async () => {
     chip,
     cells: TIERS.map((t) => homeOdCell(t as Tier, chip)),
   }));
-  const rowH = ladder.length > 5 ? 54 : 62;
+  const rowH = ladder.length > 5 ? 52 : 60;
 
-  const kicker = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center' }, [
-    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 15, fontWeight: 600, letterSpacing: 3, color: C.navy }, 'CCIR · COMPUTE CREDIT INDEX RESEARCH'),
-    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 15, letterSpacing: 1, color: C.dim }, `As of ${meta.as_of_date}`),
+  const band = el('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 62, flexShrink: 0, backgroundColor: C.navy, paddingLeft: PAD, paddingRight: PAD }, [
+    el('div', { display: 'flex', alignItems: 'baseline', gap: 18 }, [
+      el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 26, fontWeight: 600, letterSpacing: 5, color: CREAM }, 'CCIR'),
+      el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 13, letterSpacing: 3, color: CREAM_DIM }, 'COMPUTE CREDIT INDEX RESEARCH'),
+    ]),
+    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 13, letterSpacing: 3, color: CREAM_DIM }, 'DAILY REFERENCE RATES'),
   ]);
 
-  const headline = el('div', { display: 'flex', alignItems: 'center', height: 64, flexShrink: 0, fontFamily: 'IBM Plex Serif', fontSize: 44, fontWeight: 600, color: C.ink, letterSpacing: -0.5, lineHeight: 1.2, marginTop: 12 }, 'Independent reference rates for GPU compute.');
-  const standfirst = el('div', { display: 'flex', alignItems: 'center', height: 24, flexShrink: 0, fontFamily: 'IBM Plex Mono', fontSize: 17, color: C.dim, lineHeight: 1.2, marginTop: 4, marginBottom: 20 }, 'USD per GPU-hour, on demand, by operator segment.');
+  const titleRow = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexShrink: 0, marginTop: 30 }, [
+    el('div', { display: 'flex', flexDirection: 'column' }, [
+      el('div', { display: 'flex', alignItems: 'center', height: 52, fontFamily: 'IBM Plex Serif', fontSize: 40, fontWeight: 600, color: C.ink, letterSpacing: -0.5, lineHeight: 1.15 }, 'GPU rental reference rates'),
+      el('div', { display: 'flex', alignItems: 'center', height: 22, fontFamily: 'IBM Plex Mono', fontSize: 16, color: C.dim, marginTop: 4 }, 'USD per GPU-hour · on-demand · by operator segment'),
+    ]),
+    el('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }, [
+      el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 12, letterSpacing: 2.5, color: C.faint }, 'AS OF'),
+      el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 21, fontWeight: 600, color: C.ink, marginTop: 2 }, meta.as_of_date),
+    ]),
+  ]);
 
-  const headRow = el('div', { display: 'flex', alignItems: 'flex-end', paddingBottom: 10, borderBottom: `2.5px solid ${C.ink}` }, [
-    el('div', { display: 'flex', flexGrow: 1 }),
+  const headRow = el('div', { display: 'flex', alignItems: 'stretch', flexShrink: 0, borderBottom: `2.5px solid ${C.ink}`, marginTop: 24 }, [
+    el('div', { display: 'flex', alignItems: 'center', flexGrow: 1, fontFamily: 'IBM Plex Mono', fontSize: 13, fontWeight: 600, letterSpacing: 2.5, color: C.dim, paddingBottom: 9 }, 'SILICON'),
     ...TIERS.map((t) =>
-      el('div', { display: 'flex', justifyContent: 'flex-end', width: COL_W, fontFamily: 'IBM Plex Mono', fontSize: 14, fontWeight: 600, letterSpacing: 2.5, color: t === 'T2' ? C.navy : C.dim }, SEGMENTS[t].toUpperCase()),
+      el('div', { display: 'flex', alignItems: 'center', justifyContent: 'center', width: COL_W, paddingBottom: 9, fontFamily: 'IBM Plex Mono', fontSize: 13, fontWeight: 600, letterSpacing: 2.5, color: t === 'T2' ? C.navy : C.dim, ...(t === 'T2' ? { backgroundColor: T2_BAND } : {}) }, SEGMENTS[t].toUpperCase()),
     ),
   ]);
 
   const bodyRows = ladder.map(({ chip, cells }) =>
-    el('div', { display: 'flex', alignItems: 'center', height: rowH, borderBottom: `1px solid ${C.rule}` }, [
-      el('div', { display: 'flex', flexGrow: 1, fontFamily: 'IBM Plex Mono', fontSize: 23, fontWeight: 600, letterSpacing: 1.5, color: C.ink }, chip.replace(/-/g, ' ')),
+    el('div', { display: 'flex', alignItems: 'stretch', height: rowH, flexShrink: 0, borderBottom: `1px solid ${C.rule}` }, [
+      el('div', { display: 'flex', alignItems: 'center', flexGrow: 1, fontFamily: 'IBM Plex Mono', fontSize: 22, fontWeight: 600, letterSpacing: 1.5, color: C.ink }, chip.replace(/-/g, ' ')),
       ...cells.map((c, i) => {
         const t = TIERS[i];
         return el('div', {
-          display: 'flex', justifyContent: 'flex-end', width: COL_W,
-          fontFamily: 'IBM Plex Mono', fontSize: 25,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', width: COL_W,
+          fontFamily: 'IBM Plex Mono', fontSize: 24,
           fontWeight: c && t === 'T2' ? 600 : 400,
           color: !c ? C.faint : t === 'T2' ? C.navy : C.ink,
+          ...(t === 'T2' ? { backgroundColor: T2_BAND } : {}),
         }, c ? headlineValue(c as Rate).toFixed(2) : '—');
       }),
     ]),
   );
 
-  const footer = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: 14, borderTop: `1px solid ${C.rule2}` }, [
-    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 15, color: C.dim }, 'No positions. Observed prices only.'),
-    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 16, fontWeight: 600, letterSpacing: 1, color: C.navy }, 'ccir.io'),
+  const footer = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0, marginTop: 'auto', paddingTop: 12, borderTop: `1px solid ${C.rule2}` }, [
+    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 14, color: C.dim }, 'No positions. Published prices, not privately negotiated deals.'),
+    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 15, fontWeight: 600, letterSpacing: 1, color: C.navy }, 'ccir.io'),
   ]);
 
-  const root = el('div', { display: 'flex', flexDirection: 'column', width: 1200, height: 630, backgroundColor: C.bg, paddingTop: 36, paddingLeft: PAD, paddingRight: PAD, paddingBottom: 30 }, [
-    el('div', { display: 'flex', width: 130, height: 6, flexShrink: 0, backgroundColor: C.navy, marginBottom: 16 }),
-    kicker,
-    headline,
-    standfirst,
-    headRow,
-    ...bodyRows,
-    footer,
+  const root = el('div', { display: 'flex', flexDirection: 'column', width: 1200, height: 630, backgroundColor: C.bg }, [
+    band,
+    el('div', { display: 'flex', flexDirection: 'column', flexGrow: 1, paddingTop: 0, paddingLeft: PAD, paddingRight: PAD, paddingBottom: 26 }, [
+      titleRow,
+      headRow,
+      ...bodyRows,
+      footer,
+    ]),
   ]);
 
   const png = await toPng(root);
