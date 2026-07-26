@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import {
-  headlineRates, meta, premiumChipsList,
+  headlineRates, meta, premiumChipsList, homeOdCell, headlineValue, headlineStatOf,
   neocloudCommittedCell, neocloudCommittedTenors,
 } from '../data/snapshot';
 import { TIERS, TIER_LABELS_SHORT, TERM_DISPLAY } from '../data/types';
@@ -10,29 +10,14 @@ import type { Rate, Tier } from '../data/types';
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 
 // --- headline ladder (mirrors /rates) -------------------------------------
-// Guaranteed on-demand reference: int=GTD, form + region pooled. Stat rule:
-// n≥10 → mean (deep enough to trust), else median (small panels skew).
-const N_MEAN_THRESHOLD = 10;
-const STAT_RANK: Record<string, number> = { Published: 0, Provisional: 1, Shadow: 2 };
-// Region-pooled (ALL) since 2026-07-25 so the ladder's H100 cell ties exactly
-// to the term panel's OD anchor on the same series grain. /rates remains the
-// US citable headline — lender/counsel engagement points there, not here.
-function odCell(tier: Tier, chip: string): Rate | undefined {
-  return headlineRates
-    .filter((r) => r.tier === tier && r.gpu_model === chip &&
-                   r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
-                   r.promotion_status !== 'Shadow')
-    .sort((a, b) =>
-      (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
-      (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
-}
-function headlineStat(c: Rate): number {
-  return c.n_sources >= N_MEAN_THRESHOLD ? c.price_mean : c.price_median;
-}
+// Cell selection and value rule live in snapshot.ts (homeOdCell /
+// headlineValue) so this ladder, the OG share card, and /rates can never
+// disagree. Region-pooled (ALL) since 2026-07-25 so the ladder's H100 cell
+// ties exactly to the term panel's OD anchor on the same series grain.
+// /rates remains the US citable headline — lender/counsel engagement points
+// there, not here.
 function cellTitle(c: Rate): string {
-  const kind = c.n_sources >= N_MEAN_THRESHOLD ? 'mean' : 'median';
-  return `${c.series_id} · ${kind}, n=${c.n_sources} · median ${fmt(c.price_median)} · mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)}`;
+  return `${c.series_id} · ${headlineStatOf(c)}, n=${c.n_sources} · median ${fmt(c.price_median)} · mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)}`;
 }
 
 const chips = (() => {
@@ -40,7 +25,7 @@ const chips = (() => {
   return (live.length > 0 ? live : ['B200', 'H200', 'H100', 'A100']);
 })();
 const ladder = chips
-  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, odCell(t, chip)])) as Record<Tier, Rate | undefined> }))
+  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeOdCell(t, chip)])) as Record<Tier, Rate | undefined> }))
   .filter((row) => TIERS.some((t) => row.cells[t]));
 
 // --- committed term panel (companion to the ladder; mirrors /term) --------
@@ -53,7 +38,7 @@ const termRows = neocloudCommittedTenors()
   .filter((r): r is { term: typeof r.term; cell: Rate } => !!r.cell);
 function vsOd(c: Rate): string {
   if (!termAnchor) return '—';
-  const pct = Math.round((headlineStat(c) / headlineStat(termAnchor) - 1) * 100);
+  const pct = Math.round((headlineValue(c) / headlineValue(termAnchor) - 1) * 100);
   return `${pct > 0 ? '+' : '−'}${Math.abs(pct)}%`;
 }
 
@@ -129,7 +114,7 @@ const researchGroups: ResearchGroup[] = [
                       if (!c) return <td class="num empty">—</td>;
                       return (
                         <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
-                          {fmt(headlineStat(c))}
+                          {fmt(headlineValue(c))}
                         </td>
                       );
                     })}
@@ -137,10 +122,14 @@ const researchGroups: ResearchGroup[] = [
                 ))}
               </tbody>
             </table>
-            <div class="table-foot">
-              CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-ALL · hover a rate for
-              its full series id, stat, IQR and panel depth · US headline on /rates
-            </div>
+            <details class="table-foot">
+              <summary>Series &amp; stat</summary>
+              <div class="tf-body">
+                CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-ALL · headline = panel
+                mean at n&nbsp;≥&nbsp;10, else median · hover a rate for its full
+                series id, stat, IQR and panel depth · US citable headline on /rates
+              </div>
+            </details>
           </div>
         </div>
 
@@ -159,23 +148,26 @@ const researchGroups: ResearchGroup[] = [
                 {termAnchor && (
                   <tr>
                     <td class="term-cell">On-demand</td>
-                    <td class="num posted" title={cellTitle(termAnchor)}>{fmt(headlineStat(termAnchor))}</td>
+                    <td class="num posted" title={cellTitle(termAnchor)}>{fmt(headlineValue(termAnchor))}</td>
                     <td class="num disc anchor-disc">anchor</td>
                   </tr>
                 )}
                 {termRows.map(({ term, cell }) => (
                   <tr>
                     <td class="term-cell">{TERM_DISPLAY[term] ?? term}</td>
-                    <td class="num posted" title={cellTitle(cell)}>{fmt(headlineStat(cell))}</td>
+                    <td class="num posted" title={cellTitle(cell)}>{fmt(headlineValue(cell))}</td>
                     <td class="num disc">{vsOd(cell)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div class="table-foot">
-              CRI-T2-H100-ALL-GTD-&lbrace;TENOR&rbrace;-ALL · region-pooled ·
-              vs-OD on the same series grain
-            </div>
+            <details class="table-foot">
+              <summary>Series &amp; stat</summary>
+              <div class="tf-body">
+                CRI-T2-H100-ALL-GTD-&lbrace;TENOR&rbrace;-ALL · region-pooled ·
+                vs-OD on the same series grain, same stat rule as the ladder
+              </div>
+            </details>
           </div>
         </div>
       </div>
@@ -272,13 +264,24 @@ const researchGroups: ResearchGroup[] = [
     .th-scope { color: var(--ink); font-weight: var(--weight-strong); }
     .th-meta { color: var(--ink-dim); white-space: nowrap; }
     .table-foot {
-      padding: 8px 16px;
       border-top: 1px solid var(--rule-2);
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 1px);
       color: var(--ink-faint);
       letter-spacing: 0.02em;
     }
+    .table-foot summary {
+      padding: 8px 16px;
+      cursor: pointer;
+      list-style: none;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      user-select: none;
+    }
+    .table-foot summary::-webkit-details-marker { display: none; }
+    .table-foot summary::after { content: ' +'; }
+    .table-foot[open] summary::after { content: ' −'; }
+    .table-foot .tf-body { padding: 0 16px 8px; line-height: 1.6; }
     table.ladder-table, table.term-table { width: 100%; border-collapse: collapse; }
     table.ladder-table th.chip-col { text-align: left; width: 18%; }
     table.ladder-table th.tier-col { text-align: right; padding: 10px 16px; }

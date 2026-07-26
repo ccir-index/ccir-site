@@ -38,8 +38,15 @@ export function tierTable(opts: {
   ladder: LadderRow[];
   secondaryHeader: string;
   secondary: (cell: Cell, tier: string, cells: Record<string, Cell>) => string;
+  valueHeader?: string;
+  // NB: not named "valueOf" — every object inherits Object.prototype.valueOf,
+  // so a destructuring default under that name never applies.
+  cellValue?: (cell: NonNullable<Cell>) => number;
 }) {
-  const { tiers, labelOf, ladder, secondaryHeader, secondary } = opts;
+  const {
+    tiers, labelOf, ladder, secondaryHeader, secondary,
+    valueHeader = 'MEDIAN $/HR', cellValue = (c) => c.price_median,
+  } = opts;
 
   const tierHead = (t: string) =>
     el('div', { display: 'flex', flexDirection: 'column', width: W_TIER, borderLeft: `1px solid ${C.rule}` }, [
@@ -48,7 +55,7 @@ export function tierTable(opts: {
         el('div', { display: 'flex', fontSize: 12, fontWeight: 400, letterSpacing: 2, color: C.dim }, labelOf(t).toUpperCase()),
       ]),
       el('div', { display: 'flex', borderTop: `1px solid ${C.rule}` }, [
-        el('div', { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: W_MED, height: 30, padding: '0 14px', color: C.faint, fontSize: 11, letterSpacing: 1.5 }, 'MEDIAN $/HR'),
+        el('div', { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: W_MED, height: 30, padding: '0 14px', color: C.faint, fontSize: 11, letterSpacing: 1.5 }, valueHeader),
         el('div', { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: W_N, height: 30, padding: '0 14px', color: C.faint, fontSize: 11, letterSpacing: 1.5, borderLeft: `1px solid ${C.rule}` }, secondaryHeader),
       ]),
     ]);
@@ -63,7 +70,7 @@ export function tierTable(opts: {
       el('div', { display: 'flex', alignItems: 'center', width: W_SILICON, padding: '0 16px', color: C.ink, fontSize: 19, fontWeight: 600, letterSpacing: 1 }, chip.replace(/-/g, ' ')),
       ...tiers.flatMap((t) => {
         const c = cells[t];
-        const med = c ? `$${c.price_median.toFixed(2)}` : '—';
+        const med = c ? `$${cellValue(c).toFixed(2)}` : '—';
         const medColor = !c ? C.faint : t === tiers[0] ? C.navy : C.ink;
         return [
           el('div', { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: W_MED, height: '100%', padding: '0 14px', borderLeft: `1px solid ${C.rule}`, color: medColor, fontSize: 20, fontWeight: c ? 600 : 400 }, med),

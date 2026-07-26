@@ -113,10 +113,14 @@ function cellTitle(c: Rate): string {
           ))}
         </tbody>
       </table>
-      <div class="table-foot">
-        CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-US · hover a rate for its
-        full series id, stat, region, IQR and panel depth
-      </div>
+      <details class="table-foot">
+        <summary>Series &amp; stat</summary>
+        <div class="tf-body">
+          CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-US · headline = panel
+          mean at n&nbsp;≥&nbsp;10, else median · hover a rate for its full
+          series id, stat, region, IQR and panel depth
+        </div>
+      </details>
     </div>
     <section class="defs-section">
       <TierDefinitions headerless={true} />
@@ -155,13 +159,24 @@ function cellTitle(c: Rate): string {
     .th-scope { color: var(--ink); font-weight: var(--weight-strong); }
     .th-meta { color: var(--ink-dim); white-space: nowrap; }
     .table-foot {
-      padding: 8px 16px;
       border-top: 1px solid var(--rule-2);
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 1px);
       color: var(--ink-faint);
       letter-spacing: 0.02em;
     }
+    .table-foot summary {
+      padding: 8px 16px;
+      cursor: pointer;
+      list-style: none;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      user-select: none;
+    }
+    .table-foot summary::-webkit-details-marker { display: none; }
+    .table-foot summary::after { content: ' +'; }
+    .table-foot[open] summary::after { content: ' −'; }
+    .table-foot .tf-body { padding: 0 16px 8px; line-height: 1.6; }
     table.ladder-table { width: 100%; border-collapse: collapse; }
     table.ladder-table th.chip-col { text-align: left; width: 30%; }
     table.ladder-table th.tier-col { text-align: right; padding: 10px 18px; }

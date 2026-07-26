@@ -300,6 +300,22 @@ export function headlineStatOf(r: Rate): 'mean' | 'median' {
   return (r.n_sources ?? 0) >= 10 ? 'mean' : 'median';
 }
 
+// Home-ladder cell: guaranteed on-demand reference at the pooled grain.
+// ONE selection for every surface that renders this ladder (homepage, OG
+// share card) so they can never disagree: strict GTD, form + region pooled,
+// Shadow out, Published preferred over Provisional, then panel breadth.
+const HOME_OD_RANK: Record<string, number> = { Published: 0, Provisional: 1 };
+export function homeOdCell(tier: Tier, chip: string): Rate | undefined {
+  return headlineRates
+    .filter((r) => r.tier === tier && r.gpu_model === chip &&
+                   r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
+                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
+                   r.promotion_status !== 'Shadow')
+    .sort((a, b) =>
+      (HOME_OD_RANK[a.promotion_status] ?? 3) - (HOME_OD_RANK[b.promotion_status] ?? 3) ||
+      (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+}
+
 // Operator-tier T2 (Neocloud) committed cell per (chip, tenor) — the committed
 // term-structure source that replaces the retired NEOCLOUD grade band. Prefer
 // GTD (committed is guaranteed by nature), form + region pooled, non-Shadow.
