@@ -16,7 +16,9 @@ const SEGMENTS: Record<string, string> = {
   T1: 'Hyperscaler', T2: 'Neocloud', T3: 'Marketplace',
 };
 const PAD = 60;
-const COL_W = 214;
+// Wide value columns pull the first figure toward the chip labels — a
+// narrow label column + long empty gulf reads worse than generous columns.
+const COL_W = 300;
 
 export const GET: APIRoute = async () => {
   const live = premiumChipsList();
