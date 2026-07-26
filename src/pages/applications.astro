@@ -192,6 +192,16 @@ const rolloverPrecedents: { feature: string; precedent: string }[] = [
 // On-page contents — ids match the anchored use-case articles and section h3s.
 const toc = [
   {
+    id: 'citation-annex',
+    kicker: 'Annex',
+    label: 'Series Citation & Disruption Provisions',
+    secs: [
+      ['annex-a', 'Part A — Definitions'],
+      ['annex-b', 'Part B — Reference Rate Disruption'],
+      ['annex-cal', 'Calibration Notes'],
+    ],
+  },
+  {
     id: 'uc-01',
     kicker: 'Use case 01',
     label: 'Market Price Monitoring Covenant',
@@ -289,6 +299,179 @@ const toc = [
         ))}
       </div>
     </nav>
+
+    <article class="usecase" id="citation-annex">
+      <header class="uc-head">
+        <span class="uc-kicker">Citation Annex · Applies to any citing document</span>
+        <h2>Series Citation and Disruption Provisions</h2>
+        <p class="uc-lede">
+          As the administrator, CCIR standardizes the two things only an
+          administrator can: how its series are correctly cited, and what
+          should happen to a citing document if a series materially changes
+          or ceases. The annex below is published for that purpose. It takes
+          no position on commercial terms between parties — coverage levels,
+          thresholds, remedies, and cure mechanics are matters for the
+          parties and their counsel (Use Case 01 works one such structure as
+          an illustration). It is not legal advice and not a recommended
+          form of agreement.
+        </p>
+      </header>
+
+      <section class="sec">
+        <p class="calib-note">
+          Incorporation: Part A inserts into the citing document's
+          definitions. Part B inserts as a benchmark-disruption provision
+          wherever the citing document houses rate mechanics. Bracketed items
+          are calibrated by the parties. The calibration notes at the end do
+          not form part of the operative language.
+        </p>
+        <button id="annex-copy" class="annex-copy" type="button">Copy annex text</button>
+      </section>
+
+      <section class="sec">
+        <h3 id="annex-a"><span class="sec-n">A</span> Part A — Definitions</h3>
+        <pre class="cov-body">
+<span class="cov-h">"Citing Document"</span> means the credit agreement, confirmation, indenture,
+valuation policy, or other instrument incorporating this Annex.
+
+<span class="cov-h">"CRI Reference Rate"</span> means, as of any date of determination, the rate
+published as <strong>[SERIES ID]</strong> by the Reference Rate Administrator on its
+principal website (currently ccir.io), expressed in U.S. dollars per GPU
+per hour, for the most recent Publication Date on or prior to such date.
+
+<span class="cov-h">"Reference Rate Administrator"</span> means Compute Credit Index Research LLC,
+a Delaware limited liability company, or any successor administrator of
+the [SERIES ID] rate that (i) maintains a published methodology
+substantially consistent with the CCIR Methodology in effect on the
+[Closing Date / Trade Date / Effective Date] (or any successor version
+adopted in compliance with the Reference Rate Administrator's published
+Change Management Policy) and (ii) operates with structural independence
+from counterparties to GPU compute transactions.
+
+<span class="cov-h">"CCIR Methodology"</span> means the methodology document published by the
+Reference Rate Administrator at ccir.io/documents/methodology, as in
+effect on the [Closing Date / Trade Date / Effective Date], together with
+any amendment adopted in compliance with the Change Management Policy.
+
+<span class="cov-h">"Change Management Policy"</span> means the change management policy published
+by the Reference Rate Administrator at ccir.io/documents/change-management,
+as in effect on the [Closing Date / Trade Date / Effective Date].
+
+<span class="cov-h">"Publication Date"</span> means each day on which the Reference Rate
+Administrator publishes the CRI Reference Rate in accordance with its
+stated publication schedule.
+
+<span class="cov-h">"Reference Rate Average"</span> means, as of any date of determination, the
+arithmetic mean of the CRI Reference Rate for each of the [thirty (30)]
+consecutive Publication Dates ending on (and including) the most recent
+Publication Date on or prior to such date. [Include if the Citing
+Document tests an average rather than a single print.]</pre>
+      </section>
+
+      <section class="sec">
+        <h3 id="annex-b"><span class="sec-n">B</span> Part B — Reference Rate Disruption</h3>
+        <pre class="cov-body">
+<span class="cov-h">(i)  Reference Rate Disruption Events.</span> Each of the following shall
+constitute a "Reference Rate Disruption Event":
+
+    (A)  <span class="cov-h">Cessation Event:</span> the Reference Rate Administrator publicly
+    announces that it has ceased or will cease to publish the CRI
+    Reference Rate, and no successor administrator has assumed
+    publication;
+
+    (B)  <span class="cov-h">Administrator Event:</span> the Reference Rate Administrator (1)
+    ceases to maintain a published methodology, (2) loses material
+    structural independence from counterparties to GPU compute
+    transactions, or (3) becomes the subject of an enforcement action
+    by a financial regulator for benchmark-related conduct;
+
+    (C)  <span class="cov-h">Material Methodology Change:</span> the Reference Rate Administrator
+    implements a change to the methodology governing the CRI Reference
+    Rate that, in the reasonable determination of the [Determining
+    Party], is not substantively similar to the methodology in effect
+    on the [Closing Date / Trade Date / Effective Date] and would, if
+    applied to the historical period, have produced a Reference Rate
+    Average more than [ten percent (10%)] different from the actual
+    published values; or
+
+    (D)  <span class="cov-h">Publication Disruption:</span> the Reference Rate Administrator
+    fails to publish the CRI Reference Rate for [five (5)] or more
+    consecutive Publication Dates other than as a result of a
+    scheduled publication holiday.
+
+<span class="cov-h">(ii) Replacement Rate Waterfall.</span> Upon the occurrence and during the
+continuance of a Reference Rate Disruption Event, the "Replacement
+Rate" shall be determined by the [Determining Party] in the following
+order of priority:
+
+    First, any rate published by a successor administrator that has
+    publicly assumed responsibility for continued publication of the
+    [SERIES ID] rate using a methodology substantially consistent with
+    the CCIR Methodology then in effect;
+
+    Second, a rate constructed by the [Determining Party] from
+    seller-posted prices of the type and from the source categories
+    specified in the CCIR Methodology, applying the aggregation
+    methodology specified in the CCIR Methodology in effect
+    immediately prior to the Reference Rate Disruption Event;
+
+    Third, any other published GPU compute reference rate selected by
+    the [Determining Party] [(with the consent of [the Required
+    Lenders / the parties])] that (1) is administered by an entity
+    structurally independent from counterparties to GPU compute
+    transactions, (2) covers [PRODUCT] [CHIP] pricing offered by
+    [SEGMENT] in [REGION], and (3) is published with a frequency of at
+    least weekly; or
+
+    Fourth, a rate determined in good faith by the [Determining
+    Party], based on then-available information regarding seller-posted
+    [PRODUCT] [CHIP] prices from [SEGMENT] of the type historically
+    used by the Reference Rate Administrator.
+
+<span class="cov-h">(iii) Level Adjustment.</span> Upon application of any Replacement Rate, the
+[Determining Party] shall adjust each rate-referencing level, threshold,
+or trigger defined in the Citing Document by applying an adjustment
+spread (which may be positive or negative) calculated to neutralize any
+change arising solely from the change in rate input, measured over the
+[thirty (30)]-day period ending on the date of the Reference Rate
+Disruption Event.
+
+<span class="cov-h">(iv) Conforming Changes.</span> The [Determining Party] may, in connection
+with the implementation of any Replacement Rate, make such technical,
+administrative, or operational changes to the Citing Document (including
+to determination schedules, publication-date references, and threshold
+amounts) as it reasonably determines are appropriate[, without further
+consent of the parties].</pre>
+      </section>
+
+      <section class="sec">
+        <h3 id="annex-cal"><span class="sec-n">C</span> Calibration Notes</h3>
+        <div class="ftable-wrap">
+          <table class="ftable">
+            <tbody>
+              <tr><th>[SERIES ID]</th><td>Match the series cell to the exposure: segment × silicon × product × region. Mixed-generation pools: see Use Case 03 (Pool Reference Rate).</td></tr>
+              <tr><th>[Closing Date / Trade Date / Effective Date]</th><td>Use the citing document's version-anchor date convention.</td></tr>
+              <tr><th>[Determining Party]</th><td>Administrative Agent in credit documents; Calculation Agent in confirmations; the valuation designee in fund policies.</td></tr>
+              <tr><th>[30] Publication Dates</th><td>Averaging window, if an average is tested. Longer smooths composition noise; shorter reacts faster. Align with the series' publication cadence.</td></tr>
+              <tr><th>[10]%</th><td>Operationalizes "material" methodology change numerically; calibratable against the Change Management Policy's change classes.</td></tr>
+              <tr><th>[5] days</th><td>Publication-disruption trigger; align with the series' stated publication schedule.</td></tr>
+              <tr><th>Consent brackets</th><td>Bilateral documents typically drop agent-style consent mechanics.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="source-note">
+        This annex is published by the Reference Rate Administrator to
+        standardize how its series are cited and how citing documents may
+        provide for series change or cessation. It is not legal advice, not
+        a recommended form of agreement, and not an offer of any instrument.
+        The Reference Rate Administrator is not a party to, and assumes no
+        obligations or liability under, any document that references its
+        published series. All commercial terms are matters for the parties
+        and their counsel.
+      </p>
+    </article>
 
     <article class="usecase" id="uc-01">
       <header class="uc-head">
@@ -1568,6 +1751,19 @@ Servicer Report.</pre>
       font-weight: var(--weight-strong);
     }
 
+    .annex-copy {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--accent);
+      background: var(--surface-2);
+      border: 1px solid var(--rule);
+      padding: 7px 14px;
+      cursor: pointer;
+    }
+    .annex-copy:hover { border-color: var(--accent); }
+
     .source-note {
       font-family: var(--font-mono) !important;
       font-size: calc(var(--fs-xs) - 1px) !important;
@@ -1590,4 +1786,25 @@ Servicer Report.</pre>
     }
     .more-soon a { color: var(--accent); font-weight: var(--weight-strong); }
   </style>
+
+  <script>
+    const copyBtn = document.getElementById('annex-copy');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async () => {
+        const parts = Array.from(
+          document.querySelectorAll<HTMLElement>('#citation-annex pre.cov-body'),
+        ).map((p) => p.innerText.trim());
+        const text =
+          'ANNEX [__] — CCIR SERIES CITATION AND DISRUPTION PROVISIONS\n\n' +
+          parts.join('\n\n');
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.textContent = 'Copied';
+        } catch {
+          copyBtn.textContent = 'Copy failed — select manually';
+        }
+        setTimeout(() => { copyBtn.textContent = 'Copy annex text'; }, 2000);
+      });
+    }
+  </script>
 </Base>
