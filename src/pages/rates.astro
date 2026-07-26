@@ -46,7 +46,7 @@ function chipDisplay(token: string): string {
 
 function cellTitle(c: Rate): string {
   const kind = headlineStatOf(c);
-  return `${kind === 'mean' ? 'Mean' : 'Median'} (n=${c.n_sources}) · region ${c.region} · median ${fmt(c.price_median)} · mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)}`;
+  return `${c.series_id} · ${kind === 'mean' ? 'Mean' : 'Median'} (n=${c.n_sources}) · region ${c.region} · median ${fmt(c.price_median)} · mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)}`;
 }
 ---
 <Base
@@ -81,6 +81,10 @@ function cellTitle(c: Rate): string {
     </header>
 
     <div class="table-wrap">
+      <div class="table-head">
+        <span class="th-scope">On-demand, guaranteed</span>
+        <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
+      </div>
       <table class="data ladder-table">
         <thead>
           <tr>
@@ -88,7 +92,6 @@ function cellTitle(c: Rate): string {
             {TIERS.map((t) => (
               <th class={`tier-col tier-col-${t.toLowerCase()}`}>
                 <span class={`tier-badge tier-badge-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</span>
-                <span class="th-sub">$/hr</span>
               </th>
             ))}
           </tr>
@@ -102,8 +105,7 @@ function cellTitle(c: Rate): string {
                 if (!c) return <td class="num empty">—</td>;
                 return (
                   <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
-                    ${fmt(headlineValue(c))}
-                    <div class="cell-sid">{c.series_id}</div>
+                    {fmt(headlineValue(c))}
                   </td>
                 );
               })}
@@ -111,6 +113,10 @@ function cellTitle(c: Rate): string {
           ))}
         </tbody>
       </table>
+      <div class="table-foot">
+        CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-US · hover a rate for its
+        full series id, stat, region, IQR and panel depth
+      </div>
     </div>
     <section class="defs-section">
       <TierDefinitions headerless={true} />
@@ -134,40 +140,50 @@ function cellTitle(c: Rate): string {
       background: var(--surface);
       overflow-x: auto;
     }
+    .table-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--rule-2);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .th-scope { color: var(--ink); font-weight: var(--weight-strong); }
+    .th-meta { color: var(--ink-dim); white-space: nowrap; }
+    .table-foot {
+      padding: 8px 16px;
+      border-top: 1px solid var(--rule-2);
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+    }
     table.ladder-table { width: 100%; border-collapse: collapse; }
-    table.ladder-table th.chip-col { text-align: left; width: 14%; }
-    table.ladder-table th.tier-col { text-align: center; padding: 10px 14px; }
+    table.ladder-table th.chip-col { text-align: left; width: 30%; }
+    table.ladder-table th.tier-col { text-align: right; padding: 10px 18px; }
     table.ladder-table th.tier-col-t1 { color: var(--tier-t1); }
     table.ladder-table th.tier-col-t2 { color: var(--tier-t2); }
     table.ladder-table th.tier-col-t3 { color: var(--tier-t3); }
-    table.ladder-table th .th-sub {
-      display: block;
-      font-size: calc(var(--fs-xs) - 2px);
-      color: var(--ink-faint);
-      font-weight: var(--weight-body);
-      letter-spacing: var(--tracking-eye);
-      text-transform: uppercase;
-      margin-top: 3px;
-    }
     table.ladder-table .chip-cell { white-space: nowrap; }
     table.ladder-table .chip-cell .chip-name {
       font-family: var(--font-mono);
-      font-size: var(--fs-sm);
+      font-size: var(--fs-md);
       color: var(--ink);
       font-weight: var(--weight-strong);
       letter-spacing: 0.04em;
     }
-    table.ladder-table td.num { text-align: center; }
-    table.ladder-table td.posted { font-weight: var(--weight-strong); cursor: help; }
-    .cell-sid {
+    table.ladder-table td.num {
+      text-align: right;
+      padding-right: 18px;
       font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 2px);
-      font-weight: var(--weight-body);
-      color: var(--ink-faint);
-      letter-spacing: 0.02em;
-      margin-top: 3px;
-      white-space: nowrap;
+      font-size: var(--fs-lg);
+      font-variant-numeric: tabular-nums;
     }
+    table.ladder-table td.posted { font-weight: var(--weight-strong); cursor: help; }
     /* Middle tier (Neocloud) is the market that matters — give it the accent. */
     table.ladder-table td.tier-pos-t2 { color: var(--accent); font-weight: var(--weight-strong); }
     table.ladder-table th.tier-col-t2 { color: var(--accent); }

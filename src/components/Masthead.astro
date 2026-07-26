@@ -12,7 +12,7 @@ const nav = [
             '/realized', '/chip-economics', '/utilization', '/observatory',
             '/availability', '/markets', '/marketplace', '/vast'] },
   { href: '/credit', label: 'Credit' },
-  { href: '/hardware', label: 'Secondary Market' },
+  { href: '/hardware', label: 'Secondary', label2: 'Market' },
   { href: '/explorer', label: 'Explorer' },
   { href: '/applications', label: 'Applications' },
   { href: '/contact', label: 'Contact' },
@@ -22,117 +22,116 @@ function isActive(n: { href: string; match?: string[] }): boolean {
   const group = n.match ?? [n.href];
   return group.some((g) => path === g || path.startsWith(g + '/'));
 }
-
-// Format dateline like a broadsheet: "Sunday, April 26, 2026"
-function dateline(iso: string): string {
-  const d = new Date(iso + 'T00:00:00Z');
-  return d.toLocaleDateString('en-US', {
-    timeZone: 'UTC',
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
 ---
 <header class="masthead">
+  <div class="top-rule">
+    <div class="wrap top-rule-inner">
+      <span class="claim">No positions in the markets we measure</span>
+      <span class="top-meta">
+        <span class="dateline">AS OF {meta.as_of_date}</span>
+        <span class="sep" aria-hidden="true">·</span>
+        <span class="status">
+          <span class="dot" aria-hidden="true"></span>BY 07:30 ET
+        </span>
+      </span>
+    </div>
+  </div>
   <div class="masthead-band wrap">
     <a class="brand" href="/">
       <span class="brand-mark">CCIR</span>
-      <span class="brand-name">Compute Credit Index Research</span>
+      <span class="brand-name">Compute Credit<br />Index Research</span>
     </a>
-    <div class="masthead-meta">
-      <span class="dateline">{dateline(meta.as_of_date)}</span>
+    <nav class="nav">
+      {nav.map((n) => (
+        <a
+          href={n.href}
+          class:list={['nav-link', { on: isActive(n), stacked: !!n.label2 }]}
+        >{n.label}{n.label2 && <span class="nav-l2">{n.label2}</span>}</a>
+      ))}
+    </nav>
+    <div class="masthead-tools">
       <ThemeToggle />
-    </div>
-  </div>
-  <div class="nav-band">
-    <div class="wrap nav-inner">
-      <nav class="nav">
-        {nav.map((n) => (
-          <a
-            href={n.href}
-            target={n.external ? '_blank' : undefined}
-            rel={n.external ? 'noopener noreferrer' : undefined}
-            class:list={['nav-link', { on: isActive(n) }]}
-          >{n.label}{n.external && <span class="ext-mark" aria-hidden="true">↗</span>}</a>
-        ))}
-      </nav>
-      <span class="status">
-        <span class="dot" aria-hidden="true"></span>PIPELINE · BY 07:30 ET
-      </span>
     </div>
   </div>
 </header>
 
 <style>
   .masthead { background: var(--surface); border-bottom: 1px solid var(--rule-2); }
+
+  /* Row 1 — the claim, the date, the cadence. Nothing else. */
+  .top-rule {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+  }
+  .top-rule-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+  }
+  .claim {
+    color: var(--accent);
+    font-weight: var(--weight-strong);
+  }
+  .top-meta {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink-dim);
+    white-space: nowrap;
+  }
+  .dateline { color: var(--ink); font-weight: var(--weight-strong); }
+  .sep { color: var(--ink-faint); }
+  .status { display: inline-flex; align-items: center; gap: 6px; }
+  .status .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--pos);
+    box-shadow: 0 0 6px var(--pos);
+  }
+
+  /* Row 2 — identity and navigation. */
   .masthead-band {
     display: flex;
     align-items: center;
-    gap: 24px;
-    padding-top: 14px;
+    gap: 32px;
+    padding-top: 12px;
     padding-bottom: 12px;
-    flex-wrap: wrap;
   }
   .brand {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 12px;
     text-decoration: none;
     color: var(--ink);
+    flex-shrink: 0;
   }
   .brand-mark {
     color: var(--accent);
     font-family: var(--font-mono);
     font-weight: var(--weight-strong);
-    font-size: var(--fs-md);
-    letter-spacing: 0.06em;
+    font-size: var(--fs-2xl);
+    letter-spacing: 0.04em;
+    line-height: 1;
   }
   .brand-name {
-    font-family: var(--font-display);
-    font-weight: var(--weight-display);
-    font-size: var(--fs-xl);
-    letter-spacing: -0.005em;
-  }
-  .masthead-meta {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 18px;
     font-family: var(--font-mono);
-    font-size: var(--fs-xs);
-    color: var(--ink-dim);
+    font-size: calc(var(--fs-xs) - 1px);
     text-transform: uppercase;
     letter-spacing: var(--tracking-eye);
+    color: var(--ink-dim);
+    line-height: 1.45;
   }
-  .dateline {
-    font-family: var(--font-mono);
-    color: var(--ink);
-    font-weight: var(--weight-strong);
-  }
-  .version {
-    padding: 3px 8px;
-    border: 1px solid var(--rule-2);
-    color: var(--accent);
-    font-weight: var(--weight-strong);
-    border-radius: var(--rad);
-  }
-
-  .nav-band {
-    background: var(--surface-2);
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-  }
-  .nav-inner {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    min-height: 36px;
-  }
-  .nav { display: flex; gap: 22px; }
+  .nav { display: flex; gap: 22px; align-items: center; }
+  .nav-link.stacked { line-height: 1.25; padding: 0; }
+  .nav-l2 { display: block; }
   .nav-link {
     font-family: var(--font-mono);
     font-size: var(--fs-xs);
@@ -144,60 +143,35 @@ function dateline(iso: string): string {
   }
   .nav-link:hover { color: var(--ink); text-decoration: none; }
   .nav-link.on { color: var(--accent); border-bottom-color: var(--accent); }
-  .nav-link .ext-mark {
-    margin-left: 3px;
-    font-size: 0.85em;
-    color: var(--ink-faint);
-  }
-  .status {
-    margin-left: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--font-mono);
-    font-size: var(--fs-xs);
-    color: var(--ink-dim);
-    letter-spacing: var(--tracking-eye);
-    text-transform: uppercase;
-  }
-  .status .dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--pos);
-    box-shadow: 0 0 6px var(--pos);
-  }
+  .masthead-tools { margin-left: auto; flex-shrink: 0; }
 
-  /* Mobile — contain nav overflow inside the nav band itself
+  /* Mobile — contain nav overflow inside the band itself
      instead of pushing the whole page wider than the viewport. */
-  @media (max-width: 720px) {
-    .nav-inner {
-      gap: 12px;
-      padding-left: 0;
-      padding-right: 0;
-    }
+  @media (max-width: 860px) {
+    .masthead-band { gap: 16px; flex-wrap: wrap; }
     .nav {
+      order: 3;
+      flex: 1 1 100%;
       gap: 16px;
       overflow-x: auto;
-      flex: 1 1 auto;
       min-width: 0;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
-      padding: 0 var(--wrap-pad, 16px);
     }
     .nav::-webkit-scrollbar { display: none; }
-    .nav-link {
-      flex-shrink: 0;
-      white-space: nowrap;
-    }
-    .status { display: none; }
-    .masthead-band { gap: 14px; padding-top: 12px; padding-bottom: 10px; }
-    .masthead-meta { gap: 12px; }
-    .brand-name { font-size: var(--fs-md); }
+    .nav-link { flex-shrink: 0; white-space: nowrap; }
+  }
+
+  @media (max-width: 720px) {
+    .top-rule-inner { flex-wrap: wrap; gap: 4px 16px; }
+    .top-meta { margin-left: auto; }
+    .masthead-band { padding-top: 10px; padding-bottom: 8px; }
+    .brand-mark { font-size: var(--fs-xl); }
   }
 
   @media (max-width: 480px) {
     .brand-name { display: none; }
-    .nav { gap: 14px; }
+    .status { display: none; }
+    .sep { display: none; }
   }
 </style>

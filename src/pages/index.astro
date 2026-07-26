@@ -1,7 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
-import { headlineRates, meta, premiumChipsList } from '../data/snapshot';
-import { TIERS, TIER_LABELS_SHORT } from '../data/types';
+import {
+  headlineRates, meta, premiumChipsList,
+  neocloudCommittedCell, neocloudCommittedTenors,
+} from '../data/snapshot';
+import { TIERS, TIER_LABELS_SHORT, TERM_DISPLAY } from '../data/types';
 import type { Rate, Tier } from '../data/types';
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
@@ -11,14 +14,14 @@ const fmt = (n: number, dp = 2) => n.toFixed(dp);
 // n≥10 → mean (deep enough to trust), else median (small panels skew).
 const N_MEAN_THRESHOLD = 10;
 const STAT_RANK: Record<string, number> = { Published: 0, Provisional: 1, Shadow: 2 };
-// Mirrors /rates exactly: US only, no region fallback — the home ladder and
-// the rates ladder must always show the same numbers, and a missing US cell
-// shows a dash rather than substituting the all-regions pool.
+// Region-pooled (ALL) since 2026-07-25 so the ladder's H100 cell ties exactly
+// to the term panel's OD anchor on the same series grain. /rates remains the
+// US citable headline — lender/counsel engagement points there, not here.
 function odCell(tier: Tier, chip: string): Rate | undefined {
   return headlineRates
     .filter((r) => r.tier === tier && r.gpu_model === chip &&
                    r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'US' && r.interruptibility === 'GTD' &&
+                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
                    r.promotion_status !== 'Shadow')
     .sort((a, b) =>
       (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
@@ -29,7 +32,7 @@ function headlineStat(c: Rate): number {
 }
 function cellTitle(c: Rate): string {
   const kind = c.n_sources >= N_MEAN_THRESHOLD ? 'mean' : 'median';
-  return `${kind}, n=${c.n_sources} · median ${fmt(c.price_median)} · mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)}`;
+  return `${c.series_id} · ${kind}, n=${c.n_sources} · median ${fmt(c.price_median)} · mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)}`;
 }
 
 const chips = (() => {
@@ -40,36 +43,46 @@ const ladder = chips
   .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, odCell(t, chip)])) as Record<Tier, Rate | undefined> }))
   .filter((row) => TIERS.some((t) => row.cells[t]));
 
-// --- research grid: 3 pinned + 6 rotating (3×3) -----------------------------
-// Rotation is deterministic per build: seeded by as_of_date, so the daily
-// data-sync rebuild advances the selection and every visitor sees the same
-// grid on a given day. Step 5 is coprime with the pool size, so consecutive
-// days share few cards and the full pool cycles through.
-type MiPiece = { href: string; title: string; blurb: string };
-const MI_PINNED: MiPiece[] = [
-  { href: '/chip-economics', title: 'Chip Economics', blurb: 'Earning power per spec-sheet unit — one lens is flat.' },
-  { href: '/utilization', title: 'Utilization & Availability', blurb: 'How much of the fleet is working.' },
-  { href: '/research/same-facility-different-marks', title: 'Same Facility, Different Marks', blurb: 'Four funds file 99 to 103 on one GPU-backed loan — dispersion by regime.' },
-];
-const MI_POOL: MiPiece[] = [
-  { href: '/term', title: 'Committed Term Structure', blurb: 'Guaranteed capacity priced by tenor.' },
-  { href: '/basis', title: 'On-Demand vs Clearing Basis', blurb: 'List asks vs where it transacts.' },
-  { href: '/realized/', title: 'Realized vs Rate Card', blurb: 'What clouds actually earn per GPU-hr.' },
-  { href: '/research/od-vs-committed', title: 'The Commitment Discount', blurb: 'On-demand vs committed H100 posted prices, Oct 2023 – Jun 2026.' },
-  { href: '/research/gpu-age-curve', title: 'Rent and Age', blurb: 'Five generations on July 6, 2026 — how the market prices chip age.' },
-  { href: '/research/rent-and-msrp', title: 'Rent and MSRP', blurb: 'Rent passed the MSRP anchor within 11–17 months, every generation.' },
-  { href: '/research/rental-rates-by-generation', title: 'Rates by Generation', blurb: 'Nine years of posted prices — declines arrive in steps.' },
-  { href: '/research/itel-1979', title: 'Itel, 1979', blurb: 'Residual insurance, the IBM 4300, and a $2B lesson.' },
-  { href: '/research/compute-contracts', title: 'The Compute Contract', blurb: 'How GPU-hours are sold, from terms of service to take-or-pay.' },
-  { href: '/research/gpu-spv', title: 'The GPU SPV', blurb: 'How lenders take compute as collateral.' },
-  { href: '/research/training-vs-inference', title: 'Training vs Inference', blurb: 'Backlog vs load — a primer for credit readers.' },
-  { href: '/research/compute-glossary', title: 'Compute Glossary', blurb: 'The vocabulary of compute paper, in finance terms.' },
-];
-const miDay = Math.floor(Date.parse(`${meta.as_of_date}T00:00:00Z`) / 86_400_000);
-const miStart = ((miDay * 5) % MI_POOL.length + MI_POOL.length) % MI_POOL.length;
-const miPieces: MiPiece[] = [
-  ...MI_PINNED,
-  ...Array.from({ length: 6 }, (_, i) => MI_POOL[(miStart + i) % MI_POOL.length]),
+// --- committed term panel (companion to the ladder; mirrors /term) --------
+// Anchor and tenors are all the region-pooled Neocloud H100 GTD series —
+// identical composition, so the vs-OD column is a like-for-like discount.
+const TERM_ANCHOR_SERIES = 'CRI-T2-H100-ALL-GTD-OD-ALL';
+const termAnchor = headlineRates.find((r) => r.series_id === TERM_ANCHOR_SERIES);
+const termRows = neocloudCommittedTenors()
+  .map((t) => ({ term: t, cell: neocloudCommittedCell('H100', t) }))
+  .filter((r): r is { term: typeof r.term; cell: Rate } => !!r.cell);
+function vsOd(c: Rate): string {
+  if (!termAnchor) return '—';
+  const pct = Math.round((headlineStat(c) / headlineStat(termAnchor) - 1) * 100);
+  return `${pct > 0 ? '+' : '−'}${Math.abs(pct)}%`;
+}
+
+// --- research: the hub's own taxonomy, three items per group ---------------
+// Fixed selection (rotation retired 2026-07-25): standing monitors lead each
+// group, dated notes follow. Kickers carry the monitor/note distinction.
+type ResearchItem = { href: string; title: string; kicker: string };
+type ResearchGroup = { theme: string; items: ResearchItem[] };
+const researchGroups: ResearchGroup[] = [
+  { theme: 'Asset Economics', items: [
+    { href: '/chip-economics', title: 'Chip Economics', kicker: 'Monitor · daily' },
+    { href: '/research/gpu-age-curve', title: 'Rent and Age: Five Generations', kicker: 'Note · 2026-07-06' },
+    { href: '/research/rent-and-msrp', title: 'Rent and MSRP', kicker: 'Note · 2026-07-08' },
+  ] },
+  { theme: 'Term & Price Structure', items: [
+    { href: '/term', title: 'Committed Term Structure', kicker: 'Monitor · daily' },
+    { href: '/research/od-vs-committed', title: 'The Commitment Discount', kicker: 'Note · 2026-07-06' },
+    { href: '/research/rental-rates-by-generation', title: 'Rates by Generation', kicker: 'Note · 2026-07-08' },
+  ] },
+  { theme: 'Demand & Utilization', items: [
+    { href: '/realized/', title: 'Realized vs Rate Card', kicker: 'Monitor · daily' },
+    { href: '/utilization', title: 'Utilization & Availability', kicker: 'Monitor · daily' },
+    { href: '/research/training-vs-inference', title: 'Training vs Inference', kicker: 'Primer' },
+  ] },
+  { theme: 'Precedents & Filings', items: [
+    { href: '/research/itel-1979', title: 'Itel and the IBM 4300', kicker: 'Note · 1979' },
+    { href: '/research/same-facility-different-marks', title: 'Same Facility, Different Marks', kicker: 'Note · 2026-07-12' },
+    { href: '/research/big-tech-hidden-debt', title: 'Big Tech’s Hidden Debt', kicker: 'Note · 2026-07-22' },
+  ] },
 ];
 ---
 <Base
@@ -79,63 +92,112 @@ const miPieces: MiPiece[] = [
 >
   <section class="wrap top">
     <header class="hero">
-      <div class="kicker">CCIR · Citable Reference Rates · Independent Analysis · {meta.as_of_date}</div>
       <h1>Reference Rates for the Compute Market</h1>
       <p class="standfirst lede">
-        Tracked daily across chips and deployment classes — premium silicon to
-        the long tail — from dozens of providers.
+        Published daily across chips and deployment classes.
       </p>
     </header>
 
-    <!-- Layer 1 — the reference ladder -->
+    <!-- Layer 1 — the reference ladder + the term curve -->
     <section class="ladder-block">
-      <div class="block-head">
-        <span class="kicker">Reference Rates · Guaranteed on-demand</span>
-        <a class="block-link" href="/rates">Full GPU rental rate ladder →</a>
-      </div>
-      <div class="table-wrap">
-        <table class="data ladder-table">
-          <thead>
-            <tr>
-              <th class="chip-col">Silicon</th>
-              {TIERS.map((t) => (
-                <th class={`tier-col tier-col-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {ladder.map(({ chip, cells }) => (
-              <tr>
-                <td class="chip-cell">{chip.replace(/-/g, ' ')}</td>
-                {TIERS.map((t) => {
-                  const c = cells[t];
-                  if (!c) return <td class="num empty">—</td>;
-                  return (
-                    <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
-                      ${fmt(headlineStat(c))}
-                      <div class="cell-sid">{c.series_id}</div>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div class="ladder-row">
+        <div class="ladder-col">
+          <div class="block-head">
+            <span class="kicker">Reference Rates</span>
+            <a class="block-link" href="/rates">Full rate ladder →</a>
+          </div>
+          <div class="table-wrap">
+            <div class="table-head">
+              <span class="th-scope">On-demand, guaranteed · region-pooled</span>
+              <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
+            </div>
+            <table class="data ladder-table">
+              <thead>
+                <tr>
+                  <th class="chip-col">Silicon</th>
+                  {TIERS.map((t) => (
+                    <th class={`tier-col tier-col-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {ladder.map(({ chip, cells }) => (
+                  <tr>
+                    <td class="chip-cell">{chip.replace(/-/g, ' ')}</td>
+                    {TIERS.map((t) => {
+                      const c = cells[t];
+                      if (!c) return <td class="num empty">—</td>;
+                      return (
+                        <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
+                          {fmt(headlineStat(c))}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div class="table-foot">
+              CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-ALL · hover a rate for
+              its full series id, stat, IQR and panel depth · US headline on /rates
+            </div>
+          </div>
+        </div>
+
+        <div class="term-col">
+          <div class="block-head">
+            <span class="kicker">Term Structure</span>
+            <a class="block-link" href="/term">Full term curve →</a>
+          </div>
+          <div class="table-wrap">
+            <div class="table-head">
+              <span class="th-scope">Committed · Neocloud H100</span>
+              <span class="th-meta">USD/GPU-hr · as of {meta.as_of_date}</span>
+            </div>
+            <table class="data term-table">
+              <tbody>
+                {termAnchor && (
+                  <tr>
+                    <td class="term-cell">On-demand</td>
+                    <td class="num posted" title={cellTitle(termAnchor)}>{fmt(headlineStat(termAnchor))}</td>
+                    <td class="num disc anchor-disc">anchor</td>
+                  </tr>
+                )}
+                {termRows.map(({ term, cell }) => (
+                  <tr>
+                    <td class="term-cell">{TERM_DISPLAY[term] ?? term}</td>
+                    <td class="num posted" title={cellTitle(cell)}>{fmt(headlineStat(cell))}</td>
+                    <td class="num disc">{vsOd(cell)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div class="table-foot">
+              CRI-T2-H100-ALL-GTD-&lbrace;TENOR&rbrace;-ALL · region-pooled ·
+              vs-OD on the same series grain
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Layer 2 — market intelligence -->
+    <!-- Layer 2 — research, in the hub's own taxonomy -->
     <section class="mi-block">
       <div class="block-head">
         <span class="kicker">Research</span>
         <a class="block-link" href="/research">All monitors &amp; notes →</a>
       </div>
-      <div class="mi-grid">
-        {miPieces.map((p) => (
-          <a class="mi-card" href={p.href}>
-            <h3 class="mi-title">{p.title}</h3>
-            <p class="mi-blurb">{p.blurb}</p>
-          </a>
+      <div class="rg-grid">
+        {researchGroups.map((g) => (
+          <div class="rg-group">
+            <div class="rg-theme">{g.theme}</div>
+            {g.items.map((it) => (
+              <a class="rg-item" href={it.href}>
+                <span class="rg-kicker">{it.kicker}</span>
+                <span class="rg-title">{it.title}</span>
+              </a>
+            ))}
+          </div>
         ))}
       </div>
     </section>
@@ -185,15 +247,46 @@ const miPieces: MiPiece[] = [
       letter-spacing: var(--tracking-eye);
     }
 
-    .ladder-block { margin: 0 0 34px; }
+    .ladder-block { margin: 0 0 40px; }
+    .ladder-row {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .ladder-row { grid-template-columns: 1fr; } }
+
     .table-wrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; }
-    table.ladder-table { width: 100%; border-collapse: collapse; }
-    table.ladder-table th.chip-col { text-align: left; width: 16%; }
-    table.ladder-table th.tier-col { text-align: center; padding: 10px 14px; }
+    .table-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 16px;
+      border-bottom: 1px solid var(--rule-2);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .th-scope { color: var(--ink); font-weight: var(--weight-strong); }
+    .th-meta { color: var(--ink-dim); white-space: nowrap; }
+    .table-foot {
+      padding: 8px 16px;
+      border-top: 1px solid var(--rule-2);
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+    }
+    table.ladder-table, table.term-table { width: 100%; border-collapse: collapse; }
+    table.ladder-table th.chip-col { text-align: left; width: 18%; }
+    table.ladder-table th.tier-col { text-align: right; padding: 10px 16px; }
     table.ladder-table th.tier-col-t1 { color: var(--tier-t1); }
     table.ladder-table th.tier-col-t2 { color: var(--tier-t2); }
     table.ladder-table th.tier-col-t3 { color: var(--tier-t3); }
-    table.ladder-table td.chip-cell {
+    table.ladder-table td.chip-cell,
+    table.term-table td.term-cell {
       font-family: var(--font-mono);
       font-size: var(--fs-sm);
       color: var(--ink);
@@ -201,54 +294,81 @@ const miPieces: MiPiece[] = [
       letter-spacing: 0.04em;
       white-space: nowrap;
     }
-    table.ladder-table td.num { text-align: center; }
-    table.ladder-table td.posted { font-weight: var(--weight-strong); cursor: help; }
-    .cell-sid {
+    table.ladder-table td.num,
+    table.term-table td.num {
+      text-align: right;
+      padding-right: 16px;
       font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 2px);
-      font-weight: var(--weight-body);
-      color: var(--ink-faint);
-      letter-spacing: 0.02em;
-      margin-top: 3px;
+      font-size: var(--fs-md);
+      font-variant-numeric: tabular-nums;
+    }
+    table.ladder-table td.posted,
+    table.term-table td.posted { font-weight: var(--weight-strong); cursor: help; }
+    table.term-table td.disc {
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      width: 20%;
       white-space: nowrap;
+    }
+    table.term-table td.anchor-disc {
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-size: calc(var(--fs-xs) - 1px);
     }
     /* Middle tier (Neocloud) is the market that matters — give it the accent. */
     table.ladder-table td.tier-pos-t2 { color: var(--accent); }
     table.ladder-table th.tier-col-t2 { color: var(--accent); }
     table.ladder-table td.tier-pos-t1, table.ladder-table td.tier-pos-t3 { color: var(--ink); }
     table.ladder-table td.empty { color: var(--ink-faint); }
+
     .mi-block { margin: 0 0 32px; }
-    .mi-grid {
+    .rg-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 1px;
       background: var(--rule);
       border: 1px solid var(--rule);
     }
-    @media (max-width: 860px) { .mi-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 520px) { .mi-grid { grid-template-columns: 1fr; } }
-    .mi-card {
+    @media (max-width: 1020px) { .rg-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .rg-grid { grid-template-columns: 1fr; } }
+    .rg-group {
       background: var(--surface);
-      padding: 15px 17px;
+      padding: 13px 15px 15px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 10px;
+    }
+    .rg-theme {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      font-weight: var(--weight-strong);
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--rule-2);
+    }
+    .rg-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
       text-decoration: none;
       color: var(--ink);
     }
-    .mi-card:hover { background: var(--surface-2); text-decoration: none; }
-    .mi-title {
-      font-family: var(--font-display);
-      font-size: var(--fs-md);
-      font-weight: var(--weight-display);
-      margin: 0;
+    .rg-item:hover .rg-title { color: var(--accent); }
+    .rg-kicker {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 2px);
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
     }
-    .mi-blurb {
-      font-family: var(--font-body);
+    .rg-title {
+      font-family: var(--font-display);
       font-size: var(--fs-sm);
-      color: var(--ink-dim);
-      line-height: 1.5;
-      margin: 0;
+      font-weight: var(--weight-display);
+      line-height: 1.35;
     }
 
     .credit-strip {
@@ -266,7 +386,7 @@ const miPieces: MiPiece[] = [
     }
     .credit-strip:hover { background: var(--surface-2); text-decoration: none; }
     .cs-text { display: flex; flex-direction: column; gap: 5px; }
-    .cs-line { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.5; }
+    .cs-line { font-family: var(--font-body); font-size: var(--fs-sm); color: var(--ink); line-height: 1.5; }
     .cs-foot {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
