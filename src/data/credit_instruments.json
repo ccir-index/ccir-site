@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "as_of": "2026-07-26",
+  "as_of": "2026-07-27",
   "compiled_from": [
    "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
    "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -627,7 +627,7 @@
    "size_note": "Nebius's first-ever secured debt; announced 2026-07-17 (company release furnished as Form 6-K EX-99.1). Company frames it as a repeatable structure for >$40B of additional contracted revenue (IG customers such as Microsoft and Meta)",
    "rate": {
     "kind": "sofr_spread",
-    "value": 2.50,
+    "value": 2.5,
     "note": "SOFR + 2.50%"
    },
    "maturity": "2030-10-31",
@@ -4835,6 +4835,72 @@
     "url": "https://www.bloomberg.com/news/articles/2026-05-28/apollo-shops-36-billion-debt-deal-to-buy-google-chips-for-anthropic"
    },
    "as_of": "2026-07-20"
+  },
+  {
+   "id": "vantage-frontier-tx",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+   "issuer": "Vantage Data Centers",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "Vantage \"Frontier\" campus, Shackelford County, TX (project-level borrower)",
+   "name": "Frontier campus debt package (Stargate — Oracle/OpenAI)",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 23250,
+   "size_note": "$23.25B per Bloomberg (initial underwrite reported at $22B, Aug 2025; final size “still being calculated” at launch). $25B total campus cost per Vantage release; Silver Lake + DigitalBridge ~$3B equity (press). Part of ~$38B two-campus package with vantage-lighthouse-wi",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": null
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Project-level",
+   "security": "1.4 GW / 10-building / 1,200-acre Frontier campus; Oracle tenant for OpenAI (Stargate) per press",
+   "lenders": [
+    "JPMorgan + MUFG (leads); BNP Paribas, Goldman Sachs, Societe Generale, SMBC, Wells Fargo underwriting (press); distributed across 2-dozen+ institutions by Apr 2026 (Bloomberg)"
+   ],
+   "status": "press",
+   "issued": "Underwrite reported 2025-08-20; distribution reported ~complete 2026-04-15 (both Bloomberg)",
+   "source": {
+    "doc": "Bloomberg (all debt terms — press); Vantage news release 2025-08-18 (campus, total cost)",
+    "date": "2026-04-15",
+    "url": "https://www.bloomberg.com/news/articles/2026-04-15/oracle-tied-38-billion-debt-takes-months-for-market-to-swallow"
+   },
+   "as_of": "2026-07-27"
+  },
+  {
+   "id": "vantage-lighthouse-wi",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+   "issuer": "Vantage Data Centers",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "Vantage \"Lighthouse\" campus, Port Washington, WI (project-level borrower)",
+   "name": "Lighthouse campus debt package (Stargate — Oracle/OpenAI)",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 14750,
+   "size_note": "$14.75B per Bloomberg; part of ~$38B two-campus package with vantage-frontier-tx. $15B+ total project per joint OpenAI/Oracle/Vantage release (2025-10-22); broke ground Dec 2025",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": null
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Project-level",
+   "security": "Four-building, 672-acre Lighthouse campus; Oracle tenant for OpenAI (Stargate) per joint release",
+   "lenders": [
+    "JPMorgan + MUFG (leads) per Bloomberg"
+   ],
+   "status": "press",
+   "issued": "Package reported 2025-09-04; “record $38B sale nears” 2025-10-23 (both Bloomberg)",
+   "source": {
+    "doc": "Bloomberg (all debt terms — press); OpenAI/Oracle/Vantage joint release 2025-10-22 (project, site)",
+    "date": "2025-10-23",
+    "url": "https://www.bloomberg.com/news/articles/2025-10-23/record-38-billion-debt-sale-nears-for-oracle-tied-data-centers"
+   },
+   "as_of": "2026-07-27"
   },
   {
    "id": "general-compute-upper90-sambanova",
