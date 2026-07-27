@@ -84,9 +84,15 @@ const ivCards = IV_SPEC.map((s) => {
   if (!s.modeledOnly && (d['3Y'] == null || !hwm)) return null;
   const age = IV_NOW - s.vintage;
   const base = ivValue(spot, d, IV_BASE.r, IV_BASE.life, age);
-  const combos: number[] = [];
-  for (const rr of [0.10, 0.15, 0.25]) for (const lf of [5, 6, 7]) for (const gg of IV_G)
-    combos.push(ivValue(spot, d, rr, lf, age, gg));
+  // One-at-a-time sensitivity: each assumption varied around base with the
+  // others held at base — no stacking of jointly optimistic/pessimistic
+  // corners (a full cross doubles the band with scenarios nobody holds).
+  // Life bounds at or below the chip's current age are omitted: a zero-year
+  // PV is the salvage question, not a rate-model output.
+  const combos: number[] = [ivValue(spot, d, IV_BASE.r, IV_BASE.life, age)];
+  for (const rr of [0.10, 0.25]) combos.push(ivValue(spot, d, rr, IV_BASE.life, age));
+  for (const lf of [5, 7]) if (lf > age) combos.push(ivValue(spot, d, IV_BASE.r, lf, age));
+  for (const gg of IV_G) combos.push(ivValue(spot, d, IV_BASE.r, IV_BASE.life, age, gg));
   const ask = hwm?.ask?.med ?? null;
   const t90 = hwm?.t90?.med ?? null;
   // Strip scale: zero-anchored so mark positions read as magnitudes.
@@ -393,11 +399,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         are never extended flat. A chip with no secondary-market tape lane
         is published <em>modeled only</em>, so marked, and carries no
         ask or executed corroboration until one exists.
-        The sensitivity band re-runs the model over discount rates of
-        10–25% crossed with service lives of 5–7 years and decay of
-        10–30%/yr — the 30% bound is the worst case on record (V100 from
-        its scarcity peak) — and shows the min–max; utilization and margin
-        are held at base. The
+        The sensitivity band varies one assumption at a time around base —
+        discount rate 10–25%, service life 5–7 years, decay 10–30%/yr (the
+        30% bound is the worst case on record: V100 from its scarcity
+        peak) — and shows the min–max. Jointly optimistic or pessimistic
+        corners are not stacked; utilization and margin are held at base;
+        a life bound at or below a chip's current age is omitted rather
+        than shown as a zero. The
         discount-rate band is anchored to observed GPU-asset-backed
         financing yields in CCIR's <a href="/credit">credit ledger</a> —
         see Method below.
