@@ -1,0 +1,116 @@
+---
+import Base from '../../layouts/Base.astro';
+import { meta } from '../../data/snapshot';
+---
+<Base
+  title="Data Terms · CCIR"
+  ogImage="/og/documents.png"
+  description="Terms governing use of CCIR's published series and data — viewing, quotation and citation with attribution, and the permission requirement for systematic retrieval or redistribution."
+  showTape={false}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Documents · Data Terms · as published {meta.as_of_date}</div>
+      <h1>Data Terms</h1>
+      <p class="standfirst">
+        What may be done with the published series without asking, and what
+        requires written permission.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> Scope and Ownership</h2>
+      <p>
+        These terms cover the series values, tables, charts, and underlying
+        data published on ccir.io (the &ldquo;published data&rdquo;). The
+        published data and the compilations they form are &copy; Compute
+        Credit Index Research LLC. Photographs and third-party material
+        credited on individual pages remain under their stated licenses.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Viewing, Quotation, and Citation</h2>
+      <p>
+        The site is free to read. Published values may be quoted and cited
+        with attribution to <strong>CCIR (ccir.io)</strong> — including the
+        series identifier and publication date where the context allows — in
+        research, reporting, internal analysis, and documents. The
+        <a href="/documents/methodology">Methodology</a> describes what each
+        series measures; a citation relies on that document.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> Systematic Retrieval and Redistribution</h2>
+      <p>
+        Systematic or bulk retrieval of the published data, redistribution of
+        series or series history, commercial repackaging or resale, and use of
+        the published data as an input to a derived commercial product each
+        require written permission:
+        <a href="mailto:research@ccir.io">research@ccir.io</a>.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> Referencing a Series in an Agreement</h2>
+      <p>
+        Parties considering a reference to a CCIR series in a credit
+        agreement, confirmation, or valuation policy should see the
+        <a href="/applications#citation-annex">Citation Annex</a> — definitions,
+        disruption events, and fallback drafting — and are invited to contact
+        the administrator.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> No Warranty</h2>
+      <p>
+        The published data are provided as is, without warranty of any kind,
+        including fitness for a particular purpose. Series are computed and
+        corrected under the published
+        <a href="/documents/methodology">Methodology</a> and
+        <a href="/documents/change-management">Change Management Policy</a>;
+        use of the published data is at the user&rsquo;s own risk. Revisions
+        to these terms are posted on this page with the publication date
+        above.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 80ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 26px 0; max-width: 76ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+    .sec p {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 12px;
+    }
+    .sec strong { color: var(--accent); }
+  </style>
+</Base>
