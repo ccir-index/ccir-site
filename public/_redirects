@@ -1,3 +1,5 @@
 # Cloudflare Pages redirects. /home exists as a clean cache-busting alias
 # for the homepage in social links (X caches link cards per URL).
+# /reference added 2026-07-26 for the LinkedIn pin (fresh URL = fresh crawl).
 /home / 301
+/reference / 301
