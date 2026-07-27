@@ -29,7 +29,15 @@ const ivParse = (raw: string) => {
 const ivRates = ivParse(ivRatesRaw);
 const ivCmi = ivParse(ivCmiRaw);
 const IV_HOURS = 8766;
-const IV_BASE = { u: 0.75, m: 0.65, r: 0.15, g: 0.30, life: 6 };
+// g (decay beyond the observed curve) is MEASURED, not assumed — calibrated
+// 2026-07-27 from the wayback prior-gen rate panel (2020–2024 archived
+// provider prints, repricer tier, OD only) spliced with the live tape:
+// through-cycle pooled A100+V100 −15.1%/yr; from the 2024 cycle peak A100
+// −19.4%/yr, H100 −15.8%/yr. Base 0.18 sits inside that bracket. The old
+// 0.30 base equals the worst case on record (V100 from its scarcity peak)
+// and stays as the conservative bound of IV_G.
+const IV_BASE = { u: 0.75, m: 0.65, r: 0.15, g: 0.18, life: 6 };
+const IV_G = [0.10, 0.18, 0.30];
 const IV_NOW = 2026 + (7 - 0.5) / 12;
 const IV_SPEC = [
   { key: 'H100-80-SXM5', label: 'H100 SXM', model: 'H100', silicon: 'h100-sxm-80gb', vintage: 2023 + 2 / 12, modeledOnly: false },
@@ -77,7 +85,8 @@ const ivCards = IV_SPEC.map((s) => {
   const age = IV_NOW - s.vintage;
   const base = ivValue(spot, d, IV_BASE.r, IV_BASE.life, age);
   const combos: number[] = [];
-  for (const rr of [0.10, 0.15, 0.25]) for (const lf of [5, 6, 7]) combos.push(ivValue(spot, d, rr, lf, age));
+  for (const rr of [0.10, 0.15, 0.25]) for (const lf of [5, 6, 7]) for (const gg of IV_G)
+    combos.push(ivValue(spot, d, rr, lf, age, gg));
   const ask = hwm?.ask?.med ?? null;
   const t90 = hwm?.t90?.med ?? null;
   // Strip scale: zero-anchored so mark positions read as magnitudes.
@@ -374,8 +383,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <summary>Model assumptions & sensitivity</summary>
       <p class="ivnote">
         Base case: year 1 at the 1Y committed rate, years 2–3 bootstrapped
-        from the 2Y/3Y committed curve, 30%/yr decay beyond the last
-        observed tenor of each chip's curve; 75%
+        from the 2Y/3Y committed curve, 18%/yr decay beyond the last
+        observed tenor of each chip's curve — a measured base, calibrated
+        to the realized decline of prior-generation rates (Method); 75%
         utilization; 65% net margin after power, colocation, and operations;
         15% discount rate; 6-year service life from volume availability.
         Where a chip's committed curve ends short of year 3 (B200: 1Y),
@@ -384,8 +394,10 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         is published <em>modeled only</em>, so marked, and carries no
         ask or executed corroboration until one exists.
         The sensitivity band re-runs the model over discount rates of
-        10–25% crossed with service lives of 5–7 years and shows the
-        min–max; utilization, margin, and decay are held at base. The
+        10–25% crossed with service lives of 5–7 years and decay of
+        10–30%/yr — the 30% bound is the worst case on record (V100 from
+        its scarcity peak) — and shows the min–max; utilization and margin
+        are held at base. The
         discount-rate band is anchored to observed GPU-asset-backed
         financing yields in CCIR's <a href="/credit">credit ledger</a> —
         see Method below.
@@ -762,6 +774,27 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         under the same provenance rules. The contribution lane is above.
       </p>
       <p>
+        <strong>Decay beyond the curve.</strong> The 18%/yr base is
+        measured, not assumed. Archived provider pricing pages (Wayback
+        Machine captures, 2020–2024, every row carrying its snapshot URL),
+        spliced with the live tape, put the realized through-cycle decline
+        of prior-generation on-demand rates at −15%/yr pooled across A100
+        and V100; measured from the 2024 cycle peak, A100 ran −19%/yr and
+        H100 −16%/yr. The 30%/yr figure this model previously assumed
+        matches only the worst case on record — V100 from its scarcity
+        peak — and is retained as the conservative bound of the sensitivity
+        band. The structural reason decay runs slower than the hardware
+        release cycle: across the current fleet the market prices memory
+        bandwidth — re-denominated per TB/s of bandwidth, five generations
+        of datacenter silicon rent inside a narrow band (see
+        <a href="/chip-economics#bandwidth">the bandwidth band</a>) — so a
+        prior generation's rate follows its bandwidth position, not its
+        age. That cross-section is one date, not a decay path — the caveat
+        published with the band applies here too — which is why this
+        model's decay is calibrated from realized rate history rather than
+        read off the band.
+      </p>
+      <p>
         <strong>Discount rate.</strong> The 15% base and the 10–25% band
         are anchored to observed pricing in CCIR's
         <a href="/credit">credit ledger</a>: GPU-asset-backed facilities
@@ -779,10 +812,11 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         and it is labeled model-implied wherever it appears, with its
         assumption set printed beside it. Everything else is an observed
         price with provenance. Rate inputs are observed prices out to the
-        last observed tenor; beyond it, a stated decay assumption applies
-        and is disclosed with the figure. CCIR publishes no depreciation
-        schedule as a product; the model prices today's curve plus those
-        stated assumptions, not a predicted market. Statistics follow the methodology's stat policy:
+        last observed tenor; beyond it, a decay rate calibrated from
+        realized rate history applies and is disclosed with the figure.
+        CCIR publishes no depreciation schedule as a product; the model
+        prices today's curve plus disclosed, history-calibrated
+        assumptions, not a predicted market. Statistics follow the methodology's stat policy:
         counts ship with every median in the series data; thin cells
         gated; windows labeled on every display.
       </p>
