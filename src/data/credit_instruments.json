@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "as_of": "2026-07-20",
+  "as_of": "2026-07-26",
   "compiled_from": [
    "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
    "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -1063,7 +1063,7 @@
    "name": "7.250% Senior Secured Notes due 2030 (Flash Compute JV)",
    "instrument_type": "bond",
    "size_usd_m": 1300,
-   "size_note": "Off balance sheet — unconsolidated 50.1% JV, equity method",
+   "size_note": "Off balance sheet — unconsolidated 50.1% JV, equity method. TeraWulf announced sale of its 50.1% JV interest to a Fluidstack-led buyer 7/6/26 (~$530M, three installments); ownership annotation pending closing disclosures",
    "rate": {
     "kind": "fixed",
     "value": 7.25,
@@ -1882,7 +1882,7 @@
    "name": "Hardware 3 DDTL (Microsoft-contract financing)",
    "instrument_type": "credit_facility",
    "size_usd_m": 1500,
-   "size_note": "~$1.5B commitment; drawn balance undisclosed (draws through May 29, 2027)",
+   "size_note": "~$1.5B commitment; drawn balance undisclosed (draws through May 29, 2027). Q4 FY26 results 8-K (7/20/26): cash at 6/30/26 includes $1.7B restricted cash in connection with the GPU financing for the Microsoft contract at Horizon 1–4",
    "rate": {
     "kind": "sofr_spread",
     "value": 2.25,
@@ -4771,35 +4771,36 @@
   {
    "id": "meta-elpaso",
    "exclude_from_issuance": true,
-   "exclude_reason": "Out of scope on two counts: data-center-campus credit (security is the El Paso campus, not GPUs — same basis as the excluded meta-beignet-hyperion), and status is rumored/unclosed (~$13B 'in the works', no close as of early Jul 2026), so it isn't issued debt.",
-   "issuer": "Meta / Blue Owl \"Hyperion\" JV (Richland Parish, LA)",
+   "exclude_reason": "Out of scope on two counts: data-center-campus credit (security is the El Paso campus, not GPUs — same basis as the excluded meta-beignet-hyperion), and the bonds are in syndication but unpriced as of 2026-07-26, so it isn't issued debt.",
+   "issuer": "Meta / BlackRock \"Sopaipilla\" JV (El Paso, TX)",
    "ticker": null,
    "issuer_type": "private",
-   "entity": "El Paso, TX campus SPV (separate follow-on)",
-   "name": "2026 follow-on — El Paso campus SPV financing",
+   "entity": "\"Sopaipilla Investor\" SPV — BlackRock ~80% / Meta 20% (press); Meta leases the campus back",
+   "name": "El Paso campus SPV bonds (in syndication)",
    "instrument_type": "other",
-   "size_usd_m": 13000,
-   "size_note": "~$13B in the works; majority debt; no close as of early Jul 2026. No support found for a \"$25–30B\" El Paso figure. Meta's $30B Oct 2025 corporate bond is on-balance-sheet and separate",
+   "size_usd_m": 12000,
+   "size_note": ">$12B bond marketing launched 7/20/26 (Bloomberg); earlier press had ~$13B. Backed by a Meta 20-yr lease commencing 2028 (renewal options, early-exit penalties, per press). Price talk above 7% — reported ~40bp wide of the Oct-25 Hyperion print. Not priced as of 7/26/26. Meta's $30B Oct 2025 corporate bond is on-balance-sheet and separate",
    "rate": {
     "kind": "undisclosed",
     "value": null,
-    "note": null
+    "note": "Price talk above 7% during marketing (press); no pricing"
    },
-   "maturity": "Undisclosed",
+   "maturity": "2048 (per press)",
    "maturity_note": null,
    "seniority": "Undisclosed",
-   "security": "El Paso, TX campus (1 GW by 2028 per CNBC)",
+   "security": "El Paso, TX campus (~1 GW; Meta 20-yr leaseback per press)",
    "lenders": [
-    "Morgan Stanley + JPMorgan (leading, per press)"
+    "JPMorgan (syndication, press)",
+    "Morgan Stanley (syndication, press)"
    ],
-   "status": "rumored",
+   "status": "press",
    "issued": null,
    "source": {
-    "doc": "CNBC; Bloomberg via Yahoo",
-    "date": "2026-03-26",
-    "url": "https://www.cnbc.com/2026/03/26/meta-to-spend-10-billion-on-ai-data-center-in-el-paso-1gw-by-2028.html"
+    "doc": "Bloomberg 7/20/26; FT 7/24/26 (press)",
+    "date": "2026-07-24",
+    "url": "https://www.bloomberg.com/news/articles/2026-07-20/blackrock-eyes-more-than-12-billion-debt-for-data-center"
    },
-   "as_of": "2026-07-02"
+   "as_of": "2026-07-26"
   },
   {
    "id": "apollo-blackstone-anthropic-tpu-spv",
@@ -5090,6 +5091,105 @@
     "url": "https://firmus.co/newsroom/firmus-secures-us10-billion-financing-led-by-blackstone-and-coatue-to-scale-energy-efficient-ai-infrastructure"
    },
    "as_of": "2026-07-06"
+  },
+  {
+   "id": "galaxy-helios2-9875-2031",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Secured by real estate / data-center campus and project assets, not GPUs (strict scope; same basis as apld-9250-2030 and the Meta campus SPVs).",
+   "issuer": "Galaxy Digital Inc.",
+   "ticker": "GLXY",
+   "issuer_type": "public",
+   "entity": "Galaxy Helios Data Centers II LLC (issuer); guaranteed by Galaxy Helios II LLC",
+   "name": "9.875% Senior Secured Notes due 2031 (Helios Phase II)",
+   "instrument_type": "bond",
+   "size_usd_m": 3507,
+   "size_note": "$3.507B private offering priced 7/23/26; expected close 7/28/26. Amortizes 4.00%/yr of original principal, semi-annual. Proceeds fund Helios Phase II construction — two buildings, eight data halls, 400 MW utility / 260 MW critical IT, Dickens County, TX — and debt-service reserves. Campus leased to CoreWeave (15-yr term, per Bloomberg — press)",
+   "rate": {
+    "kind": "fixed",
+    "value": 9.875,
+    "note": "Cash, semi-annual Feb 1 / Aug 1; first coupon 2/1/27"
+   },
+   "maturity": "2031-08-01",
+   "maturity_note": null,
+   "seniority": "Senior secured, project-level (issuer + guarantor obligations)",
+   "security": "First-priority liens on substantially all assets of issuer and guarantor (excluded-property carve-outs) plus pledge of issuer equity held by its direct parent",
+   "lenders": [
+    "Bookrunners not named in pricing release"
+   ],
+   "status": "confirmed",
+   "issued": "2026-07-23",
+   "source": {
+    "doc": "8-K 7/24/26 (Ex-99.1 pricing release)",
+    "date": "2026-07-24",
+    "url": "https://www.sec.gov/Archives/edgar/data/1859392/000185939226000074/exhibit991-pressreleasepri.htm"
+   },
+   "as_of": "2026-07-26"
+  },
+  {
+   "id": "palebluedot-brookfield-tor",
+   "issuer": "PaleBlueDot AI",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": null,
+   "name": "US$255M credit refinancing facility",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 255,
+   "size_note": "$255M credit financing announced 7/22/26; company frames proceeds as refinancing plus expansion of agentic-AI infrastructure",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": null
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Undisclosed",
+   "security": "Undisclosed",
+   "lenders": [
+    "Brookfield Asset Management",
+    "Tor Investment Management",
+    "J.P. Morgan (placement agent)"
+   ],
+   "status": "confirmed",
+   "issued": "2026-07-22",
+   "source": {
+    "doc": "Company release (via SFNet TSL Express 7/22/26)",
+    "date": "2026-07-22",
+    "url": "https://www.sfnet.com/home/industry-data-publications/the-secured-lender/tsl-express-daily-articles-news/tsl-express-daily-articles-news/2026/07/22/palebluedot-ai-closes-us-255-million-credit-financing-to-accelerate-agentic-ai-infra-expansion"
+   },
+   "as_of": "2026-07-26"
+  },
+  {
+   "id": "wulf-kentucky-plan",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Out of scope on two counts: data-center-campus financing (Kentucky 'Justified Data' campus, not GPUs) and status is rumored/planned — no launch or pricing as of 2026-07-26, so it isn't issued debt.",
+   "issuer": "TeraWulf Inc.",
+   "ticker": "WULF",
+   "issuer_type": "public",
+   "entity": "Justified Data campus, Kentucky (Anthropic-leased)",
+   "name": "Planned ~$3.5B financing — leveraged loan + high-yield (per press)",
+   "instrument_type": "other",
+   "size_usd_m": 3500,
+   "size_note": "~$3.5B contemplated across a first-time leveraged loan and high-yield bonds (Bloomberg 7/9/26); would fund the Anthropic-leased Kentucky campus announced 7/6/26 (20-yr lease). Not launched or priced",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": null
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Undisclosed",
+   "security": "Kentucky 'Justified Data' campus; 20-yr Anthropic lease (press)",
+   "lenders": [
+    "Morgan Stanley (expected lead, per press)"
+   ],
+   "status": "rumored",
+   "issued": null,
+   "source": {
+    "doc": "Bloomberg 7/9/26 (press); TeraWulf release 7/6/26 (lease + Abernathy stake sale)",
+    "date": "2026-07-09",
+    "url": "https://www.bloomberg.com/news/articles/2026-07-09/terawulf-eyes-3-5-billion-for-anthropic-leased-data-center"
+   },
+   "as_of": "2026-07-26"
   }
  ],
  "retired": [
