@@ -5256,6 +5256,72 @@
     "url": "https://www.bloomberg.com/news/articles/2026-07-09/terawulf-eyes-3-5-billion-for-anthropic-leased-data-center"
    },
    "as_of": "2026-07-26"
+  },
+  {
+   "id": "aligned-abs-2026",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center real-estate/lease securitization — collateral is four operating campuses and tenant leases, not GPUs (strict scope; same basis as galaxy-helios2-9875-2031 and the Meta campus SPVs).",
+   "issuer": "Aligned Data Centers",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "Aligned Data Centers (securitization issuer entity not named in release)",
+   "name": "Term ABS notes, Class A-2-I + Class B — $1.183B securitization",
+   "instrument_type": "bond",
+   "size_usd_m": 1183,
+   "size_note": "$1.183B closed 7/28/26, upsized ~30% from initial $905M target; first Aligned securitization since 2023. Class A-2-I and Class B term notes, both with 5-yr anticipated repayment dates. Backed by four Aligned campuses; 14 enterprise customers; >90% of annualized adjusted base rent from investment-grade counterparties (issuer release). Proceeds fund development pipeline, refinance upcoming maturities, and reserve accounts",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": "Coupons and ratings not stated in the issuer release"
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": "5-yr anticipated repayment date, both classes; legal final not stated in release",
+   "seniority": "Senior secured (securitization)",
+   "security": "Four operating Aligned data center campuses and associated tenant leases",
+   "lenders": [
+    "Structuring agents not named in release"
+   ],
+   "status": "confirmed",
+   "issued": "2026-07-28",
+   "source": {
+    "doc": "Aligned Data Centers release 7/28/26 (GlobeNewswire)",
+    "date": "2026-07-28",
+    "url": "https://www.globenewswire.com/news-release/2026/07/28/3334210/0/en/Aligned-Data-Centers-Completes-1-18-Billion-Securitization-Financing.html"
+   },
+   "as_of": "2026-07-28"
+  },
+  {
+   "id": "compass-abs-2026-2",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center real-estate/lease securitization — collateral is seven completed operational data centers, not GPUs (strict scope; same basis as galaxy-helios2-9875-2031 and the Meta campus SPVs).",
+   "issuer": "Compass Datacenters",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "Compass Datacenters Issuer III LLC — Series 2026-2 (per S&P preliminary-ratings release title)",
+   "name": "Series 2026-2 ABS notes — $413M in three tranches",
+   "instrument_type": "bond",
+   "size_usd_m": 413,
+   "size_note": "$413M priced in three tranches (DCD 7/27/26 — press): Class A-2-I $295M, Class A-2-II $68M, Class A-2-III $50M. Only Class A-2-III rated — A (S&P), citing 1.69x DSCR at closing and liquidity reserves of $28.3M/$5.2M/$18.5M. Backed by seven completed operational data centers. Compass owned by Brookfield Infrastructure + Ontario Teachers' (2023, $5.5B). No issuer release found",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": "Coupons not published; only tranche sizes and the single S&P rating reported"
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Senior secured (securitization)",
+   "security": "Seven completed operational Compass data centers and associated leases",
+   "lenders": [
+    "Bookrunners not named in press coverage"
+   ],
+   "status": "press",
+   "issued": "2026-07-27",
+   "source": {
+    "doc": "DCD 7/27/26 (press); S&P preliminary ratings, Compass Datacenters Issuer III LLC Series 2026-2 (7/20/26 wk)",
+    "date": "2026-07-27",
+    "url": "https://www.datacenterdynamics.com/en/news/compass-datacenters-raises-413-million-in-abs-bonds/"
+   },
+   "as_of": "2026-07-28"
   }
  ],
  "retired": [
