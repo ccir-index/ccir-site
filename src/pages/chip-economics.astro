@@ -18,6 +18,7 @@ const SNAP_DATE = '2026-07-06';
     <div class="wrap apps-nav-inner">
       <a class="apps-nav-link" href="#lenses">Lenses</a>
       <a class="apps-nav-link" href="#bandwidth">Bandwidth</a>
+      <a class="apps-nav-link" href="#parity">Parity</a>
       <a class="apps-nav-link" href="#watt-rent">Watt-Rent</a>
       <a class="apps-nav-link" href="#economic-life">Economic Life</a>
       <a class="apps-nav-link" href="#method">Method</a>
@@ -288,6 +289,42 @@ const SNAP_DATE = '2026-07-06';
         </svg>
       </div>
       <p class="sid"><b>CRB-T2-BW-ALL-OD-US</b> · band row fields: band_min · band_max · band_mean · band_spread_pct · n_chips · member_chips. Emission gate n_chips ≥ 3, all members publication-qualified. Research-grade at launch (Shadow → Provisional).</p>
+
+      <div id="parity">
+        <p>
+          <strong>The two parity rules.</strong> The sharpest way to see what
+          the band rules out is to price the oldest member both ways. If
+          compute were the priced unit, every new generation would force the
+          prior one down to its share of the throughput: against the H100
+          print of $3.22, a chip with 32% of the BF16 throughput reprices to
+          $1.02. If bandwidth is the priced unit, the same H100 print implies
+          $1.92 — the A100 carries 60% of the bandwidth. Two rules, two
+          implied rates:
+        </p>
+        <div class="twrap">
+          <table>
+            <thead>
+              <tr><th>Pricing rule</th><th>Assumes the market pays for</th><th class="num">Implied A100 rate</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Compute parity</td><td>BF16 throughput — 312 vs 989.5 TFLOPS</td><td class="num">$1.02</td></tr>
+              <tr><td>Bandwidth parity</td><td>HBM bandwidth — 2.0 vs 3.35 TB/s</td><td class="num">$1.92</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          The observed A100 print is <strong>$1.80</strong> — 94% of
+          bandwidth parity, 77% above compute parity, at 5.7 years of age.
+          The market repriced the A100 to its bandwidth share, not its
+          compute share. That is the band's claim restated as a spread you
+          can falsify: the day prior-generation prints migrate from the
+          bandwidth-parity line toward the compute-parity line is the day
+          the band breaks. The schedule to watch it on is the bandwidth
+          frontier itself, which has moved more slowly than the compute
+          frontier — the band's newest member entered at its predecessor's
+          8.0 TB/s.
+        </p>
+      </div>
     </section>
 
     <!-- ======================= §03 WATT-RENT ======================= -->
@@ -761,7 +798,7 @@ const SNAP_DATE = '2026-07-06';
       white-space: nowrap;
     }
     .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
-    #lenses, #bandwidth, #watt-rent, #economic-life, #method { scroll-margin-top: 52px; }
+    #lenses, #bandwidth, #parity, #watt-rent, #economic-life, #method { scroll-margin-top: 52px; }
 
     /* designation strip — single-sentence boundary element */
     .designation {
