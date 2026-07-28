@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "as_of": "2026-07-27",
+  "as_of": "2026-07-28",
   "compiled_from": [
    "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
    "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -4771,36 +4771,36 @@
   {
    "id": "meta-elpaso",
    "exclude_from_issuance": true,
-   "exclude_reason": "Out of scope on two counts: data-center-campus credit (security is the El Paso campus, not GPUs — same basis as the excluded meta-beignet-hyperion), and the bonds are in syndication but unpriced as of 2026-07-26, so it isn't issued debt.",
+   "exclude_reason": "Data-center-campus credit, not GPU-collateral: security is the El Paso campus plus the Meta lease (Meta is tenant, not borrower); same basis as the excluded meta-beignet-hyperion.",
    "issuer": "Meta / BlackRock \"Sopaipilla\" JV (El Paso, TX)",
    "ticker": null,
    "issuer_type": "private",
-   "entity": "\"Sopaipilla Investor\" SPV — BlackRock ~80% / Meta 20% (press); Meta leases the campus back",
-   "name": "El Paso campus SPV bonds (in syndication)",
-   "instrument_type": "other",
-   "size_usd_m": 12000,
-   "size_note": ">$12B bond marketing launched 7/20/26 (Bloomberg); earlier press had ~$13B. Backed by a Meta 20-yr lease commencing 2028 (renewal options, early-exit penalties, per press). Price talk above 7% — reported ~40bp wide of the Oct-25 Hyperion print. Not priced as of 7/26/26. Meta's $30B Oct 2025 corporate bond is on-balance-sheet and separate",
+   "entity": "Sopaipilla Investor LLC (SPV issuer) — BlackRock ~80% / Meta 20%; Meta leases the campus back",
+   "name": "7.534% amortizing secured notes due 2048 — El Paso JV (Sopaipilla)",
+   "instrument_type": "bond",
+   "size_usd_m": 12547,
+   "size_note": "$12.547B placed 7/27/26 (press — PitchBook-LCD); marketing launched 7/20/26 at >$12B. Backed by a Meta 20-yr lease commencing 2028 (renewal options, early-exit penalties, per press). Total development ~$14B, ~960MW–1GW, online 2028, Meta sole initial tenant (Meta/BlackRock announcement 7/28/26). Meta's $30B Oct 2025 corporate bond is on-balance-sheet and separate",
    "rate": {
-    "kind": "undisclosed",
-    "value": null,
-    "note": "Price talk above 7% during marketing (press); no pricing"
+    "kind": "fixed",
+    "value": 7.534,
+    "note": "7.534% at T+287.5, priced 7/27/26 — ALL pricing is press (PitchBook-LCD/Bloomberg); no company statement discloses pricing. Talk had been >7%, ~40bp wide of the Oct-25 Hyperion print; whispers (T+287.5 area) did not move. Traded above par on the break (blocks ≥103, ~T+217/~7.31%, PitchBook-LCD). Rated A+ (S&P) / AA- (Fitch, KBRA), stable. Amortizing"
    },
-   "maturity": "2048 (per press)",
+   "maturity": "2048-11-30",
    "maturity_note": null,
-   "seniority": "Undisclosed",
-   "security": "El Paso, TX campus (~1 GW; Meta 20-yr leaseback per press)",
+   "seniority": "Senior secured (SPV)",
+   "security": "El Paso, TX campus (~960MW–1GW; Meta 20-yr leaseback commencing 2028); BlackRock ~80% / Meta 20% equity",
    "lenders": [
     "JPMorgan (syndication, press)",
     "Morgan Stanley (syndication, press)"
    ],
-   "status": "press",
-   "issued": null,
+   "status": "confirmed",
+   "issued": "2026-07-27",
    "source": {
-    "doc": "Bloomberg 7/20/26; FT 7/24/26 (press)",
-    "date": "2026-07-24",
-    "url": "https://www.bloomberg.com/news/articles/2026-07-20/blackrock-eyes-more-than-12-billion-debt-for-data-center"
+    "doc": "PitchBook-LCD 7/28/26 (pricing — press); Bloomberg 7/27/26; Meta/BlackRock announcement 7/28/26 (JV, cost, equity)",
+    "date": "2026-07-28",
+    "url": "https://pitchbook.com/news/articles/investors-flock-to-12-5b-data-center-bond-deal-for-blackrock-sponsored-sopaipilla"
    },
-   "as_of": "2026-07-26"
+   "as_of": "2026-07-28"
   },
   {
    "id": "apollo-blackstone-anthropic-tpu-spv",
