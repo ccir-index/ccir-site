@@ -5169,7 +5169,7 @@
    "name": "9.875% Senior Secured Notes due 2031 (Helios Phase II)",
    "instrument_type": "bond",
    "size_usd_m": 3507,
-   "size_note": "$3.507B private offering priced 7/23/26; expected close 7/28/26. Amortizes 4.00%/yr of original principal, semi-annual. Proceeds fund Helios Phase II construction — two buildings, eight data halls, 400 MW utility / 260 MW critical IT, Dickens County, TX — and debt-service reserves. Campus leased to CoreWeave (15-yr term, per Bloomberg — press)",
+   "size_note": "$3.507B private offering (144A/Reg S) priced 7/23/26; completed 7/28/26 at an issue price of 99.500% of principal (close 8-K). Amortizes 4.00%/yr of original principal, semi-annual (pricing release); per the close 8-K, no amortization before the first payment date at least ten months after Project completion. Proceeds fund Helios Phase II construction — two buildings, eight data halls, 400 MW utility / 260 MW critical IT, Dickens County, TX — and debt-service reserves. Indenture 7/28/26 with The Bank of New York Mellon as trustee and collateral agent; issuer's direct parent is Galaxy Helios II Qualified Opportunity Zone Business, LLC. Campus leased to CoreWeave (15-yr term, per Bloomberg — press)",
    "rate": {
     "kind": "fixed",
     "value": 9.875,
@@ -5180,16 +5180,16 @@
    "seniority": "Senior secured, project-level (issuer + guarantor obligations)",
    "security": "First-priority liens on substantially all assets of issuer and guarantor (excluded-property carve-outs) plus pledge of issuer equity held by its direct parent",
    "lenders": [
-    "Bookrunners not named in pricing release"
+    "Morgan Stanley & Co. LLC (representative of the initial purchasers; purchase agreement 7/23/26)"
    ],
    "status": "confirmed",
-   "issued": "2026-07-23",
+   "issued": "2026-07-28",
    "source": {
-    "doc": "8-K 7/24/26 (Ex-99.1 pricing release)",
-    "date": "2026-07-24",
-    "url": "https://www.sec.gov/Archives/edgar/data/1859392/000185939226000074/exhibit991-pressreleasepri.htm"
+    "doc": "8-K 7/28/26 (Items 1.01/2.03 — completion of offering, indenture); pricing terms per 8-K 7/24/26 Ex-99.1",
+    "date": "2026-07-28",
+    "url": "https://www.sec.gov/Archives/edgar/data/1859392/000185939226000079/glxy-20260728.htm"
    },
-   "as_of": "2026-07-26"
+   "as_of": "2026-07-30"
   },
   {
    "id": "palebluedot-brookfield-tor",
