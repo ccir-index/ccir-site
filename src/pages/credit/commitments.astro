@@ -20,6 +20,10 @@ const delta = (m: any) =>
 const sumL = mon.companies.reduce((s, c) => s + (c.leases_nyc.v ?? 0), 0);
 const sumP = mon.companies.reduce((s, c) => s + (c.purchase.v ?? 0), 0);
 const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
+// all-in = forward stack + debt face + balance-sheet lease liabilities
+const allIn = (c: any) =>
+  (c.leases_nyc.v ?? 0) + (c.purchase.v ?? 0) + (c.visible?.debt ?? 0) + (c.visible?.leases ?? 0);
+const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
 ---
 <Base
   title="AI Commitments Monitor — Big Tech Off-Balance-Sheet Obligations · CCIR"
@@ -58,6 +62,7 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
       <div class="tile"><div class="tlab">Leases not yet commenced</div><div class="tval">{fmtB(sumL, 0)}</div></div>
       <div class="tile"><div class="tlab">Purchase &amp; other commitments</div><div class="tval">{fmtB(sumP, 0)}</div></div>
       <div class="tile"><div class="tlab">Combined</div><div class="tval">{fmtB(sumL + sumP, 0)}</div></div>
+      <div class="tile"><div class="tlab">All-in, adding debt + commenced leases</div><div class="tval">{fmtB(sumAll, 0)}</div></div>
       <div class="tile"><div class="tlab">Revenue backlog (RPO), four sellers</div><div class="tval">{fmtB(sumR, 0)}</div></div>
     </div>
 
@@ -70,6 +75,7 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
               <th>Company</th>
               <th>Leases not yet commenced</th>
               <th>Purchase &amp; other commitments</th>
+              <th>All-in obligations</th>
               <th>Revenue backlog (RPO)</th>
               <th>Support instruments</th>
             </tr>
@@ -89,6 +95,11 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
                   {c.purchase.note && <div class="nt">{c.purchase.note}</div>}
                 </td>
                 <td>
+                  <span class="v">{fmtB(allIn(c), 0)}</span> <span class="w">{c.visible?.w}</span>
+                  {c.rpo.v != null && <div class="d">backlog ÷ all-in: {(c.rpo.v / allIn(c)).toFixed(2)}×</div>}
+                  {c.visible?.note && <div class="nt">{c.visible.note}</div>}
+                </td>
+                <td>
                   <span class="v">{fmtB(c.rpo.v)}</span> {c.rpo.v != null && <span class="w">{c.rpo.w}</span>}
                   {delta(c.rpo) && <div class="d">{delta(c.rpo)} vs {c.rpo.pw} ({fmtB(c.rpo.pv)})</div>}
                   {c.rpo.note && <div class="nt">{c.rpo.note}</div>}
@@ -106,10 +117,17 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
         $B, undiscounted, as disclosed. Windows differ where issuers'
         fiscal calendars and disclosure practices differ and are labeled
         on every cell; deltas are shown only against the same issuer's
-        prior disclosure of the same quantity. Microsoft's purchase and
-        construction commitments update annually (10-K only). Oracle's
+        prior disclosure of the same quantity. Oracle's
         prior lease figure is fiscal 2022, the earliest comparable
-        disclosure.
+        disclosure. <strong>All-in obligations</strong> = the two forward
+        columns plus debt at face value and balance-sheet lease
+        liabilities (operating + finance), each from the same issuer's
+        cited filings — a total fixed-claims stack, CCIR arithmetic on
+        disclosed figures. The backlog ÷ all-in ratio is a conservative
+        screen, not a coverage finding: RPO is contracted revenue only,
+        while debt and commenced leases are also serviced by revenue no
+        backlog captures — advertising, retail, licenses. Support
+        instruments are contingent and are in no total.
       </p>
     </section>
 
