@@ -162,6 +162,54 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
         investment advice.
       </p>
     </section>
+
+    <section class="sec" id="implied-rates">
+      <h2><span class="n">§</span> Implied committed rates</h2>
+      <p>
+        Where a publicly disclosed multi-year compute deal states enough —
+        dollars, term, and quantity — CCIR backs out the implied unit
+        rate. Every figure is implied — CCIR arithmetic on disclosed
+        figures — graded by disclosure quality, and none is an observed
+        price. These rows are not part of any CCIR benchmark series. The
+        methodology and per-deal detail are in the research note
+        <a href="/research/implied-committed-rates">Implied Committed
+        Rates</a>; this table updates as deals publish.
+      </p>
+      <blockquote class="icr-assume">
+        Assumptions, permanent: ratable spend across the disclosed term;
+        100% of contracted hours billed; all disclosed dollars treated as
+        compute; constant fleet; 8,760 hr/yr. Every assumption biases the
+        implied rate downward — <strong>all figures are floors on blended
+        committed rates, not observed prices.</strong> Grades: A = dollars,
+        term, and units all company-disclosed; B = one input from
+        attributed press. Grade-C rows (talks-stage or heavy estimation)
+        do not publish. $/GPU-hr and $/MW-month rows are never blended.
+      </blockquote>
+      <div class="icr-wrap">
+        <table class="icr">
+          <thead>
+            <tr><th>Deal</th><th>Disclosed</th><th>Implied rate</th><th>Grade</th><th>As of</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Microsoft–Nscale/Aker (Narvik)</td><td>$6.2B · 5 yr · ~52,000 GB300</td><td><strong>$2.72/GPU-hr</strong></td><td>A</td><td>Sep-25</td></tr>
+            <tr><td>Anthropic–xAI (SpaceX)</td><td>$1.25B/mo through May 2029 · ~325,000 NVIDIA GPUs · 90-day outs after initial 3 mo</td><td><strong>$5.27/GPU-hr</strong></td><td>A</td><td>Jun-26</td></tr>
+            <tr><td>Microsoft–IREN</td><td>$9.7B · 5 yr · 200MW critical IT load, GB300</td><td>~$2.2/GPU-hr <em>(CCIR density estimate)</em></td><td>A (MW)</td><td>Nov-25</td></tr>
+            <tr><td>Microsoft–Nebius</td><td>$17.4B (up to $19.4B) · 5 yr · "&gt;100k GB300" per press</td><td><strong>$3.97/GPU-hr</strong></td><td>B</td><td>Sep-25</td></tr>
+            <tr><td>OpenAI–AWS</td><td>$38B · 7 yr · "hundreds of thousands" of GPUs</td><td><strong>$1.24–3.10/GPU-hr</strong> (band)</td><td>B</td><td>Nov-25</td></tr>
+            <tr><td>Microsoft–IREN (MW basis)</td><td>$9.7B · 5 yr · 200MW critical IT load</td><td><strong>$808k/MW-month</strong></td><td>A</td><td>Nov-25</td></tr>
+            <tr><td>OpenAI–Oracle (Stargate)</td><td>&gt;$300B · 5 yr · up to 4.5GW</td><td><strong>$1.11M/MW-month</strong></td><td>A</td><td>Sep-25</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="footnote">
+        Not computable, no rate published: Meta–CoreWeave (~$35.2B total —
+        no units disclosed), OpenAI–CoreWeave (~$22.4B — no units),
+        Anthropic–Microsoft Azure ($30B — no term; the "up to 1GW" is a
+        separate additional commitment and is not a valid denominator).
+        Sources and per-row caveats in the
+        <a href="/research/implied-committed-rates">research note</a>.
+      </p>
+    </section>
   </section>
 
   <style>
@@ -220,5 +268,26 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
     .tblnote { font-size: var(--fs-xs); color: var(--ink-faint); margin-top: 8px; max-width: 84ch; line-height: 1.5; }
     .footnote { font-size: var(--fs-sm); color: var(--ink-faint); border-top: 1px solid var(--rule); padding-top: 8px; max-width: 74ch; }
     .footnote a, .sec a { color: var(--accent); }
+    .icr-assume {
+      border-left: 3px solid var(--accent); margin: 0 0 14px;
+      padding: 10px 16px; background: var(--surface);
+      font-family: var(--font-body); font-size: var(--fs-sm);
+      color: var(--ink); line-height: 1.6; max-width: 74ch;
+    }
+    .icr-wrap { overflow-x: auto; margin: 12px 0 8px; }
+    .icr {
+      border-collapse: collapse; font-family: var(--font-mono);
+      font-size: var(--fs-xs); min-width: 680px;
+    }
+    .icr th {
+      text-align: left; color: var(--ink-dim); font-weight: 600;
+      border-bottom: 1px solid var(--rule); padding: 6px 14px 6px 0;
+      letter-spacing: 0.03em;
+    }
+    .icr td {
+      color: var(--ink); border-bottom: 1px solid var(--rule);
+      padding: 8px 14px 8px 0; vertical-align: top; line-height: 1.5;
+    }
+    .icr em { font-style: normal; color: var(--ink-faint); font-size: 10.5px; }
   </style>
 </Base>

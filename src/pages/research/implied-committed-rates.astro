@@ -1,0 +1,471 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/*
+  Dated research note — implied committed rates backed out of publicly
+  disclosed multi-year AI-compute deals, frozen to the sources cited
+  (verified 2026-07-30). Companion standing table lives on
+  /credit/commitments and updates as deals publish; research notes are
+  dated, not updated in place. All rates are implied — CCIR arithmetic on
+  disclosed figures — floors by construction, and not part of any CCIR
+  benchmark series.
+*/
+const AS_OF = '2026-07-30';
+
+// ---- chart 1: the identical-unit set (GB300-class, ~5yr, Microsoft buyer) ----
+const C1 = [
+  { t: 'IREN', v: 2.2, lab: '~$2.15–2.18', est: true, badge: 'CCIR density estimate' },
+  { t: 'Nscale · Narvik', v: 2.72, lab: '$2.72', est: false, badge: 'A · all inputs disclosed' },
+  { t: 'Nebius', v: 3.97, lab: '$3.97', est: false, badge: 'B · GPU count per press' },
+];
+const C1W = 700, C1BH = 30, C1GAP = 26, C1L = 150, C1R = 190, C1T = 16;
+const C1H = C1T + C1.length * (C1BH + C1GAP) + 6;
+const c1x = (v: number) => (v / 4.4) * (C1W - C1L - C1R);
+
+// ---- chart 2: the full GPU-hour table as a chart (bands + points) ----
+const C2 = [
+  { t: 'OpenAI–AWS', lo: 1.24, hi: 3.10, lab: '$1.24–3.10', badge: 'B · parameterized band' },
+  { t: 'Microsoft–IREN', lo: 2.2, hi: 2.2, lab: '~$2.2', badge: 'est.', est: true },
+  { t: 'Microsoft–Nscale', lo: 2.72, hi: 2.72, lab: '$2.72', badge: 'A' },
+  { t: 'Microsoft–Nebius', lo: 3.97, hi: 3.97, lab: '$3.97', badge: 'B' },
+  { t: 'Anthropic–xAI', lo: 5.27, hi: 5.27, lab: '$5.27', badge: 'A · 90-day outs' },
+];
+const C2W = 700, C2BH = 24, C2GAP = 22, C2L = 168, C2R = 168, C2T = 14;
+const C2H = C2T + C2.length * (C2BH + C2GAP) + 6;
+const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
+---
+<Base
+  title="Implied Committed Rates: What the Big Compute Deals Pay per GPU-Hour · CCIR Research"
+  description="The multi-year AI compute mega-deals are committed-term prints disclosed as lump sums, not rates. CCIR backs out the implied $/GPU-hour and $/MW-month from the disclosed figures, grades each by disclosure quality, and shows why every number is a floor by construction."
+  ogImage="/og/implied-committed-rates.png"
+  article={{ published: '2026-07-30' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {AS_OF} · filings, company releases + attributed press</div>
+      <h1>Implied Committed Rates: What the Big Compute Deals Pay per GPU-Hour</h1>
+      <p class="standfirst">
+        The mega-deals that dominate the headlines — $38 billion, $300
+        billion — are actual negotiated committed-term prints, disclosed as
+        lump sums rather than rates. This note backs the unit rate out of
+        the disclosed figures, and every number it produces is a floor by
+        construction: each assumption required to do the division biases
+        the implied rate downward. What survives is an anchor for the rate
+        the disclosures leave implicit — the cleanest print, Microsoft's
+        Norway contract with Nscale, implies <strong>$2.72 per
+        GPU-hour</strong> with every input company-disclosed. Each figure
+        below is implied — CCIR arithmetic on disclosed figures — graded by
+        disclosure quality, and none is an observed price. A standing
+        version of these tables is maintained on the
+        <a href="/credit/commitments">AI commitments monitor</a>.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> The print inside the lump sum</h2>
+      <p>
+        The committed-term market shows itself in pieces: posted asks (our
+        <a href="/term">committed-term curve</a>), financial forwards,
+        reserved-block venues, and the lump-sum headlines. The mega-deals
+        are the largest committed-term prints in the market — and their
+        disclosure format states the total while leaving the unit rate
+        implicit. When a company disclosures dollars, term, and quantity
+        for the same contract, the implied unit rate is arithmetic, not
+        estimation. Where one input comes from press rather than the
+        company, the grade says so. Where an input is missing, the rate is
+        not computed.
+      </p>
+      <p>
+        This analysis lives on the research and credit surfaces. It is not
+        part of any CCIR benchmark series, and no figure here feeds one.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Method: assumptions and grades</h2>
+      <blockquote class="assume">
+        Spend is ratable across the full disclosed term. 100% of contracted
+        hours are billed. All disclosed dollars are treated as compute — no
+        carve-out for power, networking, or services. Fleet size is
+        constant over the term. 8,760 hours per year; 730 hours per month.
+        <strong>Every one of these assumptions biases the implied rate
+        downward. All figures are therefore floors on blended committed
+        rates, not observed prices.</strong>
+      </blockquote>
+      <p>
+        Why floors: real contracts ramp, so fewer early hours stand against
+        the same dollars; disclosed totals often include non-compute scope;
+        and no fleet bills every hour. Each correction would raise the
+        implied rate.
+      </p>
+      <p>
+        <strong>Grades.</strong> <strong>A</strong> — dollars, term, and
+        units all company-disclosed. <strong>B</strong> — one input from
+        attributed press. <strong>C</strong> — talks-stage or heavy
+        estimation; grade-C rows do not publish, here or on the standing
+        table. Dollar-per-GPU-hour and dollar-per-megawatt rows are
+        separate tables and are never blended or averaged; TPU commitments
+        are excluded entirely.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> The GPU-hour table</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Deal</th><th>Disclosed</th><th>Implied rate</th><th>Grade</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Microsoft–Nscale/Aker (Narvik)</td>
+              <td>$6.2B · 5 yr · ~52,000 GB300</td>
+              <td><strong>$2.72/GPU-hr</strong></td>
+              <td><span class="gA">A</span></td>
+            </tr>
+            <tr>
+              <td>Anthropic–xAI (SpaceX)</td>
+              <td>$1.25B/month through May 2029 · ~325,000 NVIDIA GPUs</td>
+              <td><strong>$5.27/GPU-hr</strong></td>
+              <td><span class="gA">A</span></td>
+            </tr>
+            <tr>
+              <td>Microsoft–IREN</td>
+              <td>$9.7B · 5 yr · 200MW critical IT load, GB300</td>
+              <td>~$2.2/GPU-hr <span class="est">CCIR estimate</span></td>
+              <td><span class="gA">A</span><span class="gnote">MW basis</span></td>
+            </tr>
+            <tr>
+              <td>Microsoft–Nebius</td>
+              <td>$17.4B (up to $19.4B) · 5 yr · "&gt;100,000 GB300s" (press)</td>
+              <td><strong>$3.97/GPU-hr</strong> ($4.43 at $19.4B)</td>
+              <td><span class="gB">B</span></td>
+            </tr>
+            <tr>
+              <td>OpenAI–AWS</td>
+              <td>$38B · 7 yr · "hundreds of thousands" of NVIDIA GPUs</td>
+              <td><strong>$1.24–$3.10/GPU-hr</strong> (band)</td>
+              <td><span class="gB">B</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tblfoot">All rows: implied — CCIR arithmetic on disclosed figures; floors per §02.</p>
+      <p>
+        <strong>Narvik leads because it is the cleanest print in
+        public:</strong> dollars, term, and GPU count all disclosed by the
+        parties in a single release. $6.2B ÷ (52,000 × 8,760 × 5) = $2.72.
+        Nothing estimated.
+      </p>
+      <p>
+        <strong>Anthropic–xAI is the fee-basis print.</strong> SpaceX's
+        prospectus discloses the terms verbatim: "the customer has agreed
+        to pay us $1.25 billion per month through May 2029," for compute
+        capacity that "includes approximately 325,000 NVIDIA GPUs" across
+        the COLOSSUS facilities. A monthly fee needs no term assumption:
+        $1.25B ÷ (325,000 × 730 hours) = $5.27. Three caveats travel with
+        the row. Either party may terminate on 90 days' notice after an
+        initial three-month period, so the contract prices like a
+        short-tenor rate wearing a 2029 end date. The filing names no GPU
+        generation, so the row is not part of the GB300 set below and no
+        spread against it is computed. And capacity ramped through May and
+        June 2026 at a reduced fee.
+      </p>
+      <p>
+        <strong>IREN is graded A on the megawatt basis</strong> (§04); the
+        GPU figure is a labeled CCIR estimate. The filing discloses 200MW
+        of critical IT load, not a GPU count. Applying NVIDIA's published
+        GB300 NVL72 rack figure — "full rack requiring up to 142 kW" —
+        yields roughly 101,000 GPUs as an upper bound (rack power is not
+        critical IT load; facility IT power also carries network and
+        storage), so the ~$2.2 rate is a floor even within the estimate.
+      </p>
+      <p>
+        <strong>The AWS band is a band, not a point.</strong> The companies
+        said "hundreds of thousands" of NVIDIA GPUs plus "tens of millions"
+        of CPUs. CCIR parameterizes their own phrase: 500,000 GPUs implies
+        $1.24; 200,000 implies $3.10. The CPU scope means even the band is
+        a floor on the GPU-attributable rate.
+      </p>
+      <p>
+        The only identical-unit comparison in public: <strong>Narvik $2.72,
+        IREN ~$2.2 (estimate), Nebius $3.97 — all GB300-class, all
+        five-year terms, all Microsoft as buyer.</strong> Same buyer, same
+        silicon generation, same tenor; the residual spread is
+        jurisdiction, scope, and counterparty.
+      </p>
+      <figure class="chart-fig">
+        <div class="fig-title">One buyer, one chip class, three prices · implied $/GPU-hr</div>
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${C1W} ${C1H}`} role="img" aria-label="Three horizontal bars of implied dollars per GPU hour for GB300-class five-year Microsoft contracts: IREN approximately 2 dollars 15 to 2 dollars 18 as a CCIR density estimate, Nscale Narvik 2 dollars 72 with all inputs disclosed, Nebius 3 dollars 97 with the GPU count from press.">
+            <defs>
+              <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" class="hatchline" />
+              </pattern>
+            </defs>
+            {C1.map((c, i) => {
+              const y = C1T + i * (C1BH + C1GAP);
+              return (
+                <g>
+                  <text x={C1L - 8} y={y + C1BH / 2 + 4} text-anchor="end" class="clab">{c.t}</text>
+                  <rect x={C1L} y={y} width={c1x(c.v)} height={C1BH} class={c.est ? 'segEst' : 'segA'} />
+                  <text x={C1L + c1x(c.v) + 8} y={y + C1BH / 2 - 2} class="cval">{c.lab}</text>
+                  <text x={C1L + c1x(c.v) + 8} y={y + C1BH / 2 + 12} class="cmeta">{c.badge}</text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+        <details class="fignotes">
+          <summary>Chart notes</summary>
+          <p>
+            GB300-class, ~5-year terms, Microsoft as buyer. Implied — CCIR
+            arithmetic on disclosed figures under the §02 assumptions;
+            floors by construction. IREN bar is a labeled CCIR estimate
+            from disclosed megawatts and NVIDIA's published rack power.
+          </p>
+        </details>
+      </figure>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> The megawatt table</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Deal</th><th>Disclosed</th><th>Implied rate</th><th>Grade</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Microsoft–IREN</td>
+              <td>$9.7B · 5 yr · 200MW critical IT load</td>
+              <td><strong>$808,000/MW-month</strong></td>
+              <td><span class="gA">A</span></td>
+            </tr>
+            <tr>
+              <td>OpenAI–Oracle (Stargate)</td>
+              <td>&gt;$300B · 5 yr · up to 4.5GW</td>
+              <td><strong>$1.11M/MW-month</strong></td>
+              <td><span class="gA">A</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tblfoot">All rows: implied — CCIR arithmetic on disclosed figures; floors per §02.</p>
+      <p>
+        No public conversion from gigawatts to GPU count exists for the
+        Stargate agreement, so CCIR declines to state one; the megawatt row
+        is the computable read. One definitional caution: IREN's
+        denominator is disclosed critical IT load, while Stargate's "up to
+        4.5GW" carries no IT-versus-facility breakdown — the same
+        "megawatt" is not necessarily the same denominator, which is why
+        these two rows are presented, not spread-differenced.
+      </p>
+      <figure class="chart-fig">
+        <div class="fig-title">The GPU-hour table as a chart · implied $/GPU-hr</div>
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${C2W} ${C2H}`} role="img" aria-label="Five horizontal marks of implied dollars per GPU hour: OpenAI AWS band 1 dollar 24 to 3 dollars 10, Microsoft IREN estimate around 2 dollars 20, Microsoft Nscale 2 dollars 72, Microsoft Nebius 3 dollars 97, Anthropic xAI 5 dollars 27 with 90 day termination rights.">
+            {C2.map((c, i) => {
+              const y = C2T + i * (C2BH + C2GAP);
+              const x0 = C2L + c2x(c.lo), x1 = C2L + c2x(c.hi);
+              return (
+                <g>
+                  <text x={C2L - 8} y={y + C2BH / 2 + 4} text-anchor="end" class="clab">{c.t}</text>
+                  {c.hi > c.lo
+                    ? <rect x={x0} y={y + C2BH / 2 - 5} width={x1 - x0} height="10" class="segBand" />
+                    : <rect x={C2L} y={y} width={c2x(c.lo)} height={C2BH} class={c.est ? 'segEst' : 'segA'} />}
+                  <text x={x1 + 8} y={y + C2BH / 2 - 2} class="cval">{c.lab}</text>
+                  <text x={x1 + 8} y={y + C2BH / 2 + 12} class="cmeta">{c.badge}</text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+        <details class="fignotes">
+          <summary>Chart notes</summary>
+          <p>
+            Rows differ in chip generation, scope, and tenor; the chart
+            presents them side by side and computes no spreads. The AWS
+            entry is a parameterized band; the xAI entry is terminable on
+            90 days' notice after an initial three-month period, with GPU
+            models unspecified in the filing.
+          </p>
+        </details>
+      </figure>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> What cannot be computed — and one deal everyone computes wrong</h2>
+      <p>
+        Where a required input is missing, no rate is published.
+        <strong>Meta–CoreWeave</strong>: $14.2 billion through December
+        2031, plus approximately $21 billion combining a new order form
+        through December 2032 with an exercised option under a prior order
+        form — dollars and terms disclosed, no units of any kind; the order
+        form itself was not filed even in redacted form.
+        <strong>OpenAI–CoreWeave</strong>: approximately $22.4 billion
+        across agreements — no units.
+      </p>
+      <p>
+        <strong>Anthropic–Microsoft Azure is the most commonly mis-computed
+        deal in circulation:</strong> $30 billion of committed Azure spend
+        with no term disclosed, and the "up to one gigawatt" is a separate,
+        additional capacity commitment. Dividing the $30 billion by the
+        gigawatt pairs a numerator and a denominator from two different
+        commitments. CCIR publishes no rate for this deal.
+      </p>
+      <p>
+        Excluded from the tables by policy: reported talks (Meta–Anthropic,
+        ~$10 billion per the New York Times) are talks, not prints; and
+        this week's earnings-call remarks — Amazon's statement that
+        capacity is "largely reserved" for 2027 and reserving for 2028 —
+        remain unofficial pending transcripts and appear here only as that.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">06</span> Read against the credit record</h2>
+      <p>
+        Every GPU-backed credit prices a revenue assumption its lender
+        cannot observe. KBRA's AI-compute framework builds on an assumed
+        relationship between old and new compute prices; Fitch's
+        analyses of GPU-backed paper carry renewal-rate assumptions the
+        agency itself does not call observable. The re-leasing question —
+        what does committed compute rent for when the anchor contract
+        rolls? — is one those frameworks answer by assumption.
+      </p>
+      <p>
+        The implied rates above are a public anchor for that assumption:
+        actual anchor-tenant contracts, reduced to unit rates, graded by
+        disclosure quality, floored by construction. The IREN row is
+        literal — the $9.7 billion Microsoft contract is the collateral
+        cash flow behind whatever IREN finances next, as the Nebius and
+        CoreWeave paper already on the
+        <a href="/credit">compute-credit record</a> shows in filed form.
+      </p>
+      <p>
+        No solvency opinion and no forecast follows from any of this. What
+        follows is a table: <strong>CCIR maintains an implied committed
+        rates section on the <a href="/credit/commitments">AI commitments
+        monitor</a></strong> — grade A and B rows only, the §02 assumptions
+        block permanent, the grade column always shown — updated as deals
+        publish.
+      </p>
+      <p class="footnote">
+        Sources — Aker ASA–Nscale JV release (Sep 17, 2025); SpaceX final
+        prospectus, Form 424B4 (acc. 0001628280-26-042639, Jun 12, 2026);
+        IREN Form 8-K Ex-99.1 (Nov 3, 2025); Nebius Form 6-K (Sep 8, 2025)
+        with GPU count as attributed press (DCD, Reuters); OpenAI–AWS joint
+        releases (Nov 3, 2025); OpenAI, "Five new Stargate sites" (Sep 23,
+        2025) and OpenAI capacity statements (Jul 2025); CoreWeave Forms
+        8-K (Sep 30, 2025; acc. 0001769628-26-000154, Apr 9, 2026); NVIDIA
+        Enterprise Reference Architecture, NVL72 AI Factory components
+        (rack power input for the labeled IREN estimate); attributed press:
+        The New York Times (Meta–Anthropic talks). All implied rates are
+        CCIR arithmetic on the cited disclosures under the §02 assumptions;
+        they are floors on blended committed rates, not observed prices,
+        and are not part of any CCIR benchmark series. Nothing here is a
+        solvency opinion, a forecast, or investment advice; CCIR publishes
+        reference data and records.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec a { color: var(--accent); }
+    .assume {
+      border-left: 3px solid var(--accent);
+      margin: 0 0 14px;
+      padding: 10px 16px;
+      background: var(--surface);
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink);
+      line-height: 1.6;
+      max-width: 74ch;
+    }
+    .tbl-wrap { overflow-x: auto; margin: 14px 0 6px; }
+    table {
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      min-width: 620px;
+    }
+    th {
+      text-align: left; color: var(--ink-dim); font-weight: 600;
+      border-bottom: 1px solid var(--rule); padding: 6px 14px 6px 0;
+      letter-spacing: 0.03em;
+    }
+    td {
+      color: var(--ink); border-bottom: 1px solid var(--rule);
+      padding: 8px 14px 8px 0; vertical-align: top; line-height: 1.5;
+    }
+    .gA, .gB {
+      display: inline-block; padding: 1px 7px; border-radius: 3px;
+      font-weight: 700; font-size: 11px;
+    }
+    .gA { background: var(--accent); color: var(--surface); }
+    .gB { border: 1px solid var(--accent); color: var(--accent); }
+    .gnote { display: block; font-size: 10px; color: var(--ink-faint); margin-top: 3px; }
+    .est { font-size: 10.5px; color: var(--ink-faint); display: block; }
+    .tblfoot { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); margin: 4px 0 14px; }
+    .chart-fig { margin: 18px 0 22px; max-width: 700px; }
+    .chart-box { border: 1px solid var(--rule); background: var(--surface); }
+    .chart-box svg { display: block; width: 100%; height: auto; }
+    .fig-title { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.03em; margin-bottom: 6px; }
+    .segA { fill: var(--accent); }
+    .segEst { fill: url(#hatch); stroke: var(--accent); stroke-width: 1; }
+    .segBand { fill: var(--accent); opacity: 0.45; }
+    .hatchline { stroke: var(--accent); stroke-width: 2; }
+    :global(html[data-theme="terminal"]) .segA { fill: #f5b301; }
+    :global(html[data-theme="terminal"]) .segBand { fill: #4d9fff; opacity: 0.8; }
+    :global(html[data-theme="terminal"]) .segEst { stroke: #f5b301; }
+    :global(html[data-theme="terminal"]) .hatchline { stroke: #f5b301; }
+    :global(html[data-theme="terminal"]) .gA { background: #f5b301; color: #0a0e1a; }
+    :global(html[data-theme="terminal"]) .gB { border-color: #f5b301; color: #f5b301; }
+    .fignotes { margin-top: 6px; }
+    .fignotes summary {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-faint); cursor: pointer; user-select: none;
+    }
+    .fignotes summary:hover { color: var(--ink-dim); }
+    .fignotes p {
+      font-size: var(--fs-xs); color: var(--ink-faint);
+      line-height: 1.5; margin: 6px 0 0; max-width: 74ch;
+    }
+    .clab, .cval, .ckey, .cmeta { font-family: var(--font-mono); }
+    .clab { font-size: 13px; fill: var(--ink); }
+    .cval { font-size: 12.5px; font-weight: 700; fill: var(--ink); }
+    .ckey { font-size: 11px; fill: var(--ink-dim); }
+    .cmeta { font-size: 10.5px; fill: var(--ink-faint); }
+    .footnote {
+      font-size: var(--fs-sm);
+      color: var(--ink-faint);
+      border-top: 1px solid var(--rule);
+      padding-top: 8px;
+      max-width: 74ch;
+    }
+    .footnote a { color: var(--accent); }
+  </style>
+</Base>
