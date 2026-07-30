@@ -303,7 +303,8 @@ export function headlineStatOf(r: Rate): 'mean' | 'median' {
 // Home-ladder cell: guaranteed on-demand reference at the pooled grain.
 // ONE selection for every surface that renders this ladder (homepage, OG
 // share card) so they can never disagree: strict GTD, form + region pooled,
-// Shadow out, Published preferred over Provisional, then panel breadth.
+// Shadow out, Published preferred over Provisional, variant sub-series
+// (e.g. A100-40GB) after pooled, then panel breadth.
 const HOME_OD_RANK: Record<string, number> = { Published: 0, Provisional: 1 };
 export function homeOdCell(tier: Tier, chip: string): Rate | undefined {
   return headlineRates
@@ -313,6 +314,7 @@ export function homeOdCell(tier: Tier, chip: string): Rate | undefined {
                    r.promotion_status !== 'Shadow')
     .sort((a, b) =>
       (HOME_OD_RANK[a.promotion_status] ?? 3) - (HOME_OD_RANK[b.promotion_status] ?? 3) ||
+      variantRank(a) - variantRank(b) ||
       (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
 }
 
