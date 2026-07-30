@@ -1,17 +1,17 @@
 {
-  "as_of": "2026-07-23",
-  "next_expected": "Microsoft 10-K FY2026 (fiscal year ended June 30, 2026), expected late July 2026",
+  "as_of": "2026-07-30",
+  "next_expected": "Amazon 10-Q Q2 2026 (quarter ended June 30, 2026), expected early August 2026",
   "companies": [
     {
       "key": "meta",
       "name": "Meta",
-      "latest_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001628280-26-028526",
-      "prior_filing": "10-K FY2025 (period 2025-12-31), acc 0001628280-26-003942",
-      "leases_nyc": { "v": 182.88, "w": "Mar-26", "pv": 103.77, "pw": "Dec-25" },
-      "purchase": { "v": 237.67, "w": "Mar-26", "pv": 131.05, "pw": "Dec-25", "note": "non-cancelable; +~$24B added Apr-26 (subsequent event); excludes $14.72B contingent cloud capacity" },
-      "rpo": { "v": null, "w": "Mar-26", "pv": null, "pw": "Dec-25", "note": "no compute revenue backlog" },
-      "support": { "v": 28.0, "w": "Mar-26", "label": "RVG threshold, unconsolidated Louisiana venture (recorded liability $0; max exposure $46.0B)" },
-      "ocf_ttm": 124.0
+      "latest_filing": "10-Q Q2 2026 (period 2026-06-30), acc 0001628280-26-050705",
+      "prior_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001628280-26-028526",
+      "leases_nyc": { "v": 278.99, "w": "Jun-26", "pv": 182.88, "pw": "Mar-26", "note": "data centers, colocations, network infrastructure; commencing 2026–2036, terms >1 to 30 yrs; separately, ~$68B of further data-center leases signed Jul-26 (subsequent event), commencing 2027–28, terms 18–20 yrs — not in the quarter-end figure" },
+      "purchase": { "v": 349.31, "w": "Jun-26", "pv": 237.67, "pw": "Mar-26", "note": "non-cancelable; ~$53.5B due 2026, ~$81.7B due 2027; excludes $14.72B contingent cloud capacity; $10.8B of money-market funds escrowed against multi-year infrastructure purchase agreements (released 2028–30)" },
+      "rpo": { "v": null, "w": "Jun-26", "pv": null, "pw": "Mar-26", "note": "no compute revenue backlog" },
+      "support": { "v": 28.0, "w": "Jun-26", "label": "RVG threshold, unconsolidated Louisiana venture (no liability recorded — payments 'not probable'; max exposure $46.0B); El Paso exclusivity agreement (subsequent event) adds RVG max ~$13B upon closing, expected Q3-26" },
+      "ocf_ttm": 130.3
     },
     {
       "key": "alphabet",
@@ -27,13 +27,13 @@
     {
       "key": "microsoft",
       "name": "Microsoft",
-      "latest_filing": "10-Q Q3 FY2026 (period 2026-03-31), acc 0001193125-26-191507",
-      "prior_filing": "10-K FY2025 (period 2025-06-30), acc 0000950170-25-100235",
-      "leases_nyc": { "v": 196.6, "w": "Mar-26", "pv": 92.7, "pw": "Jun-25" },
-      "purchase": { "v": 142.05, "w": "Jun-25", "pv": null, "pw": "", "note": "$109.95B purchase (take-or-pay + open POs) + $32.1B construction; 10-K table only — first refresh lands with the FY26 10-K" },
-      "rpo": { "v": 633.0, "w": "Mar-26", "pv": 375.0, "pw": "Jun-25", "note": "$627B commercial (+99% y/y), weighted-avg duration ~2.5 yrs" },
+      "latest_filing": "10-K FY2026 (period 2026-06-30), acc 0001193125-26-323660",
+      "prior_filing": "10-Q Q3 FY2026 (period 2026-03-31), acc 0001193125-26-191507",
+      "leases_nyc": { "v": 329.1, "w": "Jun-26", "pv": 196.6, "pw": "Mar-26", "note": "primarily datacenters; commencing FY2027–FY2033, terms 1–20 yrs; 74% of the $443.5B total lease-commitment line in the MD&A table" },
+      "purchase": { "v": 228.63, "w": "Jun-26", "pv": 142.05, "pw": "Jun-25", "note": "$194.06B purchase commitments (datacenter take-or-pay + open POs; $169.0B due FY27) + $34.57B construction — same construct as the prior 10-K row; the full MD&A contractual-obligations table (adding debt principal $46.1B + interest $25.6B + leases $443.5B) totals $743.8B" },
+      "rpo": { "v": 684.0, "w": "Jun-26", "pv": 633.0, "pw": "Mar-26", "note": "$678B commercial (+84% y/y), weighted-avg duration ~2.3 yrs, ~30% recognized within 12 mo" },
       "support": { "v": null, "w": "", "label": "none disclosed as a separate category" },
-      "ocf_ttm": 170.2
+      "ocf_ttm": 182.9
     },
     {
       "key": "oracle",
