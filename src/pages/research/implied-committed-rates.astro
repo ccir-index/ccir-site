@@ -99,6 +99,17 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         implied rate.
       </p>
       <p>
+        <strong>Chip attribution.</strong> The chip column records the
+        generation as the parties disclosed it — or "per press" or
+        "unspecified" where they did not. Where the generation is
+        unspecified, the rate is fleet-blended. No performance adjustment
+        is applied across generations: a GPU-hour is the unit, not a unit
+        of compute output, so rates on different chips are different
+        products, not comparable prices. Megawatt-to-GPU conversions use
+        NVIDIA's published rack power and are always labeled as CCIR
+        estimates.
+      </p>
+      <p>
         <strong>Grades.</strong> <strong>A</strong> — dollars, term, and
         units all company-disclosed. <strong>B</strong> — one input from
         attributed press. <strong>C</strong> — talks-stage or heavy
@@ -114,36 +125,41 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
       <div class="tbl-wrap">
         <table>
           <thead>
-            <tr><th>Deal</th><th>Disclosed</th><th>Implied rate</th><th>Grade</th></tr>
+            <tr><th>Deal</th><th>Chip</th><th>Disclosed</th><th>Implied rate</th><th>Grade</th></tr>
           </thead>
           <tbody>
             <tr>
               <td>Microsoft–Nscale/Aker (Narvik)</td>
-              <td>$6.2B · 5 yr · ~52,000 GB300</td>
+              <td>GB300 <span class="chipsrc">disclosed</span></td>
+              <td>$6.2B · 5 yr · ~52,000 GPUs</td>
               <td><strong>$2.72/GPU-hr</strong></td>
               <td><span class="gA">A</span></td>
             </tr>
             <tr>
               <td>Anthropic–xAI (SpaceX)</td>
-              <td>$1.25B/month through May 2029 · ~325,000 NVIDIA GPUs</td>
+              <td>unspecified <span class="chipsrc">NVIDIA, no model filed</span></td>
+              <td>$1.25B/month through May 2029 · ~325,000 GPUs</td>
               <td><strong>$5.27/GPU-hr</strong></td>
               <td><span class="gA">A</span></td>
             </tr>
             <tr>
               <td>Microsoft–IREN</td>
-              <td>$9.7B · 5 yr · 200MW critical IT load, GB300</td>
+              <td>GB300 <span class="chipsrc">disclosed</span></td>
+              <td>$9.7B · 5 yr · 200MW critical IT load</td>
               <td>~$2.2/GPU-hr <span class="est">CCIR estimate</span></td>
               <td><span class="gA">A</span><span class="gnote">MW basis</span></td>
             </tr>
             <tr>
               <td>Microsoft–Nebius</td>
-              <td>$17.4B (up to $19.4B) · 5 yr · "&gt;100,000 GB300s" (press)</td>
+              <td>GB300 <span class="chipsrc">per press</span></td>
+              <td>$17.4B (up to $19.4B) · 5 yr · "&gt;100,000" GPUs (press)</td>
               <td><strong>$3.97/GPU-hr</strong> ($4.43 at $19.4B)</td>
               <td><span class="gB">B</span></td>
             </tr>
             <tr>
               <td>OpenAI–AWS</td>
-              <td>$38B · 7 yr · "hundreds of thousands" of NVIDIA GPUs</td>
+              <td>GB200/GB300 <span class="chipsrc">disclosed</span></td>
+              <td>$38B · 7 yr · "hundreds of thousands" of GPUs + CPUs</td>
               <td><strong>$1.24–$3.10/GPU-hr</strong> (band)</td>
               <td><span class="gB">B</span></td>
             </tr>
@@ -233,17 +249,19 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
       <div class="tbl-wrap">
         <table>
           <thead>
-            <tr><th>Deal</th><th>Disclosed</th><th>Implied rate</th><th>Grade</th></tr>
+            <tr><th>Deal</th><th>Chip</th><th>Disclosed</th><th>Implied rate</th><th>Grade</th></tr>
           </thead>
           <tbody>
             <tr>
               <td>Microsoft–IREN</td>
+              <td>GB300 <span class="chipsrc">disclosed</span></td>
               <td>$9.7B · 5 yr · 200MW critical IT load</td>
               <td><strong>$808,000/MW-month</strong></td>
               <td><span class="gA">A</span></td>
             </tr>
             <tr>
               <td>OpenAI–Oracle (Stargate)</td>
+              <td>n/a <span class="chipsrc">power basis</span></td>
               <td>&gt;$300B · 5 yr · up to 4.5GW</td>
               <td><strong>$1.11M/MW-month</strong></td>
               <td><span class="gA">A</span></td>
@@ -429,6 +447,7 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
     .gB { border: 1px solid var(--accent); color: var(--accent); }
     .gnote { display: block; font-size: 10px; color: var(--ink-faint); margin-top: 3px; }
     .est { font-size: 10.5px; color: var(--ink-faint); display: block; }
+    .chipsrc { font-size: 10px; color: var(--ink-faint); display: block; }
     .tblfoot { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint); margin: 4px 0 14px; }
     .chart-fig { margin: 18px 0 22px; max-width: 700px; }
     .chart-box { border: 1px solid var(--rule); background: var(--surface); }

@@ -184,20 +184,24 @@ const sumR = mon.companies.reduce((s, c) => s + (c.rpo.v ?? 0), 0);
         term, and units all company-disclosed; B = one input from
         attributed press. Grade-C rows (talks-stage or heavy estimation)
         do not publish. $/GPU-hr and $/MW-month rows are never blended.
+        Chip column = the generation as the parties disclosed it; where
+        unspecified, the rate is fleet-blended. No performance adjustment
+        across generations — rates on different chips are different
+        products, not comparable prices.
       </blockquote>
       <div class="icr-wrap">
         <table class="icr">
           <thead>
-            <tr><th>Deal</th><th>Disclosed</th><th>Implied rate</th><th>Grade</th><th>As of</th></tr>
+            <tr><th>Deal</th><th>Chip</th><th>Disclosed</th><th>Implied rate</th><th>Grade</th><th>As of</th></tr>
           </thead>
           <tbody>
-            <tr><td>Microsoft–Nscale/Aker (Narvik)</td><td>$6.2B · 5 yr · ~52,000 GB300</td><td><strong>$2.72/GPU-hr</strong></td><td>A</td><td>Sep-25</td></tr>
-            <tr><td>Anthropic–xAI (SpaceX)</td><td>$1.25B/mo through May 2029 · ~325,000 NVIDIA GPUs · 90-day outs after initial 3 mo</td><td><strong>$5.27/GPU-hr</strong></td><td>A</td><td>Jun-26</td></tr>
-            <tr><td>Microsoft–IREN</td><td>$9.7B · 5 yr · 200MW critical IT load, GB300</td><td>~$2.2/GPU-hr <em>(CCIR density estimate)</em></td><td>A (MW)</td><td>Nov-25</td></tr>
-            <tr><td>Microsoft–Nebius</td><td>$17.4B (up to $19.4B) · 5 yr · "&gt;100k GB300" per press</td><td><strong>$3.97/GPU-hr</strong></td><td>B</td><td>Sep-25</td></tr>
-            <tr><td>OpenAI–AWS</td><td>$38B · 7 yr · "hundreds of thousands" of GPUs</td><td><strong>$1.24–3.10/GPU-hr</strong> (band)</td><td>B</td><td>Nov-25</td></tr>
-            <tr><td>Microsoft–IREN (MW basis)</td><td>$9.7B · 5 yr · 200MW critical IT load</td><td><strong>$808k/MW-month</strong></td><td>A</td><td>Nov-25</td></tr>
-            <tr><td>OpenAI–Oracle (Stargate)</td><td>&gt;$300B · 5 yr · up to 4.5GW</td><td><strong>$1.11M/MW-month</strong></td><td>A</td><td>Sep-25</td></tr>
+            <tr><td>Microsoft–Nscale/Aker (Narvik)</td><td>GB300</td><td>$6.2B · 5 yr · ~52,000 GPUs</td><td><strong>$2.72/GPU-hr</strong></td><td>A</td><td>Sep-25</td></tr>
+            <tr><td>Anthropic–xAI (SpaceX)</td><td>unspecified</td><td>$1.25B/mo through May 2029 · ~325,000 NVIDIA GPUs · 90-day outs after initial 3 mo</td><td><strong>$5.27/GPU-hr</strong></td><td>A</td><td>Jun-26</td></tr>
+            <tr><td>Microsoft–IREN</td><td>GB300</td><td>$9.7B · 5 yr · 200MW critical IT load</td><td>~$2.2/GPU-hr <em>(CCIR density estimate)</em></td><td>A (MW)</td><td>Nov-25</td></tr>
+            <tr><td>Microsoft–Nebius</td><td>GB300 (press)</td><td>$17.4B (up to $19.4B) · 5 yr · "&gt;100k" GPUs per press</td><td><strong>$3.97/GPU-hr</strong></td><td>B</td><td>Sep-25</td></tr>
+            <tr><td>OpenAI–AWS</td><td>GB200/GB300</td><td>$38B · 7 yr · "hundreds of thousands" of GPUs + CPUs</td><td><strong>$1.24–3.10/GPU-hr</strong> (band)</td><td>B</td><td>Nov-25</td></tr>
+            <tr><td>Microsoft–IREN (MW basis)</td><td>GB300</td><td>$9.7B · 5 yr · 200MW critical IT load</td><td><strong>$808k/MW-month</strong></td><td>A</td><td>Nov-25</td></tr>
+            <tr><td>OpenAI–Oracle (Stargate)</td><td>n/a</td><td>&gt;$300B · 5 yr · up to 4.5GW</td><td><strong>$1.11M/MW-month</strong></td><td>A</td><td>Sep-25</td></tr>
           </tbody>
         </table>
       </div>
