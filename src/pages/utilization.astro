@@ -112,7 +112,7 @@ const DEFAULT_CHIP = 'h100-sxm';
       <div class="card-head">
         <div>
           <h2>Availability over time</h2>
-          <p class="card-sub">Rolling 7-day breadth — the share of genuine-capacity venues (X of Y) showing stock; falling = venues selling out. Dashed verticals flag a change in the venue panel. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
+          <p class="card-sub">Rolling 7-day count-weighted availability — the mean share of capacity-probes finding stock across genuine-capacity venues; falling = capacity selling down. Dashed verticals flag a change in the venue panel. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
         </div>
         <div class="confbadge" id="confbadge"></div>
       </div>
@@ -135,15 +135,19 @@ const DEFAULT_CHIP = 'h100-sxm';
       <summary>How this is measured</summary>
       <p class="method">
         Each source's window rate is its share of capacity-probes that found
-        stock, count-weighted within source. The headline is <em>breadth</em> —
-        of the Y genuine-capacity venues that disclosed a signal, the share X/Y
-        that found any stock — shown as Fractional (any shape) and Cluster (full
-        8-GPU node). Breadth, not a median, because availability is bimodal
-        (venues clump dry or flush) and a median collapses to 0 or 1 on a bare
-        majority; its slope over time is the demand read. Each rolling point uses
-        the venues present in that window, and dashed verticals flag where the
-        panel set changed, so added venues don't read as a demand move. Utilization
-        is a separate measured metric — never blended into availability.
+        stock, count-weighted within source. Two layers, same panel: the
+        <em>tiles</em> report breadth — of the Y genuine-capacity venues that
+        disclosed a signal, the count X whose window rate is at least 10% of
+        cycles (the floor keeps a venue with one available probe all week from
+        reading as available until history rolls out of the window) — and the
+        <em>chart</em> plots the count-weighted mean venue rate, which shows
+        capacity selling down as it happens rather than in window-edge steps.
+        Both shown as Fractional (any shape) and Cluster (full 8-GPU node).
+        Each rolling point uses the venues present in that window, and dashed
+        verticals flag where the panel set changed, so added venues don't read
+        as a demand move. Method updated Jul 30, 2026 (floor + mean-rate chart;
+        raw per-venue rates in the panel below are unchanged). Utilization is a
+        separate measured metric — never blended into availability.
       </p>
     </details>
   </section>
@@ -298,6 +302,10 @@ const DEFAULT_CHIP = 'h100-sxm';
       const ink = css('--ink-dim', '#9a9991');
       const grid = css('--rule', '#2a2a2a') + '44';
       const series = (rows, key) => { const m = mapByDate(rows, key); return dates.map((d) => (m[d] == null ? null : m[d] * 100)); };
+      // Chart series = count-weighted mean venue rate (2026-07-30 method note);
+      // falls back to breadth until the first export carrying the mean columns.
+      const kAny = (rows) => (rows || []).some((r) => r.pct_available_mean !== '' && r.pct_available_mean != null) ? 'pct_available_mean' : 'breadth';
+      const k8 = (rows) => (rows || []).some((r) => r.pct_available_8x_mean !== '' && r.pct_available_8x_mean != null) ? 'pct_available_8x_mean' : 'breadth_8x';
       // change markers: x-indices where the venue panel set shifts (single-chip
       // only — on a multi-chip axis each chip's panel changes would collide).
       let markers = [];
@@ -312,13 +320,13 @@ const DEFAULT_CHIP = 'h100-sxm';
       if (selected.length === 1) {
         const c = colorFor(selected[0].slug);
         datasets = [
-          { label: 'Fractional', data: series(trends[selected[0].slug], 'breadth'), borderColor: css('--ink-faint', '#8e8a82'), borderWidth: 1.25, borderDash: [4, 3], fill: false, tension: 0.3, pointRadius: 0, pointHoverRadius: 3, order: 2 },
-          { label: 'Cluster (8×)', data: series(trends[selected[0].slug], 'breadth_8x'), borderColor: c, backgroundColor: gradient(ctx, c), borderWidth: 2.75, fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 5, order: 1 },
+          { label: 'Fractional', data: series(trends[selected[0].slug], kAny(trends[selected[0].slug])), borderColor: css('--ink-faint', '#8e8a82'), borderWidth: 1.25, borderDash: [4, 3], fill: false, tension: 0.3, pointRadius: 0, pointHoverRadius: 3, order: 2 },
+          { label: 'Cluster (8×)', data: series(trends[selected[0].slug], k8(trends[selected[0].slug])), borderColor: c, backgroundColor: gradient(ctx, c), borderWidth: 2.75, fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 5, order: 1 },
         ];
         $('trend-mode').textContent = 'Cluster (8×) vs Fractional.';
       } else {
         datasets = selected.map((ch) => ({
-          label: ch.label, data: series(trends[ch.slug], 'breadth_8x'),
+          label: ch.label, data: series(trends[ch.slug], k8(trends[ch.slug])),
           borderColor: colorFor(ch.slug), borderWidth: 2.25, fill: false, tension: 0.3, pointRadius: 0, pointHoverRadius: 4,
         }));
         $('trend-mode').textContent = 'Cluster (8×) availability by chip.';
@@ -389,9 +397,11 @@ const DEFAULT_CHIP = 'h100-sxm';
         trends[ch.slug] = (await avTrend(ch.slug)).filter((r) => r.confidence === 'ok' && r.as_of_date >= AVAIL_START);
       }));
       const aMaps = [];
+      const hasMean = (rows, k) => (rows || []).some((r) => r[k] !== '' && r[k] != null);
       selected.forEach((ch) => {
-        aMaps.push(mapByDate(trends[ch.slug], 'breadth_8x'));
-        if (selected.length === 1) aMaps.push(mapByDate(trends[ch.slug], 'breadth'));
+        const rows = trends[ch.slug];
+        aMaps.push(mapByDate(rows, hasMean(rows, 'pct_available_8x_mean') ? 'pct_available_8x_mean' : 'breadth_8x'));
+        if (selected.length === 1) aMaps.push(mapByDate(rows, hasMean(rows, 'pct_available_mean') ? 'pct_available_mean' : 'breadth'));
       });
       const aDates = trimStart(unionDates(Object.values(trends)), aMaps);
       renderTrend(selected, aDates, trends);
