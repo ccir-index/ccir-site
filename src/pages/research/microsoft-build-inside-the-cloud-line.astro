@@ -6,9 +6,13 @@ import Base from '../../layouts/Base.astro';
   (acc 0001193125-26-323660, filed 2026-07-29), the FY26 Q4 release, and
   the official earnings-call transcripts cited in-text; peer figures from
   the filings cited in the group-exhibit notes. Quantities maintained on
-  /credit/commitments. Research notes are dated, not updated in place.
+  /credit/commitments. Research notes are dated, not updated in place —
+  sole labeled exception (John, 2026-07-31): Amazon group-exhibit figures
+  refreshed to its Q2-26 10-Q (acc 0001018724-26-000026, filed 2026-07-31,
+  the day after publication), marked in the kicker and sources.
 */
 const AS_OF = '2026-07-30';
+const UPDATED = '2026-07-31';
 
 // ---- chart 1: commercial RPO vs Microsoft Cloud revenue, grouped bars ----
 const C1 = [
@@ -30,7 +34,7 @@ const c1x = (i: number) => C1L + 60 + i * 200;
 >
   <section class="wrap top">
     <header class="page-head">
-      <div class="kicker">Research · {AS_OF} · filings + official transcripts</div>
+      <div class="kicker">Research · {AS_OF} · updated {UPDATED} (Amazon Q2 10-Q) · filings + official transcripts</div>
       <h1>Five Builders, One Covered Quadrant: Microsoft's FY2026</h1>
       <p class="standfirst">
         Five companies are building AI infrastructure at a combined pace
@@ -67,10 +71,12 @@ const c1x = (i: number) => C1L + 60 + i * 200;
         <li><strong>Oracle</strong> — the highest backlog coverage,
         1.45×: $638B against $441B of total obligations, on cloud revenue
         of $34.0B; capex of $55.7B runs 1.6× that revenue.</li>
-        <li><strong>Amazon</strong> — 0.80× on March figures: $364B
-        against $457B of total obligations, its debt face having nearly
-        doubled in the March quarter; AWS revenue of $148.4B against
-        $173.0B of capex.</li>
+        <li><strong>Amazon</strong> — 0.94×: $496B against $528B of
+        total obligations per the Q2 10-Q it filed July 31 — the backlog
+        grew 36% in the quarter (computed) and its weighted-average life
+        stretched to 6.4 years from 5.5; debt face reached $133.0B, with
+        a further $25.0B of notes issued in July; AWS revenue of $148.4B
+        against $173.0B of capex.</li>
         <li><strong>Alphabet</strong> — 0.51×: $519.5B against $1,018B,
         the largest obligations stack of the five, on Google Cloud
         revenue of $77.6B (trailing year, computed); capex of $132.4B
@@ -84,16 +90,15 @@ const c1x = (i: number) => C1L + 60 + i * 200;
       </ul>
       <figure class="chart-fig">
         <div class="chart-box exhibit">
-          <img src="/exhibits/buildout-coverage-20260730.png"
-            alt="Bubble chart of five companies. Horizontal axis: cloud revenue divided by capital spend. Vertical axis: contracted backlog divided by all-in obligations including debt and balance-sheet leases. Microsoft sits alone in the shaded upper-right covered quadrant at 1.5 and 1.03. Amazon at 0.86 and 0.80 and Oracle at 0.61 and 1.45 are hollow, marking negative trailing free cash flow. Alphabet at 0.59 and 0.51. Meta sits at the origin with no cloud revenue and no backlog. Bubble area is proportional to capital spend."
+          <img src="/exhibits/buildout-coverage-20260731.png"
+            alt="Bubble chart of five companies. Horizontal axis: cloud revenue divided by capital spend. Vertical axis: contracted backlog divided by all-in obligations including debt and balance-sheet leases. Microsoft sits alone in the shaded upper-right covered quadrant at 1.5 and 1.03. Amazon at 0.86 and 0.94 and Oracle at 0.61 and 1.45 are hollow, marking negative trailing free cash flow. Alphabet at 0.59 and 0.51. Meta sits at the origin with no cloud revenue and no backlog. Bubble area is proportional to capital spend."
             width="2160" height="1380" loading="lazy" />
         </div>
         <details class="fignotes">
           <summary>Chart notes &amp; definitions</summary>
           <p>
-            Trailing-year windows ending June 2026 (Oracle: May 2026;
-            Amazon backlog and obligations as of March 2026, its Q2 10-Q
-            pending). Capex is company-wide, including disclosed
+            Trailing-year windows ending June 2026 (Oracle: May 2026).
+            Capex is company-wide, including disclosed
             finance-lease additions, against cloud-segment revenue —
             definitions differ by company (Microsoft Cloud includes Office
             365; Google Cloud includes Workspace and TPU sales; Oracle
@@ -174,7 +179,7 @@ const c1x = (i: number) => C1L + 60 + i * 200;
         The chart below is the forward slice of the obligations stack —
         the AI-era commitments signed ahead of delivery, before debt and
         commenced leases are added. On that slice alone the coverage runs
-        higher: Oracle 2.3×, Amazon 1.6×, Microsoft 1.3×, Alphabet 0.6×;
+        higher: Oracle 2.3×, Amazon 1.7×, Microsoft 1.3×, Alphabet 0.6×;
         the all-in ratios above temper each by the balance sheet. Meta
         discloses no compute revenue backlog at all against $628 billion
         of forward commitments — four contracted books and one merchant
@@ -182,8 +187,8 @@ const c1x = (i: number) => C1L + 60 + i * 200;
       </p>
       <figure class="chart-fig">
         <div class="chart-box exhibit">
-          <img src="/exhibits/contracted-books-20260730.png"
-            alt="Paired horizontal bars per company of contracted revenue backlog in gold against contracted obligations in blue. Oracle 638 billion dollars of backlog against 273 billion of obligations, 2.3 times. Amazon 364 against 229, 1.6 times, March figures. Microsoft 678 against 523, 1.3 times. Alphabet 520 against 896, 0.6 times. Meta shows no backlog against 628 billion of obligations."
+          <img src="/exhibits/contracted-books-20260731.png"
+            alt="Paired horizontal bars per company of contracted revenue backlog in gold against contracted obligations in blue. Oracle 638 billion dollars of backlog against 273 billion of obligations, 2.3 times. Amazon 496 against 286, 1.7 times. Microsoft 678 against 523, 1.3 times. Alphabet 520 against 896, 0.6 times. Meta shows no backlog against 628 billion of obligations."
             width="2160" height="1280" loading="lazy" />
         </div>
         <details class="fignotes">
@@ -191,9 +196,10 @@ const c1x = (i: number) => C1L + 60 + i * 200;
           <p>
             Backlog = commercial RPO; obligations = leases signed but not
             yet commenced plus purchase obligations, latest filing each
-            (Microsoft, Alphabet, and Meta as of June 2026; Oracle May
-            2026; Amazon March 2026 — its Q2 10-Q, and roughly $68B of
-            data-center leases Meta signed in July, are not yet in these
+            (Microsoft, Amazon, Alphabet, and Meta as of June 2026;
+            Oracle May 2026 — roughly $68B of data-center leases Meta
+            signed in July and $19B of purchase commitments Oracle
+            entered after its fiscal year-end are not yet in these
             figures). Obligation constructs differ by issuer: Alphabet's
             purchase figure is its MD&A total including open purchase
             orders and supply, energy, and content commitments — the
@@ -214,9 +220,13 @@ const c1x = (i: number) => C1L + 60 + i * 200;
         months; roughly 45% tied to OpenAI as of December per the
         company's January disclosure, with the fourth quarter's growth
         attributed to clients other than AI model developers.</li>
-        <li><strong>Amazon</strong> — a 5.5-year weighted life; a $138B
-        OpenAI arrangement, disclosed by Amazon, equal to about 38% of
-        the March backlog.</li>
+        <li><strong>Amazon</strong> — the book lengthened to a 6.4-year
+        weighted life from 5.5 in March. A $138B OpenAI arrangement,
+        disclosed by Amazon, equals about 28% of the June backlog — and
+        the Q2 10-Q discloses an expansion of the Anthropic commitment
+        announced in the quarter of more than $100B over ten years, both
+        arrangements including obligations tied to the performance of
+        AWS chips.</li>
         <li><strong>Oracle</strong> — the longest and most concentrated:
         ~12% converts within twelve months, 34% in months 13–36, 34% in
         months 37–60, the remainder later; attributed only to "certain
@@ -335,9 +345,9 @@ const c1x = (i: number) => C1L + 60 + i * 200;
         earnings-call transcripts. CDS levels as attributed in-text (Bloomberg; FT/LSEG; Reuters and S&P Global Market Intelligence; Seeking Alpha — July 27–29, 2026 quotes). Group-exhibit peer figures: Meta Q2
         2026 10-Q (acc. 0001628280-26-050705); Alphabet Q2 2026 10-Q
         (acc. 0001652044-26-000071); Oracle FY2026 10-K (acc.
-        0001193125-26-277521); Amazon Q1 2026 10-Q (acc.
-        0001018724-26-000014) and Q2 2026 earnings release (backlog and
-        obligations pending its Q2 10-Q). Ratios and the uniform cash
+        0001193125-26-277521); Amazon Q2 2026 10-Q (acc.
+        0001018724-26-000026, filed July 31 — Amazon figures updated to
+        it that day) and Q2 2026 earnings release. Ratios and the uniform cash
         basis are our calculations from the disclosed figures. Nothing here is a
         solvency opinion, a forecast, or investment advice; CCIR publishes
         reference data and records.
