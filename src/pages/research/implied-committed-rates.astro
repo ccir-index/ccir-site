@@ -31,7 +31,8 @@ const C2 = [
   { t: 'Anthropic–xAI', lo: 5.27, hi: 5.27, lab: '$5.27', badge: 'A · 90-day outs' },
 ];
 const C2W = 700, C2BH = 24, C2GAP = 22, C2L = 168, C2R = 168, C2T = 14;
-const C2H = C2T + C2.length * (C2BH + C2GAP) + 6;
+const C2H = C2T + C2.length * (C2BH + C2GAP) + 26;
+const C2TICKS = [0, 1, 2, 3, 4, 5];
 const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
 ---
 <Base
@@ -282,6 +283,12 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         <div class="fig-title">The GPU-hour table as a chart · implied $/GPU-hr</div>
         <div class="chart-box">
           <svg viewBox={`0 0 ${C2W} ${C2H}`} role="img" aria-label="Five horizontal marks of implied dollars per GPU hour: OpenAI AWS band 1 dollar 24 to 3 dollars 10, Microsoft IREN estimate around 2 dollars 20, Microsoft Nscale 2 dollars 72, Microsoft Nebius 3 dollars 97, Anthropic xAI 5 dollars 27 with 90 day termination rights.">
+            {C2TICKS.map((v) => (
+              <g>
+                <line x1={C2L + c2x(v)} y1={C2T - 6} x2={C2L + c2x(v)} y2={C2H - 22} class="gridv" />
+                <text x={C2L + c2x(v)} y={C2H - 8} text-anchor="middle" class="cmeta">${v}</text>
+              </g>
+            ))}
             {C2.map((c, i) => {
               const y = C2T + i * (C2BH + C2GAP);
               const x0 = C2L + c2x(c.lo), x1 = C2L + c2x(c.hi);
@@ -289,7 +296,7 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
                 <g>
                   <text x={C2L - 8} y={y + C2BH / 2 + 4} text-anchor="end" class="clab">{c.t}</text>
                   {c.hi > c.lo
-                    ? <rect x={x0} y={y + C2BH / 2 - 5} width={x1 - x0} height="10" class="segBand" />
+                    ? <rect x={x0} y={y} width={x1 - x0} height={C2BH} class="segBand" />
                     : <rect x={C2L} y={y} width={c2x(c.lo)} height={C2BH} class={c.est ? 'segEst' : 'segA'} />}
                   <text x={x1 + 8} y={y + C2BH / 2 - 2} class="cval">{c.lab}</text>
                   <text x={x1 + 8} y={y + C2BH / 2 + 12} class="cmeta">{c.badge}</text>
@@ -425,10 +432,11 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
     .fig-title { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.03em; margin-bottom: 6px; }
     .segA { fill: var(--accent); }
     .segEst { fill: url(#hatch); stroke: var(--accent); stroke-width: 1; }
-    .segBand { fill: var(--accent); opacity: 0.45; }
+    .segBand { fill: var(--accent); opacity: 0.4; }
+    .gridv { stroke: var(--rule); stroke-width: 1; opacity: 0.6; }
     .hatchline { stroke: var(--accent); stroke-width: 2; }
     :global(html[data-theme="terminal"]) .segA { fill: #f5b301; }
-    :global(html[data-theme="terminal"]) .segBand { fill: #4d9fff; opacity: 0.8; }
+    :global(html[data-theme="terminal"]) .segBand { fill: #f5b301; opacity: 0.45; }
     :global(html[data-theme="terminal"]) .segEst { stroke: #f5b301; }
     :global(html[data-theme="terminal"]) .hatchline { stroke: #f5b301; }
     :global(html[data-theme="terminal"]) .gA { background: #f5b301; color: #0a0e1a; }
