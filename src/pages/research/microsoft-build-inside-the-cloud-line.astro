@@ -1,0 +1,415 @@
+---
+import Base from '../../layouts/Base.astro';
+
+/*
+  Dated research note — frozen to Microsoft's FY2026 10-K
+  (acc 0001193125-26-323660, filed 2026-07-29), the FY26 Q4 release, and
+  the official earnings-call transcripts cited in-text; peer figures from
+  the filings cited in the group-exhibit notes. Quantities maintained on
+  /credit/commitments. Research notes are dated, not updated in place.
+*/
+const AS_OF = '2026-07-30';
+
+// ---- chart 1: commercial RPO vs Microsoft Cloud revenue, grouped bars ----
+const C1 = [
+  { t: 'FY2024', b: 269, r: 137.4, ratio: '2.0×' },
+  { t: 'FY2025', b: 368, r: 168.9, ratio: '2.2×' },
+  { t: 'FY2026', b: 678, r: 214.4, ratio: '3.2×' },
+];
+const C1W = 700, C1H = 300, C1T = 46, C1B = 26, C1L = 54, C1R = 16;
+const C1BW = 74, C1PG = 6;
+const c1y = (v: number) => C1T + (1 - v / 730) * (C1H - C1T - C1B);
+const c1x = (i: number) => C1L + 60 + i * 200;
+
+---
+<Base
+  title="Five Builders, One Covered Quadrant: Microsoft's FY2026 · CCIR Research"
+  description="Microsoft's FY2026 10-K read against the group: $115.9B of capex inside $214.4B of cloud revenue — the only major AI builder whose cloud out-earns its build — and a $678B contracted backlog covering its contracted obligations 1.3×. Five builders, two axes, one covered quadrant."
+  ogImage="/og/microsoft-build-inside-the-cloud-line.png"
+  article={{ published: '2026-07-30' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {AS_OF} · filings + official transcripts</div>
+      <h1>Five Builders, One Covered Quadrant: Microsoft's FY2026</h1>
+      <p class="standfirst">
+        Five companies are building AI infrastructure at a combined pace
+        above half a trillion dollars a year. Four of them spend more on
+        the build than their cloud businesses bring in. Microsoft is the
+        lone company whose cloud revenue covers its capital spend —
+        $115.9 billion of capex against $214.4 billion of Microsoft Cloud
+        revenue in the FY2026 10-K filed July 29 — and the lone one
+        whose contracted backlog covers its total obligations: $678
+        billion against $658 billion of forward commitments, debt, and
+        lease liabilities. This note reads Microsoft's filing against the
+        group's: what each company has sold, what each spends, and which
+        builds are paid for by the clouds they serve. Figures are from
+        filings and releases unless
+        attributed; quantities are maintained on the
+        <a href="/credit/commitments">AI commitments monitor</a>.
+      </p>
+    </header>
+
+    <section class="sec">
+      <h2><span class="n">01</span> Where the five builds stand</h2>
+      <p>
+        Set five of the largest AI builders on two axes — capital spend
+        against the cloud revenue that pays for it, and contracted
+        backlog against contracted obligations — and Microsoft is alone
+        in the covered quadrant:
+      </p>
+      <ul>
+        <li><strong>Microsoft</strong> — $140.6B of trailing-year capital
+        spend, including finance-lease additions, inside $214.4B of
+        Microsoft Cloud revenue; a $678B backlog against $658B of total
+        obligations — forward commitments, debt at face, and
+        balance-sheet leases — 1.03×.</li>
+        <li><strong>Oracle</strong> — the highest backlog coverage,
+        1.45×: $638B against $441B of total obligations, on cloud revenue
+        of $34.0B; capex of $55.7B runs 1.6× that revenue.</li>
+        <li><strong>Amazon</strong> — 0.80× on March figures: $364B
+        against $457B of total obligations, its debt face having nearly
+        doubled in the March quarter; AWS revenue of $148.4B against
+        $173.0B of capex.</li>
+        <li><strong>Alphabet</strong> — 0.51×: $519.5B against $1,018B,
+        the largest obligations stack of the five, on Google Cloud
+        revenue of $77.6B (trailing year, computed); capex of $132.4B
+        runs 1.7× its cloud line. The stack is partly construction of the
+        disclosure: Alphabet's purchase figure is the broadest of the
+        five, sweeping in open purchase orders plus supply, energy
+        (take-or-pay to 2054), and content commitments.</li>
+        <li><strong>Meta</strong> — no compute revenue and no backlog
+        disclosed, against $741B of total obligations and $92.4B of
+        capex.</li>
+      </ul>
+      <figure class="chart-fig">
+        <div class="chart-box exhibit">
+          <img src="/exhibits/buildout-coverage-20260730.png"
+            alt="Bubble chart of five companies. Horizontal axis: cloud revenue divided by capital spend. Vertical axis: contracted backlog divided by all-in obligations including debt and balance-sheet leases. Microsoft sits alone in the shaded upper-right covered quadrant at 1.5 and 1.03. Amazon at 0.86 and 0.80 and Oracle at 0.61 and 1.45 are hollow, marking negative trailing free cash flow. Alphabet at 0.59 and 0.51. Meta sits at the origin with no cloud revenue and no backlog. Bubble area is proportional to capital spend."
+            width="2160" height="1380" loading="lazy" />
+        </div>
+        <details class="fignotes">
+          <summary>Chart notes &amp; definitions</summary>
+          <p>
+            Trailing-year windows ending June 2026 (Oracle: May 2026;
+            Amazon backlog and obligations as of March 2026, its Q2 10-Q
+            pending). Capex is company-wide, including disclosed
+            finance-lease additions, against cloud-segment revenue —
+            definitions differ by company (Microsoft Cloud includes Office
+            365; Google Cloud includes Workspace and TPU sales; Oracle
+            excludes license support), and each company's capex also
+            serves businesses outside its cloud. Backlog = commercial RPO;
+            obligations (all-in) = leases signed but not yet commenced plus
+            purchase obligations, plus debt at face value and
+            balance-sheet lease liabilities (operating and finance) — the
+            components all five disclose; construction commitments,
+            disclosed only by Microsoft, are excluded, and Meta's
+            finance-lease liabilities are not broken out in its Q2 10-Q,
+            slightly understating its stack. The ratio is a conservative
+            screen, not a coverage finding: backlog is contracted revenue
+            only, while debt and commenced leases are also serviced by
+            revenue no backlog captures. Hollow = negative trailing free
+            cash flow on a uniform basis (operating cash flow − capex −
+            finance-lease additions). All ratios are our calculations
+            from the filings.
+          </p>
+        </details>
+      </figure>
+      <p>
+        The trajectory matters as much as the position: Microsoft's capital
+        spend has gone from 32% of Microsoft Cloud revenue in FY2024 to 38%
+        in FY2025 to 54% in FY2026 — the share has doubled in two years.
+        The build is inside the revenue line, and the line is being
+        approached from below.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Backlog vs cloud revenue</h2>
+      <p>
+        Customers have signed <strong>$678 billion</strong> of commercial
+        contracts Microsoft has not yet delivered — up 84% in a year, with
+        a weighted-average duration of about 2.3 years and roughly 30%
+        expected to convert to revenue within twelve months. Azure grew
+        43% in the fourth quarter against the company's own 39–40% guide,
+        and Microsoft Cloud revenue reached $214.4 billion for the fiscal
+        year. For two years the backlog held near twice the annual cloud
+        run-rate. It now stands at more than three times — the backlog is
+        growing faster than the infrastructure that serves it.
+      </p>
+      <figure class="chart-fig">
+        <div class="fig-title">Commercial RPO vs Microsoft Cloud revenue · $B at fiscal year end</div>
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${C1W} ${C1H}`} role="img" aria-label="Grouped bars of Microsoft commercial remaining performance obligations versus Microsoft Cloud revenue at three fiscal year ends: 269 billion dollars of backlog against 137 billion of revenue in fiscal 2024, 368 against 169 in fiscal 2025, and 678 against 214 in fiscal 2026 — the ratio moving from 2.0 times to 3.2 times.">
+            {C1.map((c, i) => {
+              const xb = c1x(i);
+              const yb = c1y(c.b), yr = c1y(c.r), y0 = c1y(0);
+              return (
+                <g>
+                  <rect x={xb} y={yb} width={C1BW} height={y0 - yb} class="segA" />
+                  <rect x={xb + C1BW + C1PG} y={yr} width={C1BW} height={y0 - yr} class="segB" />
+                  <text x={xb + C1BW + C1PG / 2} y={yb - 8} text-anchor="middle" class="cval">${c.b.toFixed(0)}B</text>
+                  <text x={xb + C1BW + C1PG + C1BW / 2} y={yr - 8} text-anchor="middle" class="ckey">${c.r.toFixed(0)}B</text>
+                  <text x={xb + C1BW + C1PG / 2} y={yb - 30} text-anchor="middle" class="cratio">{c.ratio}</text>
+                  <text x={xb + C1BW + C1PG / 2} y={C1H - 8} text-anchor="middle" class="clab">{c.t}</text>
+                </g>
+              );
+            })}
+            <line x1={C1L} y1={c1y(0)} x2={C1W - C1R} y2={c1y(0)} class="axis" />
+            <g transform={`translate(${C1L}, ${C1T - 24})`}>
+              <rect x="0" y="-9" width="10" height="10" class="segA" />
+              <text x="16" y="0" class="ckey">commercial RPO</text>
+              <rect x="176" y="-9" width="10" height="10" class="segB" />
+              <text x="192" y="0" class="ckey">Microsoft Cloud revenue</text>
+            </g>
+          </svg>
+        </div>
+        <details class="fignotes">
+          <summary>Chart notes &amp; definitions</summary>
+          <p>
+            Commercial RPO from each fiscal year's 10-K ($269B FY24, $368B
+            FY25, $678B FY26); growth percentages are computed, not
+            printed. Microsoft Cloud revenue per the company's releases.
+            The ~30%-within-12-months figure applies to total-company RPO.
+          </p>
+        </details>
+      </figure>
+    </section>
+    <section class="sec">
+      <h2><span class="n">03</span> Backlog vs contracted obligations</h2>
+      <p>
+        The chart below is the forward slice of the obligations stack —
+        the AI-era commitments signed ahead of delivery, before debt and
+        commenced leases are added. On that slice alone the coverage runs
+        higher: Oracle 2.3×, Amazon 1.6×, Microsoft 1.3×, Alphabet 0.6×;
+        the all-in ratios above temper each by the balance sheet. Meta
+        discloses no compute revenue backlog at all against $628 billion
+        of forward commitments — four contracted books and one merchant
+        position.
+      </p>
+      <figure class="chart-fig">
+        <div class="chart-box exhibit">
+          <img src="/exhibits/contracted-books-20260730.png"
+            alt="Paired horizontal bars per company of contracted revenue backlog in gold against contracted obligations in blue. Oracle 638 billion dollars of backlog against 273 billion of obligations, 2.3 times. Amazon 364 against 229, 1.6 times, March figures. Microsoft 678 against 523, 1.3 times. Alphabet 520 against 896, 0.6 times. Meta shows no backlog against 628 billion of obligations."
+            width="2160" height="1280" loading="lazy" />
+        </div>
+        <details class="fignotes">
+          <summary>Chart notes</summary>
+          <p>
+            Backlog = commercial RPO; obligations = leases signed but not
+            yet commenced plus purchase obligations, latest filing each
+            (Microsoft, Alphabet, and Meta as of June 2026; Oracle May
+            2026; Amazon March 2026 — its Q2 10-Q, and roughly $68B of
+            data-center leases Meta signed in July, are not yet in these
+            figures). Obligation constructs differ by issuer: Alphabet's
+            purchase figure is its MD&A total including open purchase
+            orders and supply, energy, and content commitments — the
+            broadest of the five — while Oracle disclosed only
+            unconditional obligations, primarily power. Ratios are our
+            calculations from the filings.
+          </p>
+        </details>
+      </figure>
+      <p>
+        The ratio is one dimension of a sold book; tenor and counterparty
+        are the others — and the four books differ more on those than on
+        the ratio:
+      </p>
+      <ul>
+        <li><strong>Microsoft</strong> — the shortest and broadest book:
+        ~2.3-year weighted duration, ~30% converting within twelve
+        months; roughly 45% tied to OpenAI as of December per the
+        company's January disclosure, with the fourth quarter's growth
+        attributed to clients other than AI model developers.</li>
+        <li><strong>Amazon</strong> — a 5.5-year weighted life; a $138B
+        OpenAI arrangement, disclosed by Amazon, equal to about 38% of
+        the March backlog.</li>
+        <li><strong>Oracle</strong> — the longest and most concentrated:
+        ~12% converts within twelve months, 34% in months 13–36, 34% in
+        months 37–60, the remainder later; attributed only to "certain
+        significant cloud contracts," unnamed — while OpenAI has
+        published a partnership with Oracle exceeding $300 billion over
+        five years, up to roughly 47% of the book from a single
+        counterparty.</li>
+        <li><strong>Alphabet</strong> — a faster book, ~50% within 24
+        months; no concentration figure disclosed.</li>
+      </ul>
+      <p>
+        The shares are our calculations from the cited disclosures.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> The swap market's read</h2>
+      <p>
+        The credit market priced these differences in real time this
+        week, as five-year credit-default-swap spreads across the complex
+        swept to records:
+      </p>
+      <ul>
+        <li><strong>Oracle</strong> — near 215bp per FT/LSEG, beyond its
+        2008 peak (S&P Global Market Intelligence quoted nearer 200 the
+        same day).</li>
+        <li><strong>Meta and Alphabet</strong> — records per Bloomberg
+        and LSEG; Alphabet's attributed to its negative second-quarter
+        free cash flow (a single-quarter print, computed at −$5.9B from
+        its filed cash flows; its trailing-twelve-month line in the chart
+        above remains positive).</li>
+        <li><strong>CoreWeave</strong> — near 855bp per Bloomberg.</li>
+        <li><strong>Amazon</strong> — near 68bp per Bloomberg, from
+        36 at the start of the year; no post-earnings level was in
+        circulation as of this writing.</li>
+        <li><strong>Microsoft</strong> — near 53bp per Bloomberg, the
+        tightest of the group.</li>
+      </ul>
+      <p>
+        All levels are as attributed; none are CCIR observations. One
+        market framing, attributed: Seeking Alpha described Oracle's
+        contract as "a liquid hedge on AI capex, OpenAI execution and
+        broader data-center spending narratives" — the backlog-quality
+        question, stated as a price.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> Read against the credit record</h2>
+      <p>
+        One measurement note belongs beside the exhibit. On a uniform cash
+        basis — operating cash flow minus capital expenditure minus
+        finance-lease additions — Microsoft generated $42 billion in
+        FY2026, against $67 billion of reported free cash flow; the
+        difference is $24.6 billion of finance-lease additions, non-cash
+        at inception and repaid through financing. The instrument moves
+        where the build appears in the statements, not whether it is
+        covered: counted in full, the build still sits inside the cloud
+        revenue line. And the address moves again next year — on the
+        fourth-quarter call the CFO said more future datacenter leases
+        will shift from finance to operating leases from FY2027, "finance
+        leases are included in capital expenditures while operating
+        leases are not," restating calendar-2026 capital-expenditure
+        expectations from roughly $190 billion in April to approximately
+        $175 billion on the reclassification alone. Same contracts, less
+        of the build in the reported lines.
+      </p>
+      <figure class="chart-fig">
+        <div class="chart-box exhibit">
+          <img src="/exhibits/fcf-uniform-basis-20260730.png"
+            alt="Five lines of trailing twelve month free cash flow on a uniform basis, operating cash flow minus capex minus finance lease additions, from early 2024 through June 2026. Alphabet ends at plus 51 billion dollars, Microsoft plus 42, Meta plus 39, while Amazon declines to minus 16 and Oracle to minus 29."
+            width="2160" height="1280" loading="lazy" />
+        </div>
+        <details class="fignotes">
+          <summary>Chart notes</summary>
+          <p>
+            Filed cash flows; gross capex, not net of proceeds. Companies'
+            own reported figures differ by basis — Amazon reports −$7.6B
+            trailing free cash flow on its definition (capex net of
+            proceeds, before lease additions); Microsoft +$67B before its
+            $24.6B of finance-lease additions. Oracle pre-FY2026 and Meta
+            pre-2025 finance-lease additions are undisclosed and treated
+            as zero; Meta's 2026 and Oracle's FY2026 nine-month additions
+            are apportioned, as labeled on the card. The hollow bubbles in
+            the exhibit above mark the two companies negative on this
+            basis.
+          </p>
+        </details>
+      </figure>
+      <p>
+        On the credit side: Microsoft's committed stack funds at lease
+        economics — a 13-year weighted-average remaining term at a
+        disclosed 4.5% discount rate — while standalone GPU-backed
+        borrowers on the <a href="/credit">compute-credit record</a> fund
+        at spreads of several hundred basis points over it, and unlike
+        Alphabet's backstops, the lease book carries no quarterly filed
+        mark.
+        <strong>CCIR carries these quantities with each Microsoft
+        filing</strong> on the
+        <a href="/credit/commitments">AI commitments monitor</a>, and the
+        rates the committed deals themselves imply on the
+        <a href="/research/implied-committed-rates">implied committed
+        rates</a> table.
+      </p>
+      <p class="footnote">
+        Sources — Microsoft Form 10-K for the fiscal year ended June 30,
+        2026 (acc. 0001193125-26-323660) and FY26 Q4 earnings release;
+        prior-period figures from the FY2025 10-K (acc.
+        0000950170-25-100235) and FY2024 10-K (acc. 0000950170-24-087843);
+        useful-life and capital-expenditure quotations from Microsoft's
+        official FY26 Q4 (July 29, 2026) and FY26 Q3 (April 29, 2026)
+        earnings-call transcripts. CDS levels as attributed in-text (Bloomberg; FT/LSEG; Reuters and S&P Global Market Intelligence; Seeking Alpha — July 27–29, 2026 quotes). Group-exhibit peer figures: Meta Q2
+        2026 10-Q (acc. 0001628280-26-050705); Alphabet Q2 2026 10-Q
+        (acc. 0001652044-26-000071); Oracle FY2026 10-K (acc.
+        0001193125-26-277521); Amazon Q1 2026 10-Q (acc.
+        0001018724-26-000014) and Q2 2026 earnings release (backlog and
+        obligations pending its Q2 10-Q). Ratios and the uniform cash
+        basis are our calculations from the disclosed figures. Nothing here is a
+        solvency opinion, a forecast, or investment advice; CCIR publishes
+        reference data and records.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec a { color: var(--accent); }
+    .sec ul {
+      font-family: var(--font-body); font-size: var(--fs-md);
+      color: var(--ink); line-height: 1.65; margin: 0 0 13px;
+      padding-left: 1.2em;
+    }
+    .sec li { margin: 0 0 8px; }
+    .chart-fig { margin: 18px 0 22px; max-width: 700px; }
+    .chart-box { border: 1px solid var(--rule); background: var(--surface); }
+    .chart-box svg { display: block; width: 100%; height: auto; }
+    .fig-title { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.03em; margin-bottom: 6px; }
+    .segA { fill: var(--accent); }
+    .segB { fill: var(--accent); opacity: 0.4; }
+    .exhibit img { display: block; width: 100%; height: auto; }
+    :global(html[data-theme="terminal"]) .segA { fill: #f5b301; }
+    :global(html[data-theme="terminal"]) .segB { fill: #4d9fff; opacity: 1; }
+    .fignotes { margin-top: 6px; }
+    .fignotes summary {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-faint); cursor: pointer; user-select: none;
+    }
+    .fignotes summary:hover { color: var(--ink-dim); }
+    .fignotes p {
+      font-size: var(--fs-xs); color: var(--ink-faint);
+      line-height: 1.5; margin: 6px 0 0; max-width: 74ch;
+    }
+    .axis { stroke: var(--rule); stroke-width: 1; }
+    .clab, .cval, .ckey, .cmeta, .cratio { font-family: var(--font-mono); }
+    .clab { font-size: 13px; fill: var(--ink); }
+    .cval { font-size: 12px; fill: var(--ink); }
+    .cratio { font-size: 14px; font-weight: 700; fill: var(--ink); }
+    .ckey { font-size: 11px; fill: var(--ink-dim); }
+    .cmeta { font-size: 10.5px; fill: var(--ink-faint); }
+    .footnote {
+      font-size: var(--fs-sm);
+      color: var(--ink-faint);
+      border-top: 1px solid var(--rule);
+      padding-top: 8px;
+      max-width: 74ch;
+    }
+    .footnote a { color: var(--accent); }
+  </style>
+</Base>
