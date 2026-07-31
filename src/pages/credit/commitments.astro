@@ -122,7 +122,7 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
         disclosure. <strong>All-in obligations</strong> = the two forward
         columns plus debt at face value and balance-sheet lease
         liabilities (operating + finance), each from the same issuer's
-        cited filings — a total fixed-claims stack, CCIR arithmetic on
+        cited filings — a total fixed-claims stack, CCIR calculation on
         disclosed figures. The backlog ÷ all-in ratio is a conservative
         screen, not a coverage finding: RPO is contracted revenue only,
         while debt and commenced leases are also serviced by revenue no
@@ -186,8 +186,7 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
       <p>
         Where a publicly disclosed multi-year compute deal states enough —
         dollars, term, and quantity — CCIR backs out the implied unit
-        rate. Every figure is implied — CCIR arithmetic on disclosed
-        figures — graded by disclosure quality, and none is an observed
+        rate. Every figure is implied — computed by CCIR from the disclosed figures — graded by disclosure quality, and none is an observed
         price. These rows are not part of any CCIR benchmark series. The
         methodology and per-deal detail are in the research note
         <a href="/research/implied-committed-rates">Implied Committed

@@ -6,7 +6,7 @@ import Base from '../../layouts/Base.astro';
   disclosed multi-year AI-compute deals, frozen to the sources cited
   (verified 2026-07-30). Companion standing table lives on
   /credit/commitments and updates as deals publish; research notes are
-  dated, not updated in place. All rates are implied — CCIR arithmetic on
+  dated, not updated in place. All rates are implied — CCIR calculation on
   disclosed figures — floors by construction, and not part of any CCIR
   benchmark series.
 */
@@ -54,8 +54,8 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         the disclosures leave implicit — the cleanest print, Microsoft's
         Norway contract with Nscale, implies <strong>$2.72 per
         GPU-hour</strong> with every input company-disclosed. Each figure
-        below is implied — CCIR arithmetic on disclosed figures — graded by
-        disclosure quality, and none is an observed price. A standing
+        below is implied — computed by CCIR from the disclosed figures —
+        graded by disclosure quality, and none is an observed price. A standing
         version of these tables is maintained on the
         <a href="/credit/commitments">AI commitments monitor</a>.
       </p>
@@ -70,7 +70,7 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         are the largest committed-term prints in the market — and their
         disclosure format states the total while leaving the unit rate
         implicit. When a company disclosures dollars, term, and quantity
-        for the same contract, the implied unit rate is arithmetic, not
+        for the same contract, the implied unit rate is calculation, not
         estimation. Where one input comes from press rather than the
         company, the grade says so. Where an input is missing, the rate is
         not computed.
@@ -166,7 +166,7 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
           </tbody>
         </table>
       </div>
-      <p class="tblfoot">All rows: implied — CCIR arithmetic on disclosed figures; floors per §02.</p>
+      <p class="tblfoot">All rows: implied — computed by CCIR from the disclosed figures; floors per §02.</p>
       <p>
         <strong>Narvik leads because it is the cleanest print in
         public:</strong> dollars, term, and GPU count all disclosed by the
@@ -235,8 +235,7 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         <details class="fignotes">
           <summary>Chart notes</summary>
           <p>
-            GB300-class, ~5-year terms, Microsoft as buyer. Implied — CCIR
-            arithmetic on disclosed figures under the §02 assumptions;
+            GB300-class, ~5-year terms, Microsoft as buyer. Implied — computed by CCIR from the disclosed figures under the §02 assumptions;
             floors by construction. IREN bar is a labeled CCIR estimate
             from disclosed megawatts and NVIDIA's published rack power.
           </p>
@@ -269,7 +268,7 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
           </tbody>
         </table>
       </div>
-      <p class="tblfoot">All rows: implied — CCIR arithmetic on disclosed figures; floors per §02.</p>
+      <p class="tblfoot">All rows: implied — computed by CCIR from the disclosed figures; floors per §02.</p>
       <p>
         No public conversion from gigawatts to GPU count exists for the
         Stargate agreement, so CCIR declines to state one; the megawatt row
@@ -380,7 +379,7 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         Enterprise Reference Architecture, NVL72 AI Factory components
         (rack power input for the labeled IREN estimate); attributed press:
         The New York Times (Meta–Anthropic talks). All implied rates are
-        CCIR arithmetic on the cited disclosures under the §02 assumptions;
+        CCIR calculation on the cited disclosures under the §02 assumptions;
         they are floors on blended committed rates, not observed prices,
         and are not part of any CCIR benchmark series. Nothing here is a
         solvency opinion, a forecast, or investment advice; CCIR publishes
