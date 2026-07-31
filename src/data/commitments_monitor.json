@@ -1,200 +1,202 @@
 {
-  "as_of": "2026-07-30",
-  "next_expected": "Amazon 10-Q Q2 2026 (quarter ended June 30, 2026), expected early August 2026",
-  "companies": [
-    {
-      "key": "meta",
-      "name": "Meta",
-      "latest_filing": "10-Q Q2 2026 (period 2026-06-30), acc 0001628280-26-050705",
-      "prior_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001628280-26-028526",
-      "leases_nyc": {
-        "v": 278.99,
-        "w": "Jun-26",
-        "pv": 182.88,
-        "pw": "Mar-26",
-        "note": "data centers, colocations, network infrastructure; commencing 2026–2036, terms >1 to 30 yrs; separately, ~$68B of further data-center leases signed Jul-26 (subsequent event), commencing 2027–28, terms 18–20 yrs — not in the quarter-end figure"
-      },
-      "purchase": {
-        "v": 349.31,
-        "w": "Jun-26",
-        "pv": 237.67,
-        "pw": "Mar-26",
-        "note": "non-cancelable; ~$53.5B due 2026, ~$81.7B due 2027; excludes $14.72B contingent cloud capacity; $10.8B of money-market funds escrowed against multi-year infrastructure purchase agreements (released 2028–30)"
-      },
-      "rpo": {
-        "v": null,
-        "w": "Jun-26",
-        "pv": null,
-        "pw": "Mar-26",
-        "note": "no compute revenue backlog"
-      },
-      "support": {
-        "v": 28.0,
-        "w": "Jun-26",
-        "label": "RVG threshold, unconsolidated Louisiana venture (no liability recorded — payments 'not probable'; max exposure $46.0B); El Paso exclusivity agreement (subsequent event) adds RVG max ~$13B upon closing, expected Q3-26"
-      },
-      "ocf_ttm": 130.3,
-      "visible": {
-        "debt": 84.0,
-        "leases": 28.65,
-        "w": "Jun-26",
-        "note": "debt = $84.0B face (carrying $83.66B); balance-sheet operating lease liabilities $28.65B; finance-lease liabilities not disclosed in the Q2 10-Q (fin-lease ROU assets $9.47B) — all-in stack understated by that amount"
-      }
-    },
-    {
-      "key": "alphabet",
-      "name": "Alphabet",
-      "latest_filing": "10-Q Q2 2026 (period 2026-06-30), acc 0001652044-26-000071",
-      "prior_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001652044-26-000048",
-      "leases_nyc": {
-        "v": 85.2,
-        "w": "Jun-26",
-        "pv": 75.6,
-        "pw": "Mar-26",
-        "note": "commencing 2026–2031, terms 1–26 yrs; separately, a short-term lease signed Jun-26 with a non-cancelable commitment of ~$5.8B, commencing Q3-26"
-      },
-      "purchase": {
-        "v": 811.0,
-        "w": "Jun-26",
-        "pv": 332.4,
-        "pw": "Mar-26",
-        "note": "MD&A total incl. open purchase orders; $200.7B short-term; note-level fixed/guaranteed supply+energy+content = $707.0B — supply agreements generally fulfilled through 2030, energy take-or-pay obligations through 2054"
-      },
-      "rpo": {
-        "v": 519.5,
-        "w": "Jun-26",
-        "pv": 467.6,
-        "pw": "Mar-26",
-        "note": "$513.9B Google Cloud; definition includes ≤1-yr contracts since Q1-26; 'limited number' of TPU-system supply agreements began recognizing revenue in Q2-26, significant majority expected in 2027"
-      },
-      "support": {
-        "v": 43.8,
-        "w": "Jun-26",
-        "label": "data-center backstops as credit derivatives, notional (was $28.4B Mar-26, $16.9B Dec-25, $0 Dec-24); fair-value liability $815M vs $69M Dec-25; further ~$24.1B of backstops agreed, terms pending; separately $7.6B energy financial guarantees (terms through Sep-26) and a $20.0B milestone-contingent funding commitment to an unnamed private company, booked as an equity derivative"
-      },
-      "ocf_ttm": 185.7,
-      "visible": {
-        "debt": 101.09,
-        "leases": 20.63,
-        "w": "Jun-26",
-        "note": "debt = $101.09B total face incl current portion; op leases $18.04B + fin leases $2.59B"
-      }
-    },
-    {
-      "key": "microsoft",
-      "name": "Microsoft",
-      "latest_filing": "10-K FY2026 (period 2026-06-30), acc 0001193125-26-323660",
-      "prior_filing": "10-Q Q3 FY2026 (period 2026-03-31), acc 0001193125-26-191507",
-      "leases_nyc": {
-        "v": 329.1,
-        "w": "Jun-26",
-        "pv": 196.6,
-        "pw": "Mar-26",
-        "note": "primarily datacenters; commencing FY2027–FY2033, terms 1–20 yrs; 74% of the $443.5B total lease-commitment line in the MD&A table"
-      },
-      "purchase": {
-        "v": 194.06,
-        "w": "Jun-26",
-        "pv": 142.05,
-        "pw": "Jun-25",
-        "note": "$194.06B purchase commitments (datacenter take-or-pay + open POs; $169.0B due FY27). Separately disclosed: $34.57B construction commitments — excluded from the normalized columns because only Microsoft discloses construction as its own line; the prior-year row ($142.05B) included it, so the delta is mixed-basis. The full MD&A contractual-obligations table (leases $443.5B + purchase + construction + debt principal $46.1B + interest $25.6B) totals $743.8B"
-      },
-      "rpo": {
-        "v": 684.0,
-        "w": "Jun-26",
-        "pv": 633.0,
-        "pw": "Mar-26",
-        "note": "$678B commercial (+84% y/y), weighted-avg duration ~2.3 yrs, ~30% recognized within 12 mo"
-      },
-      "support": {
-        "v": null,
-        "w": "",
-        "label": "none disclosed as a separate category"
-      },
-      "ocf_ttm": 182.9,
-      "visible": {
-        "debt": 46.14,
-        "leases": 88.52,
-        "w": "Jun-26",
-        "note": "debt = $46.14B total face value; op leases $21.93B + fin leases $66.59B"
-      }
-    },
-    {
-      "key": "oracle",
-      "name": "Oracle",
-      "latest_filing": "10-K FY2026 (period 2026-05-31), acc 0001193125-26-277521",
-      "prior_filing": "10-K FY2022 (period 2022-05-31), acc 0001564590-22-023675 — earliest comparable for leases",
-      "leases_nyc": {
-        "v": 260.0,
-        "w": "May-26",
-        "pv": 4.1,
-        "pw": "May-22",
-        "note": "terms 15–19 yrs, commencing FY27–FY29; includes a lease with $3.3B guarantee of the lessor's borrowing (matures Sep-26)"
-      },
-      "purchase": {
-        "v": 13.31,
-        "w": "May-26",
-        "pv": null,
-        "pw": "",
-        "note": "unconditional, primarily data-center power; +$19B cloud-infrastructure purchase commitments signed after year-end (subsequent event)"
-      },
-      "rpo": {
-        "v": 638.0,
-        "w": "May-26",
-        "pv": 138.0,
-        "pw": "May-25",
-        "note": "~12% expected to convert to revenue within 12 months; increase attributed to 'certain significant cloud contracts,' unnamed"
-      },
-      "support": {
-        "v": 3.3,
-        "w": "May-26",
-        "label": "guarantee of a lessor's borrowing within the lease pipeline"
-      },
-      "ocf_ttm": 32.0,
-      "visible": {
-        "debt": 130.11,
-        "leases": 37.89,
-        "w": "May-26",
-        "note": "debt = $130.11B total senior notes and other borrowings (pre-adjustment; incl term loan $5.14B + CP $1.47B); op leases $30.19B + fin leases $7.70B"
-      }
-    },
-    {
-      "key": "amazon",
-      "name": "Amazon",
-      "latest_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001018724-26-000014",
-      "prior_filing": "10-K FY2025 (period 2025-12-31), acc 0001018724-26-000004",
-      "leases_nyc": {
-        "v": 106.35,
-        "w": "Mar-26",
-        "pv": 96.37,
-        "pw": "Dec-25"
-      },
-      "purchase": {
-        "v": 122.58,
-        "w": "Mar-26",
-        "pv": 103.64,
-        "pw": "Dec-25",
-        "note": "$103.77B unconditional purchase obligations + $18.81B other commitments"
-      },
-      "rpo": {
-        "v": 364.0,
-        "w": "Mar-26",
-        "pv": 244.0,
-        "pw": "Dec-25",
-        "note": "AWS, contracts >1 yr, weighted-avg life 5.5 yrs; growth driven by OpenAI arrangement expanded $100B to $138B"
-      },
-      "support": {
-        "v": null,
-        "w": "",
-        "label": "none disclosed as backstop/guarantee; related: $20B milestone-linked Anthropic financing facility, $35B OpenAI equity commitment letter"
-      },
-      "ocf_ttm": 148.5,
-      "visible": {
-        "debt": 122.63,
-        "leases": 104.94,
-        "w": "Mar-26",
-        "note": "debt = $122.63B total face incl current portion (nearly doubled in Q1-26: $37B USD + €14.5B March issuances); op leases $91.62B + fin leases $13.33B"
-      }
-    }
-  ]
+ "as_of": "2026-07-31",
+ "next_expected": "Oracle 10-Q FY27 Q1 (quarter ending August 31, 2026), expected mid-September 2026",
+ "companies": [
+  {
+   "key": "meta",
+   "name": "Meta",
+   "latest_filing": "10-Q Q2 2026 (period 2026-06-30), acc 0001628280-26-050705",
+   "prior_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001628280-26-028526",
+   "leases_nyc": {
+    "v": 278.99,
+    "w": "Jun-26",
+    "pv": 182.88,
+    "pw": "Mar-26",
+    "note": "data centers, colocations, network infrastructure; commencing 2026–2036, terms >1 to 30 yrs; separately, ~$68B of further data-center leases signed Jul-26 (subsequent event), commencing 2027–28, terms 18–20 yrs — not in the quarter-end figure"
+   },
+   "purchase": {
+    "v": 349.31,
+    "w": "Jun-26",
+    "pv": 237.67,
+    "pw": "Mar-26",
+    "note": "non-cancelable; ~$53.5B due 2026, ~$81.7B due 2027; excludes $14.72B contingent cloud capacity; $10.8B of money-market funds escrowed against multi-year infrastructure purchase agreements (released 2028–30)"
+   },
+   "rpo": {
+    "v": null,
+    "w": "Jun-26",
+    "pv": null,
+    "pw": "Mar-26",
+    "note": "no compute revenue backlog"
+   },
+   "support": {
+    "v": 28.0,
+    "w": "Jun-26",
+    "label": "RVG threshold, unconsolidated Louisiana venture (no liability recorded — payments 'not probable'; max exposure $46.0B); El Paso exclusivity agreement (subsequent event) adds RVG max ~$13B upon closing, expected Q3-26"
+   },
+   "ocf_ttm": 130.3,
+   "visible": {
+    "debt": 84.0,
+    "leases": 28.65,
+    "w": "Jun-26",
+    "note": "debt = $84.0B face (carrying $83.66B); balance-sheet operating lease liabilities $28.65B; finance-lease liabilities not disclosed in the Q2 10-Q (fin-lease ROU assets $9.47B) — all-in stack understated by that amount"
+   }
+  },
+  {
+   "key": "alphabet",
+   "name": "Alphabet",
+   "latest_filing": "10-Q Q2 2026 (period 2026-06-30), acc 0001652044-26-000071",
+   "prior_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001652044-26-000048",
+   "leases_nyc": {
+    "v": 85.2,
+    "w": "Jun-26",
+    "pv": 75.6,
+    "pw": "Mar-26",
+    "note": "commencing 2026–2031, terms 1–26 yrs; separately, a short-term lease signed Jun-26 with a non-cancelable commitment of ~$5.8B, commencing Q3-26"
+   },
+   "purchase": {
+    "v": 811.0,
+    "w": "Jun-26",
+    "pv": 332.4,
+    "pw": "Mar-26",
+    "note": "MD&A total incl. open purchase orders; $200.7B short-term; note-level fixed/guaranteed supply+energy+content = $707.0B — supply agreements generally fulfilled through 2030, energy take-or-pay obligations through 2054"
+   },
+   "rpo": {
+    "v": 519.5,
+    "w": "Jun-26",
+    "pv": 467.6,
+    "pw": "Mar-26",
+    "note": "$513.9B Google Cloud; definition includes ≤1-yr contracts since Q1-26; 'limited number' of TPU-system supply agreements began recognizing revenue in Q2-26, significant majority expected in 2027"
+   },
+   "support": {
+    "v": 43.8,
+    "w": "Jun-26",
+    "label": "data-center backstops as credit derivatives, notional (was $28.4B Mar-26, $16.9B Dec-25, $0 Dec-24); fair-value liability $815M vs $69M Dec-25; further ~$24.1B of backstops agreed, terms pending; separately $7.6B energy financial guarantees (terms through Sep-26) and a $20.0B milestone-contingent funding commitment to an unnamed private company, booked as an equity derivative"
+   },
+   "ocf_ttm": 185.7,
+   "visible": {
+    "debt": 101.09,
+    "leases": 20.63,
+    "w": "Jun-26",
+    "note": "debt = $101.09B total face incl current portion; op leases $18.04B + fin leases $2.59B"
+   }
+  },
+  {
+   "key": "microsoft",
+   "name": "Microsoft",
+   "latest_filing": "10-K FY2026 (period 2026-06-30), acc 0001193125-26-323660",
+   "prior_filing": "10-Q Q3 FY2026 (period 2026-03-31), acc 0001193125-26-191507",
+   "leases_nyc": {
+    "v": 329.1,
+    "w": "Jun-26",
+    "pv": 196.6,
+    "pw": "Mar-26",
+    "note": "primarily datacenters; commencing FY2027–FY2033, terms 1–20 yrs; 74% of the $443.5B total lease-commitment line in the MD&A table"
+   },
+   "purchase": {
+    "v": 194.06,
+    "w": "Jun-26",
+    "pv": 142.05,
+    "pw": "Jun-25",
+    "note": "$194.06B purchase commitments (datacenter take-or-pay + open POs; $169.0B due FY27). Separately disclosed: $34.57B construction commitments — excluded from the normalized columns because only Microsoft discloses construction as its own line; the prior-year row ($142.05B) included it, so the delta is mixed-basis. The full MD&A contractual-obligations table (leases $443.5B + purchase + construction + debt principal $46.1B + interest $25.6B) totals $743.8B"
+   },
+   "rpo": {
+    "v": 684.0,
+    "w": "Jun-26",
+    "pv": 633.0,
+    "pw": "Mar-26",
+    "note": "$678B commercial (+84% y/y), weighted-avg duration ~2.3 yrs, ~30% recognized within 12 mo; backlog ÷ all-in ratio uses the commercial figure (house basis)",
+    "ratio_v": 678.0
+   },
+   "support": {
+    "v": null,
+    "w": "",
+    "label": "none disclosed as a separate category"
+   },
+   "ocf_ttm": 182.9,
+   "visible": {
+    "debt": 46.14,
+    "leases": 88.52,
+    "w": "Jun-26",
+    "note": "debt = $46.14B total face value; op leases $21.93B + fin leases $66.59B"
+   }
+  },
+  {
+   "key": "oracle",
+   "name": "Oracle",
+   "latest_filing": "10-K FY2026 (period 2026-05-31), acc 0001193125-26-277521",
+   "prior_filing": "10-K FY2022 (period 2022-05-31), acc 0001564590-22-023675 — earliest comparable for leases",
+   "leases_nyc": {
+    "v": 260.0,
+    "w": "May-26",
+    "pv": 4.1,
+    "pw": "May-22",
+    "note": "terms 15–19 yrs, commencing FY27–FY29; includes a lease with $3.3B guarantee of the lessor's borrowing (matures Sep-26)"
+   },
+   "purchase": {
+    "v": 13.31,
+    "w": "May-26",
+    "pv": null,
+    "pw": "",
+    "note": "unconditional, primarily data-center power; +$19B cloud-infrastructure purchase commitments signed after year-end (subsequent event)"
+   },
+   "rpo": {
+    "v": 638.0,
+    "w": "May-26",
+    "pv": 138.0,
+    "pw": "May-25",
+    "note": "~12% expected to convert to revenue within 12 months; increase attributed to 'certain significant cloud contracts,' unnamed"
+   },
+   "support": {
+    "v": 3.3,
+    "w": "May-26",
+    "label": "guarantee of a lessor's borrowing within the lease pipeline"
+   },
+   "ocf_ttm": 32.0,
+   "visible": {
+    "debt": 130.11,
+    "leases": 37.89,
+    "w": "May-26",
+    "note": "debt = $130.11B total senior notes and other borrowings (pre-adjustment; incl term loan $5.14B + CP $1.47B); op leases $30.19B + fin leases $7.70B"
+   }
+  },
+  {
+   "key": "amazon",
+   "name": "Amazon",
+   "latest_filing": "10-Q Q2 2026 (period 2026-06-30), acc 0001018724-26-000026",
+   "prior_filing": "10-Q Q1 2026 (period 2026-03-31), acc 0001018724-26-000014",
+   "leases_nyc": {
+    "v": 137.21,
+    "w": "Jun-26",
+    "pv": 106.35,
+    "pw": "Mar-26",
+    "note": "$93.5B of the undiscounted total falls due after 2030"
+   },
+   "purchase": {
+    "v": 148.43,
+    "w": "Jun-26",
+    "pv": 122.58,
+    "pw": "Mar-26",
+    "note": "$130.07B unconditional purchase obligations (energy, digital media content, property & equipment, software) + $18.37B other commitments"
+   },
+   "rpo": {
+    "v": 496.0,
+    "w": "Jun-26",
+    "pv": 364.0,
+    "pw": "Mar-26",
+    "note": "AWS, contracts >1 yr, weighted-avg life 6.4 yrs (5.5 at Mar-26); Q2 10-Q discloses an expansion of the Anthropic collaboration announced in the quarter of more than $100B over 10 yrs (Q1: OpenAI arrangement expanded $100B to $138B) — both including obligations tied to the performance of AWS chips"
+   },
+   "support": {
+    "v": null,
+    "w": "",
+    "label": "none disclosed as backstop/guarantee; related: $20B milestone-linked Anthropic financing facility; OpenAI equity commitment fully funded (remaining $21.3B Series C invested Jul-26, subsequent event); $10.0B invested in Anthropic nonvoting preferred in Q2"
+   },
+   "ocf_ttm": 161.4,
+   "visible": {
+    "debt": 133.0,
+    "leases": 109.77,
+    "w": "Jun-26",
+    "note": "debt = $133.0B total face incl current portion (May-26 CHF ~$3.5B + Jun-26 CAD ~$9.9B issuances); a further $25.0B of USD notes issued Jul-26 (subsequent event, not in the quarter-end face total); op leases $96.32B + fin leases $13.45B"
+   }
+  }
+ ]
 }

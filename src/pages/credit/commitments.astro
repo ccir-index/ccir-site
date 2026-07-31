@@ -96,7 +96,7 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
                 </td>
                 <td>
                   <span class="v">{fmtB(allIn(c), 0)}</span> <span class="w">{c.visible?.w}</span>
-                  {c.rpo.v != null && <div class="d">backlog ÷ all-in: {(c.rpo.v / allIn(c)).toFixed(2)}×</div>}
+                  {c.rpo.v != null && <div class="d">backlog ÷ all-in: {((c.rpo.ratio_v ?? c.rpo.v) / allIn(c)).toFixed(2)}×</div>}
                   {c.visible?.note && <div class="nt">{c.visible.note}</div>}
                 </td>
                 <td>
