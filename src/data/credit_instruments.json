@@ -222,6 +222,37 @@
    "as_of": "2026-05-18"
   },
   {
+   "id": "crwv-ddtl-2600-2026",
+   "issuer": "CoreWeave, Inc.",
+   "ticker": "CRWV",
+   "issuer_type": "public",
+   "entity": null,
+   "name": "$2.6B DDTL (Jul 2026)",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 2600,
+   "size_note": "$2.6B first-lien delayed-draw; draws over 5 years, interest on drawn amounts only (FT)",
+   "rate": {
+    "kind": "sofr_spread",
+    "value": 5.5,
+    "note": "S+550, 0% floor, 97 OID; ~10.44% yield to maturity at issue. Widened from S+425–450 / 99 OID talk. Completion + final terms press-reported (PitchBook LCD, reported Aug 1); 8-K not yet filed."
+   },
+   "maturity": "2031-09-01",
+   "maturity_note": "Amortization scaled to fully repay the facility by maturity (PitchBook LCD)",
+   "seniority": "First-lien senior secured",
+   "security": "GPUs and ancillary components under take-or-pay contracts (Anthropic, Jane Street, Midjourney, Hudson River Trading, Anysphere — per PitchBook LCD/FT); DSCR ≥1.35x at borrower, aligned with parent revolver covenants until parent reaches IG; $112.5M minimum liquidity until 12 months pre-maturity; lockbox in place until half the debt is repaid, and also triggered if the lease rate drops below a threshold (FT term sheet)",
+   "lenders": [
+    "JPMorgan (lead)"
+   ],
+   "status": "confirmed",
+   "issued": "2026-08-01",
+   "source": {
+    "doc": "PitchBook LCD (completion, final terms); FT 7/30/26 (term sheet: lockbox, offtake mix)",
+    "date": "2026-08-01",
+    "url": "https://pitchbook.com/news/articles/coreweave-completes-2-6b-term-loan-after-raising-the-spread-and-yield"
+   },
+   "as_of": "2026-08-01"
+  },
+  {
    "id": "crwv-notes-9250-2030",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
