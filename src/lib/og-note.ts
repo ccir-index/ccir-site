@@ -2,7 +2,7 @@
   Shared OG card layout for research notes, primers, and product pages that
   aren't driven by live snapshot tables: masthead + kicker, one/two-line
   display title, short standfirst, a small row table, footer with the URL.
-  Same 1200x630 editorial-cream system as lib/og.ts (satori -> resvg).
+  Same 1200x630 terminal-dark system as lib/og.ts (satori -> resvg).
   ASCII-safe text only where possible — the embedded IBM Plex Mono subset
   lacks some glyphs (no "→"; use ASCII arrows).
 */
@@ -10,14 +10,10 @@ import { C, el, toPng } from './og';
 
 export type NoteRow = [string, string, string];
 
-// Terminal (dark) palette for note cards that opt out of the editorial
-// cream — same slots as C, values from the site's terminal theme tokens.
-// The navy slot carries the wordmark/figure emphasis; on terminal that
-// role belongs to the accent.
-export const CT = {
-  bg: '#0b0c0e', surface: '#111418', head: '#16191e', rule: '#23262b', rule2: '#3a3e45',
-  ink: '#e8e6e1', dim: '#9a958c', faint: '#6b675f', navy: '#ff9100',
-} as const;
+// Terminal (dark) palette — since 2026-08-02 this IS the default `C` in
+// lib/og.ts (all OG cards render terminal). Kept as a named export for
+// the endpoints that opted in explicitly before the default flipped.
+export const CT = C;
 
 export interface NoteCardSpec {
   kicker: string;
@@ -27,7 +23,7 @@ export interface NoteCardSpec {
   rows: NoteRow[];
   foot?: string;
   url: string;
-  /** Palette override — pass CT for the terminal (dark) card. Defaults to the editorial C. */
+  /** Palette override. Defaults to C (terminal dark since 2026-08-02). */
   palette?: typeof C;
 }
 

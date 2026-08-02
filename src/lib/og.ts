@@ -1,7 +1,12 @@
 /*
-  Shared Open Graph card renderer. Builds a 1200x630 editorial-cream card
+  Shared Open Graph card renderer. Builds a 1200x630 terminal-dark card
   (CCIR masthead + title + a tier table) from live snapshot data via
   satori -> resvg. Used by /og/tiers.png, /og/home.png, /og/spreads.png.
+
+  2026-08-02: default palette switched editorial-cream -> terminal
+  (site default theme + house social-card style). The slot names are
+  unchanged; `navy` is the emphasis slot and carries the terminal
+  amber accent.
 */
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
@@ -16,8 +21,8 @@ const serif400 = readFileSync(join(serifDir, 'ibm-plex-serif-latin-400-normal.wo
 const serif600 = readFileSync(join(serifDir, 'ibm-plex-serif-latin-600-normal.woff'));
 
 export const C = {
-  bg: '#f5f1e8', surface: '#fbf7ee', head: '#efeadd', rule: '#d4d0c4', rule2: '#b8b3a4',
-  ink: '#0d0d0d', dim: '#5b5852', faint: '#8e8a82', navy: '#143055',
+  bg: '#0b0c0e', surface: '#111418', head: '#16191e', rule: '#23262b', rule2: '#3a3e45',
+  ink: '#e8e6e1', dim: '#9a958c', faint: '#6b675f', navy: '#ff9100',
 };
 
 // satori consumes the React element shape at runtime; build it with plain objects
