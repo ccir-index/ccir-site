@@ -2,10 +2,10 @@
 import Base from '../layouts/Base.astro';
 import {
   headlineRates, meta, premiumChipsList, homeOdCell, headlineValue, headlineStatOf,
-  neocloudCommittedCell, neocloudCommittedTenors,
 } from '../data/snapshot';
+import { wpSpread } from '../data/committed_mi';
 import { TIERS, TIER_LABELS_SHORT, TERM_DISPLAY } from '../data/types';
-import type { Rate, Tier } from '../data/types';
+import type { Rate, Term, Tier } from '../data/types';
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 
@@ -29,18 +29,38 @@ const ladder = chips
   .filter((row) => TIERS.some((t) => row.cells[t]));
 
 // --- committed term panel (companion to the ladder; mirrors /term) --------
-// Anchor and tenors are all the region-pooled Neocloud H100 GTD series —
-// identical composition, so the vs-OD column is a like-for-like discount.
+// Anchor = the region-pooled Neocloud H100 GTD OD headline — the same cell
+// TermCurveChart anchors on. Tenor values are implied off that anchor by the
+// WITHIN-PROVIDER committed spread (committed_mi: each operator's committed
+// ask vs its own on-demand, operator-equal) — the /term par-curve
+// construction, so this panel and the chart it links to print identical
+// numbers (2026-08-02; the previous posted band medians differenced against
+// the OD headline mixed two provider panels and contradicted /term's tags).
+// Tenor floor at 3M mirrors the chart (1M short-end contango belongs to the
+// data story, not the par-curve read — John 2026-07-02).
 const TERM_ANCHOR_SERIES = 'CRI-T2-H100-ALL-GTD-OD-ALL';
 const termAnchor = headlineRates.find((r) => r.series_id === TERM_ANCHOR_SERIES);
-const termRows = neocloudCommittedTenors()
-  .map((t) => ({ term: t, cell: neocloudCommittedCell('H100', t) }))
-  .filter((r): r is { term: typeof r.term; cell: Rate } => !!r.cell);
-function vsOd(c: Rate): string {
-  if (!termAnchor) return '—';
-  const pct = Math.round((headlineValue(c) / headlineValue(termAnchor) - 1) * 100);
-  return `${pct > 0 ? '+' : '−'}${Math.abs(pct)}%`;
-}
+const TERM_TENORS: Term[] = ['3M', '6M', '1Y', '2Y', '3Y'];
+const termRows = (() => {
+  if (!termAnchor) return [];
+  const anchorV = headlineValue(termAnchor);
+  return TERM_TENORS.flatMap((term) => {
+    const sp = wpSpread('H100', term);
+    if (!sp) return [];
+    const value = anchorV * (1 + sp.spread);
+    const pct = sp.spread * 100;
+    const rounded = Math.round(Math.abs(pct));
+    return [{
+      term,
+      value,
+      disc: rounded === 0 ? '0%' : `${pct > 0 ? '+' : '−'}${rounded}%`,
+      title:
+        `H100 · ${term} committed vs own OD: ${pct > 0 ? '+' : '−'}${Math.abs(pct).toFixed(1)}% — ` +
+        `within-provider signed spread (${sp.n_pairs} provider pairs) → ` +
+        `$${fmt(value)} implied off the $${fmt(anchorV)} on-demand anchor`,
+    }];
+  });
+})();
 
 // --- research: the hub's own taxonomy, three items per group ---------------
 // Fixed selection (rotation retired 2026-07-25): standing monitors lead each
@@ -153,11 +173,11 @@ const researchGroups: ResearchGroup[] = [
                     <td class="num disc anchor-disc">anchor</td>
                   </tr>
                 )}
-                {termRows.map(({ term, cell }) => (
+                {termRows.map(({ term, value, disc, title }) => (
                   <tr>
                     <td class="term-cell">{TERM_DISPLAY[term] ?? term}</td>
-                    <td class="num posted" title={cellTitle(cell)}>{fmt(headlineValue(cell))}</td>
-                    <td class="num disc">{vsOd(cell)}</td>
+                    <td class="num posted" title={title}>{fmt(value)}</td>
+                    <td class="num disc">{disc}</td>
                   </tr>
                 ))}
               </tbody>
@@ -165,8 +185,11 @@ const researchGroups: ResearchGroup[] = [
             <details class="table-foot">
               <summary>Series &amp; stat</summary>
               <div class="tf-body">
-                CRI-T2-H100-ALL-GTD-&lbrace;TENOR&rbrace;-ALL · US &amp; EU pooled ·
-                vs-OD on the same series grain, same stat rule as the ladder
+                Anchor CRI-T2-H100-ALL-GTD-OD-ALL · tenor values implied off
+                the anchor by the within-provider committed spread (each
+                operator's committed ask vs its own on-demand,
+                operator-equal) — same construction as the /term curve ·
+                market-intelligence series, not a citable reference rate
               </div>
             </details>
           </div>
