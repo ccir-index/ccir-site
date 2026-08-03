@@ -26,8 +26,8 @@ const allIn = (c: any) =>
 const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
 ---
 <Base
-  title="AI Commitments Monitor — Big Tech Off-Balance-Sheet Obligations · CCIR"
-  description="A filings-season tracker of Big Tech's AI infrastructure commitments: leases not yet commenced, purchase obligations, remaining performance obligations (RPO), and credit-support instruments for Meta, Alphabet, Microsoft, Oracle, and Amazon — every figure windowed and traced to its SEC accession."
+  title="Big Tech's $2.6 Trillion in Signed AI Commitments · CCIR Monitor"
+  description="Meta, Alphabet, Microsoft, Oracle and Amazon have signed $2,607B of AI infrastructure commitments not yet delivered — leases not yet commenced plus purchase obligations, as of 2026-07-31. A filings-season monitor: every figure windowed, computed from the disclosed figures, and traced to its SEC accession."
 >
   <nav class="apps-navband" aria-label="credit section">
     <div class="wrap apps-nav-inner">
@@ -44,7 +44,17 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
   <section class="wrap top">
     <header class="page-head">
       <div class="kicker">Credit · living surface · updated each filing season</div>
-      <h1>AI Commitments Monitor</h1>
+      <h1>AI Commitments Monitor: $2.6 Trillion Signed, Not Yet Delivered</h1>
+      <p class="standfirst">
+        Meta, Alphabet, Microsoft, Oracle and Amazon have signed
+        <strong>{fmtB(sumL + sumP, 0)}</strong> of AI infrastructure
+        commitments that have not yet been delivered — leases signed on
+        buildings not yet handed over, plus contracts to buy chips, power
+        and capacity at stated minimums. That figure is those two
+        disclosed quantities added together, as of {mon.as_of}; it is not
+        debt, and it is not the same as the all-in total below, which adds
+        borrowings and leases already on the balance sheet.
+      </p>
       <p class="standfirst">
         The demand-side commitments that back compute credit, tracked from
         the SEC filings of the five largest AI buyers. Two footnote
@@ -59,9 +69,9 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
     </header>
 
     <div class="tiles">
+      <div class="tile tile-lead"><div class="tlab">Signed, not yet delivered</div><div class="tval">{fmtB(sumL + sumP, 0)}</div></div>
       <div class="tile"><div class="tlab">Leases not yet commenced</div><div class="tval">{fmtB(sumL, 0)}</div></div>
       <div class="tile"><div class="tlab">Purchase &amp; other commitments</div><div class="tval">{fmtB(sumP, 0)}</div></div>
-      <div class="tile"><div class="tlab">Combined</div><div class="tval">{fmtB(sumL + sumP, 0)}</div></div>
       <div class="tile"><div class="tlab">All-in, adding debt + commenced leases</div><div class="tval">{fmtB(sumAll, 0)}</div></div>
       <div class="tile"><div class="tlab">Revenue backlog (RPO), four sellers</div><div class="tval">{fmtB(sumR, 0)}</div></div>
     </div>
@@ -268,6 +278,8 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
     }
     .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 6px 0 22px; max-width: 900px; }
     .tile { border: 1px solid var(--rule); background: var(--surface); padding: 12px 14px; }
+    .tile-lead { border-color: var(--accent); }
+    .tile-lead .tlab { color: var(--accent); }
     .tlab { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.03em; }
     .tval { font-family: var(--font-display); font-size: var(--fs-2xl); font-weight: var(--weight-display); margin-top: 2px; }
     .sec { margin: 26px 0; max-width: 96ch; }
