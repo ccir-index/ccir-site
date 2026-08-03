@@ -1,6 +1,6 @@
 {
  "_meta": {
-  "as_of": "2026-07-28",
+  "as_of": "2026-08-03",
   "compiled_from": [
    "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
    "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -1441,6 +1441,39 @@
     "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315226030333/form8-k.htm"
    },
    "as_of": "2026-06-26"
+  },
+  {
+   "id": "apld-rcf-2025",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Corporate revolver secured on parent-level assets, not GPU-collateral — out of the GPU-collateralized spread/issuance scope.",
+   "issuer": "Applied Digital Corporation",
+   "ticker": "APLD",
+   "issuer_type": "public",
+   "entity": "Applied Digital Corporation (borrower)",
+   "name": "2025 Revolving Credit Facility",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 65,
+   "size_note": "$65M aggregate principal of revolving loans and letters of credit; amounts borrowed and repaid are available for future borrowing; draws undisclosed. Modified 5/29/26 and the standby letters of credit transferred on entry into the 2026 Revolving Credit Facility.",
+   "rate": {
+    "kind": "sofr_spread",
+    "value": 2.75,
+    "note": "SOFR + 2.75% per annum on the outstanding balance"
+   },
+   "maturity": null,
+   "maturity_note": "Not stated in the FY2026 10-K",
+   "seniority": "Secured revolver",
+   "security": "All of the Company's assets (none of its subsidiaries')",
+   "lenders": [
+    "First National Bank of Omaha"
+   ],
+   "status": "confirmed",
+   "issued": "2025-11-10",
+   "source": {
+    "doc": "10-K FY2026 (acc. 0001144879-26-000048), Debt note",
+    "date": "2026-07-29",
+    "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000048/apld-20260531.htm"
+   },
+   "as_of": "2026-08-03"
   },
   {
    "id": "cifr-conv-2030",
@@ -5045,8 +5078,8 @@
     "value": 4.75,
     "note": null
    },
-   "maturity": "2032",
-   "maturity_note": "Day not stated in the closing release",
+   "maturity": "2032-06-15",
+   "maturity_note": "Maturity date confirmed as June 15, 2032 in the 7/31/26 S-1 (the closing release omitted the day)",
    "seniority": "Senior unsecured",
    "security": null,
    "lenders": [
@@ -5059,7 +5092,40 @@
     "date": "2026-06-29",
     "url": "https://www.sec.gov/Archives/edgar/data/2068385/000149315226030417/ex99-1.htm"
    },
-   "as_of": "2026-07-10"
+   "as_of": "2026-08-03"
+  },
+  {
+   "id": "sharonai-conv-2031",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+   "issuer": "Sharon AI",
+   "ticker": "SHAZ",
+   "issuer_type": "public",
+   "entity": null,
+   "name": "6.00% Convertible Senior Notes due 2031",
+   "instrument_type": "convertible",
+   "size_usd_m": 350,
+   "size_note": "$350.0M aggregate principal. Securities Purchase Agreement with qualified institutional buyers 4/26/26; offering closed 5/20/26. Referred to in the S-1 as the \"May 2026 Convertible Notes\".",
+   "rate": {
+    "kind": "fixed",
+    "value": 6.0,
+    "note": null
+   },
+   "maturity": "2031",
+   "maturity_note": "Day not stated in the S-1; \"due 2031\" as filed",
+   "seniority": "Senior (as titled); ranking not separately stated for this series in the S-1",
+   "security": null,
+   "lenders": [
+    "144A QIBs"
+   ],
+   "status": "confirmed",
+   "issued": "2026-05-20",
+   "source": {
+    "doc": "S-1 (acc. 0001493152-26-035629), Recent Developments + Description of Securities",
+    "date": "2026-07-31",
+    "url": "https://www.sec.gov/Archives/edgar/data/2068385/000149315226035629/forms-1.htm"
+   },
+   "as_of": "2026-08-03"
   },
   {
    "id": "usdai-quantum",
