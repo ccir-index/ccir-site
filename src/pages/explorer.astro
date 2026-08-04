@@ -174,7 +174,7 @@ const rows = source.map((r) => ({
             <th class="sortable" data-key="region">Region</th>
             <th class="sortable" data-key="mean" data-num>Mean $/hr</th>
             <th class="sortable" data-key="median" data-num>Median $/hr</th>
-            <th class="sortable" data-key="p25" data-num>IQR</th>
+            <th class="sortable mob-hide" data-key="p25" data-num>IQR</th>
             <th class="sortable" data-key="n_src" data-num>n</th>
             <th class="sortable" data-key="d30" data-num
                 title="Trailing 30-day change in the published headline. Shown only for series whose headline is the n≥10 mean; thinner median-headline series show — .">30d</th>
@@ -234,7 +234,7 @@ const rows = source.map((r) => ({
             '<td class="dim">' + dash(r.region, r.region_label) + '</td>' +
             '<td class="num ' + (r.hstat === 'mean' ? 'posted headline-stat' : 'dim') + '" title="' + (r.hstat === 'mean' ? 'Headline stat for this series (n≥10)' : '') + '">$' + fmt(r.mean) + '</td>' +
             '<td class="num ' + (r.hstat === 'median' ? 'posted headline-stat' : 'dim') + '" title="' + (r.hstat === 'median' ? 'Headline stat for this series (n<10)' : '') + '">$' + fmt(r.median) + '</td>' +
-            '<td class="num dim">$' + fmt(r.p25) + '–$' + fmt(r.p75) + '</td>' +
+            '<td class="num dim mob-hide">$' + fmt(r.p25) + '–$' + fmt(r.p75) + '</td>' +
             '<td class="num">' + r.n_src + '</td>' +
             '<td class="trend">' + trend(r) + '</td>' +
           '</tr>';
@@ -330,5 +330,38 @@ const rows = source.map((r) => ({
     #rows-table .d30.down { color: var(--ink-faint); }
     #rows-table th.sortable[data-dir='asc']::after { content: '▲'; color: var(--accent); }
     #rows-table th.sortable[data-dir='desc']::after { content: '▼'; color: var(--accent); }
+
+    /* Mobile: this table cannot fit a phone — it scrolls inside .table-wrap
+       with the series-id column pinned so rows stay identifiable while
+       scrolling. IQR is the one column dropped on phones (.mob-hide); the
+       stat itself stays on every row's hover title and on desktop. Injected
+       cells need :global (see note above). */
+    @media (max-width: 600px) {
+      #rows-table th,
+      #rows-table :global(td) { padding-left: 6px; padding-right: 6px; }
+      #rows-table th { font-size: 10px; letter-spacing: 0.04em; }
+      #rows-table th:first-child,
+      #rows-table :global(td.sid) {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: var(--surface);
+        border-right: 1px solid var(--rule-2);
+      }
+      #rows-table th:first-child { background: var(--surface-2); z-index: 3; }
+      #rows-table :global(td.sid) { max-width: 138px; }
+      #rows-table :global(td.sid code) {
+        font-size: 10px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      #rows-table :global(td .tier-badge) {
+        font-size: 10px;
+        letter-spacing: 0.03em;
+        padding: 1px 4px;
+      }
+      th.mob-hide,
+      #rows-table :global(td.mob-hide) { display: none; }
+    }
   </style>
 </Base>

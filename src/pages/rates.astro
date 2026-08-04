@@ -204,6 +204,28 @@ function cellTitle(c: Rate): string {
     table.ladder-table td.tier-pos-t1, table.ladder-table td.tier-pos-t3 { color: var(--ink); }
     table.ladder-table td.empty { color: var(--ink-faint); }
 
+    /* Mobile: the 4-column ladder must FIT the viewport (same pattern as
+       the landing-page ladders) — the segment badges plus desktop cell
+       padding force a minimum width past 360px phones, which turned into
+       a horizontal scroll that read as the Marketplace column being cut
+       off. Tighten type and padding instead of scrolling. */
+    @media (max-width: 600px) {
+      table.ladder-table th,
+      table.ladder-table td { padding-left: 4px; padding-right: 4px; }
+      table.ladder-table th.tier-col { padding: 8px 4px; }
+      table.ladder-table th.tier-col .tier-badge {
+        font-size: 10px;
+        letter-spacing: 0.03em;
+        padding: 2px 4px;
+      }
+      table.ladder-table td.num { font-size: var(--fs-md); }
+      table.ladder-table .chip-cell .chip-name {
+        font-size: var(--fs-sm);
+        letter-spacing: 0.02em;
+      }
+      .table-head { flex-wrap: wrap; gap: 2px 10px; }
+    }
+
     .defs-section { margin: 32px 0 0; }
   </style>
 </Base>

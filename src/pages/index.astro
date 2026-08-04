@@ -120,60 +120,12 @@ const researchGroups: ResearchGroup[] = [
       <div class="ladder-row">
         <div class="ladder-col">
           <div class="block-head">
-            <span class="kicker">Reference Rates</span>
-            <a class="block-link" href="/rates">Full rate ladder →</a>
-          </div>
-          <div class="table-wrap">
-            <div class="table-head">
-              <span class="th-scope">On-demand, guaranteed · US &amp; EU</span>
-              <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
-            </div>
-            <table class="data ladder-table">
-              <thead>
-                <tr>
-                  <th class="chip-col">Silicon</th>
-                  {TIERS.map((t) => (
-                    <th class={`tier-col tier-col-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {ladder.map(({ chip, cells }) => (
-                  <tr>
-                    <td class="chip-cell">{chip.replace(/-/g, ' ')}</td>
-                    {TIERS.map((t) => {
-                      const c = cells[t];
-                      if (!c) return <td class="num empty">—</td>;
-                      return (
-                        <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
-                          {fmt(headlineValue(c))}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <details class="table-foot">
-              <summary>Series &amp; stat</summary>
-              <div class="tf-body">
-                CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-ALL · headline = panel
-                mean at n&nbsp;≥&nbsp;10, else median · hover a rate for its full
-                series id, stat, IQR and panel depth · US citable headline on /rates
-              </div>
-            </details>
-            <a class="term-pointer" href="/term">Committed term structure →</a>
-          </div>
-        </div>
-
-        <div class="term-col">
-          <div class="block-head">
             <span class="kicker">Interruptible</span>
             <a class="block-link" href="/rates">Full rate ladder →</a>
           </div>
           <div class="table-wrap">
             <div class="table-head">
-              <span class="th-scope">On-demand, interruptible · US &amp; EU</span>
+              <span class="th-scope">What spare capacity is priced at · on-demand, interruptible · US &amp; EU</span>
               <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
             </div>
             <table class="data ladder-table">
@@ -212,6 +164,54 @@ const researchGroups: ResearchGroup[] = [
                 the two ladders is printed — the panels differ in composition
               </div>
             </details>
+          </div>
+        </div>
+
+        <div class="term-col">
+          <div class="block-head">
+            <span class="kicker">Guaranteed</span>
+            <a class="block-link" href="/rates">Full rate ladder →</a>
+          </div>
+          <div class="table-wrap">
+            <div class="table-head">
+              <span class="th-scope">What committed capacity is priced at · on-demand, guaranteed · US &amp; EU</span>
+              <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
+            </div>
+            <table class="data ladder-table">
+              <thead>
+                <tr>
+                  <th class="chip-col">Silicon</th>
+                  {TIERS.map((t) => (
+                    <th class={`tier-col tier-col-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {ladder.map(({ chip, cells }) => (
+                  <tr>
+                    <td class="chip-cell">{chip.replace(/-/g, ' ')}</td>
+                    {TIERS.map((t) => {
+                      const c = cells[t];
+                      if (!c) return <td class="num empty">—</td>;
+                      return (
+                        <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
+                          {fmt(headlineValue(c))}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <details class="table-foot">
+              <summary>Series &amp; stat</summary>
+              <div class="tf-body">
+                CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-ALL · headline = panel
+                mean at n&nbsp;≥&nbsp;10, else median · hover a rate for its full
+                series id, stat, IQR and panel depth · US citable headline on /rates
+              </div>
+            </details>
+            <a class="term-pointer" href="/term">Committed term structure →</a>
           </div>
         </div>
       </div>

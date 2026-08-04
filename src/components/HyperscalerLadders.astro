@@ -248,4 +248,9 @@ const ariaLabel =
   .endlbl.s-aws { fill: var(--series-aws); }
   .hlc-caption { font-family: var(--font-mono); font-size: var(--fs-xs);
     color: var(--ink-faint); line-height: 1.6; margin-top: 8px; }
+  /* Phones: the long kicker and the as-of date can't share one line — let
+     the head wrap instead of squeezing the meta against the kicker. */
+  @media (max-width: 600px) {
+    .hlc-head { flex-wrap: wrap; gap: 2px 10px; }
+  }
 </style>

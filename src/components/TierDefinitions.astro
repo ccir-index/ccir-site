@@ -260,4 +260,14 @@ const attrs: Array<{ key: AttrKey; label: string; cells: Record<Tier, string> }>
       padding: 8px 10px;
     }
   }
+  /* Phones: let the attribute column wrap so the 4-column matrix fits the
+     viewport instead of forcing a horizontal scroll. */
+  @media (max-width: 600px) {
+    table.cap-matrix th, table.cap-matrix td { padding: 6px 5px; }
+    table.cap-matrix th.attr-col { width: auto; min-width: 0; }
+    table.cap-matrix td.attr-name {
+      white-space: normal;
+      letter-spacing: 0.04em;
+    }
+  }
 </style>

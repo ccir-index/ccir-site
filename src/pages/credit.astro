@@ -1512,5 +1512,30 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       .filters .count { margin-left: 0; flex-basis: 100%; }
       .panel-head { flex-wrap: wrap; }
     }
+
+    /* Mobile: the 11-column ledger cannot fit a phone — it scrolls inside
+       .table-scroll with the issuer column pinned so rows stay identifiable
+       while scrolling. Backgrounds on the pinned cells must be opaque (the
+       stripe tint is translucent on desktop) or scrolled columns show
+       through. */
+    @media (max-width: 600px) {
+      #credit-table th,
+      #credit-table td { padding-left: 7px; padding-right: 7px; }
+      #credit-table th { font-size: 10px; letter-spacing: 0.04em; }
+      #credit-table th:first-child,
+      #credit-table td.c-issuer {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: var(--surface);
+        border-right: 1px solid var(--rule-2);
+      }
+      #credit-table th:first-child { background: var(--surface-2); z-index: 3; }
+      #credit-table tbody tr.stripe:not(:hover) td.c-issuer {
+        background: color-mix(in srgb, var(--surface-2) 55%, var(--surface));
+      }
+      #credit-table tbody tr:hover td.c-issuer { background: var(--surface-3); }
+      .c-issuer { max-width: 96px; }
+    }
   </style>
 </Base>

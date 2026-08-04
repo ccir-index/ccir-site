@@ -780,6 +780,16 @@ const windowEnd = listingsMeta?.window_end ?? '—';
       .vast-page .chip-cap { margin-left: 0; }
     }
 
+    @media (max-width: 600px) {
+      /* Legend rows are innerHTML-injected, so their cells fall back to the
+         global table.data padding — tighten it so the 6-column legend fits
+         a phone. :global because Astro's scoped selectors never match
+         injected cells. */
+      .vast-page .data th,
+      .vast-page .data :global(td) { padding-left: 5px; padding-right: 5px; }
+      .vast-page .data th { letter-spacing: 0.04em; }
+    }
+
     @media (max-width: 480px) {
       .vast-page .chart-wrap { height: 300px; padding: 8px; }
       .vast-page .data { font-size: calc(var(--fs-sm) - 1px); }
@@ -789,9 +799,16 @@ const windowEnd = listingsMeta?.window_end ?? '—';
       /* Legend table — Days col is least-load-bearing on a phone (total
          observations already shows in legend-summary). Hide to keep the
          7-col legend fitting; .table-wrap still allows horizontal scroll
-         if a user wants the full set. */
+         if a user wants the full set. td needs :global — legend rows are
+         innerHTML-injected, so the scoped td:last-child never matched and
+         only the header cell was hiding (column shift). */
       .vast-page #legend-table th:last-child,
-      .vast-page #legend-table td:last-child { display: none; }
+      .vast-page #legend-table :global(td:last-child) { display: none; }
+      .vast-page .data th,
+      .vast-page .data :global(td) { padding-left: 4px; padding-right: 4px; }
+      .vast-page #legend-table :global(td.provider code) {
+        font-size: calc(var(--fs-sm) - 1px);
+      }
     }
   </style>
 </Base>

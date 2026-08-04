@@ -324,5 +324,33 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
       padding: 8px 14px 8px 0; vertical-align: top; line-height: 1.5;
     }
     .icr em { font-style: normal; color: var(--ink-faint); font-size: 10.5px; }
+
+    /* Mobile: both tables are genuinely too wide for a phone — each scrolls
+       inside its own overflow-x wrapper with the identity column pinned so
+       rows stay readable while scrolling. */
+    @media (max-width: 600px) {
+      table.mon th, table.mon td { padding: 8px; }
+      table.mon th:nth-child(1) { width: 96px; }
+      table.mon th:first-child,
+      table.mon td.co {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: var(--surface);
+        border-right: 1px solid var(--rule-2);
+      }
+      table.mon .fil { max-width: 12ch; }
+      .icr th, .icr td { padding-right: 10px; }
+      .icr th:first-child,
+      .icr td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: var(--bg);
+        border-right: 1px solid var(--rule-2);
+        padding-right: 8px;
+        max-width: 118px;
+      }
+    }
   </style>
 </Base>
