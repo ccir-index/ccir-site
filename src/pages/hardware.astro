@@ -143,7 +143,7 @@ const GA: Record<string, string> = {
 
 // ---- chart geometry ----
 const mk = (s: string) => { const [y, mo] = s.split('-').map(Number); return y! * 12 + (mo! - 1); };
-const X0 = mk('2023-07'), X1 = mk('2026-07');
+const X0 = mk('2023-07'), X1 = mk('2026-08');
 const CW = 960, CH = 400, PL = 56, PR = 88, PT = 20, PB = 34;
 const fmtK = (v: number) => v >= 1000 ? '$' + (v / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : '$' + Math.round(v);
 const iw = CW - PL - PR, ih = CH - PT - PB;
@@ -315,7 +315,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: 'CCIR Secondary-Market Hardware Prices',
-    description: 'Income-derived, model-implied values for deployed datacenter GPUs (H100, H200, A100, and B200 modeled-only) computed from the CRI rental rate and committed term curve with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a tape lane exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
+    description: 'Income-derived, model-implied values for datacenter GPUs (H100, H200, A100, and B200 modeled-only) computed from the CRI rental rate and committed term curve with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a tape lane exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
     url: 'https://ccir.io/hardware',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2023-07/..',
@@ -347,7 +347,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <h1>The Secondary Market</h1>
       <p class="subhead">What a deployed GPU is worth as an earning asset — and what machines list and sell for.</p>
       <p class="standfirst">
-        This page tracks two numbers for deployed datacenter hardware. The
+        This page tracks two numbers for the same silicon — and the
+        difference between them is deployment. The
         first is a going-concern value: what a machine is worth deployed
         and earning. CCIR
         derives it from its own benchmark — an income approach over the CRI
@@ -363,8 +364,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         and provenance. Those are inputs to recovery analysis, not a
         recovery estimate.
         Where the record allows, the page shows each value three ways —
-        model-implied, posted ask, executed sale — independent methods
-        triangulating a figure none could validate alone.
+        model-implied, posted ask, executed sale.
       </p>
     </header>
 
@@ -383,11 +383,11 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
           <div class={'ivcard' + (v.modeledOnly ? ' ivmodelonly' : '')}>
             <div class="ivchip">{v.label}{v.modeledOnly && <span class="ivtag">modeled only</span>}</div>
             <div class="ivval">{fmtUsd(v.base)}</div>
-            <div class="ivrange">sensitivity {fmtK(v.lo)} – {fmtK(v.hi)}{v.intStress != null && <> · interruptible stress {fmtK(v.intStress)}</>}</div>
+            <div class="ivrange">sensitivity {fmtK(v.lo)} – {fmtK(v.hi)}</div>
             <div class="ivstrip" aria-hidden="true">
               <div class="ivband" style={`left:${p(v.lo)}%;width:${p(v.hi) - p(v.lo)}%`}></div>
               <div class="ivdot" style={`left:${p(v.base)}%`} title={`model ${fmtUsd(v.base)}`}></div>
-              {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`interruptible stress ${fmtUsd(v.intStress)} — earning the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) with no contract`}></div>}
+              {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`no-contract floor ${fmtUsd(v.intStress)} — earning the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) at the same 75% utilization and 65% net margin as the base case; the rate is the only changed input`}></div>}
               {v.ask != null && <div class="ivtick" style={`left:${p(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
               {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)} (n=${v.t90N})`}></div>}
               {/* right endpoint intentionally unlabeled: it is the padded
@@ -405,6 +405,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
                 <div class="ivrow"><span class="g g-ask"></span>ask {fmtUsd(v.ask)}<span class="dim"> · {v.ask ? (v.base / v.ask).toFixed(2) + '× model/ask' : ''}</span></div>
                 <div class="ivrow"><span class="g g-t90"></span>sold 90d {fmtUsd(v.t90)}<span class="dim"> · curve to {v.curveTo}</span></div>
               </>
+            )}
+            {v.intStress != null && (
+              <div class="ivrow"><span class="g g-int"></span>no-contract floor {fmtUsd(v.intStress)}<span class="dim"> · interruptible rate, base-case assumptions</span></div>
             )}
             <div class="ivmeta">rate leg ${v.spot.toFixed(2)}/hr · {v.remaining.toFixed(1)}yr remaining at 6yr service life</div>
           </div>
@@ -435,6 +438,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         discount-rate band is anchored to observed GPU-asset-backed
         financing yields in CCIR's <a href="/credit">credit ledger</a> —
         see Method below.
+        The no-contract floor is the same model with one input changed:
+        the published Neocloud interruptible rate as the earning path from
+        day one — flat year 1, decay beyond, no committed curve by
+        construction. Utilization stays at the base 75% deliberately: a
+        floating interruptible rate is the price at which spare capacity
+        clears, so the rate already carries the demand risk — haircutting
+        utilization as well would count it twice.
         The executed
         lane is an observed disposition record, not a recovery estimate:
         single-unit retail clearings can sit above or below a bulk
@@ -800,33 +810,22 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         the parties who own those judgments.
       </p>
       <p>
-        <strong>The record from here.</strong> The history above is
-        reconstructed from dated captures and archives; it ends where the
-        archives end. From July 2026 forward the record is collected
-        directly — executed sales weekly, posted asks on a daily and
-        weekly cadence — with every capture archived at collection time
-        under the same provenance rules. The contribution lane is above.
+        <strong>The record from here.</strong> Rows before July 2026 come
+        from dated captures, each carrying its source snapshot; from July
+        2026 forward the record is collected directly — executed sales
+        weekly, posted asks on a daily and weekly cadence — with every
+        capture archived at collection time.
       </p>
       <p>
-        <strong>Decay beyond the curve.</strong> The 18%/yr base is
-        measured, not assumed. Archived provider pricing pages (Wayback
-        Machine captures, 2020–2024, every row carrying its snapshot URL),
-        spliced with the live tape, put the realized through-cycle decline
-        of prior-generation on-demand rates at −15%/yr pooled across A100
-        and V100; measured from the 2024 cycle peak, A100 ran −19%/yr and
-        H100 −16%/yr. The 30%/yr figure this model previously assumed
-        matches only the worst case on record — V100 from its scarcity
-        peak — and is retained as the conservative bound of the sensitivity
-        band. The structural reason decay runs slower than the hardware
-        release cycle: across the current fleet the market prices memory
-        bandwidth — re-denominated per TB/s of bandwidth, five generations
-        of datacenter silicon rent inside a narrow band (see
-        <a href="/chip-economics#bandwidth">the bandwidth band</a>) — so a
-        prior generation's rate follows its bandwidth position, not its
-        age. That cross-section is one date, not a decay path — the caveat
-        published with the band applies here too — which is why this
-        model's decay is calibrated from realized rate history rather than
-        read off the band.
+        <strong>Decay beyond the curve.</strong> The decay base is
+        measured, not assumed. Archived provider pricing pages (2020–2024,
+        every row carrying its snapshot URL) spliced with the live tape
+        put the realized decline of prior-generation on-demand rates
+        between −15%/yr (through-cycle, pooled A100 and V100) and −19%/yr
+        (A100 from the 2024 cycle peak; H100 ran −16%/yr). The 18%/yr base
+        sits inside that measured bracket. The 30%/yr bound of the
+        sensitivity band is the worst case on record — V100 from its
+        scarcity peak.
       </p>
       <p>
         <strong>Discount rate.</strong> The 15% base and the 10–25% band
@@ -940,6 +939,12 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .iv .g-t90 {
       width: 7px; height: 7px; background: var(--ink-dim);
       transform: rotate(45deg); vertical-align: 0;
+    }
+    /* matches the strip's hollow-ring mark (.ivint) */
+    .iv .g-int {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--surface); border: 2px solid var(--ink-dim);
+      vertical-align: -1px;
     }
     .iv .ivmeta {
       margin-top: 8px; font-family: var(--font-mono); font-size: var(--fs-xs);
