@@ -390,7 +390,10 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
               {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`interruptible stress ${fmtUsd(v.intStress)} — earning the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) with no contract`}></div>}
               {v.ask != null && <div class="ivtick" style={`left:${p(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
               {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)} (n=${v.t90N})`}></div>}
-              <span class="ivs0">0</span><span class="ivs1">{fmtK(v.smax)}</span>
+              {/* right endpoint intentionally unlabeled: it is the padded
+                  axis max (1.06× the largest mark), not a quantity — every
+                  real value on the strip is named in the rows below. */}
+              <span class="ivs0">0</span>
             </div>
             {v.modeledOnly ? (
               <>
