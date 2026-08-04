@@ -60,7 +60,7 @@ const cell = (src: string, term: string): number | null => {
 
 // --- geometry (mirrors the chart above) ------------------------------------
 const W = 920, H = 430;
-const MARGIN = { top: 28, right: 158, bottom: 38, left: 46 };
+const MARGIN = { top: 28, right: 214, bottom: 38, left: 46 };
 const x0 = MARGIN.left, x1 = W - MARGIN.right, y0 = MARGIN.top, y1 = H - MARGIN.bottom;
 const innerW = x1 - x0, innerH = y1 - y0;
 const MAX_MONTHS = 60;
@@ -118,7 +118,7 @@ const series = PROVIDERS.flatMap(({ key, od, label, cls, note }) => {
   const endPct = odV != null ? Math.round((1 - end.value / odV) * 100) : null;
   const oneY = cell(key, '1Y');
   const oneYTag = odV != null && oneY != null && pts.length > 1
-    ? { x: xOf(12), y: yOf(oneY) + 20, txt: `1Y −${Math.round((1 - oneY / odV) * 100)}%` }
+    ? { x: xOf(12), y: yOf(oneY) + 20, txt: `1Y −${Math.round((1 - oneY / odV) * 100)}%`, cls }
     : null;
   return [{ label, cls, path, pts: allPts, end, endPct, oneYTag, od: odPt, odLink: null as string | null }];
 });
@@ -191,12 +191,21 @@ const ariaLabel =
               d={`M${p.x},${p.y - 6} L${p.x + 6},${p.y} L${p.x},${p.y + 6} L${p.x - 6},${p.y} Z`}>
           <title>{p.title}</title>
         </path>
-        <text class="sc-lbl" x={p.x + 10} y={p.y + 4}>{p.label.replace('AWS ', '').replace('GCP ', '')}</text>
+        <text class="sc-lbl" x={p.x} y={p.y + 20} text-anchor="middle">{p.label.replace('AWS ', '').replace('GCP ', '')}</text>
       </>
     ))}
-    {series.map((s) => s.oneYTag && (
-      <text class="ytag" x={s.oneYTag.x} y={s.oneYTag.y}>{s.oneYTag.txt}</text>
-    ))}
+    {(() => {
+      // Azure and GCP 1Y levels sit within cents of each other, so their
+      // tags collide at the same x — stagger vertically and color each
+      // tag with its series hue so ownership survives the separation.
+      const tags = series.flatMap((s) => (s.oneYTag ? [s.oneYTag] : []))
+        .sort((a, b) => a.y - b.y);
+      for (let i = 1; i < tags.length; i++)
+        if (tags[i]!.y - tags[i - 1]!.y < 15) tags[i]!.y = tags[i - 1]!.y + 15;
+      return tags.map((g) => (
+        <text class={`ytag s-${g.cls}`} x={g.x} y={g.y}>{g.txt}</text>
+      ));
+    })()}
     {endLabels.map(({ s, y }) => (
       <text x={s.end.x + 10} y={y + 4}>
         <tspan class={`endlbl s-${s.cls}`}>{s.label} ${fmt(s.end.value)}</tspan>
@@ -259,7 +268,11 @@ const ariaLabel =
   .diamond.s-aws { fill: var(--series-aws); }
   .diamond.s-gcp { fill: var(--series-gcp); }
   .sc-lbl, .endlbl { font-family: var(--font-mono); font-size: 12px; fill: var(--ink-dim); }
-  .endpct, .ytag { font-family: var(--font-mono); font-size: 11px; fill: var(--ink-faint); }
+  .endpct { font-family: var(--font-mono); font-size: 11px; fill: var(--ink-faint); }
+  .ytag { font-family: var(--font-mono); font-size: 11px; opacity: .85; }
+  .ytag.s-azure { fill: var(--series-azure); }
+  .ytag.s-gcp { fill: var(--series-gcp); }
+  .ytag.s-aws { fill: var(--series-aws); }
   .endlbl.s-azure { fill: var(--series-azure); }
   .endlbl.s-gcp { fill: var(--series-gcp); }
   .endlbl.s-aws { fill: var(--series-aws); }
