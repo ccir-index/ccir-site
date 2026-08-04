@@ -353,7 +353,11 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         derives it from its own benchmark — an income approach over the CRI
         rental rate and committed term curve, yielding a
         <strong>model-implied value</strong>
-        with every assumption disclosed below. The second is
+        with every assumption disclosed below. Every input is CCIR's own
+        published surface: the rental rate, the committed term curve, and
+        a discount band anchored to GPU-asset-backed financing yields as
+        filed in the <a href="/credit">credit ledger</a> — the same
+        collateral's own financing market prices the discount. The second is
         observational: what hardware clears at when it is sold — executed
         sales and posted asks, kept in separate lanes with count, window,
         and provenance. Those are inputs to recovery analysis, not a
