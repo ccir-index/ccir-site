@@ -22,12 +22,12 @@ runpod,b200-sxm,T3,Other,categorical,False,2026-05-28,69,0.0457,,v2.2.1
 oci_caps,gb200,T1,US,count,True,2026-05-28,69,1.0,1.0,v2.2.1
 akash_console,h100-sxm,,EU|Other|US,count,False,2026-05-28,67,0.0729,,v2.2.1
 prime_intellect,h100-sxm,,EU|US,categorical,False,2026-05-29,67,0.1394,,v2.2.1
-aws_caps,h100-sxm,T1,EU|Other|US,score,True,2026-05-28,69,0.4527,0.4527,v2.2.1
+aws_caps,h100-sxm,T1,EU|Other|US,score,True,2026-05-28,69,0.4454,0.4454,v2.2.1
 azure_skus,h100-sxm,T1,EU|Other|US,categorical,True,2026-05-28,69,0.0,0.0,v2.2.1
 oci_caps,h100-sxm,T1,US,count,True,2026-05-28,69,1.0,1.0,v2.2.1
 crusoe_caps,h100-sxm,T2,EU|US,binary,True,2026-06-15,51,0.9693,0.9693,v2.2.1
-hyperstack_stocks,h100-sxm,T2,Other|US,count,True,2026-05-28,69,0.6573,0.6573,v2.2.1
-lambda_caps,h100-sxm,T2,Other|US,binary,True,2026-05-28,69,0.2561,0.9595,v2.2.1
+hyperstack_stocks,h100-sxm,T2,Other|US,count,True,2026-05-28,69,0.65,0.65,v2.2.1
+lambda_caps,h100-sxm,T2,Other|US,binary,True,2026-05-28,69,0.2597,0.9595,v2.2.1
 latitude_caps,h100-sxm,T2,Other,categorical,False,2026-05-28,69,1.0,,v2.2.1
 scaleway,h100-sxm,T2,EU,categorical,True,2026-05-28,69,0.0,0.1822,v2.2.1
 massed_compute,h100-sxm,T3,US,count,False,2026-05-28,69,0.3814,,v2.2.1
@@ -35,7 +35,7 @@ runpod,h100-sxm,T3,Other,categorical,False,2026-05-28,69,0.0,,v2.2.1
 tensordock,h100-sxm,T3,US,count,False,2026-07-03,1,0.8333,,v2.2.1
 akash_console,h200-sxm,,EU|Other|US,count,False,2026-05-28,67,0.0019,,v2.2.1
 prime_intellect,h200-sxm,,EU|US,categorical,False,2026-05-28,59,0.119,,v2.2.1
-aws_caps,h200-sxm,T1,EU|Other|US,score,True,2026-05-28,69,0.6926,0.6926,v2.2.1
+aws_caps,h200-sxm,T1,EU|Other|US,score,True,2026-05-28,69,0.6853,0.6853,v2.2.1
 azure_skus,h200-sxm,T1,EU|Other|US,categorical,True,2026-05-28,69,1.0,1.0,v2.2.1
 oci_caps,h200-sxm,T1,US,count,True,2026-05-28,69,1.0,1.0,v2.2.1
 hyperstack_stocks,h200-sxm,T2,Other,count,True,2026-06-27,39,0.7117,0.7117,v2.2.1
