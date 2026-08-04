@@ -95,6 +95,9 @@ const series = PROVIDERS.flatMap(({ key, od, label, cls, note }) => {
     return [{ x: xOf(months), y: yOf(v), value: v,
               title: `${label} ${term} reservation · $${fmt(v)}/GPU-hr · ${note} · as of ${lastDay}` }];
   });
+  if (pts.length === 1) {
+    pts[0]!.title += ` · the operator's only published reserved tenor for this silicon — its schedule runs straight from the metered list to this point`;
+  }
   if (!pts.length) return [];
   const odV = cell(od, 'OnDemand');
   const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
@@ -230,7 +233,7 @@ const ariaLabel =
   .xtick { text-anchor: middle; }
   .odlbl { text-anchor: start; }
   .ln { stroke-width: 2; }
-  .ln.odlink { stroke-dasharray: 4 5; stroke-width: 1.6; opacity: .8; }
+  .ln.odlink { stroke-dasharray: 3 6; stroke-width: 1.3; opacity: .45; }
   .ln.s-azure { stroke: var(--series-azure); }
   .ln.s-gcp { stroke: var(--series-gcp); }
   .ln.s-aws { stroke: var(--series-aws); }
