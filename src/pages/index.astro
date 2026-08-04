@@ -373,6 +373,23 @@ const researchGroups: ResearchGroup[] = [
     table.ladder-table td.num { text-align: center; padding-right: 0; }
     table.ladder-table td.posted,
     table.term-table td.posted { font-weight: var(--weight-strong); cursor: help; }
+    /* Mobile: the two 4-column ladders must FIT the viewport. The tier
+       headers' uppercase tracking + desktop cell padding force a minimum
+       table width around 460px, which turned into a horizontal scroll
+       that read as the Marketplace column being cut off. Tighten the
+       type and padding instead of scrolling. */
+    @media (max-width: 600px) {
+      table.ladder-table th,
+      table.ladder-table td { padding-left: 4px; padding-right: 4px; }
+      table.ladder-table th.tier-col {
+        padding: 8px 4px;
+        font-size: 10px;
+        letter-spacing: 0.03em;
+      }
+      table.ladder-table td.num { font-size: var(--fs-sm); }
+      table.ladder-table td.chip-cell { font-size: var(--fs-xs); letter-spacing: 0.02em; }
+      .table-head { flex-wrap: wrap; gap: 2px 10px; }
+    }
     table.term-table td.disc {
       font-size: var(--fs-xs);
       color: var(--ink-dim);
