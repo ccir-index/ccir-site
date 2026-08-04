@@ -1,12 +1,38 @@
 ---
 import Base from '../layouts/Base.astro';
-import { headlineRates, meta, headlineStatOf } from '../data/snapshot';
+import { headlineRates, meta, headlineStatOf, seriesHistory } from '../data/snapshot';
 import { TIERS, TIER_LABELS, REGION_LABELS } from '../data/types';
 
-// Trend/sparkline column removed 2026-07-06: the operator-tier panel is days
-// old and the form×int×geo cells younger still, so a 30d window reads as
-// composition change, not market movement. Re-add once the fixed panel has a
-// full window of history.
+// Trend column removed 2026-07-06 ("a 30d window reads as composition change,
+// not market movement"), RESTORED 2026-08-03 on John's call: panel changes are
+// inevitable and are tracked per the methodology and changelog, so the trend is
+// worth showing rather than withholding. The window is labelled and the sparkline
+// is drawn from the same medians /rates publishes; n for the current print stays
+// in its own column.
+const SPARK_W = 58;
+const SPARK_H = 16;
+const SPARK_DAYS = 30;
+
+// Precomputed here, not in the client script: the table body is rendered from a
+// plain JS array, so each row carries a finished polyline + change figure.
+function spark(seriesId: string, median: number) {
+  const hist = seriesHistory(seriesId).slice(-SPARK_DAYS);
+  const pts = hist.length ? hist.map((h) => h.median) : [];
+  if (pts.length && pts[pts.length - 1] !== median) pts.push(median);
+  if (pts.length < 2) return { path: '', change: null as number | null };
+  const lo = Math.min(...pts);
+  const hi = Math.max(...pts);
+  const span = hi - lo;
+  const dx = SPARK_W / (pts.length - 1);
+  const path = pts
+    .map((v, i) => {
+      const y = span === 0 ? SPARK_H / 2 : SPARK_H - 1 - ((v - lo) / span) * (SPARK_H - 2);
+      return `${(i * dx).toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+  const first = pts[0]!;
+  return { path, change: first > 0 ? (pts[pts.length - 1]! / first - 1) * 100 : null };
+}
 
 const FORM_ORDER = ['SXM', 'PCIe', 'NVL', 'ALL'];
 const REGION_ORDER = ['US', 'EU', 'APAC', 'Other', 'ALL'];
@@ -49,6 +75,10 @@ const rows = source.map((r) => ({
   p25: r.price_p25,
   p75: r.price_p75,
   n_src: r.n_sources,
+  ...(() => {
+    const s = spark(r.series_id, r.price_median);
+    return { spark_path: s.path, d30: s.change };
+  })(),
 }));
 ---
 <Base
@@ -135,6 +165,8 @@ const rows = source.map((r) => ({
             <th class="sortable" data-key="median" data-num>Median $/hr</th>
             <th class="sortable" data-key="p25" data-num>IQR</th>
             <th class="sortable" data-key="n_src" data-num>n</th>
+            <th class="sortable" data-key="d30" data-num
+                title="Change in the median over the trailing 30 days. Median-based even where this series' headline stat is the mean — the bundled history carries price_median.">30d median</th>
           </tr>
         </thead>
         <tbody id="rows-tbody"></tbody>
@@ -146,6 +178,16 @@ const rows = source.map((r) => ({
     (function () {
       function fmt(n, dp) { return Number(n).toFixed(dp != null ? dp : 2); }
       function dash(tok, label) { return tok === 'ALL' ? '—' : label; }
+      function trend(r) {
+        if (!r.spark_path) return '<span class="dim">—</span>';
+        var pct = r.d30 == null ? '' :
+          '<span class="d30 ' + (r.d30 > 0 ? 'up' : r.d30 < 0 ? 'down' : '') + '">' +
+          (r.d30 > 0 ? '+' : '') + r.d30.toFixed(1) + '%</span>';
+        return '<svg class="spark" width="58" height="16" viewBox="0 0 58 16" ' +
+          'aria-hidden="true"><polyline points="' + r.spark_path + '" fill="none" ' +
+          'stroke="currentColor" stroke-width="1.25" stroke-linejoin="round" ' +
+          'stroke-linecap="round"/></svg>' + pct;
+      }
       var F = { tier: '', chip: '', form: '', interrupt: '', region: '', search: '' };
       var tbody = document.getElementById('rows-tbody');
       var match = document.getElementById('match');
@@ -183,6 +225,7 @@ const rows = source.map((r) => ({
             '<td class="num ' + (r.hstat === 'median' ? 'posted headline-stat' : 'dim') + '" title="' + (r.hstat === 'median' ? 'Headline stat for this series (n<10)' : '') + '">$' + fmt(r.median) + '</td>' +
             '<td class="num dim">$' + fmt(r.p25) + '–$' + fmt(r.p75) + '</td>' +
             '<td class="num">' + r.n_src + '</td>' +
+            '<td class="trend">' + trend(r) + '</td>' +
           '</tr>';
         }).join('');
       }
@@ -269,6 +312,11 @@ const rows = source.map((r) => ({
     #rows-table th.sortable { cursor: pointer; user-select: none; white-space: nowrap; }
     #rows-table th.sortable:hover { color: var(--accent); }
     #rows-table th.sortable::after { content: '↕'; margin-left: 5px; color: var(--ink-faint); font-size: 0.85em; }
+    #rows-table td.trend { white-space: nowrap; }
+    #rows-table .spark { color: var(--ink-dim); vertical-align: middle; }
+    #rows-table .d30 { font-family: var(--font-mono); font-size: var(--fs-xs); margin-left: 6px; color: var(--ink-dim); }
+    #rows-table .d30.up { color: var(--accent); }
+    #rows-table .d30.down { color: var(--ink-faint); }
     #rows-table th.sortable[data-dir='asc']::after { content: '▲'; color: var(--accent); }
     #rows-table th.sortable[data-dir='desc']::after { content: '▼'; color: var(--accent); }
   </style>
