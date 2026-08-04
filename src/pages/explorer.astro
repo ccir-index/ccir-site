@@ -80,8 +80,14 @@ const rows = source.map((r) => ({
   p25: r.price_p25,
   p75: r.price_p75,
   n_src: r.n_sources,
+  // Trend shown ONLY where the headline stat is the n>=10 mean (John,
+  // 2026-08-03). Median-headline series are the thin ones — at the extreme,
+  // CRI-T3-B200-SXM-INT-OD-US is a single source (HHI 10,000) whose "30d
+  // move" is one marketplace repricing its own listings. A sparkline next to
+  // those reads as a market trend and isn't one. Everything else renders "—".
   ...(() => {
-    const s = spark(r.series_id, headlineStatOf(r) === 'mean' ? r.price_mean : r.price_median);
+    if (headlineStatOf(r) !== 'mean') return { spark_path: '', d30: null };
+    const s = spark(r.series_id, r.price_mean);
     return { spark_path: s.path, d30: s.change };
   })(),
 }));
@@ -171,7 +177,7 @@ const rows = source.map((r) => ({
             <th class="sortable" data-key="p25" data-num>IQR</th>
             <th class="sortable" data-key="n_src" data-num>n</th>
             <th class="sortable" data-key="d30" data-num
-                title="Change in the published headline over the trailing 30 days — the n≥10 mean where that applies, the median otherwise. Same basis as the highlighted stat column.">30d</th>
+                title="Trailing 30-day change in the published headline. Shown only for series whose headline is the n≥10 mean; thinner median-headline series show — .">30d</th>
           </tr>
         </thead>
         <tbody id="rows-tbody"></tbody>
