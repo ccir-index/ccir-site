@@ -83,14 +83,21 @@ def extract_rows(csv_text: str):
         # public/data/rates_history.csv, which is derived from this file and
         # was shipping below-floor cells unmarked: 1,582 public rows against
         # 688 in the gated rates_daily for the same day.
-        yield sid, d, med, (r.get("promotion_status") or "Unknown")
+        # price_headline carried 2026-08-03: the headline stat is the n>=10
+        # MEAN for some series and the median for the rest, so a history of
+        # medians alone cannot produce a trend that ties to the number /rates
+        # publishes. Only ~16 of ~2,165 series differ on a given day — but
+        # they are the n>=10 cells, i.e. the flagship ones (T2 H100 GTD OD US
+        # among them). Falls back to the median when absent.
+        yield (sid, d, med, (r.get("promotion_status") or "Unknown"),
+               (r.get("price_headline") or med))
 
 
 def main() -> int:
     today = date.fromisoformat(os.environ.get("CCIR_HISTORY_TODAY", date.today().isoformat()))
     start = today - timedelta(days=WINDOW_DAYS - 1)
 
-    rows: dict[tuple[str, str], tuple[str, str]] = {}
+    rows: dict[tuple[str, str], tuple[str, str, str]] = {}
     fetched = 0
     skipped = 0
     cur = start
@@ -103,8 +110,8 @@ def main() -> int:
             if text is None:
                 continue
             any_for_date = True
-            for sid, asof, med, status in extract_rows(text):
-                rows[(sid, asof)] = (med, status)
+            for sid, asof, med, status, headline in extract_rows(text):
+                rows[(sid, asof)] = (med, status, headline)
         if any_for_date:
             fetched += 1
         else:
@@ -115,9 +122,10 @@ def main() -> int:
     os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
     with open(OUT_PATH, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, lineterminator="\n")
-        w.writerow(["series_id", "as_of_date", "price_median", "promotion_status"])
-        for (sid, asof), (med, status) in sorted_rows:
-            w.writerow([sid, asof, med, status])
+        w.writerow(["series_id", "as_of_date", "price_median",
+                    "promotion_status", "price_headline"])
+        for (sid, asof), (med, status, headline) in sorted_rows:
+            w.writerow([sid, asof, med, status, headline])
 
     print(
         f"wrote {OUT_PATH}: {len(sorted_rows)} rows from {fetched} dates "

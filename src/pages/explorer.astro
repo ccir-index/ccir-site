@@ -15,10 +15,15 @@ const SPARK_DAYS = 30;
 
 // Precomputed here, not in the client script: the table body is rendered from a
 // plain JS array, so each row carries a finished polyline + change figure.
-function spark(seriesId: string, median: number) {
+// Drawn from the HEADLINE value, not the median: the headline stat is the
+// n>=10 mean on some series and the median on the rest, so a median-based
+// trend contradicts the daily number on exactly the flagship cells
+// (CRI-T2-H100-ALL-GTD-OD-US: median 3.6400->3.9025 = +7.2%, headline
+// 3.5681->3.7534 = +5.2%). The chart has to tie to what /rates publishes.
+function spark(seriesId: string, headlineNow: number) {
   const hist = seriesHistory(seriesId).slice(-SPARK_DAYS);
-  const pts = hist.length ? hist.map((h) => h.median) : [];
-  if (pts.length && pts[pts.length - 1] !== median) pts.push(median);
+  const pts = hist.length ? hist.map((h) => h.headline) : [];
+  if (pts.length && pts[pts.length - 1] !== headlineNow) pts.push(headlineNow);
   if (pts.length < 2) return { path: '', change: null as number | null };
   const lo = Math.min(...pts);
   const hi = Math.max(...pts);
@@ -76,7 +81,7 @@ const rows = source.map((r) => ({
   p75: r.price_p75,
   n_src: r.n_sources,
   ...(() => {
-    const s = spark(r.series_id, r.price_median);
+    const s = spark(r.series_id, headlineStatOf(r) === 'mean' ? r.price_mean : r.price_median);
     return { spark_path: s.path, d30: s.change };
   })(),
 }));
@@ -166,7 +171,7 @@ const rows = source.map((r) => ({
             <th class="sortable" data-key="p25" data-num>IQR</th>
             <th class="sortable" data-key="n_src" data-num>n</th>
             <th class="sortable" data-key="d30" data-num
-                title="Change in the median over the trailing 30 days. Median-based even where this series' headline stat is the mean — the bundled history carries price_median.">30d median</th>
+                title="Change in the published headline over the trailing 30 days — the n≥10 mean where that applies, the median otherwise. Same basis as the highlighted stat column.">30d</th>
           </tr>
         </thead>
         <tbody id="rows-tbody"></tbody>

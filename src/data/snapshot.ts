@@ -236,7 +236,12 @@ export const prevMedians: Map<string, number> = (() => {
 // Per-series price-median history bundled at sync time. Keyed by series_id;
 // each value is sorted ascending by date. Powers the Sparkline component on
 // the rates table and /tiers ladder.
-export interface HistoryPoint { date: string; median: number }
+// `headline` is the value /rates actually publishes for that series on that
+// day — the n>=10 mean where it applies, the median otherwise. Trends must be
+// drawn from it, not from `median`, or the chart contradicts the daily number
+// on exactly the flagship (n>=10) cells. Falls back to median for rows written
+// before price_headline was carried (2026-08-03).
+export interface HistoryPoint { date: string; median: number; headline: number }
 
 const _seriesHistory: Map<string, HistoryPoint[]> = (() => {
   const out = new Map<string, HistoryPoint[]>();
@@ -247,6 +252,7 @@ const _seriesHistory: Map<string, HistoryPoint[]> = (() => {
   const idIdx = headers.indexOf('series_id');
   const dateIdx = headers.indexOf('as_of_date');
   const medIdx = headers.indexOf('price_median');
+  const headIdx = headers.indexOf('price_headline');
   if (idIdx === -1 || dateIdx === -1 || medIdx === -1) return out;
   for (let i = 1; i < lines.length; i++) {
     const cells = lines[i]!.split(',');
@@ -254,9 +260,11 @@ const _seriesHistory: Map<string, HistoryPoint[]> = (() => {
     const d = cells[dateIdx];
     const med = Number(cells[medIdx]);
     if (!id || !d || !Number.isFinite(med)) continue;
+    const rawHead = headIdx === -1 ? NaN : Number(cells[headIdx]);
+    const head = Number.isFinite(rawHead) ? rawHead : med;
     let arr = out.get(id);
     if (!arr) { arr = []; out.set(id, arr); }
-    arr.push({ date: d, median: med });
+    arr.push({ date: d, median: med, headline: head });
   }
   for (const arr of out.values()) {
     arr.sort((a, b) => a.date.localeCompare(b.date));

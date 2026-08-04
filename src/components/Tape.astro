@@ -1,7 +1,6 @@
 ---
-import { headlineRates, meta, seriesHistory } from '../data/snapshot';
+import { headlineRates, meta, seriesHistory, headlineStatOf } from '../data/snapshot';
 import { TIER_LABELS_SHORT, type Tier } from '../data/types';
-import Sparkline from './Sparkline.astro';
 
 // Premium-chip series only. Featured flagship cells under the 7-segment
 // grammar. T1 / T2 / T3 operator segments across the canonical 6 silicons.
@@ -36,10 +35,14 @@ const short = (r: typeof ticks[number]) => {
   return `${TIER_LABELS_SHORT[tier] ?? tier} ${chip}`;
 };
 
-// 30-day change: today's price_median vs the bundled history point closest
-// to 30 calendar days ago. Returns null (→ flat glyph, no %) when there is
-// no reference point at least ~2 weeks back — bootstrap days or new series
-// don't have a meaningful 30-day window yet.
+// 30-day change: today's published HEADLINE vs the bundled history point
+// closest to 30 calendar days ago. Headline, not median — the headline stat is
+// the n>=10 mean on some series and the median on the rest, so a median-based
+// change contradicts the number /rates publishes on exactly the flagship cells
+// (2026-08-03: T2 H100 GTD OD US reads +7.2% on medians, +5.2% on headline).
+// Returns null (→ flat glyph, no %) when there is no reference point at least
+// ~2 weeks back — bootstrap days or new series don't have a meaningful 30-day
+// window yet.
 const DAY = 86_400_000;
 const MIN_LOOKBACK_DAYS = 14; // reference must be at least this old to show a %
 
@@ -56,8 +59,9 @@ function change30(r: typeof ticks[number]): { pct: number; dir: 'up' | 'down' | 
     if (d < best) { best = d; ref = p; }
   }
   const lookbackDays = (latestMs - Date.parse(ref.date)) / DAY;
-  if (lookbackDays < MIN_LOOKBACK_DAYS || !(ref.median > 0)) return null;
-  const pct = ((r.price_median - ref.median) / ref.median) * 100;
+  if (lookbackDays < MIN_LOOKBACK_DAYS || !(ref.headline > 0)) return null;
+  const now = headlineStatOf(r) === 'mean' ? r.price_mean : r.price_median;
+  const pct = ((now - ref.headline) / ref.headline) * 100;
   const rounded = Math.round(pct * 10) / 10;
   const dir = rounded > 0 ? 'up' : rounded < 0 ? 'down' : 'flat';
   return { pct: rounded, dir };
@@ -79,9 +83,8 @@ const runLabel = meta.as_of_date;
             return (
               <span class="tick">
                 <span class="sym">{short(r)}</span>
-                <span class="px">${fmt(r.price_median)}</span>
+                <span class="px">${fmt(headlineStatOf(r) === 'mean' ? r.price_mean : r.price_median)}</span>
                 <span class={`dir dir-${dir}`}>{glyph}{pctLabel && ` ${pctLabel}`}</span>
-                <span class="spark"><Sparkline seriesId={r.series_id} median={r.price_median} width={42} height={14} /></span>
               </span>
             );
           })}
@@ -162,5 +165,4 @@ const runLabel = meta.as_of_date;
   .tick .dir-up { color: var(--neg); }
   .tick .dir-down { color: var(--pos); }
   .tick .dir-flat { color: var(--ink-faint); }
-  .tick .spark { display: inline-flex; }
 </style>
