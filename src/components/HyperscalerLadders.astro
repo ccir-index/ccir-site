@@ -96,34 +96,46 @@ const series = PROVIDERS.flatMap(({ key, od, label, cls, note }) => {
               title: `${label} ${term} reservation · $${fmt(v)}/GPU-hr · ${note} · as of ${lastDay}` }];
   });
   if (pts.length === 1) {
-    pts[0]!.title += ` · the operator's only published reserved tenor for this silicon — its schedule runs straight from the metered list to this point`;
+    pts[0]!.title += ` · the operator's only published reserved tenor for this silicon`;
   }
   if (!pts.length) return [];
   const odV = cell(od, 'OnDemand');
-  const path = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
-  // OD connects to the first reserved tenor with a DASHED segment: same
-  // operator's book (within-provider, so the pooled chart's detachment
-  // rationale does not apply here), but a different purchase construct —
-  // metered list vs reserved commitment — so the segment is marked.
-  const odPt = odV != null ? { x: OD_X, y: yOf(odV), value: odV,
-    title: `${label} on-demand list $${fmt(odV)}/GPU-hr — the zero-commitment end of the same operator's book (metered list, not a reservation)` } : null;
-  const odLink = odPt && pts[0]
-    ? `M${odPt.x.toFixed(1)},${odPt.y.toFixed(1)} L${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`
+  // OD is the zero-commitment point of the SAME axis: at these operators
+  // the reserved tenors are billing commitments (commitment_kind
+  // financial-only — spend committed for a discount, capacity not
+  // separately guaranteed), so list -> 1Y -> 3Y -> 5Y is one continuous
+  // book of the same purchase family and draws as ONE solid line. The
+  // construct boundary worth marking is capacity-guarantee products —
+  // the diamonds. (Supersedes the 2026-08-05 dashed-bridge design.)
+  const odPt = odV != null ? { x: OD_X, y: yOf(odV), value: odV, months: 0,
+    title: `${label} on-demand list $${fmt(odV)}/GPU-hr — the zero-commitment point of the same book (metered; reserved tenors at this operator are billing commitments)` } : null;
+  const allPts = odPt ? [odPt as unknown as Pt, ...pts] : pts;
+  const path = allPts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const end = pts[pts.length - 1]!;
+  // Within-provider discounts vs the operator's OWN list — the same-book
+  // construction, so a percentage is legitimate here (the pooled chart's
+  // cross-panel % objection does not apply).
+  const endPct = odV != null ? Math.round((1 - end.value / odV) * 100) : null;
+  const oneY = cell(key, '1Y');
+  const oneYTag = odV != null && oneY != null && pts.length > 1
+    ? { x: xOf(12), y: yOf(oneY) + 20, txt: `1Y −${Math.round((1 - oneY / odV) * 100)}%` }
     : null;
-  return [{ label, cls, path, pts, end: pts[pts.length - 1]!, od: odPt, odLink }];
+  return [{ label, cls, path, pts: allPts, end, endPct, oneYTag, od: odPt, odLink: null as string | null }];
 });
 
 // Short-commit capacity-guarantee products — detached diamonds, labeled.
 const shortCommit = [
-  { src: 'aws_capacity_blocks', term: 'CapacityBlock', months: 3, label: 'AWS Capacity Blocks',
+  { src: 'aws_capacity_blocks', od: 'aws', term: 'CapacityBlock', months: 3, label: 'AWS Capacity Blocks',
     dur: '1d–6mo take-or-pay, reference rate', cls: 'aws' },
-  { src: 'gcp_dws', term: 'FlexStart', months: 0.25, label: 'GCP flex-start',
+  { src: 'gcp_dws', od: 'gcp', term: 'FlexStart', months: 0.25, label: 'GCP flex-start',
     dur: '≤7-day defined duration', cls: 'gcp' },
 ].flatMap((s) => {
   const v = cell(s.src, s.term);
   if (v == null) return [];
+  const own = cell(s.od, 'OnDemand');
+  const pct = own != null ? ` · −${Math.round((1 - v / own) * 100)}% vs the operator's own list` : '';
   return [{ ...s, x: xOf(s.months), y: yOf(v), value: v,
-            title: `${s.label} · $${fmt(v)}/GPU-hr · ${s.dur} · capacity-guarantee product — not on the reservation lines` }];
+            title: `${s.label} · $${fmt(v)}/GPU-hr${pct} · ${s.dur} · capacity-guarantee product — not on the reservation lines` }];
 });
 
 // End labels with collision handling.
@@ -137,9 +149,9 @@ const endLabels = (() => {
 
 const ariaLabel =
   `Hyperscaler reservation schedules for H100, as of ${lastDay}: each line is one named operator's own published ` +
-  `reserved levels in USD per GPU-hour (Azure 1, 3 and 5 year; GCP 1 and 3 year; AWS where published). A dashed segment ` +
-  `connects each operator's on-demand list price to its first reserved tenor — the same operator's book, marked because ` +
-  `the list is a metered product, not a reservation. Diamonds are short-commitment ` +
+  `reserved levels in USD per GPU-hour (Azure 1, 3 and 5 year; GCP 1 and 3 year; AWS where published). Each line runs ` +
+  `from the operator's on-demand list through its reserved tenors — one book, one axis of commitment length; reserved ` +
+  `tenors at these operators are billing commitments rather than capacity guarantees. Diamonds are short-commitment ` +
   `capacity-guarantee products (AWS Capacity Blocks reference, GCP flex-start), drawn at their duration position and ` +
   `never connected to the reservation lines. All values are dollar levels; no percentages are drawn between different panels.`;
 ---
@@ -152,7 +164,7 @@ const ariaLabel =
     {yTicks.map((v) => (
       <>
         <line class={`grid${v === 0 ? ' baseline' : ''}`} x1={x0} x2={x1} y1={yOf(v)} y2={yOf(v)} />
-        <text class="ytick" x={x0 - 8} y={yOf(v) + 4}>{v}</text>
+        <text class="ytick" x={x0 - 8} y={yOf(v) + 4}>${v}</text>
       </>
     ))}
     <text class="xtick odlbl" x={OD_X} y={y1 + 24}>OD list</text>
@@ -164,7 +176,6 @@ const ariaLabel =
     ))}
     {series.map((s) => (
       <>
-        {s.odLink && <path class={`ln odlink s-${s.cls}`} d={s.odLink} fill="none" />}
         <path class={`ln s-${s.cls}`} d={s.path} fill="none" />
         {s.pts.map((p) => (
           <circle class={`pt s-${s.cls}`} cx={p.x} cy={p.y} r="4.5"><title>{p.title}</title></circle>
@@ -183,21 +194,25 @@ const ariaLabel =
         <text class="sc-lbl" x={p.x + 10} y={p.y + 4}>{p.label.replace('AWS ', '').replace('GCP ', '')}</text>
       </>
     ))}
+    {series.map((s) => s.oneYTag && (
+      <text class="ytag" x={s.oneYTag.x} y={s.oneYTag.y}>{s.oneYTag.txt}</text>
+    ))}
     {endLabels.map(({ s, y }) => (
-      <text class={`endlbl s-${s.cls}`} x={s.end.x + 10} y={y + 4}>
-        {s.label} {fmt(s.end.value)}
+      <text x={s.end.x + 10} y={y + 4}>
+        <tspan class={`endlbl s-${s.cls}`}>{s.label} ${fmt(s.end.value)}</tspan>
+        {s.endPct != null && <tspan class="endpct" dx="8">−{s.endPct}% vs list</tspan>}
       </text>
     ))}
   </svg>
   <figcaption id="hlc-caption" class="hlc-caption">
     Each line is one operator's own published schedule — dollar levels,
     never cross-operator percentages, one US region basis throughout
-    (regional schedules are not mixed). The dashed segment runs from the
-    operator's on-demand list to its first reserved tenor: the same
-    operator's book, but a different purchase construct — a metered list,
-    not a reservation. Diamonds are short-commitment capacity-guarantee
-    products at their duration — a different product kind, shown beside
-    the reservation lines, never blended into them.
+    (regional schedules are not mixed) — from the metered on-demand list
+    through its reserved tenors. At these operators a reserved tenor is a
+    billing commitment: spend is committed for a discount, capacity is
+    not separately guaranteed. Products that DO guarantee capacity are
+    the diamonds, shown at their duration — a different product kind,
+    never blended into the lines.
   </figcaption>
 </figure>
 
@@ -233,7 +248,6 @@ const ariaLabel =
   .xtick { text-anchor: middle; }
   .odlbl { text-anchor: start; }
   .ln { stroke-width: 2; }
-  .ln.odlink { stroke-dasharray: 3 6; stroke-width: 1.3; opacity: .45; }
   .ln.s-azure { stroke: var(--series-azure); }
   .ln.s-gcp { stroke: var(--series-gcp); }
   .ln.s-aws { stroke: var(--series-aws); }
@@ -241,11 +255,11 @@ const ariaLabel =
   .pt.s-azure { fill: var(--series-azure); }
   .pt.s-gcp { fill: var(--series-gcp); }
   .pt.s-aws { fill: var(--series-aws); }
-  .pt.od { fill-opacity: .55; }
   .diamond { stroke: var(--surface); stroke-width: 1.5; }
   .diamond.s-aws { fill: var(--series-aws); }
   .diamond.s-gcp { fill: var(--series-gcp); }
   .sc-lbl, .endlbl { font-family: var(--font-mono); font-size: 12px; fill: var(--ink-dim); }
+  .endpct, .ytag { font-family: var(--font-mono); font-size: 11px; fill: var(--ink-faint); }
   .endlbl.s-azure { fill: var(--series-azure); }
   .endlbl.s-gcp { fill: var(--series-gcp); }
   .endlbl.s-aws { fill: var(--series-aws); }
