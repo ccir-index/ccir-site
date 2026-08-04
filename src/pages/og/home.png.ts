@@ -7,8 +7,8 @@ import { TIERS, PREMIUM_CHIPS } from '../../data/types';
 export const prerender = true;
 
 // Two-grade assessment sheet for the home share card, TERMINAL skin —
-// mirrors the 2026-08-05 landing redesign: interruptible LEFT, guaranteed
-// RIGHT (the commitment axis), each grade a full segment ladder. Same cell
+// mirrors the 2026-08-05 landing (as revised same day): GUARANTEED leads
+// (the citable surface first), interruptible companion right. Same cell
 // selection and value rules as the homepage (homeIntCell / homeOdCell /
 // headlineValue) — card and page can never disagree. Below-floor cells
 // print an em dash, exactly like the page.
