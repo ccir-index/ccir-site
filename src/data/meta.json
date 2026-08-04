@@ -1,11 +1,11 @@
 {
   "as_of_date": "2026-08-04",
-  "published_at_ct": "2026-08-04T12:09:03-05:00",
-  "published_at_utc": "2026-08-04T17:09:03+00:00",
-  "run_id": "export-20260804T170846Z-e99504d7",
+  "published_at_ct": "2026-08-03T18:29:52-05:00",
+  "published_at_utc": "2026-08-03T23:29:52+00:00",
+  "run_id": "export-20260803T232926Z-05b4a27a",
   "methodology_version": "v2.2.1",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
-  "contributing_today": 64,
+  "contributing_today": 61,
   "listings_history": {
     "chips": [
       "h100-sxm-80gb",
@@ -19,10 +19,10 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 23894,
+    "total_rows": 22133,
     "window_days": 90,
-    "window_end": "2026-08-04",
-    "window_start": "2026-05-07"
+    "window_end": "2026-08-03",
+    "window_start": "2026-05-06"
   },
   "marketplace_history": {
     "chips": [
@@ -43,10 +43,10 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 1163,
+    "total_rows": 1272,
     "window_days": 7,
-    "window_end": "2026-08-04",
-    "window_start": "2026-07-29"
+    "window_end": "2026-08-03",
+    "window_start": "2026-07-28"
   },
   "vast": {
     "chips_observed": [
@@ -63,14 +63,14 @@
       "RTX 6000Ada",
       "RTX A6000"
     ],
-    "latest_collected_at_utc": "2026-08-04 13:21:45.545240+00:00",
+    "latest_collected_at_utc": "2026-08-04 01:13:26.287373+00:00",
     "n_chips": 12,
-    "n_offers_latest_cycle": 1879,
+    "n_offers_latest_cycle": 1890,
     "status": "ok",
     "summary_file": "vast_summary.csv",
     "window_days": 30,
-    "window_end": "2026-08-04",
-    "window_start": "2026-07-06"
+    "window_end": "2026-08-03",
+    "window_start": "2026-07-05"
   },
   "availability": {
     "chips_observed": [
@@ -84,15 +84,15 @@
       "l40s",
       "rtx-pro-6000"
     ],
-    "latest_collected_at_utc": "2026-08-04 13:22:14.771240+00:00",
-    "n_available_latest_cycle": 41,
+    "latest_collected_at_utc": "2026-08-04 01:13:53.113745+00:00",
+    "n_available_latest_cycle": 60,
     "n_chips": 9,
     "n_sku_regions_latest_cycle": 304,
     "status": "ok",
     "summary_file": "shadeform_summary.csv",
     "window_days": 30,
-    "window_end": "2026-08-04",
-    "window_start": "2026-07-06"
+    "window_end": "2026-08-03",
+    "window_start": "2026-07-05"
   },
   "utilization": {
     "chips": [
@@ -115,7 +115,7 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 290,
+    "occupancy_cycles": 284,
     "occupancy_series_start": "2026-05-13",
     "runpod_occupancy_chips": [],
     "runpod_occupancy_cycles": 0,

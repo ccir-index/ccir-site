@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import TermCurveChart from '../components/TermCurveChart.astro';
+import HyperscalerLadders from '../components/HyperscalerLadders.astro';
 // HyperscalerTermChart PULLED same-day it shipped (John, 2026-07-16): T1 US
 // cells are n=2-4 and cell-to-cell %s manufactured a fake H200 "1Y −26%"
 // (within-provider truth: −7%). Replacement = per-provider reservation
@@ -65,6 +66,24 @@ import { meta } from '../data/snapshot';
       </header>
 
       <TermCurveChart />
+      <p class="population-note">
+        The curve above is computed from operators that post tenor ladders —
+        committed rates quoted as discounts to their own on-demand asks.
+        Capacity-guarantee contracts sold as flexible bands (take-or-pay
+        blocks, duration-banded clusters) are a different product kind:
+        they are recorded as their own series and shown at their duration
+        below, never blended into this curve — including where they price
+        <em>above</em> the operator's own on-demand list.
+      </p>
+    </section>
+
+    <section class="curve-section">
+      <header class="sec-head">
+        <div class="kicker">Section 02 · Named operators, published schedules</div>
+        <h2>Hyperscaler Reservation Schedules</h2>
+      </header>
+
+      <HyperscalerLadders />
     </section>
 
     <aside class="mi-more">
@@ -113,6 +132,16 @@ import { meta } from '../data/snapshot';
 
     .curve-section { margin: 0 0 36px; }
 
+    .population-note {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      line-height: 1.7;
+      max-width: 720px;
+      margin: 14px 0 0;
+      padding-top: 10px;
+      border-top: 1px solid var(--rule);
+    }
     .mi-more {
       margin: 0 0 36px;
       padding: 12px 16px;

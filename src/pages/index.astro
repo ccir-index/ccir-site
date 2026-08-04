@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import {
-  headlineRates, meta, premiumChipsList, homeOdCell, headlineValue, headlineStatOf,
+  headlineRates, meta, premiumChipsList, homeOdCell, homeIntCell, headlineValue, headlineStatOf,
 } from '../data/snapshot';
 import { wpSpread } from '../data/committed_mi';
 import { TIERS, TIER_LABELS_SHORT, TERM_DISPLAY } from '../data/types';
@@ -26,6 +26,17 @@ const chips = (() => {
 })();
 const ladder = chips
   .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeOdCell(t, chip)])) as Record<Tier, Rate | undefined> }))
+  .filter((row) => TIERS.some((t) => row.cells[t]));
+
+// --- interruptible ladder (LOCALHOST PREVIEW, 2026-08-04) ------------------
+// Second grade of the same survey: identical panel construction, identical
+// cell-selection rule (homeIntCell), revocable-occupancy products. Below-
+// floor cells print an em dash and fill as the INT panel deepens. No ratio
+// against the guaranteed ladder is printed anywhere — different panel
+// compositions. Replaces the term panel in this preview; /term surfacing
+// decision pending.
+const intLadder = chips
+  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeIntCell(t, chip)])) as Record<Tier, Rate | undefined> }))
   .filter((row) => TIERS.some((t) => row.cells[t]));
 
 // --- committed term panel (companion to the ladder; mirrors /term) --------
@@ -151,45 +162,54 @@ const researchGroups: ResearchGroup[] = [
                 series id, stat, IQR and panel depth · US citable headline on /rates
               </div>
             </details>
+            <a class="term-pointer" href="/term">Committed term structure →</a>
           </div>
         </div>
 
         <div class="term-col">
           <div class="block-head">
-            <span class="kicker">Term Structure</span>
-            <a class="block-link" href="/term">Full term curve →</a>
+            <span class="kicker">Interruptible</span>
+            <a class="block-link" href="/rates">Full rate ladder →</a>
           </div>
           <div class="table-wrap">
             <div class="table-head">
-              <span class="th-scope">Committed · Neocloud H100</span>
-              <span class="th-meta">USD/GPU-hr · as of {meta.as_of_date}</span>
+              <span class="th-scope">On-demand, interruptible · US &amp; EU</span>
+              <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
             </div>
-            <table class="data term-table">
+            <table class="data ladder-table">
+              <thead>
+                <tr>
+                  <th class="chip-col">Silicon</th>
+                  {TIERS.map((t) => (
+                    <th class={`tier-col tier-col-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</th>
+                  ))}
+                </tr>
+              </thead>
               <tbody>
-                {termAnchor && (
+                {intLadder.map(({ chip, cells }) => (
                   <tr>
-                    <td class="term-cell">On-demand</td>
-                    <td class="num posted" title={cellTitle(termAnchor)}>{fmt(headlineValue(termAnchor))}</td>
-                    <td class="num disc anchor-disc">anchor</td>
-                  </tr>
-                )}
-                {termRows.map(({ term, value, disc, title }) => (
-                  <tr>
-                    <td class="term-cell">{TERM_DISPLAY[term] ?? term}</td>
-                    <td class="num posted" title={title}>{fmt(value)}</td>
-                    <td class="num disc">{disc}</td>
+                    <td class="chip-cell">{chip.replace(/-/g, ' ')}</td>
+                    {TIERS.map((t) => {
+                      const c = cells[t];
+                      if (!c) return <td class="num empty">—</td>;
+                      return (
+                        <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
+                          {fmt(headlineValue(c))}
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
             </table>
             <details class="table-foot">
-              <summary>Series &amp; stat</summary>
+              <summary>Series &amp; grade</summary>
               <div class="tf-body">
-                Anchor CRI-T2-H100-ALL-GTD-OD-ALL · tenor values implied off
-                the anchor by the within-provider committed spread (each
-                operator's committed ask vs its own on-demand,
-                operator-equal) — same construction as the /term curve ·
-                market-intelligence series, not a citable reference rate
+                CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-INT-OD-ALL · same panel
+                construction as the guaranteed ladder, second grade:
+                revocable occupancy (the operator may reclaim the capacity)
+                · em dash = below the publication floor · no ratio between
+                the two ladders is printed — the panels differ in composition
               </div>
             </details>
           </div>
@@ -256,6 +276,17 @@ const researchGroups: ResearchGroup[] = [
       margin-bottom: 10px;
     }
     .block-link { color: var(--accent); }
+    .term-pointer {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--ink-dim);
+      text-decoration: none;
+    }
+    .term-pointer:hover { color: var(--accent); }
     .block-link {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
@@ -266,7 +297,9 @@ const researchGroups: ResearchGroup[] = [
     .ladder-block { margin: 0 0 40px; }
     .ladder-row {
       display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      /* Two-grade preview 2026-08-04: the ladders are mirror images — equal
+         columns (was 3fr/2fr when the right column held the term panel). */
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 36px;
       align-items: start;
     }

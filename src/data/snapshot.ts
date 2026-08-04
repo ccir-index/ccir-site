@@ -315,10 +315,21 @@ export function headlineStatOf(r: Rate): 'mean' | 'median' {
 // (e.g. A100-40GB) after pooled, then panel breadth.
 const HOME_OD_RANK: Record<string, number> = { Published: 0, Provisional: 1 };
 export function homeOdCell(tier: Tier, chip: string): Rate | undefined {
+  return homeGradeCell(tier, chip, 'GTD');
+}
+
+// The interruptible sibling of homeOdCell — identical selection rule, second
+// grade. Same panel construction, so the two ladders can sit side by side;
+// no ratio between them is ever printed (the panels differ in composition).
+export function homeIntCell(tier: Tier, chip: string): Rate | undefined {
+  return homeGradeCell(tier, chip, 'INT');
+}
+
+function homeGradeCell(tier: Tier, chip: string, grade: 'GTD' | 'INT'): Rate | undefined {
   return headlineRates
     .filter((r) => r.tier === tier && r.gpu_model === chip &&
                    r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
+                   r.region === 'ALL' && r.interruptibility === grade &&
                    r.promotion_status !== 'Shadow')
     .sort((a, b) =>
       (HOME_OD_RANK[a.promotion_status] ?? 3) - (HOME_OD_RANK[b.promotion_status] ?? 3) ||

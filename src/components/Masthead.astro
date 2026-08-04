@@ -5,10 +5,14 @@ import { meta } from '../data/snapshot';
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const nav = [
   { href: '/rates', label: 'Rates' },
+  // Term promoted to top-level 2026-08-05 (it lost its landing-page panel
+  // to the interruptible ladder; the tenor dimension is a pillar, not a
+  // research note).
+  { href: '/term', label: 'Term' },
   // Research is a hub (monitors + dated notes) — light it up on every piece
   // it houses, including /research/* note subroutes.
   { href: '/research', label: 'Research',
-    match: ['/research', '/intelligence', '/term', '/basis', '/spreads',
+    match: ['/research', '/intelligence', '/basis', '/spreads',
             '/realized', '/chip-economics', '/utilization', '/observatory',
             '/availability', '/markets', '/marketplace', '/vast'] },
   { href: '/credit', label: 'Credit' },
