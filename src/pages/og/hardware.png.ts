@@ -36,16 +36,13 @@ function ivCard(v: (typeof ivCards)[number]) {
     el('div', { display: 'flex', fontSize: 12.5, color: C.dim }, `sensitivity ${k(v.lo)} – ${k(v.hi)}`),
   ]);
 
+  // Strip carries only the sensitivity band and the model dot (2026-08-04
+  // ruling): the corroborating numbers live in the text rows below — mark
+  // glyphs without an on-image legend read as noise at share-card size.
   const marks: unknown[] = [
     el('div', { position: 'absolute', left: p(v.lo), top: 6, width: p(v.hi) - p(v.lo), height: 6, backgroundColor: 'rgba(255,145,0,0.26)', borderRadius: 3 }, ''),
     el('div', { position: 'absolute', left: p(v.base) - 5, top: 4, width: 10, height: 10, borderRadius: 5, backgroundColor: AMBER }, ''),
   ];
-  if (v.intStress != null)
-    marks.push(el('div', { position: 'absolute', left: p(v.intStress) - 5, top: 4, width: 10, height: 10, borderRadius: 5, backgroundColor: C.surface, border: `2px solid ${C.dim}` }, ''));
-  if (v.ask != null)
-    marks.push(el('div', { position: 'absolute', left: p(v.ask) - 1, top: 1, width: 2.5, height: 16, backgroundColor: C.ink }, ''));
-  if (v.t90 != null)
-    marks.push(el('div', { position: 'absolute', left: p(v.t90) - 4.5, top: 4.5, width: 9, height: 9, backgroundColor: C.dim, transform: 'rotate(45deg)' }, ''));
   const strip = el('div', { position: 'relative', display: 'flex', width: STRIP_W, height: 18, marginTop: 10 }, marks);
 
   const rows = v.modeledOnly
