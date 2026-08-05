@@ -124,8 +124,9 @@ const servedAsOf = served[0]?.as_of_date ?? frontierLatestDay;
 const windowStart = frontierDays[0] ?? '2026-07-03';
 ---
 <Base
-  title="Token Prices · CCIR"
-  description="Posted prices per million tokens, recorded daily: what the frontier model owners post first-party, and the cross-provider range where widely served open-weight models are priced. Two constructions, never blended."
+  title="Token Prices — GPT-5.6, Claude & Open-Weight Models · CCIR"
+  description="Daily record of posted token prices: OpenAI GPT-5.6 (sol, terra, luna) and Anthropic Claude first-party price lists, plus cross-provider medians for Kimi K2, DeepSeek, Qwen and other open-weight models. USD per 1M tokens."
+  ogImage="/og/tokens.png?v=1"
 >
   <section class="wrap top">
     <div class="kicker">Token prices · USD per 1M tokens</div>
@@ -138,6 +139,32 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       records both daily and never blends them.
     </p>
   </section>
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'CCIR Token Posted Price Record',
+    description: 'Daily record of posted prices per 1 million tokens: '
+      + 'first-party price lists from OpenAI and Anthropic (frontier posted '
+      + 'construction) and cross-provider medians for open-weight models '
+      + 'served by three or more independent providers (served construction). '
+      + 'The two constructions are never pooled.',
+    url: 'https://ccir.io/tokens',
+    creator: { '@id': 'https://ccir.io/#org' },
+    publisher: { '@id': 'https://ccir.io/#org' },
+    isAccessibleForFree: true,
+    temporalCoverage: `${windowStart}/..`,
+    keywords: [
+      'token prices', 'GPT-5.6 API pricing', 'Claude API pricing',
+      'Kimi K2 price', 'DeepSeek price', 'price per million tokens',
+      'LLM inference pricing', 'open-weight model pricing',
+    ],
+    variableMeasured: [
+      { '@type': 'PropertyValue', name: 'input price', unitText: 'USD per 1M tokens' },
+      { '@type': 'PropertyValue', name: 'cached input price', unitText: 'USD per 1M tokens' },
+      { '@type': 'PropertyValue', name: 'output price', unitText: 'USD per 1M tokens' },
+    ],
+  })} />
 
   <section class="wrap">
     <div class="sec-head">
