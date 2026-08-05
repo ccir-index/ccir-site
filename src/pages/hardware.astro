@@ -239,24 +239,17 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <h1>The Secondary Market</h1>
       <p class="subhead">What a deployed GPU is worth as an earning asset — and what machines list and sell for.</p>
       <p class="standfirst">
-        This page tracks two numbers for the same silicon — and the
-        difference between them is deployment. The
-        first is a going-concern value: what a machine is worth deployed
-        and earning. CCIR
-        derives it from its own benchmark — an income approach over the CRI
-        rental rate and committed term curve, yielding a
-        <strong>model-implied value</strong>
-        with every assumption disclosed below. Every input is CCIR's own
-        published surface: the rental rate, the committed term curve, and
-        a discount band anchored to GPU-asset-backed financing yields as
-        filed in the <a href="/credit">credit ledger</a> — the same
-        collateral's own financing market prices the discount. The second is
-        observational: what hardware clears at when it is sold — executed
-        sales and posted asks, kept in separate lanes with count, window,
-        and provenance. Those are inputs to recovery analysis, not a
-        recovery estimate.
-        Where the record allows, the page shows each value three ways —
-        model-implied, posted ask, executed sale.
+        This page tracks two numbers for the same silicon; the difference
+        between them is deployment. The first is a going-concern value —
+        what a machine is worth deployed and earning — computed from
+        CCIR's own benchmark: an income approach over the CRI rental rate
+        and committed term curve, yielding a
+        <strong>model-implied value</strong> with every assumption
+        disclosed and the discount rate anchored to the same collateral's
+        financing yields in the <a href="/credit">credit ledger</a>. The
+        second is observational: what hardware clears at when it is
+        sold — executed sales and posted asks, in separate lanes. Inputs
+        to recovery analysis, not a recovery estimate.
       </p>
     </header>
 

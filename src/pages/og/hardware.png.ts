@@ -47,8 +47,12 @@ function ivCard(v: (typeof ivCards)[number]) {
 
   const rows = v.modeledOnly
     ? [
-        el('div', { display: 'flex', fontSize: 12.5, color: C.faint, marginTop: 8 },
-          `not triangulated — no ask or executed lane yet · no-contract floor ${usd(v.intStress)}`),
+        // MODELED ONLY tag already says not-triangulated; keep this to one
+        // line so the card never wraps.
+        el('div', { display: 'flex', alignItems: 'center', gap: 18, fontSize: 12.5, marginTop: 8 }, [
+          el('div', { display: 'flex', color: C.faint }, 'no ask or executed lane yet'),
+          ...(v.intStress != null ? [el('div', { display: 'flex', color: C.dim }, `no-contract floor ${usd(v.intStress)}`)] : []),
+        ]),
       ]
     : [
         el('div', { display: 'flex', alignItems: 'center', gap: 18, fontSize: 12.5, marginTop: 8 }, [
