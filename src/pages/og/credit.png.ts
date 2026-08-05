@@ -68,7 +68,7 @@ export const GET: APIRoute = async () => {
 
   const body = el('div', { display: 'flex', flexDirection: 'column', flexGrow: 1 }, [
     el('div', { display: 'flex', gap: 20 }, [
-      panel('GPU-COLLATERAL SOFR TAPE', 'SPREAD OVER SOFR AT SIGNING, PP · JUL 2023 – JUN 2026', TAPE),
+      panel('GPU-COLLATERAL SOFR SPREADS', 'SPREAD OVER SOFR AT SIGNING, PP · JUL 2023 – JUN 2026', TAPE),
       panel('PROJECT-BOND COUPONS', 'LEASE-BACKED 144A SENIOR SECURED, % · OCT 2025 – JUN 2026', BONDS),
     ]),
     el('div', { display: 'flex', alignItems: 'flex-end', flexGrow: 1, color: C.dim, fontSize: 14, letterSpacing: 1.5, paddingBottom: 2 },

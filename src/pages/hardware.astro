@@ -315,7 +315,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: 'CCIR Secondary-Market Hardware Prices',
-    description: 'Income-derived, model-implied values for datacenter GPUs (H100, H200, A100, and B200 modeled-only) computed from the CRI rental rate and committed term curve with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a tape lane exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
+    description: 'Income-derived, model-implied values for datacenter GPUs (H100, H200, A100, and B200 modeled-only) computed from the CRI rental rate and committed term curve with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a sales record exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
     url: 'https://ccir.io/hardware',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2023-07/..',
@@ -374,7 +374,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         Model-implied value of a deployed unit, derived from the CRI T2
         (neocloud) US guaranteed on-demand rate and the neocloud committed
         term curve, recomputed on each daily data refresh. Not a transacted
-        price — the corroborating tapes are beside each figure.
+        price — the corroborating market records are beside each figure.
       </p>
       <div class="ivgrid">
         {ivCards.map((v) => {
@@ -425,7 +425,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         15% discount rate; 6-year service life from volume availability.
         Where a chip's committed curve ends short of year 3 (B200: 1Y),
         decay applies from the end of its observed curve — missing tenors
-        are never extended flat. A chip with no secondary-market tape lane
+        are never extended flat. A chip with no secondary-market record
         is published <em>modeled only</em>, so marked, and carries no
         ask or executed corroboration until one exists.
         The sensitivity band varies one assumption at a time around base —
@@ -448,10 +448,10 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The executed
         lane is an observed disposition record, not a recovery estimate:
         single-unit retail clearings can sit above or below a bulk
-        disposition, and no current tape measures market impact at volume.
+        disposition, and no current record measures market impact at volume.
         Loss-given-default is a transaction-level parameter — lien
         position, priority, workout cost, timing, pool composition — and
-        belongs to the party doing the recovery analysis; this tape is one
+        belongs to the party doing the recovery analysis; this record is one
         of its inputs.
       </p>
       </details>
@@ -479,10 +479,10 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     </section>
 
     <section class="sec">
-      <h2><span class="n">§</span> The tape — executed sales &amp; posted asks</h2>
+      <h2><span class="n">§</span> The record — executed sales &amp; posted asks</h2>
       <p class="secintro">
-        Three years of executed sales (July 2023 – July 2026; 3,564
-        sold listings, 15,155 units, $28.9M documented) beside the asks
+        Three years of executed sales (July 2023 – August 2026; 3,009
+        sold listings, 10,911 units, $26.3M documented) beside the asks
         posted today across an official marketplace API and a named dealer
         cohort — the rental market prices an hour of compute; this page
         prices the machine itself.
@@ -490,7 +490,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     </section>
 
     <figure class="chart-fig">
-      <div class="fig-title">The tape today · executed vs posted ask</div>
+      <div class="fig-title">The record today · executed vs posted ask</div>
       <div class="chart-box">
         <svg viewBox={`0 0 ${LW} ${LH}`} role="img"
              aria-label="Current price ladder per model, log scale: filled dots mark the trailing 90-day executed median, open circles the current posted-ask median. Asks sit above executed on every model; the gap is widest on H100 SXM5 at about two times and narrowest on V100 and RTX A6000 at 1.2 to 1.4 times.">
@@ -751,16 +751,17 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         the market's own price for locked duration, not a forecast. The
         assumed legs are printed with the figure: decay beyond the curve,
         utilization, net margin, discount rate, service life. It is a model
-        output and is labeled as one everywhere it appears; the tapes below
+        output and is labeled as one everywhere it appears; the sale and
+        ask records below
         corroborate it, and the model-to-ask ratio and executed price are
         shown beside every figure so the reader holds all three numbers at
-        once. Where no tape lane exists for a chip (B200), the value is
+        once. Where no market record exists for a chip (B200), the value is
         published modeled-only and marked as such on its card: it is not
         triangulated against asks or executed sales, its committed curve is
         observed to 1Y with decay applied beyond, its rate leg is a
         provisional headline, and its volume-availability vintage is
         assumed rather than sourced. It graduates to the corroborated
-        treatment when a tape lane exists.
+        treatment when a market record exists.
       </p>
       <p>
         <strong>Executed record.</strong> Dated, human-captured snapshots of
@@ -811,8 +812,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       </p>
       <p>
         <strong>Decay beyond the curve.</strong> The decay base is
-        measured, not assumed: archived pricing pages spliced with the
-        live tape show A100 and V100 rental rates fell 15–19% a year as
+        measured, not assumed: archived pricing pages and the live record
+        together show A100 and V100 rental rates fell 15–19% a year as
         those chips aged, and the 18%/yr base sits inside that measured
         range. The 30%/yr bound of the sensitivity band is the worst case
         on record — V100 from its scarcity peak.
