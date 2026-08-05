@@ -506,8 +506,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-07-30,sesterce,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,IIF,T2IF,T2,8.7010,False,,Available,v2.2.1
 2026-07-30,spheron,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,10.2131,False,,Available,v2.2.1
 2026-07-30,spheron,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,Interruptible,Spot,Other,Other,DIF,T3IF,T3,5.8101,False,,Available,v2.2.1
-2026-07-31,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,5.9893,False,,Available,v2.2.1
 2026-07-31,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.6717,False,,Available,v2.2.1
+2026-07-31,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,5.9893,False,,Available,v2.2.1
 2026-07-31,coreweave,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T2,4.4800,False,,Available,v2.2.1
 2026-07-31,datacrunch,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T2IF,T2,7.5000,True,local-nvme,Available,v2.2.1
 2026-07-31,datacrunch,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,1M,NonInterruptible,Reserved,EU,EU,SIF,T2IF,T2,7.3500,True,local-nvme,Available,v2.2.1
@@ -549,8 +549,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-08-01,spheron,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,10.2131,False,,Available,v2.2.1
 2026-08-01,spheron,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,Interruptible,Spot,Other,Other,DIF,T3IF,T3,5.8101,False,,Available,v2.2.1
 2026-08-02,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T1IF,T1,17.8020,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.2.1
-2026-08-02,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.5766,False,,Available,v2.2.1
 2026-08-02,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.4419,False,,Available,v2.2.1
+2026-08-02,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.5766,False,,Available,v2.2.1
 2026-08-02,aws_capacity_blocks,b300-sxm-288gb,B300,288GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,US-East,US,HIF,T2IF,T1,14.0400,False,,Available,v2.2.1
 2026-08-02,coreweave,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T2,4.4800,False,,Available,v2.2.1
 2026-08-02,datacrunch,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T2IF,T2,7.5000,True,local-nvme,Available,v2.2.1
@@ -600,8 +600,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-08-03,spheron,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,10.2131,False,,Available,v2.2.1
 2026-08-03,spheron,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,Interruptible,Spot,Other,Other,DIF,T3IF,T3,5.8101,False,,Available,v2.2.1
 2026-08-04,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T1IF,T1,17.8020,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.2.1
-2026-08-04,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.5616,False,,Available,v2.2.1
 2026-08-04,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.5765,False,,Available,v2.2.1
+2026-08-04,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.5616,False,,Available,v2.2.1
 2026-08-04,aws_capacity_blocks,b300-sxm-288gb,B300,288GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,US-East,US,HIF,T2IF,T1,14.0400,False,,Available,v2.2.1
 2026-08-04,coreweave,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T2,4.4800,False,,Available,v2.2.1
 2026-08-04,datacrunch,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T2IF,T2,7.5000,True,local-nvme,Available,v2.2.1
@@ -625,8 +625,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-08-04,scaleway,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T3IF,T2,8.6363,True,local-nvme,Available,v2.2.1
 2026-08-04,spheron,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,Interruptible,Spot,Other,Other,DIF,T3IF,T3,5.8101,False,,Available,v2.2.1
 2026-08-05,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T1IF,T1,17.8020,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.2.1
-2026-08-05,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.5273,False,,Available,v2.2.1
-2026-08-05,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.5823,False,,Available,v2.2.1
+2026-08-05,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.5843,False,,Available,v2.2.1
+2026-08-05,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.4847,False,,Available,v2.2.1
 2026-08-05,aws_capacity_blocks,b300-sxm-288gb,B300,288GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,US-East,US,HIF,T2IF,T1,14.0400,False,,Available,v2.2.1
 2026-08-05,coreweave,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T2,4.4800,False,,Available,v2.2.1
 2026-08-05,datacrunch,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T2IF,T2,7.5000,True,local-nvme,Available,v2.2.1
