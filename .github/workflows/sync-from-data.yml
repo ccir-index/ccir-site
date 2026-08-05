@@ -119,6 +119,16 @@ jobs:
             done
           done
           # Cross-chip summary file
+          # Token surfaces (/tokens, added 2026-08-05): frontier first-party
+          # posted series + open-weight cross-provider medians. Graceful skip.
+          for tf in frontier_token_posted.csv token_models_latest.csv; do
+            if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$tf" "$BASE/$tf"; then
+              echo "fetched $tf"
+            else
+              echo "no $tf at $DATE — /tokens keeps previous"
+              : > ".sync/$tf"
+            fi
+          done
           if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/vast_summary.csv" "$BASE/vast_summary.csv"; then
             echo "fetched vast_summary.csv"
           else
@@ -253,6 +263,9 @@ jobs:
         run: |
           set -euo pipefail
           cp .sync/rates_daily.csv      src/data/rates_daily.csv
+          for tf in frontier_token_posted.csv token_models_latest.csv; do
+            if [ -s ".sync/$tf" ]; then cp ".sync/$tf" "src/data/$tf"; fi
+          done
           cp .sync/rates_shadow.csv     src/data/rates_shadow.csv
           cp .sync/rates_daily_prev.csv src/data/rates_daily_prev.csv
           # Overlay CSV — leave the previous copy in place if this snapshot lacked it.
