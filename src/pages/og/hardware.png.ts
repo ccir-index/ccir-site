@@ -25,7 +25,7 @@ function ivCard(v: (typeof ivCards)[number]) {
   const p = (x: number) => Math.max(0, Math.min(1, x / v.smax)) * STRIP_W;
 
   const head = el('div', { display: 'flex', alignItems: 'center', gap: 10 }, [
-    el('div', { display: 'flex', fontSize: 15, fontWeight: 600, letterSpacing: 2.5, color: C.dim }, v.label.toUpperCase()),
+    el('div', { display: 'flex', fontSize: 15, fontWeight: 600, letterSpacing: 2.5, color: AMBER }, v.label.toUpperCase()),
     ...(v.modeledOnly
       ? [el('div', { display: 'flex', fontSize: 10.5, letterSpacing: 1.5, color: C.faint, border: `1px solid ${C.rule2}`, padding: '2px 7px' }, 'MODELED ONLY')]
       : []),
@@ -55,7 +55,7 @@ function ivCard(v: (typeof ivCards)[number]) {
       ]
     : [
         el('div', { display: 'flex', alignItems: 'center', gap: 18, fontSize: 12.5, marginTop: 8 }, [
-          el('div', { display: 'flex', color: C.ink }, `ask ${usd(v.ask)}`),
+          el('div', { display: 'flex', color: C.dim }, `ask ${usd(v.ask)}`),
           el('div', { display: 'flex', color: C.dim }, `sold 90d ${usd(v.t90)}`),
           ...(v.intStress != null ? [el('div', { display: 'flex', color: C.dim }, `no-contract floor ${usd(v.intStress)}`)] : []),
         ]),
@@ -80,7 +80,7 @@ export const GET: APIRoute = async () => {
 
   const png = await toPng(frame(
     'Model-implied GPU value',
-    'Income model on the CRI rate · corroborated by executed sales and posted asks · not a transacted price',
+    'Income model on the CRI rate · discount rate grounded in the credit ledger · corroborated by sales and asks',
     body,
     hw.as_of,
   ));
