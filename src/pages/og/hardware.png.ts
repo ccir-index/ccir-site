@@ -1,58 +1,86 @@
 import type { APIRoute } from 'astro';
 import { frame, toPng, el, C } from '../../lib/og';
+import { ivCards } from '../../lib/ivmodel';
 import hw from '../../data/hardware_panels.json';
 
 export const prerender = true;
 
 /*
-  OG card for /hardware (The Secondary Market): executed vs posted-ask
-  tape for the headline models, derived from the same hardware_panels.json
-  the page renders, so the card cannot drift from the page. ASCII only.
+  OG card for /hardware: the four model-implied value cards, rendered from
+  the SAME computation the page uses (src/lib/ivmodel.ts) — the share card
+  can never disagree with the page. Layout mirrors the on-page IV grid:
+  headline value, sensitivity band strip with ask/sold/floor marks, and the
+  corroborating rows. Replaced the executed-vs-ask table 2026-08-04 when
+  the IV cards became the page's lead visual.
 */
-const PICK = ['H100-80-SXM5', 'H200-141', 'A100-80-SXM4', 'A100-40', 'V100-32', 'V100-16'];
-const byKey = new Map(hw.models.map((m: any) => [m.key, m]));
-PICK.forEach((k) => { if (!byKey.has(k)) throw new Error(`og/hardware: missing model ${k}`); });
 
-const usd = (v: number | null) =>
-  v == null ? '-' : '$' + Math.round(v).toLocaleString('en-US');
+const AMBER = C.navy;
+const usd = (v: number | null | undefined) =>
+  v == null ? '—' : '$' + Math.round(v).toLocaleString('en-US');
+const k = (v: number) => (v >= 1000 ? '$' + (v / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : '$' + Math.round(v));
 
-const rows: [string, string, string, string][] = PICK.map((k) => {
-  const m: any = byKey.get(k);
-  const pct = m.pct_of_launch != null ? m.pct_of_launch.toFixed(0) + '%' : '-';
-  return [m.label, usd(m.t90.med), usd(m.ask.med), pct];
-});
+const CARD_W = 544, CARD_H = 186, STRIP_W = CARD_W - 44;
 
-const ROW_H = 46;
-const table = el('div', { display: 'flex', flexDirection: 'column', width: 1104, border: `1px solid ${C.rule}`, backgroundColor: C.surface }, [
-  el('div', { display: 'flex', alignItems: 'center', backgroundColor: C.head, borderBottom: `1px solid ${C.rule2}`, padding: '10px 18px' }, [
-    el('div', { display: 'flex', width: 320, color: C.faint, fontSize: 13, letterSpacing: 1.5 }, 'MODEL'),
-    el('div', { display: 'flex', width: 260, color: C.faint, fontSize: 13, letterSpacing: 1.5 }, 'EXECUTED MEDIAN (90D)'),
-    el('div', { display: 'flex', width: 260, color: C.faint, fontSize: 13, letterSpacing: 1.5 }, 'POSTED ASK MEDIAN'),
-    el('div', { display: 'flex', color: C.faint, fontSize: 13, letterSpacing: 1.5 }, '% OF LAUNCH'),
-  ]),
-  ...rows.map(([label, ex, ask, pct], idx) =>
-    el('div', { display: 'flex', alignItems: 'center', height: ROW_H, borderBottom: idx === rows.length - 1 ? 'none' : `1px solid ${C.rule}`, padding: '0 18px' }, [
-      el('div', { display: 'flex', width: 320, color: C.ink, fontSize: 19, fontWeight: 600 }, label),
-      el('div', { display: 'flex', width: 260, color: C.navy, fontSize: 20, fontWeight: 600 }, ex),
-      el('div', { display: 'flex', width: 260, color: C.dim, fontSize: 19 }, ask),
-      el('div', { display: 'flex', color: C.dim, fontSize: 19 }, pct),
-    ])
-  ),
-]);
+function ivCard(v: (typeof ivCards)[number]) {
+  const p = (x: number) => Math.max(0, Math.min(1, x / v.smax)) * STRIP_W;
+
+  const head = el('div', { display: 'flex', alignItems: 'center', gap: 10 }, [
+    el('div', { display: 'flex', fontSize: 15, fontWeight: 600, letterSpacing: 2.5, color: C.dim }, v.label.toUpperCase()),
+    ...(v.modeledOnly
+      ? [el('div', { display: 'flex', fontSize: 10.5, letterSpacing: 1.5, color: C.faint, border: `1px solid ${C.rule2}`, padding: '2px 7px' }, 'MODELED ONLY')]
+      : []),
+  ]);
+
+  const value = el('div', { display: 'flex', alignItems: 'baseline', gap: 14, marginTop: 6 }, [
+    el('div', { display: 'flex', fontFamily: 'IBM Plex Serif', fontSize: 34, fontWeight: 600, color: C.ink }, usd(v.base)),
+    el('div', { display: 'flex', fontSize: 12.5, color: C.dim }, `sensitivity ${k(v.lo)} – ${k(v.hi)}`),
+  ]);
+
+  const marks: unknown[] = [
+    el('div', { position: 'absolute', left: p(v.lo), top: 6, width: p(v.hi) - p(v.lo), height: 6, backgroundColor: 'rgba(255,145,0,0.26)', borderRadius: 3 }, ''),
+    el('div', { position: 'absolute', left: p(v.base) - 5, top: 4, width: 10, height: 10, borderRadius: 5, backgroundColor: AMBER }, ''),
+  ];
+  if (v.intStress != null)
+    marks.push(el('div', { position: 'absolute', left: p(v.intStress) - 5, top: 4, width: 10, height: 10, borderRadius: 5, backgroundColor: C.surface, border: `2px solid ${C.dim}` }, ''));
+  if (v.ask != null)
+    marks.push(el('div', { position: 'absolute', left: p(v.ask) - 1, top: 1, width: 2.5, height: 16, backgroundColor: C.ink }, ''));
+  if (v.t90 != null)
+    marks.push(el('div', { position: 'absolute', left: p(v.t90) - 4.5, top: 4.5, width: 9, height: 9, backgroundColor: C.dim, transform: 'rotate(45deg)' }, ''));
+  const strip = el('div', { position: 'relative', display: 'flex', width: STRIP_W, height: 18, marginTop: 10 }, marks);
+
+  const rows = v.modeledOnly
+    ? [
+        el('div', { display: 'flex', fontSize: 12.5, color: C.faint, marginTop: 8 },
+          `not triangulated — no ask or executed lane yet · no-contract floor ${usd(v.intStress)}`),
+      ]
+    : [
+        el('div', { display: 'flex', alignItems: 'center', gap: 18, fontSize: 12.5, marginTop: 8 }, [
+          el('div', { display: 'flex', color: C.ink }, `ask ${usd(v.ask)}`),
+          el('div', { display: 'flex', color: C.dim }, `sold 90d ${usd(v.t90)}`),
+          ...(v.intStress != null ? [el('div', { display: 'flex', color: C.dim }, `no-contract floor ${usd(v.intStress)}`)] : []),
+        ]),
+      ];
+
+  const meta = el('div', { display: 'flex', fontSize: 11.5, color: C.faint, marginTop: 6 },
+    `rate leg $${v.spot.toFixed(2)}/hr · curve to ${v.curveTo} · ${v.remaining.toFixed(1)}yr remaining at 6yr life`);
+
+  return el('div', {
+    display: 'flex', flexDirection: 'column', width: CARD_W, height: CARD_H,
+    backgroundColor: C.surface, border: `1px solid ${C.rule}`, padding: '14px 22px',
+  }, [head, value, strip, ...rows, meta]);
+}
 
 export const GET: APIRoute = async () => {
-  const units = hw.models.reduce((s: number, m: any) => s + m.vol3y.units, 0);
-  const vol = hw.models.reduce((s: number, m: any) => s + m.vol3y.usd, 0);
-
-  const body = el('div', { display: 'flex', flexDirection: 'column', flexGrow: 1 }, [
-    table,
-    el('div', { display: 'flex', alignItems: 'flex-end', flexGrow: 1, color: C.dim, fontSize: 14, letterSpacing: 1.5, paddingBottom: 2 },
-      `${units.toLocaleString('en-US')} UNITS · $${(vol / 1e6).toFixed(1)}M EXECUTED · JUL 2023 - JUL 2026 · OBSERVED PRICES, NOT VALUATIONS`),
+  if (ivCards.length !== 4) throw new Error(`og/hardware: expected 4 IV cards, got ${ivCards.length}`);
+  const [c1, c2, c3, c4] = ivCards;
+  const body = el('div', { display: 'flex', flexDirection: 'column', gap: 14 }, [
+    el('div', { display: 'flex', gap: 16 }, [ivCard(c1!), ivCard(c2!)]),
+    el('div', { display: 'flex', gap: 16 }, [ivCard(c3!), ivCard(c4!)]),
   ]);
 
   const png = await toPng(frame(
-    'The Secondary Market',
-    'What datacenter GPUs are listed at - and execute at - over time.',
+    'Model-implied GPU value',
+    'Income model on the CRI rate · corroborated by executed sales and posted asks · not a transacted price',
     body,
     hw.as_of,
   ));
