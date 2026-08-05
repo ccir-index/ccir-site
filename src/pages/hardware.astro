@@ -239,17 +239,15 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <h1>The Secondary Market</h1>
       <p class="subhead">What a deployed GPU is worth as an earning asset — and what machines list and sell for.</p>
       <p class="standfirst">
-        This page tracks two numbers for the same silicon; the difference
-        between them is deployment. The first is a going-concern value —
-        what a machine is worth deployed and earning — computed from
-        CCIR's own benchmark: an income approach over the CRI rental rate
-        and committed term curve, yielding a
-        <strong>model-implied value</strong> with every assumption
-        disclosed and the discount rate anchored to the same collateral's
-        financing yields in the <a href="/credit">credit ledger</a>. The
-        second is observational: what hardware clears at when it is
-        sold — executed sales and posted asks, in separate lanes. Inputs
-        to recovery analysis, not a recovery estimate.
+        This page publishes one value per chip — what a machine is worth
+        deployed and earning — and triangulates it against the market.
+        The value is <strong>model-implied</strong>, computed from CCIR's
+        own benchmark: an income approach over the CRI rental rate and
+        committed term curve, every assumption disclosed, the discount
+        rate anchored to the same collateral's financing yields in the
+        <a href="/credit">credit ledger</a>. The market checks are
+        observational — executed sales and posted asks, in separate
+        lanes. Inputs to recovery analysis, not a recovery estimate.
       </p>
     </header>
 
