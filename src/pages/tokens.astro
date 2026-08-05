@@ -89,7 +89,9 @@ const tierSeries = TIERS.map((t) => ({
 }));
 const chartDays = frontierDays.filter((d) =>
   tierSeries.some((s) => s.pts.some((p) => p.d === d)));
-const W = 640, H = 230, PAD_L = 44, PAD_R = 56, PAD_T = 14, PAD_B = 26;
+// PAD_R sized for the longest right-edge series label ("terra $12" at 11px
+// mono ≈ 62px past the +6 offset) — labels must fit inside the viewBox.
+const W = 640, H = 230, PAD_L = 44, PAD_R = 78, PAD_T = 14, PAD_B = 26;
 const xFor = (d: string) => {
   const i = chartDays.indexOf(d);
   return PAD_L + (i / Math.max(1, chartDays.length - 1)) * (W - PAD_L - PAD_R);
@@ -284,11 +286,12 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       <h2>Open-weight models — by serving breadth</h2>
       <span class="sec-note">cross-provider medians · n ≥ 3 · {servedAsOf}</span>
     </div>
-    <table class="tbl wide">
+    <table class="tbl wide sortable" id="served-tbl">
       <thead>
         <tr>
-          <th>Model</th><th>Providers</th>
-          <th>Input median</th><th>Output median</th><th>Output range</th>
+          <th data-t="s">Model</th><th data-t="n">Providers</th>
+          <th data-t="n">Input median</th><th data-t="n">Output median</th>
+          <th data-t="n">Output range</th>
         </tr>
       </thead>
       <tbody>
@@ -310,6 +313,40 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       not a data defect.
     </p>
   </section>
+
+  <script is:inline>
+    // Click-to-sort for the open-weight table. Numeric columns parse the
+    // first number in the cell ("$0.55", "12", "$0.19 – $0.99" → its min);
+    // first click sorts numeric columns descending, text ascending.
+    (() => {
+      const tbl = document.getElementById('served-tbl');
+      if (!tbl) return;
+      const tbody = tbl.tBodies[0];
+      const num = (s) => {
+        const m = s.replace(/[$,]/g, '').match(/-?\d+(?:\.\d+)?/);
+        return m ? parseFloat(m[0]) : -Infinity;
+      };
+      tbl.querySelectorAll('th').forEach((th, i) => {
+        th.addEventListener('click', () => {
+          const numeric = th.dataset.t === 'n';
+          const first = numeric ? 'descending' : 'ascending';
+          const dir = th.getAttribute('aria-sort') === first
+            ? (first === 'descending' ? 'ascending' : 'descending')
+            : first;
+          tbl.querySelectorAll('th').forEach((h) => h.removeAttribute('aria-sort'));
+          th.setAttribute('aria-sort', dir);
+          const sign = dir === 'ascending' ? 1 : -1;
+          [...tbody.rows]
+            .sort((a, b) => {
+              const av = a.cells[i].textContent.trim();
+              const bv = b.cells[i].textContent.trim();
+              return sign * (numeric ? num(av) - num(bv) : av.localeCompare(bv));
+            })
+            .forEach((r) => tbody.appendChild(r));
+        });
+      });
+    })();
+  </script>
 
   <section class="wrap method">
     <div class="sec-head"><span class="sec-no">·</span><h2>Method</h2></div>
@@ -373,6 +410,10 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   .model { font-weight: 500; }
   .dim { color: var(--ink-dim, #888); }
   .wide td, .wide th { padding-right: 16px; }
+  .sortable th { cursor: pointer; user-select: none; }
+  .sortable th::after { content: ""; display: inline-block; width: 1em; }
+  .sortable th[aria-sort="descending"]::after { content: " ↓"; }
+  .sortable th[aria-sort="ascending"]::after { content: " ↑"; }
 
   .chart-block { margin-top: 30px; }
   .chart-title { font-size: var(--fs-xs); color: var(--ink-dim, #888); margin-bottom: 6px; }
