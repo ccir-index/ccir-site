@@ -39,10 +39,7 @@ const bars: Bar[] = PICKS.flatMap((p) => {
 const MAXV = Math.max(1, ...bars.map((b) => b.output));
 const PLOT_H = 250;
 const h = (v: number) => Math.max(3, Math.round((v / MAXV) * PLOT_H));
-const fmt = (v: number) =>
-  v >= 10 ? `$${Math.round(v)}`
-  : v >= 1 ? `$${v.toFixed(2).replace(/\.?0+$/, '')}`
-  : `$${v.toFixed(2)}`;
+const fmt = (v: number) => (v >= 10 ? `$${Math.round(v)}` : `$${v.toFixed(2)}`);
 
 function bar(v: number, color: string, servedRow: boolean) {
   return el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }, [
@@ -81,7 +78,7 @@ const legend = el('div', { display: 'flex', alignItems: 'center', gap: 22, fontS
     el('div', { display: 'flex' }, 'output'),
   ]),
   el('div', { display: 'flex', color: C.faint },
-    'solid = first-party posted · outlined = served median (n shown) · never blended'),
+    'n = providers serving that model'),
 ]);
 
 const root = el('div', {

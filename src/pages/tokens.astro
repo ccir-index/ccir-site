@@ -162,10 +162,7 @@ const cy = (v: number) =>
 const cmpTicks = [0, 10, 20, 30, 40, 50].filter((t) => t <= cmpMax);
 const GRP_W = (CW - CPAD_L - CPAD_R) / Math.max(1, cmpBars.length);
 const BAR_W = 26, BAR_GAP = 2;
-const fmtV = (v: number) =>
-  v >= 10 ? `$${Math.round(v)}`
-  : v >= 1 ? `$${v.toFixed(2).replace(/\.?0+$/, '')}`
-  : `$${v.toFixed(2)}`;
+const fmtV = (v: number) => (v >= 10 ? `$${Math.round(v)}` : `$${v.toFixed(2)}`);
 
 const windowStart = frontierDays[0] ?? '2026-07-03';
 ---
@@ -178,11 +175,9 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
     <div class="kicker">Token prices · USD per 1M tokens</div>
     <h1>Token Prices</h1>
     <p class="dek">
-      Two prices exist for a token. The <strong>frontier posted price</strong> is
-      set by the model owner on its own price list. The
-      <strong>served price</strong> is what independent providers post to run the
-      same open-weight model — a range with a median, not one number. CCIR
-      records both daily and never blends them.
+      A token has two prices: what the model owner posts, and what
+      independent providers charge to serve the same open model. Recorded
+      daily, kept apart.
     </p>
   </section>
 
@@ -282,8 +277,7 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
         {sonnetSep && (
           <p class="foot-note">
             Sonnet 5 is posted to step to {fmt(sonnetSep.input, 0)} in /
-            {fmt(sonnetSep.output, 0)} out on 2026-09-01 — a scheduled reprice,
-            already on the record.
+            {fmt(sonnetSep.output, 0)} out on 2026-09-01 — already on the record.
           </p>
         )}
       </div>
@@ -317,9 +311,8 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
         ))}
       </svg>
       <p class="chart-note">
-        One vendor, one day, three tiers: on 2026-07-30 the posted output price
-        fell 80% on luna and 20% on terra while sol held. The commodity tier
-        repriced; the frontier tier did not.
+        One vendor, one day, three tiers: on 2026-07-30 the posted output
+        price fell 80% on luna and 20% on terra while sol held.
       </p>
     </div>
   </section>
@@ -351,10 +344,8 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       </tbody>
     </table>
     <p class="foot-note">
-      Each row pools independent providers posting a price for the same
-      open-weight model; the median is operator-equal and n is disclosed.
-      A wide range on the same model is dispersion in the serving market,
-      not a data defect.
+      Each row is a median across independent providers of the same model,
+      n disclosed. A wide range is dispersion in the serving market.
     </p>
 
     {cmpBars.length >= 3 && (
@@ -365,7 +356,6 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
         <div class="cmp-legend mono">
           <span><span class="sw sw-in"></span> input</span>
           <span><span class="sw sw-out"></span> output</span>
-          <span class="dim">solid = first-party posted · hatched = served median (n shown)</span>
         </div>
         <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
           aria-label="Grouped bar chart comparing posted input and output prices per million tokens across models.">
@@ -420,10 +410,9 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
           <line x1={CPAD_L} x2={CW - CPAD_R} y1={cy(0)} y2={cy(0)} class="axis" />
         </svg>
         <p class="chart-note">
-          Two constructions on one canvas, never pooled: solid bars are the
-          model owners' own posted prices; hatched bars are cross-provider
-          served medians at the disclosed n. The gap between the commodity
-          floor and the frontier tier is the exhibit.
+          Rows carrying an n are served medians across that many providers;
+          the rest are the model owners' posted prices. Two constructions,
+          never pooled.
         </p>
       </div>
     )}
@@ -464,21 +453,21 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   </script>
 
   <section class="wrap method">
-    <div class="sec-head"><span class="sec-no">·</span><h2>Method</h2></div>
-    <ul>
-      <li>All prices in USD per 1 million tokens, as posted.</li>
-      <li>Frontier rows are recorded from the model owners' own price
-        lists, captured daily; the record runs from {windowStart}. A reprice
-        appears on the day the owner's list changed.</li>
-      <li>Open-weight rows are medians across independent providers posting
-        a price for the same model; rows publish at n ≥ 3.</li>
-      <li>The two constructions are never pooled: a first-party posted
-        price and a cross-provider median answer different questions.</li>
-      <li>Token prices are not evidence about GPU rental rates. The two are
-        linked by serving efficiency — tokens produced per GPU-hour — which
-        is a vendor variable, not a market price. CCIR publishes the GPU-hour
-        record separately.</li>
-    </ul>
+    <details>
+      <summary class="mono">Method</summary>
+      <ul>
+        <li>USD per 1 million tokens, as posted. Record runs from {windowStart}.</li>
+        <li>Posted rows come from the model owners' own price lists, captured
+          daily; a reprice appears on the day the list changed.</li>
+        <li>Served rows are medians across independent providers of the same
+          open-weight model, published at n ≥ 3.</li>
+        <li>The two are never pooled — a posted price and a cross-provider
+          median answer different questions.</li>
+        <li>Token prices are not evidence about GPU rental rates. The link
+          between them is serving efficiency, a vendor variable rather than a
+          market price. CCIR publishes the GPU-hour record separately.</li>
+      </ul>
+    </details>
   </section>
 </Base>
 
@@ -558,6 +547,14 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   .spark-line { stroke: var(--accent); stroke-width: 1.5; }
   .spark-flat { stroke: var(--ink-dim, #888); stroke-width: 1.5; opacity: 0.55; }
 
-  .method ul { max-width: 720px; padding-left: 18px; }
+  .method { margin-top: 44px; }
+  .method details {
+    border-top: 1px solid var(--rule, #8884); padding-top: 10px;
+  }
+  .method summary {
+    cursor: pointer; font-size: var(--fs-xs); text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--ink-dim, #888);
+  }
+  .method ul { max-width: 720px; padding-left: 18px; margin-top: 12px; }
   .method li { margin-bottom: 8px; font-size: var(--fs-sm); }
 </style>
