@@ -123,12 +123,56 @@ const servedRows = [...served]
   .slice(0, 16);
 const servedAsOf = served[0]?.as_of_date ?? frontierLatestDay;
 
+// ---------------------------------------------------------------------------
+// Cross-model input/output comparison (grouped bars). Two constructions on
+// one canvas, visually distinguished, NEVER pooled: first-party posted bars
+// are solid; served-median bars are hatched and carry their n. Curated to
+// the flagship rung of each family we track.
+// ---------------------------------------------------------------------------
+const CMP_PICKS: { kind: 'served' | 'frontier'; id: string; l1: string; l2: string }[] = [
+  { kind: 'served',   id: 'deepseekv4flash',            l1: 'DeepSeek',    l2: 'V4 Flash' },
+  { kind: 'served',   id: 'qwen3coder480ba35binstruct', l1: 'Qwen3 Coder', l2: '480B' },
+  { kind: 'served',   id: 'kimik2thinking',             l1: 'Kimi K2',     l2: 'Thinking' },
+  { kind: 'frontier', id: 'gpt-5.6-sol',                l1: 'OpenAI',      l2: 'GPT-5.6 Sol' },
+  { kind: 'frontier', id: 'Claude Opus 5',              l1: 'Anthropic',   l2: 'Opus 5' },
+  { kind: 'frontier', id: 'Claude Fable 5',             l1: 'Anthropic',   l2: 'Fable 5' },
+];
+interface CmpBar {
+  l1: string; l2: string; input: number; output: number;
+  servedN: number | null;  // null = first-party posted
+}
+const cmpBars: CmpBar[] = CMP_PICKS.flatMap((p) => {
+  if (p.kind === 'frontier') {
+    const r = latest.get(p.id);
+    return r && r.input != null && r.output != null
+      ? [{ l1: p.l1, l2: p.l2, input: r.input, output: r.output, servedN: null }]
+      : [];
+  }
+  const r = served.find((s) => s.model_id === p.id);
+  return r && r.input_median != null && r.output_median != null
+    ? [{ l1: p.l1, l2: p.l2, input: r.input_median, output: r.output_median,
+         servedN: r.n_providers }]
+    : [];
+}).sort((a, b) => a.output - b.output);
+
+const CW = 640, CH = 260, CPAD_L = 40, CPAD_R = 8, CPAD_T = 20, CPAD_B = 36;
+const cmpMax = Math.max(1, ...cmpBars.map((b) => b.output)) * 1.06;
+const cy = (v: number) =>
+  Math.round((CPAD_T + (1 - v / cmpMax) * (CH - CPAD_T - CPAD_B)) * 10) / 10;
+const cmpTicks = [0, 10, 20, 30, 40, 50].filter((t) => t <= cmpMax);
+const GRP_W = (CW - CPAD_L - CPAD_R) / Math.max(1, cmpBars.length);
+const BAR_W = 26, BAR_GAP = 2;
+const fmtV = (v: number) =>
+  v >= 10 ? `$${Math.round(v)}`
+  : v >= 1 ? `$${v.toFixed(2).replace(/\.?0+$/, '')}`
+  : `$${v.toFixed(2)}`;
+
 const windowStart = frontierDays[0] ?? '2026-07-03';
 ---
 <Base
   title="Token Prices — GPT-5.6, Claude & Open-Weight Models · CCIR"
   description="Daily record of posted token prices: OpenAI GPT-5.6 (sol, terra, luna) and Anthropic Claude first-party price lists, plus cross-provider medians for Kimi K2, DeepSeek, Qwen and other open-weight models. USD per 1M tokens."
-  ogImage="/og/tokens.png?v=1"
+  ogImage="/og/tokens.png?v=2"
 >
   <section class="wrap top">
     <div class="kicker">Token prices · USD per 1M tokens</div>
@@ -312,6 +356,77 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       A wide range on the same model is dispersion in the serving market,
       not a data defect.
     </p>
+
+    {cmpBars.length >= 3 && (
+      <div class="chart-block">
+        <div class="chart-title mono">
+          posted price by model · input &amp; output · USD per 1M tokens · {servedAsOf}
+        </div>
+        <div class="cmp-legend mono">
+          <span><span class="sw sw-in"></span> input</span>
+          <span><span class="sw sw-out"></span> output</span>
+          <span class="dim">solid = first-party posted · hatched = served median (n shown)</span>
+        </div>
+        <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
+          aria-label="Grouped bar chart comparing posted input and output prices per million tokens across models.">
+          <defs>
+            <pattern id="tok-hatch-in" width="5" height="5" patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)">
+              <rect width="5" height="5" fill="var(--tok-c1)" opacity="0.32" />
+              <line x1="0" y1="0" x2="0" y2="5" stroke="var(--tok-c1)" stroke-width="2.2" />
+            </pattern>
+            <pattern id="tok-hatch-out" width="5" height="5" patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)">
+              <rect width="5" height="5" fill="var(--tok-c3)" opacity="0.32" />
+              <line x1="0" y1="0" x2="0" y2="5" stroke="var(--tok-c3)" stroke-width="2.2" />
+            </pattern>
+          </defs>
+          {cmpTicks.map((t) => (
+            <>
+              <line x1={CPAD_L} x2={CW - CPAD_R} y1={cy(t)} y2={cy(t)} class="grid" />
+              <text x={CPAD_L - 6} y={cy(t) + 3} class="tick" text-anchor="end">${t}</text>
+            </>
+          ))}
+          {cmpBars.map((b, i) => {
+            const cx0 = CPAD_L + i * GRP_W + GRP_W / 2;
+            const xIn = cx0 - BAR_W - BAR_GAP / 2;
+            const xOut = cx0 + BAR_GAP / 2;
+            const y0 = cy(0);
+            const con = b.servedN != null
+              ? `served median, n=${b.servedN} providers` : 'first-party posted';
+            return (
+              <>
+                <rect x={xIn} width={BAR_W} y={cy(b.input)}
+                  height={Math.max(1.5, y0 - cy(b.input))}
+                  fill={b.servedN != null ? 'url(#tok-hatch-in)' : 'var(--tok-c1)'}>
+                  <title>{`${b.l1} ${b.l2} — input ${fmtV(b.input)} per 1M tokens (${con})`}</title>
+                </rect>
+                <rect x={xOut} width={BAR_W} y={cy(b.output)}
+                  height={Math.max(1.5, y0 - cy(b.output))}
+                  fill={b.servedN != null ? 'url(#tok-hatch-out)' : 'var(--tok-c3)'}>
+                  <title>{`${b.l1} ${b.l2} — output ${fmtV(b.output)} per 1M tokens (${con})`}</title>
+                </rect>
+                <text x={xIn + BAR_W / 2} y={cy(b.input) - 4} class="vlab"
+                  text-anchor="middle">{fmtV(b.input)}</text>
+                <text x={xOut + BAR_W / 2} y={cy(b.output) - 4} class="vlab"
+                  text-anchor="middle">{fmtV(b.output)}</text>
+                <text x={cx0} y={CH - 22} class="tick" text-anchor="middle">{b.l1}</text>
+                <text x={cx0} y={CH - 11} class="tick" text-anchor="middle">
+                  {b.l2}{b.servedN != null ? ` · n=${b.servedN}` : ''}
+                </text>
+              </>
+            );
+          })}
+          <line x1={CPAD_L} x2={CW - CPAD_R} y1={cy(0)} y2={cy(0)} class="axis" />
+        </svg>
+        <p class="chart-note">
+          Two constructions on one canvas, never pooled: solid bars are the
+          model owners' own posted prices; hatched bars are cross-provider
+          served medians at the disclosed n. The gap between the commodity
+          floor and the frontier tier is the exhibit.
+        </p>
+      </div>
+    )}
   </section>
 
   <script is:inline>
@@ -419,7 +534,19 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   .chart-title { font-size: var(--fs-xs); color: var(--ink-dim, #888); margin-bottom: 6px; }
   svg { width: 100%; height: auto; --tok-c1: #3b82f6; --tok-c2: #0d9488; --tok-c3: #c96f06; }
   .grid { stroke: var(--rule-soft, #8883); stroke-width: 1; }
+  .axis { stroke: var(--rule, #8886); stroke-width: 1; }
   .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim, #888); }
+  .vlab { font-family: var(--font-mono); font-size: 9.5px; fill: var(--ink-soft, var(--ink)); }
+  .cmp-legend {
+    display: flex; gap: 18px; align-items: center; flex-wrap: wrap;
+    font-size: var(--fs-xs); margin-bottom: 8px;
+  }
+  .cmp-legend .sw {
+    display: inline-block; width: 10px; height: 10px; margin-right: 5px;
+    vertical-align: -1px;
+  }
+  .cmp-legend .sw-in { background: #3b82f6; }
+  .cmp-legend .sw-out { background: #c96f06; }
   .series-label { font-family: var(--font-mono); font-size: 11px; }
   .chart-note, .foot-note {
     font-size: var(--fs-sm); color: var(--ink-soft, var(--ink));
