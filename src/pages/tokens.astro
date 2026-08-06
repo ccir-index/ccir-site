@@ -129,26 +129,38 @@ const servedAsOf = served[0]?.as_of_date ?? frontierLatestDay;
 // are solid; served-median bars are hatched and carry their n. Curated to
 // the flagship rung of each family we track.
 // ---------------------------------------------------------------------------
-const CMP_PICKS: { kind: 'served' | 'frontier'; id: string; l1: string; l2: string }[] = [
-  { kind: 'served',   id: 'deepseekv4flash',            l1: 'DeepSeek',    l2: 'V4 Flash' },
-  { kind: 'served',   id: 'qwen3coder480ba35binstruct', l1: 'Qwen3 Coder', l2: '480B' },
-  { kind: 'served',   id: 'kimik2thinking',             l1: 'Kimi K2',     l2: 'Thinking' },
-  { kind: 'frontier', id: 'gpt-5.6-sol',                l1: 'OpenAI',      l2: 'GPT-5.6 Sol' },
-  { kind: 'frontier', id: 'Claude Opus 5',              l1: 'Anthropic',   l2: 'Opus 5' },
-  { kind: 'frontier', id: 'Claude Fable 5',             l1: 'Anthropic',   l2: 'Fable 5' },
+// Each pick prefers a FIRST-PARTY posted row when the record carries one
+// (matched by pattern so a vendor's own id spelling doesn't need hardcoding)
+// and falls back to the served median otherwise. When a vendor's own price
+// list enters the record, its bar upgrades construction automatically and
+// the n label drops, because the row is no longer a median.
+const CMP_PICKS: {
+  frontierMatch?: RegExp; servedId?: string; l1: string; l2: string;
+}[] = [
+  { frontierMatch: /deepseek.*v4.*flash/i, servedId: 'deepseekv4flash',
+    l1: 'DeepSeek', l2: 'V4 Flash' },
+  { frontierMatch: /qwen.*(3\.8|max)/i, servedId: 'qwen3coder480ba35binstruct',
+    l1: 'Qwen3 Coder', l2: '480B' },
+  { frontierMatch: /kimi.*k3/i, servedId: 'kimik2thinking',
+    l1: 'Kimi K2', l2: 'Thinking' },
+  { frontierMatch: /^gpt-5\.6-sol$/i,     l1: 'OpenAI',    l2: 'GPT-5.6 Sol' },
+  { frontierMatch: /^Claude Opus 5$/i,    l1: 'Anthropic', l2: 'Opus 5' },
+  { frontierMatch: /^Claude Fable 5$/i,   l1: 'Anthropic', l2: 'Fable 5' },
 ];
 interface CmpBar {
   l1: string; l2: string; input: number; output: number;
   servedN: number | null;  // null = first-party posted
 }
 const cmpBars: CmpBar[] = CMP_PICKS.flatMap((p) => {
-  if (p.kind === 'frontier') {
-    const r = latest.get(p.id);
-    return r && r.input != null && r.output != null
-      ? [{ l1: p.l1, l2: p.l2, input: r.input, output: r.output, servedN: null }]
-      : [];
+  if (p.frontierMatch) {
+    const hit = [...latest.values()].find(
+      (r) => p.frontierMatch!.test(r.model_id) && r.input != null && r.output != null);
+    if (hit) {
+      return [{ l1: p.l1, l2: p.l2, input: hit.input as number,
+                output: hit.output as number, servedN: null }];
+    }
   }
-  const r = served.find((s) => s.model_id === p.id);
+  const r = p.servedId ? served.find((s) => s.model_id === p.servedId) : undefined;
   return r && r.input_median != null && r.output_median != null
     ? [{ l1: p.l1, l2: p.l2, input: r.input_median, output: r.output_median,
          servedN: r.n_providers }]

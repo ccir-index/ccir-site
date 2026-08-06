@@ -15,22 +15,31 @@ const BLUE = '#3b82f6';   // input  (house pair)
 const ORANGE = '#c96f06'; // output (house pair)
 
 const latest = frontierLatest();
-const PICKS: { kind: 'served' | 'frontier'; id: string; l1: string; l2: string }[] = [
-  { kind: 'served',   id: 'deepseekv4flash',            l1: 'DeepSeek',    l2: 'V4 Flash' },
-  { kind: 'served',   id: 'qwen3coder480ba35binstruct', l1: 'Qwen3 Coder', l2: '480B' },
-  { kind: 'served',   id: 'kimik2thinking',             l1: 'Kimi K2',     l2: 'Thinking' },
-  { kind: 'frontier', id: 'gpt-5.6-sol',                l1: 'OpenAI',      l2: 'GPT-5.6 Sol' },
-  { kind: 'frontier', id: 'Claude Opus 5',              l1: 'Anthropic',   l2: 'Opus 5' },
-  { kind: 'frontier', id: 'Claude Fable 5',             l1: 'Anthropic',   l2: 'Fable 5' },
+// Mirrors the page's resolution exactly: prefer a first-party posted row
+// when the record has one (pattern-matched, so vendor id spellings need no
+// hardcoding), else the served median. Card and page cannot diverge.
+const PICKS: { frontierMatch?: RegExp; servedId?: string; l1: string; l2: string }[] = [
+  { frontierMatch: /deepseek.*v4.*flash/i, servedId: 'deepseekv4flash',
+    l1: 'DeepSeek', l2: 'V4 Flash' },
+  { frontierMatch: /qwen.*(3\.8|max)/i, servedId: 'qwen3coder480ba35binstruct',
+    l1: 'Qwen3 Coder', l2: '480B' },
+  { frontierMatch: /kimi.*k3/i, servedId: 'kimik2thinking',
+    l1: 'Kimi K2', l2: 'Thinking' },
+  { frontierMatch: /^gpt-5\.6-sol$/i,   l1: 'OpenAI',    l2: 'GPT-5.6 Sol' },
+  { frontierMatch: /^Claude Opus 5$/i,  l1: 'Anthropic', l2: 'Opus 5' },
+  { frontierMatch: /^Claude Fable 5$/i, l1: 'Anthropic', l2: 'Fable 5' },
 ];
 interface Bar { l1: string; l2: string; input: number; output: number; n: number | null }
 const bars: Bar[] = PICKS.flatMap((p) => {
-  if (p.kind === 'frontier') {
-    const r = latest.get(p.id);
-    return r && r.input != null && r.output != null
-      ? [{ l1: p.l1, l2: p.l2, input: r.input, output: r.output, n: null }] : [];
+  if (p.frontierMatch) {
+    const hit = [...latest.values()].find(
+      (r) => p.frontierMatch!.test(r.model_id) && r.input != null && r.output != null);
+    if (hit) {
+      return [{ l1: p.l1, l2: p.l2, input: hit.input as number,
+                output: hit.output as number, n: null }];
+    }
   }
-  const r = served.find((s) => s.model_id === p.id);
+  const r = p.servedId ? served.find((s) => s.model_id === p.servedId) : undefined;
   return r && r.input_median != null && r.output_median != null
     ? [{ l1: p.l1, l2: p.l2, input: r.input_median, output: r.output_median,
          n: r.n_providers }] : [];
@@ -62,8 +71,7 @@ function group(b: Bar) {
     ]),
     el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center' }, [
       el('div', { display: 'flex', fontSize: 17, color: C.ink }, b.l1),
-      el('div', { display: 'flex', fontSize: 14.5, color: C.dim },
-        b.n != null ? `${b.l2} · n=${b.n}` : b.l2),
+      el('div', { display: 'flex', fontSize: 14.5, color: C.dim }, b.l2),
     ]),
   ]);
 }
@@ -77,8 +85,6 @@ const legend = el('div', { display: 'flex', alignItems: 'center', gap: 22, fontS
     el('div', { display: 'flex', width: 14, height: 14, backgroundColor: ORANGE }, ''),
     el('div', { display: 'flex' }, 'output'),
   ]),
-  el('div', { display: 'flex', color: C.faint },
-    'n = providers serving that model'),
 ]);
 
 const root = el('div', {
