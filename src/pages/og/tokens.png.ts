@@ -18,13 +18,16 @@ const latest = frontierLatest();
 // Mirrors the page's resolution exactly: prefer a first-party posted row
 // when the record has one (pattern-matched, so vendor id spellings need no
 // hardcoding), else the served median. Card and page cannot diverge.
-const PICKS: { frontierMatch?: RegExp; servedId?: string; l1: string; l2: string }[] = [
-  { frontierMatch: /deepseek.*v4.*flash/i, servedId: 'deepseekv4flash',
+const PICKS: {
+  frontierMatch?: RegExp; servedId?: string;
+  l1: string; l2: string; fl1?: string; fl2?: string;
+}[] = [
+  { frontierMatch: /^deepseek-v4-flash$/i, servedId: 'deepseekv4flash',
     l1: 'DeepSeek', l2: 'V4 Flash' },
   { frontierMatch: /qwen.*(3\.8|max)/i, servedId: 'qwen3coder480ba35binstruct',
     l1: 'Qwen3 Coder', l2: '480B' },
-  { frontierMatch: /kimi.*k3/i, servedId: 'kimik2thinking',
-    l1: 'Kimi K2', l2: 'Thinking' },
+  { frontierMatch: /^kimi-k3$/i, servedId: 'kimik2thinking',
+    l1: 'Kimi K2', l2: 'Thinking', fl1: 'Moonshot', fl2: 'Kimi K3' },
   { frontierMatch: /^gpt-5\.6-sol$/i,   l1: 'OpenAI',    l2: 'GPT-5.6 Sol' },
   { frontierMatch: /^Claude Opus 5$/i,  l1: 'Anthropic', l2: 'Opus 5' },
   { frontierMatch: /^Claude Fable 5$/i, l1: 'Anthropic', l2: 'Fable 5' },
@@ -35,7 +38,7 @@ const bars: Bar[] = PICKS.flatMap((p) => {
     const hit = [...latest.values()].find(
       (r) => p.frontierMatch!.test(r.model_id) && r.input != null && r.output != null);
     if (hit) {
-      return [{ l1: p.l1, l2: p.l2, input: hit.input as number,
+      return [{ l1: p.fl1 ?? p.l1, l2: p.fl2 ?? p.l2, input: hit.input as number,
                 output: hit.output as number, n: null }];
     }
   }
