@@ -85,13 +85,10 @@ const root = el('div', {
   display: 'flex', flexDirection: 'column', width: 1200, height: 630,
   backgroundColor: C.bg, padding: '38px 52px 30px', fontFamily: 'IBM Plex Mono',
 }, [
-  el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }, [
-    el('div', { display: 'flex', alignItems: 'baseline', gap: 12 }, [
-      el('div', { display: 'flex', color: C.navy, fontSize: 24, fontWeight: 600, letterSpacing: 3 }, 'CCIR'),
-      el('div', { display: 'flex', color: C.dim, fontSize: 16 },
-        `Token prices · USD per 1M tokens · ${frontierLatestDay}`),
-    ]),
-    el('div', { display: 'flex', color: C.dim, fontSize: 16 }, 'ccir.io/tokens'),
+  el('div', { display: 'flex', alignItems: 'baseline', gap: 12 }, [
+    el('div', { display: 'flex', color: C.navy, fontSize: 24, fontWeight: 600, letterSpacing: 3 }, 'CCIR'),
+    el('div', { display: 'flex', color: C.dim, fontSize: 16 },
+      `Token prices · USD per 1M tokens · ${frontierLatestDay}`),
   ]),
   el('div', { display: 'flex', color: C.ink, fontSize: 34, fontWeight: 600, marginTop: 18 },
     'What a million tokens costs, by model'),
@@ -101,10 +98,8 @@ const root = el('div', {
     marginTop: 26, paddingBottom: 2, flexGrow: 1,
     borderBottom: `2px solid ${C.rule2}`,
   }, bars.map(group)),
-  el('div', { display: 'flex', justifyContent: 'space-between', marginTop: 14, fontSize: 14, color: C.faint }, [
-    el('div', { display: 'flex' }, 'recorded daily from posted price lists and serving offers'),
-    el('div', { display: 'flex' }, 'CCIR — Cloud Compute Index & Rates'),
-  ]),
+  el('div', { display: 'flex', marginTop: 16, fontSize: 16, color: C.dim },
+    'ccir.io/tokens'),
 ]);
 
 export const GET: APIRoute = async () => {
