@@ -194,6 +194,77 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
     </p>
   </section>
 
+  <section class="wrap">
+    {cmpBars.length >= 3 && (
+      <div class="chart-block lead-chart">
+        <div class="chart-title mono">
+          posted price by model · input &amp; output · USD per 1M tokens · {servedAsOf}
+        </div>
+        <div class="cmp-legend mono">
+          <span><span class="sw sw-in"></span> input</span>
+          <span><span class="sw sw-out"></span> output</span>
+        </div>
+        <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
+          aria-label="Grouped bar chart comparing posted input and output prices per million tokens across models.">
+          <defs>
+            <pattern id="tok-hatch-in" width="5" height="5" patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)">
+              <rect width="5" height="5" fill="var(--tok-c1)" opacity="0.32" />
+              <line x1="0" y1="0" x2="0" y2="5" stroke="var(--tok-c1)" stroke-width="2.2" />
+            </pattern>
+            <pattern id="tok-hatch-out" width="5" height="5" patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)">
+              <rect width="5" height="5" fill="var(--tok-c3)" opacity="0.32" />
+              <line x1="0" y1="0" x2="0" y2="5" stroke="var(--tok-c3)" stroke-width="2.2" />
+            </pattern>
+          </defs>
+          {cmpTicks.map((t) => (
+            <>
+              <line x1={CPAD_L} x2={CW - CPAD_R} y1={cy(t)} y2={cy(t)} class="grid" />
+              <text x={CPAD_L - 6} y={cy(t) + 3} class="tick" text-anchor="end">${t}</text>
+            </>
+          ))}
+          {cmpBars.map((b, i) => {
+            const cx0 = CPAD_L + i * GRP_W + GRP_W / 2;
+            const xIn = cx0 - BAR_W - BAR_GAP / 2;
+            const xOut = cx0 + BAR_GAP / 2;
+            const y0 = cy(0);
+            const con = b.servedN != null
+              ? `served median, n=${b.servedN} providers` : 'first-party posted';
+            return (
+              <>
+                <rect x={xIn} width={BAR_W} y={cy(b.input)}
+                  height={Math.max(1.5, y0 - cy(b.input))}
+                  fill={b.servedN != null ? 'url(#tok-hatch-in)' : 'var(--tok-c1)'}>
+                  <title>{`${b.l1} ${b.l2} — input ${fmtV(b.input)} per 1M tokens (${con})`}</title>
+                </rect>
+                <rect x={xOut} width={BAR_W} y={cy(b.output)}
+                  height={Math.max(1.5, y0 - cy(b.output))}
+                  fill={b.servedN != null ? 'url(#tok-hatch-out)' : 'var(--tok-c3)'}>
+                  <title>{`${b.l1} ${b.l2} — output ${fmtV(b.output)} per 1M tokens (${con})`}</title>
+                </rect>
+                <text x={xIn + BAR_W / 2} y={cy(b.input) - 4} class="vlab"
+                  text-anchor="middle">{fmtV(b.input)}</text>
+                <text x={xOut + BAR_W / 2} y={cy(b.output) - 4} class="vlab"
+                  text-anchor="middle">{fmtV(b.output)}</text>
+                <text x={cx0} y={CH - 22} class="tick" text-anchor="middle">{b.l1}</text>
+                <text x={cx0} y={CH - 11} class="tick" text-anchor="middle">
+                  {b.l2}{b.servedN != null ? ` · n=${b.servedN}` : ''}
+                </text>
+              </>
+            );
+          })}
+          <line x1={CPAD_L} x2={CW - CPAD_R} y1={cy(0)} y2={cy(0)} class="axis" />
+        </svg>
+        <p class="chart-note">
+          Rows carrying an n are served medians across that many providers;
+          the rest are the model owners' posted prices. Two constructions,
+          never pooled.
+        </p>
+      </div>
+    )}
+  </section>
+
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
@@ -361,74 +432,6 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       n disclosed. A wide range is dispersion in the serving market.
     </p>
 
-    {cmpBars.length >= 3 && (
-      <div class="chart-block">
-        <div class="chart-title mono">
-          posted price by model · input &amp; output · USD per 1M tokens · {servedAsOf}
-        </div>
-        <div class="cmp-legend mono">
-          <span><span class="sw sw-in"></span> input</span>
-          <span><span class="sw sw-out"></span> output</span>
-        </div>
-        <svg viewBox={`0 0 ${CW} ${CH}`} role="img"
-          aria-label="Grouped bar chart comparing posted input and output prices per million tokens across models.">
-          <defs>
-            <pattern id="tok-hatch-in" width="5" height="5" patternUnits="userSpaceOnUse"
-              patternTransform="rotate(45)">
-              <rect width="5" height="5" fill="var(--tok-c1)" opacity="0.32" />
-              <line x1="0" y1="0" x2="0" y2="5" stroke="var(--tok-c1)" stroke-width="2.2" />
-            </pattern>
-            <pattern id="tok-hatch-out" width="5" height="5" patternUnits="userSpaceOnUse"
-              patternTransform="rotate(45)">
-              <rect width="5" height="5" fill="var(--tok-c3)" opacity="0.32" />
-              <line x1="0" y1="0" x2="0" y2="5" stroke="var(--tok-c3)" stroke-width="2.2" />
-            </pattern>
-          </defs>
-          {cmpTicks.map((t) => (
-            <>
-              <line x1={CPAD_L} x2={CW - CPAD_R} y1={cy(t)} y2={cy(t)} class="grid" />
-              <text x={CPAD_L - 6} y={cy(t) + 3} class="tick" text-anchor="end">${t}</text>
-            </>
-          ))}
-          {cmpBars.map((b, i) => {
-            const cx0 = CPAD_L + i * GRP_W + GRP_W / 2;
-            const xIn = cx0 - BAR_W - BAR_GAP / 2;
-            const xOut = cx0 + BAR_GAP / 2;
-            const y0 = cy(0);
-            const con = b.servedN != null
-              ? `served median, n=${b.servedN} providers` : 'first-party posted';
-            return (
-              <>
-                <rect x={xIn} width={BAR_W} y={cy(b.input)}
-                  height={Math.max(1.5, y0 - cy(b.input))}
-                  fill={b.servedN != null ? 'url(#tok-hatch-in)' : 'var(--tok-c1)'}>
-                  <title>{`${b.l1} ${b.l2} — input ${fmtV(b.input)} per 1M tokens (${con})`}</title>
-                </rect>
-                <rect x={xOut} width={BAR_W} y={cy(b.output)}
-                  height={Math.max(1.5, y0 - cy(b.output))}
-                  fill={b.servedN != null ? 'url(#tok-hatch-out)' : 'var(--tok-c3)'}>
-                  <title>{`${b.l1} ${b.l2} — output ${fmtV(b.output)} per 1M tokens (${con})`}</title>
-                </rect>
-                <text x={xIn + BAR_W / 2} y={cy(b.input) - 4} class="vlab"
-                  text-anchor="middle">{fmtV(b.input)}</text>
-                <text x={xOut + BAR_W / 2} y={cy(b.output) - 4} class="vlab"
-                  text-anchor="middle">{fmtV(b.output)}</text>
-                <text x={cx0} y={CH - 22} class="tick" text-anchor="middle">{b.l1}</text>
-                <text x={cx0} y={CH - 11} class="tick" text-anchor="middle">
-                  {b.l2}{b.servedN != null ? ` · n=${b.servedN}` : ''}
-                </text>
-              </>
-            );
-          })}
-          <line x1={CPAD_L} x2={CW - CPAD_R} y1={cy(0)} y2={cy(0)} class="axis" />
-        </svg>
-        <p class="chart-note">
-          Rows carrying an n are served medians across that many providers;
-          the rest are the model owners' posted prices. Two constructions,
-          never pooled.
-        </p>
-      </div>
-    )}
   </section>
 
   <script is:inline>
@@ -533,6 +536,9 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   .sortable th[aria-sort="ascending"]::after { content: " ↑"; }
 
   .chart-block { margin-top: 30px; }
+  /* Lead chart sits directly under the hero — tighter top, a little more air
+     before the first section rule. */
+  .lead-chart { margin-top: 18px; margin-bottom: 8px; }
   .chart-title { font-size: var(--fs-xs); color: var(--ink-dim, #888); margin-bottom: 6px; }
   svg { width: 100%; height: auto; --tok-c1: #3b82f6; --tok-c2: #0d9488; --tok-c3: #c96f06; }
   .grid { stroke: var(--rule-soft, #8883); stroke-width: 1; }
