@@ -31,13 +31,26 @@ const PROVIDER_ORDER = ['openai', 'anthropic', 'google', 'deepseek', 'moonshot',
                         'xai', 'meta', 'alibaba', 'zai', 'minimax', 'mistral',
                         'thinkingmachines', 'xiaomi'];
 
-const PROVIDER_META: Record<string, { label: string; note?: string; models?: string[] }> = {
+const PROVIDER_META: Record<string, {
+  label: string; note?: string; models?: string[]; keepCurated?: boolean;
+}> = {
+  // OpenAI's table runs strictly newest-first, so source_rank reproduces
+  // exactly the five models listed here and picks up new ones by itself.
+  // The list is kept only as the pre-source_rank FALLBACK (no `keepCurated`)
+  // and can be deleted once a snapshot carrying ranks has shipped — without
+  // it, a deploy landing before that snapshot would fall through to
+  // dearest-first and head the block with o1-pro and gpt-5.4-pro.
   openai: {
     label: 'OpenAI', note: 'standard tier',
     models: ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.5-pro'],
   },
+  // Anthropic curates PERMANENTLY, and the reason is worth recording so
+  // nobody deletes it expecting rank to cover it: their table groups by
+  // FAMILY, not by recency — Opus 5, 4.8, 4.7, 4.6, 4.5, 4.1 and 4 all
+  // precede the first Sonnet. Ranking would fill the block with historical
+  // Opus versions and show no Sonnet or Haiku at all.
   anthropic: {
-    label: 'Anthropic', note: 'model table',
+    label: 'Anthropic', note: 'model table', keepCurated: true,
     models: ['Claude Fable 5', 'Claude Opus 5',
              'Claude Sonnet 5 through August 31, 2026', 'Claude Haiku 4.5'],
   },
@@ -98,14 +111,35 @@ const providerBlocks = (() => {
   ];
   return ordered.map((provider) => {
     const cfg = PROVIDER_META[provider] ?? { label: provider };
-    const rows = cfg.models
+    const pool = byProvider.get(provider)!
+      // Vendor-labelled legacy first: what a lab calls legacy stays in the
+      // record and off the page. RETIRED_RE still catches labs that annotate
+      // in the display name rather than in axes.
+      .filter((r) => r.lifecycle !== 'legacy')
+      .filter((r) => !RETIRED_RE.test(r.model_display || r.model_id));
+    // Selection, in order of preference:
+    //   1. a permanent curated list, where the vendor's own order is not a
+    //      relevance ranking (Anthropic groups by family);
+    //   2. the VENDOR's row order, which needs no upkeep as models ship;
+    //   3. a pre-source_rank fallback — the curated list if one is left,
+    //      else dearest-first — so a deploy landing before the first ranked
+    //      snapshot degrades to today's behaviour rather than to junk.
+    const haveRank = pool.some((r) => r.source_rank != null);
+    const curated = cfg.models
       ? (cfg.models.map(frontierRow).filter(Boolean) as TableRow[])
-      : (byProvider.get(provider)!
-          .filter((r) => !RETIRED_RE.test(r.model_display || r.model_id))
-          .sort((a, b) => (b.output ?? 0) - (a.output ?? 0))
-          .slice(0, UNCURATED_MAX)
-          .map((r) => frontierRow(r.model_id))
-          .filter(Boolean) as TableRow[]);
+      : null;
+    let rows: TableRow[];
+    if (curated && (cfg.keepCurated || !haveRank)) {
+      rows = curated;
+    } else {
+      const ranked = haveRank
+        ? [...pool].sort((a, b) => (a.source_rank ?? Infinity) - (b.source_rank ?? Infinity))
+        : [...pool].sort((a, b) => (b.output ?? 0) - (a.output ?? 0));
+      rows = ranked
+        .slice(0, UNCURATED_MAX)
+        .map((r) => frontierRow(r.model_id))
+        .filter(Boolean) as TableRow[];
+    }
     return { provider, label: cfg.label, note: cfg.note, rows };
   }).filter((b) => b.rows.length > 0);
 })();
