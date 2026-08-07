@@ -1,0 +1,75 @@
+---
+/*
+  Provider mark for the /tokens first-party blocks.
+
+  TYPOGRAPHIC, not the vendors' brand logos — deliberately.
+
+  Two reasons. First, sourcing: a CC0 icon set covers 11 of the 13 labs on
+  this page but NOT OpenAI (removed upstream; only "OpenAI Gym" remains) and
+  not Thinking Machines. OpenAI is the largest block here, so a real-logo
+  treatment would fail on the most prominent name and read as broken.
+
+  Second, posture: we publish a record of what these labs post. Ranging their
+  trademarks down our own price tables edges toward implying affiliation or
+  endorsement, which a benchmark administrator should not do. A neutral
+  monogram identifies the block without borrowing anyone's brand.
+
+  If real marks are ever cleared per-vendor, this is the only file to change:
+  swap the monogram for an inline <svg> keyed on `slug` and the call sites
+  stay as they are.
+*/
+interface Props {
+  slug: string;
+  label: string;
+}
+const { slug, label } = Astro.props;
+
+// Explicit, not derived from the label: "MiniMax" and "Mistral" both start
+// "Mi", and Moonshot/Meta both start "M".
+const MONOGRAM: Record<string, string> = {
+  openai: 'OA',
+  anthropic: 'AN',
+  google: 'GO',
+  deepseek: 'DS',
+  moonshot: 'MS',
+  xai: 'XA',
+  meta: 'ME',
+  alibaba: 'AL',
+  zai: 'ZA',
+  minimax: 'MM',
+  mistral: 'MI',
+  thinkingmachines: 'TM',
+  xiaomi: 'XI',
+};
+
+// A lab added upstream renders its first two letters rather than nothing —
+// the page is built from the data, so a new provider must not need a site
+// change just to get a mark.
+const mark = MONOGRAM[slug] ?? label.replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase();
+---
+
+<span class="lab-mark" aria-hidden="true">{mark}</span>
+
+<style>
+  .lab-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Sized in rem, not em: the chip sets its own font-size, so em would
+       resolve against that and collapse the box to ~13px. */
+    width: 1.35rem;
+    height: 1.35rem;
+    margin-right: 0.5rem;
+    vertical-align: -0.2rem;
+    border: 1px solid var(--rule, #8886);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    line-height: 1;
+    color: var(--ink-dim, #999);
+    /* The chip sits inside an h3 — keep it from inheriting heading weight. */
+    font-variant-numeric: tabular-nums;
+  }
+</style>

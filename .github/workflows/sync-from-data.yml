@@ -469,6 +469,22 @@ jobs:
           git config user.email "ccir-pipeline@ccir.io"
           git config user.name  "CCIR Pipeline"
           git add src/data/rates_daily.csv src/data/rates_shadow.csv src/data/rates_daily_prev.csv src/data/indices_history.csv src/data/meta.json src/data/vast_basis.csv src/data/committed_mi.csv
+          # The token CSVs are the only files staged into src/data by a loop
+          # (everything else in those loops lands in public/data, which is
+          # covered by `git add -A public/data` below). They were fetched and
+          # copied but never added, so /tokens rendered 2026-08-05 data while
+          # meta.json — which IS in the list above — refreshed daily: on
+          # 2026-08-07 the standfirst read "199 models" over tables built from
+          # a two-day-old file, and token_models_tracked.csv (the roster that
+          # makes that figure auditable) had never been committed at all.
+          # Added per-file only when present: the staging step leaves the
+          # previous copy in place when a snapshot lacks one of these, and
+          # token_models_tracked.csv has no committed copy yet — a bare
+          # `git add` on a missing path is fatal under `set -e` and would
+          # take the whole snapshot refresh down with it.
+          for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv; do
+            if [ -f "src/data/$tf" ]; then git add "src/data/$tf"; fi
+          done
           # public/data/listings_history_*.csv only exists once the upstream
           # pipeline starts emitting these files; -A on a missing dir is fine.
           if [ -d public/data ]; then
