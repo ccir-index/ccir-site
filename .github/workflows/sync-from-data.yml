@@ -121,7 +121,11 @@ jobs:
           # Cross-chip summary file
           # Token surfaces (/tokens, added 2026-08-05): frontier first-party
           # posted series + open-weight cross-provider medians. Graceful skip.
-          for tf in frontier_token_posted.csv token_models_latest.csv; do
+          # token_models_tracked.csv (2026-08-06) is the deduped coverage
+          # roster behind the published "N models tracked" figure — the two
+          # lanes use different id conventions, so the count must come from
+          # there and never from summing the other two files' row counts.
+          for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv; do
             if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$tf" "$BASE/$tf"; then
               echo "fetched $tf"
             else
@@ -263,7 +267,7 @@ jobs:
         run: |
           set -euo pipefail
           cp .sync/rates_daily.csv      src/data/rates_daily.csv
-          for tf in frontier_token_posted.csv token_models_latest.csv; do
+          for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv; do
             if [ -s ".sync/$tf" ]; then cp ".sync/$tf" "src/data/$tf"; fi
           done
           cp .sync/rates_shadow.csv     src/data/rates_shadow.csv
@@ -399,6 +403,9 @@ jobs:
               'vast': m.get('vast'),
               'availability': m.get('availability'),
               'utilization': m.get('utilization'),
+              # carries models_tracked + models_tracked_basis so the page
+              # renders the exported figure instead of deriving its own
+              'tokens': m.get('tokens'),
           }
           with open('src/data/meta.json', 'w') as f:
               json.dump(meta, f, indent=2)

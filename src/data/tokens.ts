@@ -11,10 +11,14 @@
 */
 import frontierCsv from './frontier_token_posted.csv?raw';
 import servedCsv from './token_models_latest.csv?raw';
+import { meta } from './snapshot';
 
 export interface FrontierRow {
   as_of_date: string;
-  provider: 'openai' | 'anthropic';
+  // widened 2026-08-06: the lane started as openai/anthropic only and has
+  // since taken deepseek, moonshot, google and zai. Keep it open — a narrow
+  // union here silently mistypes every new first-party source.
+  provider: string;
   model_id: string;
   model_display: string;
   input: number | null;
@@ -96,6 +100,44 @@ export const served: ServedRow[] = parse(servedCsv).map((r) => ({
   output_min: num(r.output_min),
   output_max: num(r.output_max),
 }));
+
+/*
+  Coverage headline — "N models tracked".
+
+  Authoritative value comes from the export (manifest -> meta.json), which
+  computes it once through the canonical model id. The local fallback below
+  exists only so the figure survives a snapshot published before that field
+  shipped; it applies the SAME dedupe rule.
+
+  What neither path may ever do is add the two files' row counts together:
+  the panel stores canonical ids (`kimik3`) and the first-party series stores
+  the vendor's raw id (`kimi-k3`), so a naive union counts every model in both
+  lanes twice — it read 102 against a true 97 on 2026-08-06.
+*/
+export function canonicalModelId(raw: string): string {
+  const tail = (raw ?? '').trim().split('/').pop() ?? '';
+  return tail.toLowerCase().replace(/[^a-z0-9.]/g, '');
+}
+
+function computeModelsTracked(): number {
+  const ids = new Set<string>();
+  for (const r of served) {
+    const c = canonicalModelId(r.model_id);
+    if (c) ids.add(c);
+  }
+  const latest = frontier.length
+    ? frontier.reduce((a, r) => (r.as_of_date > a ? r.as_of_date : a), '')
+    : '';
+  for (const r of frontier) {
+    if (r.as_of_date !== latest) continue;
+    const c = canonicalModelId(r.model_id);
+    if (c) ids.add(c);
+  }
+  return ids.size;
+}
+
+export const modelsTracked: number =
+  meta.tokens?.models_tracked ?? computeModelsTracked();
 
 export const frontierDays: string[] = [...new Set(frontier.map((r) => r.as_of_date))].sort();
 export const frontierLatestDay: string = frontierDays[frontierDays.length - 1] ?? '';

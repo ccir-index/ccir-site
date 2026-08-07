@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import {
   frontier, served, frontierDays, frontierLatestDay,
-  frontierLatest, frontierSeries, lastReprice,
+  frontierLatest, frontierSeries, lastReprice, modelsTracked, canonicalModelId,
 } from '../data/tokens';
 
 /*
@@ -13,16 +13,55 @@ import {
 
 const latest = frontierLatest();
 
-// Most-relevant curation (current commercial models; retired/deprecated and
-// date-scoped future rows stay in the CSV, not on the page).
-const OPENAI_MODELS = ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.5-pro'];
-const ANTHROPIC_MODELS = [
-  'Claude Fable 5', 'Claude Opus 5',
-  'Claude Sonnet 5 through August 31, 2026', 'Claude Haiku 4.5',
-];
+/*
+  Section 01 is built FROM THE DATA, one block per provider present in the
+  latest day — not from a hardcoded pair. It used to render OpenAI and
+  Anthropic only, so DeepSeek and Moonshot were captured, exported, synced
+  and then never shown; the wave-4 sweep would have added eight more labs
+  behind the same wall.
+
+  Curation is per-provider and OPTIONAL. OpenAI and Anthropic post deep back
+  catalogues (36 and 16 rows, down to gpt-3.5 and davinci), so those two name
+  the models worth showing. A provider with no curated list shows everything
+  it posted that day, minus retired/deprecated rows — so a NEW lab appears by
+  itself, which is the whole point.
+*/
+const PROVIDER_ORDER = ['openai', 'anthropic', 'google', 'deepseek', 'moonshot',
+                        'xai', 'meta', 'alibaba', 'zai', 'minimax', 'mistral',
+                        'thinkingmachines', 'xiaomi'];
+
+const PROVIDER_META: Record<string, { label: string; note?: string; models?: string[] }> = {
+  openai: {
+    label: 'OpenAI', note: 'standard tier',
+    models: ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.5-pro'],
+  },
+  anthropic: {
+    label: 'Anthropic', note: 'model table',
+    models: ['Claude Fable 5', 'Claude Opus 5',
+             'Claude Sonnet 5 through August 31, 2026', 'Claude Haiku 4.5'],
+  },
+  google: { label: 'Google', note: 'standard tier' },
+  deepseek: { label: 'DeepSeek', note: 'standard price' },
+  moonshot: { label: 'Moonshot', note: 'per-model pages' },
+  xai: { label: 'xAI', note: 'model catalogue' },
+  meta: { label: 'Meta', note: 'standard tier' },
+  alibaba: { label: 'Alibaba', note: 'international storefront' },
+  zai: { label: 'Z.AI', note: 'model table' },
+  minimax: { label: 'MiniMax', note: 'standard tier' },
+  mistral: { label: 'Mistral', note: 'API price list' },
+  thinkingmachines: { label: 'Thinking Machines', note: 'serverless inference' },
+  xiaomi: { label: 'Xiaomi', note: 'overseas price list' },
+};
+
 const DISPLAY_OVERRIDES: Record<string, string> = {
   'Claude Sonnet 5 through August 31, 2026': 'Claude Sonnet 5',
 };
+
+// Rows the vendor still posts but no longer sells; they stay in the CSV as
+// record and off the page. Date-scoped FUTURE rows are excluded here too —
+// Sonnet 5's September step is called out in its own note below.
+const RETIRED_RE = /retired|deprecated|legacy|starting \w+ \d/i;
+const UNCURATED_MAX = 8;
 
 interface TableRow {
   id: string; name: string; input: number | null; cached: number | null;
@@ -38,8 +77,37 @@ function frontierRow(id: string): TableRow | null {
     reprice: lastReprice(id),
   };
 }
-const openaiRows = OPENAI_MODELS.map(frontierRow).filter(Boolean) as TableRow[];
-const anthropicRows = ANTHROPIC_MODELS.map(frontierRow).filter(Boolean) as TableRow[];
+/*
+  One block per provider that published on the latest day, in PROVIDER_ORDER,
+  with anything unrecognised appended alphabetically — so a lab added to the
+  pipeline shows up here without a site change. A curated provider renders its
+  named models; an uncurated one renders what it posted, dearest first, minus
+  retired rows and capped so one deep catalogue can't swamp the section.
+*/
+const providerBlocks = (() => {
+  const byProvider = new Map<string, typeof frontier>();
+  for (const r of latest.values()) {
+    if (!byProvider.has(r.provider)) byProvider.set(r.provider, []);
+    byProvider.get(r.provider)!.push(r);
+  }
+  const seen = [...byProvider.keys()];
+  const ordered = [
+    ...PROVIDER_ORDER.filter((p) => byProvider.has(p)),
+    ...seen.filter((p) => !PROVIDER_ORDER.includes(p)).sort(),
+  ];
+  return ordered.map((provider) => {
+    const cfg = PROVIDER_META[provider] ?? { label: provider };
+    const rows = cfg.models
+      ? (cfg.models.map(frontierRow).filter(Boolean) as TableRow[])
+      : (byProvider.get(provider)!
+          .filter((r) => !RETIRED_RE.test(r.model_display || r.model_id))
+          .sort((a, b) => (b.output ?? 0) - (a.output ?? 0))
+          .slice(0, UNCURATED_MAX)
+          .map((r) => frontierRow(r.model_id))
+          .filter(Boolean) as TableRow[]);
+    return { provider, label: cfg.label, note: cfg.note, rows };
+  }).filter((b) => b.rows.length > 0);
+})();
 
 // Sonnet-5's scheduled reprice (date-scoped row on Anthropic's page).
 const sonnetSep = latest.get('Claude Sonnet 5 starting September 1, 2026');
@@ -123,6 +191,43 @@ const servedRows = [...served]
   .slice(0, 16);
 const servedAsOf = served[0]?.as_of_date ?? frontierLatestDay;
 
+/*
+  Models carried by BOTH constructions — an open-weight model whose owner also
+  posts a price. They appear once in each section at numbers that can differ
+  sharply (on 2026-08-06 DeepSeek V4 Pro posted $0.87 out while the median of
+  four independent hosts was $2.90). That gap is the point of keeping the two
+  apart, but on one page it can read as a contradiction, so the sharpest
+  current example is named below.
+
+  Picked by widest relative gap so the note tracks the data rather than
+  freezing an example. Both figures are printed as-is; the ratio between them
+  is deliberately NOT computed — the two are different constructions, and a
+  derived multiple would invite reading them as one series.
+*/
+const crossListed = (() => {
+  const postedByCanon = new Map<string, { name: string; output: number }>();
+  for (const r of latest.values()) {
+    if (r.output == null) continue;
+    const c = canonicalModelId(r.model_id);
+    if (c && !postedByCanon.has(c)) {
+      postedByCanon.set(c, { name: r.model_display || r.model_id, output: r.output });
+    }
+  }
+  const both = servedRows
+    .map((s) => {
+      const p = postedByCanon.get(canonicalModelId(s.model_id));
+      if (!p || s.output_median == null || p.output <= 0) return null;
+      return {
+        name: p.name, posted: p.output, served: s.output_median,
+        gap: Math.abs(s.output_median - p.output) / p.output,
+      };
+    })
+    .filter(Boolean) as { name: string; posted: number; served: number; gap: number }[];
+  both.sort((a, b) => b.gap - a.gap);
+  // only worth a note when a gap is actually material
+  return { count: both.length, widest: both[0]?.gap >= 0.1 ? both[0] : null };
+})();
+
 // ---------------------------------------------------------------------------
 // Cross-model input/output comparison (grouped bars). Two constructions on
 // one canvas, visually distinguished, NEVER pooled: first-party posted bars
@@ -181,11 +286,13 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
 ---
 <Base
   title="Token Prices — GPT-5.6, Claude & Open-Weight Models · CCIR"
-  description="Daily record of posted token prices: OpenAI GPT-5.6 (sol, terra, luna) and Anthropic Claude first-party price lists, plus cross-provider medians for Kimi K2, DeepSeek, Qwen and other open-weight models. USD per 1M tokens."
+  description="Daily record of posted token prices from model owners' own price lists — OpenAI, Anthropic, Google, DeepSeek, Moonshot, xAI, Meta, Alibaba, Z.AI, MiniMax, Mistral and more — plus cross-provider medians for open-weight models served by three or more independent providers. USD per 1M tokens."
   ogImage="/og/tokens.png?v=2"
 >
   <section class="wrap top">
-    <div class="kicker">Token prices · USD per 1M tokens</div>
+    <div class="kicker">
+      Token prices · USD per 1M tokens{modelsTracked > 0 ? ` · ${modelsTracked} models` : ''}
+    </div>
     <h1>Token Prices</h1>
     <p class="dek">
       A token has two prices: what the model owner posts, and what
@@ -270,10 +377,10 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
     '@type': 'Dataset',
     name: 'CCIR Token Posted Price Record',
     description: 'Daily record of posted prices per 1 million tokens: '
-      + 'first-party price lists from OpenAI and Anthropic (frontier posted '
-      + 'construction) and cross-provider medians for open-weight models '
-      + 'served by three or more independent providers (served construction). '
-      + 'The two constructions are never pooled.',
+      + 'first-party price lists published by the model owners themselves '
+      + '(frontier posted construction) and cross-provider medians for '
+      + 'open-weight models served by three or more independent providers '
+      + '(served construction). The two constructions are never pooled.',
     url: 'https://ccir.io/tokens',
     creator: { '@id': 'https://ccir.io/#org' },
     publisher: { '@id': 'https://ccir.io/#org' },
@@ -281,7 +388,9 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
     temporalCoverage: `${windowStart}/..`,
     keywords: [
       'token prices', 'GPT-5.6 API pricing', 'Claude API pricing',
-      'Kimi K2 price', 'DeepSeek price', 'price per million tokens',
+      'Gemini API pricing', 'Grok API pricing', 'Muse Spark pricing',
+      'Kimi K3 price', 'DeepSeek price', 'GLM pricing', 'Qwen pricing',
+      'Mistral API pricing', 'price per million tokens',
       'LLM inference pricing', 'open-weight model pricing',
     ],
     variableMeasured: [
@@ -299,72 +408,46 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
     </div>
 
     <div class="grid2">
-      <div>
-        <h3 class="prov">OpenAI <span class="prov-note">standard tier</span></h3>
-        <table class="tbl">
-          <thead><tr><th>Model</th><th>Input</th><th>Cached</th><th>Output</th><th>30d</th><th>Last reprice</th></tr></thead>
-          <tbody>
-            {openaiRows.map((r) => (
-              <tr>
-                <td class="mono model">{r.name}</td>
-                <td class="mono">{fmt(r.input)}</td>
-                <td class="mono dim">{fmt(r.cached)}</td>
-                <td class="mono">{fmt(r.output)}</td>
-                <td class="spark-cell">
-                  {(() => { const sp = spark(r.id); return sp ? (
-                    <svg viewBox={`0 0 ${SPARK_W} ${SPARK_H}`} class="spark"
-                      aria-label={`30-day output price sparkline for ${r.name}`}>
-                      <path d={sp.path} fill="none"
-                        class={sp.flat ? 'spark-flat' : 'spark-line'} />
-                    </svg>
-                  ) : <span class="dim mono">—</span>; })()}
-                </td>
-                <td class="mono dim">
-                  {r.reprice
-                    ? `${r.reprice.date} (${pct(r.output, r.reprice.prevOutput)})`
-                    : 'none in record'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div>
-        <h3 class="prov">Anthropic <span class="prov-note">model table</span></h3>
-        <table class="tbl">
-          <thead><tr><th>Model</th><th>Input</th><th>Cache hit</th><th>Output</th><th>30d</th><th>Last reprice</th></tr></thead>
-          <tbody>
-            {anthropicRows.map((r) => (
-              <tr>
-                <td class="mono model">{r.name}</td>
-                <td class="mono">{fmt(r.input)}</td>
-                <td class="mono dim">{fmt(r.cached)}</td>
-                <td class="mono">{fmt(r.output)}</td>
-                <td class="spark-cell">
-                  {(() => { const sp = spark(r.id); return sp ? (
-                    <svg viewBox={`0 0 ${SPARK_W} ${SPARK_H}`} class="spark"
-                      aria-label={`30-day output price sparkline for ${r.name}`}>
-                      <path d={sp.path} fill="none"
-                        class={sp.flat ? 'spark-flat' : 'spark-line'} />
-                    </svg>
-                  ) : <span class="dim mono">—</span>; })()}
-                </td>
-                <td class="mono dim">
-                  {r.reprice
-                    ? `${r.reprice.date} (${pct(r.output, r.reprice.prevOutput)})`
-                    : 'none in record'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {sonnetSep && (
-          <p class="foot-note">
-            Sonnet 5 is posted to step to {fmt(sonnetSep.input, 0)} in /
-            {fmt(sonnetSep.output, 0)} out on 2026-09-01 — already on the record.
-          </p>
-        )}
-      </div>
+      {providerBlocks.map((b) => (
+        <div>
+          <h3 class="prov">
+            {b.label}{b.note && <span class="prov-note">{b.note}</span>}
+          </h3>
+          <table class="tbl">
+            <thead><tr><th>Model</th><th>Input</th><th>Cached</th><th>Output</th><th>30d</th><th>Last reprice</th></tr></thead>
+            <tbody>
+              {b.rows.map((r) => (
+                <tr>
+                  <td class="mono model">{r.name}</td>
+                  <td class="mono">{fmt(r.input)}</td>
+                  <td class="mono dim">{fmt(r.cached)}</td>
+                  <td class="mono">{fmt(r.output)}</td>
+                  <td class="spark-cell">
+                    {(() => { const sp = spark(r.id); return sp ? (
+                      <svg viewBox={`0 0 ${SPARK_W} ${SPARK_H}`} class="spark"
+                        aria-label={`30-day output price sparkline for ${r.name}`}>
+                        <path d={sp.path} fill="none"
+                          class={sp.flat ? 'spark-flat' : 'spark-line'} />
+                      </svg>
+                    ) : <span class="dim mono">—</span>; })()}
+                  </td>
+                  <td class="mono dim">
+                    {r.reprice
+                      ? `${r.reprice.date} (${pct(r.output, r.reprice.prevOutput)})`
+                      : 'none in record'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {b.provider === 'anthropic' && sonnetSep && (
+            <p class="foot-note">
+              Sonnet 5 is posted to step to {fmt(sonnetSep.input, 0)} in /
+              {fmt(sonnetSep.output, 0)} out on 2026-09-01 — already on the record.
+            </p>
+          )}
+        </div>
+      ))}
     </div>
 
     <div class="chart-block">
@@ -431,6 +514,18 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       Each row is a median across independent providers of the same model,
       n disclosed. A wide range is dispersion in the serving market.
     </p>
+    {crossListed.widest && (
+      <p class="foot-note">
+        Some models sit in both sections: the owner posts a price and
+        independent providers also serve the open weights. The two numbers are
+        different measurements, not a restatement — {crossListed.widest.name} is
+        posted at {fmt(crossListed.widest.posted)} per 1M output tokens above,
+        and the median of independent providers here is
+        {' '}{fmt(crossListed.widest.served)}. What a model owner asks and what
+        the serving market charges are separate facts, and neither is pooled
+        into the other.
+      </p>
+    )}
 
   </section>
 
