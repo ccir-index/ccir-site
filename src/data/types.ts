@@ -65,6 +65,25 @@ export interface Rate {
   methodology_version: string;
 }
 
+// Coverage figures for /tokens, published by export_tokens.py. `models_tracked`
+// is deduped across BOTH lanes through the canonical model id — the panel
+// carries canonical ids and the first-party series carries vendor raw ids, so
+// summing the two files' row counts double-counts anything in both.
+export interface TokensMeta {
+  models_tracked: number;
+  models_tracked_basis?: {
+    panel_n3_gate: number;
+    frontier_latest_day: number;
+    in_both_lanes: number;
+    frontier_as_of: string;
+    roster_file: string;
+    definition: string;
+  };
+  n_models_published?: number;
+  series_id?: string;
+  basket_version?: string;
+}
+
 export interface SnapshotMeta {
   as_of_date: string;
   published_at_ct: string;
@@ -74,6 +93,8 @@ export interface SnapshotMeta {
   independence_declaration: string;
   contributing_today: number;
   sources_by_tier: Record<Tier, number>;
+  // absent until the first sync carrying the tokens manifest fragment
+  tokens?: TokensMeta;
 }
 
 export const TIERS: readonly Tier[] = ['T1', 'T2', 'T3'] as const;

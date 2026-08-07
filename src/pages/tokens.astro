@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import {
   frontier, served, frontierDays, frontierLatestDay,
-  frontierLatest, frontierSeries, lastReprice,
+  frontierLatest, frontierSeries, lastReprice, modelsTracked,
 } from '../data/tokens';
 
 /*
@@ -185,7 +185,9 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   ogImage="/og/tokens.png?v=2"
 >
   <section class="wrap top">
-    <div class="kicker">Token prices · USD per 1M tokens</div>
+    <div class="kicker">
+      Token prices · USD per 1M tokens{modelsTracked > 0 ? ` · ${modelsTracked} models` : ''}
+    </div>
     <h1>Token Prices</h1>
     <p class="dek">
       A token has two prices: what the model owner posts, and what
