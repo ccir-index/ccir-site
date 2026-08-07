@@ -24,6 +24,13 @@ export interface FrontierRow {
   input: number | null;
   cached_input: number | null;
   output: number | null;
+  /* Position in the vendor's OWN price table (0 = first row they list).
+     Null until the 2026-08-07 pipeline change reaches a snapshot, so every
+     consumer must tolerate its absence rather than assume rank 0. */
+  source_rank: number | null;
+  /* The vendor's own lifecycle wording, never our inference. 'legacy' means
+     the lab itself marks the model legacy/deprecated/retired. */
+  lifecycle: string | null;
 }
 
 export interface ServedRow {
@@ -77,6 +84,18 @@ function parse(csv: string): Record<string, string>[] {
   });
 }
 
+/* axes is a JSON blob in a CSV cell; a malformed one must not take the page
+   down, and an absent lifecycle is never read as evidence either way. */
+function readLifecycle(axes: string | undefined): string | null {
+  if (!axes) return null;
+  try {
+    const o = JSON.parse(axes);
+    return typeof o?.lifecycle === 'string' ? o.lifecycle : null;
+  } catch {
+    return null;
+  }
+}
+
 export const frontier: FrontierRow[] = parse(frontierCsv).map((r) => ({
   as_of_date: r.as_of_date,
   provider: r.provider as FrontierRow['provider'],
@@ -85,6 +104,8 @@ export const frontier: FrontierRow[] = parse(frontierCsv).map((r) => ({
   input: num(r.input_usd_per_mtok),
   cached_input: num(r.cached_input_usd_per_mtok),
   output: num(r.output_usd_per_mtok),
+  source_rank: num(r.source_rank),
+  lifecycle: readLifecycle(r.axes),
 }));
 
 export const served: ServedRow[] = parse(servedCsv).map((r) => ({
