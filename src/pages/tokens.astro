@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import LabMark from '../components/LabMark.astro';
 import {
   frontier, served, frontierDays, frontierLatestDay,
   frontierLatest, frontierSeries, lastReprice, modelsTracked, canonicalModelId,
@@ -411,7 +412,7 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       {providerBlocks.map((b) => (
         <div>
           <h3 class="prov">
-            {b.label}{b.note && <span class="prov-note">{b.note}</span>}
+            <LabMark slug={b.provider} label={b.label} />{b.label}{b.note && <span class="prov-note">{b.note}</span>}
           </h3>
           <table class="tbl">
             <thead><tr><th>Model</th><th>Input</th><th>Cached</th><th>Output</th><th>30d</th><th>Last reprice</th></tr></thead>
