@@ -135,6 +135,52 @@ export const served: ServedRow[] = parse(servedCsv).map((r) => ({
   the vendor's raw id (`kimi-k3`), so a naive union counts every model in both
   lanes twice — it read 102 against a true 97 on 2026-08-06.
 */
+/*
+  Family + version, for picking the CURRENT member of each model line.
+
+  These are PRESENTATION rules, not claims about the data — unlike the
+  vendor-label-only test that governs deprecation in the published count,
+  choosing which of a lab's rows to show is ours to make. Nothing here is
+  written to the record.
+
+  Why a family rule at all: ranking by the vendor's row order alone shows
+  whatever a lab happens to list first, and labs don't agree on what that
+  means. Anthropic groups by family (Opus 5, 4.8, 4.7 … all before the first
+  Sonnet), so a plain top-N filled the block with historical Opus versions.
+  OpenAI's o-series runs OLDEST-first, so first-listed picked o1 over o4-mini.
+  Taking the highest version within each family handles both.
+*/
+export function familyKey(modelId: string): string {
+  return (modelId ?? '')
+    .toLowerCase()
+    // date-scoped variants are the same family ("Claude Sonnet 5 through
+    // August 31, 2026" and its September row are one line, not two)
+    .replace(/\bthrough\b.*$|\bstarting\b.*$/, '')
+    .replace(/[0-9]+(\.[0-9]+)*/g, '')
+    .replace(/[-_\s]+/g, ' ')
+    .trim();
+}
+
+/** >0 when `a` is a newer member of its family than `b`. */
+export function cmpVersion(a: string, b: string): number {
+  const [av, ad] = versionKey(a);
+  const [bv, bd] = versionKey(b);
+  return av !== bv ? av - bv : ad - bd;
+}
+
+/** Sort key for "newest member of this family". */
+export function versionKey(modelId: string): [number, number] {
+  const id = modelId ?? '';
+  // A 4-digit year is a SNAPSHOT DATE, not a version — without this,
+  // gpt-4o-2024-05-13 reads as version 2024 and beats plain gpt-4o.
+  const stripped = id.replace(/\b(19|20)\d{2}(-\d{2})*\b/g, ' ');
+  const nums = (stripped.match(/[0-9]+(?:\.[0-9]+)?/g) ?? [])
+    .map(Number).filter((n) => n < 1000);
+  // On a tie the UNDATED id wins, so `gpt-4o` represents the line rather
+  // than one of its pinned snapshots.
+  return [nums[0] ?? 0, /\b(19|20)\d{2}\b/.test(id) ? -1 : 0];
+}
+
 export function canonicalModelId(raw: string): string {
   const tail = (raw ?? '').trim().split('/').pop() ?? '';
   return tail.toLowerCase().replace(/[^a-z0-9.]/g, '');

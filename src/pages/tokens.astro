@@ -4,6 +4,7 @@ import LabMark from '../components/LabMark.astro';
 import {
   frontier, served, frontierDays, frontierLatestDay,
   frontierLatest, frontierSeries, lastReprice, modelsTracked, canonicalModelId,
+  familyKey, cmpVersion,
 } from '../data/tokens';
 
 /*
@@ -21,39 +22,19 @@ const latest = frontierLatest();
   and then never shown; the wave-4 sweep would have added eight more labs
   behind the same wall.
 
-  Curation is per-provider and OPTIONAL. OpenAI and Anthropic post deep back
-  catalogues (36 and 16 rows, down to gpt-3.5 and davinci), so those two name
-  the models worth showing. A provider with no curated list shows everything
-  it posted that day, minus retired/deprecated rows — so a NEW lab appears by
-  itself, which is the whole point.
+  Nothing here names a model. Every block is one row per model LINE — the
+  newest member of each family the lab currently sells — so a new model, or a
+  whole new lab, appears without a site change. That is the point: the
+  hand-maintained lists this replaced had already gone stale (Claude Mythos 5
+  was captured for two days and never shown).
 */
 const PROVIDER_ORDER = ['openai', 'anthropic', 'google', 'deepseek', 'moonshot',
                         'xai', 'meta', 'alibaba', 'zai', 'minimax', 'mistral',
                         'thinkingmachines', 'xiaomi'];
 
-const PROVIDER_META: Record<string, {
-  label: string; note?: string; models?: string[]; keepCurated?: boolean;
-}> = {
-  // OpenAI's table runs strictly newest-first, so source_rank reproduces
-  // exactly the five models listed here and picks up new ones by itself.
-  // The list is kept only as the pre-source_rank FALLBACK (no `keepCurated`)
-  // and can be deleted once a snapshot carrying ranks has shipped — without
-  // it, a deploy landing before that snapshot would fall through to
-  // dearest-first and head the block with o1-pro and gpt-5.4-pro.
-  openai: {
-    label: 'OpenAI', note: 'standard tier',
-    models: ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.5-pro'],
-  },
-  // Anthropic curates PERMANENTLY, and the reason is worth recording so
-  // nobody deletes it expecting rank to cover it: their table groups by
-  // FAMILY, not by recency — Opus 5, 4.8, 4.7, 4.6, 4.5, 4.1 and 4 all
-  // precede the first Sonnet. Ranking would fill the block with historical
-  // Opus versions and show no Sonnet or Haiku at all.
-  anthropic: {
-    label: 'Anthropic', note: 'model table', keepCurated: true,
-    models: ['Claude Fable 5', 'Claude Opus 5',
-             'Claude Sonnet 5 through August 31, 2026', 'Claude Haiku 4.5'],
-  },
+const PROVIDER_META: Record<string, { label: string; note?: string }> = {
+  openai: { label: 'OpenAI', note: 'standard tier' },
+  anthropic: { label: 'Anthropic', note: 'model table' },
   google: { label: 'Google', note: 'standard tier' },
   deepseek: { label: 'DeepSeek', note: 'standard price' },
   moonshot: { label: 'Moonshot', note: 'per-model pages' },
@@ -75,7 +56,6 @@ const DISPLAY_OVERRIDES: Record<string, string> = {
 // record and off the page. Date-scoped FUTURE rows are excluded here too —
 // Sonnet 5's September step is called out in its own note below.
 const RETIRED_RE = /retired|deprecated|legacy|starting \w+ \d/i;
-const UNCURATED_MAX = 8;
 
 interface TableRow {
   id: string; name: string; input: number | null; cached: number | null;
@@ -94,9 +74,7 @@ function frontierRow(id: string): TableRow | null {
 /*
   One block per provider that published on the latest day, in PROVIDER_ORDER,
   with anything unrecognised appended alphabetically — so a lab added to the
-  pipeline shows up here without a site change. A curated provider renders its
-  named models; an uncurated one renders what it posted, dearest first, minus
-  retired rows and capped so one deep catalogue can't swamp the section.
+  pipeline shows up here without a site change.
 */
 const providerBlocks = (() => {
   const byProvider = new Map<string, typeof frontier>();
@@ -117,29 +95,34 @@ const providerBlocks = (() => {
       // in the display name rather than in axes.
       .filter((r) => r.lifecycle !== 'legacy')
       .filter((r) => !RETIRED_RE.test(r.model_display || r.model_id));
-    // Selection, in order of preference:
-    //   1. a permanent curated list, where the vendor's own order is not a
-    //      relevance ranking (Anthropic groups by family);
-    //   2. the VENDOR's row order, which needs no upkeep as models ship;
-    //   3. a pre-source_rank fallback — the curated list if one is left,
-    //      else dearest-first — so a deploy landing before the first ranked
-    //      snapshot degrades to today's behaviour rather than to junk.
-    const haveRank = pool.some((r) => r.source_rank != null);
-    const curated = cfg.models
-      ? (cfg.models.map(frontierRow).filter(Boolean) as TableRow[])
-      : null;
-    let rows: TableRow[];
-    if (curated && (cfg.keepCurated || !haveRank)) {
-      rows = curated;
-    } else {
-      const ranked = haveRank
-        ? [...pool].sort((a, b) => (a.source_rank ?? Infinity) - (b.source_rank ?? Infinity))
-        : [...pool].sort((a, b) => (b.output ?? 0) - (a.output ?? 0));
-      rows = ranked
-        .slice(0, UNCURATED_MAX)
-        .map((r) => frontierRow(r.model_id))
-        .filter(Boolean) as TableRow[];
+    // ONE ROW PER MODEL LINE — the newest member of each family.
+    //
+    // No cap and no hand-maintained lists: a lab's block is however many
+    // lines it currently sells. The lists this replaces were already stale —
+    // Claude Mythos 5 ($10/$50) was captured for two days and never shown,
+    // because it shipped after someone last edited the array.
+    //
+    // Family, not rank alone: labs disagree about what "first" means.
+    // Anthropic groups by family (Opus 5, 4.8, 4.7 … all before the first
+    // Sonnet), so a top-N showed six historical Opus versions and no Sonnet.
+    // OpenAI's o-series runs OLDEST-first, so first-listed picked o1 over
+    // o4-mini. Highest version within a family handles both.
+    const best = new Map<string, typeof pool[number]>();
+    for (const r of pool) {
+      const f = familyKey(r.model_id) || r.model_id;
+      const cur = best.get(f);
+      if (!cur || cmpVersion(r.model_id, cur.model_id) > 0) best.set(f, r);
     }
+    // Families appear in the vendor's own order where we have it; before the
+    // first ranked snapshot, dearest-first — which changes the ORDER of the
+    // lines, never WHICH line represents a family.
+    const haveRank = pool.some((r) => r.source_rank != null);
+    const rows = [...best.entries()]
+      .sort((a, b) => (haveRank
+        ? (a[1].source_rank ?? Infinity) - (b[1].source_rank ?? Infinity)
+        : (b[1].output ?? 0) - (a[1].output ?? 0)))
+      .map(([, r]) => frontierRow(r.model_id))
+      .filter(Boolean) as TableRow[];
     return { provider, label: cfg.label, note: cfg.note, rows };
   }).filter((b) => b.rows.length > 0);
 })();
