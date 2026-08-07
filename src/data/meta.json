@@ -134,12 +134,12 @@
     "basket_version": "b1",
     "latest_input_usd_per_mtok": "0.31980000",
     "latest_output_usd_per_mtok": "1.07400000",
-    "models_tracked": 199,
+    "models_tracked": 191,
     "models_tracked_basis": {
       "definition": "distinct canonical_model_id across the published panel (n>=3 providers) and the latest day of the first-party posted-price series",
       "frontier_as_of": "2026-08-07",
-      "frontier_latest_day": 170,
-      "in_both_lanes": 24,
+      "frontier_latest_day": 158,
+      "in_both_lanes": 20,
       "panel_n3_gate": 53,
       "roster_file": "token_models_tracked.csv"
     },
