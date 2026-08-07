@@ -114,7 +114,7 @@ export const served: ServedRow[] = parse(servedCsv).map((r) => ({
   the vendor's raw id (`kimi-k3`), so a naive union counts every model in both
   lanes twice — it read 102 against a true 97 on 2026-08-06.
 */
-function canonicalModelId(raw: string): string {
+export function canonicalModelId(raw: string): string {
   const tail = (raw ?? '').trim().split('/').pop() ?? '';
   return tail.toLowerCase().replace(/[^a-z0-9.]/g, '');
 }

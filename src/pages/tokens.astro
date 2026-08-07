@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import {
   frontier, served, frontierDays, frontierLatestDay,
-  frontierLatest, frontierSeries, lastReprice, modelsTracked,
+  frontierLatest, frontierSeries, lastReprice, modelsTracked, canonicalModelId,
 } from '../data/tokens';
 
 /*
@@ -190,6 +190,43 @@ const servedRows = [...served]
     || (b.output_median ?? 0) - (a.output_median ?? 0))
   .slice(0, 16);
 const servedAsOf = served[0]?.as_of_date ?? frontierLatestDay;
+
+/*
+  Models carried by BOTH constructions — an open-weight model whose owner also
+  posts a price. They appear once in each section at numbers that can differ
+  sharply (on 2026-08-06 DeepSeek V4 Pro posted $0.87 out while the median of
+  four independent hosts was $2.90). That gap is the point of keeping the two
+  apart, but on one page it can read as a contradiction, so the sharpest
+  current example is named below.
+
+  Picked by widest relative gap so the note tracks the data rather than
+  freezing an example. Both figures are printed as-is; the ratio between them
+  is deliberately NOT computed — the two are different constructions, and a
+  derived multiple would invite reading them as one series.
+*/
+const crossListed = (() => {
+  const postedByCanon = new Map<string, { name: string; output: number }>();
+  for (const r of latest.values()) {
+    if (r.output == null) continue;
+    const c = canonicalModelId(r.model_id);
+    if (c && !postedByCanon.has(c)) {
+      postedByCanon.set(c, { name: r.model_display || r.model_id, output: r.output });
+    }
+  }
+  const both = servedRows
+    .map((s) => {
+      const p = postedByCanon.get(canonicalModelId(s.model_id));
+      if (!p || s.output_median == null || p.output <= 0) return null;
+      return {
+        name: p.name, posted: p.output, served: s.output_median,
+        gap: Math.abs(s.output_median - p.output) / p.output,
+      };
+    })
+    .filter(Boolean) as { name: string; posted: number; served: number; gap: number }[];
+  both.sort((a, b) => b.gap - a.gap);
+  // only worth a note when a gap is actually material
+  return { count: both.length, widest: both[0]?.gap >= 0.1 ? both[0] : null };
+})();
 
 // ---------------------------------------------------------------------------
 // Cross-model input/output comparison (grouped bars). Two constructions on
@@ -477,6 +514,18 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       Each row is a median across independent providers of the same model,
       n disclosed. A wide range is dispersion in the serving market.
     </p>
+    {crossListed.widest && (
+      <p class="foot-note">
+        Some models sit in both sections: the owner posts a price and
+        independent providers also serve the open weights. The two numbers are
+        different measurements, not a restatement — {crossListed.widest.name} is
+        posted at {fmt(crossListed.widest.posted)} per 1M output tokens above,
+        and the median of independent providers here is
+        {' '}{fmt(crossListed.widest.served)}. What a model owner asks and what
+        the serving market charges are separate facts, and neither is pooled
+        into the other.
+      </p>
+    )}
 
   </section>
 
