@@ -312,11 +312,6 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       Token prices · USD per 1M tokens{modelsTracked > 0 ? ` · ${modelsTracked} models` : ''}
     </div>
     <h1>Token Prices</h1>
-    <p class="dek">
-      A token has two prices: what the model owner posts, and what
-      independent providers charge to serve the same open model. Recorded
-      daily, kept apart.
-    </p>
   </section>
 
   <section class="wrap">
@@ -422,7 +417,7 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
     <div class="sec-head">
       <span class="sec-no">01</span>
       <h2>Frontier posted — first-party</h2>
-      <span class="sec-note">from the owners' price lists · recorded since {windowStart}</span>
+      <span class="sec-note">from the owners' price lists</span>
     </div>
 
     <div class="grid2">
@@ -609,7 +604,6 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
     color: var(--accent);
   }
   h1 { margin: 8px 0 10px; }
-  .dek { max-width: 700px; color: var(--ink-soft, var(--ink)); }
 
   .sec-head {
     display: flex; align-items: baseline; gap: 12px;
