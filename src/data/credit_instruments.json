@@ -4262,7 +4262,7 @@
    "rate": {
     "kind": "fixed",
     "value": 6.25,
-    "note": "6.25% coupon at par (tight end of 6.25–6.375% guidance); 5-yr non-call 2; BB (Fitch, on Google lease guarantee; Fluidstack unrated)"
+    "note": "6.25% coupon at par (tight end of 6.25–6.375% guidance); 5-yr non-call 2; BB– (S&P, recovery '2'), on the Google lease guarantee; Fluidstack unrated. Earlier 'Fitch BB' tag could not be verified in the public record (2026-08-09 check) — S&P is the confirmed agency"
    },
    "maturity": "2031 (5-yr non-call 2)",
    "maturity_note": null,
@@ -4274,11 +4274,11 @@
    "status": "confirmed",
    "issued": "Priced ~2026-04-16/17",
    "source": {
-    "doc": "Latham & Watkins (issuer counsel) priced release 4/20/26; Fitch BB on Google lease guarantee (Fluidstack unrated); S&P rated; Bloomberg/LCD secondary. Private JV — no SEC filing.",
+    "doc": "Latham & Watkins (issuer counsel) priced release 4/20/26; Cooley/Cahill counsel releases 4/16–17/26; S&P BB– (recovery '2') on the Google lease guarantee (Fluidstack unrated); Bloomberg/LCD secondary. Private JV — no SEC filing. No tap or upsize through 2026-08-09.",
     "date": "2026-04-20",
     "url": "https://www.lw.com/en/news/latham-advises-on-meridian-arc-holdco-senior-secured-notes-offering-to-finance-ai-data-center"
    },
-   "as_of": "2026-07-05"
+   "as_of": "2026-08-09"
   },
   {
    "id": "fluidstack-macquarie",
@@ -4708,7 +4708,7 @@
    "name": "Valor GPU SPV program (context)",
    "instrument_type": "lease",
    "size_usd_m": 20000,
-   "size_note": "~$20B program: ~$12.5B debt + ~$7.5B equity (incl. up to $2B NVIDIA) — program scale partly rumored",
+   "size_note": "~$20B program: ~$12.5B debt + ~$7.5B equity (incl. up to $2B NVIDIA) — program scale partly rumored; no confirmed close of the full program through 2026-08-09. DISTINCT from xAI's $20B Series E equity round (closed 2026-01-06, xAI PR) — do not conflate",
    "rate": {
     "kind": "undisclosed",
     "value": null,
@@ -4789,13 +4789,13 @@
     "Valor-arranged chip-lease vehicle"
    ],
    "status": "press",
-   "issued": "Reported 2026-02-09, \"near final\" — no Apollo close PR found",
+   "issued": "Reported 2026-02-09, \"near final\" — no Apollo close PR found (re-checked 2026-08-09: still none)",
    "source": {
     "doc": "The Information; Reuters pickup",
     "date": "2026-02-09",
     "url": "https://www.theinformation.com/articles/apollo-nears-3-billion-chip-funding-deal-tied-xai"
    },
-   "as_of": "2026-07-02"
+   "as_of": "2026-08-09"
   },
   {
    "id": "meta-beignet-hyperion",
@@ -4876,12 +4876,12 @@
    "entity": "SPV purchasing Google/Broadcom-designed TPUs; leases hardware to Anthropic",
    "name": "Private-credit facility — Anthropic TPU lease SPV",
    "instrument_type": "other",
-   "size_usd_m": 36000,
-   "size_note": "~$36B across three tranches (~$6B A1 / ~$25B A2 / ~$4.5B B); Broadcom residual-value guarantee on the ~$31B senior (A1+A2). ~16 delayed-draw releases over ~13 months. Reported May–June 2026 (NOT in the 07-10→07-20 sweep window; surfaced as ongoing coverage) and closed alongside Anthropic's $65B Series H. Largest reported private-credit / chip-financing deal on record",
+   "size_usd_m": 35000,
+   "size_note": "Marketed from 2026-05-28 at ~$36B; finalized at $35B ~2026-06-08 (FT via pickup; Axios 6/10 — press). Three tranches: $6B A1 (offered ~T+100) / $24–25B A2 (tranche size varies across press) / $4.5B B; Broadcom deficiency/residual-value guarantee on the ~$31B senior (A1+A2); ~$800M equity from Apollo's Atlas SP. ~16 delayed-draw releases over ~13 months; closed alongside Anthropic's $65B Series H. Largest reported private-credit / chip-financing deal on record. A separate ≥$36B second package (Ironwood TPU rentals) was PITCHED by Blackstone per Bloomberg 2026-08-04 — early talks, not this instrument",
    "rate": {
     "kind": "undisclosed",
     "value": null,
-    "note": "Press pricing: ~5.75% on the Broadcom-guaranteed $25B A2 tranche; ~8–9% on the un-guaranteed B tranche"
+    "note": "Press pricing: A2 5.75% at par (Broadcom-guaranteed); B tranche 8.5% (no Broadcom support); A1 offered ~T+100. No filing exists — all pricing is press"
    },
    "maturity": "Undisclosed",
    "maturity_note": null,
@@ -4892,13 +4892,13 @@
     "Blackstone (press)"
    ],
    "status": "press",
-   "issued": null,
+   "issued": "Finalized ~2026-06-08 (press; no filing)",
    "source": {
-    "doc": "Bloomberg (2026-05-28; Broadcom backing 2026-06-02); Axios (2026-06-10) — press",
-    "date": "2026-06-02",
+    "doc": "Bloomberg (2026-05-28 marketing; Broadcom backing 2026-06-02); FT 2026-06-09 via pickup ($35B final, tranche pricing); Axios (2026-06-10) — all press",
+    "date": "2026-06-10",
     "url": "https://www.bloomberg.com/news/articles/2026-05-28/apollo-shops-36-billion-debt-deal-to-buy-google-chips-for-anthropic"
    },
-   "as_of": "2026-07-20"
+   "as_of": "2026-08-09"
   },
   {
    "id": "vantage-frontier-tx",

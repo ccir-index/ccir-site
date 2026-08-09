@@ -387,15 +387,15 @@ const bondPath = [
   { id: 'cifr-6000-2031', date: '2026-06-15', tag: 'CIFR 6.000', tier: 'strong' as Tier },
 ].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
 
-// Context: the other filed project bonds of the window. Meridian Arc (the
-// large SPV landlord bond) is now confirmed — issuer-counsel priced release
-// + Fitch BB — so it is a filled dot, no longer hollow. No silent caps.
+// Context: the other filed project bonds of the window. Scope: CORPORATE
+// issuers only — bonds with recourse to an operating company's balance
+// sheet. Non-recourse landlord SPV paper (Meridian Arc, the WULF Flash
+// Compute JV) moved to the leaseback panel below 2026-08-09; the seat —
+// who answers for the debt — is the boundary between the two charts.
 const bondContext = [
-  { id: 'wulf-jv-7250-2030', date: '2025-12-29', tag: 'WULF JV 7.250', tier: 'mid' as Tier, press: false },
   { id: 'apld-6750-2031', date: '2026-03-10', tag: 'APLD 6.750', tier: 'strong' as Tier, press: false },
   { id: 'corz-7750-2031', date: '2026-05-06', tag: 'CORZ 7.750', tier: 'weak' as Tier, press: false },
   { id: 'apld-7000-2031', date: '2026-06-16', tag: 'APLD 7.000', tier: 'weak' as Tier, press: false },
-  { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc 6.250', tier: 'mid' as Tier, press: false },
 ].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
 
 const bObstacles = [
@@ -428,6 +428,50 @@ const B_TICKS_X = [
   { label: 'Jun ’26', iso: '2026-06-15' },
 ];
 const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed(1)}`).join(' ');
+
+// ---- Chart C: leaseback / securitization landlord paper ---------------------
+// Mirrors Chart B's construction (coupon vs pricing date, tier colour,
+// hollow = press-sourced pricing, ◎ = long amortizer) now that the panel
+// TITLES carry the operator/landlord seat distinction. One addition: mark
+// AREA ∝ deal size — this panel exists to show where the financing volume
+// moved, so size is a first-class encoding. Shares Chart B's x scale (bx).
+const C_YMIN = 5.5, C_YMAX = 10.5;
+const cy = (v: number) => y0 + (y1 - y0) * ((C_YMAX - v) / (C_YMAX - C_YMIN));
+const C_TICKS_Y = [6, 7, 8, 9, 10];
+const leasebackCfg = [
+  { id: 'meta-beignet-hyperion', date: '2025-10-16', tag: 'Hyperion (Meta)', tier: 'strong' as Tier, press: true, long: true },
+  { id: 'wulf-jv-7250-2030', date: '2025-12-29', tag: 'WULF JV (Fluidstack)', tier: 'mid' as Tier, press: false, long: false },
+  { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc (Fluidstack)', tier: 'mid' as Tier, press: false, long: false },
+  { id: 'galaxy-helios2-9875-2031', date: '2026-07-23', tag: 'Helios II (CoreWeave)', tier: 'weak' as Tier, press: false, long: false },
+  { id: 'meta-elpaso', date: '2026-07-27', tag: 'Sopaipilla (Meta)', tier: 'strong' as Tier, press: true, long: true },
+].map((p) => ({
+  ...p,
+  inst: inst(p.id),
+  v: inst(p.id).rate.value as number,
+  sizeB: (inst(p.id).size_usd_m as number) / 1000,
+}));
+const crad = (b: number) => Math.max(3.5, 2.6 * Math.sqrt(b));
+const cFmt = (v: number) => v.toFixed(3).replace(/0$/, '');
+// Big marks: obstacle points at the rim as well as the center, so the label
+// solver keeps labels off the circles themselves.
+const cObstacles = leasebackCfg.flatMap((p) => {
+  const X = bx(p.date), Y = cy(p.v), r = crad(p.sizeB);
+  return [
+    { x: X, y: Y },
+    { x: X + r, y: Y }, { x: X - r, y: Y },
+    { x: X, y: Y + r }, { x: X, y: Y - r },
+  ];
+});
+const cLabelItems: LabIn[] = leasebackCfg.map((p) => ({
+  x: bx(p.date), y: cy(p.v), v: p.v,
+  lines: [
+    { t: cFmt(p.v), cls: 'pt-label' } as LabLine,
+    { t: p.tag, cls: 'pt-tag' } as LabLine,
+    { t: `$${p.sizeB.toFixed(1)}B${p.long ? ' · am. 2048–49' : ''}`, cls: 'pt-sub' } as LabLine,
+  ],
+  rid: `row-${p.id}`,
+}));
+const cLabels = layoutLabels(cLabelItems, cObstacles);
 ---
 <Base
   title="Compute Credit Tracker — GPU-Backed Loans & Financing, As Filed · CCIR"
@@ -466,6 +510,7 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
       <a class="apps-nav-link" href="#issuance">Issuance</a>
       <a class="apps-nav-link" href="#spreads">Spreads</a>
       <a class="apps-nav-link" href="#coupons">Coupons</a>
+      <a class="apps-nav-link" href="#leaseback">Leaseback</a>
       <a class="apps-nav-link" href="#ledger">Ledger</a>
       <a class="apps-nav-link" href="#collateral-treatment">Collateral treatment</a>
       <a class="apps-nav-link" href="#methodology">Method</a>
@@ -509,10 +554,11 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     <div class="panel" id="issuance">
       <div class="panel-head">
         <div>
-          <div class="panel-title">GPU-backed debt issuance — observed, by quarter</div>
+          <div class="panel-title">Compute-infrastructure debt issuance — observed, by quarter</div>
           <div class="panel-sub">
-            Amount issued for every tracked instrument, bucketed by issuance
-            quarter · the line is cumulative tracked debt
+            Amount issued, bucketed by issuance quarter — GPU-collateralized
+            vs data-center/campus-secured · the line is cumulative
+            GPU-collateralized tracked debt
           </div>
         </div>
         <span class="badge">AS FILED</span>
@@ -624,10 +670,12 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     <div class="panel" id="coupons">
       <div class="panel-head">
         <div>
-          <div class="panel-title">Project-bond coupons — by offtake credit support</div>
+          <div class="panel-title">Operator bond coupons — corporate issuers, by offtake credit support</div>
           <div class="panel-sub">
-            Coupon at pricing/close, fixed-rate senior secured Rule 144A, coloured by who
-            backs the lease · window Oct 2025 – Jun 2026
+            Coupon at pricing/close, fixed-rate senior secured Rule 144A issued
+            by the data-center <em>operator</em> — recourse to a corporate
+            balance sheet — coloured by who backs the lease · window
+            Oct 2025 – Jun 2026
           </div>
         </div>
         <span class="badge">FILED TERMS</span>
@@ -706,13 +754,104 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
             level. Structure: IREN 5.96% is Microsoft-*contract*-secured GPU
             financing under a common-terms agreement, structurally closer to the
             floating-rate facilities in the chart above than to a single-campus
-            lease bond. Meridian Arc 6.25% is special-purpose vehicle (SPV)
-            landlord paper on a Google-
-            guaranteed Fluidstack lease — confirmed via issuer counsel (Latham)
-            pricing release and Fitch's BB rating (on the Google guarantee;
-            Fluidstack unrated). The joint venture (JV) parents are private,
-            so there is no SEC
-            filing.
+            lease bond. One scope line: every issuer here is an operating
+            company — the bonds have recourse to a corporate balance sheet.
+            Non-recourse landlord vehicles (Meridian Arc, the TeraWulf Flash
+            Compute JV) are charted separately below, where the tenant's lease
+            is the entire credit.
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Chart C — leaseback / securitization landlord paper -->
+    <div class="panel" id="leaseback">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Landlord SPV &amp; securitization coupons — non-recourse, by tenant credit</div>
+          <div class="panel-sub">
+            Coupon at pricing — bankruptcy-remote landlord vehicles with no
+            operating company behind them; the compute tenant's lease or its
+            guarantee is the entire credit · mark area ∝ deal size ·
+            window Oct 2025 – Jul 2026
+          </div>
+        </div>
+        <span class="badge">AT PRICING</span>
+      </div>
+      <div class="legend">
+        <div class="lg-line">
+          <span class="lg-head">By tenant credit · IG → none</span>
+          <span class="lg-item"><span class="lg-dot tier-strong"></span>Meta direct leaseback</span>
+          <span class="lg-item"><span class="lg-dot tier-mid"></span>Google-guaranteed lease (Fluidstack tenant)</span>
+          <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud tenant (CoreWeave)</span>
+        </div>
+        <div class="lg-line">
+          <span class="lg-head">Symbol</span>
+          <span class="lg-item lg-note">● issuer/filing-sourced pricing · ○ press-sourced pricing · ◎ fully amortizing 2048–49 · mark area ∝ deal size</span>
+        </div>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Coupons on non-recourse landlord and securitization paper backed by compute tenant leases, priced October 2025 to July 2026. Meta direct leasebacks priced at 6.58 and 7.534 percent; Google-guaranteed Fluidstack leases at 6.25 and 7.25 percent; the CoreWeave-tenant print at 9.875 percent. Mark area is proportional to deal size.">
+        {C_TICKS_Y.map((t) => (
+          <>
+            <line x1={x0} y1={cy(t)} x2={x1} y2={cy(t)} class="grid" />
+            <text x={x0 - 8} y={cy(t) + 3} class="tick tick-y">{t.toFixed(1)}</text>
+          </>
+        ))}
+        {B_TICKS_X.map((t) => (
+          <text x={bx(t.iso)} y={y1 + 24} class="tick tick-x">{t.label}</text>
+        ))}
+        <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
+        {leasebackCfg.map((p) => {
+          const X = bx(p.date), Y = cy(p.v), r = crad(p.sizeB);
+          return (
+            <g class="hot" data-row={`row-${p.id}`}>
+              {p.long && <circle cx={X} cy={Y} r={r + 3.5} class={`ring tier-stroke-${p.tier}`} />}
+              <circle cx={X} cy={Y} r={r} class={p.press ? `pt-hollow tier-stroke-${p.tier}` : `pt tier-${p.tier}`} />
+            </g>
+          );
+        })}
+        {cLabels.map((L) => (
+          <g class="hot" data-row={L.rid}>
+            {L.leader && (
+              <line
+                x1={L.x} y1={L.y + (L.ly > L.y ? 7 : -7)}
+                x2={L.lx} y2={L.ly > L.y ? L.ly + 1 : L.ly + L.h + 1}
+                class="leader"
+              />
+            )}
+            {L.linePos.map((ln) => <text x={L.lx} y={ln.y} class={ln.cls}>{ln.t}</text>)}
+          </g>
+        ))}
+      </svg>
+      <details class="panel-foot-disclosure">
+        <summary>How to read this</summary>
+        <div class="panel-foot">
+          <p>
+            The boundary with the chart above is the seat, not the collateral:
+            those bonds are issued by operating companies and carry recourse
+            to a corporate balance sheet; these are issued by bankruptcy-remote
+            vehicles that exist only to own the campus. No operating business
+            stands behind them — the credit being priced is the compute
+            tenant's obligation to pay, and nothing else. This is where the
+            financing volume moved in 2026. Read across the tiers: Meta's
+            direct leasebacks priced at 6.58% (Hyperion, Oct 2025) and 7.534%
+            (Sopaipilla, Jul 2026 — ~40bp wide of Hyperion per the pricing
+            coverage); Google-guaranteed Fluidstack leases at 6.25–7.25%; and
+            the one neocloud-tenant print — Helios Phase II, leased to
+            CoreWeave — at 9.875%. Within the same structure family, roughly
+            230–330 basis points separate a hyperscaler's lease from a
+            neocloud's.
+          </p>
+          <p>
+            Comparability caveats. Tenor: the two Meta notes amortize fully
+            to 2048–49 (◎), so their coupons embed decades of duration the
+            2030–31 bonds don't. Sourcing: both Meta coupons are press-sourced
+            (Bloomberg/IFR/LCD) — the notes are rated A+/AA− but no issuer
+            statement discloses pricing — hence the hollow marks; the other
+            three coupons come from filings or issuer/counsel releases. Two
+            securitizations priced in the same window without public coupons
+            and are tracked in the ledger but not charted: Aligned Data
+            Centers $1.18B (Jul 28) and Compass Series 2026-2 $413M (Jul 27).
           </p>
         </div>
       </details>
@@ -1261,6 +1400,9 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
     .tier-stroke-strong { stroke: var(--ct-strong); }
     .tier-stroke-mid { stroke: var(--ct-mid); }
     .tier-stroke-weak { stroke: var(--ct-weak); }
+    .row-label.tier-strong { fill: var(--ct-strong); }
+    .row-label.tier-mid { fill: var(--ct-mid); }
+    .row-label.tier-weak { fill: var(--ct-weak); }
     /* Chronological reading aid only — deliberately faint + dashed so it
        reads as sequence, not a single-driver trend. */
     .path-seq {

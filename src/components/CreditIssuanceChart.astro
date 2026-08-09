@@ -1,9 +1,12 @@
 ---
 /*
-  GPU-backed debt issuance by quarter — observed from the tracked instrument
-  ledger (credit_instruments.json). Bars = amount issued that quarter (left
-  axis); line = cumulative tracked (right axis). Observed only — no modelling
-  of drawdowns or amortization. Caveats live in the expandable note.
+  Compute-infrastructure debt issuance by quarter — observed from the tracked
+  instrument ledger (credit_instruments.json). Two bar series per quarter:
+  GPU-collateralized (strict scope, as before) and data-center/campus-secured
+  (classified from each held-out row's exclude_reason). Line = cumulative
+  GPU-collateralized tracked (unchanged meaning). Observed only — no
+  modelling of drawdowns or amortization. Caveats live in the expandable
+  note, including the two chip-lease exclusions that sit in NEITHER series.
 */
 import creditData from '../data/credit_instruments.json';
 
@@ -18,39 +21,69 @@ function quarterOf(iso: string): string | null {
   return `${m[1]}-Q${q}`;
 }
 
-// Scope: discrete GPU-collateral debt issuance. A few tracked rows are held
-// out (exclude_from_issuance) — e.g. data-center-campus credit where GPUs
-// aren't the security, or program umbrellas that would double-count confirmed
-// tranches. They stay in the ledger elsewhere; here they'd distort the series.
+// Series 1 — discrete GPU-collateral debt issuance (strict scope, unchanged).
 const sized = instruments.filter(
   (i) => typeof i.size_usd_m === 'number' && i.size_usd_m > 0 && !i.exclude_from_issuance,
 );
-const heldOut = instruments.filter(
-  (i) => typeof i.size_usd_m === 'number' && i.size_usd_m > 0 && i.exclude_from_issuance,
+// Series 2 — data-center/campus-secured paper, classified from the ledger's
+// own exclusion reasons: campus credit, real-estate mortgages, and lease
+// securitizations. Rumored rows stay out; press-status rows are included
+// (same treatment as series 1) and flagged in the ledger.
+const DC_RX = /data-center|campus|real estate|securitiz/i;
+const dcRows = instruments.filter(
+  (i) =>
+    typeof i.size_usd_m === 'number' && i.size_usd_m > 0 &&
+    i.exclude_from_issuance &&
+    DC_RX.test(i.exclude_reason || '') &&
+    !/non-data-center/i.test(i.exclude_reason || '') &&
+    i.status !== 'rumored',
 );
-const heldOutUsd = heldOut.reduce((a, i) => a + i.size_usd_m, 0);
-const byQuarter = new Map<string, number>();
-let undated = 0;
-let undatedUsd = 0;
-for (const i of sized) {
-  const q = quarterOf(i.issued);
-  if (q === null) { undated++; undatedUsd += i.size_usd_m; continue; }
-  byQuarter.set(q, (byQuarter.get(q) ?? 0) + i.size_usd_m);
+// Held out of BOTH series (disclosed below): chip-lease SPV paper whose
+// collateral is accelerators but not GPUs, e.g. the Anthropic TPU SPV and
+// the SambaNova ASIC facility.
+const neitherRows = instruments.filter(
+  (i) =>
+    typeof i.size_usd_m === 'number' && i.size_usd_m > 0 &&
+    i.exclude_from_issuance &&
+    /TPU|ASIC/i.test(i.exclude_reason || '') &&
+    i.status !== 'rumored',
+);
+const neitherUsd = neitherRows.reduce((a, i) => a + i.size_usd_m, 0);
+
+function bucket(rows: any[]) {
+  const byQ = new Map<string, number>();
+  let undated = 0, undatedUsd = 0;
+  for (const i of rows) {
+    const q = quarterOf(i.issued);
+    if (q === null) { undated++; undatedUsd += i.size_usd_m; continue; }
+    byQ.set(q, (byQ.get(q) ?? 0) + i.size_usd_m);
+  }
+  return { byQ, undated, undatedUsd };
 }
+const g = bucket(sized);
+const d = bucket(dcRows);
 
 const WINDOW_START = '2024-Q1';
-const allQ = [...byQuarter.keys()].sort();
-const preBaseUsd = allQ.filter((q) => q < WINDOW_START).reduce((a, q) => a + byQuarter.get(q)!, 0);
+const allQ = [...new Set([...g.byQ.keys(), ...d.byQ.keys()])].sort();
+const preBaseUsd = [...g.byQ.keys()].filter((q) => q < WINDOW_START).reduce((a, q) => a + g.byQ.get(q)!, 0);
+const preBaseDcUsd = [...d.byQ.keys()].filter((q) => q < WINDOW_START).reduce((a, q) => a + d.byQ.get(q)!, 0);
 const windowQ = allQ.filter((q) => q >= WINDOW_START);
+
+const asOf = (creditData as any)._meta?.as_of ?? '';
+// The quarter containing the ledger's as-of date is in progress: mark it QTD
+// so a part-quarter bar is never read as a full-quarter collapse.
+const currentQ = quarterOf(asOf);
 
 let cum = preBaseUsd;
 const bars = windowQ.map((q) => {
-  const issued = byQuarter.get(q)!;
-  cum += issued;
-  return { q, issued_b: issued / 1000, cum_b: cum / 1000 };
+  const gpu = g.byQ.get(q) ?? 0;
+  const dc = d.byQ.get(q) ?? 0;
+  cum += gpu;
+  return { q, gpu_b: gpu / 1000, dc_b: dc / 1000, cum_b: cum / 1000, qtd: q === currentQ };
 });
 
 const totalTrackedB = sized.reduce((a, i) => a + i.size_usd_m, 0) / 1000;
+const totalDcB = dcRows.reduce((a, i) => a + i.size_usd_m, 0) / 1000;
 
 // Y scales get headroom above the data max, rounded up to a clean tick
 // step so bars and line never touch the chart ceiling.
@@ -61,9 +94,8 @@ function axisMax(raw: number): number {
   const step = [1, 2, 2.5, 5, 10].map((m) => m * pow).find((s) => s * Y_TICKS >= target)!;
   return step * Y_TICKS;
 }
-const maxBar = axisMax(Math.max(...bars.map((b) => b.issued_b), 1));
+const maxBar = axisMax(Math.max(...bars.map((b) => Math.max(b.gpu_b, b.dc_b)), 1));
 const maxCum = axisMax(Math.max(...bars.map((b) => b.cum_b), 1));
-const asOf = (creditData as any)._meta?.as_of ?? '';
 
 // --- svg geometry ----------------------------------------------------------
 const W = 920, H = 300;
@@ -71,7 +103,7 @@ const M = { top: 20, right: 58, bottom: 40, left: 54 };
 const x0 = M.left, x1 = W - M.right, y0 = M.top, y1 = H - M.bottom;
 const n = bars.length;
 const band = (x1 - x0) / n;
-const barW = Math.min(band * 0.62, 46);
+const barW = Math.min(band * 0.32, 24);
 const bx = (i: number) => x0 + band * (i + 0.5);
 const byBar = (v: number) => y1 - (v / maxBar) * (y1 - y0);
 const byCum = (v: number) => y1 - (v / maxCum) * (y1 - y0);
@@ -84,7 +116,7 @@ const qLabel = (q: string) => q.replace('-', ' ');
 ---
 <figure class="ci">
   <svg viewBox={`0 0 ${W} ${H}`} role="img"
-       aria-label={`GPU-backed debt issuance by quarter from 2024. Quarterly issuance (bars) rises to over thirty billion dollars; cumulative tracked (line) reaches ${totalTrackedB.toFixed(0)} billion.`}>
+       aria-label={`Compute-infrastructure debt issuance by quarter from 2024, two series. GPU-collateralized quarterly issuance (bars) rises to about thirty billion dollars; data-center-secured issuance rises to nearly forty billion in late 2025. The cumulative GPU-collateralized line reaches ${totalTrackedB.toFixed(0)} billion. The current quarter is marked as quarter-to-date.`}>
     {barTicks.map((t) => (
       <>
         <line x1={x0} y1={byBar(t)} x2={x1} y2={byBar(t)} class="ci-grid" />
@@ -95,15 +127,19 @@ const qLabel = (q: string) => q.replace('-', ' ');
       <text x={x1 + 8} y={byCum(t) + 3} class="ci-tick ci-tick-r">{t}</text>
     ))}
     <text x={x0 - 8} y={y0 - 7} class="ci-axis-label ci-axis-l">$B issued / qtr</text>
-    <text x={x1 + 8} y={y0 - 7} class="ci-axis-label ci-axis-r">cumulative $B</text>
+    <text x={x1 + 8} y={y0 - 7} class="ci-axis-label ci-axis-r">cumulative $B (GPU)</text>
 
     {bars.map((b, i) => (
       <>
-        <rect x={bx(i) - barW / 2} y={byBar(b.issued_b)} width={barW}
-              height={Math.max(0, y1 - byBar(b.issued_b))} class="ci-bar">
-          <title>{`${qLabel(b.q)} — $${b.issued_b.toFixed(1)}B issued · $${b.cum_b.toFixed(0)}B cumulative`}</title>
+        <rect x={bx(i) - barW - 1.5} y={byBar(b.gpu_b)} width={barW}
+              height={Math.max(0, y1 - byBar(b.gpu_b))} class={b.qtd ? 'ci-bar ci-qtd' : 'ci-bar'}>
+          <title>{`${qLabel(b.q)}${b.qtd ? ' (QTD)' : ''} — GPU-collateralized $${b.gpu_b.toFixed(1)}B · $${b.cum_b.toFixed(0)}B cumulative`}</title>
         </rect>
-        <text x={bx(i)} y={y1 + 16} class="ci-tick ci-tick-x">{qLabel(b.q)}</text>
+        <rect x={bx(i) + 1.5} y={byBar(b.dc_b)} width={barW}
+              height={Math.max(0, y1 - byBar(b.dc_b))} class={b.qtd ? 'ci-bar2 ci-qtd' : 'ci-bar2'}>
+          <title>{`${qLabel(b.q)}${b.qtd ? ' (QTD)' : ''} — data-center-secured $${b.dc_b.toFixed(1)}B`}</title>
+        </rect>
+        <text x={bx(i)} y={y1 + 16} class="ci-tick ci-tick-x">{qLabel(b.q)}{b.qtd ? '*' : ''}</text>
       </>
     ))}
 
@@ -112,37 +148,45 @@ const qLabel = (q: string) => q.replace('-', ' ');
       <circle cx={bx(i)} cy={byCum(b.cum_b)} r="2.5" class="ci-cum-dot" />
     ))}
   </svg>
+  <div class="ci-legend">
+    <span class="ci-lg"><span class="ci-swatch ci-sw1"></span>GPU-collateralized</span>
+    <span class="ci-lg"><span class="ci-swatch ci-sw2"></span>Data-center / campus-secured</span>
+    <span class="ci-lg ci-lg-note">* current quarter, partial — backfills as filings land</span>
+  </div>
 
   <details class="ci-notes">
     <summary>Notes</summary>
     <p>
-      {sized.length} tracked instruments, ${totalTrackedB.toFixed(1)}B total issued, as of {asOf}.
+      GPU-collateralized: {sized.length} instruments, ${totalTrackedB.toFixed(1)}B issued.
+      Data-center / campus-secured: {dcRows.length} instruments, ${totalDcB.toFixed(1)}B —
+      classified from the ledger's collateral descriptions (campus credit,
+      real-estate mortgages, lease securitizations); rumored rows excluded,
+      press-status rows included and flagged in the ledger. As of {asOf}.
       Observed from filings — amount issued at close, not drawn balance; no
-      drawdown or amortization is modelled.
-      {undated > 0 && (
-        <> {undated} instrument{undated === 1 ? '' : 's'} (${(undatedUsd / 1000).toFixed(1)}B)
-        carry a fuzzy issuance date, so they are in the total but not placed in a bar.</>
+      drawdown or amortization is modelled. The current quarter (*) is
+      partial: the tracker records deals when filings or releases land, so
+      the newest bars backfill upward.
+      {(g.undated > 0 || d.undated > 0) && (
+        <> Undated (in totals, not in bars): {g.undated} GPU instrument{g.undated === 1 ? '' : 's'}
+        (${(g.undatedUsd / 1000).toFixed(1)}B) and {d.undated} data-center
+        (${(d.undatedUsd / 1000).toFixed(1)}B).</>
       )}
-      {heldOut.length > 0 && (
-        <> This measures <strong>GPU-collateralized</strong> debt only —
-        secured by the GPUs or equipment themselves. {heldOut.length} instruments
-        (${(heldOutUsd / 1000).toFixed(0)}B) are tracked in the ledger but excluded
-        here: convertibles, unsecured corporate notes, real-estate and
-        data-center-campus credit, and unconfirmed deals.</>
-      )} Pre-2024 issuance (${(preBaseUsd / 1000).toFixed(1)}B) is small and sits in the
-      cumulative line's starting level rather than as its own bars.
+      {neitherRows.length > 0 && (
+        <> Sitting in NEITHER series by construction: {neitherRows.length} chip-lease
+        instruments (${(neitherUsd / 1000).toFixed(1)}B) whose collateral is
+        non-GPU accelerators — chiefly the Anthropic TPU lease SPV — shown in
+        the ledger below.</>
+      )}
+      Convertibles, unsecured corporate notes, and unconfirmed deals remain
+      outside both series. Pre-2024 issuance (GPU ${(preBaseUsd / 1000).toFixed(1)}B,
+      data-center ${(preBaseDcUsd / 1000).toFixed(1)}B) sits in the cumulative
+      line's starting level / outside the bars.
     </p>
   </details>
 </figure>
 
 <style>
   .ci { margin: 0; }
-  .ci-head {
-    font-family: var(--font-mono); font-size: var(--fs-xs);
-    letter-spacing: var(--tracking-eye); text-transform: uppercase;
-    color: var(--accent); font-weight: var(--weight-strong);
-    padding-left: 54px; margin-bottom: 6px;
-  }
   .ci svg { width: 100%; height: auto; display: block; }
   .ci-grid { stroke: var(--rule); stroke-width: 1; }
   .ci-tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim); }
@@ -154,8 +198,24 @@ const qLabel = (q: string) => q.replace('-', ' ');
   .ci-axis-r { text-anchor: end; }
   .ci-bar { fill: var(--accent); opacity: 0.85; }
   .ci-bar:hover { opacity: 1; }
+  .ci-bar2 { fill: #3b82f6; opacity: 0.75; }
+  .ci-bar2:hover { opacity: 0.95; }
+  .ci-qtd { opacity: 0.4; }
+  .ci-qtd:hover { opacity: 0.6; }
   .ci-cum-line { fill: none; stroke: var(--ink); stroke-width: 1.6; opacity: 0.7; }
   .ci-cum-dot { fill: var(--ink); opacity: 0.7; }
+  .ci-legend {
+    display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
+    padding: 8px 0 0 54px;
+  }
+  .ci-lg {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--ink-dim); display: inline-flex; align-items: center; gap: 6px;
+  }
+  .ci-lg-note { color: var(--ink-faint); }
+  .ci-swatch { width: 10px; height: 10px; display: inline-block; border-radius: 2px; }
+  .ci-sw1 { background: var(--accent); opacity: 0.85; }
+  .ci-sw2 { background: #3b82f6; opacity: 0.75; }
   .ci-notes { margin-top: 8px; }
   .ci-notes > summary {
     list-style: none; cursor: pointer;
