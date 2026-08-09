@@ -44,7 +44,10 @@ const COL_W = (CONTENT_W - SIL_W) / 3;
 export const GET: APIRoute = async () => {
   const live = premiumChipsList();
   const chips = (live.length > 0 ? live : [...PREMIUM_CHIPS]).slice(0, 5);
-  const rowH = chips.length > 4 ? 62 : 70;
+  // Fill the card: the table is the content, so size rows to the space
+  // left after band, title, column head and footer rather than leaving a
+  // block of dead space above the rule.
+  const rowH = chips.length >= 5 ? 74 : chips.length === 4 ? 88 : 96;
 
   const band = el('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 58, flexShrink: 0, backgroundColor: T.surface2, borderBottom: `1px solid ${T.rule2}`, paddingLeft: PAD, paddingRight: PAD }, [
     el('div', { display: 'flex', alignItems: 'baseline', gap: 18 }, [
