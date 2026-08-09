@@ -26,8 +26,43 @@ function isTier(v: string): v is Tier {
   return TIER_SET.has(v);
 }
 
+// Split ONE csv line, honouring double-quoted fields that contain commas.
+//
+// 2026-08-09: this was `line.split(',')`, which broke the whole page the day
+// gold started publishing `contributing_sources` — a quoted list like
+// "aws,azure,gcp" split into three cells, so a 37-field header met a 40-field
+// row and EVERY column after index 25 shifted. `promotion_status` read "4"
+// instead of "Published", `premiumChipsList()` therefore returned empty, the
+// ladders silently fell back to their hardcoded default chip list, and cells
+// resolved to the wrong series. Nothing threw; the page just rendered a
+// plausible, wrong table.
+//
+// A naive split is only ever correct by luck about what the upstream writer
+// puts in a field. Parse properly instead, so adding a column upstream can
+// never do this again.
+function splitCsvLine(line: string): string[] {
+  const out: string[] = [];
+  let cur = '';
+  let quoted = false;
+  for (let i = 0; i < line.length; i += 1) {
+    const ch = line[i];
+    if (quoted) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') { cur += '"'; i += 1; }   // escaped quote
+        else quoted = false;
+      } else cur += ch;
+    } else if (ch === '"') {
+      quoted = true;
+    } else if (ch === ',') {
+      out.push(cur); cur = '';
+    } else cur += ch;
+  }
+  out.push(cur);
+  return out;
+}
+
 function parseRow(line: string, headers: string[]): Rate {
-  const cells = line.split(',');
+  const cells = splitCsvLine(line);
   const get = (k: string) => cells[headers.indexOf(k)];
   const num = (k: string) => Number(get(k));
   const numOrNull = (k: string) => {
@@ -75,7 +110,7 @@ function parseRow(line: string, headers: string[]): Rate {
 
 function parseAllRows(text: string): Rate[] {
   const lines = text.trim().split(/\r?\n/);
-  const headers = lines[0]!.split(',');
+  const headers = splitCsvLine(lines[0]!);
   return lines.slice(1)
     .filter((l) => l.trim().length > 0)
     .map((line) => parseRow(line, headers))
@@ -220,12 +255,12 @@ export const prevMedians: Map<string, number> = (() => {
   const text = prevCsvText.trim();
   if (!text) return out;
   const lines = text.split(/\r?\n/);
-  const headers = lines[0]!.split(',');
+  const headers = splitCsvLine(lines[0]!);
   const idIdx = headers.indexOf('series_id');
   const medIdx = headers.indexOf('price_median');
   if (idIdx === -1 || medIdx === -1) return out;
   for (let i = 1; i < lines.length; i++) {
-    const cells = lines[i]!.split(',');
+    const cells = splitCsvLine(lines[i]!);
     const id = cells[idIdx];
     const med = Number(cells[medIdx]);
     if (id && Number.isFinite(med)) out.set(id, med);
@@ -248,14 +283,14 @@ const _seriesHistory: Map<string, HistoryPoint[]> = (() => {
   const text = historyCsvText.trim();
   if (!text) return out;
   const lines = text.split(/\r?\n/);
-  const headers = lines[0]!.split(',');
+  const headers = splitCsvLine(lines[0]!);
   const idIdx = headers.indexOf('series_id');
   const dateIdx = headers.indexOf('as_of_date');
   const medIdx = headers.indexOf('price_median');
   const headIdx = headers.indexOf('price_headline');
   if (idIdx === -1 || dateIdx === -1 || medIdx === -1) return out;
   for (let i = 1; i < lines.length; i++) {
-    const cells = lines[i]!.split(',');
+    const cells = splitCsvLine(lines[i]!);
     const id = cells[idIdx];
     const d = cells[dateIdx];
     const med = Number(cells[medIdx]);

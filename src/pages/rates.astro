@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import TierDefinitions from '../components/TierDefinitions.astro';
-import { headlineRates, meta, premiumChipsList, headlineValue, headlineStatOf } from '../data/snapshot';
+import { meta, premiumChipsList, headlineValue, headlineStatOf,
+         homeOdCell, homeIntCell } from '../data/snapshot';
 import { TIERS, TIER_LABELS_SHORT } from '../data/types';
 import type { Rate, Tier } from '../data/types';
 
@@ -12,60 +13,28 @@ const chips = (() => {
   return live.length > 0 ? live : ['GB200', 'B200', 'H200', 'H100', 'A100'];
 })();
 
-// Guaranteed on-demand reference cell per (segment, chip): int=GTD, form
-// pooled, region=ALL — the CURATED US+EU core pool, matching the homepage.
+// Ladder cells come from the SHARED selectors in snapshot.ts (homeOdCell /
+// homeIntCell) rather than local copies. Both are: strict grade, form pooled,
+// region=ALL — the CURATED US+EU core, which the core-region gate keeps APAC
+// and undisclosed-location rows out of — Shadow excluded, Published preferred
+// over Provisional, pooled preferred over a variant sub-series (A100-40GB),
+// then panel breadth.
 //
-// 2026-08-09: this ladder read US-only until today. Moved to the pooled scope
-// so both surfaces agree (they had drifted to printing the same nominal cell
-// 88% apart) and, decisively, for COVERAGE — see intCell below, where US-only
-// left Neocloud without a full segment ladder. `ALL` is curated, not
-// everything: the core-region gate keeps APAC and undisclosed-location rows
-// out, so this is US+EU and is labelled as such.
+// 2026-08-09: this page kept its own near-identical copies until today. They
+// differed only in the variant tiebreaker, which meant the page could quietly
+// pick a different A100 series than the homepage and the share card. Verified
+// identical selection on the 2026-08-08 snapshot before unifying, so this is a
+// no-op today and closes the drift permanently — the same contract home.png.ts
+// has always kept.
 //
-// Still guaranteed-ONLY on purpose — the interruptibility-pooled axis
-// (int=ALL) drags the number below the real on-demand rate (US H100
-// Hyperscaler $9.15 guaranteed vs $5.40 pooled). The interruptible grade gets
-// its own ladder below rather than being mixed in here.
-const STAT_RANK: Record<string, number> = { Published: 0, Provisional: 1, Shadow: 2 };
-function odCell(tier: Tier, chip: string): Rate | undefined {
-  return headlineRates
-    .filter((r) => r.tier === tier && r.gpu_model === chip &&
-                   r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
-                   r.promotion_status !== 'Shadow')
-    .sort((a, b) =>
-      (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
-      (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
-}
-
-// Interruptible companion to odCell — same scope, same stat rule, same
-// no-fallback discipline, so the two tables read line by line.
-//
-// 2026-08-09: region=ALL (curated US+EU), reverted from a brief US-only
-// experiment. COVERAGE was the binding reason: US-only carried 6 cells of
-// which only 3 Published, and Neocloud (T2) lost its H200 and B200 cells
-// outright, leaving the middle segment with no ladder at all. Under the
-// pooled scope it is 7 cells, all Published. A ladder with holes in its
-// middle segment is worse than a wider — but still curated — pool.
-//
-// The 2026-08-08 EU coverage step (33 cells moved, up to 31%) is a one-time
-// break, not a recurring risk. Comparisons run FROM 2026-08-09 forward.
-function intCell(tier: Tier, chip: string): Rate | undefined {
-  return headlineRates
-    .filter((r) => r.tier === tier && r.gpu_model === chip &&
-                   r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'ALL' && r.interruptibility === 'INT' &&
-                   r.promotion_status !== 'Shadow')
-    .sort((a, b) =>
-      (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
-      (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
-}
-
+// Guaranteed and interruptible are separate ladders, never mixed: the
+// interruptibility-pooled axis (int=ALL) drags the number below the real
+// on-demand rate (US H100 Hyperscaler $9.15 guaranteed vs $5.40 pooled).
 type LadderRow = { chip: string; cells: Partial<Record<Tier, Rate | undefined>> };
 const ladder: LadderRow[] = chips
   .map((chip) => {
     const cells: Partial<Record<Tier, Rate | undefined>> = {};
-    for (const t of TIERS) cells[t] = odCell(t, chip);
+    for (const t of TIERS) cells[t] = homeOdCell(t, chip);
     return { chip, cells };
   })
   // Drop chips with no guaranteed cell in any segment (e.g. GB200 today).
@@ -79,7 +48,7 @@ const ladder: LadderRow[] = chips
 const intLadder: LadderRow[] = ladder
   .map(({ chip }) => {
     const cells: Partial<Record<Tier, Rate | undefined>> = {};
-    for (const t of TIERS) cells[t] = intCell(t, chip);
+    for (const t of TIERS) cells[t] = homeIntCell(t, chip);
     return { chip, cells };
   })
   .filter((row) => TIERS.some((t) => row.cells[t]));
@@ -96,7 +65,7 @@ function cellTitle(c: Rate): string {
 <Base
   title="GPU Rental Rates — Daily H100, H200, B200 Price Benchmark · CCIR"
   description="Daily GPU rental price benchmarks per GPU-hour — H100, H200, B200, A100 — guaranteed on-demand rates across Hyperscaler, Neocloud, and Marketplace segments, from a fixed provider panel under a published methodology."
-  ogImage="/og/rates-live.png"
+  ogImage="/og/rates.png?v=live"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
     '@context': 'https://schema.org',
