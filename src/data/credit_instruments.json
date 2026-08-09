@@ -5516,7 +5516,7 @@
   },
   {
    "id": "aligned-abs-2026",
-   "collateral_class": "landlord_spv",
+   "collateral_class": "dc_adjacent",
    "exclude_from_issuance": true,
    "exclude_reason": "Data-center real-estate/lease securitization — collateral is four operating campuses and tenant leases, not GPUs (strict scope; same basis as galaxy-helios2-9875-2031 and the Meta campus SPVs).",
    "issuer": "Aligned Data Centers",
@@ -5550,7 +5550,7 @@
   },
   {
    "id": "compass-abs-2026-2",
-   "collateral_class": "landlord_spv",
+   "collateral_class": "dc_adjacent",
    "exclude_from_issuance": true,
    "exclude_reason": "Data-center real-estate/lease securitization — collateral is seven completed operational data centers, not GPUs (strict scope; same basis as galaxy-helios2-9875-2031 and the Meta campus SPVs).",
    "issuer": "Compass Datacenters",
@@ -5581,6 +5581,283 @@
     "url": "https://www.datacenterdynamics.com/en/news/compass-datacenters-raises-413-million-in-abs-bonds/"
    },
    "as_of": "2026-07-28"
+  },
+  {
+   "id": "stargate-jupiter-nm",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+   "collateral_class": "landlord_spv",
+   "issuer": "Project Jupiter (Stargate NM)",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "Project-level borrower, Jupiter campus, Santa Teresa NM (Dona Ana County); Blue Owl equity; BorderPlex Digital Assets + STACK coordinating (press)",
+   "name": "$18B project loan - Jupiter campus (Stargate)",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 18000,
+   "size_note": "$18B bank loan reported secured early Nov 2025 (~20-bank group). Separate: Dona Ana County authorized a $165B industrial revenue bond conduit ceiling - an authorization, not an issuance; never count it",
+   "rate": {
+    "kind": "sofr_spread",
+    "value": 2.5,
+    "note": "~SOFR+250 reported, 4-yr + two 1-yr extensions - pricing is press (Bloomberg-derived)"
+   },
+   "maturity": "~2029 (4-yr + two 1-yr extensions, press)",
+   "maturity_note": null,
+   "seniority": "Project-level",
+   "security": "Jupiter hyperscale AI campus, Santa Teresa NM; Oracle Cloud Infrastructure 18-yr lease, OpenAI primary end user (Stargate)",
+   "lenders": [
+    "~20-bank group; SMBC, BNP Paribas, Goldman Sachs, MUFG admin agents (press)"
+   ],
+   "status": "press",
+   "issued": "Reported 2025-11-10",
+   "source": {
+    "doc": "Bloomberg-derived press (loan, pricing); DCD 9/25 (Oracle 18-yr lease reveal); ABQ Journal (campus, IRB)",
+    "date": "2025-11-10",
+    "url": "https://www.datacenterdynamics.com/en/news/oracle-revealed-as-tenant-of-project-jupiter-data-center-campus-in-new-mexico/"
+   },
+   "as_of": "2026-08-09"
+  },
+  {
+   "id": "related-saline-barn",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+   "collateral_class": "landlord_spv",
+   "issuer": "Related Digital / Blackstone (Saline Twp, MI)",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "Project entity, Saline Township MI campus ('The Barn'); Related Digital + Blackstone-affiliated funds equity",
+   "name": "Fixed-rate project debt - $16B Oracle campus (PIMCO-anchored)",
+   "instrument_type": "bond",
+   "size_usd_m": 14000,
+   "size_note": "~$14B fixed-rate long-term debt of a $16B total project (debt split and PIMCO ~$10B anchor per press; the releases state the $16B package without the split). BofA structuring agent/FA; Goldman Sachs + Wells Fargo advisors",
+   "rate": {
+    "kind": "fixed",
+    "value": null,
+    "note": "Fixed-rate, long-term; coupon undisclosed"
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Project-level (structure not fully disclosed)",
+   "security": "Saline Township MI campus (~1 GW; 1,383 MW cited), purpose-built for Oracle; OpenAI end user (Stargate)",
+   "lenders": [
+    "PIMCO-managed funds and accounts (anchor, ~$10B per press)",
+    "Bank of America (structuring agent)",
+    "Goldman Sachs, Wells Fargo (advisors)"
+   ],
+   "status": "confirmed",
+   "issued": "2026-04-24",
+   "source": {
+    "doc": "Related Digital / Blackstone / BofA releases 4/24/26 ($16B project financing, PIMCO anchor, advisors); ~$14B/$10B debt detail = press (Bloomberg pickup)",
+    "date": "2026-04-24",
+    "url": "https://www.related.com/press-releases/2026-04-24/related-digital-announces-financing-16-billion-oracle-data-center-project"
+   },
+   "as_of": "2026-08-09"
+  },
+  {
+   "id": "galaxy-helios1-facility",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+   "collateral_class": "landlord_spv",
+   "issuer": "Galaxy Digital Inc.",
+   "ticker": "GLXY",
+   "issuer_type": "public",
+   "entity": "Helios Phase I project entities (project financing facility)",
+   "name": "Helios Phase I project financing facility (up to $1.4B)",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 1400,
+   "size_note": "Up to $1.4B senior secured project facility; 80% loan-to-cost, 36-month availability; Galaxy ~$350M equity contribution. Sibling of the Helios Phase II 9.875% notes (galaxy-helios2-9875-2031)",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": null
+   },
+   "maturity": "36-month facility (availability period); terms not fully disclosed",
+   "maturity_note": null,
+   "seniority": "Senior secured, project-level",
+   "security": "Helios Phase I data center (Dickens County, TX), leased to CoreWeave",
+   "lenders": [
+    "Deutsche Bank (lead)"
+   ],
+   "status": "confirmed",
+   "issued": "2025-08-15",
+   "source": {
+    "doc": "Galaxy press release 8/15/25",
+    "date": "2025-08-15",
+    "url": "https://www.prnewswire.com/news-releases/galaxy-closes-1-4-billion-project-financing-facility-to-accelerate-helios-ai-datacenter-development-302530804.html"
+   },
+   "as_of": "2026-08-09"
+  },
+  {
+   "id": "novva-cim-financing",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+   "collateral_class": "operator_campus",
+   "issuer": "Novva Data Centers / CIM Group",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "Novva Data Centers (CIM Group-backed operator)",
+   "name": "$2B financing - West Jordan UT AI campus expansion",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 2000,
+   "size_note": "$2B new financing announced 3/5/25 (J.P. Morgan + Starwood Property Trust); operator-level growth financing for the 175 MW direct-to-chip AI campus and western-US expansion",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": null
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Not fully disclosed (operator/project financing)",
+   "security": "West Jordan UT campus (175 MW, direct-to-chip liquid cooling) and expansion assets",
+   "lenders": [
+    "J.P. Morgan",
+    "Starwood Property Trust"
+   ],
+   "status": "confirmed",
+   "issued": "2025-03-05",
+   "source": {
+    "doc": "CIM Group / Novva release 3/5/25",
+    "date": "2025-03-05",
+    "url": "https://www.cimgroup.com/press-releases/cim-group-and-novva-data-centers-announce-2-billion-in-new-financing-to-accelerate-growth-in-delivering-sustainable-efficient-data-centers-across-the-western-u-s"
+   },
+   "as_of": "2026-08-09"
+  },
+  {
+   "id": "edgecore-as01-02-tl",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+   "collateral_class": "landlord_spv",
+   "issuer": "EdgeCore Digital Infrastructure",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "AS01/AS02 project borrowers (limited-recourse)",
+   "name": "AS01 + AS02 construction financing - $1.5B limited-recourse term loans",
+   "instrument_type": "credit_facility",
+   "size_usd_m": 1500,
+   "size_note": "Two limited-recourse senior secured term loans totaling $1.5B (Apterra structuring; GIP, ING leads) for two fully leased single-tenant hyperscale data centers, ~114 MW, Northern Virginia",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": null
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Senior secured, limited-recourse project loans",
+   "security": "AS01 + AS02 Northern Virginia data centers (~114 MW), fully leased to a hyperscale tenant (unnamed)",
+   "lenders": [
+    "Apterra (structuring)",
+    "Global Infrastructure Partners (credit)",
+    "ING"
+   ],
+   "status": "confirmed",
+   "issued": "2026-04",
+   "source": {
+    "doc": "EdgeCore release 4/26",
+    "date": "2026-04-30",
+    "url": "https://edgecore.com/resources/press-releases/edgecore-digital-infrastructure-secures-1-5-billion-of-construction-financing-for-two-fully-leased-hyperscale-data-centers-in-northern-virginia"
+   },
+   "as_of": "2026-08-09"
+  },
+  {
+   "id": "cloudhq-abs-2026",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center real-estate/lease securitization, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+   "collateral_class": "landlord_spv",
+   "issuer": "CloudHQ",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "CloudHQ securitization issuer (Ashburn LC1A/LC2)",
+   "name": "$1.4B ABS - two Ashburn hyperscale data centers (first dual-AAA DC ABS)",
+   "instrument_type": "bond",
+   "size_usd_m": 1400,
+   "size_note": "$1.4B in five tranches due 2031; first data-center ABS rated triple-A by both Moody's and S&P. Two Ashburn VA data centers (LC1A/LC2, 160 MW), triple-net leased to two IG hyperscalers (~14-yr WALT; one identified in press as Microsoft)",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": "Tranche coupons not in free sources; senior tranches dual-AAA"
+   },
+   "maturity": "2031",
+   "maturity_note": null,
+   "seniority": "Senior secured (securitization)",
+   "security": "Two Ashburn, VA hyperscale data centers (160 MW) and associated triple-net leases to IG hyperscale tenants",
+   "lenders": [
+    "Bookrunners not named in available coverage"
+   ],
+   "status": "press",
+   "issued": "Priced ~2026-04 (closed ~end April, press)",
+   "source": {
+    "doc": "Bloomberg 4/9/26 (marketing); GlobalCapital (first dual-AAA; pricing coverage) - press/agency",
+    "date": "2026-04-30",
+    "url": "https://www.bloomberg.com/news/articles/2026-04-09/cloudhq-seeks-to-raise-1-4-billion-from-data-center-abs-deal"
+   },
+   "as_of": "2026-08-09"
+  },
+  {
+   "id": "cloudcapital-mt-2026",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center real-estate/lease securitization, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+   "collateral_class": "landlord_spv",
+   "issuer": "Cloud Capital (Realty Income JV)",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "Cloud Capital ABS Master Trust (programmatic JV with Realty Income + a global institutional investor; seed assets >$6B)",
+   "name": "$520M master-trust ABS - Amazon-leased hyperscale data centers",
+   "instrument_type": "bond",
+   "size_usd_m": 520,
+   "size_note": "$520M inaugural issuance from the new master trust, 7/29/26; first DC ABS rated triple-A by three agencies (Fitch/DBRS/KBRA); collateral Amazon-leased hyperscale DCs. A separate ~$1.325B Cloud Capital ABS reported earlier in 2026 (DCD) is NOT yet carried - date/entity unverified",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": "Spread reported as matching the tightest DC ABS print of the period; coupon not published"
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Senior secured (securitization)",
+   "security": "Amazon-leased hyperscale data centers (master trust collateral pool)",
+   "lenders": [
+    "Bookrunners not named in release"
+   ],
+   "status": "confirmed",
+   "issued": "2026-07-29",
+   "source": {
+    "doc": "Cloud Capital release 7/29/26; Realty Income JV release (program, seed >$6B)",
+    "date": "2026-07-29",
+    "url": "https://www.prnewswire.com/news-releases/cloud-capital-launches-new-data-center-abs-master-trust-completes-520-million-triple-a-rated-issuance-302838401.html"
+   },
+   "as_of": "2026-08-09"
+  },
+  {
+   "id": "databank-hyperscale-2025",
+   "exclude_from_issuance": true,
+   "exclude_reason": "Data-center real-estate/lease securitization, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+   "collateral_class": "landlord_spv",
+   "issuer": "DataBank",
+   "ticker": null,
+   "issuer_type": "private",
+   "entity": "DataBank hyperscale master trust (separate from its colocation ABS program)",
+   "name": "$1.1B hyperscale master-trust securitization (green)",
+   "instrument_type": "bond",
+   "size_usd_m": 1100,
+   "size_note": "$1.1B, 9/24/25; first Moody's-rated data-center ABS (dual S&P/Moody's), green framework; collateral is DataBank's hyperscale (AI-tenant) footprint. DataBank's multi-tenant COLO securitizations (2024-1 $456M, Jan-26 $665M) are outside the AI-linked landlord scope and not carried",
+   "rate": {
+    "kind": "undisclosed",
+    "value": null,
+    "note": "Coupons not published in release"
+   },
+   "maturity": "Undisclosed",
+   "maturity_note": null,
+   "seniority": "Senior secured (securitization)",
+   "security": "Hyperscale data centers and associated tenant leases (master trust)",
+   "lenders": [
+    "Bookrunners not named in release"
+   ],
+   "status": "confirmed",
+   "issued": "2025-09-24",
+   "source": {
+    "doc": "DataBank release 9/24/25",
+    "date": "2025-09-24",
+    "url": "https://www.prnewswire.com/news-releases/databank-raises-1-1-billion-in-hyperscale-asset-securitization-302565290.html"
+   },
+   "as_of": "2026-08-09"
   }
  ],
  "retired": [

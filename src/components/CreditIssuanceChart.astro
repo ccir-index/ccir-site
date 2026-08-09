@@ -166,8 +166,13 @@ const qLabel = (q: string) => q.replace('-', ' ');
       paper secured by a named campus or site (Cipher, Applied Digital,
       Hut 8, Core Scientific, TeraWulf and peers). Landlord SPV &amp;
       securitization: {lsRows.length} instruments, ${sumB(lsRows).toFixed(1)}B —
-      non-recourse landlord vehicles and lease securitizations (Hyperion,
-      Sopaipilla, Vantage, Meridian Arc, Abilene, ABS). As of {asOf}.
+      non-recourse landlord vehicles and lease securitizations with an
+      AI-compute-linked tenant or purpose (Hyperion, Sopaipilla, Vantage,
+      Stargate campus loans, Meridian Arc, hyperscale-NNN ABS). Multi-tenant
+      colocation securitizations sit outside this boundary by construction
+      ({byClass('dc_adjacent').length} captured rows,
+      ${sumB(byClass('dc_adjacent')).toFixed(1)}B, held as adjacent; the
+      wider colo ABS market is not tracked). As of {asOf}.
       Observed from filings — amount issued at close, not drawn balance; no
       drawdown or amortization is modelled. The current quarter (*) is
       partial: the tracker records deals when filings or releases land, so
@@ -188,10 +193,10 @@ const qLabel = (q: string) => q.replace('-', ' ');
       Pre-2024 issuance (GPU ${(preBaseUsd / 1000).toFixed(1)}B, other ${(preOtherUsd / 1000).toFixed(1)}B)
       sits in the cumulative line's starting level / outside the bars.
       Coverage: the GPU and operator-campus series come from issuer-by-issuer
-      capture; the landlord &amp; securitization series was assembled
-      deal-by-deal and a systematic completeness review of the data-center
-      securitization market (2024 onward) is in progress — read its earlier
-      bars as minimums, not market totals.
+      capture; the landlord series was widened 2026-08-09 by a systematic
+      review of AI-linked campus financings and hyperscale-NNN
+      securitizations (2024 onward). A small verification tail remains, so
+      its earlier bars can still step up as deals are confirmed.
     </p>
   </details>
 </figure>
