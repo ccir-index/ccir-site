@@ -23,6 +23,7 @@
  "instruments": [
   {
    "id": "crwv-ddtl-1",
+   "collateral_class": "gpu",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -56,6 +57,7 @@
   },
   {
    "id": "crwv-ddtl-2",
+   "collateral_class": "gpu",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -91,6 +93,7 @@
   },
   {
    "id": "crwv-ddtl-2-1",
+   "collateral_class": "gpu",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -123,6 +126,7 @@
   },
   {
    "id": "crwv-ddtl-3",
+   "collateral_class": "gpu",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -157,6 +161,7 @@
   },
   {
    "id": "crwv-ddtl-4",
+   "collateral_class": "gpu",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -189,6 +194,7 @@
   },
   {
    "id": "crwv-ddtl-5",
+   "collateral_class": "gpu",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -223,6 +229,7 @@
   },
   {
    "id": "crwv-ddtl-2600-2026",
+   "collateral_class": "gpu",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -254,6 +261,7 @@
   },
   {
    "id": "crwv-notes-9250-2030",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "CoreWeave, Inc.",
@@ -287,6 +295,7 @@
   },
   {
    "id": "crwv-notes-9000-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "CoreWeave, Inc.",
@@ -320,6 +329,7 @@
   },
   {
    "id": "crwv-notes-9750-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "CoreWeave, Inc.",
@@ -353,6 +363,7 @@
   },
   {
    "id": "crwv-notes-9625-2032",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "CoreWeave, Inc.",
@@ -386,6 +397,7 @@
   },
   {
    "id": "crwv-notes-eur-8500-2032",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "CoreWeave, Inc.",
@@ -419,6 +431,7 @@
   },
   {
    "id": "crwv-conv-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "CoreWeave, Inc.",
@@ -452,6 +465,7 @@
   },
   {
    "id": "crwv-conv-2032",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "CoreWeave, Inc.",
@@ -486,6 +500,7 @@
   },
   {
    "id": "crwv-rcf",
+   "collateral_class": "secured_undisclosed",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -518,6 +533,7 @@
   },
   {
    "id": "crwv-oem-financings",
+   "collateral_class": "gpu",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -549,6 +565,7 @@
   },
   {
    "id": "crwv-software-financings",
+   "collateral_class": "secured_undisclosed",
    "issuer": "CoreWeave, Inc.",
    "ticker": "CRWV",
    "issuer_type": "public",
@@ -580,6 +597,7 @@
   },
   {
    "id": "crwv-magnetar-loan",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "CoreWeave, Inc.",
@@ -613,6 +631,7 @@
   },
   {
    "id": "crwv-dcsp",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "CoreWeave, Inc.",
@@ -648,6 +667,7 @@
   },
   {
    "id": "nbis-secured-tl-775",
+   "collateral_class": "gpu",
    "issuer": "Nebius Group N.V.",
    "ticker": "NBIS",
    "issuer_type": "public",
@@ -688,6 +708,7 @@
   },
   {
    "id": "nbis-conv-2029",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Nebius Group N.V.",
@@ -721,6 +742,7 @@
   },
   {
    "id": "nbis-conv-2031-jun",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Nebius Group N.V.",
@@ -754,6 +776,7 @@
   },
   {
    "id": "nbis-conv-2030",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Nebius Group N.V.",
@@ -787,6 +810,7 @@
   },
   {
    "id": "nbis-conv-2032",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Nebius Group N.V.",
@@ -820,6 +844,7 @@
   },
   {
    "id": "nbis-conv-2031-mar",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Nebius Group N.V.",
@@ -853,6 +878,7 @@
   },
   {
    "id": "nbis-conv-2033",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Nebius Group N.V.",
@@ -886,6 +912,7 @@
   },
   {
    "id": "nbis-legacy-2025",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Nebius Group N.V.",
@@ -917,6 +944,7 @@
   },
   {
    "id": "wulf-notes-7750-2030",
+   "collateral_class": "operator_campus",
    "issuer": "TeraWulf Inc.",
    "ticker": "WULF",
    "issuer_type": "public",
@@ -949,6 +977,7 @@
   },
   {
    "id": "wulf-conv-2030",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "TeraWulf Inc.",
@@ -982,6 +1011,7 @@
   },
   {
    "id": "wulf-conv-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "TeraWulf Inc.",
@@ -1016,6 +1046,7 @@
   },
   {
    "id": "wulf-conv-2032",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "TeraWulf Inc.",
@@ -1050,6 +1081,7 @@
   },
   {
    "id": "wulf-rcf",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Corporate parent revolving credit facility secured by substantially all Company assets, not a GPU-asset-backed facility — out of the GPU-collateralized spread/issuance scope (2026-07-20).",
    "issuer": "TeraWulf Inc.",
@@ -1085,6 +1117,7 @@
   },
   {
    "id": "wulf-jv-7250-2030",
+   "collateral_class": "landlord_spv",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "TeraWulf Inc.",
@@ -1119,6 +1152,7 @@
   },
   {
    "id": "apld-9250-2030",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Applied Digital Corporation",
@@ -1152,6 +1186,7 @@
   },
   {
    "id": "apld-6750-2031",
+   "collateral_class": "operator_campus",
    "issuer": "Applied Digital Corporation",
    "ticker": "APLD",
    "issuer_type": "public",
@@ -1184,6 +1219,7 @@
   },
   {
    "id": "apld-7000-2031",
+   "collateral_class": "operator_campus",
    "issuer": "Applied Digital Corporation",
    "ticker": "APLD",
    "issuer_type": "public",
@@ -1216,6 +1252,7 @@
   },
   {
    "id": "apld-conv-2030",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Applied Digital Corporation",
@@ -1249,6 +1286,7 @@
   },
   {
    "id": "apld-devco-macquarie",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Applied Digital Corporation",
@@ -1282,6 +1320,7 @@
   },
   {
    "id": "apld-starion-eln01",
+   "collateral_class": "operator_campus",
    "issuer": "Applied Digital Corporation",
    "ticker": "APLD",
    "issuer_type": "public",
@@ -1313,6 +1352,7 @@
   },
   {
    "id": "apld-cornerstone-gpu01",
+   "collateral_class": "gpu",
    "issuer": "Applied Digital Corporation",
    "ticker": "APLD",
    "issuer_type": "public",
@@ -1344,6 +1384,7 @@
   },
   {
    "id": "apld-starion-hosting",
+   "collateral_class": "operator_campus",
    "issuer": "Applied Digital Corporation",
    "ticker": "APLD",
    "issuer_type": "public",
@@ -1375,6 +1416,7 @@
   },
   {
    "id": "apld-other-safes-notes",
+   "collateral_class": "out",
    "issuer": "Applied Digital Corporation",
    "ticker": "APLD",
    "issuer_type": "public",
@@ -1406,6 +1448,7 @@
   },
   {
    "id": "apld-rcf",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured revolver on certain non-data-center project assets, not GPU-collateral — out of the GPU-collateralized spread/issuance scope (2026-07-20).",
    "issuer": "Applied Digital Corporation",
@@ -1444,6 +1487,7 @@
   },
   {
    "id": "apld-rcf-2025",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Corporate revolver secured on parent-level assets, not GPU-collateral — out of the GPU-collateralized spread/issuance scope.",
    "issuer": "Applied Digital Corporation",
@@ -1477,6 +1521,7 @@
   },
   {
    "id": "cifr-conv-2030",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
@@ -1510,6 +1555,7 @@
   },
   {
    "id": "cifr-conv-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
@@ -1543,6 +1589,7 @@
   },
   {
    "id": "cifr-7125-2030",
+   "collateral_class": "operator_campus",
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
    "ticker": "CIFR",
    "issuer_type": "public",
@@ -1575,6 +1622,7 @@
   },
   {
    "id": "cifr-6125-2031",
+   "collateral_class": "operator_campus",
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
    "ticker": "CIFR",
    "issuer_type": "public",
@@ -1607,6 +1655,7 @@
   },
   {
    "id": "cifr-6000-2031",
+   "collateral_class": "operator_campus",
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
    "ticker": "CIFR",
    "issuer_type": "public",
@@ -1639,6 +1688,7 @@
   },
   {
    "id": "cifr-rcf",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Corporate parent revolving credit facility secured by substantially all Company assets (undrawn at 3/31/26), not a GPU-asset-backed facility — out of the GPU-collateralized spread/issuance scope (2026-07-20).",
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
@@ -1679,6 +1729,7 @@
   },
   {
    "id": "cifr-coinbase",
+   "collateral_class": "out",
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
    "ticker": "CIFR",
    "issuer_type": "public",
@@ -1710,6 +1761,7 @@
   },
   {
    "id": "cifr-twoprime",
+   "collateral_class": "out",
    "issuer": "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
    "ticker": "CIFR",
    "issuer_type": "public",
@@ -1741,6 +1793,7 @@
   },
   {
    "id": "iren-conv-2030",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "IREN Limited",
@@ -1774,6 +1827,7 @@
   },
   {
    "id": "iren-conv-2029",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "IREN Limited",
@@ -1807,6 +1861,7 @@
   },
   {
    "id": "iren-conv-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "IREN Limited",
@@ -1840,6 +1895,7 @@
   },
   {
    "id": "iren-conv-2032",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "IREN Limited",
@@ -1873,6 +1929,7 @@
   },
   {
    "id": "iren-conv-jun-2033",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "IREN Limited",
@@ -1906,6 +1963,7 @@
   },
   {
    "id": "iren-conv-dec-2033",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "IREN Limited",
@@ -1939,6 +1997,7 @@
   },
   {
    "id": "iren-hw3-ddtl",
+   "collateral_class": "gpu",
    "issuer": "IREN Limited",
    "ticker": "IREN",
    "issuer_type": "public",
@@ -1972,6 +2031,7 @@
   },
   {
    "id": "iren-hw3-notes",
+   "collateral_class": "gpu",
    "issuer": "IREN Limited",
    "ticker": "IREN",
    "issuer_type": "public",
@@ -2004,6 +2064,7 @@
   },
   {
    "id": "iren-gpu-leases",
+   "collateral_class": "gpu",
    "issuer": "IREN Limited",
    "ticker": "IREN",
    "issuer_type": "public",
@@ -2036,6 +2097,7 @@
   },
   {
    "id": "corz-conv-2029",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Core Scientific, Inc.",
@@ -2069,6 +2131,7 @@
   },
   {
    "id": "corz-conv-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Core Scientific, Inc.",
@@ -2102,6 +2165,7 @@
   },
   {
    "id": "corz-7750-2031",
+   "collateral_class": "operator_campus",
    "issuer": "Core Scientific, Inc.",
    "ticker": "CORZ",
    "issuer_type": "public",
@@ -2135,6 +2199,7 @@
   },
   {
    "id": "corz-finance-leases",
+   "collateral_class": "gpu",
    "issuer": "Core Scientific, Inc.",
    "ticker": "CORZ",
    "issuer_type": "public",
@@ -2164,6 +2229,7 @@
   },
   {
    "id": "dlr-global-rcf",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2197,6 +2263,7 @@
   },
   {
    "id": "dlr-yen-rcf",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2230,6 +2297,7 @@
   },
   {
    "id": "dlr-euro-tl",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2263,6 +2331,7 @@
   },
   {
    "id": "dlr-chf-0200-2026",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2296,6 +2365,7 @@
   },
   {
    "id": "dlr-chf-1700-2027",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2329,6 +2399,7 @@
   },
   {
    "id": "dlr-usd-3700-2027",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2362,6 +2433,7 @@
   },
   {
    "id": "dlr-usd-5550-2028",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2395,6 +2467,7 @@
   },
   {
    "id": "dlr-eur-1125-2028",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2428,6 +2501,7 @@
   },
   {
    "id": "dlr-usd-4450-2028",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2461,6 +2535,7 @@
   },
   {
    "id": "dlr-chf-0550-2029",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2494,6 +2569,7 @@
   },
   {
    "id": "dlr-usd-3600-2029",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2527,6 +2603,7 @@
   },
   {
    "id": "dlr-gbp-3300-2029",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2560,6 +2637,7 @@
   },
   {
    "id": "dlr-exch-2029",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2593,6 +2671,7 @@
   },
   {
    "id": "dlr-eur-1500-2030",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2626,6 +2705,7 @@
   },
   {
    "id": "dlr-gbp-3750-2030",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2659,6 +2739,7 @@
   },
   {
    "id": "dlr-eur-1250-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2692,6 +2773,7 @@
   },
   {
    "id": "dlr-eur-0625-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2725,6 +2807,7 @@
   },
   {
    "id": "dlr-eur-1000-2032",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2758,6 +2841,7 @@
   },
   {
    "id": "dlr-eur-1375-2032",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2791,6 +2875,7 @@
   },
   {
    "id": "dlr-eur-3750-2033",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2824,6 +2909,7 @@
   },
   {
    "id": "dlr-eur-3875-2033",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2857,6 +2943,7 @@
   },
   {
    "id": "dlr-eur-3875-2034",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2890,6 +2977,7 @@
   },
   {
    "id": "dlr-eur-3875-2035",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2923,6 +3011,7 @@
   },
   {
    "id": "dlr-eur-4250-2037",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2956,6 +3045,7 @@
   },
   {
    "id": "dlr-teraco",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -2989,6 +3079,7 @@
   },
   {
    "id": "dlr-westin-mortgage",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -3022,6 +3113,7 @@
   },
   {
    "id": "dlr-other-unsecured",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Digital Realty Trust, Inc./L.P.",
@@ -3057,6 +3149,7 @@
   },
   {
    "id": "hut-riverbend-6192-2042",
+   "collateral_class": "operator_campus",
    "issuer": "Hut 8 Corp.",
    "ticker": "HUT",
    "issuer_type": "public",
@@ -3089,6 +3182,7 @@
   },
   {
    "id": "hut-beaconpoint-6129-2042",
+   "collateral_class": "operator_campus",
    "issuer": "Hut 8 Corp.",
    "ticker": "HUT",
    "issuer_type": "public",
@@ -3121,6 +3215,7 @@
   },
   {
    "id": "hut-falconx",
+   "collateral_class": "out",
    "issuer": "Hut 8 Corp.",
    "ticker": "HUT",
    "issuer_type": "public",
@@ -3152,6 +3247,7 @@
   },
   {
    "id": "hut-coatue-conv",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Hut 8 Corp.",
@@ -3185,6 +3281,7 @@
   },
   {
    "id": "hut-tzrc-note",
+   "collateral_class": "out",
    "issuer": "Hut 8 Corp.",
    "ticker": "HUT",
    "issuer_type": "public",
@@ -3216,6 +3313,7 @@
   },
   {
    "id": "hut-twoprime-revolver",
+   "collateral_class": "secured_undisclosed",
    "issuer": "Hut 8 Corp.",
    "ticker": "HUT",
    "issuer_type": "public",
@@ -3247,6 +3345,7 @@
   },
   {
    "id": "hut-safe",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Hut 8 Corp.",
@@ -3280,6 +3379,7 @@
   },
   {
    "id": "btbt-conv-2030",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Bit Digital, Inc.",
@@ -3314,6 +3414,7 @@
   },
   {
    "id": "wyfi-conv-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Bit Digital, Inc.",
@@ -3347,6 +3448,7 @@
   },
   {
    "id": "wyfi-landsbankinn",
+   "collateral_class": "gpu",
    "issuer": "Bit Digital, Inc.",
    "ticker": "BTBT",
    "issuer_type": "public",
@@ -3378,6 +3480,7 @@
   },
   {
    "id": "wyfi-rbc-mtl3",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Bit Digital, Inc.",
@@ -3411,6 +3514,7 @@
   },
   {
    "id": "btbt-galaxy-mla",
+   "collateral_class": "out",
    "issuer": "Bit Digital, Inc.",
    "ticker": "BTBT",
    "issuer_type": "public",
@@ -3442,6 +3546,7 @@
   },
   {
    "id": "wyfi-briley-nc1",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Bit Digital, Inc.",
@@ -3475,6 +3580,7 @@
   },
   {
    "id": "hive-exch-t1",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "HIVE Digital Technologies Ltd.",
@@ -3508,6 +3614,7 @@
   },
   {
    "id": "hive-exch-t2",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "HIVE Digital Technologies Ltd.",
@@ -3541,6 +3648,7 @@
   },
   {
    "id": "hive-mortgage-1",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "HIVE Digital Technologies Ltd.",
@@ -3574,6 +3682,7 @@
   },
   {
    "id": "hive-mortgage-2",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "HIVE Digital Technologies Ltd.",
@@ -3607,6 +3716,7 @@
   },
   {
    "id": "hive-boden",
+   "collateral_class": "secured_undisclosed",
    "issuer": "HIVE Digital Technologies Ltd.",
    "ticker": "HIVE",
    "issuer_type": "public",
@@ -3638,6 +3748,7 @@
   },
   {
    "id": "hive-atlantic",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "HIVE Digital Technologies Ltd.",
@@ -3673,6 +3784,7 @@
   },
   {
    "id": "hive-dell-lease",
+   "collateral_class": "gpu",
    "issuer": "HIVE Digital Technologies Ltd.",
    "ticker": "HIVE",
    "issuer_type": "public",
@@ -3704,6 +3816,7 @@
   },
   {
    "id": "slnh-generate-a",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Soluna Holdings, Inc.",
@@ -3737,6 +3850,7 @@
   },
   {
    "id": "slnh-greencloud",
+   "collateral_class": "gpu",
    "issuer": "Soluna Holdings, Inc.",
    "ticker": "SLNH",
    "issuer_type": "public",
@@ -3768,6 +3882,7 @@
   },
   {
    "id": "slnh-galaxy-sophie",
+   "collateral_class": "operator_campus",
    "issuer": "Soluna Holdings, Inc.",
    "ticker": "SLNH",
    "issuer_type": "public",
@@ -3799,6 +3914,7 @@
   },
   {
    "id": "slnh-kati-land",
+   "collateral_class": "operator_campus",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Soluna Holdings, Inc.",
@@ -3832,6 +3948,7 @@
   },
   {
    "id": "slnh-springlane-equip",
+   "collateral_class": "operator_campus",
    "issuer": "Soluna Holdings, Inc.",
    "ticker": "SLNH",
    "issuer_type": "public",
@@ -3863,6 +3980,7 @@
   },
   {
    "id": "slnh-generate-c",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Wind-farm project financing (Briscoe 149.85 MW, TX), not GPU-collateral — out of the GPU-collateralized spread/issuance scope (2026-07-20).",
    "issuer": "Soluna Holdings, Inc.",
@@ -3896,6 +4014,7 @@
   },
   {
    "id": "slnh-yorkville",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
    "issuer": "Soluna Holdings, Inc.",
@@ -3960,6 +4079,7 @@
   },
   {
    "id": "crusoe-upper90-project",
+   "collateral_class": "out",
    "issuer": "Crusoe Energy Systems",
    "ticker": null,
    "issuer_type": "private",
@@ -3991,6 +4111,7 @@
   },
   {
    "id": "crusoe-svb-sparkfund-generate",
+   "collateral_class": "out",
    "issuer": "Crusoe Energy Systems",
    "ticker": null,
    "issuer_type": "private",
@@ -4024,6 +4145,7 @@
   },
   {
    "id": "crusoe-gpu-facility-2023",
+   "collateral_class": "gpu",
    "issuer": "Crusoe Energy Systems",
    "ticker": null,
    "issuer_type": "private",
@@ -4055,6 +4177,7 @@
   },
   {
    "id": "crusoe-upper90-syndicated",
+   "collateral_class": "gpu",
    "issuer": "Crusoe Energy Systems",
    "ticker": null,
    "issuer_type": "private",
@@ -4091,6 +4214,7 @@
   },
   {
    "id": "crusoe-brookfield",
+   "collateral_class": "secured_undisclosed",
    "issuer": "Crusoe Energy Systems",
    "ticker": null,
    "issuer_type": "private",
@@ -4122,6 +4246,7 @@
   },
   {
    "id": "crusoe-victorypark",
+   "collateral_class": "gpu",
    "issuer": "Crusoe Energy Systems",
    "ticker": null,
    "issuer_type": "private",
@@ -4153,6 +4278,7 @@
   },
   {
    "id": "crusoe-gs-amd",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Status not confirmed-closed (strict scope, 2026-07-06).",
    "issuer": "Crusoe Energy Systems",
@@ -4187,6 +4313,7 @@
   },
   {
    "id": "abilene-phase1",
+   "collateral_class": "landlord_spv",
    "issuer": "Crusoe Energy Systems",
    "ticker": null,
    "issuer_type": "private",
@@ -4218,6 +4345,7 @@
   },
   {
    "id": "abilene-phase2",
+   "collateral_class": "landlord_spv",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Crusoe Energy Systems",
@@ -4251,6 +4379,7 @@
   },
   {
    "id": "fluidstack-meridian-arc",
+   "collateral_class": "landlord_spv",
    "issuer": "Fluidstack",
    "ticker": null,
    "issuer_type": "private",
@@ -4314,6 +4443,7 @@
   },
   {
    "id": "fluidstack-early-debt",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Status not confirmed-closed (strict scope, 2026-07-06).",
    "issuer": "Fluidstack",
@@ -4347,6 +4477,7 @@
   },
   {
    "id": "lambda-macquarie-spv",
+   "collateral_class": "gpu",
    "issuer": "Lambda",
    "ticker": null,
    "issuer_type": "private",
@@ -4380,6 +4511,7 @@
   },
   {
    "id": "lambda-jpm-275",
+   "collateral_class": "secured_undisclosed",
    "issuer": "Lambda",
    "ticker": null,
    "issuer_type": "private",
@@ -4415,6 +4547,7 @@
   },
   {
    "id": "lambda-jpm-1000",
+   "collateral_class": "secured_undisclosed",
    "issuer": "Lambda",
    "ticker": null,
    "issuer_type": "private",
@@ -4447,6 +4580,7 @@
   },
   {
    "id": "vultr-package",
+   "collateral_class": "secured_undisclosed",
    "issuer": "Vultr (The Constant Company, LLC)",
    "ticker": null,
    "issuer_type": "private",
@@ -4483,6 +4617,7 @@
   },
   {
    "id": "nscale-ddtl",
+   "collateral_class": "gpu",
    "issuer": "Nscale",
    "ticker": null,
    "issuer_type": "private",
@@ -4515,6 +4650,7 @@
   },
   {
    "id": "nscale-narvik",
+   "collateral_class": "operator_campus",
    "issuer": "Nscale",
    "ticker": null,
    "issuer_type": "private",
@@ -4550,6 +4686,7 @@
   },
   {
    "id": "nscale-rcf-2026",
+   "collateral_class": "secured_undisclosed",
    "issuer": "Nscale",
    "ticker": null,
    "issuer_type": "private",
@@ -4592,6 +4729,7 @@
   },
   {
    "id": "mistral-essonne",
+   "collateral_class": "secured_undisclosed",
    "issuer": "Mistral AI",
    "ticker": null,
    "issuer_type": "private",
@@ -4629,6 +4767,7 @@
   },
   {
    "id": "cerebras-revolver",
+   "collateral_class": "secured_undisclosed",
    "issuer": "Cerebras Systems",
    "ticker": null,
    "issuer_type": "private",
@@ -4668,6 +4807,7 @@
   },
   {
    "id": "xai-ms-package",
+   "collateral_class": "secured_undisclosed",
    "issuer": "xAI",
    "ticker": null,
    "issuer_type": "private",
@@ -4699,6 +4839,7 @@
   },
   {
    "id": "xai-valor-program",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Program umbrella, not a discrete issuance: ~$7.5B is equity, scale partly rumored (status: press), and the confirmed Apollo tranches under it are tracked separately — counting it would double-count.",
    "issuer": "xAI",
@@ -4733,6 +4874,7 @@
   },
   {
    "id": "xai-apollo-vci",
+   "collateral_class": "gpu",
    "issuer": "xAI",
    "ticker": null,
    "issuer_type": "private",
@@ -4765,6 +4907,7 @@
   },
   {
    "id": "xai-apollo-t2",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Status not confirmed-closed (strict scope, 2026-07-06).",
    "issuer": "xAI",
@@ -4799,6 +4942,7 @@
   },
   {
    "id": "meta-beignet-hyperion",
+   "collateral_class": "landlord_spv",
    "exclude_from_issuance": true,
    "exclude_reason": "Data-center campus credit, not GPU-collateral: security is the Hyperion campus plus Meta's operating-lease guarantee (Meta is tenant, not borrower); an IG hyperscaler real-estate SPV, different in kind from neocloud GPU-backed debt.",
    "issuer": "Meta / Blue Owl \"Hyperion\" JV (Richland Parish, LA)",
@@ -4834,6 +4978,7 @@
   },
   {
    "id": "meta-elpaso",
+   "collateral_class": "landlord_spv",
    "exclude_from_issuance": true,
    "exclude_reason": "Data-center-campus credit, not GPU-collateral: security is the El Paso campus plus the Meta lease (Meta is tenant, not borrower); same basis as the excluded meta-beignet-hyperion.",
    "issuer": "Meta / BlackRock \"Sopaipilla\" JV (El Paso, TX)",
@@ -4868,6 +5013,7 @@
   },
   {
    "id": "apollo-blackstone-anthropic-tpu-spv",
+   "collateral_class": "chip_lease",
    "exclude_from_issuance": true,
    "exclude_reason": "Out of strict GPU scope: collateral is Google/Broadcom-designed TPUs (not GPUs) leased to Anthropic via an SPV; carried as market context, same treatment class as the Meta campus SPVs. Press-sourced, not an issuer/lender release.",
    "issuer": "Apollo / Blackstone-led private-credit SPV (Anthropic TPU lease)",
@@ -4902,6 +5048,7 @@
   },
   {
    "id": "vantage-frontier-tx",
+   "collateral_class": "landlord_spv",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Vantage Data Centers",
@@ -4935,6 +5082,7 @@
   },
   {
    "id": "vantage-lighthouse-wi",
+   "collateral_class": "landlord_spv",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
    "issuer": "Vantage Data Centers",
@@ -4968,6 +5116,7 @@
   },
   {
    "id": "general-compute-upper90-sambanova",
+   "collateral_class": "chip_lease",
    "exclude_from_issuance": true,
    "exclude_reason": "Out of strict GPU scope: collateral is SambaNova SN50 inference ASICs (non-GPU AI silicon), not GPUs. Carried as a new-asset-class context row pending any curator decision to widen scope. Press-sourced.",
    "issuer": "General Compute",
@@ -5001,6 +5150,7 @@
   },
   {
    "id": "usdai-qumulus",
+   "collateral_class": "gpu",
    "issuer": "QumulusAI",
    "ticker": "QMLS",
    "issuer_type": "public",
@@ -5032,6 +5182,7 @@
   },
   {
    "id": "usdai-sharonai",
+   "collateral_class": "gpu",
    "issuer": "Sharon AI Holdings, Inc.",
    "ticker": "SHAZ",
    "issuer_type": "public",
@@ -5063,6 +5214,7 @@
   },
   {
    "id": "sharonai-conv-2032",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Sharon AI",
@@ -5096,6 +5248,7 @@
   },
   {
    "id": "sharonai-conv-2031",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
    "issuer": "Sharon AI",
@@ -5129,6 +5282,7 @@
   },
   {
    "id": "usdai-quantum",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Status not confirmed-closed (strict scope, 2026-07-06).",
    "issuer": "Quantum Solutions Co., Ltd.",
@@ -5162,6 +5316,7 @@
   },
   {
    "id": "usdai-crucible",
+   "collateral_class": "gpu",
    "issuer": "Crucible (Crucible Compute)",
    "ticker": null,
    "issuer_type": "private",
@@ -5193,6 +5348,7 @@
   },
   {
    "id": "usdai-duos",
+   "collateral_class": "gpu",
    "issuer": "Duos Edge AI, Inc. (Duos Technologies Group)",
    "ticker": "DUOT",
    "issuer_type": "public",
@@ -5224,6 +5380,7 @@
   },
   {
    "id": "firmus-southgate-blackstone",
+   "collateral_class": "secured_undisclosed",
    "issuer": "Firmus Technologies",
    "ticker": null,
    "issuer_type": "private",
@@ -5257,6 +5414,7 @@
   },
   {
    "id": "galaxy-helios2-9875-2031",
+   "collateral_class": "landlord_spv",
    "exclude_from_issuance": true,
    "exclude_reason": "Secured by real estate / data-center campus and project assets, not GPUs (strict scope; same basis as apld-9250-2030 and the Meta campus SPVs).",
    "issuer": "Galaxy Digital Inc.",
@@ -5290,6 +5448,7 @@
   },
   {
    "id": "palebluedot-brookfield-tor",
+   "collateral_class": "secured_undisclosed",
    "issuer": "PaleBlueDot AI",
    "ticker": null,
    "issuer_type": "private",
@@ -5323,6 +5482,7 @@
   },
   {
    "id": "wulf-kentucky-plan",
+   "collateral_class": "out",
    "exclude_from_issuance": true,
    "exclude_reason": "Out of scope on two counts: data-center-campus financing (Kentucky 'Justified Data' campus, not GPUs) and status is rumored/planned — no launch or pricing as of 2026-07-26, so it isn't issued debt.",
    "issuer": "TeraWulf Inc.",
@@ -5356,6 +5516,7 @@
   },
   {
    "id": "aligned-abs-2026",
+   "collateral_class": "landlord_spv",
    "exclude_from_issuance": true,
    "exclude_reason": "Data-center real-estate/lease securitization — collateral is four operating campuses and tenant leases, not GPUs (strict scope; same basis as galaxy-helios2-9875-2031 and the Meta campus SPVs).",
    "issuer": "Aligned Data Centers",
@@ -5389,6 +5550,7 @@
   },
   {
    "id": "compass-abs-2026-2",
+   "collateral_class": "landlord_spv",
    "exclude_from_issuance": true,
    "exclude_reason": "Data-center real-estate/lease securitization — collateral is seven completed operational data centers, not GPUs (strict scope; same basis as galaxy-helios2-9875-2031 and the Meta campus SPVs).",
    "issuer": "Compass Datacenters",

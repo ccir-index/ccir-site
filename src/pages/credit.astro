@@ -98,10 +98,13 @@ const TYPE_LABEL: Record<string, string> = {
 const issuers = [...new Set(instruments.map((i: any) => i.issuer))];
 const types = [...new Set(instruments.map((i: any) => i.instrument_type))];
 
-// GPU-collateralized subset — the strict issuance scope charted below. The
-// full ledger also carries convertibles, unsecured notes, and data-center
-// credit, tracked for context but not secured by the GPUs themselves.
-const inScopeC = instruments.filter((i: any) => !i.exclude_from_issuance && typeof i.size_usd_m === 'number' && i.size_usd_m > 0);
+// GPU-collateralized subset — the strict issuance scope. Read from the
+// per-row collateral_class field (2026-08-09 row-by-row curation pass;
+// see drafts/credit_collateral_class_review_2026_08_09.md): only rows whose
+// filed security describes GPU/equipment collateral. Campus-secured operator
+// paper, landlord SPV/securitization paper, chip-lease paper, and secured
+// facilities with undisclosed collateral are all tracked but classed apart.
+const inScopeC = instruments.filter((i: any) => i.collateral_class === 'gpu');
 const inScopeUsdB = Math.round(inScopeC.reduce((a: number, i: any) => a + i.size_usd_m, 0) / 1000);
 
 // Collateral-treatment scan — amortization-family language anywhere in an
@@ -556,9 +559,10 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         <div>
           <div class="panel-title">Compute-infrastructure debt issuance — observed, by quarter</div>
           <div class="panel-sub">
-            Amount issued, bucketed by issuance quarter — GPU-collateralized
-            vs landlord SPV &amp; securitization-secured · the line is
-            cumulative GPU-collateralized tracked debt
+            Amount issued, bucketed by issuance quarter and collateral seat —
+            GPU-collateralized · operator campus-secured · landlord SPV &amp;
+            securitization · the line is cumulative GPU-collateralized
+            tracked debt
           </div>
         </div>
         <span class="badge">AS FILED</span>
