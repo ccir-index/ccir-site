@@ -160,12 +160,12 @@ const qLabel = (q: string) => q.replace('-', ' ');
     <p>
       Series are read from a per-instrument collateral classification set row
       by row from the filed security descriptions (2026-08-09 curation pass).
-      GPU-collateralized: {gpuRows.length} instruments, ${sumB(gpuRows).toFixed(1)}B —
+      GPU-collateralized: {gpuRows.length} instruments, ${sumB(gpuRows).toFixed(1)}B,
       disclosed GPU/equipment collateral only. Operator campus-secured:
-      {ocRows.length} instruments, ${sumB(ocRows).toFixed(1)}B — operator-issued
+      {ocRows.length} instruments, ${sumB(ocRows).toFixed(1)}B, operator-issued
       paper secured by a named campus or site (Cipher, Applied Digital,
       Hut 8, Core Scientific, TeraWulf and peers). Landlord SPV &amp;
-      securitization: {lsRows.length} instruments, ${sumB(lsRows).toFixed(1)}B —
+      securitization: {lsRows.length} instruments, ${sumB(lsRows).toFixed(1)}B,
       non-recourse landlord vehicles and lease securitizations with an
       AI-compute-linked tenant or purpose (Hyperion, Sopaipilla, Vantage,
       Stargate campus loans, Meridian Arc, hyperscale-NNN ABS). Multi-tenant
@@ -173,15 +173,15 @@ const qLabel = (q: string) => q.replace('-', ' ');
       ({byClass('dc_adjacent').length} captured rows,
       ${sumB(byClass('dc_adjacent')).toFixed(1)}B, held as adjacent; the
       wider colo ABS market is not tracked). As of {asOf}.
-      Observed from filings — amount issued at close, not drawn balance; no
+      Observed from filings: amount issued at close, not drawn balance. No
       drawdown or amortization is modelled. The current quarter (*) is
-      partial: the tracker records deals when filings or releases land, so
+      partial. The tracker records deals when filings or releases land, so
       the newest bars backfill upward.
       Not charted, by construction: {clRows.length} chip-lease
-      instruments (${sumB(clRows).toFixed(1)}B; non-GPU accelerators — chiefly
+      instruments (${sumB(clRows).toFixed(1)}B; non-GPU accelerators, chiefly
       the Anthropic TPU lease SPV) and {suRows.length} secured facilities
-      whose filings do not state the collateral (${sumB(suRows).toFixed(1)}B) —
-      undisclosed stays undisclosed, so they are tracked in the ledger but
+      whose filings do not state the collateral (${sumB(suRows).toFixed(1)}B).
+      Undisclosed stays undisclosed, so they are tracked in the ledger but
       not assigned to a collateral series. Convertibles, unsecured notes,
       crypto-collateralized loans, program umbrellas, and unconfirmed deals
       are outside the measure entirely.
@@ -191,9 +191,9 @@ const qLabel = (q: string) => q.replace('-', ' ');
         landlord {l.undated} (${(l.undatedUsd / 1000).toFixed(1)}B).</>
       )}
       Pre-2024 issuance (GPU ${(preBaseUsd / 1000).toFixed(1)}B, other ${(preOtherUsd / 1000).toFixed(1)}B)
-      sits in the cumulative line's starting level / outside the bars.
+      sits in the cumulative line's starting level, outside the bars.
       Coverage: the GPU and operator-campus series come from issuer-by-issuer
-      capture; the landlord series was widened 2026-08-09 by a systematic
+      capture. The landlord series was widened 2026-08-09 by a systematic
       review of AI-linked campus financings and hyperscale-NNN
       securitizations (2024 onward). A small verification tail remains, so
       its earlier bars can still step up as deals are confirmed.

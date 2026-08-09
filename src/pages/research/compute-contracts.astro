@@ -86,8 +86,8 @@ const msas = [
         A GPU-hour is sold under one of three kinds of paper: published terms
         of service that any customer accepts as-is, reserved commitments of a
         month to a year, and negotiated multi-year agreements with fixed
-        payment obligations. All three are now readable in primary documents —
-        the retail terms are published in full, and the large agreements are
+        payment obligations. All three are now readable in primary documents.
+        The retail terms are published in full, and the large agreements are
         filed, redacted, as material-contract exhibits on the U.S. Securities and Exchange Commission (SEC) EDGAR filing system. This
         primer walks the spectrum using the documents themselves. Its
         companion, <a href="/research/gpu-spv">The GPU SPV</a>, follows the
@@ -100,8 +100,8 @@ const msas = [
       <p>
         The same accelerator earns under very different contracts depending on
         who is renting it and for how long. The rate cards CCIR tracks are the
-        posted-ask layer of this spectrum — on-demand rates and committed asks
-        by tenor (<a href="/term">/term</a>) — and the persistent gap between
+        posted-ask layer of this spectrum: on-demand rates and committed asks
+        by tenor (<a href="/term">/term</a>). The persistent gap between
         the two ends is measured in
         <a href="/research/od-vs-committed">The Commitment Discount</a>. What
         follows is the contractual machinery behind those postings.
@@ -130,17 +130,17 @@ const msas = [
     <section class="sec" id="on-demand">
       <h2><span class="n">02</span> The On-Demand End: Published Terms</h2>
       <p>
-        At the retail end there is no negotiation — the contract is a document
+        At the retail end there is no negotiation. The contract is a document
         on the provider's website, accepted at account creation. CoreWeave's
         <a href={EDGAR.tos} rel="noopener" target="_blank">Terms of
         Service</a> (last modified June 30, 2022) is representative and
         published in full, with an Acceptable Use Policy, Data Processing
         Agreement, and Privacy Policy incorporated by reference. The
-        commercial mechanics are ordinary trade credit: invoices under
-        $20,000 are charged to the customer's card, invoices of $20,000 or
-        more are payable by automated clearing house (ACH) or wire on Net 15 terms, and unpaid balances
+        commercial mechanics are ordinary trade credit. Invoices under
+        $20,000 are charged to the customer's card. Invoices of $20,000 or
+        more are payable by automated clearing house (ACH) or wire on Net 15 terms. Unpaid balances
         accrue a finance charge of 1.5% per month. Non-payment carries an
-        operational remedy — suspension of application programming interface (API) access:
+        operational remedy, suspension of application programming interface (API) access:
       </p>
       <figure class="doc-ex">
         <div class="doc-ex-label">CoreWeave Terms of Service (published) — payment and suspension</div>
@@ -160,8 +160,8 @@ const msas = [
         Marketplace venues sit at the same end with a different seller: on a
         marketplace the machines are listed by independent hosts, billing runs
         per second, and there is no capacity commitment in either direction.
-        This is the fully interruptible, no-commitment end of the spectrum —
-        the prices posted here are the on-demand series in the
+        This is the fully interruptible, no-commitment end of the spectrum.
+        The prices posted here are the on-demand series in the
         <a href="/rates">published rates</a>, and the clearing-type venues in
         the <a href="/basis">basis monitor</a>.
       </p>
@@ -173,10 +173,10 @@ const msas = [
         The committed end runs on a two-layer architecture. The
         <strong>master services agreement</strong> is the frame: definitions,
         service obligations, payment mechanics, termination rights. The
-        commercial substance — chips, quantities, prices, dates — lives in
+        commercial substance (chips, quantities, prices, dates) lives in
         <strong>order forms</strong> executed under it. CoreWeave's MSAs with
-        Microsoft, OpenAI, and NVIDIA are filed on EDGAR; the order forms are
-        not, and within the filed MSAs the registrant's redactions, marked
+        Microsoft, OpenAI, and NVIDIA are filed on EDGAR. The order forms are
+        not. Within the filed MSAs the registrant's redactions, marked
         [*], fall almost exactly where the commercial terms sit. The legal
         architecture is fully readable.
       </p>
@@ -196,11 +196,11 @@ const msas = [
         </table>
       </div>
       <p class="tfoot">
-        CoreWeave, Inc. (SEC Central Index Key, or CIK, 0001769628) exhibit filings; counterparty links
+        CoreWeave, Inc. (SEC Central Index Key, or CIK, 0001769628) exhibit filings. Counterparty links
         open the filed exhibit as verified on {DATED}.
       </p>
       <p>
-        The frame itself is compact — the Microsoft agreement runs thirteen
+        The frame itself is compact. The Microsoft agreement runs thirteen
         sections, and the finance-relevant machinery concentrates in four:
       </p>
       <div class="twrap">
@@ -210,22 +210,22 @@ const msas = [
             <tr><td class="num">1</td><td class="strong">Definitions</td><td class="wide">The units of the deal: Order Form, Reserved Instances, Bulk Credits, Hardware Failure. Everything downstream is built from these.</td></tr>
             <tr><td class="num">2</td><td class="strong">Services</td><td class="wide">Access to the reserved capacity and the ordering mechanics. In the NVIDIA agreement, this is where the capacity-cap “[*] Rule” lives.</td></tr>
             <tr><td class="num">3–7</td><td class="strong">Responsibilities · Data · IP · Confidentiality · Reps</td><td class="wide">Use restrictions, data processing, licenses, and the confidentiality clause that keeps order forms out of the public record.</td></tr>
-            <tr><td class="num">8–9</td><td class="strong">Limitation of Liability · Indemnification</td><td class="wide">Damages caps and consequential-damages waivers — the ceiling on what a service failure can cost the operator.</td></tr>
-            <tr><td class="num">10</td><td class="strong">Term and Termination</td><td class="wide">Cure periods, insolvency triggers, and the remarketing-and-damages formula quoted below — the take-or-pay skeleton.</td></tr>
+            <tr><td class="num">8–9</td><td class="strong">Limitation of Liability · Indemnification</td><td class="wide">Damages caps and consequential-damages waivers: the ceiling on what a service failure can cost the operator.</td></tr>
+            <tr><td class="num">10</td><td class="strong">Term and Termination</td><td class="wide">Cure periods, insolvency triggers, and the remarketing-and-damages formula quoted below: the take-or-pay skeleton.</td></tr>
             <tr><td class="num">11</td><td class="strong">Payment of Fees</td><td class="wide">Net terms and early-payment discounts (percentages redacted), billing in arrears for on-demand use, no-offset mechanics.</td></tr>
             <tr><td class="num">12</td><td class="strong">Availability of Service</td><td class="wide">SLAs and the hardware-failure clause: two consecutive business days of failure suspends the payment obligation.</td></tr>
-            <tr><td class="num">13</td><td class="strong">General</td><td class="wide">Assignment and governing law — the section any lender's collateral assignment, or a substitute operator, must pass through.</td></tr>
+            <tr><td class="num">13</td><td class="strong">General</td><td class="wide">Assignment and governing law: the section any lender's collateral assignment, or a substitute operator, must pass through.</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="tfoot">Section titles as filed in Ex. 10.23; groupings 3–7 and 8–9 condensed. The OpenAI and NVIDIA agreements follow the same skeleton with counterparty-specific insertions.</p>
+      <p class="tfoot">Section titles as filed in Ex. 10.23. Groupings 3–7 and 8–9 condensed. The OpenAI and NVIDIA agreements follow the same skeleton with counterparty-specific insertions.</p>
       <figure class="photo doc-shot">
         <img src="/img/research/doc-msa-title.png" width="1100" height="760"
              alt="The first page of the CoreWeave–Microsoft Master Services Agreement as filed on EDGAR, showing the redaction legend, Microsoft Corporation as customer, and the opening definitions." loading="lazy" />
         <figcaption>
-          As filed: the first page of the CoreWeave–Microsoft Master Services
+          As filed, the first page of the CoreWeave–Microsoft Master Services
           Agreement (<a href={EDGAR.msft} rel="noopener" target="_blank">Ex.
-          10.23</a>) — the redaction legend, the counterparty, and the
+          10.23</a>). It shows the redaction legend, the counterparty, and the
           definitions the deal is built from.
         </figcaption>
       </figure>
@@ -256,13 +256,13 @@ const msas = [
         Payment relief is specified mechanically. Under the Microsoft
         agreement, if a hardware failure persists for two consecutive
         business days, the payment obligation for the affected services is
-        canceled until service is restored — downtime is priced into the
+        canceled until service is restored. Downtime is priced into the
         contract as suspended rent, not damages. And the termination clause
         contains the market structure of the committed discount in remedy
-        form: if CoreWeave terminates for the customer's breach, it may
-        remarket the dedicated servers, credit the proceeds against what the
-        customer owes, and the customer's exposure is capped at the lesser of
-        the remaining contract fees net of those proceeds, or —
+        form. If CoreWeave terminates for the customer's breach, it may
+        remarket the dedicated servers and credit the proceeds against what
+        the customer owes. The customer's exposure is capped at the lesser of
+        the remaining contract fees net of those proceeds, or:
       </p>
       <figure class="doc-ex">
         <div class="doc-ex-label">Master Services Agreement (Microsoft), Ex. 10.23 — §10(c), termination damages</div>
@@ -279,15 +279,15 @@ const msas = [
       <p>
         Read that limb (II) again: a committed customer who walks can be
         re-rated as if it had bought every hour on demand. The spread between
-        committed and on-demand rates — the
-        <a href="/research/od-vs-committed">commitment discount</a> — is not
-        just a pricing observation; it is the unit in which this contract
+        committed and on-demand rates, the
+        <a href="/research/od-vs-committed">commitment discount</a>, is not
+        just a pricing observation. It is the unit in which this contract
         computes damages.
       </p>
       <p>
         Two counterparty-specific clauses show how far the negotiated end is
         from the retail terms. The NVIDIA agreement caps how much of
-        CoreWeave's fleet NVIDIA itself may consume — the size of the cap is
+        CoreWeave's fleet NVIDIA itself may consume. The size of the cap is
         redacted, the rule is not: “CoreWeave must not, at any point in time,
         dedicate more than <mark>[*]</mark> of available customer capacity to
         NVIDIA (the ‘<mark>[*]</mark> Rule’); such capacity being measured by
@@ -295,7 +295,7 @@ const msas = [
         report, in advance, its own projected inability to pay (“a
         ‘Reportable Event’ occurs when Customer becomes currently unable to
         or is projected to be unable to, within the next four (4) month
-        period, pay the fees due”), and pre-arranges a <strong>substitute
+        period, pay the fees due”). It also pre-arranges a <strong>substitute
         operator</strong>: on certain CoreWeave insolvency-type events, the
         customer may require assignment of the order forms, the agreement,
         and the applicable data-center agreements to a third-party operator
@@ -320,20 +320,20 @@ const msas = [
       <h2><span class="n">04</span> The Middle of the Market</h2>
       <p>
         Between the click-through terms and the negotiated multi-billion
-        MSA sits the middle market — reserved capacity in the tens of
-        millions of dollars — and its paper reaches the public record by two
+        MSA sits the middle market: reserved capacity in the tens of
+        millions of dollars. Its paper reaches the public record by two
         routes: standardized reserved-capacity agreements published in full
         on providers' sites, and SEC exhibits when one party is a public
         company small enough for the deal to be material.
       </p>
       <p>
         The best filed specimen runs in the buying direction. In June 2024,
-        Soluna — a small-cap — contracted with HPE for NVIDIA H100
+        Soluna (a small-cap) contracted with HPE for NVIDIA H100
         infrastructure-as-a-service: $34.0 million over 36 months, filed
         complete as a statement of work with the full services agreement and
         SLA attached. The mechanics are what a mid-market commitment
-        actually looks like: an initial pre-payment of $10,293,350.40 —
-        roughly 30% of the deal — a satisfactory credit check as a condition
+        looks like: an initial pre-payment of $10,293,350.40
+        (roughly 30% of the deal), a satisfactory credit check as a condition
         of acceptance, a parent guaranty as credit support, and an express
         right to resell the capacity onward:
       </p>
@@ -354,9 +354,9 @@ const msas = [
         <img src="/img/research/doc-soluna-pricing.png" width="1100" height="560"
              alt="The pricing schedule from the Soluna–HPE statement of work as filed: GPU as-a-Service, NVIDIA H100 SXM, priced per GPU-hour over a 36-month term, with rates redacted and the upfront payment shown." loading="lazy" />
         <figcaption>
-          As filed: the pricing schedule of the Soluna–HPE statement of work
+          As filed, the pricing schedule of the Soluna–HPE statement of work
           (<a href={EDGAR.soluna} rel="noopener" target="_blank">Ex.
-          10.105</a>, §3.6) — GPU-as-a-Service, unit of measure the GPU-hour,
+          10.105</a>, §3.6). GPU-as-a-Service, unit of measure the GPU-hour,
           36-month term, rates redacted [***] with the upfront payment and
           remaining balance left in.
         </figcaption>
@@ -364,7 +364,7 @@ const msas = [
       <p>
         The record even carries the deal's full life: the agreement was
         terminated by 8-K in March 2025. Signing, prepayment, guaranty,
-        termination — a complete mid-market compute commitment, end to end,
+        termination: a complete mid-market compute commitment, end to end,
         in public documents.
       </p>
       <p>
@@ -373,22 +373,22 @@ const msas = [
         price quoted at the time of purchase, for the Term of the applicable
         Order,” provides that “payment obligations are non-cancelable and,
         unless otherwise specified, Fees paid are non-refundable,” and
-        charges 1.5% per month on late amounts — the same finance charge as
+        charges 1.5% per month on late amounts, the same finance charge as
         the retail terms in §02. It also lets the customer “terminate any
         Order for convenience at any time through our website”: the
         termination button exists, and the payment obligation survives it.
         Nebius's published services agreement defines a “Committed Volume of
         Services” payable “regardless of whether actual consumption is below
         the committed volume.” And the hyperscalers sell the same shape in
-        standardized units — Amazon Web Services (AWS) Capacity Blocks for ML (machine learning) reserve GPU
+        standardized units. Amazon Web Services (AWS) Capacity Blocks for ML (machine learning) reserve GPU
         capacity for one to 182 days, non-cancelable and non-modifiable once
         purchased. At every size, committed capacity means the same thing:
         the hours belong to the customer whether used or not.
       </p>
       <p>
         One pattern in what is <em>not</em> public: smaller operators
-        disclose deal terms generously — sizes, tenors, prepayment
-        percentages arrive by press release — but the contract text itself
+        disclose deal terms generously. Sizes, tenors, and prepayment
+        percentages arrive by press release, but the contract text itself
         is rarely filed. The Soluna exhibit is the exception. For most of
         the middle market, the posted rate card and the published template
         are the observable layer.
@@ -402,14 +402,14 @@ const msas = [
         and that somewhere has its own filed paper. On May 28, 2025, two
         Applied Digital subsidiaries signed datacenter leases with CoreWeave
         for the full capacity of two buildings at the Ellendale, North Dakota
-        campus — 250 MW in aggregate. The leases themselves are filed as
+        campus, 250 MW in aggregate. The leases themselves are filed as
         exhibits, redacted with the same conventions as the MSAs. From the
         8-K: each lease runs an initial approximately fifteen-year term with
         three five-year extension options; expected total contract value is
         approximately $3 billion for Building 2 and $4 billion for Building
         3; the landlord owes customary service levels backed by service-level
-        credits; CoreWeave may terminate an affected lease outright — no
-        termination fee — if specified delivery dates are missed, and may
+        credits; CoreWeave may terminate an affected lease outright (no
+        termination fee) if specified delivery dates are missed, and may
         terminate for convenience at any time on notice with a specified
         termination fee. Applied Digital guarantees its subsidiaries'
         obligations, and issued CoreWeave a warrant alongside.
@@ -420,7 +420,7 @@ const msas = [
         fifteen-year datacenter lease, which sits on the landlord's power
         infrastructure. Each layer is longer-dated than the one above it, and
         each is a contract someone finances. The credit agreements that do so
-        take assignment of exactly these documents — the subject of
+        take assignment of exactly these documents, the subject of
         <a href="/research/gpu-spv">the companion primer</a>.
       </p>
       <div class="stack-fig">
@@ -459,13 +459,13 @@ const msas = [
       <p>
         The redactions are permitted by Regulation S-K Item 601(b)(10), and
         registrants use them consistently: cure periods, discount
-        percentages, capacity caps, and — above all — prices and volumes are
+        percentages, capacity caps, and (above all) prices and volumes are
         omitted as “not material” and competitively harmful. What the filed
         record establishes is the architecture: how a reservation is defined,
         when payment stops, who may terminate and at what computed cost, and
         which documents travel together when an operator is replaced. The
         commercial terms inside the [*] marks are the part of this market
-        that only posted prices make observable — the series CCIR publishes
+        that only posted prices make observable. The series CCIR publishes
         at <a href="/rates">/rates</a> are the unredacted layer.
       </p>
     </section>
@@ -485,7 +485,7 @@ const msas = [
       </ul>
       <p class="tfoot">
         All excerpts verified against the filed text on {DATED}. [*] marks
-        are the registrants' redactions, reproduced as filed; emphasis, where
+        are the registrants' redactions, reproduced as filed. Emphasis, where
         added, is noted.
       </p>
     </section>

@@ -8,7 +8,7 @@ const cards = [
     title: 'Providers',
     cadence: 'Daily · 90d window · 25+ operators',
     summary:
-      'Per-provider list-ask time-series across hyperscalers, neoclouds, and managed-Kubernetes operators that run their own datacenters. Solid lines show guaranteed availability; dashed lines show interruptible. Bundled offerings are flagged and can be toggled.',
+      'Per-provider list-ask time-series across hyperscalers, neoclouds, and managed-Kubernetes operators that run their own datacenters. Solid lines show guaranteed availability. Dashed lines show interruptible. Bundled offerings are flagged and can be toggled.',
     inside: 'H100-SXM · H200-SXM · B200-SXM · GB200-NVL · A100-SXM',
   },
   {
@@ -17,7 +17,7 @@ const cards = [
     title: 'Marketplace',
     cadence: 'Intraday · 3h cadence · 7d window',
     summary:
-      'Least-expensive available rates from third-party-host marketplaces. Vast.ai restricted to verified hosts; RunPod split by sub-product (Secure / Community / Spot / Cluster). MIN is the headline; Vast median sits behind it as a faded backdrop.',
+      'Least-expensive available rates from third-party-host marketplaces. Vast.ai restricted to verified hosts. RunPod split by sub-product (Secure / Community / Spot / Cluster). MIN is the headline. Vast median sits behind it as a faded backdrop.',
     inside: 'Vast.ai Verified · RunPod Secure · Community · Spot · Cluster',
   },
   {
@@ -26,7 +26,7 @@ const cards = [
     title: 'Availability',
     cadence: 'Daily series · ~4 probes/day · 90d window',
     summary:
-      'The quantity side of the market: a diffusion read of how many genuine-capacity venues show launchable stock — breadth (X of Y venues), two bounds (any configuration vs full 8-GPU node), charted over time so the slope reads demand tightening or easing. Measured Vast utilization (denominator-fixed rented/total) rides alongside as the depth card.',
+      'The quantity side of the market: a diffusion read of how many genuine-capacity venues show launchable stock. Breadth (X of Y venues) and two bounds (any configuration vs full 8-GPU node) are charted over time, so the slope reads demand tightening or easing. Measured Vast utilization (denominator-fixed rented/total) rides alongside as the depth card.',
     inside: 'Breadth (X of Y venues) · any-config vs cluster (8×) · measured Vast utilization · per-source disclosure',
   },
   {
@@ -35,7 +35,7 @@ const cards = [
     title: 'Vast Overlay — Basis & Occupancy',
     cadence: 'Daily basis · 4 occupancy snapshots/day',
     summary:
-      'Vast is the one live, executable marketplace in the panel, so it is pulled out of the list-ask panel and re-surfaced here on both axes: price (how the live venue sits vs the ex-Vast Tier-3 list-ask floor) and quantity (implied utilization — machine-reconstructed share of listed capacity not currently rentable). Single-venue signal, shown alongside the main series.',
+      'Vast is the one live, executable marketplace in the panel, so it is pulled out of the list-ask panel and re-surfaced here on both axes: price (how the live venue sits vs the ex-Vast Tier-3 list-ask floor) and quantity (implied utilization: machine-reconstructed share of listed capacity not currently rentable). Single-venue signal, shown alongside the main series.',
     inside: 'Clearing basis · implied utilization since 2026-05-13 · whole-node share',
   },
 ];
@@ -77,8 +77,8 @@ const cards = [
 
     <p class="foot-note">
       Panel inputs feed the operator-equal median that produces each published
-      Compute Rate Index (CRI) rate. The Vast overlay is an adjacent surface — the one live,
-      executable venue in the panel — that CCIR exposes for visibility but does
+      Compute Rate Index (CRI) rate. The Vast overlay is an adjacent surface (the one live,
+      executable venue in the panel) that CCIR exposes for visibility but does
       not incorporate into the rate methodology. See the panel definition and
       eligibility filters below.
     </p>

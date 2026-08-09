@@ -237,17 +237,19 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
   <section class="wrap top">
     <header class="page-head">
       <h1>The Secondary Market</h1>
-      <p class="subhead">What a deployed GPU is worth as an earning asset — and what machines list and sell for.</p>
+      <p class="subhead">What a deployed GPU is worth as an earning asset, and what machines list and sell for.</p>
       <p class="standfirst">
-        This page publishes one value per chip — what a machine is worth
-        deployed and earning — and triangulates it against the market.
-        The value is <strong>model-implied</strong>, computed from CCIR's
-        own benchmark: an income approach over the CRI rental rate and
-        committed term curve, every assumption disclosed, the discount
-        rate anchored to the same collateral's financing yields in the
+        This page publishes one value per chip: what a machine is worth
+        deployed and earning. It triangulates that value against the
+        market. The value is <strong>model-implied</strong>, computed
+        from CCIR's own benchmark. It is an income approach over the CRI
+        rental rate and committed term curve. Every assumption is
+        disclosed, and the discount rate is anchored to the same
+        collateral's financing yields in the
         <a href="/credit">credit ledger</a>. The market checks are
-        observational — executed sales and posted asks, in separate
-        lanes. Inputs to recovery analysis, not a recovery estimate.
+        observational: executed sales and posted asks, in separate
+        lanes. They are inputs to recovery analysis, not a recovery
+        estimate.
       </p>
     </header>
 
@@ -256,8 +258,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <p class="secintro">
         Model-implied value of a deployed unit, derived from the CRI T2
         (neocloud) US guaranteed on-demand rate and the neocloud committed
-        term curve, recomputed on each daily data refresh. Not a transacted
-        price — the corroborating market records are beside each figure.
+        term curve, recomputed on each daily data refresh. It is not a
+        transacted price: the corroborating market records are beside each
+        figure.
       </p>
       <div class="ivgrid">
         {ivCards.map((v) => {
@@ -300,41 +303,41 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <details class="ivnote-d">
       <summary>Model assumptions & sensitivity</summary>
       <p class="ivnote">
-        Base case: year 1 at the 1Y committed rate, years 2–3 bootstrapped
-        from the 2Y/3Y committed curve, 18%/yr decay beyond the last
-        observed tenor of each chip's curve — a measured base, calibrated
+        Base case: year 1 at the 1Y committed rate; years 2–3 bootstrapped
+        from the 2Y/3Y committed curve; 18%/yr decay beyond the last
+        observed tenor of each chip's curve, a measured base calibrated
         to the realized decline of prior-generation rates (Method); 75%
         utilization; 65% net margin after power, colocation, and operations;
         15% discount rate; 6-year service life from volume availability.
         Where a chip's committed curve ends short of year 3 (B200: 1Y),
-        decay applies from the end of its observed curve — missing tenors
+        decay applies from the end of its observed curve. Missing tenors
         are never extended flat. A chip with no secondary-market record
         is published <em>modeled only</em>, so marked, and carries no
         ask or executed corroboration until one exists.
-        The sensitivity band varies one assumption at a time around base —
+        The sensitivity band varies one assumption at a time around base:
         discount rate 10–25%, service life 5–7 years, decay 10–30%/yr (the
         30% bound is the worst case on record: V100 from its scarcity
-        peak) — and shows the min–max. Jointly optimistic or pessimistic
-        corners are not stacked; utilization and margin are held at base;
-        a life bound at or below a chip's current age is omitted rather
+        peak). The band shows the min–max. Jointly optimistic or pessimistic
+        corners are not stacked. Utilization and margin are held at base.
+        A life bound at or below a chip's current age is omitted rather
         than shown as a zero. The
         discount-rate band is anchored to observed GPU-asset-backed
-        financing yields in CCIR's <a href="/credit">credit ledger</a> —
-        see Method below.
+        financing yields in CCIR's <a href="/credit">credit ledger</a>
+        (see Method below).
         The no-contract floor is the same model with one input changed:
         the published Neocloud interruptible rate as the earning path from
-        day one — flat year 1, decay beyond, no committed curve by
-        construction. Utilization stays at the base 75% deliberately: a
-        floating interruptible rate is the price at which spare capacity
-        clears, so the rate already carries the demand risk — haircutting
-        utilization as well would count it twice.
+        day one. That path is flat in year 1, decays beyond, and has no
+        committed curve by construction. Utilization stays at the base
+        75% deliberately. A floating interruptible rate is the price at
+        which spare capacity clears, so the rate already carries the
+        demand risk. Haircutting utilization as well would count it twice.
         The executed
-        lane is an observed disposition record, not a recovery estimate:
-        single-unit retail clearings can sit above or below a bulk
+        lane is an observed disposition record, not a recovery estimate.
+        Single-unit retail clearings can sit above or below a bulk
         disposition, and no current record measures market impact at volume.
-        Loss-given-default is a transaction-level parameter — lien
-        position, priority, workout cost, timing, pool composition — and
-        belongs to the party doing the recovery analysis; this record is one
+        Loss-given-default is a transaction-level parameter (lien
+        position, priority, workout cost, timing, pool composition) and
+        belongs to the party doing the recovery analysis. This record is one
         of its inputs.
       </p>
       </details>
@@ -344,10 +347,10 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <h2><span class="n">§</span> Contribute to the record</h2>
       <div class="cta-box">
         <p>
-          If you buy, sell,
-          broker, finance, or insure this hardware and hold executed price
-          records — dealer sales, disposal and auction results, broker
-          quotes, portfolio liquidations — CCIR accepts contributed data
+          Do you buy, sell,
+          broker, finance, or insure this hardware? If you hold executed
+          price records (dealer sales, disposal and auction results, broker
+          quotes, portfolio liquidations), CCIR accepts contributed data
           under the evidence-grading and provenance rules that govern
           every row on this page. Contributions are held
           source-confidential and enter published statistics only in
@@ -355,7 +358,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         </p>
         <p>
           <strong>Underwriting against GPU collateral?</strong> If you
-          need a series observed — a model, a venue, a spread —
+          need a series observed (a model, a venue, a spread),
           <a href="/contact">get in touch</a>.
         </p>
       </div>
@@ -367,7 +370,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         Three years of executed sales (July 2023 – August 2026; 3,009
         sold listings, 10,911 units, $26.3M documented) beside the asks
         posted today across an official marketplace API and a named dealer
-        cohort — the rental market prices an hour of compute; this page
+        cohort. The rental market prices an hour of compute. This page
         prices the machine itself.
       </p>
     </section>
@@ -420,8 +423,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
           <p class="tfoot">
             Per-GPU prices, log scale, as of {hw.as_of}. Executed dots require
             ≥3 sold listings in the window (models without one show ask only).
-            The gap between dots is the posted premium; it narrows as a model
-            commoditizes — ~2× on H100, ~1.2× on V100.
+            The gap between dots is the posted premium. It narrows as a model
+            commoditizes: ~2× on H100, ~1.2× on V100.
           </p>
         </details>
       </figcaption>
@@ -478,23 +481,23 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         <details class="tfoot-details">
           <summary>Chart notes</summary>
           <p class="tfoot">
-            One panel per model with a locked launch-price basis; x = the
+            One panel per model with a locked launch-price basis. x = the
             executed record's calendar window, July 2023 – July 2026,
-            shared across panels; y = percent of the evidence-graded
+            shared across panels. y = percent of the evidence-graded
             launch basis, log scale fitted per panel to that chip's own
-            range — panels are not directly overlayable by eye; the table
+            range, so panels are not directly overlayable by eye. The table
             carries the comparable levels (bases: V100 $18,625 [A] · A100
             $24,875 [A] · H100 $33,600 [B] · RTX A6000 $4,650 [B] —
             system-price, teardown, and announced-price bases; NVIDIA
             publishes no datacenter MSRP). The line is the executed
-            sales record, 3-month rolling median of sold listings —
-            every point sourced sales; thin months can
+            sales record, a 3-month rolling median of sold listings.
+            Every point is sourced sales. Thin months can
             move on few sales (the early-2025 H100 notch is a single
             month's 7-unit quantity liquidation, not a market level).
             The open circle at each panel's right edge marks the CURRENT
             posted-ask median (multi-source; the ladder above carries the
-            levels and counts). Asks lead and overstate executed prices —
-            roughly 1.2–2× — and the lanes are never blended. Archived
+            levels and counts). Asks lead and overstate executed prices,
+            roughly 1.2–2×, and the lanes are never blended. Archived
             ask history and dated contemporary reports are collected and
             retained in the dataset but not charted: sticky catalog
             prices and carried-forward quotes describe dealer posture,
@@ -503,7 +506,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
             Bars below: units sold per month across the executed record,
             calendar time. Models with thin or young records (H200, H100
             NVL, A100 80GB) and L40S are tracked in the table but not
-            paneled — a rolling median through one-listing months would
+            paneled. A rolling median through one-listing months would
             whipsaw, and no L40S launch basis meets the evidence bar.
           </p>
         </details>
@@ -612,8 +615,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       catalogs in the US and UK (source count shown per row; named, with
       currency and VAT treatment, in Method). Hopper-class dealer pages are
       largely quote-gated, which is why source counts vary by model. Asks
-      are opening prices, never pooled with executed;
-      ask/executed is the posted premium — it narrows as a model
+      are opening prices, never pooled with executed.
+      Ask/executed is the posted premium. It narrows as a model
       commoditizes. % of launch uses the evidence-graded basis in Method
       ([B]/[C] = non-vendor basis). 3-yr volume counts all hardware forms
       of the model (cards, lots, servers); accessories and mislabeled items
@@ -630,17 +633,18 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         contract for, with every leg either observable or disclosed. The
         observable legs: the CRI T2 US guaranteed on-demand headline as the
         spot rate, and the neocloud committed term curve (1Y/2Y/3Y
-        per-operator median discounts) pricing years one through three —
-        the market's own price for locked duration, not a forecast. The
+        per-operator median discounts) pricing years one through three.
+        The curve is the market's own price for locked duration, not a
+        forecast. The
         assumed legs are printed with the figure: decay beyond the curve,
         utilization, net margin, discount rate, service life. It is a model
-        output and is labeled as one everywhere it appears; the sale and
+        output and is labeled as one everywhere it appears. The sale and
         ask records below
-        corroborate it, and the model-to-ask ratio and executed price are
-        shown beside every figure so the reader holds all three numbers at
+        corroborate it. The model-to-ask ratio and executed price are
+        shown beside every figure, so the reader holds all three numbers at
         once. Where no market record exists for a chip (B200), the value is
-        published modeled-only and marked as such on its card: it is not
-        triangulated against asks or executed sales, its committed curve is
+        published modeled-only and marked as such on its card. It is not
+        triangulated against asks or executed sales. Its committed curve is
         observed to 1Y with decay applied beyond, its rate leg is a
         provisional headline, and its volume-availability vintage is
         assumed rather than sourced. It graduates to the corroborated
@@ -654,27 +658,27 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         dollar volume, format, and date last sold; every capture is archived.
         Rows are classified by title into single cards, multi-unit lots,
         servers, bare baseboards, converted cards (e.g. SXM-to-PCIe
-        conversions — tracked, never banded), accessories, and mislabeled
-        SKUs (V100S, L40, H100i and kin — excluded and tallied). Of the full
+        conversions; tracked, never banded), accessories, and mislabeled
+        SKUs (V100S, L40, H100i and kin; excluded and tallied). Of the full
         record, 11,388 units and $26.0M are hardware of the models tracked
-        here — the figures this page reports; the remainder is the excluded
-        tally. Multi-sale listings count once at their average price; their
-        sale history carries a date-last-sold only, so month assignment for
-        those listings is approximate. Chart lines are 3-month rolling
-        medians across sold listings, drawn solid throughout — every point
-        is sourced sales; per-month listing counts ship in the series CSV,
-        and thin months can move on few sales.
+        here. Those are the figures this page reports. The remainder is the
+        excluded tally. Multi-sale listings count once at their average
+        price. Their sale history carries a date-last-sold only, so month
+        assignment for those listings is approximate. Chart lines are
+        3-month rolling medians across sold listings, drawn solid
+        throughout. Every point is sourced sales. Per-month listing counts
+        ship in the series CSV, and thin months can move on few sales.
       </p>
       <p>
         <strong>Posted asks.</strong> Current single-GPU asks from the eBay
         Browse API (official, keyed) and dealer catalogs collected under
         each source's terms: IT Creations and UnixSurplus (USD), Bargain
         Hardware and ETB Technologies (GBP, ex-VAT basis, converted at the
-        ECB reference rate of the observation date — {hw.fx.gbpusd} as of
+        ECB reference rate of the observation date: {hw.fx.gbpusd} as of
         {hw.fx.date}). Additional dealers are tracked quote-gated
-        (presence, no price). Collected sources are named; data contributed
+        (presence, no price). Collected sources are named. Data contributed
         through the channel below is held source-confidential with its
-        evidence grade disclosed. Asks are a stock of open offers — they
+        evidence grade disclosed. Asks are a stock of open offers. They
         lead and overstate executed prices and are shown only beside them,
         never blended.
       </p>
@@ -684,14 +688,14 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         value-retention and useful-life assumptions, insurers underwriting
         residual value, and borrowers negotiating either side of those
         terms all face the same gap: no citable, neutral record of what
-        datacenter hardware actually sells for. Today, credit documents
-        overwhelmingly amortize GPU collateral to zero — not because the
+        datacenter hardware sells for. Today, credit documents
+        overwhelmingly amortize GPU collateral to zero, not because the
         hardware is worthless, but because no reference existed. This page
-        is the record: observed secondary-market prices with provenance —
-        executed levels, posted asks, volumes, and the spread between them —
-        the raw inputs from which recovery evidence, depreciation
-        assumptions, or residual analyses can be independently derived by
-        the parties who own those judgments.
+        is the record: observed secondary-market prices with provenance.
+        It carries executed levels, posted asks, volumes, and the spread
+        between them. These are the raw inputs from which the parties who
+        own those judgments can independently derive recovery evidence,
+        depreciation assumptions, or residual analyses.
       </p>
       <p>
         <strong>Decay beyond the curve.</strong> The decay base is
@@ -699,7 +703,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         together show A100 and V100 rental rates fell 15–19% a year as
         those chips aged, and the 18%/yr base sits inside that measured
         range. The 30%/yr bound of the sensitivity band is the worst case
-        on record — V100 from its scarcity peak.
+        on record: V100 from its scarcity peak.
       </p>
       <p>
         <strong>Discount rate.</strong> The 15% base and the 10–25% band
@@ -709,7 +713,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         (2023) to 7% (2026, rated). A going-concern discount rate sits at
         or above the secured debt cost of the same collateral. The
         observed record skews to the sector's largest, highest-rated
-        borrowers — a floor on the sector's cost of capital — and the
+        borrowers, a floor on the sector's cost of capital. The
         band's width above that floor carries the equity premium and the
         typical operator's higher funding cost. The 25% upper bound keeps
         the 2023 era in the band: debt on this collateral then cost
@@ -717,17 +721,18 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       </p>
       <p>
         <strong>What is model and what is observed.</strong> Exactly one
-        figure on this page is a model output — the income-derived value —
-        and it is labeled model-implied wherever it appears, with its
+        figure on this page is a model output: the income-derived value.
+        It is labeled model-implied wherever it appears, with its
         assumption set printed beside it. Everything else is an observed
         price with provenance. Rate inputs are observed prices out to the
-        last observed tenor; beyond it, a decay rate calibrated from
+        last observed tenor. Beyond it, a decay rate calibrated from
         realized rate history applies and is disclosed with the figure.
-        CCIR publishes no depreciation schedule as a product; the model
+        CCIR publishes no depreciation schedule as a product. The model
         prices today's curve plus disclosed, history-calibrated
-        assumptions, not a predicted market. Statistics follow the methodology's stat policy:
-        counts ship with every median in the series data; thin cells
-        gated; windows labeled on every display.
+        assumptions, not a predicted market. Statistics follow the
+        methodology's stat policy: counts ship with every median in the
+        series data, thin cells are gated, and windows are labeled on
+        every display.
       </p>
     </section>
   </section>

@@ -48,23 +48,23 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
       <p class="standfirst">
         Meta, Alphabet, Microsoft, Oracle and Amazon have signed
         <strong>{fmtB(sumL + sumP, 0)}</strong> of AI infrastructure
-        commitments that have not yet been delivered — leases signed on
+        commitments that have not yet been delivered: leases signed on
         buildings not yet handed over, plus contracts to buy chips, power
         and capacity at stated minimums. That figure is those two
-        disclosed quantities added together, as of {mon.as_of}; it is not
-        debt, and it is not the same as the all-in total below, which adds
+        disclosed quantities added together, as of {mon.as_of}. It is not
+        debt. It is not the same as the all-in total below, which adds
         borrowings and leases already on the balance sheet.
       </p>
       <p class="standfirst">
         The demand-side commitments that back compute credit, tracked from
         the SEC filings of the five largest AI buyers. Two footnote
-        quantities — in plain terms, <em>rent</em> (leases signed on data
+        quantities, in plain terms <em>rent</em> (leases signed on data
         centers still under construction) and <em>bills</em> (contracts to
-        buy chips, power, and capacity at stated minimums) — plus the
+        buy chips, power, and capacity at stated minimums), plus the
         revenue backlog on the other side of the same contracts, and the
         support instruments written around them. Every figure carries its
-        window and traces to an accession number. As of {mon.as_of};
-        next expected update: {mon.next_expected}.
+        window and traces to an accession number. As of {mon.as_of}.
+        Next expected update: {mon.next_expected}.
       </p>
     </header>
 
@@ -126,19 +126,20 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
       <p class="tblnote">
         $B, undiscounted, as disclosed. Windows differ where issuers'
         fiscal calendars and disclosure practices differ and are labeled
-        on every cell; deltas are shown only against the same issuer's
+        on every cell. Deltas are shown only against the same issuer's
         prior disclosure of the same quantity. Oracle's
         prior lease figure is fiscal 2022, the earliest comparable
         disclosure. <strong>All-in obligations</strong> = the two forward
         columns plus debt at face value and balance-sheet lease
         liabilities (operating + finance), each from the same issuer's
-        cited filings — a total fixed-claims stack built only from
-        components all five issuers disclose (construction commitments,
-        disclosed only by Microsoft, are excluded from these columns),
-        computed by us from the disclosed figures. The backlog ÷ all-in ratio is a conservative
+        cited filings. It is a total fixed-claims stack built only from
+        components all five issuers disclose, computed by us from the
+        disclosed figures. Construction commitments, disclosed only by
+        Microsoft, are excluded from these columns. The backlog ÷ all-in
+        ratio is a conservative
         screen, not a coverage finding: RPO is contracted revenue only,
         while debt and commenced leases are also serviced by revenue no
-        backlog captures — advertising, retail, licenses. Support
+        backlog captures (advertising, retail, licenses). Support
         instruments are contingent and are in no total.
       </p>
     </section>
@@ -147,21 +148,21 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
       <h2><span class="n">§</span> What these quantities are</h2>
       <p>
         <strong>Leases signed but not yet commenced</strong> are rental
-        agreements on facilities — overwhelmingly data centers — that have
+        agreements on facilities, overwhelmingly data centers, that have
         not been delivered. Nothing appears on the balance sheet until the
-        landlord hands over the building; at commencement, a lease
+        landlord hands over the building. At commencement, a lease
         liability and right-of-use asset are recognized. The footnote is
         therefore a forward calendar of balance-sheet lease liabilities,
         with terms disclosed as long as 30 years.
         <strong>Purchase and other commitments</strong> are contracts to
-        buy goods and services — cloud capacity, chips and servers, power —
+        buy goods and services (cloud capacity, chips and servers, power),
         reported at the non-cancelable portion or contractual minimum,
         in the issuers' own language: "non-cancelable," "take-or-pay,"
         "unconditional… enforceable and legally binding."
         <strong>Remaining performance obligations</strong> are the same
         class of contract seen from the seller's side: contracted future
         revenue not yet recognized. <strong>Support instruments</strong>
-        are credit support written around other parties' financings —
+        are credit support written around other parties' financings:
         payment backstops (Alphabet accounts for these as credit
         derivatives at fair value), residual value guarantees, and
         guarantees of lessors' borrowings.
@@ -169,7 +170,7 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
       <p>
         Why a compute-credit record tracks them: these commitments are the
         collateral of the offtake-backed lane of the
-        <a href="/credit">compute credit tracker</a> — a compute
+        <a href="/credit">compute credit tracker</a>. A compute
         provider's contracted cash flows from an investment-grade customer
         are that customer's purchase commitment seen from the other end,
         and the market prices their quality. The launch analysis, with the
@@ -179,7 +180,7 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
         $1.65 Trillion "Hidden Debt"</a>. On the support-instruments
         column specifically, see
         <a href="/research/alphabet-pays-for-data-center-speed">How
-        Alphabet Pays to Obtain Compute Capacity at Speed</a> — the backstop book and
+        Alphabet Pays to Obtain Compute Capacity at Speed</a>: the backstop book and
         its booked cost per $100, which this monitor updates with each
         Alphabet 10-Q.
       </p>
@@ -187,7 +188,7 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
         Sources: latest and prior filings per issuer as listed in each
         row, verified against the documents on EDGAR. This page is
         updated within days of each new 10-Q/10-K from the covered
-        issuers; figures are as-disclosed and are not restated between
+        issuers. Figures are as-disclosed and are not restated between
         filings. Nothing here is a solvency opinion, a forecast, or
         investment advice.
       </p>
@@ -196,26 +197,27 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
     <section class="sec" id="implied-rates">
       <h2><span class="n">§</span> Implied committed rates</h2>
       <p>
-        Where a publicly disclosed multi-year compute deal states enough —
-        dollars, term, and quantity — CCIR backs out the implied unit
-        rate. Every figure is implied — computed by CCIR from the disclosed figures — graded by disclosure quality, and none is an observed
+        Where a publicly disclosed multi-year compute deal states enough
+        (dollars, term, and quantity), CCIR backs out the implied unit
+        rate. Every figure is implied, computed by CCIR from the disclosed
+        figures, and graded by disclosure quality. None is an observed
         price. These rows are not part of any CCIR benchmark series. The
         methodology and per-deal detail are in the research note
         <a href="/research/implied-committed-rates">Implied Committed
-        Rates</a>; this table updates as deals publish.
+        Rates</a>. This table updates as deals publish.
       </p>
       <blockquote class="icr-assume">
         Assumptions, permanent: ratable spend across the disclosed term;
         100% of contracted hours billed; all disclosed dollars treated as
         compute; constant fleet; 8,760 hr/yr. Every assumption biases the
-        implied rate downward — <strong>all figures are floors on blended
+        implied rate downward: <strong>all figures are floors on blended
         committed rates, not observed prices.</strong> Grades: A = dollars,
         term, and units all company-disclosed; B = one input from
         attributed press. Grade-C rows (talks-stage or heavy estimation)
         do not publish. $/GPU-hr and $/MW-month rows are never blended.
-        Chip column = the generation as the parties disclosed it; where
+        Chip column = the generation as the parties disclosed it. Where
         unspecified, the rate is fleet-blended. No performance adjustment
-        across generations — rates on different chips are different
+        across generations: rates on different chips are different
         products, not comparable prices. This table carries $/GPU-hr rows
         only, newest first; megawatt-basis reads (IREN's grade-A basis,
         Stargate) live in the research note.
@@ -235,9 +237,9 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
         </table>
       </div>
       <p class="footnote">
-        Not computable, no rate published: Meta–CoreWeave (~$35.2B total —
-        no units disclosed), OpenAI–CoreWeave (~$22.4B — no units),
-        Anthropic–Microsoft Azure ($30B — no term; the "up to 1GW" is a
+        Not computable, no rate published: Meta–CoreWeave (~$35.2B total,
+        no units disclosed), OpenAI–CoreWeave (~$22.4B, no units),
+        Anthropic–Microsoft Azure ($30B, no term; the "up to 1GW" is a
         separate additional commitment and is not a valid denominator).
         Sources and per-row caveats in the
         <a href="/research/implied-committed-rates">research note</a>.

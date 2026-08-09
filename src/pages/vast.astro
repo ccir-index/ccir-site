@@ -27,14 +27,14 @@ const vastMeta = (meta as any).vast;
     <details class="def-disclosure">
       <summary>How to read this</summary>
       <p class="standfirst lede">
-        Vast.ai is the only per-host order-book marketplace in the panel —
+        Vast.ai is the only per-host order-book marketplace in the panel:
         every individual machine listing is exposed via the API, with hundreds
         to thousands of distinct host offers per chip, repriced continuously
         by hosts.
         This page surfaces what the median alone omits: distribution shape,
         quality bands, $/perf frontier, supply structure, geography, egress
         and storage costs, network quality, long-tail catalog, and the
-        time-series of the spread itself. <strong>Observatory data — exploratory market detail, separate from our headline reference rates.</strong> Vast is the reference marketplace, not a tier.
+        time-series of the spread itself. <strong>Observatory data: exploratory market detail, separate from our headline reference rates.</strong> Vast is the reference marketplace, not a tier.
       </p>
     </details>
 
@@ -84,9 +84,9 @@ const vastMeta = (meta as any).vast;
         <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Every offer live on Vast at the snapshot for the selected chip, binned by per-whole-GPU
-          $/hr (log scale on x). The vertical amber line shows the median; the
+          $/hr (log scale on x). The vertical amber line shows the median. The
           dashed grey shows the median interruptible-bid floor. Where the
-          histogram has a long upper tail, that's the trust premium — buyers
+          histogram has a long upper tail, that is the trust premium: buyers
           pay 5-50× the floor for verified datacenter offers vs deverified
           hosts. <code>per_gpu_dph = dph_total / num_gpus / gpu_frac</code>.
         </p>
@@ -112,7 +112,7 @@ const vastMeta = (meta as any).vast;
         <p class="footnote">
           Median per-GPU $/hr for offers tagged <code>verified</code> (audited
           datacenter hosts) vs <code>deverified</code> (hosted, unverified).
-          The premium varies sharply by chip — RTX 4090 verified is ~2× deverified
+          The premium varies sharply by chip: RTX 4090 verified is ~2× deverified
           but H100 SXM verified can be <em>cheaper</em> than deverified.
         </p>
       </details>
@@ -146,12 +146,12 @@ const vastMeta = (meta as any).vast;
       <details class="def-disclosure">
         <summary>Definitions &amp; notes</summary>
         <p class="footnote">
-          <strong>DLPerf</strong> is Vast.ai's composite deep-learning benchmark — a
+          <strong>DLPerf</strong> is Vast.ai's composite deep-learning benchmark: a
           synthetic mixed-precision matmul/conv score that proxies training
           throughput. Shown <em>per GPU</em> here so it lines up with the per-GPU
-          $/hr column. <strong>DLPerf/$/h</strong> is bundle perf-per-dollar; higher
+          $/hr column. <strong>DLPerf/$/h</strong> is bundle perf-per-dollar. Higher
           is more performance per dollar of total spend on the offer (independent
-          of unit choice — same ratio whether you compute per-GPU or per-bundle).
+          of unit choice; same ratio whether you compute per-GPU or per-bundle).
         </p>
       </details>
     </section>
@@ -175,7 +175,7 @@ const vastMeta = (meta as any).vast;
         <p class="footnote">
           Count of live offers by GPU count (1×, 2×, 4×, 8×, other) for the
           selected chip. Reveals whether the chip has scale-up supply or only
-          single-GPU rentals — material for buyers planning multi-node training.
+          single-GPU rentals. That is material for buyers planning multi-node training.
         </p>
       </details>
     </section>
@@ -250,7 +250,7 @@ const vastMeta = (meta as any).vast;
         <p class="footnote">
           Bandwidth distribution is bimodal: consumer-hosted GPUs at gigabit-class,
           proper datacenter offers at multi-Gbps. Same chip, very different
-          connectivity — matters for training jobs that pull from cloud storage.
+          connectivity. This matters for training jobs that pull from cloud storage.
         </p>
       </details>
     </section>
@@ -300,7 +300,7 @@ const vastMeta = (meta as any).vast;
         <p class="footnote">
           Five lines show how the per-GPU $/hr distribution shifts over time:
           p10 (cheapest 10%), p25, p50 (median), p75, p90 (most expensive 10%).
-          When spread widens, supply is fragmenting; when it narrows, the market
+          When spread widens, supply is fragmenting. When it narrows, the market
           is converging.
         </p>
       </details>
@@ -308,11 +308,11 @@ const vastMeta = (meta as any).vast;
 
     <p class="footnote-last">
       Collected every three hours alongside <a href="/marketplace">/marketplace</a>
-      while live; collection has been paused since 2026-05-13 pending the pipeline
+      while live. Collection has been paused since 2026-05-13 pending the pipeline
       migration, and every figure on this page reflects the last published snapshot.
-      Vast bundles API authenticated via CCIR research key — values are public list-asks
+      Vast bundles API authenticated via CCIR research key. Values are public list-asks
       as Vast publishes them. Distribution shape captured at the cycle Vast served the
-      query; offers churn faster than this cadence so the histogram is a snapshot, not
+      query. Offers churn faster than this cadence, so the histogram is a snapshot, not
       a long-window aggregate.
     </p>
   </section>

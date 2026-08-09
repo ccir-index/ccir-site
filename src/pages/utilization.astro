@@ -45,9 +45,9 @@ const DEFAULT_CHIP = 'h100-sxm';
     <div class="kicker">CCIR · SUPPLY OBSERVATORY <span class="mi-tag">Market&nbsp;Intelligence</span></div>
     <h1>Utilization &amp; Availability</h1>
     <p class="deck">
-      Two lenses on GPU supply. <strong>Utilization</strong> — of the capacity the
-      one marketplace we can measure actually lists, how much is rented, tracked
-      over time. <strong>Availability</strong> — of the genuine-capacity venues we
+      Two lenses on GPU supply. <strong>Utilization</strong>: of the capacity the
+      one marketplace we can measure lists, how much is rented, tracked
+      over time. <strong>Availability</strong>: of the genuine-capacity venues we
       probe, how many show launchable stock (<strong>X of Y</strong>), so the slope
       reads demand tightening or easing.
     </p>
@@ -66,7 +66,7 @@ const DEFAULT_CHIP = 'h100-sxm';
       <div class="card-head">
         <div>
           <h2>Measured utilization <span class="tag">one marketplace source</span></h2>
-          <p class="card-sub">Vast.ai — the only marketplace that discloses rented / total. Rolling 7-day utilization, denominator fixed to each window's median listed capacity.</p>
+          <p class="card-sub">Vast.ai: the only marketplace that discloses rented / total. Rolling 7-day utilization, denominator fixed to each window's median listed capacity.</p>
         </div>
       </div>
       <div class="util-grid">
@@ -112,7 +112,7 @@ const DEFAULT_CHIP = 'h100-sxm';
       <div class="card-head">
         <div>
           <h2>Availability over time</h2>
-          <p class="card-sub">Rolling 7-day count-weighted availability — the mean share of capacity-probes finding stock across genuine-capacity venues; falling = capacity selling down. Dashed verticals flag a change in the venue panel. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
+          <p class="card-sub">Rolling 7-day count-weighted availability: the mean share of capacity-probes finding stock across genuine-capacity venues. Falling = capacity selling down. Dashed verticals flag a change in the venue panel. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
         </div>
         <div class="confbadge" id="confbadge"></div>
       </div>
@@ -135,11 +135,11 @@ const DEFAULT_CHIP = 'h100-sxm';
       <summary>How this is measured</summary>
       <p class="method">
         Each source's window rate is its share of capacity-probes that found
-        stock, count-weighted within source. Two layers, same panel: the
-        <em>tiles</em> report breadth — of the Y genuine-capacity venues that
+        stock, count-weighted within source. Two layers, same panel. The
+        <em>tiles</em> report breadth: of the Y genuine-capacity venues that
         disclosed a signal, the count X whose window rate is at least 10% of
         cycles (the floor keeps a venue with one available probe all week from
-        reading as available until history rolls out of the window) — and the
+        reading as available until history rolls out of the window). The
         <em>chart</em> plots the count-weighted mean venue rate, which shows
         capacity selling down as it happens rather than in window-edge steps.
         Both shown as Fractional (any shape) and Cluster (full 8-GPU node).
@@ -147,7 +147,7 @@ const DEFAULT_CHIP = 'h100-sxm';
         verticals flag where the panel set changed, so added venues don't read
         as a demand move. Method updated Jul 30, 2026 (floor + mean-rate chart;
         raw per-venue rates in the panel below are unchanged). Utilization is a
-        separate measured metric — never blended into availability.
+        separate measured metric, never blended into availability.
       </p>
     </details>
   </section>

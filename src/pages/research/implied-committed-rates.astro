@@ -46,17 +46,17 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
       <div class="kicker">Research · {AS_OF} · filings, company releases + attributed press</div>
       <h1>Implied Committed Rates: What the Big Compute Deals Pay per GPU-Hour</h1>
       <p class="standfirst">
-        The mega-deals that dominate the headlines — $38 billion, $300
-        billion — are actual negotiated committed-term prints, disclosed as
+        The mega-deals that dominate the headlines ($38 billion, $300
+        billion) are actual negotiated committed-term prints, disclosed as
         lump sums rather than rates. This note backs the unit rate out of
         the disclosed figures, and every number it produces is a floor by
         construction: each assumption required to do the division biases
         the implied rate downward. What survives is an anchor for the rate
-        the disclosures leave implicit — the cleanest print, Microsoft's
+        the disclosures leave implicit. The cleanest print, Microsoft's
         Norway contract with Nscale, implies <strong>$2.72 per
         GPU-hour</strong> with every input company-disclosed. Each figure
-        below is implied — computed by CCIR from the disclosed figures —
-        graded by disclosure quality, and none is an observed price. A standing
+        below is implied, computed by CCIR from the disclosed figures, and
+        graded by disclosure quality. None is an observed price. A standing
         version of these tables is maintained on the
         <a href="/credit/commitments">AI commitments monitor</a>.
       </p>
@@ -68,9 +68,9 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         The committed-term market shows itself in pieces: posted asks (our
         <a href="/term">committed-term curve</a>), financial forwards,
         reserved-block venues, and the lump-sum headlines. The mega-deals
-        are the largest committed-term prints in the market — and their
+        are the largest committed-term prints in the market. Their
         disclosure format states the total while leaving the unit rate
-        implicit. When a company disclosures dollars, term, and quantity
+        implicit. When a company discloses dollars, term, and quantity
         for the same contract, the implied unit rate is calculation, not
         estimation. Where one input comes from press rather than the
         company, the grade says so. Where an input is missing, the rate is
@@ -86,7 +86,8 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
       <h2><span class="n">02</span> Method: assumptions and grades</h2>
       <blockquote class="assume">
         Spend is ratable across the full disclosed term. 100% of contracted
-        hours are billed. All disclosed dollars are treated as compute — no
+        hours are billed. All disclosed dollars are treated as compute, with
+        no
         carve-out for power, networking, or services. Fleet size is
         constant over the term. 8,760 hours per year; 730 hours per month.
         <strong>Every one of these assumptions biases the implied rate
@@ -95,13 +96,13 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
       </blockquote>
       <p>
         Why floors: real contracts ramp, so fewer early hours stand against
-        the same dollars; disclosed totals often include non-compute scope;
-        and no fleet bills every hour. Each correction would raise the
+        the same dollars. Disclosed totals often include non-compute scope.
+        And no fleet bills every hour. Each correction would raise the
         implied rate.
       </p>
       <p>
         <strong>Chip attribution.</strong> The chip column records the
-        generation as the parties disclosed it — or "per press" or
+        generation as the parties disclosed it, or "per press" or
         "unspecified" where they did not. Where the generation is
         unspecified, the rate is fleet-blended. No performance adjustment
         is applied across generations: a GPU-hour is the unit, not a unit
@@ -111,12 +112,12 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         estimates.
       </p>
       <p>
-        <strong>Grades.</strong> <strong>A</strong> — dollars, term, and
-        units all company-disclosed. <strong>B</strong> — one input from
-        attributed press. <strong>C</strong> — talks-stage or heavy
-        estimation; grade-C rows do not publish, here or on the standing
+        <strong>Grades.</strong> <strong>A</strong>: dollars, term, and
+        units all company-disclosed. <strong>B</strong>: one input from
+        attributed press. <strong>C</strong>: talks-stage or heavy
+        estimation. Grade-C rows do not publish, here or on the standing
         table. Dollar-per-GPU-hour and dollar-per-megawatt rows are
-        separate tables and are never blended or averaged; TPU commitments
+        separate tables and are never blended or averaged. TPU commitments
         are excluded entirely.
       </p>
     </section>
@@ -192,23 +193,23 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         <strong>IREN is graded A on the megawatt basis</strong> (§04); the
         GPU figure is a labeled CCIR estimate. The filing discloses 200MW
         of critical IT load, not a GPU count. Applying NVIDIA's published
-        GB300 NVL72 rack figure — "full rack requiring up to 142 kW" —
+        GB300 NVL72 rack figure, "full rack requiring up to 142 kW",
         yields roughly 101,000 GPUs as an upper bound (rack power is not
         critical IT load; facility IT power also carries network and
-        storage), so the ~$2.2 rate is a floor even within the estimate.
+        storage). So the ~$2.2 rate is a floor even within the estimate.
       </p>
       <p>
         <strong>The AWS band is a band, not a point.</strong> The companies
         said "hundreds of thousands" of NVIDIA GPUs plus "tens of millions"
         of CPUs. CCIR parameterizes their own phrase: 500,000 GPUs implies
-        $1.24; 200,000 implies $3.10. The CPU scope means even the band is
+        $1.24, and 200,000 implies $3.10. The CPU scope means even the band is
         a floor on the GPU-attributable rate.
       </p>
       <p>
         The only identical-unit comparison in public: <strong>Narvik $2.72,
-        IREN ~$2.2 (estimate), Nebius $3.97 — all GB300-class, all
+        IREN ~$2.2 (estimate), Nebius $3.97: all GB300-class, all
         five-year terms, all Microsoft as buyer.</strong> Same buyer, same
-        silicon generation, same tenor; the residual spread is
+        silicon generation, same tenor. The residual spread is
         jurisdiction, scope, and counterparty.
       </p>
       <figure class="chart-fig">
@@ -236,8 +237,10 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         <details class="fignotes">
           <summary>Chart notes</summary>
           <p>
-            GB300-class, ~5-year terms, Microsoft as buyer. Implied — computed by CCIR from the disclosed figures under the §02 assumptions;
-            floors by construction. IREN bar is a labeled CCIR estimate
+            GB300-class, ~5-year terms, Microsoft as buyer. Implied:
+            computed by CCIR from the disclosed figures under the §02
+            assumptions, floors by construction. IREN bar is a labeled CCIR
+            estimate
             from disclosed megawatts and NVIDIA's published rack power.
           </p>
         </details>
@@ -272,10 +275,10 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
       <p class="tblfoot">All rows: implied — computed by CCIR from the disclosed figures; floors per §02.</p>
       <p>
         No public conversion from gigawatts to GPU count exists for the
-        Stargate agreement, so CCIR declines to state one; the megawatt row
+        Stargate agreement, so CCIR declines to state one. The megawatt row
         is the computable read. One definitional caution: IREN's
         denominator is disclosed critical IT load, while Stargate's "up to
-        4.5GW" carries no IT-versus-facility breakdown — the same
+        4.5GW" carries no IT-versus-facility breakdown. The same
         "megawatt" is not necessarily the same denominator, which is why
         these two rows are presented, not spread-differenced.
       </p>
@@ -308,9 +311,9 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         <details class="fignotes">
           <summary>Chart notes</summary>
           <p>
-            Rows differ in chip generation, scope, and tenor; the chart
+            Rows differ in chip generation, scope, and tenor. The chart
             presents them side by side and computes no spreads. The AWS
-            entry is a parameterized band; the xAI entry is terminable on
+            entry is a parameterized band. The xAI entry is terminable on
             90 days' notice after an initial three-month period, with GPU
             models unspecified in the filing.
           </p>
@@ -323,17 +326,17 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
       <p>
         Every GPU-backed credit prices a revenue assumption its lender
         cannot observe. KBRA's AI-compute framework builds on an assumed
-        relationship between old and new compute prices; Fitch's
+        relationship between old and new compute prices. Fitch's
         analyses of GPU-backed paper carry renewal-rate assumptions the
-        agency itself does not call observable. The re-leasing question —
-        what does committed compute rent for when the anchor contract
-        rolls? — is one those frameworks answer by assumption.
+        agency itself does not call observable. The re-leasing question
+        (what does committed compute rent for when the anchor contract
+        rolls?) is one those frameworks answer by assumption.
       </p>
       <p>
         The implied rates above are a public anchor for that assumption:
         actual anchor-tenant contracts, reduced to unit rates, graded by
         disclosure quality, floored by construction. The IREN row is
-        literal — the $9.7 billion Microsoft contract is the collateral
+        literal: the $9.7 billion Microsoft contract is the collateral
         cash flow behind whatever IREN finances next, as the Nebius and
         CoreWeave paper already on the
         <a href="/credit">compute-credit record</a> shows in filed form.
@@ -342,12 +345,12 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         No solvency opinion and no forecast follows from any of this. What
         follows is a table: <strong>CCIR maintains an implied committed
         rates section on the <a href="/credit/commitments">AI commitments
-        monitor</a></strong> — grade A and B rows only, the §02 assumptions
-        block permanent, the grade column always shown — updated as deals
-        publish.
+        monitor</a></strong>, with grade A and B rows only, the §02
+        assumptions block permanent, and the grade column always shown,
+        updated as deals publish.
       </p>
       <p class="footnote">
-        Sources — Aker ASA–Nscale JV release (Sep 17, 2025); SpaceX final
+        Sources: Aker ASA–Nscale JV release (Sep 17, 2025); SpaceX final
         prospectus, Form 424B4 (acc. 0001628280-26-042639, Jun 12, 2026);
         IREN Form 8-K Ex-99.1 (Nov 3, 2025); Nebius Form 6-K (Sep 8, 2025)
         with GPU count as attributed press (DCD, Reuters); OpenAI–AWS joint
@@ -357,10 +360,10 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         Enterprise Reference Architecture, NVL72 AI Factory components
         (rack power input for the labeled IREN estimate); attributed press:
         The New York Times (Meta–Anthropic talks). All implied rates are
-        CCIR calculation on the cited disclosures under the §02 assumptions;
-        they are floors on blended committed rates, not observed prices,
+        CCIR calculation on the cited disclosures under the §02 assumptions.
+        They are floors on blended committed rates, not observed prices,
         and are not part of any CCIR benchmark series. Nothing here is a
-        solvency opinion, a forecast, or investment advice; CCIR publishes
+        solvency opinion, a forecast, or investment advice. CCIR publishes
         reference data and records.
       </p>
     </section>

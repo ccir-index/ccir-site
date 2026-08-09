@@ -99,7 +99,7 @@ const f2Ticks = [0, 1, 2, 3, 4];
         cross-held tranches across five sectors set the baseline. Performing
         credit agrees to about a quarter of a point, and disagreement past
         three points follows a restructuring or a bankruptcy. The exception
-        is performing compute paper — and the last collateral class to file
+        is performing compute paper. The last collateral class to file
         this picture was data-center credit, roughly a decade ago. This note
         traces that precedent, and its exit through securitization, alongside
         the compute panel.
@@ -113,13 +113,13 @@ const f2Ticks = [0, 1, 2, 3, 4];
         investments are held by two or more unaffiliated advisers. The widest
         is the CoreWeave Compute Acquisition Co. IV first-lien delayed-draw
         facility (SOFR + 6.00%): Carlyle funds file 99.0, MSD Investment Corp.
-        100.0, Great Elm 102.0, and PIMCO Capital Solutions BDC 103.1 — a
-        <strong>4.06-point spread on identical first-lien paper at the same
+        100.0, Great Elm 102.0, and PIMCO Capital Solutions BDC 103.1. That is
+        a <strong>4.06-point spread on identical first-lien paper at the same
         date</strong>, with two of the four holders' pieces identical to the
         dollar of principal. The second-widest pair is Crusoe Energy Systems'
-        13% fixed tranche: Monroe Capital, which reduced its position roughly
-        83% during the quarter, files 98.4; LAGO Evergreen, which held, files
-        102.5 — equal to its amortized cost, in both quarters it has reported.
+        13% fixed tranche. Monroe Capital, which reduced its position roughly
+        83% during the quarter, files 98.4. LAGO Evergreen, which held, files
+        102.5, equal to its amortized cost, in both quarters it has reported.
       </p>
       <figure class="chart-fig">
         <div class="chart-box">
@@ -146,7 +146,7 @@ const f2Ticks = [0, 1, 2, 3, 4];
         </div>
         <figcaption>
           Filed fair-value marks, % of par, at 3/31/2026. One dot per
-          unaffiliated adviser; dashed line at par. Right margin: max−min.
+          unaffiliated adviser. Dashed line at par. Right margin: max−min.
           Hover a dot for the holder.
         </figcaption>
       </figure>
@@ -165,7 +165,7 @@ const f2Ticks = [0, 1, 2, 3, 4];
         season, matched the same way (same borrower, same tranche economics,
         same date; one mark per unaffiliated adviser; term-loan core only),
         give the baseline. The dispersion statistic is the mean pairwise
-        absolute difference (pwMAD) between advisers' marks — a measure that
+        absolute difference (pwMAD) between advisers' marks. This measure
         does not grow mechanically with the number of holders, so an
         11-adviser facility and a 2-adviser facility compare fairly.
       </p>
@@ -202,9 +202,9 @@ const f2Ticks = [0, 1, 2, 3, 4];
       </figure>
       <p>
         The pattern is regime, not sector. Every performing conventional or
-        hard-asset tranche — syndicated fiber, medical-equipment rental,
+        hard-asset tranche (syndicated fiber, medical-equipment rental,
         aviation MRO, and unitranche facilities with as many as eleven
-        unaffiliated holders — lands between 0.14 and 0.94 points, median
+        unaffiliated holders) lands between 0.14 and 0.94 points, median
         0.26. Dispersion past two points appears in exactly two places:
         credits that have been through a restructuring or bankruptcy (PetVet
         2.8; Hornblower 3.9; 48Forty 4.2, where six advisers mark fresh
@@ -221,11 +221,11 @@ const f2Ticks = [0, 1, 2, 3, 4];
       <p>
         Why can honest valuations of the same loan sit four points apart? A
         fair-value measurement on a performing private loan is, under the
-        accounting standard, an exit price — and in practice it is usually
+        accounting standard, an exit price. In practice it is usually
         produced by an income approach: discount the loan's remaining
         contractual cash flows at the yield a market participant would
         require today, over the loan's expected remaining life, calibrated to
-        the price the fund actually paid at entry. Observable transactions in
+        the price the fund paid at entry. Observable transactions in
         the same instrument, where they exist, take precedence over any
         model. Three inputs, then: a market yield, an expected life, and a
         calibration basis. Each is a place two valuation processes can
@@ -233,22 +233,22 @@ const f2Ticks = [0, 1, 2, 3, 4];
       </p>
       <p>
         <strong>The market yield needs an anchor, and anchors come in
-        grades.</strong> The strongest is a trade print: corporate bonds —
-        including this sector's 144A project bonds — disseminate actual
+        grades.</strong> The strongest is a trade print: corporate bonds
+        (including this sector's 144A project bonds) disseminate actual
         transactions, and a holder marks at the print. One grade down is a
-        dealer quote: broadly syndicated loans never touch an exchange, but
-        dealers make markets and pricing services publish composites daily,
-        and the controls show what that does — Zayo's five unaffiliated
+        dealer quote. Broadly syndicated loans never touch an exchange, but
+        dealers make markets and pricing services publish composites daily.
+        The controls show what that does: Zayo's five unaffiliated
         holders cluster inside 35 basis points, effectively on two values,
         and one files the position at Level 1/2 rather than Level 3. A
         grade below that is comparable density: no quote, but enough similar
         deals priced each quarter that the clearing spread is effectively
-        known — Integrity Marketing's eleven unaffiliated holders agree
+        known. Integrity Marketing's eleven unaffiliated holders agree
         inside three-quarters of a point with no quote in sight. Compute
         credit's loan channel has none of the three. Its comparable set is
         about a dozen disclosed signings over three years, across which the
         disclosed spread fell by more than seven points. A yield input drawn
-        from that record is judgment, and judgments differ — by a point or
+        from that record is judgment, and judgments differ by a point or
         more of yield, which on multi-year paper is points of price.
         Dispersion in this sample tracks the anchor grade, not the
         accounting level.
@@ -256,9 +256,9 @@ const f2Ticks = [0, 1, 2, 3, 4];
       <p>
         <strong>And the anchor is set by the financing channel, not the
         borrower.</strong> CoreWeave's convertible notes trade in a dealer
-        market; the sector's 144A project bonds print on TRACE. The
-        GPU-collateralized loan channel — the same credits, the same
-        collateral economics — has no print, no dealer market, and no
+        market. The sector's 144A project bonds print on TRACE. The
+        GPU-collateralized loan channel (the same credits, the same
+        collateral economics) has no print, no dealer market, and no
         pricing-service composite. It is the channel where four holders sit
         four points apart.
       </p>
@@ -267,7 +267,7 @@ const f2Ticks = [0, 1, 2, 3, 4];
         loan paying an above-market coupon is worth more than par only for
         as long as the coupon survives, and prepayable paper caps the upside
         at par the day the borrower refinances. The CoreWeave facility pays
-        roughly three points a year over where new compute paper prints; at
+        roughly three points a year over where new compute paper prints. At
         that rate, one year of assumed remaining life is approximately the
         entire gap between the lowest and highest filed marks. And expected
         life is genuinely uncertain here: documented compute facilities have
@@ -284,48 +284,48 @@ const f2Ticks = [0, 1, 2, 3, 4];
         this sample's filed numbers. On the CoreWeave facility, Carlyle's
         fair value sits within a tenth of a point of its amortized cost,
         while Great Elm and PIMCO carry fair value about three points above
-        theirs; on Crusoe, LAGO's fair value equals its amortized cost to
-        the dollar in both quarters it has filed, while Monroe — the one
-        holder that transacted during the period — files the only mark below
+        theirs. On Crusoe, LAGO's fair value equals its amortized cost to
+        the dollar in both quarters it has filed, while Monroe (the one
+        holder that transacted during the period) files the only mark below
         par in the group. The filings do not state any fund's method, and
-        this note does not infer one; they do state these arithmetic facts.
+        this note does not infer one. They do state these arithmetic facts.
         What the coexistence of both patterns on identical paper establishes
         is the absence of a shared observable input that would force them
-        together: in the quoted controls, the anchor does that work; here
+        together. In the quoted controls, the anchor does that work. Here
         there is nothing to anchor to.
       </p>
       <p>
         None of this requires a view on the collateral. Every mark in the
         compute sample sits between 98 and 104, every position is
-        performing, and — as the ledger's collateral-treatment record shows —
-        every disclosed GPU schedule amortizes its collateral toward zero, so
-        a performing mark never has to price the hardware at all. The
+        performing, and (as the ledger's collateral-treatment record shows)
+        every disclosed GPU schedule amortizes its collateral toward zero.
+        So a performing mark never has to price the hardware at all. The
         disagreement is about the price of money against this collateral
         class: the right spread, and how long the paper lives. Those are
-        precisely the two quantities this market does not yet publish.
+        the two quantities this market does not yet publish.
       </p>
       <p>
         The panel's own structure points at the second quantity. Within the
-        compute sample — small as it is — dispersion orders with remaining
+        compute sample (small as it is), dispersion orders with remaining
         modeled life: the equipment loan weeks from maturity shows
         two-thirds of a point of disagreement, the older amortizing
         delayed-draw about one point, and the long-window facility four.
-        Where nothing is left to model, holders agree; where an
+        Where nothing is left to model, holders agree. Where an
         above-market coupon has years of assumed life to run, they do not.
       </p>
       <p class="footnote">
         Holders also file different maturity dates for the same facilities
-        (on the CoreWeave facility: 5/16/2029, 5/22/2029, and 5/16/2030) —
-        a reporting-convention artifact of delayed-draw structures, whose
-        draws carry their own tenors; no primary document reconciles the
-        dates, and they do not explain the mark ordering.
+        (on the CoreWeave facility: 5/16/2029, 5/22/2029, and 5/16/2030).
+        This is a reporting-convention artifact of delayed-draw structures,
+        whose draws carry their own tenors. No primary document reconciles
+        the dates, and they do not explain the mark ordering.
       </p>
     </section>
 
     <section class="sec">
       <h2><span class="n">04</span> What Narrows the Range</h2>
       <p>
-        Mark dispersion is not a permanent feature of a credit market; it is
+        Mark dispersion is not a permanent feature of a credit market. It is
         a feature of a market's age. Each of the missing inputs above has a
         known delivery mechanism, and each is visible in filings when it
         arrives.
@@ -339,12 +339,12 @@ const f2Ticks = [0, 1, 2, 3, 4];
         A trade in the instrument outranks any model, and one is already
         visible in this sample: the quarter's only seller files the group's
         only below-par mark. Syndication and securitization generalize that
-        effect — Zayo's holders, with a dealer quote to anchor to, land
-        within 14 basis points — and this road ends the public record: the
+        effect. Zayo's holders, with a dealer quote to anchor to, land
+        within 14 basis points. This road ends the public record: the
         paper leaves the schedules. Data-center lending, compute's nearest
-        predecessor, took it; its cross-held Level 3 loans no longer exist
+        predecessor, took it. Its cross-held Level 3 loans no longer exist
         (the decade of record behind that sentence is traced in section
-        05). GPU-backed securitization has begun; each deal that prices
+        05). GPU-backed securitization has begun. Each deal that prices
         converts a modeled input into an observed one, and removes that
         paper from this panel.
       </p>
@@ -352,25 +352,25 @@ const f2Ticks = [0, 1, 2, 3, 4];
         <strong>The density road: inputs thicken until models converge.</strong>
         The controls prove a market needs no quote to agree. Eleven
         unaffiliated holders of one insurance-brokerage unitranche file
-        within three-quarters of a point — paper that will never trade or
-        be quoted — because enough similar facilities price every quarter
+        within three-quarters of a point (paper that will never trade or
+        be quoted) because enough similar facilities price every quarter
         that the clearing spread is effectively known. Compute's bilateral
         channel converges this way if its record thickens: every new
-        signing adds a spread comparable — the 2026 cluster at +1.75 to
+        signing adds a spread comparable (the 2026 cluster at +1.75 to
         +2.25 is already a tighter calibration set than the sparse
-        2023–2024 prints — and every documented resolution adds an
+        2023–2024 prints), and every documented resolution adds an
         expected-life observation, narrowing the assumption that currently
         accounts for the largest share of the gap. Unlike the quoted road,
         this one keeps the paper in the filings: convergence happens on
         the record.
       </p>
       <p>
-        Both roads narrow the range; they differ in whether anyone gets to
+        Both roads narrow the range. They differ in whether anyone gets to
         watch. And because each mechanism surfaces in public filings, the
         dispersion itself is measurable quarter by quarter: the same
         facilities will be marked again next quarter, by the same holders,
         on a growing record. Whether the range narrows is not a matter of
-        argument — it will be on the record, one filing season at a time.
+        argument. It will be on the record, one filing season at a time.
       </p>
     </section>
 
@@ -381,52 +381,52 @@ const f2Ticks = [0, 1, 2, 3, 4];
         this stage, and the previous one's record is complete. A decade ago
         data-center credit sat exactly here: bilateral loans on fund books,
         marked quarterly by judgment. Solar Capital carried a bilateral
-        ViaWest note (13.5%, part paid-in-kind) from the end of 2010; by
+        ViaWest note (13.5%, part paid-in-kind) from the end of 2010. By
         2017, TierPoint's second-lien term loan (L+7.25, due 2025) was
         cross-held by unaffiliated complexes including FS/KKR, Benefit
         Street, and BlackRock TCP, whose same-tranche marks ran as much as
-        5.2 points apart — at year-end 2019, two complexes filed 88.8 and
+        5.2 points apart. At year-end 2019, two complexes filed 88.8 and
         94.0 on identical paper. The same borrower's broadly syndicated
         first lien, with a daily quote, was marked identically to the basis
         point by its holders. The dispersion belonged to the channel, not
-        the borrower — the same split the CoreWeave structure shows today
-        between its quoted converts and its unquoted loan channel.
+        the borrower. It is the same split the CoreWeave structure shows
+        today between its quoted converts and its unquoted loan channel.
       </p>
       <p>
         Every pattern in the compute panel above appears in that record.
         One holder's mark on the TierPoint second lien sat unchanged at
         99.01 for four consecutive quarters while another's moved with the
-        market — anchoring policy and live modeling coexisting on identical
+        market: anchoring policy and live modeling coexisting on identical
         paper. And a judgment mark could sit far from the eventual outcome
-        with no default intervening: FS/KKR carried Flexential's second
-        lien at 74 in 2019; the loan was refinanced at par two years later,
+        with no default intervening. FS/KKR carried Flexential's second
+        lien at 74 in 2019. The loan was refinanced at par two years later,
         weeks ahead of the company's $2.1 billion inaugural securitization.
       </p>
       <p>
         The exit is documented to the week. Data-center securitization
-        began in February 2018 with Vantage's inaugural ABS; DataBank and
-        Flexential followed in 2021. TierPoint's last filed fund marks —
-        99.63 — are dated June 30, 2023; its $1.06 billion securitization
+        began in February 2018 with Vantage's inaugural ABS. DataBank and
+        Flexential followed in 2021. TierPoint's last filed fund marks,
+        99.63, are dated June 30, 2023. Its $1.06 billion securitization
         closed July 10, 2023, and the loan left the schedules. No market price
-        ever arrived to test the marks — the only evidence that could have
-        — and repayment at par settles nothing: a loan can be worth 74 to
+        ever arrived to test the marks, the only evidence that could have.
+        Repayment at par settles nothing: a loan can be worth 74 to
         any buyer in 2019 and still pay off at par in 2021. The
         refinancing did not answer the question of what the second lien
-        had been worth; it retired the instrument that posed it. This quarter's filings contain no cross-held data-center
+        had been worth. It retired the instrument that posed it. This quarter's filings contain no cross-held data-center
         loan pairs at all.
       </p>
       <p>
         Stated as a working view rather than a fact: we anticipate compute
         credit splits along the two roads of section 04. The contracted,
         long-dated core migrates toward syndicated and securitized
-        channels — that exit has begun — while the short, amortizing
+        channels (that exit has begun), while the short, amortizing
         bridge vintages never pool at all: they refinance away, as they
         are designed to. What remains bilateral converges in place if
         signings densify, the way the control panel's unquoted unitranches
-        did — and that convergence, unlike the securitized exit, happens
+        did. That convergence, unlike the securitized exit, happens
         on the record. GPU-backed securitization has begun. On the
         data-center clock, the compute panel above sits at roughly
-        2015–2017: cross-held, judgment-marked, dispersed — and, for now,
+        2015–2017: cross-held, judgment-marked, and dispersed. For now it is
         completely public. The record will be maintained here for as long
         as the window stays open.
       </p>
@@ -436,9 +436,9 @@ const f2Ticks = [0, 1, 2, 3, 4];
       <h2><span class="n">06</span> Method &amp; Limitations</h2>
       <p>
         Marks are reproduced from schedules of investments in 10-Q filings for
-        the period ended 3/31/2026 (one 10-K), read July 2026; a mark is fair
+        the period ended 3/31/2026 (one 10-K), read July 2026. A mark is fair
         value divided by principal, both as filed. Tranches match on borrower
-        plus tranche economics (rate and maturity month); advisers are
+        plus tranche economics (rate and maturity month). Advisers are
         counted once per complex, with affiliated vehicles collapsed.
         Excluded: revolver and delayed-draw rows whose filed values net
         unfunded-commitment fees (not comparable as filed); positions held
@@ -446,21 +446,21 @@ const f2Ticks = [0, 1, 2, 3, 4];
         pair whose coupons indicate different classes of the same program;
         rows filed at millions precision where rounding exceeds the measured
         dispersion. The data-center precedent (section 05) applies the same
-        matching rules to schedules of investments filed 2014–2023 — 42
+        matching rules to schedules of investments filed 2014–2023: 42
         cross-complex tranche-quarters across TierPoint, Flexential, ViaWest,
-        and peers; stressed names of that era (Sungard, Internap, Cyxtera)
+        and peers. Stressed names of that era (Sungard, Internap, Cyxtera)
         are flagged separately and excluded from the performing comparison,
         and securitization dates are from issuer announcements.
       </p>
       <p>
-        Limits. Compute tranches have two to four unaffiliated holders each —
-        the finding is the table, not a statistic, and one quarter's filings
+        Limits. Compute tranches have two to four unaffiliated holders each.
+        The finding is the table, not a statistic, and one quarter's filings
         are one observation of each mark. Coverage is funds that file
-        schedules of investments; banks and private funds, which hold most
+        schedules of investments. Banks and private funds, which hold most
         compute credit, publish no marks. One holder files identical marks on
         both of its CoreWeave tranches, consistent with position-level rather
         than tranche-level marking. Marks are each filer's own fair-value
-        determinations; nothing here estimates, adjusts, or opines on any of
+        determinations. Nothing here estimates, adjusts, or opines on any of
         them.
       </p>
       <p class="data-note">

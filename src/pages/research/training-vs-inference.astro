@@ -17,10 +17,10 @@ const DATED = '2026-07-07';
       <div class="kicker">Research · primer · {DATED}</div>
       <h1>Training, Inference, and What Compute Earns</h1>
       <p class="standfirst">
-        GPU-backed credit is underwritten against what compute capacity earns,
-        and what it earns depends on which of two workloads is renting it.
-        This primer defines both in credit terms — no machine-learning
-        background assumed — and points to where the difference is already
+        GPU-backed credit is underwritten against what compute capacity earns.
+        What it earns depends on which of two workloads is renting it.
+        This primer defines both in credit terms, with no machine-learning
+        background assumed. It points to where the difference is already
         visible in published series: tenor, price by generation, and
         utilization.
       </p>
@@ -32,8 +32,8 @@ const DATED = '2026-07-07';
         <strong>Training builds the model.</strong> It is a project-style
         compute campaign: thousands of the newest accelerators, wired together
         on one high-bandwidth fabric, run near flat-out by a single customer
-        for months. The buyers are few — frontier labs and hyperscalers — and
-        the procurement is characteristically a multi-year committed contract
+        for months. The buyers are few: frontier labs and hyperscalers. The
+        procurement is characteristically a multi-year committed contract
         for a dedicated cluster. When the campaign ends, the demand ends with
         it until the next model generation begins.
       </p>
@@ -41,10 +41,10 @@ const DATED = '2026-07-07';
         <strong>Inference runs the model.</strong> Every chatbot query, application programming interface (API)
         call, coding assistant, and AI feature inside an application is
         inference: the trained model producing output for an end user. The
-        demand is recurring and usage-driven — it scales with adoption and
+        demand is recurring and usage-driven. It scales with adoption and
         with the revenue of the applications on top, not with any one
-        project's calendar. It is latency-sensitive, it follows end-user
-        activity through the day, and it runs acceptably on a far wider range
+        project's calendar. It is latency-sensitive and follows end-user
+        activity through the day. It runs acceptably on a far wider range
         of hardware than training does, including older generations.
       </p>
     </section>
@@ -55,16 +55,17 @@ const DATED = '2026-07-07';
         Training demand behaves like <strong>construction backlog</strong>:
         lumpy, concentrated in a handful of counterparties, and wrapped in
         multi-year contracts. Those contracts are the offtakes that appear in
-        GPU-backed credit as collateral quality — the ledger's own spread
+        GPU-backed credit as collateral quality. The ledger's own spread
         history prices draws by the contract standing behind the compute
         (<a href="/credit">/credit</a>).
       </p>
       <p>
         Inference demand behaves like <strong>utility load</strong>: diffuse,
-        recurring, diurnal, and transacted at shorter tenors. And because a
-        GPU-hour is non-storable — an hour unsold is an hour gone — capacity
-        coming off contract reprices at the prevailing curve immediately,
-        the way power does, not the way a warehouse of inventory does.
+        recurring, diurnal, and transacted at shorter tenors. A
+        GPU-hour is also non-storable: an hour unsold is an hour gone. So
+        capacity coming off contract reprices at the prevailing curve
+        immediately, the way power does, not the way a warehouse of inventory
+        does.
       </p>
     </section>
 
@@ -72,15 +73,15 @@ const DATED = '2026-07-07';
       <h2><span class="n">03</span> Where the Mix Shift Shows Up — Three Observables</h2>
       <p>
         <strong>Tenor.</strong> Training procurement supplies the long
-        committed contracts; inference demand transacts on-demand and at
+        committed contracts. Inference demand transacts on-demand and at
         commitments of a year or less. As the workload mix shifts, the
         contract book behind a borrower shortens, and more of its revenue
-        rolls to the prevailing market each year — rollover exposure priced
-        off the published term curve
+        rolls to the prevailing market each year. That is rollover exposure
+        priced off the published term curve
         (<a href="/research/od-vs-committed">/research/od-vs-committed</a>;
         worked rollover mechanics at <a href="/applications">/applications</a>).
         Shorter books convert single-name offtake credit into portfolio and
-        market risk — the kind monitored with published series rather than
+        market risk: the kind monitored with published series rather than
         credit memos.
       </p>
       <p>
@@ -88,8 +89,8 @@ const DATED = '2026-07-07';
         bandwidth more than peak arithmetic, and older datacenter GPUs still
         carry competitive bandwidth. In the current cross-section, rental
         rates per unit of memory bandwidth are flat from A100 to B300 while
-        rates per unit of raw compute steepen with age — the pattern of a
-        market already pricing inference at the margin, and the mechanism by
+        rates per unit of raw compute steepen with age. That is the pattern of
+        a market already pricing inference at the margin, and the mechanism by
         which old silicon keeps earning
         (<a href="/research/gpu-age-curve">/research/gpu-age-curve</a>).
       </p>
@@ -97,7 +98,7 @@ const DATED = '2026-07-07';
         <strong>Utilization.</strong> Inference load follows end-user activity
         through the day, so realized revenue per GPU-hour sits below posted
         rates even for contracted fleets. Posted price times full utilization
-        is not a revenue forecast; the filed realized figures are tracked at
+        is not a revenue forecast. The filed realized figures are tracked at
         <a href="/realized">/realized</a>.
       </p>
     </section>
@@ -106,12 +107,12 @@ const DATED = '2026-07-07';
       <h2><span class="n">04</span> What This Does Not Say</h2>
       <p>
         This primer makes no forecast about the training-inference mix. The
-        point is narrower: the two workloads leave different fingerprints in
-        observable prices — tenor structure, per-generation pricing,
-        realized-versus-posted gaps — and each fingerprint is published as a
+        point is narrower. The two workloads leave different fingerprints in
+        observable prices: tenor structure, per-generation pricing, and
+        realized-versus-posted gaps. Each fingerprint is published as a
         series that can be watched rather than assumed. The falsifiable
         markers for an inference-led repricing are listed in the age-curve
-        note; the term structure and re-contracting history are in the
+        note. The term structure and re-contracting history are in the
         on-demand-versus-committed note. Sources and series construction per
         the <a href="/documents/methodology">Methodology</a>.
       </p>

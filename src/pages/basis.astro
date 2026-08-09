@@ -28,12 +28,12 @@ const windowDays = rows[0]?.window_days ?? 7;
     <div class="kicker">Overlay · Marketplace clearing vs list-ask</div>
     <h1>Clearing Basis</h1>
     <p class="dek">
-      CCIR's headline reference rate is built from posted list-asks — every
-      panel source posts a rate card. One venue is different: Vast.ai is a live,
+      CCIR's headline reference rate is built from posted list-asks: every
+      panel source posts a rate card. One venue is different. Vast.ai is a live,
       continuously-repriced, executable marketplace. Vast is tracked separately so the list-ask series stays clean, and re-surfaced here as a
       basis: how the live marketplace price sits relative to the ex-Vast
-      list-ask floor at matched tier (Tier 3). Positive = the live venue is
-      pricing <em>above</em> posted list-asks; negative = below.
+      list-ask floor at matched tier (Tier 3). Positive means the live venue is
+      pricing <em>above</em> posted list-asks. Negative means below.
     </p>
 
     <table class="basis">
@@ -68,7 +68,7 @@ const windowDays = rows[0]?.window_days ?? 7;
       As of {asOf} · {windowDays}-day window · operator-equal medians, matched
       tier (Tier 3). Input is the bid clearing floor where Vast exposes one,
       otherwise the on-demand live ask (flagged per row). <strong>Single-venue
-      signal</strong> — Vast only; it is the lone executable marketplace in the
+      signal</strong>: Vast only. It is the lone executable marketplace in the
       panel, not the whole market. A single-venue market-intelligence signal.
     </p>
 
@@ -77,13 +77,13 @@ const windowDays = rows[0]?.window_days ?? 7;
       <h2>Implied market utilization — Vast marketplace</h2>
       <p class="dek">
         The same venue's listings disclose how much of each machine is
-        currently rentable — enough to reconstruct occupancy machine by
-        machine, snapshot by snapshot. Both lines read the same direction —
+        currently rentable: enough to reconstruct occupancy machine by
+        machine, snapshot by snapshot. Both lines read the same direction:
         higher means tighter. <strong>Capacity</strong> (solid): share of listed
         GPU capacity not currently rentable. <strong>Whole nodes</strong>
         (dashed): share of machines without a rentable 8-GPU block.
-        The panel-wide availability view is a separate product —
-        see <a href="/utilization">Availability</a>; the two are never
+        The panel-wide availability view is a separate product
+        (see <a href="/utilization">Availability</a>), and the two are never
         blended.
       </p>
       <div class="occ-pills" id="occ-pills" role="group" aria-label="Select a chip"></div>
@@ -98,7 +98,7 @@ const windowDays = rows[0]?.window_days ?? 7;
       </div>
       <p class="note" id="occ-note">
         Four snapshots daily. A machine with zero rentable chunks may be fully
-        rented <em>or</em> host-paused — the public feed cannot distinguish
+        rented <em>or</em> host-paused. The public feed cannot distinguish
         them, so the utilization read is IMPLIED: share of listed capacity not currently
         rentable. Denominator is listed capacity only. History begins
         2026-05-13. Single-venue market-intelligence signal.

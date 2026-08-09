@@ -152,15 +152,15 @@ const fitLines = CHIPS.map((c) => {
         The <a href="/research/gpu-age-curve">age-curve note</a> measures one
         date's prices across generations of different ages. This note measures
         the other axis: each generation's own posted rental rate through time,
-        reconstructed from dated captures of providers' own pricing pages —
-        1,430 archived on-demand observations, October 2017 to April 2026,
-        every row carrying the archive URL it was read from. The
-        reconstruction ends at the archive's edge; CCIR's live panel is the
+        reconstructed from dated captures of providers' own pricing pages.
+        That is 1,430 archived on-demand observations, October 2017 to April
+        2026, every row carrying the archive URL it was read from. The
+        reconstruction ends at the archive's edge. CCIR's live panel is the
         continuation from there. Three facts sit on the surface of the
-        data: posted rates decline in steps, set by the minority of providers
-        who reprice; demand episodes have twice interrupted the decline — in
+        data. Posted rates decline in steps, set by the minority of providers
+        who reprice. Demand episodes have twice interrupted the decline: in
         2021–2023, and again from late 2025, when the AI buildout pushed
-        posted rates up across every generation still listed; and no
+        posted rates up across every generation still listed. And no
         generation's realized path matches the smooth decline a single-date
         cross-section suggests.
       </p>
@@ -243,20 +243,21 @@ const fitLines = CHIPS.map((c) => {
         </table>
       </div>
       <p>
-        Three generations, three different decline rates, none of them smooth
-        — the R² column is as much of the finding as the slopes. V100, the
+        Three generations, three different decline rates, none of them
+        smooth. The R² column is as much of the finding as the slopes. V100,
+        the
         one generation observable from mid-life to end-of-life, declined
         fastest and most regularly. A100's posted median is $2.20 in
-        September 2021 and $1.99 in April 2026 — −2.2% per year endpoint to
+        September 2021 and $1.99 in April 2026: −2.2% per year endpoint to
         endpoint, across four and a half years that also contained the 2022
         peak ($3.05) and the 2025 trough ($1.75). H100's posted median ends
         the window higher than it began it.
       </p>
       <p>
         All prices are nominal, as posted. The "less CPI" column subtracts
-        each window's consumer price index (CPI) inflation rate — the CPI
-        for urban consumers (CPI-U) series (3–4%/yr over these years) — from
-        the fit — which matters most for A100: a path that is nearly flat in
+        each window's consumer price index (CPI) inflation rate, the CPI
+        for urban consumers (CPI-U) series (3–4%/yr over these years), from
+        the fit. This matters most for A100: a path that is nearly flat in
         posted dollars is a decline of roughly 6% per year in real terms,
         endpoint to endpoint.
       </p>
@@ -270,8 +271,8 @@ const fitLines = CHIPS.map((c) => {
       <p>
         <strong>2021–2023.</strong> Posted rates on then-current and
         prior generations firmed through the GPU shortage and the first phase
-        of the AI buildout. V100 — four to six years old — rose 48% at
-        DataCrunch and was repriced upward at OVHcloud; A100 rates at the
+        of the AI buildout. V100, four to six years old, rose 48% at
+        DataCrunch and was repriced upward at OVHcloud. A100 rates at the
         repricers rose through 2023 into early 2024, and Lambda raised its
         A100 list prices outright in January 2024. The episode ended in
         mid-2024: A100 and V100 posted rates stepped down 30–56% from their
@@ -280,11 +281,11 @@ const fitLines = CHIPS.map((c) => {
       <p>
         <strong>Late 2025 – the window's edge.</strong> The declines bottomed around
         July–August 2025. From roughly December 2025, posted rates turned up
-        across every generation still listed, at every provider that reprices
-        — driven by demand from the AI buildout: H100 +29% at Verda by
-        December, H200 +70% by March; and in spring 2026 Lambda raised A100
-        by 56% in seven weeks and repriced V100 — silicon approaching its
-        ninth year — from a list unchanged since June 2022. The sticky tier,
+        across every generation still listed, at every provider that
+        reprices, driven by demand from the AI buildout: H100 +29% at Verda by
+        December, H200 +70% by March. In spring 2026 Lambda raised A100
+        by 56% in seven weeks and repriced V100, silicon approaching its
+        ninth year, from a list unchanged since June 2022. The sticky tier,
         as in the first episode, has not moved. This is the sharpest broad
         repricing of prior-generation silicon in the record.
       </p>
@@ -299,11 +300,11 @@ const fitLines = CHIPS.map((c) => {
         cross-section compares differently-aged chips at one date: how the
         market prices age, today. A cohort path is one chip through time, and
         includes everything that happened to the whole market level along the
-        way — including the two demand episodes above. A generation that ages
+        way, including the two demand episodes above. A generation that ages
         through a firming market declines more slowly than the
-        cross-sectional age gradient; V100, most of whose life predates the
+        cross-sectional age gradient. V100, most of whose life predates the
         boom, is the one cohort that tracks it closely. Both series are
-        published; which one a reader needs depends on the question being
+        published. Which one a reader needs depends on the question being
         asked of it.
       </p>
     </section>
@@ -312,14 +313,14 @@ const fitLines = CHIPS.map((c) => {
       <h2><span class="n">04</span> Limitations</h2>
       <p>
         Posted asks, not transactions. Panel composition changes as providers
-        enter, exit, redesign pages, or stop rendering prices server-side;
-        the carry-forward repair and per-point counts are disclosed, and thin
+        enter, exit, redesign pages, or stop rendering prices server-side.
+        The carry-forward repair and per-point counts are disclosed, and thin
         months are excluded from fitted figures. A100 pools memory variants.
-        Archive coverage is not uniform — notable gaps: RunPod from mid-2025,
+        Archive coverage is not uniform. Notable gaps: RunPod from mid-2025,
         Oracle Cloud Infrastructure (OCI) after 2023, OVHcloud's US-dollar pages in 2025. Step dates are
         bounded by capture dates, not observed exactly: a raise "in spring
         2026" occurred between two dated captures. Methodology per the
-        <a href="/documents/methodology">published documents</a>; the
+        <a href="/documents/methodology">published documents</a>. The
         underlying observation file, one archive URL per row, is available
         on request via <a href="/contact">/contact</a>.
       </p>
@@ -336,33 +337,34 @@ const fitLines = CHIPS.map((c) => {
           Paperspace, RunPod, with Common Crawl recoveries of Crusoe,
           Hyperstack, Together, and TensorDock. Every archived observation is
           a price the provider itself posted, on a dated page, with the
-          capture URL recorded. The reconstruction ends at April 2026 — one
+          capture URL recorded. The reconstruction ends at April 2026: one
           uniform right edge for every generation, all from the same
           measurement system. CCIR's live panel, which tracks the same
-          providers daily, is the continuation from there; it is
+          providers daily, is the continuation from there. It is
           deliberately not spliced into this dated note.
         </p>
         <p>
-          <strong>Filters.</strong> Guaranteed on-demand rates only —
+          <strong>Filters.</strong> Guaranteed on-demand rates only:
           reserved, interruptible (hyperscaler "Spot" products and
           community tiers alike), and "starting-at" teaser
-          rows excluded; USD only; per-instance prices divided to per-GPU
-          with the derivation recorded per row; known page bugs excluded.
+          rows are excluded. USD only. Per-instance prices are divided to
+          per-GPU
+          with the derivation recorded per row. Known page bugs are excluded.
         </p>
         <p>
           <strong>Repair.</strong> Posted prices are step functions: a page
           that read $1.79 in January and $1.79 in June did not move in
           between. Gaps between captures are carried forward at most six
-          months; providers drop out of the panel beyond that. The monthly
+          months. Providers drop out of the panel beyond that. The monthly
           panel value is the median across providers present that month,
           with the count disclosed per point. Months with fewer than three
-          providers are drawn dashed and excluded from every fitted figure;
-          trailing thin months at the end of a series are truncated rather
+          providers are drawn dashed and excluded from every fitted figure.
+          Trailing thin months at the end of a series are truncated rather
           than drawn.
         </p>
         <p>
           <strong>Basis notes.</strong> CoreWeave's componentized per-GPU
-          rate card (constant from 2021) was withdrawn in November 2025; its
+          rate card (constant from 2021) was withdrawn in November 2025. Its
           instance-derived prices are a different billing basis and are
           treated as a separate series. A100 pools 40GB and 80GB memory
           variants at chip grain, matching the published series convention.

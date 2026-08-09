@@ -524,20 +524,20 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       <div class="kicker">Market Intelligence · Compute Credit · as of {AS_OF}</div>
       <h1>Compute Credit Tracker</h1>
       <p class="standfirst lede">
-        The debt stack behind AI compute — GPU-backed loans and the credit
-        around them — tracked as filed. {instruments.length}
-        instruments across {issuers.length} issuers — public companies from
-        their U.S. Securities and Exchange Commission (SEC) filings, private
-        issuers from company, lender, or arranger
+        The debt stack behind AI compute: GPU-backed loans and the credit
+        around them, tracked as filed. {instruments.length}
+        instruments across {issuers.length} issuers. Public companies come
+        from their U.S. Securities and Exchange Commission (SEC) filings,
+        private issuers from company, lender, or arranger
         statements. Of these, ${inScopeUsdB}B across {inScopeC.length} are
-        secured directly by the GPUs — the issuance measure charted below;
-        convertibles, unsecured notes, and data-center credit are tracked for
-        context. Coupons, spreads, collateral, and lenders are reproduced
-        as disclosed; where a filing does not state a term, the row says
-        <em>undisclosed</em> — nothing here is estimated. One pattern holds
-        across the whole ledger: no GPU-collateralized instrument references
-        a market residual value — every disclosed schedule amortizes
-        collateral toward zero
+        secured directly by the GPUs. That subset is the issuance measure
+        charted below. Convertibles, unsecured notes, and data-center credit
+        are tracked for context. Coupons, spreads, collateral, and lenders
+        are reproduced as disclosed. Where a filing does not state a term,
+        the row says <em>undisclosed</em>. Nothing here is estimated. One
+        pattern holds across the whole ledger: no GPU-collateralized
+        instrument references a market residual value. Every disclosed
+        schedule amortizes collateral toward zero
         (<a href="#collateral-treatment">collateral treatment</a>).
       </p>
       <div class="disclosure">
@@ -637,31 +637,31 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         <summary>How to read this</summary>
         <div class="panel-foot">
           <p>
-            Colour, not the date, is the story. The two lowest spreads (+2.25%,
-            2026) are the facilities wrapped by an investment-grade offtake
-            contract — CoreWeave DDTL 4.0 (Meta-backed) and IREN Hardware 3
-            (Microsoft-backed) — while the widest (+9.62% in 2023, and the +13.00%
-            non-IG leg of DDTL 2.0) are unwrapped GPU collateral on weaker credit.
-            The market did not simply reprice a GPU pledge from +9.62% to +2.25%;
-            a large part of that move is the pledge being re-underwritten as
-            IG-contract paper. Read the compression as credit enhancement, not
-            calendar.
+            Colour, not the date, carries the story. The two lowest spreads
+            (+2.25%, 2026) are the facilities wrapped by an investment-grade
+            offtake contract: CoreWeave DDTL 4.0 (Meta-backed) and IREN
+            Hardware 3 (Microsoft-backed). The widest (+9.62% in 2023, and
+            the +13.00% non-IG leg of DDTL 2.0) are unwrapped GPU collateral
+            on weaker credit. The market did not simply reprice a GPU pledge
+            from +9.62% to +2.25%. A large part of that move is the pledge
+            being re-underwritten as IG-contract paper. Read the compression
+            as credit enhancement, not calendar.
           </p>
           <p>
             Spreads are stated in the credit agreements (percentage points over
-            the SOFR variant each filing names); vintage date = signing/close.
-            DDTL 2.0 prints as a bar — +6.00–6.50% on IG contract loans, +13.00%
+            the SOFR variant each filing names). Vintage date = signing/close.
+            DDTL 2.0 prints as a bar: +6.00–6.50% on IG contract loans, +13.00%
             (◆) non-IG. One caveat the level understates: DDTL 4.0 is only
-            ~$4.5B floating at +2.25%; ~$4.0B is a fixed U.S. Treasury
-            (UST)-based tranche, so its
+            ~$4.5B floating at +2.25%. A further ~$4.0B is a fixed U.S. Treasury
+            (UST)-based tranche, so the facility's
             all-in cost sits above the plotted spread (the ledger's effective-rate
             column runs ~7–11% across these facilities). Six of seven points are
             CoreWeave itself, so this is closer to one issuer's spread history
             than a market cross-section.
           </p>
           <p>
-            Fitch's July 16, 2026 rating action on the proposed DDTL 5.5 — and
-            the GPU lease-rate assumption that now leads its rating case — is
+            Fitch's July 16, 2026 rating action on the proposed DDTL 5.5, and
+            the GPU lease-rate assumption that now leads its rating case, is
             examined in the research note
             <a href="/research/fitch-coreweave-ddtl-5-5">A GPU Lease Rate
             Enters the Rating Case: Fitch's BB+ on CoreWeave's DDTL 5.5</a>.
@@ -741,25 +741,23 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           <p>
             The coupon fell because the offtake credit improved, not merely
             because time passed. The ~6% cluster (CIFR Black Pearl/Stingray,
-            IREN, APLD ComputeCo 2) is backed by an investment-grade tenant —
-            Amazon, Amazon Web Services (AWS), Microsoft, Oracle — or is an
+            IREN, APLD ComputeCo 2) is backed by an investment-grade tenant
+            (Amazon, Amazon Web Services (AWS), Microsoft, Oracle) or is an
             IG-rated bond (Hut 8's
-            BBB− 2042s); the 7.1–7.75% band is Google-guaranteed paper where the
-            tenant is unrated Fluidstack; and the 9.25% outlier (APLD ComputeCo 1)
+            BBB− 2042s). The 7.1–7.75% band is Google-guaranteed paper where the
+            tenant is unrated Fluidstack. The 9.25% outlier (APLD ComputeCo 1)
             is leased to CoreWeave, itself a levered neocloud. Same coupon axis,
-            three different credit structures. The faint grey line only orders the
-            named vintages by date — it is a reading aid, not a single-driver
-            trend.
+            three different credit structures.
           </p>
           <p>
             Two comparability caveats the y-axis hides. Tenor: Hut 8's 6.19/6.13%
-            notes (◎) mature in 2042 — ~16 years — so their coupon embeds far more
-            duration than the 2030–31 bonds; they are not like-for-like at the same
+            notes (◎) mature in 2042, ~16 years out, so their coupon embeds far more
+            duration than the 2030–31 bonds. They are not like-for-like at the same
             level. Structure: IREN 5.96% is Microsoft-*contract*-secured GPU
-            financing under a common-terms agreement, structurally closer to the
+            financing under a common-terms agreement. It sits structurally closer to the
             floating-rate facilities in the chart above than to a single-campus
             lease bond. One scope line: every issuer here is an operating
-            company — the bonds have recourse to a corporate balance sheet.
+            company, so the bonds have recourse to a corporate balance sheet.
             Non-recourse landlord vehicles (Meridian Arc, the TeraWulf Flash
             Compute JV) are charted separately below, where the tenant's lease
             is the entire credit.
@@ -831,32 +829,32 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         <summary>How to read this</summary>
         <div class="panel-foot">
           <p>
-            The boundary with the chart above is the seat, not the collateral:
-            those bonds are issued by operating companies and carry recourse
-            to a corporate balance sheet; these are issued by bankruptcy-remote
+            The boundary with the chart above is the seat, not the collateral.
+            Those bonds are issued by operating companies and carry recourse
+            to a corporate balance sheet. These are issued by bankruptcy-remote
             vehicles that exist only to own the campus. No operating business
-            stands behind them — the credit being priced is the compute
+            stands behind them. The credit being priced is the compute
             tenant's obligation to pay, and nothing else. This is where the
-            financing volume moved in 2026. Read across the tiers: Meta's
+            financing volume moved in 2026. Read across the tiers. Meta's
             direct leasebacks priced at 6.58% (Hyperion, Oct 2025) and 7.534%
-            (Sopaipilla, Jul 2026 — ~40bp wide of Hyperion per the pricing
-            coverage); Google-guaranteed Fluidstack leases at 6.25–7.25%; and
-            the one neocloud-tenant print — Helios Phase II, leased to
-            CoreWeave — at 9.875%. Within the same structure family, roughly
-            230–330 basis points separate a hyperscaler's lease from a
+            (Sopaipilla, Jul 2026, ~40bp wide of Hyperion per the pricing
+            coverage). Google-guaranteed Fluidstack leases priced at
+            6.25–7.25%. The one neocloud-tenant print is Helios Phase II,
+            leased to CoreWeave, at 9.875%. Within the same structure family,
+            roughly 230–330 basis points separate a hyperscaler's lease from a
             neocloud's.
           </p>
           <p>
             Comparability caveats. Tenor: the two Meta notes amortize fully
             to 2048–49 (◎), so their coupons embed decades of duration the
             2030–31 bonds don't. Sourcing: both Meta coupons are press-sourced
-            (Bloomberg/IFR/LCD) — the notes are rated A+/AA− but no issuer
-            statement discloses pricing — hence the hollow marks; the other
+            (Bloomberg/IFR/LCD), hence the hollow marks. The notes are rated
+            A+/AA− but no issuer statement discloses pricing. The other
             three coupons come from filings or issuer/counsel releases. Two
             multi-tenant data-center securitizations priced in the same
             window (Aligned Data Centers $1.18B, Jul 28; Compass Series
-            2026-2 $413M, Jul 27) sit outside the AI-linked landlord scope
-            and are tracked in the ledger as adjacent, not charted.
+            2026-2 $413M, Jul 27). They sit outside the AI-linked landlord
+            scope and are tracked in the ledger as adjacent, not charted.
           </p>
         </div>
       </details>
@@ -867,8 +865,8 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       <h2>Instrument ledger</h2>
       <p class="standfirst">
         Every live instrument across the panel. Filter by issuer, type,
-        seniority, lender, or confirmation status; click a column header to
-        sort; each row links the filing or release it was taken from.
+        seniority, lender, or confirmation status. Click a column header to
+        sort. Each row links the filing or release it was taken from.
       </p>
     </div>
     <div class="filters" id="credit-filters">
@@ -966,10 +964,10 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       latest-reported principal outstanding where filed, committed/face where
       drawn balances are undisclosed (hover the size). Non-USD sizes use the
       USD equivalents reported in the filings themselves. Rate sorting uses
-      the filed coupon or spread; undisclosed rates sort last. Lender cells
-      show the lead institution as filed (hover for the full list); the
+      the filed coupon or spread. Undisclosed rates sort last. Lender cells
+      show the lead institution as filed (hover for the full list). The
       lender filter matches on normalized institution names across every
-      role — lender, agent, trustee, or arranger — as named in the filings.
+      role (lender, agent, trustee, or arranger) as named in the filings.
       Clicking a chart data point jumps to its ledger row.
     </p>
 
@@ -978,13 +976,13 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       <h2>Collateral treatment</h2>
       <p>
         Of the {inScopeC.length} GPU-collateralized instruments, {amortC.length}
-        disclose amortization mechanics in their filed terms — depreciated-cost
+        disclose amortization mechanics in their filed terms: depreciated-cost
         borrowing bases, scheduled quarterly or monthly amortization,
-        debt-service coverage ratio (DSCR)-targeted paydowns,
+        debt-service coverage ratio (DSCR)-targeted paydowns, and
         amortization-plus-balloon structures. Every
         disclosed schedule points the same direction: collateral value is
         written down toward zero over the facility's life. No GPU-collateralized
-        instrument on this ledger references a market residual value; the
+        instrument on this ledger references a market residual value. The
         remainder do not disclose amortization mechanics in any primary
         document. The only residual-value references anywhere on the ledger
         sit outside the GPU-collateral scope: the Hyperion data-center JV
@@ -994,17 +992,17 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       </p>
       <p>
         A structure that amortizes collateral to zero embeds no assumption
-        about terminal value. A structure that does not — partial
-        amortization, a balloon sized to a resale assumption — substitutes an
-        assumption for a schedule, and the difference between the two is
-        something to monitor, not to fix at close: worked covenant, rollover,
+        about terminal value. A structure that does not (partial
+        amortization, a balloon sized to a resale assumption) substitutes an
+        assumption for a schedule. The difference between the two is
+        something to monitor, not to fix at close. Worked covenant, rollover,
         and pool-surveillance mechanics are at
-        <a href="/applications">/applications</a>, and the measured
+        <a href="/applications">/applications</a>. The measured
         per-generation decline path is at
         <a href="/research/gpu-age-curve">/research/gpu-age-curve</a>. The
-        reasoning behind referencing a lease rate at all — a GPU's earning
-        power is a market rate — is the
-        <a href="/research/gpu-as-income-asset">income-asset primer</a>.
+        <a href="/research/gpu-as-income-asset">income-asset primer</a> gives
+        the reasoning behind referencing a lease rate at all: a GPU's earning
+        power is a market rate.
       </p>
     </div>
 
@@ -1019,10 +1017,10 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         for public issuers, and company, lender, or arranger releases for
         private issuers. Terms are reproduced as filed. Where a rate, size,
         maturity, or collateral description is not stated in any primary
-        document, the field reads <em>undisclosed</em> — no figure on this
+        document, the field reads <em>undisclosed</em>. No figure on this
         page is estimated or interpolated. Journalist-sourced terms that lack
-        a primary-party release are flagged <span class="chip chip-press">press</span>;
-        transactions reported as in-talks with no announced close are flagged
+        a primary-party release are flagged <span class="chip chip-press">press</span>.
+        Transactions reported as in-talks with no announced close are flagged
         <span class="chip chip-rumored">rumored</span>. Items flagged UNVERIFIED
         inside a note reproduce the ledger's own open questions.
       </p>
@@ -1030,15 +1028,15 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         Updates are event-driven: rows change when a new filing or release
         lands, not on a fixed schedule. Corrections are welcome via the
         <a href="/contact">contact page</a> and are applied against the cited
-        document. This page is a research publication of CCIR; it is not
+        document. This page is a research publication of CCIR. It is not
         investment advice, an offer, or a solicitation.
       </p>
       <details class="def-disclosure">
         <summary>Retired and excluded instruments</summary>
         <p class="retired-lede">
           Instruments verified repaid, extinguished, settled, superseded, or
-          determined not to be debt are excluded from the ledger above and
-          recorded here so the panel's history stays auditable.
+          determined not to be debt are excluded from the ledger above. They
+          are recorded here so the panel's history stays auditable.
         </p>
         <ul class="retired-list">
           {retired.map((r: any) => (

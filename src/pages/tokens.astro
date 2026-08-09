@@ -377,8 +377,8 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
           <line x1={CPAD_L} x2={CW - CPAD_R} y1={cy(0)} y2={cy(0)} class="axis" />
         </svg>
         <p class="chart-note">
-          Rows carrying an n are served medians across that many providers;
-          the rest are the model owners' posted prices. Two constructions,
+          Rows carrying an n are served medians across that many providers.
+          The rest are the model owners' posted prices. Two constructions,
           never pooled.
         </p>
       </div>
@@ -456,7 +456,7 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
           {b.provider === 'anthropic' && sonnetSep && (
             <p class="foot-note">
               Sonnet 5 is posted to step to {fmt(sonnetSep.input, 0)} in /
-              {fmt(sonnetSep.output, 0)} out on 2026-09-01 — already on the record.
+              {fmt(sonnetSep.output, 0)} out on 2026-09-01. The step is already on the record.
             </p>
           )}
         </div>
@@ -531,7 +531,7 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       <p class="foot-note">
         Some models sit in both sections: the owner posts a price and
         independent providers also serve the open weights. The two numbers are
-        different measurements, not a restatement — {crossListed.widest.name} is
+        different measurements, not a restatement. {crossListed.widest.name} is
         posted at {fmt(crossListed.widest.posted)} per 1M output tokens above,
         and the median of independent providers here is
         {' '}{fmt(crossListed.widest.served)}. What a model owner asks and what
@@ -585,7 +585,7 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
           daily; a reprice appears on the day the list changed.</li>
         <li>Served rows are medians across independent providers of the same
           open-weight model, published at n ≥ 3.</li>
-        <li>The two are never pooled — a posted price and a cross-provider
+        <li>The two are never pooled. A posted price and a cross-provider
           median answer different questions.</li>
         <li>Token prices are not evidence about GPU rental rates. The link
           between them is serving efficiency, a vendor variable rather than a

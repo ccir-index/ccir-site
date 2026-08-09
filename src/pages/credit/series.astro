@@ -284,13 +284,13 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       <p class="standfirst lede">
         The derived layer of the credit record. The
         <a href="/credit">instrument tracker</a> reproduces each facility as
-        filed; this page computes from it — and from the schedules of
+        filed. This page computes from it, and from the schedules of
         investments of SEC-reporting funds that hold the same paper. Three
         series: the spread each GPU-collateralized facility signed at, how
-        long facilities actually stay outstanding, and the fair-value marks
+        long facilities stay outstanding, and the fair-value marks
         different lenders file on identical instruments. Every number here is
         either reproduced from a primary document or is arithmetic on two
-        filed figures — a ratio, a month count, a max−min.
+        filed figures: a ratio, a month count, a max−min.
         <em>Nothing on this page is a CCIR valuation.</em>
       </p>
     </div>
@@ -301,9 +301,9 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
     <h2><span class="n">01</span> Spread at Signing</h2>
     <p class="sec-lede">
       Disclosed spreads on GPU-collateralized instruments, ordered by signing
-      date — the primary-market series. Of the {inScope.length} instruments in
+      date: the primary-market series. Of the {inScope.length} instruments in
       the tracker's issuance scope, {spreadRows.length} disclose a floating
-      spread and a signing date; the rest are fixed-coupon (see the
+      spread and a signing date. The rest are fixed-coupon (see the
       <a href="/credit#coupons">coupon section</a> of the tracker) or file the
       rate as undisclosed, and undisclosed stays undisclosed.
       <a class="csv-link" href="/credit/series/spreads.csv">series CSV ↓</a>
@@ -350,10 +350,10 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       </svg>
       <div class="panel-foot">
         <p>
-          Spreads as disclosed in each signing document; grid-priced facilities
-          show their disclosed range. Each dot is numbered to the table below;
-          hover for detail. Window: the tracker's full GPU-collateralized
-          record, {spreadRangeLong}.
+          Spreads are as disclosed in each signing document. Grid-priced
+          facilities show their disclosed range. Each dot is numbered to the
+          table below. Hover for detail. Window: the tracker's full
+          GPU-collateralized record, {spreadRangeLong}.
         </p>
       </div>
     </div>
@@ -382,7 +382,7 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       </table>
     </div>
     <p class="tbl-note">
-      Spreads are at signing, as disclosed — this series does not restate,
+      Spreads are at signing, as disclosed. This series does not restate,
       interpolate, or update a spread after the signing document. Amendments
       that reprice a facility appear as their own disclosed events.
     </p>
@@ -398,10 +398,10 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
   <section class="wrap" id="refi-velocity">
     <h2><span class="n">02</span> Refi Velocity</h2>
     <p class="sec-lede">
-      How long compute-sector facilities actually stay outstanding. Each row
+      How long compute-sector facilities stay outstanding. Each row
       is a resolved facility where both the signing date and the resolution
-      date are documented in primary sources; months outstanding is the count
-      between the two. Borrower-side resolutions only — a fund selling its
+      date are documented in primary sources. Months outstanding is the count
+      between the two. Borrower-side resolutions only: a fund selling its
       position is not a resolution. Bridges are reported but carry their
       design tenor, so the headline median excludes them.
     </p>
@@ -448,7 +448,7 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
         {refiInsufficient.length > 0 && (
           <p class="tbl-note">
             {refiInsufficient.length} additional resolved facilities are excluded
-            because one of the two dates cannot yet be documented; they are
+            because one of the two dates cannot yet be documented. They are
             listed in the method note rather than estimated.
           </p>
         )}
@@ -471,9 +471,9 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       (period {marksPeriod}; {nHolders} holders). Where two or more
       unaffiliated advisers hold the same facility, the panel shows the
       max−min spread of their filed marks. The mark column is the ratio of
-      two filed numbers — fair value over principal — and nothing more.
+      two filed numbers, fair value over principal, and nothing more.
       Marks are each fund's own, determined by its valuation designee under
-      its own policies; conflicting filed terms across holders are reproduced,
+      its own policies. Conflicting filed terms across holders are reproduced,
       not reconciled.
     </p>
     <div class="panel">
@@ -513,22 +513,22 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       </svg>
       <div class="panel-foot">
         <p>
-          Each dot is one holder's filed mark; the line spans the lowest to
+          Each dot is one holder's filed mark. The line spans the lowest to
           highest mark on the same facility at the same date. The par line is
           drawn at 100. Hover a dot for the holder. Right margin: max−min in
           points of par.
         </p>
         <p>
-          In yield terms: translated at a common facility maturity —
-          quarterly discounting of the contractual payments, bullet repayment
-          at par, floating coupons held at the filed all-in rate — the widest
+          In yield terms: translated at a common facility maturity
+          (quarterly discounting of the contractual payments, bullet repayment
+          at par, floating coupons held at the filed all-in rate), the widest
           panel at 3/31/2026 (99.0 / 100.0 / 102.0 / 103.1) implies yields to
-          maturity of 9.96, 9.66, 9.12, and 8.86 percent: roughly 110 basis
-          points of dispersion in required return on identical paper, about
-          27 basis points per point of par. The translation is arithmetic on
-          filed numbers under the stated convention, not a valuation; every
-          implied yield falls within its own holder's filed Level 3
-          unobservable-input range for the corresponding asset class.
+          maturity of 9.96, 9.66, 9.12, and 8.86 percent. That is roughly 110
+          basis points of dispersion in required return on identical paper,
+          about 27 basis points per point of par. The translation is
+          arithmetic on filed numbers under the stated convention, not a
+          valuation. Every implied yield falls within its own holder's filed
+          Level 3 unobservable-input range for the corresponding asset class.
         </p>
       </div>
     </div>
@@ -588,7 +588,7 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
     })}
     <p class="tbl-note">
       Coverage is holders that file schedules of investments with the SEC
-      (business development companies and registered funds); bank and private
+      (business development companies and registered funds). Bank and private
       lenders do not publish marks. Marks refresh with each quarterly filing
       cycle. For a cross-sector comparison of same-facility marks, see the
       dated note <a href="/research/same-facility-different-marks">Same
@@ -620,12 +620,12 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
         <strong>Spread at signing.</strong> Instruments from the
         <a href="/credit">tracker's</a> issuance scope (GPU-collateralized,
         disclosed size) whose signing documents state a floating spread.
-        Spreads are not updated after signing; repricings enter as new
+        Spreads are not updated after signing. Repricings enter as new
         disclosed events.
       </p>
       <p>
         <strong>Refi velocity.</strong> A facility enters only when both its
-        signing and resolution dates are documented; facilities missing one
+        signing and resolution dates are documented. Facilities missing one
         date are counted and named but not estimated. Resolution types are
         taken from the resolving document. Bridge facilities are shown but
         excluded from the headline median, since their tenor is by design.
@@ -633,18 +633,18 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
       <p>
         <strong>Filed marks.</strong> Rows are reproduced from schedules of
         investments in holder 10-Qs/10-Ks, at each filing's stated period end
-        and units. One row per holder per tranche; positions held through
+        and units. One row per holder per tranche. Positions held through
         joint-venture vehicles are flagged, as their marks may not be
         independent of the venture partners. Marks on facilities with large
         undrawn commitments can embed netted fees and original-issue discount
-        in a small funded balance — those rows are flagged rather than
+        in a small funded balance. Those rows are flagged rather than
         adjusted. Fund-level exits (a holder selling its position) appear as
         <span class="chip chip-transacted">transacted</span> flags here and do
         not enter refi velocity.
       </p>
       <p>
         <strong>Cadence.</strong> The marks panel refreshes with the quarterly
-        BDC/registered-fund filing cycle; spread and refi series update as
+        BDC/registered-fund filing cycle. Spread and refi series update as
         signing or resolving documents are filed. This page carries
         reference-series governance: series definitions do not change without
         a dated method note.

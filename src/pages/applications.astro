@@ -264,24 +264,24 @@ const toc = [
     <p class="dek">
       Worked drafting examples showing how a CCIR rate fits into established
       commodity-credit-document conventions. Each example references a
-      specific CCIR series — the published, observable rate that anchors the
-      mechanic — calibrated against today's snapshot. The reference series
+      specific CCIR series (the published, observable rate that anchors the
+      mechanic), calibrated against today's snapshot. The reference series
       here is the Neocloud H100 guaranteed on-demand rate for the United
       States: a lender anchors to the CCIR series matching the operator
       segment, silicon, and geography of the collateral it lends against.
       The operator segment is a peer group defined by capability and service
-      level — operators offering comparable fabric, interconnect, and service
-      are benchmarked against one another — so a borrower is marked against
-      its true peers rather than against differently-specified capacity.
-      CCIR publishes observed posted prices; the lender owns the credit
-      judgment built on them. Why these examples anchor to a lease rate at all
-      — a GPU's earning power is a market rate — is set out in the
+      level: operators offering comparable fabric, interconnect, and service
+      are benchmarked against one another. A borrower is therefore marked
+      against its true peers rather than against differently-specified
+      capacity. CCIR publishes observed posted prices. The lender owns the
+      credit judgment built on them. Why these examples anchor to a lease
+      rate at all (a GPU's earning power is a market rate) is set out in the
       <a href="/research/gpu-as-income-asset">income-asset primer</a>. The
-      documents these examples cite — the
+      documents these examples cite are public at
+      <a href="/documents">/documents</a>: the
       published <a href="/documents/methodology">Methodology</a>, the
       <a href="/documents/change-management">Change Management Policy</a>, and
-      the administrator's <a href="/documents/governance">governance</a> — are
-      public at <a href="/documents">/documents</a>.
+      the administrator's <a href="/documents/governance">governance</a>.
     </p>
 
     <nav class="toc" id="contents" aria-label="Contents">
@@ -312,7 +312,7 @@ const toc = [
           administrator can: how its series are correctly cited, and what
           should happen to a citing document if a series materially changes
           or ceases. The annex below is published for that purpose. It takes
-          no position on commercial terms between parties — coverage levels,
+          no position on commercial terms between parties. Coverage levels,
           thresholds, remedies, and cure mechanics are matters for the
           parties and their counsel (Use Case 01 works one such structure as
           an illustration). It is not legal advice and not a recommended
@@ -484,7 +484,7 @@ consent of the parties].</pre>
           A worked drafting example showing how a CCIR rate would be cited in
           a senior-secured term loan facility as the trigger input to a
           tiered market price monitoring covenant. Modeled on the
-          reserve-based lending minimum hedging covenant — a structure in
+          reserve-based lending minimum hedging covenant: a structure in
           which falling New York Mercantile Exchange (NYMEX) strip prices automatically tighten operational
           requirements (hedging floors, reserve funding, cash sweeps) without
           immediately triggering default. Drafting illustration, not a model
@@ -536,7 +536,7 @@ consent of the parties].</pre>
           <em>signal</em>, not an <em>event</em>. There is no defaulting
           borrower behavior to litigate. The published rate either is or is
           not below the threshold on the test date. The lender's contractual
-          remedy is correspondingly graduated — operational tightening at
+          remedy is correspondingly graduated: operational tightening at
           lower thresholds, financial tightening at lower-still thresholds,
           mandatory action at the lowest. The borrower has visibility into
           where the trigger sits and can manage its operations accordingly.
@@ -563,8 +563,8 @@ consent of the parties].</pre>
         <h3 id="uc-01-s03"><span class="sec-n">03</span> Defined Terms</h3>
         <p>
           Drafted to be embeddable in a credit agreement's Definitions
-          section. The dual-anchor convention — naming the publication, the
-          administrator, and the specific data field separately — is the
+          section. The dual-anchor convention (naming the publication, the
+          administrator, and the specific data field separately) is the
           same as in modern oil-swap confirmations referencing "Brent
           (Dated) as published by S&amp;P Global Platts" and in post-LIBOR
           (the London Interbank Offered Rate) Alternative Reference Rates
@@ -706,8 +706,8 @@ the most recent Determination Date or (ii) a Reference Rate Disruption
 Event has occurred and is continuing.</pre>
         <p>
           The structure matches the RBL minimum hedging covenant's tiered
-          logic — falling published price drives tighter operational and
-          cash-flow requirements automatically — adapted to the operational
+          logic (falling published price automatically drives tighter
+          operational and cash-flow requirements), adapted to the operational
           realities of GPU-backed lending. Committed Revenue Coverage plays
           the role that hedge coverage plays in RBL: it locks in expected
           cash flow at progressively higher floors as rental rates fall,
@@ -888,14 +888,14 @@ or any Lender.</pre>
         <p>
           <strong>Step-down on improvement is automatic but releases require
           certification.</strong> When the rate recovers (Month 21 in the
-          example), the borrower's operating constraints loosen automatically
-          — but cash held in the Reserve Account does not release without a
-          compliance certificate. Tighten fast, loosen with verification.
+          example), the borrower's operating constraints loosen
+          automatically, but cash held in the Reserve Account does not
+          release without a compliance certificate.
         </p>
         <p>
           <strong>The covenant signals economic stress without triggering
           default.</strong> Tier 4 is restrictive but not default. Default
-          occurs only on cure failure within the Phase-In window — a
+          occurs only on cure failure within the Phase-In window, a
           separable, narrower event.
         </p>
       </section>
@@ -927,7 +927,7 @@ or any Lender.</pre>
         <p>
           The drafting innovation, to the extent there is one, is the
           operationalization of a published commodity-index trigger into an
-          asset class — GPU compute — in which forward markets do not yet
+          asset class (GPU compute) in which forward markets do not yet
           exist. The hedging-floor concept that has carried RBL minimum
           hedging covenants since their inception relies on the existence of
           a liquid futures market into which producers can sell forward
@@ -972,7 +972,7 @@ or any Lender.</pre>
           lacks established lender-internal alternatives to a published
           reference rate. This means a CRI rate plays a structurally more
           central role in the credit document than NYMEX strip plays in
-          RBL — governance, methodology transparency, and fallback
+          RBL. Governance, methodology transparency, and fallback
           architecture matter more, not less, in this asset class than in
           mature commodity markets.
         </p>
@@ -1019,7 +1019,7 @@ or any Lender.</pre>
         <p>
           <strong>Twelve months in Tier 4 and no default.</strong> Through the
           2025 price floor the facility ran a funded reserve, a full cash
-          sweep, and accelerated amortization — the lender de-risked
+          sweep, and accelerated amortization. The lender de-risked
           mechanically through the trough while the borrower kept operating.
           When the market turned in December 2025, restrictions stepped down
           automatically, reaching full restoration by May 2026.
@@ -1027,13 +1027,13 @@ or any Lender.</pre>
         <p>
           <strong>Every transition came from the published rate.</strong> No
           waiver negotiations, no amendment cycle, no dispute about what the
-          market was doing — eight tier events in twenty-nine months, each one
+          market was doing: eight tier events in twenty-nine months, each one
           mechanical.
         </p>
         <p class="calib-note">
           Calibration notes: the exhibit uses monthly stepped-panel medians as
-          a stand-in for the drafting's 30-day daily Reference Rate Average;
-          the backfill panel is thin early and is a different collection
+          a stand-in for the drafting's 30-day daily Reference Rate Average.
+          The backfill panel is thin early and is a different collection
           method from the live daily series (no splicing implied). June
           2026's single-month re-tightening illustrates why the drafting
           smooths on a 30-day average and includes the 15% interim test.
@@ -1047,12 +1047,12 @@ or any Lender.</pre>
           heavily contracted borrower's revenue does not move when the index
           moves, so a raw-index trigger over-tightens exactly the borrower
           the lender likes most. The objection is sound, and the repair is
-          established practice — reserve-based lending credits hedged volumes
+          established practice: reserve-based lending credits hedged volumes
           into the borrowing base at their hedge prices and applies the price
           deck only to unhedged volumes. Committed customer contracts are
           this market's hedge, so contracted capacity earns contract-price
           credit in the <em>test</em>, not merely in the coverage
-          requirement: the covenant classifies tiers on a blended rate
+          requirement. The covenant classifies tiers on a blended rate
           rather than the bare index.
         </p>
         <pre class="cov-body">
@@ -1075,7 +1075,7 @@ expirations) certified by a Responsible Officer.</pre>
         <p>
           The variant encodes the expiry dynamic mechanically: far from
           expiry, the index flows through only the uncontracted sliver and
-          the covenant barely engages; as contracts roll toward their
+          the covenant barely engages. As contracts roll toward their
           expiration dates, Exposed Capacity grows and the same index level
           bites progressively harder, reaching full force at the cliff. At
           the 2025 floor in the Section 09 backtest (index at $2.79 against
@@ -1100,7 +1100,7 @@ expirations) certified by a Responsible Officer.</pre>
           with Use case 02: the Effective Revenue Rate here and the Projected
           Rollover DSCR (debt-service coverage ratio) there are the same
           computation at different horizons,
-          so one covenant package runs on one data feed — the published
+          so one covenant package runs on one data feed: the published
           series plus the borrower's contract ladder.
         </p>
       </section>
@@ -1147,9 +1147,9 @@ expirations) certified by a Responsible Officer.</pre>
         <h3 id="uc-02-s01"><span class="sec-n">01</span> Why Rollover Is the Central Credit Question</h3>
         <p>
           The debt outlives the contracts that service it. Customer contracts
-          run three to five years; the facility matures later, so the capacity
+          run three to five years. The facility matures later, so the capacity
           behind the loan has to be re-contracted at least once before the
-          debt is repaid — at a rate no one has locked today, with no forward
+          debt is repaid, at a rate no one has locked today, with no forward
           market to hedge it. What that capacity earns when it is re-leased is
           the credit question, and it is an observable number, published
           daily.
@@ -1162,7 +1162,7 @@ expirations) certified by a Responsible Officer.</pre>
           then-prevailing rates, so if the market has repriced below the
           expiring vintage contract, coverage erodes regardless of which the
           operator takes. The drafting below references the 1-year committed
-          rate as the reference point for that choice set — the tenor renters
+          rate as the reference point for that choice set: the tenor renters
           will actually sign, priced for the occupancy the debt relies on.
         </p>
         <p>
@@ -1170,7 +1170,7 @@ expirations) certified by a Responsible Officer.</pre>
           with market-rent assumptions and lease-sweep periods, and that
           aircraft lessors price with appraiser-published re-leasing rates.
           The GPU market's equivalent of the market rent is the committed
-          term curve at the operator segment of the borrower — for a
+          term curve at the operator segment of the borrower: for a
           neocloud, the CCIR Neocloud committed series shown above.
         </p>
       </section>
@@ -1178,7 +1178,7 @@ expirations) certified by a Responsible Officer.</pre>
       <section class="sec">
         <h3 id="uc-02-s02"><span class="sec-n">02</span> Worked Rollover Exhibit</h3>
         <p class="calib-note">
-          Calibration: stylized facility — {FLEET_GPUS.toLocaleString()} GPUs
+          Calibration: stylized facility of {FLEET_GPUS.toLocaleString()} GPUs
           (1,000 nodes), {(ANCHOR_SHARE * 100).toFixed(0)}% of capacity under
           an anchor contract written at ${fmt(VINTAGE_RATE)}/GPU-hr
           (illustrative vintage), remainder sold at the on-demand rate
@@ -1203,9 +1203,8 @@ expirations) certified by a Responsible Officer.</pre>
           <strong>The exhibit prices the risk before it happens.</strong> The
           Projected Rollover DSCR is computable on any publication date from
           the borrower's contract book and the published curve. Nothing in it
-          waits for the borrower to actually re-lease — which is precisely
-          what lets the covenant act ahead of the expiry rather than after
-          the revenue is gone.
+          waits for the borrower to re-lease. That is what lets the covenant
+          act ahead of the expiry rather than after the revenue is gone.
         </p>
       </section>
 
@@ -1259,7 +1258,7 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
         <p>
           <strong>The trigger runs on the published curve, not on borrower
           projections.</strong> Both inputs to the Projected Rollover DSCR
-          that move — the re-lease rate and the trigger date — come from
+          that move (the re-lease rate and the trigger date) come from
           outside the borrower: one from the Reference Rate Administrator's
           publication, one from the contract calendar. The negotiation
           surface is confined to the thresholds.
@@ -1267,9 +1266,9 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
         <p>
           <strong>The 1Y tenor is the honest re-lease assumption.</strong>
           Renters of expiring capacity are predominantly unwilling to commit
-          beyond one year, so re-pricing expiring capacity at the 1-year
-          committed rate — rather than at on-demand or at a longer tenor the
-          market will not actually sign — matches observed contracting
+          beyond one year. Re-pricing expiring capacity at the 1-year
+          committed rate, rather than at on-demand or at a longer tenor the
+          market will not sign, matches observed contracting
           behavior.
         </p>
       </section>
@@ -1301,12 +1300,12 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
         <p>
           <strong>This is illustrative, not transactional.</strong> The
           vintage contract rate, fleet size, anchor share, and closing DSCR
-          are stylized; only the re-lease anchor and the term curve are
-          live. Panel depth on committed tenors is disclosed per cell above
-          — thin cells (n&lt;3) should be treated as indicative in real
+          are stylized. Only the re-lease anchor and the term curve are
+          live. Panel depth on committed tenors is disclosed per cell above.
+          Thin cells (n&lt;3) should be treated as indicative in real
           drafting, and the region-pooled fallback in the Market Re-Lease
-          Rate definition exists for exactly that reason. Utilization on
-          re-leased capacity is held at the contracted level; a real
+          Rate definition exists for that reason. Utilization on
+          re-leased capacity is held at the contracted level. A real
           exhibit would stress it jointly with rate.
         </p>
       </section>
@@ -1325,7 +1324,7 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
         <span class="uc-kicker">Use case 03 · Pool surveillance</span>
         <h2>Monitoring a Multi-Generation Pool</h2>
         <p class="uc-lede">
-          Securitized and warehouse pools are not one chip — they are mixed
+          Securitized and warehouse pools are not one chip. They are mixed
           fleets across generations. A worked construction for the composite
           reference such a pool needs: a unit-weighted basket of the
           published per-generation series, fixed at closing, verified in
@@ -1364,7 +1363,7 @@ upon an asset substitution, addition, or disposition reflected in a
 Servicer Report.</pre>
         <p>
           Every input is a published series with disclosed panel depth, and
-          the weights come from the deal's own asset schedule — so trustee,
+          the weights come from the deal's own asset schedule, so trustee,
           servicer, rating surveillance, and investors compute the same
           number from public data plus one document they already hold. The
           single-series covenants in Use case 01 run unchanged on the pool
@@ -1380,10 +1379,10 @@ Servicer Report.</pre>
           <a href="/research/gpu-age-curve">the age-curve note</a>). That has
           a direct consequence for pools: <strong>a static pool's earning
           power declines at approximately the same rate regardless of its
-          generation mix.</strong> Mix determines the level; it does not
+          generation mix.</strong> Mix determines the level. It does not
           change the slope. The only lever that changes a pool's decline
-          path is substitution — replacing aging units with newer
-          generations — which is precisely the servicer behavior
+          path is substitution: replacing aging units with newer
+          generations. That is the servicer behavior
           surveillance exists to verify.
         </p>
         <p>
@@ -1393,7 +1392,7 @@ Servicer Report.</pre>
           entered the basket on schedule; and panel depth <em>n</em> on each
           underlying cell, so a thinning input is visible before it matters.
           Generations without a published cell (a new chip in its first
-          weeks) enter the basket only by amendment — the same discipline as
+          weeks) enter the basket only by amendment, the same discipline as
           any index addition.
         </p>
       </section>
@@ -1401,11 +1400,11 @@ Servicer Report.</pre>
       <section class="sec">
         <h3 id="uc-03-s03"><span class="sec-n">03</span> Precedent and Limitations</h3>
         <p>
-          The construction is standard in adjacent asset classes: aircraft
+          The construction is standard in adjacent asset classes. Aircraft
           ABS monitors fleet value on appraisals weighted by airframe type
-          and vintage; container ABS tracks per-diem rates by box type and
-          age; auto ABS surveillance marks pools against vintage- and
-          segment-level auction indices. GPUs are, if anything, easier — the
+          and vintage. Container ABS tracks per-diem rates by box type and
+          age. Auto ABS surveillance marks pools against vintage- and
+          segment-level auction indices. GPUs are, if anything, easier: the
           per-generation series publish daily rather than quarterly.
           Limitations: the basket inherits each cell's panel depth (thin
           cells are disclosed, not hidden); unit weighting is one convention

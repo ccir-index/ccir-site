@@ -33,9 +33,9 @@ const availMeta = (meta as any).availability;
       <p class="standfirst lede">
         <strong>Shadeform aggregates 19 GPU clouds' publicly observable list-asks into a single view.</strong>
         This page surfaces the cross-provider view Shadeform aggregates:
-        where each chip is procurable, across providers and regions;
-        the per-provider price spread; boot-time tradeoffs; config availability;
-        long-tail chip catalog. <strong>Observatory data — not part of the CCIR published rates.</strong> Shadeform-reported pricing is third-party-attributed.
+        where each chip is procurable across providers and regions,
+        the per-provider price spread, boot-time tradeoffs, config availability,
+        and the long-tail chip catalog. <strong>Observatory data: not part of the CCIR published rates.</strong> Shadeform-reported pricing is third-party-attributed.
       </p>
     </details>
 
@@ -119,9 +119,9 @@ const availMeta = (meta as any).availability;
       <details class="def-disclosure">
         <summary>Definitions &amp; notes</summary>
         <p class="footnote">
-          Shadeform tracks 19 GPU clouds; not all carry the selected chip. Boot
+          Shadeform tracks 19 GPU clouds. Not all carry the selected chip. Boot
           times are minimum/maximum provisioning seconds reported by the provider.
-          Latitude commits to ~60s; some hyperscale-scale fleets need 180-240s.
+          Latitude commits to ~60s. Some hyperscale-scale fleets need 180-240s.
         </p>
       </details>
     </section>
@@ -143,8 +143,8 @@ const availMeta = (meta as any).availability;
         <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Each provider's min, median, and max per-GPU $/hr for the selected chip.
-          Wide bars mean broad stock-keeping unit (SKU) coverage; narrow bars mean a single configuration.
-          The cross-provider gap measures list-ask dispersion at matched chip —
+          Wide bars mean broad stock-keeping unit (SKU) coverage. Narrow bars mean a single configuration.
+          The cross-provider gap measures list-ask dispersion at matched chip:
           the same chip has been listed at $1.95–$2.99/GPU/hr across nine venues
           for H100 SXM.
         </p>
@@ -180,8 +180,8 @@ const availMeta = (meta as any).availability;
         <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Per-SKU configuration matrix. NVLink ✓ means the provider exposes
-          explicit NVLink topology — not just SXM (socketed) form. Empty cells reflect
-          Shadeform's reporting; the underlying provider may have richer
+          explicit NVLink topology, not just SXM (socketed) form. Empty cells reflect
+          Shadeform's reporting. The underlying provider may have richer
           config detail in their own application programming interface (API).
         </p>
       </details>
@@ -204,7 +204,7 @@ const availMeta = (meta as any).availability;
         <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           Min / max provisioning seconds per provider. Matters for elasticity-
-          sensitive workloads — a 4× boot-time gap between providers can be
+          sensitive workloads: a 4× boot-time gap between providers can be
           more material than a $0.10/GPU/hr price gap on short-duration jobs.
         </p>
       </details>
@@ -261,7 +261,7 @@ const availMeta = (meta as any).availability;
         <p class="footnote">
           Per-cycle <code>pct_available = n_available ÷ n_total_sku_region</code>
           for the selected chip, at the 3-hour collection cadence. Shadeform
-          exposes current state only; CCIR persists the cycle-by-cycle history
+          exposes current state only. CCIR persists the cycle-by-cycle history
           drawn here. The series ends 2026-05-13, when collection was paused.
         </p>
       </details>
@@ -293,7 +293,7 @@ const availMeta = (meta as any).availability;
         <summary>Definitions &amp; notes</summary>
         <p class="footnote">
           For each (interconnect × num_GPUs) configuration, how many providers
-          carry it. Single-provider rows mean concentration risk — capacity
+          carry it. Single-provider rows mean concentration risk: capacity
           loss has nowhere to fail over to. Multi-provider rows mean cross-
           venue arbitrage is possible.
         </p>
@@ -336,10 +336,10 @@ const availMeta = (meta as any).availability;
     </section>
 
     <p class="footnote-last">
-      Collected every three hours while live; collection has been paused since
+      Collected every three hours while live. Collection has been paused since
       2026-05-13 pending the pipeline migration, and every figure on this page
       reflects the last published snapshot. Shadeform aggregator API authenticated via
-      CCIR research key — values are public list-asks as Shadeform reports them.
+      CCIR research key. Values are public list-asks as Shadeform reports them.
       Aggregator depth: 19 GPU clouds, 28 GPU types, 269 instance types,
       ~671 (type × region) availability cells per cycle.
     </p>

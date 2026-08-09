@@ -76,9 +76,9 @@ const last = D[D.length - 1];
       <p class="standfirst">
         Monthly neocloud H100 posted prices reconstructed from archived pricing
         pages: on-demand versus committed-term, October 2023 through June 2026.
-        Two findings survive the composition repair: the committed discount is
-        persistent and schedule-like, and guaranteed on-demand did not crash to
-        the marketplace floor — it based near $2.80 through 2025 and has turned
+        Two findings survive the composition repair. The committed discount is
+        persistent and schedule-like. And guaranteed on-demand did not crash to
+        the marketplace floor: it based near $2.80 through 2025 and has turned
         up since December.
       </p>
     </header>
@@ -154,13 +154,13 @@ const last = D[D.length - 1];
       <p>
         Source: archived provider pricing pages (Common Crawl and Wayback
         captures), provider-primary, for eight neoclouds. Raw monthly medians
-        whipsaw because the capture panel changes month to month (n = 1–6) —
-        the largest swings in a naive plot are providers entering and leaving,
-        not prices moving. The repair exploits the fact that a <strong>posted
+        whipsaw because the capture panel changes month to month (n = 1–6).
+        The largest swings in a naive plot are providers entering and leaving,
+        not prices moving. The repair uses the fact that a <strong>posted
         price is a step function</strong>: it persists until the provider
         changes it. Each provider's last observed price is carried forward
         (capped at six months), so the panel changes composition only when a
-        provider first enters — never on a missed capture. The same
+        provider first enters, never on a missed capture. The same
         carry-forward convention, tighter-capped, governs the live daily panel
         per the <a href="/documents/methodology">Methodology</a>.
       </p>
@@ -168,7 +168,7 @@ const last = D[D.length - 1];
         The backfill is a different collection method from the live daily
         panel and is not spliced to it. For reference, the live series
         (<code>CRI-T2-H100-ALL-GTD-OD-ALL</code>, 20 sources) printed $3.22 on
-        {AS_OF} — inside the backfill's June range on a much deeper panel.
+        {AS_OF}, inside the backfill's June range on a much deeper panel.
       </p>
     </section>
 
@@ -177,11 +177,11 @@ const last = D[D.length - 1];
       <p>
         <strong>The committed discount is persistent and schedule-like.</strong>
         Committed prices sit below on-demand in every month of the window,
-        mostly 20–50% below, settling at 26–39% over the last year — the
-        time-series counterpart of the fixed discount schedule visible in
+        mostly 20–50% below, settling at 26–39% over the last year. That is
+        the time-series counterpart of the fixed discount schedule visible in
         today's cross-section (≈ −36% at one year). The discount compresses
         when on-demand falls toward committed (mid-2025, ~12–16%) and re-opens
-        when on-demand recovers — committed reprices slower in both
+        when on-demand recovers. Committed reprices slower in both
         directions, which is what an administered schedule looks like.
       </p>
       <p>
@@ -189,9 +189,9 @@ const last = D[D.length - 1];
         The widely-cited "$2 H100" of late 2024 was real but was an
         auction/interruptible print. Posted guaranteed on-demand at neoclouds
         slid from ~$4.78 to a floor of ~$2.80, held that base through 2025,
-        and turned upward from December 2025 — +20–40% off the floor by
+        and turned upward from December 2025: +20–40% off the floor by
         spring 2026. The guaranteed–interruptible gap is a grade distinction,
-        not noise; pooling the two grades is how the steeper narrative gets
+        not noise. Pooling the two grades is how the steeper narrative gets
         made.
       </p>
       <p>
@@ -207,12 +207,12 @@ const last = D[D.length - 1];
     <section class="sec">
       <h2><span class="n">04</span> Limitations</h2>
       <p>
-        Panel depth is thin early (n = 1 before February 2024 — dashed above;
-        treat those months as a single provider's card, not a market level).
-        Committed pools whatever tenors providers posted — predominantly one
-        month to one year, with a small minority of multi-year rows — so the
+        Panel depth is thin early: n = 1 before February 2024, dashed above.
+        Treat those months as a single provider's card, not a market level.
+        Committed pools whatever tenors providers posted, predominantly one
+        month to one year with a small minority of multi-year rows, so the
         discount series mixes tenor as well as
-        provider. Captures are monthly at best; a mid-month cut appears one
+        provider. Captures are monthly at best, so a mid-month cut appears one
         month late. All prices are posted list asks, not transactions. Eight
         providers is the recoverable archive, not the full market.
       </p>

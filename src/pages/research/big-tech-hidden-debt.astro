@@ -80,11 +80,11 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         A widely covered <a href="https://asia.nikkei.com/business/technology/five-us-tech-giants-hidden-debts-soar-to-1.65tn-on-opaque-ai-funding">Nikkei
         study</a> put the off-balance-sheet AI
         commitments of Alphabet, Amazon, Meta, Microsoft, and Oracle at
-        $1.65 trillion — 122% of their reported debt — under the headline
+        $1.65 trillion, or 122% of their reported debt, under the headline
         of "hidden debts." This note rebuilds that number from the five
         companies' own SEC filings and takes it apart: what kind of
-        obligation each dollar is, what the commitment language actually
-        binds, what sits on the other side of the same contracts, and
+        obligation each dollar is, what the commitment language binds,
+        what sits on the other side of the same contracts, and
         where the number differs from debt. Every figure below carries its
         filing and accession number.
       </p>
@@ -93,20 +93,20 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
     <section class="sec">
       <h2><span class="n">01</span> The number reconciles</h2>
       <p>
-        Summing the latest available filings — first-quarter 2026 10-Qs for
+        Sum the latest available filings: first-quarter 2026 10-Qs for
         Meta, Alphabet, and Amazon; Microsoft's 10-Q for the quarter ended
-        March 31, 2026; Oracle's fiscal-2026 10-K — the two footnote
+        March 31, 2026; Oracle's fiscal-2026 10-K. The two footnote
         categories the study counted come to approximately
         <strong>${(SUM_T / 1000).toFixed(2)} trillion</strong>: about
         ${SUM_L.toFixed(0)} billion of leases signed but not yet
         commenced, and about ${SUM_P.toFixed(0)} billion of purchase and
         other contractual commitments. In plain terms: the first bucket is
-        rent — signed leases on data centers still under construction,
-        with payments that begin when the buildings are delivered. The
-        second is bills — contracts to buy chips, power, and cloud
-        capacity, counted at the minimums the companies cannot walk away
-        from. The aggregate is real, and none of
-        it is hidden in any ordinary sense — every figure in this note
+        rent. These are signed leases on data centers still under
+        construction, with payments that begin when the buildings are
+        delivered. The second is bills: contracts to buy chips, power, and
+        cloud capacity, counted at the minimums the companies cannot walk
+        away from. The aggregate is real, and none of
+        it is hidden in any ordinary sense. Every figure in this note
         comes from the commitments and leases notes of documents filed
         with the SEC, where the accounting standards require them to be
         disclosed. The accurate description is <em>disclosed but
@@ -138,8 +138,8 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         </div>
         <figcaption>
           Microsoft purchase and construction commitments are as of June 30,
-          2025 (its fiscal 2025 10-K; the 10-Q does not update the table) —
-          the one older window in the set. Oracle's purchase figure excludes
+          2025 (its fiscal 2025 10-K; the 10-Q does not update the table).
+          That is the one older window in the set. Oracle's purchase figure excludes
           $19B of cloud-infrastructure purchase commitments signed after its
           May 31 year-end, disclosed as a subsequent event.
         </figcaption>
@@ -155,24 +155,24 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         of the $1.65 trillion is instead <em>executory</em>: promises to
         pay for facilities and goods not yet delivered. The distinction
         has consequences in both directions. An executory commitment
-        generally cannot be accelerated, has no principal, and — for
-        leases — can be rejected in bankruptcy at a capped damages claim.
+        generally cannot be accelerated, has no principal, and (for
+        leases) can be rejected in bankruptcy at a capped damages claim.
         But a commitment with take-or-pay terms binds whether or not the
-        capacity is used, which is precisely the property that lets other
+        capacity is used, which is the property that lets other
         parties borrow against it. The question the aggregate cannot
         answer, and the filings can, is how much of the total carries that
         property.
       </p>
       <p>
-        Roughly half the total — ${SUM_L.toFixed(0)} billion — is leases
-        signed but not yet commenced, and this half is not permanently
+        Roughly half the total, ${SUM_L.toFixed(0)} billion, is leases
+        signed but not yet commenced. This half is not permanently
         off-balance-sheet at all. Under the lease accounting standard,
         the liability is recognized when the landlord delivers the
-        facility; the footnote is a forward calendar of lease liabilities
+        facility. The footnote is a forward calendar of lease liabilities
         that will surface as data centers energize. Alphabet describes its
         pipeline as carrying "non-cancelable lease terms primarily between
-        one and 25 years"; Oracle's commitments run fifteen to nineteen
-        years; Meta's reach thirty. The growth in this category is the
+        one and 25 years." Oracle's commitments run fifteen to nineteen
+        years. Meta's reach thirty. The growth in this category is the
         construction pipeline made visible:
       </p>
       <figure class="chart-fig">
@@ -247,16 +247,16 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         </tbody>
       </table>
       <p>
-        Two readings follow. The alarmed reading — that the totals hide
-        soft, walk-away spending — is backwards: the issuers already
+        Two readings follow. The alarmed reading (that the totals hide
+        soft, walk-away spending) is backwards: the issuers already
         filter their totals to the non-cancelable portion or the minimum
         commitment, and exclude volume-based energy agreements entirely.
         The disclosed figures sit closer to a floor on true commitment
-        than an exaggeration. The complacent reading — that executory
-        means escapable — fails on the same language: take-or-pay and
+        than an exaggeration. The complacent reading (that executory
+        means escapable) fails on the same language. Take-or-pay and
         termination-fee terms are the reason these promises can serve as
         collateral for other people's borrowing, which is where this note
-        is ultimately headed.
+        is headed.
       </p>
     </section>
 
@@ -274,7 +274,7 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         more in agreements entered in April, and a framework "to provide
         up to $33.3 billion of future backstops … subject to finalization
         of terms with data center providers." The agreements run up to
-        fifteen years; on a default, Alphabet "retain[s] the right to
+        fifteen years. On a default, Alphabet "retain[s] the right to
         assume the underlying leases for internal use or to sublease to
         third parties." No counterparty is named in the filings.
       </p>
@@ -302,23 +302,23 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         <figcaption>
           Alphabet 10-K FY2025 and 10-Q Q1 2026. The April figure adds the
           ~$15.3B of backstop agreements disclosed as a subsequent event to
-          the March 31 notional; the further "up to $33.3 billion" framework
+          the March 31 notional. The further "up to $33.3 billion" framework
           is not charted because terms were not final. Separately, Alphabet
           reports financial guarantees supporting energy-infrastructure
           procurement of $9.0B maximum potential payments.
         </figcaption>
       </figure>
       <p>
-        The same function appears in two other forms: Meta's Louisiana
-        data-center venture — unconsolidated, 20%-owned — carries
+        The same function appears in two other forms. Meta's Louisiana
+        data-center venture (unconsolidated, 20%-owned) carries
         <strong>residual value guarantees with an aggregate threshold of
         approximately $28 billion</strong> at zero recorded liability
-        (disclosed maximum exposure to loss: $46.0 billion), and Oracle's
+        (disclosed maximum exposure to loss: $46.0 billion). Oracle's
         lease pipeline includes a facility for which it "guaranteed up to
         $3.3 billion of the lessor's borrowing." Same economic act, three
-        treatments — a fair-valued derivative, an RVG at zero, a guarantee
+        treatments: a fair-valued derivative, an RVG at zero, a guarantee
         inside a lease footnote. These notionals are small next to the
-        $1.65 trillion; they matter because they are the purest form of
+        $1.65 trillion. They matter because they are the purest form of
         the pattern the next section documents at scale.
       </p>
     </section>
@@ -328,13 +328,13 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
       <p>
         A purchase commitment is a two-sided object, and four of the five
         companies also sell compute at scale. Their disclosed revenue
-        backlogs — remaining performance obligations, the mirror image of
-        somebody's commitment footnote — now total roughly $2.1 trillion:
+        backlogs (remaining performance obligations, the mirror image of
+        somebody's commitment footnote) now total roughly $2.1 trillion:
         Oracle $638 billion (from $138 billion a year earlier), Microsoft
         $633 billion, Alphabet $467.6 billion, Amazon $364 billion. In
         aggregate, the five companies' contracted future revenues exceed
-        their contracted future spending — the arithmetic that makes the
-        commitments look covered:
+        their contracted future spending. That is the arithmetic that
+        makes the commitments look covered:
       </p>
       <figure class="chart-fig">
         <div class="fig-title">Commitments vs revenue backlog (RPO) · latest filings · $B</div>
@@ -370,31 +370,31 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
           RPO definitions differ by issuer (Alphabet's excludes cancellable
           contracts; Amazon's covers contracts over one year, weighted-average
           life 5.5 years; Microsoft's commercial RPO has a weighted-average
-          duration of ~2.5 years) — comparable in kind, not in duration.
+          duration of ~2.5 years). They are comparable in kind, not in duration.
         </figcaption>
       </figure>
       <p>
         The comfort in that arithmetic depends entirely on who owes the
-        $2.1 trillion — and here the two sides of the ledger are not
+        $2.1 trillion. Here the two sides of the ledger are not
         symmetric. The commitments are owed <em>by</em> five of the
         largest, most creditworthy balance sheets in existence, in
         language they themselves describe as non-cancelable, unconditional,
         or take-or-pay. The backlog is owed <em>to</em> them, and the
-        filings say less about by whom — but what they do say points the
+        filings say less about by whom. What they do say points the
         same direction. Amazon is the only one that names a counterparty:
         its backlog growth is driven by an OpenAI arrangement expanded by
-        $100 billion to $138 billion — while Amazon separately reports a
+        $100 billion to $138 billion. Amazon separately reports a
         $15 billion investment in OpenAI, a $35 billion equity commitment
         letter, and a financing facility of up to $20 billion for
         Anthropic that unlocks "as we reach certain delivery milestones of
         compute capacity." Oracle attributes its $500 billion backlog jump
-        to "certain significant cloud contracts," unnamed, expects only
-        12% of the total to convert to revenue within twelve months, and
+        to "certain significant cloud contracts," unnamed. It expects only
+        12% of the total to convert to revenue within twelve months. It
         states that returns on its infrastructure "are dependent on
         customer demand and the ability of our key customers to meet
         their contractual obligations." Microsoft's commercial backlog
-        grew 99% in the year it recapitalized its OpenAI relationship —
-        an equity-method stake with continuing revenue-sharing — and
+        grew 99% in the year it recapitalized its OpenAI relationship
+        (an equity-method stake with continuing revenue-sharing).
         Alphabet's includes "a limited number of agreements" to supply
         multiple gigawatts of TPU hardware, around which Alphabet itself
         provides the credit backstops of the previous section.
@@ -403,16 +403,16 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         One disclosure mechanic keeps this concentration off the standard
         screens: customer-concentration tests run on <em>recognized</em>
         revenue. Oracle can state, accurately, that no customer accounted
-        for 10% or more of its total revenues in fiscal 2026 — while
+        for 10% or more of its total revenues in fiscal 2026, while
         attributing a $500 billion backlog increase to a small number of
         contracts that have not begun converting. Backlog concentration
         only surfaces in the concentration disclosures as the contracts
         turn into revenue. So the honest restatement of the "hidden debt"
-        number is this: the obligations are disclosed, unconditional, and
-        owed by the strongest credits in the market; the receivables
+        number is this. The obligations are disclosed, unconditional, and
+        owed by the strongest credits in the market. The receivables
         covering them are concentrated in a limited number of
-        counterparties that are private, unrated, and — in the cases the
-        filings themselves disclose — financed in part by the sellers.
+        counterparties that are private, unrated, and (in the cases the
+        filings themselves disclose) financed in part by the sellers.
         What the aggregate measures is not concealment but credit
         transformation, and its scale is set by the weakest link in that
         chain, not the strongest.
@@ -437,14 +437,14 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         <figcaption>
           A duration-free coverage sketch, not a solvency measure: the
           commitments pay out over as much as thirty years while the cash
-          flow is one year's. Its use is the cross-section — the two ends of
+          flow is one year's. Its use is the cross-section: the two ends of
           the range are five times apart.
         </figcaption>
       </figure>
       <p>
         The cross-section, then, is the honest summary. Meta is the one
         pure buyer: the strongest commitment language of the five and no
-        contracted revenue against it — its coverage is advertising cash
+        contracted revenue against it. Its coverage is advertising cash
         flow, and its exposure is a return-on-investment question rather
         than a counterparty one. Oracle is the concentrated
         transformation trade: the largest lease pipeline, the longest
@@ -452,14 +452,14 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         by the largest and least-seasoned backlog. Microsoft, Alphabet,
         and Amazon hold commitments matched or exceeded by contracted
         revenue plus the largest operating cash flows in corporate
-        history — with their exposure concentrated in how much of the
+        history. Their exposure is concentrated in how much of the
         backlog traces to the same few counterparties. One aggregate
         number describes five different balance sheets. These same
-        commitments are the collateral of the compute-credit market —
-        the facilities in the <a href="/credit">compute credit
+        commitments are the collateral of the compute-credit market.
+        The facilities in the <a href="/credit">compute credit
         tracker</a> lend against exactly these promises, and price their
-        quality — which is why this record keeps them in view. This note
-        is dated; the quantities it decomposes are maintained, filing by
+        quality. That is why this record keeps them in view. This note
+        is dated. The quantities it decomposes are maintained, filing by
         filing, on the <a href="/credit/commitments">AI commitments
         monitor</a>.
       </p>
@@ -478,7 +478,7 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         Asia, "Five US tech giants' hidden debts soar to $1.65tn on
         opaque AI funding"</a> (July 2026). Quotations are verbatim from the filings.
         Nothing here is a solvency opinion, a forecast, or investment
-        advice; CCIR publishes reference data and records.
+        advice. CCIR publishes reference data and records.
       </p>
     </section>
   </section>

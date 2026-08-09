@@ -34,7 +34,7 @@ const SNAP_DATE = '2026-07-06';
     </header>
 
     <div class="designation" role="note">
-      <p class="desig-main">Analytical decomposition of published reference rates — <em>not a reference rate</em>.</p>
+      <p class="desig-main">Analytical decomposition of published reference rates: <em>not a reference rate</em>.</p>
     </div>
 
     <!-- ======================= §01 LENSES ======================= -->
@@ -180,7 +180,7 @@ const SNAP_DATE = '2026-07-06';
 
       <p class="lede">
         One observed number underlies every panel: the Neocloud guaranteed on-demand rate, in dollars per
-        GPU-hour. Each panel divides that rate by one spec-sheet denominator — and where a denominator makes
+        GPU-hour. Each panel divides that rate by one spec-sheet denominator. Where a denominator makes
         the cross-section <strong>flat</strong>, that denominator is the dimension the market prices.
       </p>
 
@@ -210,13 +210,13 @@ const SNAP_DATE = '2026-07-06';
       <h2><span class="n">02</span> The Bandwidth Band</h2>
       <p>
         Re-denominated per unit of memory bandwidth, datacenter silicon from eight months to 5.7 years of
-        age rents inside <strong>$0.87–0.98 per TB/s-hour</strong> — ±6% around a $0.92 mean. The band is
-        the test: a spread that holds tight means the age discount remains priced away; a widening spread
+        age rents inside <strong>$0.87–0.98 per TB/s-hour</strong>, ±6% around a $0.92 mean. The band is
+        the test: a spread that holds tight means the age discount remains priced away. A widening spread
         is the falsifiable marker firing. Members are disclosed on every exhibit.
       </p>
       <p>
         The flatness is a like-for-like property. It holds across cells that share an operator segment,
-        interruptibility grade, term, and region — the series named under each exhibit. Pooled cuts,
+        interruptibility grade, term, and region: the series named under each exhibit. Pooled cuts,
         marketplace minimums, or mixed interruptibility grades will not reproduce it: grade and tenor are
         different markets per unit of bandwidth, as everywhere else on this site.
       </p>
@@ -298,7 +298,7 @@ const SNAP_DATE = '2026-07-06';
           prior one down to its share of the throughput: against the H100
           print of $3.22, a chip with 32% of the BF16 throughput reprices to
           $1.02. If bandwidth is the priced unit, the same H100 print implies
-          $1.92 — the A100 carries 60% of the bandwidth. Two rules, two
+          $1.92: the A100 carries 60% of the bandwidth. Two rules, two
           implied rates:
         </p>
         <div class="twrap">
@@ -313,7 +313,7 @@ const SNAP_DATE = '2026-07-06';
           </table>
         </div>
         <p>
-          The observed A100 print is <strong>$1.80</strong> — 94% of
+          The observed A100 print is <strong>$1.80</strong>: 94% of
           bandwidth parity, 77% above compute parity, at 5.7 years of age.
           The market repriced the A100 to its bandwidth share, not its
           compute share. That is the band's claim restated as a spread you
@@ -321,7 +321,7 @@ const SNAP_DATE = '2026-07-06';
           bandwidth-parity line toward the compute-parity line is the day
           the band breaks. The schedule to watch it on is the bandwidth
           frontier itself, which has moved more slowly than the compute
-          frontier — the band's newest member entered at its predecessor's
+          frontier: the band's newest member entered at its predecessor's
           8.0 TB/s.
         </p>
       </div>
@@ -331,10 +331,10 @@ const SNAP_DATE = '2026-07-06';
     <section class="sec wide" id="watt-rent">
       <h2><span class="n">03</span> Watt-Rent by Shell Class</h2>
       <p>
-        Per unit of nameplate power, the panel sorts by shell class rather than by age — here the
+        Per unit of nameplate power, the panel sorts by shell class rather than by age. Here the
         dispersion is the finding. Consumer silicon with no datacenter bundle rents near
-        <strong>$1 per kW-hr</strong>; air-cooled datacenter silicon is flat at
-        <strong>$4.50–4.66</strong> across five years of age (A100 = H100 = L40S per watt); liquid-class
+        <strong>$1 per kW-hr</strong>. Air-cooled datacenter silicon is flat at
+        <strong>$4.50–4.66</strong> across five years of age (A100 = H100 = L40S per watt). Liquid-class
         silicon rents at <strong>$6–7</strong>. Watt-rent prices the shell a chip can occupy.
       </p>
 
@@ -385,8 +385,8 @@ const SNAP_DATE = '2026-07-06';
           </svg>
         </div>
         <figcaption class="tfoot">
-          Revenue per kW of nameplate thermal design power (TDP), by shell class — gross rent per unit of power envelope, not margin.
-          † H200 hosts in dense-air or liquid shells. ‡ L4 is an edge part — any air shell — and sits outside
+          Revenue per kW of nameplate thermal design power (TDP), by shell class: gross rent per unit of power envelope, not margin.
+          † H200 hosts in dense-air or liquid shells. ‡ L4 is an edge part (any air shell) and sits outside
           the datacenter air band. Marketplace rows (Mkt) are Marketplace-segment prints, indicative.
           Example prints · {PRINT_DATE} · rates from the {SNAP_DATE} snapshot.
         </figcaption>
@@ -419,16 +419,16 @@ const SNAP_DATE = '2026-07-06';
       <h2><span class="n">04</span> Economic Life — the Breakeven Altimeter</h2>
       <p>
         Watt-rent and cash operating cost are the same unit. A chip exits economic life when its
-        watt-rent decays to the cash boundary beneath it — so one log-scale strip reads as an
+        watt-rent decays to the cash boundary beneath it. One log-scale strip therefore reads as an
         altimeter: today's rent bands above, the cash operating boundary below, and the gap between
         them is distance to shutdown. Air-cooled silicon today covers its cash operating cost
-        <strong>≈5–7×</strong>; the consumer band near $1 is the visible preview of late life,
+        <strong>≈5–7×</strong>. The consumer band near $1 is the visible preview of late life,
         close above the boundary.
       </p>
 
       <div class="identity">
         <b>Cost-side basis.</b> Chip TDP understates system draw: an 8×H100 server on NVIDIA's HGX server platform draws
-        ≈10.2 kW against 5.6 kW of chip TDP — a ≈1.8× system factor (CPUs, NVSwitch, fans).
+        ≈10.2 kW against 5.6 kW of chip TDP, a ≈1.8× system factor (CPUs, NVSwitch, fans).
         Every cost rung below is restated per chip-TDP-kW through that factor, so both sides of the
         altimeter share the watt-rent lens's denominator. The factor is a disclosed election.
       </div>
@@ -504,10 +504,10 @@ const SNAP_DATE = '2026-07-06';
           </svg>
         </div>
         <figcaption class="tfoot">
-          Rent bands are CCIR prints (filled, member ticks at left edge); the cash boundary is a derivation
+          Rent bands are CCIR prints (filled, member ticks at left edge). The cash boundary is a derivation
           from disclosed elections (tinted), its components external reference data (outlined), cited inline.
-          Whether power is metered inside or beside the colo rate varies by contract — the power-only floor
-          and the colo asking band are therefore shown separately. All cost rungs per chip-TDP-kW via the
+          Whether power is metered inside or beside the colo rate varies by contract, so the power-only floor
+          and the colo asking band are shown separately. All cost rungs per chip-TDP-kW via the
           1.8× system factor. Component sources: CBRE (the commercial-real-estate services firm) for the
           wholesale colo asking band; the U.S. Energy Information Administration (EIA) for the power
           price, with a power usage effectiveness (PUE) of 1.4 elected. Example prints · {PRINT_DATE} ·
@@ -518,9 +518,9 @@ const SNAP_DATE = '2026-07-06';
       <div class="identity">
         <b>The crossing identity.</b> rent per watt = band level × (chip TB/s ÷ chip kW).
         Watt-rent <b>is</b> the chip's breakeven cash operating cost: economic life ends when watt-rent
-        decays to cash cost per TDP-kW — sunk capex excluded, which is why this boundary governs whether
-        an installed chip keeps running. Both sides are $/TDP-kW-hr. CCIR publishes the left side daily;
-        the cost side — colo terms, power price, staffing, the system factor, any decay election — is
+        decays to cash cost per TDP-kW. Sunk capex is excluded, which is why this boundary governs whether
+        an installed chip keeps running. Both sides are $/TDP-kW-hr. CCIR publishes the left side daily.
+        The cost side (colo terms, power price, staffing, the system factor, any decay election) is
         the reader's.
       </div>
 
@@ -528,23 +528,23 @@ const SNAP_DATE = '2026-07-06';
         <p class="weye">Worked illustration — hypothetical; every input elected by the reader</p>
         <p>
           Elect a cash operating boundary c = $0.75/TDP-kW-hr (inside the combined cash band above) and
-          a decay election g = 26%/yr (the cross-generation pace — see the caveat below). Air-band
+          a decay election g = 26%/yr (the cross-generation pace; see the caveat below). Air-band
           watt-rent today ≈ $4.58/TDP-kW-hr.
         </p>
         <p class="wmath">years to crossing = ln(watt-rent ÷ c) ÷ g = ln(4.58 ÷ 0.75) ÷ 0.26 ≈ <b>7</b></p>
         <p>
-          This is arithmetic on today's band against two elected inputs — a band-implied rent set against
+          This is arithmetic on today's band against two elected inputs: a band-implied rent set against
           an elected cash cost. It is not a projection of any rate, and CCIR publishes neither election.
         </p>
       </div>
 
       <p>
-        <strong>The honest gap.</strong> The −26% per year slope is a cross-generation reading — the pace
-        of the bandwidth frontier across five generations on one date — not the band's own decay through
-        time, which is the parameter the crossing actually needs. No one has that parameter, because the
+        <strong>The honest gap.</strong> The −26% per year slope is a cross-generation reading: the pace
+        of the bandwidth frontier across five generations on one date. It is not the band's own decay
+        through time, which is the parameter the crossing needs. No one has that parameter, because the
         band has no published history. That is the argument for starting the series now: every month of
         publication shrinks the one unmeasured input. The band is also an observed equilibrium, not a
-        law — in the 2023 shortage, frontier chips were posted far above any spec-sheet line. The flatness
+        law. In the 2023 shortage, frontier chips were posted far above any spec-sheet line. The flatness
         carries a date, which is the second argument for watching it.
       </p>
     </section>
@@ -555,8 +555,8 @@ const SNAP_DATE = '2026-07-06';
 
       <p>
         Normalized values equal the published parent series value divided by the disclosed constant.
-        The parent cell's pooling, stat, and gate decisions are inherited unchanged; denominators are
-        vendor nameplate constants from the silicon registry and are never restated — a correction is
+        The parent cell's pooling, stat, and gate decisions are inherited unchanged. Denominators are
+        vendor nameplate constants from the silicon registry and are never restated. A correction is
         a changelog entry, not a series break. Normalized series adopt the trimmed-mean stat
         (T2, shadow phase) from first print.
       </p>
@@ -602,19 +602,19 @@ const SNAP_DATE = '2026-07-06';
           A lens is admitted when its denominator is a disclosed vendor nameplate constant, it answers a
           question a credit reader has, and it tells a distinct story. Considered and excluded on record:
           <strong>token throughput</strong> (measured, not nameplate), <strong>interconnect / fabric</strong>
-          (a cluster property with no per-chip denominator — the tier axis prices the fabric),
+          (a cluster property with no per-chip denominator; the tier axis prices the fabric),
           <strong>PUE-adjusted power</strong> (PUE is the reader's election), and
-          <strong>FP8 / FP4 precision variants</strong> (a precision election — disclosure, not columns).
+          <strong>FP8 / FP4 precision variants</strong> (a precision election; disclosure, not columns).
         </p>
       </div>
 
       <p><strong>Blind spots.</strong></p>
       <ul>
-        <li>Denominators are nameplate constants — they capture none of a deployment's realized capacity, interconnect domain, or measured throughput.</li>
-        <li>System draw exceeds chip TDP (≈1.8× for HGX-class servers); TDP is the disclosed lens constant — delivered-power cost comparisons apply the system factor.</li>
-        <li>PUE, facility cost, and any decay election are the reader's; CCIR publishes prices, not the elections.</li>
-        <li>The cross-section is one date across generations, not a cohort through time; §04 states the consequence.</li>
-        <li>All numerators are posted list asks, not transactions; thin cells (n &lt; 3) are indicative.</li>
+        <li>Denominators are nameplate constants. They capture none of a deployment's realized capacity, interconnect domain, or measured throughput.</li>
+        <li>System draw exceeds chip TDP (≈1.8× for HGX-class servers). TDP is the disclosed lens constant, and delivered-power cost comparisons apply the system factor.</li>
+        <li>PUE, facility cost, and any decay election are the reader's. CCIR publishes prices, not the elections.</li>
+        <li>The cross-section is one date across generations, not a cohort through time. §04 states the consequence.</li>
+        <li>All numerators are posted list asks, not transactions. Thin cells (n &lt; 3) are indicative.</li>
       </ul>
 
       <p class="sid">

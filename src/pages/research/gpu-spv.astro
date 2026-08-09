@@ -56,7 +56,8 @@ const facilities = [
       <p class="standfirst">
         The largest GPU financings do not lend to the operating company. They
         lend to a special-purpose vehicle that owns the GPUs and holds the
-        customer contract — built so that lenders can reach the assets
+        customer contract. The vehicle is built so that lenders can reach the
+        assets
         without the parent's other creditors reaching them first. The credit
         agreements behind CoreWeave's delayed-draw term loan facilities are
         filed on the U.S. Securities and Exchange Commission (SEC) EDGAR filing system, redactions and all. This primer reads the
@@ -70,23 +71,23 @@ const facilities = [
       <h2><span class="n">01</span> The Structure</h2>
       <p>
         The pattern, from the DDTL 4.0 filing (March 30, 2026): the borrower
-        is CoreWeave Compute Acquisition Co. VIII, LLC — “CCAC VIII,” an
-        indirect subsidiary of CoreWeave, Inc. — and the $8.5 billion
+        is CoreWeave Compute Acquisition Co. VIII, LLC (“CCAC VIII,” an
+        indirect subsidiary of CoreWeave, Inc.), and the $8.5 billion
         facility exists “primarily to finance capital expenditures required
         to perform a customer contract, including the acquisition of GPU
         servers and related infrastructure.” The parent is not the borrower,
         and in this facility its guarantee is limited to specified “bad
-        acts” — though the series varies on this point, and the variation
+        acts”. The series varies on this point, and the variation
         turns out to be informative (§04). Obligations are secured by
         “substantially all assets of CCAC VIII and its subsidiaries and a
         pledge of 100% of the equity interests in CCAC VIII held by CCAC
         VIII Holdco LLC.” A collateral agent (U.S. Bank Trust Company, N.A.)
-        holds the security interests; a depositary bank holds the accounts.
+        holds the security interests. A depositary bank holds the accounts.
       </p>
       <p>
-        Nor is the shape unique to one issuer: Lambda's April 2024 financing
-        vehicle — up to $500 million, Macquarie-led — was described by the
-        company in the same grammar, “an asset-based structure secured by
+        Nor is the shape unique to one issuer. Lambda's April 2024 financing
+        vehicle (up to $500 million, Macquarie-led) was described by the
+        company in the same grammar: “an asset-based structure secured by
         GPUs and supported by their cash flow generation.”
       </p>
       <div class="stack-fig">
@@ -140,7 +141,7 @@ const facilities = [
       <p>
         Five elements recur across the filed agreements: (1) a first-priority
         perfected security interest in substantially all assets of the
-        borrower — the GPU servers above all; (2) a pledge of 100% of the
+        borrower, the GPU servers above all; (2) a pledge of 100% of the
         borrower's equity, so lenders can foreclose on the entity, not just
         the machines; (3) the borrower's rights under the customer contract,
         including rights to payment; (4) the datacenter lease rights; and
@@ -163,8 +164,8 @@ const facilities = [
       <p>
         The GPU-specific covenants are the part with no precedent in
         corporate lending and a long one in equipment finance. The borrower
-        must report the serial numbers of the machines each draw buys, and —
-        in the later facilities — pass through the manufacturer's own
+        must report the serial numbers of the machines each draw buys and,
+        in the later facilities, pass through the manufacturer's own
         per-GPU serial documentation:
       </p>
       <figure class="photo doc-shot">
@@ -197,12 +198,13 @@ const facilities = [
         Cash is trapped structurally rather than by covenant alone: every
         deposit account of the borrower must sit under a control agreement
         “sufficient to establish the Collateral Agent's control pursuant to
-        Section 9-104 of the UCC” — the Uniform Commercial Code — and collections are directed into named
-        collateral accounts — an Available Cash Account, an Other Proceeds
+        Section 9-104 of the UCC” (the Uniform Commercial Code). Collections
+        are directed into named
+        collateral accounts: an Available Cash Account, an Other Proceeds
         Account, a Distribution Reserve Account, a Liquidity Account. One
         more filed detail worth the whole exhibit: DDTL 2.0's “GPU
         Depreciated Amount” is computed assuming straight-line depreciation
-        over <strong>a useful life of six (6) years</strong> — a written,
+        over <strong>a useful life of six (6) years</strong>: a written,
         binding useful-life election, of the kind surveyed across filers on
         the <a href="/credit">credit ledger</a>.
       </p>
@@ -223,18 +225,19 @@ const facilities = [
       <p>
         The facilities amortize to zero and are tested monthly. DDTL 3.0
         carries two financial covenants stated in full in the filed
-        agreement: a debt service coverage ratio — net operating income of
-        the borrowers over debt service, trailing three months — that may
+        agreement: a debt service coverage ratio (net operating income of
+        the borrowers over debt service, trailing three months) that may
         not fall below 1.40:1.00 from April 2027, and a
         <strong>contract realization ratio</strong> that may not fall below
         0.85:1.00 from the first monthly date after closing: a covenant that
         the customer contract is actually converting to cash at 85 cents on
         the modeled dollar. DDTL 4.0's 8-K states a minimum debt service
-        coverage ratio of 1.15x once draws end; DDTL 5.0's, 1.35x. Interest-rate risk is
-        covenanted away too — DDTL 3.0 requires hedging within 45 days of
+        coverage ratio of 1.15x once draws end. DDTL 5.0's states 1.35x.
+        Interest-rate risk is
+        covenanted away too: DDTL 3.0 requires hedging within 45 days of
         closing, with any rate-cap strike at 4.50% or lower. None of the
         filed facilities references a market residual value for the
-        hardware; scheduled amortization carries the collateral to zero over
+        hardware. Scheduled amortization carries the collateral to zero over
         the loan's life, consistent with every disclosed instrument on the
         <a href="/credit">credit ledger</a>.
       </p>
@@ -267,21 +270,22 @@ const facilities = [
       </p>
       <p>
         The progression in the table is the market learning what it is
-        pricing. The 2023 facility carried an average actual rate of 14.1% —
-        a 9.62% margin over the Secured Overnight Financing Rate (SOFR), per the S-1 — and was reported at the time
+        pricing. The 2023 facility carried an average actual rate of 14.1%,
+        a 9.62% margin over the Secured Overnight Financing Rate (SOFR), per
+        the S-1. It was reported at the time
         as the first large financing collateralized by H100s. By March 2026,
         a facility over the same operator's fleet priced at SOFR + 2.25% on
-        the floating tranche and carried an A3 — six notches above the
-        parent's Ba3 corporate family rating — with CoreWeave calling it
+        the floating tranche and carried an A3, six notches above the
+        parent's Ba3 corporate family rating, with CoreWeave calling it
         “the first investment-grade rated financing secured by HPC
         infrastructure and an associated customer contract” (HPC:
         high-performance computing). Moody's tied
         the rating to the offtake: fixed take-or-pay payments from Meta,
         independent of usage, under a contract that cannot be terminated for
-        convenience; Morningstar DBRS assessed debt service coverage at
-        1.20x. Two months later, DDTL 5.0 — backed by two
-        non-investment-grade customers — priced 225 basis points wider and
-        five notches lower at Ba2, and unlike DDTL 4.0 it carries a full,
+        convenience. Morningstar DBRS assessed debt service coverage at
+        1.20x. Two months later, DDTL 5.0, backed by two
+        non-investment-grade customers, priced 225 basis points wider and
+        five notches lower at Ba2. Unlike DDTL 4.0 it carries a full,
         unconditional parent guarantee: more recourse, weaker rating. The
         collateral is the same silicon. What moved is the credit standing
         behind the committed payments: the rating travels with the offtake,
@@ -300,21 +304,21 @@ const facilities = [
         exceptional facts, be pulled back into a parent's estate.
         <strong>The operator.</strong> The SPV owns machines; the parent runs
         them. Foreclosing on CCAC VIII delivers serial-numbered servers and
-        an assigned contract that still needs an operator — which is exactly
+        an assigned contract that still needs an operator. That is exactly
         why the customer-side substitute-operator mechanics in
         <a href="/research/compute-contracts">the master services agreements (MSAs)</a> exist.
         <strong>Re-leasing.</strong> If the offtake fails, recovery depends
-        on re-renting or selling used accelerators — a market with a posted
+        on re-renting or selling used accelerators: a market with a posted
         price record but no foreclosure track record. Kroll Bond Rating Agency (KBRA), publishing on
         exactly this question in June 2026, places these transactions “at
-        the intersection” of data-center and equipment finance — neither
+        the intersection” of data-center and equipment finance. Neither
         one's precedents fully apply. The rental-price side
         of that question is observable: nine years of per-generation posted
         rates are documented in
         <a href="/research/rental-rates-by-generation">GPU Rental Rates by
         Generation</a>, and the pace at which rents age is the subject of
         <a href="/research/gpu-age-curve">Rent and Age</a>. CCIR publishes
-        the prices; the recovery elections built on them belong to the
+        the prices. The recovery elections built on them belong to the
         underwriter.
       </p>
     </section>
@@ -322,18 +326,18 @@ const facilities = [
     <section class="sec" id="precedents">
       <h2><span class="n">06</span> Precedents with Public Document Suites</h2>
       <p>
-        None of this machinery is new; what is new is the asset. Aircraft
-        enhanced equipment trust certificates put the full mechanics —
-        owner-trustee leases, lease assignments to an indenture trustee,
-        loan-to-value advance rates — into public 424B prospectuses decades
+        None of this machinery is new. What is new is the asset. Aircraft
+        enhanced equipment trust certificates put the full mechanics
+        (owner-trustee leases, lease assignments to an indenture trustee,
+        loan-to-value advance rates) into public 424B prospectuses decades
         ago, and remain the closest public template for assigning a
         long-dated payment obligation to a collateral agent. Data-center
         securitizations supply the master-trust, anticipated-repayment-date,
         and cash-sweep vocabulary the rating agencies now apply to compute.
         And the cautionary precedent for financing rapidly improving
         machines against assumed future values is documented at length in
-        <a href="/research/itel-1979">the Itel note</a>: the 1979 book
-        carried the machines' future value as an asset; the 2026 credit
+        <a href="/research/itel-1979">the Itel note</a>. The 1979 book
+        carried the machines' future value as an asset. The 2026 credit
         agreements carry it at zero.
       </p>
     </section>
