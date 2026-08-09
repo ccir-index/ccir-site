@@ -13,35 +13,48 @@ const chips = (() => {
 })();
 
 // Guaranteed on-demand reference cell per (segment, chip): int=GTD, form
-// pooled, US only — no region fallback. A cell with no US series shows a
-// dash rather than quietly substituting the all-regions pool (which mixes
-// EU/APAC panels into a ladder labeled US). Guaranteed-only on purpose —
-// the interruptible/spot pool (int=ALL) drags the number below the real
-// on-demand rate (US H100 Hyperscaler $9.15 guaranteed vs $5.40 pooled).
+// pooled, region=ALL — the CURATED US+EU core pool, matching the homepage.
+//
+// 2026-08-09: this ladder read US-only until today. Moved to the pooled scope
+// so both surfaces agree (they had drifted to printing the same nominal cell
+// 88% apart) and, decisively, for COVERAGE — see intCell below, where US-only
+// left Neocloud without a full segment ladder. `ALL` is curated, not
+// everything: the core-region gate keeps APAC and undisclosed-location rows
+// out, so this is US+EU and is labelled as such.
+//
+// Still guaranteed-ONLY on purpose — the interruptibility-pooled axis
+// (int=ALL) drags the number below the real on-demand rate (US H100
+// Hyperscaler $9.15 guaranteed vs $5.40 pooled). The interruptible grade gets
+// its own ladder below rather than being mixed in here.
 const STAT_RANK: Record<string, number> = { Published: 0, Provisional: 1, Shadow: 2 };
 function odCell(tier: Tier, chip: string): Rate | undefined {
   return headlineRates
     .filter((r) => r.tier === tier && r.gpu_model === chip &&
                    r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'US' && r.interruptibility === 'GTD' &&
+                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
                    r.promotion_status !== 'Shadow')
     .sort((a, b) =>
       (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
       (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
 }
 
-// Interruptible companion to odCell — same shape, same US-only rule, same
-// no-fallback discipline. Deliberately NOT the region=ALL series the homepage
-// ladder uses: ALL is the curated US+EU pool, and on 2026-08-08 EU rows
-// reached these cells for the first time, moving the pooled interruptible
-// prints up to 30% in a day on coverage alone. A US-only interruptible ladder
-// sits directly under a US-only guaranteed ladder and the two are comparable
-// line by line, which is the whole point of putting them on one page.
+// Interruptible companion to odCell — same scope, same stat rule, same
+// no-fallback discipline, so the two tables read line by line.
+//
+// 2026-08-09: region=ALL (curated US+EU), reverted from a brief US-only
+// experiment. COVERAGE was the binding reason: US-only carried 6 cells of
+// which only 3 Published, and Neocloud (T2) lost its H200 and B200 cells
+// outright, leaving the middle segment with no ladder at all. Under the
+// pooled scope it is 7 cells, all Published. A ladder with holes in its
+// middle segment is worse than a wider — but still curated — pool.
+//
+// The 2026-08-08 EU coverage step (33 cells moved, up to 31%) is a one-time
+// break, not a recurring risk. Comparisons run FROM 2026-08-09 forward.
 function intCell(tier: Tier, chip: string): Rate | undefined {
   return headlineRates
     .filter((r) => r.tier === tier && r.gpu_model === chip &&
                    r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'US' && r.interruptibility === 'INT' &&
+                   r.region === 'ALL' && r.interruptibility === 'INT' &&
                    r.promotion_status !== 'Shadow')
     .sort((a, b) =>
       (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
@@ -114,7 +127,7 @@ function cellTitle(c: Rate): string {
 
     <div class="table-wrap">
       <div class="table-head">
-        <span class="th-scope">On-demand, guaranteed · US only</span>
+        <span class="th-scope">On-demand, guaranteed · US &amp; EU</span>
         <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
       </div>
       <table class="data ladder-table">
@@ -148,7 +161,7 @@ function cellTitle(c: Rate): string {
       <details class="table-foot">
         <summary>Series &amp; stat</summary>
         <div class="tf-body">
-          CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-US · headline = panel
+          CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-GTD-OD-ALL · headline = panel
           mean at n&nbsp;≥&nbsp;10, else median · hover a rate for its full
           series id, stat, region, IQR and panel depth
         </div>
@@ -158,7 +171,7 @@ function cellTitle(c: Rate): string {
     {intLadder.length > 0 && (
       <div class="table-wrap int-wrap">
         <div class="table-head">
-          <span class="th-scope">On-demand, interruptible · US only</span>
+          <span class="th-scope">On-demand, interruptible · US &amp; EU</span>
           <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
         </div>
         <table class="data ladder-table">
@@ -192,11 +205,11 @@ function cellTitle(c: Rate): string {
         <details class="table-foot">
           <summary>Series &amp; stat</summary>
           <div class="tf-body">
-            CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-INT-OD-US · same panel, same
-            stat rule and same US-only scope as the guaranteed ladder above, so
-            the two read line by line · interruptible capacity is reclaimable by
+            CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-INT-OD-ALL · same panel, same
+            stat rule and same US &amp; EU scope as the guaranteed ladder above,
+            so the two read line by line · interruptible capacity is reclaimable by
             the provider, so these are not substitutes for the rates above ·
-            blank cells are segments with no US interruptible series, not zeroes
+            blank cells are segments with no interruptible series, not zeroes
           </div>
         </details>
       </div>

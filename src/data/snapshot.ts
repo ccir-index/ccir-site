@@ -308,31 +308,26 @@ export function headlineStatOf(r: Rate): 'mean' | 'median' {
   return (r.n_sources ?? 0) >= 10 ? 'mean' : 'median';
 }
 
-// Home-ladder cell: guaranteed on-demand reference, US.
+// Home-ladder cell: guaranteed on-demand reference at the pooled grain.
 // ONE selection for every surface that renders this ladder (homepage, OG
-// share card) so they can never disagree: strict GTD, form pooled, US only,
+// share card) so they can never disagree: strict GTD, form + region pooled,
 // Shadow out, Published preferred over Provisional, variant sub-series
 // (e.g. A100-40GB) after pooled, then panel breadth.
 //
-// 2026-08-08 — REGION IS US, NOT ALL. These ladders read `region === 'US'`,
-// the same scope /rates has always used. Two reasons:
+// 2026-08-09 — REGION IS `ALL`, THE CURATED US+EU CORE, ON EVERY SURFACE.
+// /rates matches this now; both pages label it "US & EU". Ruled after a brief
+// experiment pinning the headline to US, which was reverted for one reason:
+// COVERAGE. The interruptible ladder is the binding constraint — US-only
+// carries 6 cells of which 3 Published, against 7 all-Published under ALL,
+// and Neocloud (T2) loses its H200 and B200 cells entirely, leaving no full
+// segment ladder. A ladder with holes in the middle segment is worse than a
+// wider pool, and the pool is CURATED (APAC and undisclosed-location rows are
+// excluded by the core-region gate — this is US+EU, not "everywhere").
 //
-//   1. The surfaces disagreed. /rates is the US citable headline; the
-//      homepage was pooling US+EU. T1 H200 interruptible printed 6.1240 here
-//      and 3.2621 on /rates — the same chip, tier and lane, 88% apart, with
-//      nothing on either page explaining it.
-//   2. region=ALL is the curated US+EU pool, and on 2026-08-08 EU rows
-//      reached it for the FIRST time across essentially every T1 cell — 60
-//      (source, cell) footprint changes in a day, moving 33 cells by up to
-//      31%. The cell definition never changed; its coverage did. Pinning the
-//      headline to US keeps the front page off that seam.
-//
-// Coverage cost, measured on the 2026-08-08 snapshot: GTD is a wash and
-// slightly better (13 cells vs 12 — US is the only scope with a GB200 T1
-// series at all; B200 T2 drops to Provisional). INT is genuinely thinner —
-// 6 cells of which 3 Published, against 7 all-Published under ALL. Thin and
-// honest beats deep and unexplainable, and the empty cells already render
-// as an em dash.
+// On the 2026-08-08 seam: EU rows reached this pool for the first time that
+// day, moving 33 cells by up to 31%. That is a one-time coverage step, not a
+// recurring risk, and it is now behind us — comparisons run FROM 2026-08-09
+// forward. Do not quote a change across the seam; do build history from here.
 const HOME_OD_RANK: Record<string, number> = { Published: 0, Provisional: 1 };
 export function homeOdCell(tier: Tier, chip: string): Rate | undefined {
   return homeGradeCell(tier, chip, 'GTD');
@@ -349,7 +344,7 @@ function homeGradeCell(tier: Tier, chip: string, grade: 'GTD' | 'INT'): Rate | u
   return headlineRates
     .filter((r) => r.tier === tier && r.gpu_model === chip &&
                    r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'US' && r.interruptibility === grade &&
+                   r.region === 'ALL' && r.interruptibility === grade &&
                    r.promotion_status !== 'Shadow')
     .sort((a, b) =>
       (HOME_OD_RANK[a.promotion_status] ?? 3) - (HOME_OD_RANK[b.promotion_status] ?? 3) ||
