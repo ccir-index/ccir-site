@@ -116,7 +116,7 @@ const qLabel = (q: string) => q.replace('-', ' ');
 ---
 <figure class="ci">
   <svg viewBox={`0 0 ${W} ${H}`} role="img"
-       aria-label={`Compute-infrastructure debt issuance by quarter from 2024, two series. GPU-collateralized quarterly issuance (bars) rises to about thirty billion dollars; data-center-secured issuance rises to nearly forty billion in late 2025. The cumulative GPU-collateralized line reaches ${totalTrackedB.toFixed(0)} billion. The current quarter is marked as quarter-to-date.`}>
+       aria-label={`Compute-infrastructure debt issuance by quarter from 2024, two series. GPU-collateralized quarterly issuance (bars) rises to about thirty billion dollars; landlord SPV and securitization issuance rises to nearly forty billion in late 2025. The cumulative GPU-collateralized line reaches ${totalTrackedB.toFixed(0)} billion. The current quarter is marked as quarter-to-date.`}>
     {barTicks.map((t) => (
       <>
         <line x1={x0} y1={byBar(t)} x2={x1} y2={byBar(t)} class="ci-grid" />
@@ -137,7 +137,7 @@ const qLabel = (q: string) => q.replace('-', ' ');
         </rect>
         <rect x={bx(i) + 1.5} y={byBar(b.dc_b)} width={barW}
               height={Math.max(0, y1 - byBar(b.dc_b))} class={b.qtd ? 'ci-bar2 ci-qtd' : 'ci-bar2'}>
-          <title>{`${qLabel(b.q)}${b.qtd ? ' (QTD)' : ''} — data-center-secured $${b.dc_b.toFixed(1)}B`}</title>
+          <title>{`${qLabel(b.q)}${b.qtd ? ' (QTD)' : ''} — landlord SPV/securitization $${b.dc_b.toFixed(1)}B`}</title>
         </rect>
         <text x={bx(i)} y={y1 + 16} class="ci-tick ci-tick-x">{qLabel(b.q)}{b.qtd ? '*' : ''}</text>
       </>
@@ -150,7 +150,7 @@ const qLabel = (q: string) => q.replace('-', ' ');
   </svg>
   <div class="ci-legend">
     <span class="ci-lg"><span class="ci-swatch ci-sw1"></span>GPU-collateralized</span>
-    <span class="ci-lg"><span class="ci-swatch ci-sw2"></span>Data-center / campus-secured</span>
+    <span class="ci-lg"><span class="ci-swatch ci-sw2"></span>Landlord SPV &amp; securitization-secured</span>
     <span class="ci-lg ci-lg-note">* current quarter, partial — backfills as filings land</span>
   </div>
 
@@ -158,10 +158,15 @@ const qLabel = (q: string) => q.replace('-', ' ');
     <summary>Notes</summary>
     <p>
       GPU-collateralized: {sized.length} instruments, ${totalTrackedB.toFixed(1)}B issued.
-      Data-center / campus-secured: {dcRows.length} instruments, ${totalDcB.toFixed(1)}B —
-      classified from the ledger's collateral descriptions (campus credit,
-      real-estate mortgages, lease securitizations); rumored rows excluded,
-      press-status rows included and flagged in the ledger. As of {asOf}.
+      Landlord SPV &amp; securitization-secured: {dcRows.length} instruments, ${totalDcB.toFixed(1)}B —
+      campus/real-estate and lease-securitization paper classified from the
+      ledger's collateral descriptions; dominated by landlord vehicles
+      (Hyperion, Sopaipilla, Vantage, Meridian Arc) plus a small tail of
+      operator real-estate mortgages. Rumored rows excluded, press-status
+      rows included and flagged in the ledger. Operator-issued campus bonds
+      whose liens also sweep equipment (Cipher, Applied Digital, Hut 8,
+      Core Scientific) remain in the GPU-collateralized series under the
+      ledger's standing scope. As of {asOf}.
       Observed from filings — amount issued at close, not drawn balance; no
       drawdown or amortization is modelled. The current quarter (*) is
       partial: the tracker records deals when filings or releases land, so
