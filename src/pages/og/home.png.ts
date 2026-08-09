@@ -101,9 +101,9 @@ export const GET: APIRoute = async () => {
   // Guaranteed leads (citable surface first — matches the landing order,
   // 2026-08-05 revision); interruptible is the companion grade.
   const tables = el('div', { display: 'flex', justifyContent: 'space-between', flexShrink: 0, marginTop: 22 }, [
-    gradeTable('GUARANTEED', 'what committed capacity is priced at', chips, homeOdCell, rowH),
+    gradeTable('GUARANTEED · US', 'what committed capacity is priced at', chips, homeOdCell, rowH),
     el('div', { display: 'flex', width: 1, backgroundColor: T.rule2, marginTop: 8, marginBottom: 8 }, ''),
-    gradeTable('INTERRUPTIBLE', 'what spare capacity is priced at', chips, homeIntCell, rowH),
+    gradeTable('INTERRUPTIBLE · US', 'what spare capacity is priced at', chips, homeIntCell, rowH),
   ]);
 
   const footer = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0, marginTop: 'auto', paddingTop: 12, borderTop: `1px solid ${T.rule2}` }, [
