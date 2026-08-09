@@ -3,3 +3,23 @@
 # /reference added 2026-07-26 for the LinkedIn pin (fresh URL = fresh crawl).
 /home / 301
 /reference / 301
+
+# --- Retired routes (moved here 2026-08-09) -------------------------------
+# These were Astro.redirect() stubs. In a STATIC build that does not emit an
+# HTTP 301 — Astro writes an HTML file carrying a meta-refresh and
+# <meta name="robots" content="noindex">. Search Console therefore filed them
+# under "Excluded by 'noindex' tag" rather than "Page with redirect", and the
+# link equity pointing at the old URLs went nowhere.
+#
+# A real 301 at the edge fixes all three: correct reporting, equity passed to
+# the target, and no HTML round-trip.
+#
+# ⚠️ The .astro stubs MUST stay deleted. Cloudflare Pages serves a matching
+# static file in preference to a _redirects rule, so leaving dist/tiers.html
+# in place would silently shadow the rule below and nothing would change.
+/tiers                              /rates                    301
+/intelligence                       /research                 301
+/vision                             /applications             301
+/availability                       /utilization              301
+/research/rent-and-launch-price     /research/rent-and-msrp   301
+/research/unfinancialized-compute   /credit                   301
