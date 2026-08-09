@@ -30,6 +30,24 @@ function odCell(tier: Tier, chip: string): Rate | undefined {
       (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
 }
 
+// Interruptible companion to odCell — same shape, same US-only rule, same
+// no-fallback discipline. Deliberately NOT the region=ALL series the homepage
+// ladder uses: ALL is the curated US+EU pool, and on 2026-08-08 EU rows
+// reached these cells for the first time, moving the pooled interruptible
+// prints up to 30% in a day on coverage alone. A US-only interruptible ladder
+// sits directly under a US-only guaranteed ladder and the two are comparable
+// line by line, which is the whole point of putting them on one page.
+function intCell(tier: Tier, chip: string): Rate | undefined {
+  return headlineRates
+    .filter((r) => r.tier === tier && r.gpu_model === chip &&
+                   r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
+                   r.region === 'US' && r.interruptibility === 'INT' &&
+                   r.promotion_status !== 'Shadow')
+    .sort((a, b) =>
+      (STAT_RANK[a.promotion_status] ?? 3) - (STAT_RANK[b.promotion_status] ?? 3) ||
+      (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
+}
+
 type LadderRow = { chip: string; cells: Partial<Record<Tier, Rate | undefined>> };
 const ladder: LadderRow[] = chips
   .map((chip) => {
@@ -38,6 +56,20 @@ const ladder: LadderRow[] = chips
     return { chip, cells };
   })
   // Drop chips with no guaranteed cell in any segment (e.g. GB200 today).
+  .filter((row) => TIERS.some((t) => row.cells[t]));
+
+// Interruptible ladder, restricted to the chips the guaranteed ladder shows so
+// the two tables line up row for row. US interruptible coverage is genuinely
+// thin — 6 of 13 segment/chip cells today, none at T3 — and the empty ones
+// print an em dash exactly as the guaranteed ladder does. Substituting the
+// all-regions pool to fill them would put an EU-inclusive number in a table
+// labelled US, which is the error this page already refuses to make above.
+const intLadder: LadderRow[] = ladder
+  .map(({ chip }) => {
+    const cells: Partial<Record<Tier, Rate | undefined>> = {};
+    for (const t of TIERS) cells[t] = intCell(t, chip);
+    return { chip, cells };
+  })
   .filter((row) => TIERS.some((t) => row.cells[t]));
 
 function chipDisplay(token: string): string {
@@ -122,6 +154,53 @@ function cellTitle(c: Rate): string {
         </div>
       </details>
     </div>
+
+    {intLadder.length > 0 && (
+      <div class="table-wrap int-wrap">
+        <div class="table-head">
+          <span class="th-scope">On-demand, interruptible · US only</span>
+          <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
+        </div>
+        <table class="data ladder-table">
+          <thead>
+            <tr>
+              <th class="chip-col">Silicon</th>
+              {TIERS.map((t) => (
+                <th class={`tier-col tier-col-${t.toLowerCase()}`}>
+                  <span class={`tier-badge tier-badge-${t.toLowerCase()}`}>{TIER_LABELS_SHORT[t]}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {intLadder.map(({ chip, cells }) => (
+              <tr>
+                <td class="chip-cell"><div class="chip-name">{chipDisplay(chip)}</div></td>
+                {TIERS.map((t) => {
+                  const c = cells[t];
+                  if (!c) return <td class="num empty">—</td>;
+                  return (
+                    <td class={`num posted tier-pos-${t.toLowerCase()}`} title={cellTitle(c)}>
+                      {fmt(headlineValue(c))}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <details class="table-foot">
+          <summary>Series &amp; stat</summary>
+          <div class="tf-body">
+            CRI-T1/T2/T3-&lbrace;CHIP&rbrace;-ALL-INT-OD-US · same panel, same
+            stat rule and same US-only scope as the guaranteed ladder above, so
+            the two read line by line · interruptible capacity is reclaimable by
+            the provider, so these are not substitutes for the rates above ·
+            blank cells are segments with no US interruptible series, not zeroes
+          </div>
+        </details>
+      </div>
+    )}
     <section class="defs-section">
       <TierDefinitions headerless={true} />
     </section>
@@ -144,6 +223,10 @@ function cellTitle(c: Rate): string {
       background: var(--surface);
       overflow-x: auto;
     }
+    /* The interruptible ladder is a second table on the same page, not a
+       continuation of the first — space it so the two read as a pair without
+       merging into one block. */
+    .int-wrap { margin-top: 28px; }
     .table-head {
       display: flex;
       align-items: baseline;
