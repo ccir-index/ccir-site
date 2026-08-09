@@ -14,7 +14,7 @@ const fmt = (n: number, dp = 2) => n.toFixed(dp);
 // headlineValue) so this ladder, the OG share card, and /rates can never
 // disagree. Region-pooled (ALL) since 2026-07-25 so the ladder's H100 cell
 // ties exactly to the term panel's OD anchor on the same series grain.
-// /rates remains the US citable headline — lender/counsel engagement points
+// /rates carries the same US & EU citable headline — lender/counsel entry points
 // there, not here.
 function cellTitle(c: Rate): string {
   return `${c.series_id} · ${headlineStatOf(c)}, n=${c.n_sources} · median ${fmt(c.price_median)} · mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)}`;

@@ -72,11 +72,10 @@ const ladder: LadderRow[] = chips
   .filter((row) => TIERS.some((t) => row.cells[t]));
 
 // Interruptible ladder, restricted to the chips the guaranteed ladder shows so
-// the two tables line up row for row. US interruptible coverage is genuinely
-// thin — 6 of 13 segment/chip cells today, none at T3 — and the empty ones
-// print an em dash exactly as the guaranteed ladder does. Substituting the
-// all-regions pool to fill them would put an EU-inclusive number in a table
-// labelled US, which is the error this page already refuses to make above.
+// the two tables line up row for row. Coverage is thinner than the guaranteed
+// side — T3 has no interruptible series at any scope — and the empty cells
+// print an em dash exactly as the guaranteed ladder does, never a substitute
+// drawn from a different region scope.
 const intLadder: LadderRow[] = ladder
   .map(({ chip }) => {
     const cells: Partial<Record<Tier, Rate | undefined>> = {};
@@ -114,13 +113,13 @@ function cellTitle(c: Rate): string {
   })} />
   <section class="wrap top">
     <header class="page-head">
-      <div class="kicker">Reference Rates · US only · {meta.as_of_date}</div>
+      <div class="kicker">Reference Rates · US &amp; EU · {meta.as_of_date}</div>
       <h1>Reference Rates</h1>
       <p class="standfirst">
-        Guaranteed on-demand reference rate per chip across the three operator
-        segments. Every cell is a published, citable series — panel depth,
-        stat, and history disclosed. Committed term on <a href="/term">/term</a>;
-        interruptible, regional, and every other grain on
+        Guaranteed and interruptible on-demand reference rates per chip across
+        the three operator segments. Every cell is a published, citable series —
+        panel depth, stat, and history disclosed. Committed term on
+        <a href="/term">/term</a>; regional breakouts and every other grain on
         <a href="/explorer">/explorer</a>.
       </p>
     </header>
