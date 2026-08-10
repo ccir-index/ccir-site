@@ -23,3 +23,11 @@
 /availability                       /utilization              301
 /research/rent-and-launch-price     /research/rent-and-msrp   301
 /research/unfinancialized-compute   /credit                   301
+
+# scale-draft was committed by accident inside the 2026-08-09 SEO cleanup
+# above, went live unlinked but sitemapped, and carried no noindex. Page
+# deleted 2026-08-10; 301 here so anything Google crawled in that window
+# resolves cleanly instead of 404ing. Draft copy lives in
+# drafts/scale_note_draft_2026_08_02.md; its images stay in
+# public/img/research/scale/ for when the note ships properly.
+/research/scale-draft               /research                 301
