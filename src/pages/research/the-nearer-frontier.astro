@@ -1,0 +1,982 @@
+---
+/*
+  The Nearer Frontier — thesis recentred 2026-08-10 on PRICE EXPOSURE.
+  Centre: speed came from twelve-month power; the revenue book inherited
+  that term; the short book leaves SpaceX long the price of compute.
+  The 10 GW arithmetic stays in §1 as EVIDENCE that the power is
+  temporary, not as the question the note is asking.
+  Companion variant with the FINANCING centre: the-nearer-frontier-alt.
+  Both explanations of the short book stay stated and unadjudicated
+  (never publish constraint as motive). $5.27 stays separated from
+  premium language by two paragraphs; do not merge those.
+  DRAFT — localhost review only, not linked from /research, not published.
+  Chart pair #3b82f6/#c96f06 validated (dark surface, six checks).
+*/
+import Base from '../../layouts/Base.astro';
+const AS_OF = '2026-08-10';
+
+// ---- Opener donuts: Q2 2026 revenue and capex, same three segments ($B) ---
+// The pair IS the argument: AI is a third of what comes in and 86% of what
+// goes out. Same segment order and the same colour per segment in both, so
+// the AI wedge can be read across. Do not re-sort one and not the other.
+//   Revenue: 10-Q segment revenue disaggregation.
+//   Capex:   10-Q Note 18 "Supplemental segment information" — a CASH
+//            measure, equal to the cash-flow line for purchases of PP&E.
+//            It EXCLUDES AI hardware acquired through financing (H1 2026
+//            had $3.9B of PP&E financed, plus the Valor failed
+//            sale-leaseback), so it understates AI additions. Said in the
+//            caption; do not call this total AI investment.
+const SEGC = { conn: '#3b82f6', ai: '#c96f06', space: '#059669' };
+const REV_SEG = [
+  { k: 'Starlink / Connectivity', v: 4.291, c: SEGC.conn },
+  { k: 'AI (selling compute)', v: 2.561, c: SEGC.ai },
+  { k: 'Space (launch)', v: 0.962, c: SEGC.space },
+];
+const CAP_SEG = [
+  { k: 'Starlink / Connectivity', v: 1.367, c: SEGC.conn },
+  { k: 'AI (building compute)', v: 15.828, c: SEGC.ai },
+  { k: 'Space (launch)', v: 1.174, c: SEGC.space },
+];
+const DR = 70, DCX = 170, DCY = 100, DCIRC = 2 * Math.PI * DR;
+function donut(rows: Array<{ k: string; v: number; c: string }>) {
+  const tot = rows.reduce((s, d) => s + d.v, 0);
+  let acc = 0;
+  const segs = rows.map((d) => {
+    const frac = d.v / tot;
+    const seg = { ...d, frac, off: acc * DCIRC };
+    acc += frac;
+    return seg;
+  });
+  return { tot, segs };
+}
+const D_REV = donut(REV_SEG);
+const D_CAP = donut(CAP_SEG);
+
+// ---- Exhibit T: the ramp (compute capacity, GW) ---------------------------
+// Solid = reported at period end. Hollow = company target, not measured.
+// Axis runs to 11 so both stated targets sit on the same scale as what has
+// actually been built; the actual bars look small because they are.
+const TW = 700, TH = 270, TL = 56, TR = 30, TT = 34, TB = 42;
+const RAMP = [
+  { t: 'Dec ’23', gw: 0 },
+  { t: 'Dec ’24', gw: 0.3 },
+  { t: 'Dec ’25', gw: 0.8 },
+  { t: 'Mar ’26', gw: 1.0 },
+  { t: 'Jun ’26', gw: 1.4 },
+  { t: 'Dec ’26', gw: 2.0, target: true, note: 'target' },
+  { t: 'Dec ’27', gw: 10, target: true, note: '“closer to 10 than 5”' },
+];
+const tx = (i: number) => TL + ((i + 0.5) / RAMP.length) * (TW - TL - TR);
+const ty = (gw: number) => TT + (1 - gw / 11) * (TH - TT - TB);
+const TBW = 32;
+const T_TICKS = [0, 2, 4, 6, 8, 10];
+
+// ---- Exhibit A: build speed — MW online vs days to build ------------------
+// One measure on both axes for every mark: greenfield MW brought online in
+// N days. The prospectus's own industry benchmark is the reference line.
+const AW = 700, AH = 300, AL = 56, AR = 170, AT = 20, AB = 40;
+const ax = (d: number) => AL + (d / 800) * (AW - AL - AR);
+const ay = (mw: number) => AT + (1 - mw / 250) * (AH - AT - AB);
+const BUILDS = [
+  { k: 'Colossus 2', mw: 210, days: 91, c: '#c96f06' },
+  { k: 'Colossus 1', mw: 130, days: 122, c: '#c96f06' },
+  { k: 'industry benchmark', mw: 100, days: 730, c: 'none' },
+];
+const A_YT = [0, 50, 100, 150, 200, 250];
+const A_XT = [0, 200, 400, 600, 800];
+
+// ---- Exhibit B: power vs requirement (GW ranges) --------------------------
+// The blue band is the SUM of the sources table's "credited" column — the
+// exhibit must tie out visibly (John, Aug-9). Labels sit above the bars,
+// full width, so nothing clips at the left edge.
+const BW = 700, BH = 150, BL = 196, BR = 64, BT = 30, BB = 30;
+const bx = (gw: number) => BL + (gw / 17) * (BW - BL - BR);
+const BANDS = [
+  { k: 'Runnable by end-2027', lo: 2.6, hi: 3.6, c: '#3b82f6' },
+  { k: 'Needed for 10 GW', lo: 13, hi: 16, c: '#c96f06' },
+];
+const B_TODAY = 2.0;
+const B_XT = [0, 5, 10, 15];
+
+// ---- Exhibit C: committed future spend by disclosure channel ($B) ---------
+// Tornado: 2026 capital-spending pace (left) faces signed revenue
+// backlog (right). One shared $B scale across both sides. Left = each
+// company's own stated 2026 guidance, mid-point where a range is given;
+// right = RPO or the closest disclosed backlog measure, dated per row.
+const CO = [
+  { k: 'Amazon', capex: 220, cw: 'FY26 guided', rpo: 496.0, rw: 'Jun ’26', fn: '1' },
+  { k: 'Alphabet', capex: 200, cw: 'FY26 guided $195–205B', rpo: 519.5, rw: 'Jun ’26', fn: '2' },
+  { k: 'Microsoft', capex: 175, cw: 'CY26 guided ~$175B', rpo: 678.0, rw: 'Jun ’26', fn: '3' },
+  { k: 'Meta', capex: 137, cw: 'FY26 guided $130–145B', rpo: null, rw: 'own use', fn: '4' },
+  { k: 'SpaceX', capex: 65, cw: 'implied from call', rpo: 47.5, rw: 'Jun ’26', fn: '5', term: true },
+  { k: 'Oracle', capex: 55.7, cw: 'FY26 actual', rpo: 638.0, rw: 'May ’26', fn: '6' },
+  { k: 'CoreWeave', capex: 33, cw: 'FY26 guided $31–35B', rpo: 98.8, rw: 'Mar ’26', fn: '7' },
+];
+const CW = 740, CBH = 22, CGAP = 17, CT = 36;
+const CCL = 190, CCR = 280;
+const CH = CT + CO.length * (CBH + CGAP) + 34;
+const cs = 0.58;
+const cxL = (v: number) => CCL - v * cs;
+const cxR = (v: number) => CCR + v * cs;
+
+// ---- Exhibit D: coverage — signed revenue as a multiple of this year's -----
+// spend. Derived FROM the CO array above, so it ties out to Exhibit C by
+// construction; there is no second set of inputs to keep in step. The
+// financing point is the 1.0 line: below it, a year of spending is not
+// covered by anything a lender can underwrite.
+const COV = CO
+  .filter((c) => c.rpo !== null)
+  .map((c) => ({ k: c.k, r: (c.rpo as number) / c.capex, term: !!(c as any).term }))
+  .sort((a, b) => b.r - a.r);
+const DW = 700, DBH = 20, DGAP = 13, DT = 26, DL = 108, DRT = 74;
+const DH = DT + COV.length * (DBH + DGAP) + 30;
+const dxr = (r: number) => DL + (r / 12) * (DW - DL - DRT);
+
+// ---- Exhibit E: revenue against capital spending --------------------------
+// Answers "could operations pay for this?", so Meta belongs here even though
+// it has no backlog and is absent from D. Capex is joined FROM the CO array
+// so it cannot drift from Exhibit C. Two bases are drawn on every row: the
+// bar is the most recent quarter annualised (John's call — it stops fast
+// growers being judged on stale trailing revenue), the tick is trailing
+// twelve months. They are shown together because each basis distorts a
+// different row, and the ordering survives both.
+// 🔒 DIRECTION IS DELIBERATE (John, Aug-10): this is revenue ÷ capex, NOT
+// capex ÷ revenue, so a LONG BAR MEANS WELL COVERED — the same polarity as
+// Exhibit D directly above it. Drawn the intuitive way round (spending ÷
+// revenue) the sign silently flips between two adjacent blue bar charts and
+// SpaceX goes from shortest to longest. Do not "fix" this back.
+// D and E are a matched pair: covered by CONTRACTS (D), covered by CURRENT
+// EARNINGS (E). Same units, same 1.0 threshold, same direction.
+//   Q4-fiscal filers (MSFT, ORCL) peak seasonally, so ×4 flatters revenue
+//   and OVERSTATES their coverage. CoreWeave is one quarter behind (Q2 due
+//   2026-08-11), which cuts the other way. Both are captioned.
+const REV: Record<string, { q: number; qe: string; ttm: number; fq?: boolean; stale?: boolean }> = {
+  'Amazon':    { q: 200.606, qe: 'Jun ’26', ttm: 775.68 },
+  'Alphabet':  { q: 119.796, qe: 'Jun ’26', ttm: 445.87 },
+  'Microsoft': { q:  90.007, qe: 'Jun ’26', ttm: 331.84, fq: true },
+  'Meta':      { q:  60.801, qe: 'Jun ’26', ttm: 228.25 },
+  'SpaceX':    { q:   7.814, qe: 'Jun ’26', ttm:  23.04 },
+  'Oracle':    { q:  19.184, qe: 'May ’26', ttm:  67.36, fq: true },
+  'CoreWeave': { q:   2.078, qe: 'Mar ’26', ttm:   6.23, stale: true },
+};
+const INT = CO.map((c) => {
+  const r = REV[c.k];
+  return { k: c.k, qe: r.qe, fq: !!r.fq, stale: !!r.stale,
+           rr: (r.q * 4) / c.capex, tt: r.ttm / c.capex };
+}).sort((a, b) => b.rr - a.rr);
+const EW = 700, EBH = 18, EGAP = 15, ET = 34, EL = 112, ERT = 96;
+const EH = ET + INT.length * (EBH + EGAP) + 34;
+const ex = (v: number) => EL + (v / 4.0) * (EW - EL - ERT);
+const E_XT = [0, 1, 2, 3, 4];
+---
+<Base
+  title="The Nearer Frontier: SpaceX's Turn to Selling Compute · CCIR Research"
+  description="SpaceX built a top-six compute business in four quarters, on turbines that hold no air permit. Its ninety-day revenue book leaves it long the price of compute."
+  ogImage="/og/the-nearer-frontier.png"
+  article={{ published: '2026-08-10' }}
+>
+  <section class="wrap top">
+    <div class="page-head">
+      <div class="kicker">Market Intelligence · Research Note · {AS_OF}</div>
+      <h1>The Nearer Frontier</h1>
+      <p class="standfirst lede">
+        A rocket company built a top-six compute business in four
+        quarters. The speed came from power the state agreed it did not
+        have to permit, on the condition that it would not stay. The
+        contracts inherited that condition. No builder spending at this
+        scale is more exposed to what compute earns next year.
+      </p>
+    </div>
+
+    <figure class="photo">
+      <img src="/img/research/nearer-frontier/hero_starbase.jpg" alt="The Starbase sign beside Texas State Highway 4, with Starship boosters and vehicles on the horizon." loading="eager" />
+      <figcaption>Starbase, Texas. Photo: Jenny Hautmann, CC&nbsp;BY-SA&nbsp;4.0, via Wikimedia Commons.</figcaption>
+    </figure>
+
+    <p>
+      For two decades SpaceX was known for landing boosters and
+      building the world's largest satellite network. It still does
+      both. Its first quarterly filing as a public company, on
+      August&nbsp;4, describes a newer business running alongside them.
+      A third of revenue now comes from selling compute:
+      $2.56&nbsp;billion in the quarter, most of it from roughly
+      325,000 GPUs serving Anthropic at $1.25&nbsp;billion a month. The
+      capital went the other way. AI took $15.83&nbsp;billion of the
+      quarter's $18.37&nbsp;billion, against $2.54&nbsp;billion for
+      rockets and satellites together. Musk's AI company, xAI,
+      merged into SpaceX this February. SpaceX signed the Anthropic
+      agreements in May. On the filings' own timeline, the turn from
+      building compute to selling it took about one quarter.
+    </p>
+    <p>
+      The scale is easy to miss at that speed. SpaceX spent
+      $20.7&nbsp;billion across the whole company in all of 2025,
+      building rockets, launch sites and satellites included. It spent
+      $28.5&nbsp;billion in the first half of 2026 alone, about 83% of
+      it on AI. That half alone put $23.6&nbsp;billion into AI, against
+      $12.7&nbsp;billion for all of 2025. The launch business, two
+      decades in the building, now takes about one capital dollar in
+      sixteen.
+    </p>
+
+    <div class="fig-row">
+    {[
+      { t: 'Revenue by segment · Q2 2026', d: D_REV, mid: 'Q2 revenue',
+        al: 'Donut chart of second-quarter 2026 revenue: Starlink and Connectivity 4.29 billion dollars, 55 percent; AI 2.56 billion, 33 percent; Space 0.96 billion, 12 percent.' },
+      { t: 'Capital expenditure by segment · Q2 2026', d: D_CAP, mid: 'Q2 capex',
+        al: 'Donut chart of second-quarter 2026 capital expenditure: AI 15.83 billion dollars, 86 percent; Starlink and Connectivity 1.37 billion, 7 percent; Space 1.17 billion, 6 percent. AI is a third of revenue and most of the spending.' },
+    ].map((p) => (
+      <figure class="fig">
+        <div class="fig-title">{p.t}</div>
+        <svg viewBox="0 0 340 330" role="img" aria-label={p.al}>
+          {p.d.segs.map((d) => (
+            <circle cx={DCX} cy={DCY} r={DR} fill="none" stroke={d.c}
+                    stroke-width="34"
+                    stroke-dasharray={`${Math.max(d.frac * DCIRC - 2.5, 1)} ${DCIRC}`}
+                    stroke-dashoffset={-d.off}
+                    transform={`rotate(-90 ${DCX} ${DCY})`}>
+              <title>{`${d.k}: $${d.v.toFixed(2)}B · ${Math.round(d.frac * 100)}%`}</title>
+            </circle>
+          ))}
+          <text x={DCX} y={DCY - 2} class="dlab-ink t-mid" font-size="15">${p.d.tot.toFixed(2)}B</text>
+          <text x={DCX} y={DCY + 14} class="rowsub t-mid">{p.mid}</text>
+          {p.d.segs.map((d, i) => (
+            <>
+              <rect x="16" y={206 + i * 40} width="10" height="10" rx="2" fill={d.c} />
+              <text x="34" y={215 + i * 40} class="rowlab">{d.k}</text>
+              <text x="34" y={229 + i * 40} class="rowsub">${d.v.toFixed(2)}B · {Math.round(d.frac * 100)}%</text>
+            </>
+          ))}
+        </svg>
+      </figure>
+    ))}
+    </div>
+    <p class="tbl-note">
+      Capital expenditure is the cash measure in the segment note. It
+      excludes AI hardware acquired through financing, so it understates
+      what was added.
+    </p>
+
+    <figure class="fig">
+      <div class="fig-title">Compute capacity, GW · built through Jun 2026, against the two stated targets</div>
+      <div class="legend">
+        <span class="lg"><span class="sw" style="background:#3b82f6"></span>reported at period end</span>
+        <span class="lg"><span class="sw" style="background:transparent;border:2px dashed #c96f06"></span>company target</span>
+      </div>
+      <svg viewBox={`0 0 ${TW} ${TH}`} role="img" aria-label="Compute capacity rises from zero gigawatts in 2023 to 1.4 in June 2026. Two dashed target bars follow: over 2 gigawatts by the end of 2026, and closer to 10 than 5 by the end of 2027. The built bars are small beside the targets.">
+        {T_TICKS.map((t) => (
+          <>
+            <line x1={TL} y1={ty(t)} x2={TW - TR} y2={ty(t)} class="grid" />
+            <text x={TL - 8} y={ty(t) + 3} class="tick t-end">{t}</text>
+          </>
+        ))}
+        <text x={TL - 8} y={TT - 10} class="axis-label">GW</text>
+        <line x1={TL} y1={ty(0)} x2={TW - TR} y2={ty(0)} class="axis" />
+        {RAMP.map((r, i) => (
+          <>
+            <rect x={tx(i) - TBW / 2} y={ty(r.gw)} width={TBW}
+                  height={Math.max(1, ty(0) - ty(r.gw))} rx="4"
+                  fill={r.target ? 'none' : '#3b82f6'}
+                  stroke={r.target ? '#c96f06' : undefined}
+                  stroke-width={r.target ? 2 : undefined}
+                  stroke-dasharray={r.target ? '5 4' : undefined}
+                  opacity="0.9">
+              <title>{`${r.t}: ${r.gw} GW${r.target ? ' — company target, not a measurement' : ' reported'}`}</title>
+            </rect>
+            <text x={tx(i)} y={ty(r.gw) - 7} class={r.target ? 'dlab t-mid' : 'dlab-ink t-mid'}
+                  fill={r.target ? '#c96f06' : undefined}>{r.gw}</text>
+            <text x={tx(i)} y={TH - TB + 20} class="tick t-mid">{r.t}</text>
+            {r.note && <text x={tx(i)} y={TH - TB + 32} class="rowsub t-mid">{r.note}</text>}
+          </>
+        ))}
+        <text x={TL + 10} y={TT + 2} class="anno">Feb ’26 · xAI merges in</text>
+        <text x={TL + 10} y={TT + 15} class="anno">May ’26 · Anthropic $1.25B/mo signs</text>
+      </svg>
+    </figure>
+
+    <p>
+      Amazon, Microsoft, Alphabet and Meta have been building
+      data-center fleets for more than fifteen years.
+      SpaceX reached comparable annual spending in about four quarters,
+      from no compute business at all, while running a launch company
+      and a satellite network. The ambition on the table is roughly
+      10&nbsp;GW of compute by the end of 2027, five to seven times
+      today's base.
+    </p>
+    <p>
+      It moved that fast on power that was never permitted at all.
+      Mississippi agreed that turbines bolted to flatbed trailers are
+      not stationary sources, so the permit regime did not reach them.
+      That finding rested on two conditions. The units stay mobile, and
+      they do not stay long. Delivery took weeks instead of years.
+      The exemption and the limit are therefore the same fact. Take the
+      turbines off the trailers, or leave them in place, and they become
+      ordinary stationary sources with ordinary permitting. Capacity
+      held on those terms does not underwrite a five-year promise to a
+      customer.
+    </p>
+    <p>
+      <strong>So the revenue book is short.</strong> Management
+      describes the short book as a choice, and its own payback
+      arithmetic supports the description. The effect is the same under
+      either reading. A book that either side can exit in ninety days
+      leaves SpaceX holding an exposure every other seller here has laid
+      off. That exposure is the going rate of compute itself. What
+      follows traces that term through the business: the power
+      underneath it, how the book compares with everyone else's, and
+      what it leaves SpaceX carrying.
+    </p>
+
+    <h2>1 · The speed and its clock</h2>
+
+    <figure class="photo">
+      <img src="/img/research/nearer-frontier/turbine_sgta45_mobile.jpg" alt="A trailer-mounted mobile aeroderivative gas turbine unit installed at a power plant." loading="lazy" />
+      <figcaption>The product class: a trailer-mounted 41&nbsp;MW mobile
+      aeroderivative unit (Siemens SGT-A45, Bayat Power, Afghanistan) —
+      illustrative; the Southaven units are GE TM2500s and Solar
+      SMT-130s. Photo: Mahbubehp, CC&nbsp;BY-SA&nbsp;4.0, via Wikimedia
+      Commons.</figcaption>
+    </figure>
+
+    <p>
+      The GPUs sit in two data centers built by xAI before the merger,
+      named Colossus&nbsp;1 and Colossus&nbsp;2. The first brought
+      roughly 130&nbsp;MW online in 122 days. The second brought
+      210&nbsp;MW online in 91. The prospectus itself calls two years
+      the industry benchmark for a 100&nbsp;MW greenfield site, which
+      puts the first build at roughly eight times that pace and the
+      second at nearly seventeen. The mechanism behind that is
+      regulatory before it is mechanical.
+    </p>
+    <p>
+      The turbines sit at one site, in Southaven, Mississippi, and they
+      power Colossus&nbsp;2 across the state line in Tennessee. The
+      units ship in about 30 days, while big-frame turbine slots are
+      sold out into 2029–31. On July&nbsp;25, 2025 the company asked
+      Mississippi's regulator whether they needed a permit. On
+      July&nbsp;29 the regulator agreed they did not, provided each unit
+      stayed "mobile," meaning affixed to a flatbed trailer, and
+      "temporary," which it recorded as an intention that each remain on
+      site less than twelve months. The trailer is the legal basis of
+      the speed. The first units arrived within weeks, and the fleet
+      grew to 69 by this July.
+    </p>
+    <p>
+      The trailers were always meant to be a bridge. A permanent plant
+      of 41 turbines, 1.2&nbsp;GW, was approved at the same Southaven
+      site in March 2026, and that is what is supposed to take over. It
+      is roughly a year late on turbine supply, and its permit is under
+      appeal. So the bridge has had to be extended. An agreed order
+      between the company and the regulator, dated July&nbsp;30, 2026,
+      now sets a retirement date for each trailer unit, running from
+      August&nbsp;18, 2026 to July&nbsp;14, 2027. It also lets 13 of
+      them run past the original twelve months, three by up to five,
+      and the stated reason is the delay on the permanent plant. The
+      number moved. The category did not.
+    </p>
+    <p>
+      The same market shows what that route bought. The
+      behind-the-meter route delivered 400.5&nbsp;MW in about 40 days.
+      Over the same stretch, the grid route spent roughly 15 months
+      getting 300&nbsp;MW approved, and approval is not yet power. The
+      fast route costs about twice as much as a grid connection. That
+      premium is the price of the calendar, and nothing about it is
+      proprietary. Anyone can buy the same turbines.
+    </p>
+
+    <p>
+      Now the 2027 question. Management's targets come in three layers.
+      Over two gigawatts of compute this year. End-2027 compute "closer
+      to 10 gigawatts of compute than five." And 20&nbsp;GW of power
+      and cooling as a "tentative target." Here is what stands between
+      the fleet today and that number:
+    </p>
+
+    <figure class="fig">
+      <div class="fig-title">Exhibit B · The hurdles between here and 10 GW, physical and regulatory</div>
+      <table class="ledger">
+        <thead><tr><th>Constraint</th><th>Where it stands</th></tr></thead>
+        <tbody>
+          <tr><td><span class="cat">Physical</span> New big-frame turbines</td><td>Slots sold out into 2029–31; prices up ~195% since 2019</td></tr>
+          <tr><td><span class="cat">Physical</span> The one firm turbine order (Doosan Enerbility, 5&nbsp;×&nbsp;380&nbsp;MW)</td><td>At most 1.1&nbsp;GW deliverable inside the window on Doosan's own delivery schedule</td></tr>
+          <tr><td><span class="cat">Regulatory</span> The temporary-trailer exemption</td><td>No permit held; a July 2026 agreed order retires every unit between Aug&nbsp;18, 2026 and July&nbsp;14, 2027</td></tr>
+          <tr><td><span class="cat">Regulatory</span> The challenge to that exemption</td><td>Suit contends the mobile-source exclusion does not cover stationary equipment on trailers; injunction sought, hearing set for late August 2026</td></tr>
+          <tr><td><span class="cat">Regulatory</span> The permanent plant at Southaven, Mississippi</td><td>A permit was granted at 1.2&nbsp;GW in March 2026, and is under appeal from April 2026</td></tr>
+          <tr><td><span class="cat">Regulatory</span> The grid route</td><td>~15 months of approvals for 0.3&nbsp;GW</td></tr>
+          <tr><td><span class="cat">Industry backdrop</span> On-site gas conversion</td><td>~101&nbsp;GW announced across US data centers; about 2&nbsp;GW operating</td></tr>
+          <tr><td><span class="cat">Industry backdrop</span> Grid access tightening</td><td>Texas paused new data-center connections Aug&nbsp;3, 2026, pending an audit of a 474&nbsp;GW request queue</td></tr>
+        </tbody>
+      </table>
+      <p class="tbl-note">Backdrop rows are national context, not
+      SpaceX-specific; its compute sites are in Tennessee and
+      Mississippi.</p>
+      <svg viewBox={`0 0 ${BW} ${BH}`} role="img" aria-label="Two ranges on one gigawatt axis. Permanent power runnable by end 2027, from turbine purchase orders, permits, and grid approvals on the record, is 2.6 to 3.6 gigawatts, the sum of the credited column in the derivation. A 10 gigawatt off-grid campus needs roughly 13 to 16. A dashed marker shows roughly 2 gigawatts operating today, most of it the temporary fleet.">
+        {B_XT.map((t) => (
+          <>
+            <line x1={bx(t)} y1={BT - 4} x2={bx(t)} y2={BH - BB} class="grid" />
+            <text x={bx(t)} y={BH - BB + 18} class="tick t-mid">{t} GW</text>
+          </>
+        ))}
+        <line x1={bx(B_TODAY)} y1={BT - 12} x2={bx(B_TODAY)} y2={BH - BB} stroke="var(--ink-faint)" stroke-width="1.4" stroke-dasharray="4 4" />
+        <text x={bx(B_TODAY) + 6} y={BT - 14} class="rowsub">today ≈ 2 GW</text>
+        {BANDS.map((b, i) => {
+          const y = BT + 18 + i * 46;
+          return (
+            <>
+              <text x={BL - 12} y={y + 12} class="rowlab t-end">{b.k}</text>
+              <rect x={bx(b.lo)} y={y} width={bx(b.hi) - bx(b.lo)} height="16" rx="4" fill={b.c} opacity="0.9">
+                <title>{`${b.k}: ${b.lo}–${b.hi} GW`}</title>
+              </rect>
+              <text x={bx(b.hi) + 8} y={y + 12} class="dlab" fill={b.c}>{b.lo}–{b.hi}</text>
+            </>
+          );
+        })}
+      </svg>
+      <figcaption>Today's roughly 2&nbsp;GW is mostly the temporary
+      fleet, which is why it does not carry into the blue band. Sources
+      and the arithmetic behind both bands are below.</figcaption>
+      <details class="deriv">
+        <summary>Derivation: how the 2.6–3.6 GW and the 13–16 GW are built</summary>
+        <table class="ledger">
+          <thead><tr><th>Power source</th><th class="num">GW</th><th class="num">Credited by end-2027</th></tr></thead>
+          <tbody>
+            <tr><td>Temporary trailer fleet (69 units)</td><td class="num">~1.7</td><td class="num">0 — removed by then</td></tr>
+            <tr><td>Permanent Southaven plant</td><td class="num">1.2</td><td class="num">1.2</td></tr>
+            <tr><td>Doosan turbine order</td><td class="num">1.9</td><td class="num">1.1</td></tr>
+            <tr><td>Solaris power JV</td><td class="num">~1.0</td><td class="num">0–1.0 — no leases commenced at June&nbsp;30</td></tr>
+            <tr><td>Grid (TVA/MLGW)</td><td class="num">0.3</td><td class="num">0.3</td></tr>
+            <tr class="sumrow"><td><strong>Sum credited</strong></td><td class="num"></td><td class="num"><strong>2.6–3.6</strong></td></tr>
+          </tbody>
+        </table>
+        <p>
+          The need band applies the one off-grid comparable on record,
+          2.3&nbsp;GW of generation behind a 1.4&nbsp;GW campus (a ratio
+          of roughly 1.6), to a 10&nbsp;GW campus: off-grid sites carry
+          extra generation for redundancy and cooling, with no grid to
+          fall back on. A reader can recompute both bands from the
+          inputs shown. On the trailer row, note that January's federal
+          rule set an emission standard for temporary turbines and
+          eased one permitting requirement for smaller units. It grants
+          no authority to operate, and construction permitting is
+          untouched. The live question for the fleet is the pending
+          injunction, not that rule.
+        </p>
+      </details>
+    </figure>
+
+    <p>
+      <strong>Count every turbine order, permit and grid approval on
+      the record, and roughly 2.6 to 3.6&nbsp;GW of permanent power can
+      be running by the end of 2027. A 10&nbsp;GW campus needs 13 to
+      16.</strong> Meanwhile the fleet that powers today's compute is
+      being dismantled while the sprint runs.
+    </p>
+    <p>
+      Where the rest comes from is the open question, and the table
+      above sets out what stands against each route. The published
+      forecast that reaches 10&nbsp;GW reads the same record a different
+      way. It counts demonstrated deployment rate rather than announced
+      orders, and that rate is real. The difference sits in one
+      assumption. We credit the trailer fleet at zero because the
+      agreed order retires every unit before the window closes. It
+      assumes the playbook repeats at new sites, on fresh determinations
+      like the one Mississippi gave. Watch whether new temporary units
+      are allowed at new sites while the Southaven fleet comes down.
+    </p>
+    <p>
+      Neither reading changes what the power is. It is capacity that
+      exists because it was found not to need a permit, and that finding
+      holds only while the equipment is leaving. The quantity is
+      contested. The basis is not, and the basis is what the rest of the
+      business has to be built on.
+    </p>
+
+    <p>
+      The revenue side is short too. The prospectus describes the
+      business as "monetization of unused compute capacity." The fleet
+      serves the company's own AI work first, and whatever is not
+      consumed internally gets sold. Musk put training for Grok, the company's own model, at
+      roughly a tenth of compute today. A seller in that position
+      cannot promise years of capacity it may want back. The Anthropic
+      contract runs at $1.25&nbsp;billion a month on paper through May
+      2029. After the first three months, either side can walk on 90
+      days' notice. The "$40&nbsp;billion contracted" figures in trade
+      coverage are not committed revenue. The filed backlog is
+      $47.5&nbsp;billion, and 56% of it is expected inside a year.
+    </p>
+    <h2>2 · What everyone else contracted</h2>
+
+    <p>
+      The next two quarters are guided "very similar," which implies
+      roughly $65&nbsp;billion of company-wide capital spending for
+      2026. That puts it past Oracle for the year. But the size of the
+      spending is not what separates SpaceX. What separates it is what
+      stands behind it. Two things can stand behind spending on this
+      scale. One is what the business already earns. The other is what
+      customers have signed to pay.
+    </p>
+
+    <figure class="fig">
+      <div class="fig-title">Exhibit E · Current revenue as a multiple of this year's spending</div>
+      <div class="legend">
+        <span class="lg"><span class="sw" style="background:#3b82f6"></span>latest quarter, annualized</span>
+        <span class="lg"><span class="sw" style="background:#c96f06;width:3px;height:12px;border-radius:0"></span>trailing twelve months</span>
+      </div>
+      <svg viewBox={`0 0 ${EW} ${EH}`} role="img" aria-label="Revenue divided by 2026 capital spending. Amazon 3.6 times, Alphabet 2.4, Microsoft 2.0, Meta 1.8, Oracle 1.4, SpaceX 0.5, CoreWeave 0.3. A marked line at 1.0 is the level where a year of revenue matches a year of spending. Only SpaceX and CoreWeave fall below it. A longer bar means better covered.">
+        {E_XT.map((t) => (
+          <>
+            <line x1={ex(t)} y1={ET - 6} x2={ex(t)} y2={EH - 30} class="grid" />
+            <text x={ex(t)} y={EH - 14} class="tick t-mid">{t}×</text>
+          </>
+        ))}
+        <line x1={ex(1)} y1={ET - 14} x2={ex(1)} y2={EH - 30} stroke="var(--ink-faint)" stroke-width="1.4" stroke-dasharray="4 4" />
+        <text x={ex(1)} y={ET - 18} class="rowsub t-mid">a year of spending earned back</text>
+        {INT.map((c, i) => {
+          const y = ET + i * (EBH + EGAP);
+          return (
+            <>
+              <text x={EL - 10} y={y + EBH - 4} class="rowlab t-end">{c.k}</text>
+              <rect x={EL} y={y} width={Math.max(ex(c.rr) - EL, 1.5)} height={EBH} rx="4" fill="#3b82f6" opacity="0.9">
+                <title>{`${c.k}: revenue covers ${c.rr.toFixed(2)}× this year's spending, on the quarter ended ${c.qe} annualized`}</title>
+              </rect>
+              <line x1={ex(c.tt)} y1={y - 2} x2={ex(c.tt)} y2={y + EBH + 2} stroke="#c96f06" stroke-width="2.5">
+                <title>{`${c.k}: ${c.tt.toFixed(2)}× on trailing twelve months`}</title>
+              </line>
+              <text x={Math.max(ex(c.rr), ex(c.tt)) + 9} y={y + EBH - 4} class="dlab-ink">{c.rr.toFixed(2)}×</text>
+              <text x={EL - 10} y={y + EBH + 8} class="rowsub t-end">{c.qe}{c.fq ? ' · fiscal Q4' : ''}{c.stale ? ' · one quarter behind' : ''}</text>
+            </>
+          );
+        })}
+      </svg>
+      <figcaption>A longer bar means better covered. The line is a year
+      of spending earned back.</figcaption>
+      <details class="deriv">
+        <summary>Basis, dates and two caveats</summary>
+        <p>
+          Revenue is each company's most recent reported quarter times
+          four, from its 10-Q or quarterly earnings release. The tick is
+          the same ratio on trailing twelve months. Spending is the 2026
+          figure each company has stated, at the mid-point of a range.
+        </p>
+        <p>
+          Microsoft and Oracle are reporting a fiscal fourth quarter,
+          their seasonal high, so annualizing lengthens their bars.
+          CoreWeave had not filed its June quarter and sits on a March
+          anchor, which shortens its. Both caveats are visible as the
+          gap between bar and tick. Neither changes the order.
+        </p>
+        <p>
+          Amazon guided $220B, raised from $200B. Alphabet guided
+          $195–205B. Microsoft guides about $175B for calendar 2026,
+          revised down from $190B by an accounting change that moves
+          some leases out of capital spending rather than reducing what
+          it plans to spend. Meta guided $130–145B. Oracle's is
+          fiscal-2026 actual spending. CoreWeave guided $31–35B. SpaceX
+          gave no figure. Its $65B annualizes the June quarter at the
+          guidance that the next two would look "very similar," so it is
+          the only spending number here that is our arithmetic.
+        </p>
+      </details>
+    </figure>
+
+    <p>
+      Start with what the business takes in. Every hyperscaler here
+      takes in more than it plans to spend, Amazon by more than three
+      times. Oracle is the tightest of them at about 1.4. SpaceX takes
+      in roughly half of what it intends to spend this year, and
+      CoreWeave about a quarter. Neither can fund a buildout this size
+      from the business as it stands.
+    </p>
+
+    <figure class="fig">
+      <div class="fig-title">Exhibit D · Signed revenue as a multiple of this year's spending</div>
+      <svg viewBox={`0 0 ${DW} ${DH}`} role="img" aria-label="Signed revenue divided by 2026 capital spending. Oracle 11.5 times, Microsoft 3.8, CoreWeave 3.0, Alphabet 2.6, Amazon 2.3, SpaceX 0.7. A marked line at 1.0 shows one year of spending covered. SpaceX is the only company below it.">
+        <line x1={dxr(1)} y1={DT - 12} x2={dxr(1)} y2={DH - 26} stroke="var(--ink-faint)" stroke-width="1.4" stroke-dasharray="4 4" />
+        <text x={dxr(1)} y={DT - 16} class="rowsub t-mid">one year covered</text>
+        {COV.map((c, i) => {
+          const y = DT + i * (DBH + DGAP);
+          return (
+            <>
+              <text x={DL - 10} y={y + DBH - 5} class="rowlab t-end">{c.k}</text>
+              <rect x={DL} y={y} width={Math.max(dxr(c.r) - DL, 1.5)} height={DBH} rx="4"
+                    fill={c.term ? 'none' : '#3b82f6'}
+                    stroke={c.term ? '#c96f06' : undefined}
+                    stroke-width={c.term ? 2 : undefined}
+                    opacity="0.9">
+                <title>{`${c.k}: ${c.r.toFixed(1)}× — signed revenue divided by 2026 capital spending${c.term ? ', and terminable on 90 days notice' : ''}`}</title>
+              </rect>
+              <text x={dxr(c.r) + 8} y={y + DBH - 5} class="dlab"
+                    fill={c.term ? '#c96f06' : 'var(--ink)'}>{c.r.toFixed(1)}×</text>
+            </>
+          );
+        })}
+        <text x={DL} y={DH - 8} class="tick">0</text>
+        <text x={dxr(12)} y={DH - 8} class="tick t-end">12×</text>
+      </svg>
+      <figcaption>Read the same way as above. A hollow bar can be
+      cancelled on ninety days' notice.</figcaption>
+      <details class="deriv">
+        <summary>What counts as backlog, and how far it compares</summary>
+        <p>
+          Each company's remaining performance obligations, or its
+          closest reported measure. Microsoft's $678B is commercial RPO
+          across all durations, up 84% in a year. Alphabet's $519.5B has
+          included contracts of a year or less since the first quarter
+          of 2026, and $513.9B of it is Google Cloud. Amazon's $496B
+          covers only contracts running beyond one year, carries a
+          6.4-year average life, and is stated as additional to unearned
+          revenue rather than including it. CoreWeave's $98.8B is RPO at
+          March 2026, a quarter behind the rest, and its filing puts
+          take-or-pay at 98% of revenue. SpaceX's $47.5B is labeled
+          backlog and tagged as RPO, and $14.3B of it is deferred
+          revenue. Meta is absent because it sells almost no external
+          capacity.
+        </p>
+        <p>
+          The definitions do not align, and three gaps matter. SpaceX
+          reports one backlog for the whole company, so its figure
+          carries rockets and Starlink alongside compute, while
+          Microsoft's and Alphabet's cover cloud alone. Its spending
+          figure is company-wide too, so that much is at least
+          consistent within the row. And of the six, only
+          Alphabet states what it does with contracts a customer can
+          cancel. The rest are silent, SpaceX included, whose largest
+          agreement carries a ninety-day exit. Each of those gaps
+          flatters SpaceX. The ordering is what holds, not the precise
+          multiple.
+        </p>
+      </details>
+    </figure>
+
+    <p>
+      Everyone else builds against orders in hand. Oracle is the
+      extreme case, with eleven years of its current spending already
+      signed. CoreWeave, the largest dedicated compute seller, has
+      three. <strong>SpaceX is the only seller here spending more this
+      year than customers have signed to pay it, and its revenue
+      backlog is the one that can be cancelled.</strong> The pattern repeats on the
+      buying side. Its own filing is direct about suppliers: contracts
+      "generally do not have long-term binding and enforceable purchase
+      orders." The NVIDIA relationship ("our understanding with NVIDIA
+      is that we will receive a very significant percentage of their
+      GPUs next year") carries no filed dollar or volume terms. Little
+      is locked in either direction. Of the sellers here, SpaceX has
+      committed the least and kept the most exposure.
+    </p>
+    <p>
+      Some of that backlog is already cash. $14.3&nbsp;billion of it is
+      deferred revenue, received for compute not yet delivered.
+      Prepayment is real, and it is not large. That sum covers about
+      five months of current spending against a buildout that runs for
+      years. The customers are not funding obligations this size out of
+      earnings either. They are borrowing. The $35&nbsp;billion
+      private-credit vehicle that buys chips and leases them to
+      Anthropic closed in June, and a second package of at least
+      $36&nbsp;billion was pitched on August&nbsp;4
+      [→ <a href="/credit">/credit</a>].
+    </p>
+
+    <p>
+      There are three ways to pay for capacity at this scale: out of
+      what the business already earns, by borrowing against revenue
+      customers have promised, or from the capital markets. The
+      hyperscalers lean on the first. CoreWeave and the credit vehicles
+      use the second. SpaceX used the third. Every GPU-backed loan and
+      facility in our credit ledger, across every issuer since 2023,
+      comes to about $41&nbsp;billion
+      [→ <a href="/credit">/credit</a>]. SpaceX raised more than twice
+      that in ninety days, without pledging a chip or a customer
+      contract.
+    </p>
+    <p>
+      The three do not renew the same way. Operating cash flow arrives
+      every quarter. Contracted revenue renews
+      as new contracts sign. Market access has to be sought again, at
+      whatever price the market sets that day. The others here can fall
+      back on earnings or on signed contracts. SpaceX has neither.
+    </p>
+
+    <h2>3 · SpaceX is long the price of compute</h2>
+    <p>
+      Management's case for the ninety-day exit is payback speed. The CFO
+      told the August call that new compute capital pays back in under a year:
+      "It's almost like your capital is becoming almost an item that
+      you would put otherwise in COGS because it's moving so quickly."
+      Read against that claim, a book anyone can exit in a quarter is
+      not reckless. It is duration-matched. A campus that takes twenty
+      years to earn out gets a twenty-year lease. A rack that pays back
+      inside a year does not need one.
+    </p>
+    <p>
+      Today's rate is knowable from the filings. At the filed
+      terms, the Anthropic book prices out at roughly $5.27 per nameplate
+      GPU-hour, which is $1.25&nbsp;billion a month spread over the
+      calendar hours of 325,000 GPUs. It blends a mixed fleet, so it is
+      not a like-for-like against the single-chip rates we publish
+      [→ <a href="/rates">/rates</a>], but it is a clear look at what
+      one frontier lab pays for delivered capacity.
+    </p>
+    <p>
+      SpaceX's own prospectus uses about $3.33 per GPU-hour as the
+      market reference in its addressable-market arithmetic. The two are not measuring
+      the same thing. The $3.33 is a 2025 median across neoclouds,
+      weighted toward older silicon, and the fleet here mixes H100 and
+      Blackwell parts. Part of the gap is what is in the rack rather
+      than when it arrived.
+    </p>
+    <p>
+      Every multi-year book in this market exists for a reason. CoreWeave
+      sells years of take-or-pay, with a backlog that runs out to 84
+      months, because its lenders require contracted revenue before
+      they will finance a GPU. The hyperscalers sell duration without
+      that constraint, discounting committed capacity below the
+      on-demand rate to get it, which is a trade our own term curve
+      shows them making [→ <a href="/term">/term</a>]. No lender is
+      making them do it. They are buying certainty of demand.
+    </p>
+    <p>
+      SpaceX makes neither trade. Staying short buys it three things.
+    </p>
+    <ul class="blist">
+      <li>Nothing beyond a quarter is committed. What the fleet earns
+      after that follows the market rather than a multi-year term. That
+      pays while capacity is scarce, and works against them when it is
+      not.</li>
+      <li>Capacity can return to internal use on ninety days' notice,
+      instead of waiting out a contract.</li>
+      <li>Nothing is discounted for duration. Committed capacity
+      elsewhere in this market trades a lower price for the
+      commitment.</li>
+    </ul>
+    <p>
+      Two of those three hold only while the market is tight. Reclaiming
+      capacity is the one that works in either direction.
+    </p>
+    <p>
+      A second explanation is less voluntary. A seller cannot promise
+      what it may not have. The turbines behind the current fleet hold
+      no permit, and the finding that they need none depends on their
+      leaving. Every unit now has a retirement date. The permanent plant
+      meant to replace them is under appeal, and a court has been asked
+      to stop the turbines in the meantime. Power held on those terms
+      does not support a five-year commitment to a customer. The
+      ninety-day exit is not only a choice about price. It is the
+      revenue book inheriting the tenure of the power underneath it.
+    </p>
+    <p>
+      The same short book limits the damage if that power stops. A
+      customer that can leave in ninety days is also an obligation that
+      ends in ninety days. A five-year take-or-pay against capacity that
+      cannot be powered would be the worse place to stand.
+    </p>
+    <p>
+      The cost is symmetrical. If the market rent of a GPU holds,
+      sub-year paybacks make the structure self-financing. If it falls,
+      there is no contracted floor to catch it. A customer that leaves
+      on ninety days' notice leaves the hardware behind, and that
+      capacity has to be re-let at whatever the market pays then. The
+      equipment keeps running. It just earns less, over a life that now
+      outlasts the payback the spending assumed.
+    </p>
+    <p>
+      The two sides of that trade move against each other.
+      Behind-the-meter power costs about twice a grid connection, which
+      is affordable while capacity is scarce and priced accordingly. Add
+      supply and the premium compresses, but the cost base does not.
+      Speed bought at a premium has to be sold at one.
+    </p>
+    <p>
+      Everyone in this market is long the demand for compute. Contract
+      structure decides who is long the price. CoreWeave sold that
+      exposure forward, and 98% of its revenue now comes from committed
+      contracts. SpaceX did not, and the reason is narrower than it
+      first looks. Its largest agreement runs three years on paper, at a
+      fixed monthly fee. The price is not what moves. The term is.
+      Either side can end it on ninety days' notice, so nothing past a
+      quarter is settled, and what replaces it would be sold at whatever
+      the market pays then.
+    </p>
+    <p>
+      Both sides hold that exit, but they would not use it in the same
+      world. A customer leaving to buy the same capacity cheaper is an
+      ordinary procurement decision. A seller leaving to chase a higher
+      rate has to do it to its largest customer. The downside of this
+      structure travels more easily than the upside. Few balance sheets
+      in this market are more directly exposed to the going rate of
+      compute. That is the number this firm exists to publish.
+    </p>
+    <p>
+      Nothing requires the next contracts to look like the current ones.
+      Whether new agreements keep the ninety-day exit as the buildout
+      scales is the clearest disclosure to watch. The tenor of a
+      seller's book shows this exposure before any price does.
+    </p>
+    <p>
+      The founding mission is unchanged. The order of operations is not.
+      In its first quarter on the public record, selling compute brought
+      in $2.56&nbsp;billion, nearly three times what the space business
+      did. The ambition on the table is roughly ten gigawatts by the end
+      of 2027. Permanent power on the record reaches 2.6 to 3.6. Until
+      the rest is both built and permitted, the contracts on top of it
+      cannot lengthen, and SpaceX stays exposed to the price of compute.
+    </p>
+
+    <div class="metho">
+      <h2>Sources &amp; method</h2>
+      <p>
+        Figures are from SpaceX's 10-Q for the quarter ended
+        June&nbsp;30, 2026, its June 424B4 prospectus, the
+        August&nbsp;4 earnings call, each comparison company's latest
+        10-K, 10-Q or quarterly earnings release, and the Mississippi
+        and Tennessee regulatory records covering the exemption
+        determination, the permits granted, the July 2026 agreed order
+        and the pending challenges. Where a company
+        reports on a fiscal year that does not end in June, its quarter
+        end is shown on the exhibit rather than aligned to the others. We verified call quotes against two
+        independent transcript services; the official transcript was
+        not posted when we checked. Press-reported figures are
+        attributed in the text where used. The two range estimates
+        (buildable power by end-2027, and the generation requirement)
+        are our arithmetic from the sourced inputs shown beside them.
+        A reader can recompute both. Research notes are dated, not
+        updated in place.
+      </p>
+    </div>
+  </section>
+
+  <style>
+    .top { padding-top: 28px; max-width: 760px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    /* Matches the house research-note treatment (display face at --fs-xl),
+       which every other note in /research uses. Was mono/uppercase at a
+       nonexistent --fs-s token, so it silently rendered at 15px and read as
+       an eyebrow label rather than a section heading. Rule kept. */
+    .top h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      font-weight: var(--weight-display, 600);
+      letter-spacing: -0.005em;
+      color: var(--ink);
+      border-top: 1px solid var(--rule);
+      padding-top: 16px;
+    }
+    /* Two donuts, equal columns, so the AI wedge is the same scale in both
+       and can be compared across. */
+    .fig-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 720px) {
+      .fig-row { grid-template-columns: 1fr; }
+    }
+    .draft-band {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: #c96f06; border: 1px dashed #c96f06; border-radius: 4px;
+      padding: 6px 10px; margin-bottom: 18px;
+    }
+    h2 { margin-top: 34px; }
+    .epigraph {
+      font-style: italic; color: var(--ink-dim);
+      border-left: 2px solid var(--rule); padding-left: 14px; margin: 22px 0;
+    }
+    .todo {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: #c96f06; border: 1px dashed #c96f06; border-radius: 3px;
+      padding: 1px 6px;
+    }
+    .photo { margin: 24px 0; }
+    .photo img { width: 100%; height: auto; display: block; border-radius: 6px; }
+    .photo figcaption {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-faint); line-height: 1.5; margin-top: 6px;
+    }
+    .fig { margin: 28px 0; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig-title {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: 0.05em; text-transform: uppercase;
+      color: var(--ink-dim); font-weight: 600; margin-bottom: 10px;
+    }
+    figcaption {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-dim); line-height: 1.55; margin-top: 8px; max-width: 90ch;
+    }
+    .grid { stroke: var(--rule); stroke-width: 1; }
+    .axis { stroke: var(--ink-faint); stroke-width: 1; }
+    .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim); }
+    .t-end { text-anchor: end; }
+    .t-mid { text-anchor: middle; }
+    .axis-label { font-family: var(--font-mono); font-size: 9px; fill: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.04em; text-anchor: end; }
+    .anno { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+    .dlab { font-family: var(--font-mono); font-size: 11px; font-weight: 600; }
+    .dlab-ink { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); }
+    .dsub { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim); }
+    .rowlab { font-family: var(--font-mono); font-size: 11px; fill: var(--ink); }
+    .rowsub { font-family: var(--font-mono); font-size: 9.5px; fill: var(--ink-faint); }
+    .fnref { font-family: var(--font-mono); font-size: 0.75em; fill: var(--ink-faint); color: var(--ink-faint); }
+    .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 8px; }
+    .lg { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); display: inline-flex; align-items: center; gap: 6px; }
+    .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+    table.ledger { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: var(--fs-md); }
+    table.ledger th, table.ledger td { text-align: left; padding: 7px 10px 7px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+    table.ledger th { font-family: var(--font-mono); font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-dim); }
+    table.ledger .num { text-align: right; font-family: var(--font-mono); white-space: nowrap; padding-right: 16px; }
+    table.ledger .sumrow td { border-top: 2px solid var(--ink-faint); border-bottom: none; }
+    .cat {
+      font-family: var(--font-mono); font-size: 0.7em; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--ink-faint); display: block; margin-bottom: 2px;
+    }
+    .metho { margin-top: 40px; border-top: 1px solid var(--rule); padding-top: 18px; }
+    .blist {
+      max-width: 74ch;
+      margin: 4px 0 18px;
+      padding-left: 20px;
+      list-style: none;
+    }
+    .blist li {
+      position: relative;
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+    .blist li::before {
+      content: '';
+      position: absolute;
+      left: -18px;
+      top: 0.62em;
+      width: 6px;
+      height: 6px;
+      border-radius: 1px;
+      background: var(--accent);
+      opacity: 0.8;
+    }
+    .tbl-note {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-faint); margin: -6px 0 14px;
+    }
+    .deriv { margin-top: 10px; }
+    .deriv > summary {
+      list-style: none; cursor: pointer;
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: 0.05em; text-transform: uppercase;
+      color: var(--ink-dim); font-weight: 600; padding: 4px 0;
+    }
+    .deriv > summary::-webkit-details-marker { display: none; }
+    .deriv > summary::before { content: '▸ '; color: var(--accent); }
+    .deriv[open] > summary::before { content: '▾ '; }
+    .deriv p {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-dim); line-height: 1.55; margin: 6px 0 0; max-width: 90ch;
+    }
+  </style>
+</Base>
