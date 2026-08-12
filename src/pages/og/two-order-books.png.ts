@@ -25,7 +25,7 @@ const NBIS: [number, number][] = [
   [18, 2], [21, 0.4], [24, 38], [27, 57], [30, 70],
 ];
 
-const CW = 1000, CH = 330, PL = 64, PR = 150, PT = 16, PB = 40;
+const CW = 1000, CH = 370, PL = 64, PR = 150, PT = 16, PB = 40;
 const xs = (m: number) => PL + (m / 30) * (CW - PL - PR);
 const ys = (p: number) => PT + (1 - p / 140) * (CH - PT - PB);
 const path = (pts: [number, number][]) =>
@@ -95,22 +95,19 @@ function card() {
     el('div', { display: 'flex', color: C.dim, fontSize: 16 }, 'Q2 2026 · reported Aug 11-12'),
   ]);
 
-  const title = el('div', { display: 'flex', color: C.ink, fontSize: 40, fontWeight: 600, letterSpacing: 0.5, marginBottom: 4 },
-    'Two Order Books, Two Funding Machines');
-  const sub = el('div', { display: 'flex', color: C.dim, fontSize: 18, marginBottom: 14 },
-    'Customer prepayments as a share of total debt · computed from EDGAR filings');
+  const title = el('div', { display: 'flex', color: C.ink, fontSize: 34, fontWeight: 600, letterSpacing: 0.5, marginBottom: 18 },
+    'CUSTOMER PREPAYMENTS AS A SHARE OF TOTAL DEBT');
 
   const fig = el('div', { display: 'flex', width: 1104, justifyContent: 'center' }, [chart() as any]);
 
-  const foot = el('div', { display: 'flex', alignItems: 'flex-end', flexGrow: 1, justifyContent: 'space-between', fontSize: 14, letterSpacing: 1.4 }, [
-    el('div', { display: 'flex', color: C.navy }, 'ONE DEMAND STORY. OPPOSITE MACHINES.'),
+  const foot = el('div', { display: 'flex', alignItems: 'flex-end', flexGrow: 1, justifyContent: 'flex-end', fontSize: 14, letterSpacing: 1.4 }, [
     el('div', { display: 'flex', color: C.faint }, 'ccir.io/research/two-order-books'),
   ]);
 
   return el('div', {
     display: 'flex', flexDirection: 'column', width: 1200, height: 630,
     backgroundColor: C.bg, padding: 48, fontFamily: 'IBM Plex Mono',
-  }, [head, title, sub, fig, foot]);
+  }, [head, title, fig, foot]);
 }
 
 export const GET: APIRoute = async () => {
