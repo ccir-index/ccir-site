@@ -3,11 +3,13 @@ import Base from '../layouts/Base.astro';
 import TermCurveChart from '../components/TermCurveChart.astro';
 import HyperscalerLadders from '../components/HyperscalerLadders.astro';
 // HyperscalerTermChart PULLED same-day it shipped (John, 2026-07-16): T1 US
-// cells are n=2-4 and cell-to-cell %s manufactured a fake H200 "1Y −26%"
-// (within-provider truth: −7%). Replacement = per-provider reservation
-// schedules (Azure/GCP/AWS own ladders, named) — needs a listings-grain
-// export lane; queue with the azure/gcp leg-replacement decision (07-23).
-// Component stays in src/components; reinstating is one import + one tag.
+// cells were n=2-4 and cell-to-cell %s manufactured a fake H200 "1Y −26%"
+// (within-provider truth: −7%). REINSTATED 2026-08-12 (John): every T1 US
+// committed cell now prints the same three-provider panel (aws|azure|gcp)
+// after the aws RI convertible-fallback fix landed the missing H100 1Y
+// lane. Levels-only construction unchanged; OD dot stays detached (OD adds
+// OCI, n=4). Per-provider ladders below remain the within-book view.
+import HyperscalerTermChart from '../components/HyperscalerTermChart.astro';
 import { meta } from '../data/snapshot';
 // Implied-forwards section CUT (John 2026-07-02): with the par curve's OD
 // anchor moving to the pooled NEOCLOUD band OD (apples-to-apples), the
@@ -83,6 +85,7 @@ import { meta } from '../data/snapshot';
         <h2>Hyperscaler Reservation Schedules</h2>
       </header>
 
+      <HyperscalerTermChart />
       <HyperscalerLadders />
     </section>
 

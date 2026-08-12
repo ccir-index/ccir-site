@@ -1,7 +1,17 @@
 ---
 /*
-  Hyperscaler reserved curve, US — /term section 02 (added 2026-07-16).
+  Hyperscaler reserved curve, US — /term section 02 (added 2026-07-16,
+  pulled same day, REINSTATED 2026-08-12).
   Server-rendered inline SVG, same geometry system as TermCurveChart.
+
+  REINSTATEMENT BASIS (2026-08-12): the pull was about panel composition,
+  not the design — term cells then printed n=2-3 with different members per
+  cell. As of 2026-08-12 every T1 US committed cell (A100/H100/H200 x
+  1Y/3Y) prints the SAME three-provider panel (aws|azure|gcp); OD cells add
+  OCI (n=4), which is why the OD dot stays detached from the curve. The
+  H100 1Y aws vote is the convertible RI class — AWS publishes no 1yr
+  standard for p5 (parser preference rule, bronze aws.py 2026-08-12) —
+  disclosed in the chart notes below.
 
   CONSTRUCTION — published T1 US reference cells plotted directly as
   DOLLAR LEVELS ONLY. No % vs OD anywhere on this chart (John's catch,
@@ -40,9 +50,9 @@ const xOf = (months: number) =>
   x0 + innerW * (Math.sqrt(months) / Math.sqrt(MAX_MONTHS));
 
 const Y_MIN = 0;
-const Y_MAX = 10;
+const Y_MAX = 12; // raised from 10 at reinstatement — H100/H200 OD print >$10
 const yOf = (v: number) => y0 + innerH * ((Y_MAX - v) / (Y_MAX - Y_MIN));
-const yTicks = [0, 2, 4, 6, 8, 10];
+const yTicks = [0, 2, 4, 6, 8, 10, 12];
 
 const TENORS: { term: Term; months: number }[] = [
   { term: '1Y', months: 12 },
@@ -236,6 +246,11 @@ const ariaLabel =
         <li>A reservation price is a fixed schedule — the posted price of a
         commitment starting today, held for its term. Not a forecast of
         future on-demand rates.</li>
+        <li>Every committed cell on this chart carries the same
+        three-provider panel (AWS, Azure, GCP); the on-demand cells add
+        OCI. AWS's H100 1-year vote is its convertible reserved class —
+        AWS publishes no standard 1-year offering for that instance, and
+        the convertible rate is its only posted 1-year commitment.</li>
         <li>Hollow points = Provisional cells (thin panels; n on hover).
         Azure lists 5-year reservations but no 5-year series prints yet —
         the tenor joins when it clears the series gate.</li>
