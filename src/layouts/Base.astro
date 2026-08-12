@@ -89,7 +89,9 @@ const articleLd = article
   <meta name="description" content={description} />
   {noindex && <meta name="robots" content="noindex,follow" />}
   {!noindex && <link rel="canonical" href={canonical} />}
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content={article ? 'article' : 'website'} />
+  {article && <meta property="article:published_time" content={article.published} />}
+  {article?.modified && <meta property="article:modified_time" content={article.modified} />}
   <meta property="og:site_name" content="CCIR" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
