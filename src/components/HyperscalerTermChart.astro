@@ -4,33 +4,26 @@
   pulled same day, REINSTATED 2026-08-12).
   Server-rendered inline SVG, same geometry system as TermCurveChart.
 
-  REINSTATEMENT BASIS (2026-08-12): the pull was about panel composition,
-  not the design — term cells then printed n=2-3 with different members per
-  cell. As of 2026-08-12 every T1 US committed cell (A100/H100/H200 x
-  1Y/3Y) prints the SAME three-provider panel (aws|azure|gcp); OD cells add
-  OCI (n=4), which is why the OD dot stays detached from the curve. The
-  H100 1Y aws vote is the convertible RI class — AWS publishes no 1yr
-  standard for p5 (parser preference rule, bronze aws.py 2026-08-12) —
-  disclosed in the chart notes below.
-
-  CONSTRUCTION — published T1 US reference cells plotted directly as
-  DOLLAR LEVELS ONLY. No % vs OD anywhere on this chart (John's catch,
-  2026-07-16, same day as ship): the OD cell has more members (n=4) than
-  the term cells (n=2-3), so a cell-to-cell % differences two different
-  panels — the H200 "1Y −26%" it produced was mostly composition (the
-  within-provider H200 1Y discount is −7%, n=2 pairs; Azure's own H100
-  book runs −36% at 1Y while the cross-cell read said −9%). Within-
-  provider spreads live on the Neocloud chart above; this chart shows
-  what each cell PRINTS, and the OD dot is a detached reference, not a
-  connected point on the curve.
+  CONSTRUCTION (reworked 2026-08-12, John) — ONE UNIFORM PANEL end to end.
+  Every point = median of the three hyperscalers that publish committed
+  terms (aws / azure / gcp), each entering as its lowest posted US
+  guaranteed rate at that tenor; identical construction at OD, 1Y and 3Y,
+  so the line connects through OD and "% vs OD" is a within-panel read.
+  OCI publishes no committed lane on any chip we capture and is excluded
+  entirely (an OD-only vote would change the panel at one tenor — the
+  composition defect that got the 2026-07-16 version pulled the day it
+  shipped: mixed panels manufactured a fake H200 "1Y −26%" when the
+  within-provider truth was −7%). The aws H100 1Y leg is its convertible
+  RI class — aws publishes no 1yr standard for p5 (bronze aws.py
+  preference rule, 2026-08-12) — disclosed in the notes.
 
   Tenors: only OD/1Y/3Y print for T1 US today (Azure also lists 5Y but no
   5Y series prints — the roster gate). Chips: H100/H200/A100 (the T1 US
   committed set). Same series colors as the chart above — same chip, same
   hue, page-consistent.
 */
-import { t1CommittedCellUS, tierOdCell, headlineValue, headlineStatOf, meta } from '../data/snapshot';
-import type { Rate, Term } from '../data/types';
+import fs from 'node:fs';
+import { meta } from '../data/snapshot';
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 
@@ -57,20 +50,66 @@ const Y_MAX = 12; // raised from 10 at reinstatement — H100/H200 OD print >$10
 const yOf = (v: number) => y0 + innerH * ((Y_MAX - v) / (Y_MAX - Y_MIN));
 const yTicks = [0, 2, 4, 6, 8, 10, 12];
 
-const TENORS: { term: Term; months: number }[] = [
-  { term: '1Y', months: 12 },
-  { term: '3Y', months: 36 },
-];
 const X_TICKS = [{ label: 'OD', months: 0 }, { label: '1Y', months: 12 }, { label: '3Y', months: 36 }];
 
 // OD | committed divider at the sqrt-space midpoint between OD and 1Y.
 const odDividerX = x0 + innerW * (Math.sqrt(12) / 2 / Math.sqrt(MAX_MONTHS));
 
-const CHIPS = [
-  { chip: 'H100', cls: 'h100' },
-  { chip: 'H200', cls: 'h200' },
-  { chip: 'A100', cls: 'a100' },
+// 2026-08-12 REWORK (John): one uniform panel end to end. Every point on
+// every curve is the median of the SAME three providers — the three
+// hyperscalers that publish committed terms (aws, azure, gcp; each enters
+// as its lowest posted US NonInterruptible rate at that tenor). OCI posts
+// on-demand only (no committed lane on any chip we capture) and is
+// EXCLUDED from this chart entirely, so the OD point shares the committed
+// points' composition: the line connects through OD and % vs OD is a
+// within-panel read. Build-time read of the curated listings exports, same
+// lane HyperscalerLadders used.
+const SOURCES = ['aws', 'azure', 'gcp'];
+const CSVS = [
+  { chip: 'H100', cls: 'h100', file: 'listings_history_h100-sxm-80gb.csv' },
+  { chip: 'H200', cls: 'h200', file: 'listings_history_h200-sxm-141gb.csv' },
+  { chip: 'A100', cls: 'a100', file: 'listings_history_a100-sxm-80gb.csv' },
 ];
+const TENOR_MONTHS = [
+  { term: 'OnDemand', months: 0 },
+  { term: '1Y', months: 12 },
+  { term: '3Y', months: 36 },
+];
+
+interface ChipPoint { months: number; value: number; provs: Record<string, number> }
+
+function chipPoints(file: string): ChipPoint[] {
+  const raw = fs
+    .readFileSync(new URL(`../../public/data/${file}`, import.meta.url), 'utf-8')
+    .trim()
+    .split(/\r?\n/);
+  const header = raw[0]!.split(',');
+  const col = (n: string) => header.indexOf(n);
+  const iDate = col('as_of_date'), iSrc = col('source_name'),
+        iTier = col('operator_tier'), iTerm = col('commitment_term'),
+        iInt = col('interruptibility'), iPrice = col('price_usd_per_hour'),
+        iRegion = col('region');
+  const rows = raw.slice(1).map((l) => l.split(','));
+  const lastDay = rows.reduce((m, r) => (r[iDate]! > m ? r[iDate]! : m), '');
+  return TENOR_MONTHS.flatMap(({ term, months }) => {
+    const provs: Record<string, number> = {};
+    for (const src of SOURCES) {
+      const vals = rows
+        .filter((r) =>
+          r[iDate] === lastDay && r[iSrc] === src && r[iTier] === 'T1' &&
+          r[iTerm] === term && r[iInt] === 'NonInterruptible' &&
+          r[iRegion]!.startsWith('US'))
+        .map((r) => parseFloat(r[iPrice]!))
+        .filter((v) => Number.isFinite(v) && v > 0);
+      if (vals.length) provs[src] = Math.min(...vals);
+    }
+    const vs = Object.values(provs).sort((a, b) => a - b);
+    // All three providers or the point doesn't print — a 2-of-3 point would
+    // silently change the panel, which is the exact defect this rework fixes.
+    if (vs.length < 3) return [];
+    return [{ months, value: vs[1]!, provs }];
+  });
+}
 
 interface Pt {
   x: number;
@@ -90,36 +129,36 @@ interface SeriesView {
   oneYPct: string | null;
 }
 
-function cellPoint(chip: string, cell: Rate | undefined, months: number): Pt | null {
-  if (!cell) return null;
-  const v = headlineValue(cell);
-  const tenorTxt = months === 0 ? 'on-demand (reference cell — broader panel than the term cells; not on the curve)' : months === 12 ? '1Y reserved' : '3Y reserved';
-  return {
-    x: xOf(months),
-    y: yOf(v),
-    months,
-    value: v,
-    prov: cell.promotion_status === 'Provisional',
-    title: `${chip} · ${tenorTxt} (Hyperscaler, US, guaranteed) · ${headlineStatOf(cell)} $${fmt(v)} · ${cell.n_sources} sources / ${cell.n_observations} obs · ${cell.promotion_status}`,
-  };
-}
-
-const series: SeriesView[] = CHIPS.flatMap(({ chip, cls }) => {
-  const pts = [
-    cellPoint(chip, tierOdCell('T1', chip, 'US'), 0),
-    ...TENORS.map((t) => cellPoint(chip, t1CommittedCellUS(chip, t.term), t.months)),
-  ].filter((p): p is Pt => p !== null);
-  if (pts.length < 2) return [];
-  // The line covers the RESERVED tenors only — the OD dot is a detached
-  // reference (its cell has more members than the term cells; connecting
-  // them would imply a within-book path that isn't in the data).
-  const linePts = pts.filter((p) => p.months > 0);
-  if (!linePts.length) return [];
-  const path = linePts
+const series: SeriesView[] = CSVS.flatMap(({ chip, cls, file }) => {
+  const cps = chipPoints(file);
+  const od = cps.find((p) => p.months === 0);
+  if (!od || cps.length < 2) return [];
+  const tenorTxt = (m: number) =>
+    m === 0 ? 'on-demand' : m === 12 ? '1Y reserved' : '3Y reserved';
+  const pts: Pt[] = cps.map((p) => ({
+    x: xOf(p.months),
+    y: yOf(p.value),
+    months: p.months,
+    value: p.value,
+    prov: false,
+    title:
+      `${chip} · ${tenorTxt(p.months)} (US, guaranteed) · median $${fmt(p.value)} of ` +
+      `AWS $${fmt(p.provs['aws']!)} · Azure $${fmt(p.provs['azure']!)} · ` +
+      `GCP $${fmt(p.provs['gcp']!)} (each provider's lowest posted US rate)`,
+  }));
+  // Uniform panel at every tenor — the line legitimately connects through OD.
+  const path = pts
     .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
     .join(' ');
   const end = pts[pts.length - 1]!;
-  return [{ chip, cls, path, pts, end, endPct: null, oneYPct: null }];
+  const pctVsOd = (v: number) =>
+    `−${Math.abs(Math.round((v / od.value - 1) * 100))}%`;
+  const y1 = cps.find((p) => p.months === 12);
+  return [{
+    chip, cls, path, pts, end,
+    endPct: end.months === 36 ? `${pctVsOd(end.value)} vs OD` : null,
+    oneYPct: y1 ? `1Y ${pctVsOd(y1.value)}` : null,
+  }];
 });
 
 // End-label collision handling (same scheme as the chart above).
@@ -153,11 +192,11 @@ const oneYearTags = series.flatMap((s) => {
 
 const chipNames = series.map((s) => s.chip).join(', ');
 const ariaLabel =
-  `Hyperscaler reserved levels, US region, as of ${meta.as_of_date}: USD per GPU-hour for ${chipNames}. ` +
-  `Each line connects the published 1-year and 3-year reservation cells; the on-demand cell is drawn as a detached reference dot ` +
-  `because it has more panel members than the term cells — no percentage comparisons are drawn between cells for that reason. ` +
-  `Within-provider term discounts are on the Neocloud chart above. ` +
-  `Hollow points are Provisional cells; hover any point for sources, observations and status.`;
+  `Hyperscaler reserved curves, US, as of ${meta.as_of_date}: USD per GPU-hour for ${chipNames}. ` +
+  `Each point is the median of AWS, Azure and GCP — the three hyperscalers publishing committed terms — ` +
+  `each entering as its lowest posted US rate at that tenor. Same panel at on-demand, 1-year and 3-year, ` +
+  `so each curve connects through on-demand and the percentage tags are within-panel discounts. ` +
+  `OCI publishes on-demand only and is excluded. Hover any point for the three provider rates behind it.`;
 ---
 <figure class="htc" aria-describedby="htc-caption">
   <div class="htc-head">
@@ -229,34 +268,40 @@ const ariaLabel =
 
   <figcaption class="htc-foot" id="htc-caption">
     <span class="htc-note">
-      Published reservation schedules · Hyperscaler (T1) · US · guaranteed ·
-      as of {meta.as_of_date}
+      Median of AWS · Azure · GCP posted schedules (lowest US rate each) ·
+      guaranteed · OCI excluded (on-demand only) · as of {meta.as_of_date}
     </span>
     <details class="htc-details">
       <summary>Chart notes</summary>
       <ul class="htc-notes-list">
-        <li>Published T1 US reference cells plotted directly as dollar
-        levels — the operators' own posted reservation schedules at
-        on-demand, 1-year and 3-year terms. US region only; this section
-        does not pool geographies.</li>
-        <li><strong>No % vs on-demand is shown, deliberately.</strong> The
-        on-demand cell carries more panel members than the term cells, so a
-        cell-to-cell percentage would difference two different panels and
-        overstate or understate any operator's actual discount. The OD dot
-        is drawn detached from the curve for the same reason. Within-provider
-        term discounts — each operator's committed ask against its own
-        on-demand rate — are the chart above.</li>
+        <li>Each point is the median of AWS, Azure and GCP — the three
+        hyperscalers that publish committed terms — with each provider
+        entering as its lowest posted US guaranteed rate at that tenor.
+        The same three providers stand behind every point, so the curve
+        connects through on-demand and the percentage tags are honest
+        within-panel discounts. US only; this section does not pool
+        geographies.</li>
+        <li><strong>OCI is excluded, deliberately.</strong> OCI publishes
+        on-demand prices only — no reserved or committed rate appears on
+        any public OCI surface we capture, for any chip we track. Adding
+        an on-demand-only seller would change the panel at one tenor and
+        manufacture curve shape. If OCI ever posts a committed lane, it
+        joins.</li>
         <li>A reservation price is a fixed schedule — the posted price of a
         commitment starting today, held for its term. Not a forecast of
         future on-demand rates.</li>
-        <li>Every committed cell on this chart carries the same
-        three-provider panel (AWS, Azure, GCP); the on-demand cells add
-        OCI. AWS's H100 1-year vote is its convertible reserved class —
-        AWS publishes no standard 1-year offering for that instance, and
-        the convertible rate is its only posted 1-year commitment.</li>
-        <li>Hollow points = Provisional cells (thin panels; n on hover).
-        Azure lists 5-year reservations but no 5-year series prints yet —
-        the tenor joins when it clears the series gate.</li>
+        <li>AWS's H100 1-year leg is its convertible reserved class — AWS
+        publishes no standard 1-year offering for that instance, and the
+        convertible rate is its only posted 1-year commitment.</li>
+        <li><strong>H200 is absent for the same panel discipline.</strong>
+        AWS's posted US H200 reserved rates left its price file on
+        2026-08-11 (last US print 2026-08-10; its APAC and EU H200
+        reserved rates remain posted). With only two of the three
+        providers publishing US committed H200 terms, the curve does not
+        draw. It returns when the full panel prints.</li>
+        <li>Azure lists 5-year reservations but no 5-year point prints yet
+        — the tenor joins when the full panel publishes it. Hover any
+        point for the three provider rates behind the median.</li>
       </ul>
     </details>
   </figcaption>

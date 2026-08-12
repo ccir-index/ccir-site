@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import TermCurveChart from '../components/TermCurveChart.astro';
-import HyperscalerLadders from '../components/HyperscalerLadders.astro';
+// HyperscalerLadders retired from the page 2026-08-12 (see section 02 note).
 // HyperscalerTermChart PULLED same-day it shipped (John, 2026-07-16): T1 US
 // cells were n=2-4 and cell-to-cell %s manufactured a fake H200 "1Y −26%"
 // (within-provider truth: −7%). REINSTATED 2026-08-12 (John): every T1 US
@@ -86,7 +86,9 @@ import { meta } from '../data/snapshot';
       </header>
 
       <HyperscalerTermChart />
-      <HyperscalerLadders />
+      {/* HyperscalerLadders (H100-only per-provider schedules) RETIRED from
+          the page 2026-08-12 (John): the multi-chip uniform-panel chart
+          above covers the section; component stays in src/components. */}
     </section>
 
   </section>
