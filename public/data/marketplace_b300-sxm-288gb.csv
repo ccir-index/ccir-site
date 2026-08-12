@@ -1,19 +1,4 @@
 as_of_date,collected_at,collection_window_id,source_name,source_display_name,silicon_id,gpu_model,form_factor,commitment_term,interruptibility,region,cheapest_usd_hour,median_usd_hour,n_listings,methodology_version
-2026-08-05,2026-08-05T09:52:40.099864+00:00,2026-08-04-1800,runpod_cluster,RunPod · Cluster,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,8.8680,,,v2.2.1
-2026-08-05,2026-08-05T09:52:40.099864+00:00,2026-08-04-1800,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.2.1
-2026-08-05,2026-08-05T09:52:40.099864+00:00,2026-08-04-1800,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.2.1
-2026-08-05,2026-08-05T09:52:40.099864+00:00,2026-08-04-1800,runpod_spot,RunPod · Spot,b300-sxm-288gb,B300,SXM,OnDemand,Interruptible,Other,6.9400,,,v2.2.1
-2026-08-05,2026-08-05T12:34:37.586912+00:00,2026-08-05-0600,runpod_cluster,RunPod · Cluster,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,8.8680,,,v2.2.1
-2026-08-05,2026-08-05T12:34:37.586912+00:00,2026-08-05-0600,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.2.1
-2026-08-05,2026-08-05T12:34:37.586912+00:00,2026-08-05-0600,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.2.1
-2026-08-05,2026-08-05T12:34:37.586912+00:00,2026-08-05-0600,runpod_spot,RunPod · Spot,b300-sxm-288gb,B300,SXM,OnDemand,Interruptible,Other,6.9400,,,v2.2.1
-2026-08-05,2026-08-05T18:31:14.949197+00:00,2026-08-05-1000,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.2.1
-2026-08-05,2026-08-05T18:31:14.949197+00:00,2026-08-05-1000,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.2.1
-2026-08-05,2026-08-05T18:31:14.949197+00:00,2026-08-05-1000,runpod_spot,RunPod · Spot,b300-sxm-288gb,B300,SXM,OnDemand,Interruptible,Other,6.9400,,,v2.2.1
-2026-08-05,2026-08-05T21:25:15.701870+00:00,2026-08-05-1400,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.2.1
-2026-08-05,2026-08-05T21:25:15.701870+00:00,2026-08-05-1400,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.2.1
-2026-08-05,2026-08-06T00:23:00.795983+00:00,2026-08-05-1800,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.2.1
-2026-08-05,2026-08-06T00:23:00.795983+00:00,2026-08-05-1800,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.2.1
 2026-08-06,2026-08-06T09:54:01.153396+00:00,2026-08-05-1800,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.2.1
 2026-08-06,2026-08-06T09:54:01.153396+00:00,2026-08-05-1800,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.2.1
 2026-08-06,2026-08-06T09:54:01.153396+00:00,2026-08-05-1800,runpod_spot,RunPod · Spot,b300-sxm-288gb,B300,SXM,OnDemand,Interruptible,Other,6.9400,,,v2.2.1
@@ -93,3 +78,5 @@ as_of_date,collected_at,collection_window_id,source_name,source_display_name,sil
 2026-08-11,2026-08-11T21:16:18.100173+00:00,2026-08-11-1400,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.2.1
 2026-08-11,2026-08-12T00:16:53.010238+00:00,2026-08-11-1800,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.2.1
 2026-08-11,2026-08-12T00:16:53.010238+00:00,2026-08-11-1800,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.2.1
+2026-08-12,2026-08-12T06:27:33.663559+00:00,2026-08-11-1800,runpod_community,RunPod · Community,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,6.9400,,,v2.2.1
+2026-08-12,2026-08-12T06:27:33.663559+00:00,2026-08-11-1800,runpod_secure,RunPod · Secure,b300-sxm-288gb,B300,SXM,OnDemand,NonInterruptible,Other,7.3900,,,v2.2.1
