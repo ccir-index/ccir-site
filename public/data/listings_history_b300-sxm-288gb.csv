@@ -884,5 +884,6 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-08-12,qubrid,b300-sxm-288gb,B300,288GB,SXM,Unknown,1Y,NonInterruptible,Reserved,Other,Other,SIF,T2IF,T2,5.5565,False,,Available,v2.2.1,panel,
 2026-08-12,runpod_community,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,6.9400,False,,Available,v2.2.1,panel,Global
 2026-08-12,runpod_secure,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T2IF,T3,7.3900,True,local-nvme,Available,v2.2.1,panel,Global
+2026-08-12,runpod_secure,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,Other,Other,DIF,T2IF,T3,6.9400,True,local-nvme,Available,v2.2.1,panel,Global
 2026-08-12,scaleway,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T3IF,T2,8.6550,True,local-nvme,Available,v2.2.1,panel,fr-par-2
 2026-08-12,spheron,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,Interruptible,Spot,Other,Other,DIF,T3IF,T3,5.8101,False,,Available,v2.2.1,panel,uk-south-1
