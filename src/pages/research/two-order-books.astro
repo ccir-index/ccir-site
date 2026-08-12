@@ -1,0 +1,1175 @@
+---
+/*
+  Two Order Books, Two Funding Machines — CRWV + NBIS demand read in
+  two layers: the guidance layer as disclosed, then cash and contracts.
+  Published 2026-08-12. Call quotes verified: CoreWeave vs its corrected transcript;
+  Nebius vs two independent transcripts (footnotes 2 and 4).
+  Every computed ratio is labeled "computed" on the chart that shows it.
+  Chart pair #3b82f6 (CRWV) / #c96f06 (NBIS) validated with the dataviz
+  six-checks script against both theme surfaces (terminal #111418,
+  editorial #fbf7ee): worst CVD ΔE 27.4, normal-vision ΔE 33.1 — PASS.
+  Series identity is also carried by shape (line vs step) and by the
+  legend, never color alone.
+*/
+import Base from '../../layouts/Base.astro';
+const AS_OF = '2026-08-12';
+
+const C_CRWV = '#3b82f6';
+const C_NBIS = '#c96f06';
+
+// ---- shared time axis for charts 1 and 2: months since Dec 2023 (0..30) --
+const XW = 700, XL = 50, XR = 118;
+const xm = (m: number) => XL + (m / 30) * (XW - XL - XR);
+const X_TICKS = [
+  { m: 0, l: 'Dec ’23' }, { m: 6, l: 'Jun ’24' }, { m: 12, l: 'Dec ’24' },
+  { m: 18, l: 'Jun ’25' }, { m: 24, l: 'Dec ’25' }, { m: 30, l: 'Jun ’26' },
+];
+
+// ---- Chart 1: deferred revenue history, $B -------------------------------
+// CRWV = line (a convention-driven ramp: 15–25%-of-TCV prepay across all
+// committed contracts; annual prints for 2023/2024, quarterly after).
+// NBIS = step (near-zero until Q4-25, then two contracts move the whole
+// balance; a step-after path is the honest shape for that history).
+const H1 = 300, T1 = 26, B1 = 44;
+const y1 = (v: number) => T1 + (1 - v / 10) * (H1 - T1 - B1);
+const Y1_TICKS = [0, 2, 4, 6, 8, 10];
+const CRWV_DR = [
+  { m: 0,  v: 2.0047, t: 'Dec 31, 2023 · $2.0B · 424B4 (S-1 financials)' },
+  { m: 12, v: 4.0639, t: 'Dec 31, 2024 · $4.1B · 424B4' },
+  { m: 15, v: 4.048,  t: 'Mar 31, 2025 · $4.0B · 10-Q' },
+  { m: 18, v: 4.8475, t: 'Jun 30, 2025 · $4.8B · 10-Q' },
+  { m: 21, v: 5.3358, t: 'Sep 30, 2025 · $5.3B · 10-Q' },
+  { m: 24, v: 8.185,  t: 'Dec 31, 2025 · $8.2B · 10-K' },
+  { m: 27, v: 7.523,  t: 'Mar 31, 2026 · $7.5B · 10-Q' },
+  { m: 30, v: 9.692,  t: 'Jun 30, 2026 · $9.7B · 10-Q filed Aug 12, 2026' },
+];
+const NBIS_DR = [
+  { m: 9,  v: 0.0174, t: 'Sep 30, 2024 · $17.4M · 6-K' },
+  { m: 12, v: 0.0165, t: 'Dec 31, 2024 · $16.5M · 6-K / 20-F' },
+  { m: 15, v: 0.019,  t: 'Mar 31, 2025 · $19.0M · 6-K' },
+  { m: 18, v: 0.0193, t: 'Jun 30, 2025 · $19.3M · 6-K' },
+  { m: 21, v: 0.0156, t: 'Sep 30, 2025 · $15.6M · 6-K' },
+  { m: 24, v: 1.5775, t: 'Dec 31, 2025 · $1.6B · 6-K / 20-F' },
+  { m: 27, v: 4.7781, t: 'Mar 31, 2026 · $4.8B · 6-K' },
+  { m: 30, v: 5.9752, t: 'Jun 30, 2026 · $6.0B · 6-K filed Aug 12, 2026' },
+];
+const crwvDrPath = CRWV_DR
+  .map((p, i) => `${i === 0 ? 'M' : 'L'}${xm(p.m).toFixed(1)},${y1(p.v).toFixed(1)}`)
+  .join(' ');
+const nbisDrPath = NBIS_DR
+  .map((p, i) => i === 0
+    ? `M${xm(p.m).toFixed(1)},${y1(p.v).toFixed(1)}`
+    : `H${xm(p.m).toFixed(1)} V${y1(p.v).toFixed(1)}`)
+  .join(' ');
+
+// ---- Chart 2: deferred revenue as % of total debt [computed] --------------
+// The divergence chart. Both series print 38% at Dec 31, 2025 and cross.
+// NBIS drawn only from Jun 2025: before that its debt was near nil and the
+// ratio is not meaningful (said in the caption).
+const H2 = 290, T2 = 32, B2 = 44;
+const y2 = (p: number) => T2 + (1 - p / 140) * (H2 - T2 - B2);
+const Y2_TICKS = [0, 25, 50, 75, 100, 125];
+const CRWV_PD = [
+  { m: 0,  p: 132, t: 'Dec 31, 2023 · $2,004.7M ÷ $1,523.3M = 132% [computed]' },
+  { m: 12, p: 51,  t: 'Dec 31, 2024 · $4,063.9M ÷ $7,926.3M = 51% [computed]' },
+  { m: 15, p: 46,  t: 'Mar 31, 2025 · 46% [computed]' },
+  { m: 18, p: 44,  t: 'Jun 30, 2025 · 44% [computed]' },
+  { m: 21, p: 38,  t: 'Sep 30, 2025 · 38% [computed]' },
+  { m: 24, p: 38,  t: 'Dec 31, 2025 · $8,185M ÷ $21,373M = 38% [computed]' },
+  { m: 27, p: 30,  t: 'Mar 31, 2026 · 30% [computed]' },
+  { m: 30, p: 28,  t: 'Jun 30, 2026 · $9,692M ÷ $35,068M net carrying = 28% [computed]' },
+];
+const NBIS_PD = [
+  { m: 18, p: 2,   t: 'Jun 30, 2025 · $19.3M ÷ $986.2M = 2% [computed]' },
+  { m: 21, p: 0.4, t: 'Sep 30, 2025 · $15.6M ÷ $4,106.8M = 0.4% [computed]' },
+  { m: 24, p: 38,  t: 'Dec 31, 2025 · $1,577.5M ÷ $4,127.7M = 38% [computed]' },
+  { m: 27, p: 57,  t: 'Mar 31, 2026 · $4,778.1M ÷ $8,450.4M = 57% [computed]' },
+  { m: 30, p: 70,  t: 'Jun 30, 2026 · $5,975.2M ÷ $8,545.7M = 70% [computed]' },
+];
+const crwvPdPath = CRWV_PD
+  .map((p, i) => `${i === 0 ? 'M' : 'L'}${xm(p.m).toFixed(1)},${y2(p.p).toFixed(1)}`)
+  .join(' ');
+const nbisPdPath = NBIS_PD
+  .map((p, i) => `${i === 0 ? 'M' : 'L'}${xm(p.m).toFixed(1)},${y2(p.p).toFixed(1)}`)
+  .join(' ');
+
+// ---- Chart 3: quarterly prepay inflow ÷ quarterly capex [computed] --------
+// Grouped bars, six quarters. Negative = consumption of prepayments outran
+// new inflow that quarter. The 100% line is a quarter fully funded by
+// customer cash; NBIS Q1-26 is the only bar past it at either firm.
+const W3 = 700, H3 = 300, T3 = 30, B3 = 48, L3 = 50, R3 = 24;
+const y3 = (p: number) => T3 + ((140 - p) / 160) * (H3 - T3 - B3);
+const Y3_TICKS = [0, 50, 100];
+const BW3 = 26;
+const gx = (i: number) => L3 + ((i + 0.5) / 6) * (W3 - L3 - R3);
+const COV = [
+  { q: 'Q1 ’25', c: -1, n: 0,
+    ct: 'CRWV Q1 2025 · −$15.9M ÷ $1,407.4M = −1% [computed]',
+    nt: 'NBIS Q1 2025 · +$2.5M ÷ $543.9M ≈ 0% [computed]' },
+  { q: 'Q2 ’25', c: 33, n: 0,
+    ct: 'CRWV Q2 2025 · +$799.5M ÷ $2,453.0M = 33% [computed]',
+    nt: 'NBIS Q2 2025 · +$0.3M ÷ $510.6M ≈ 0% [computed]' },
+  { q: 'Q3 ’25', c: 20, n: 0,
+    ct: 'CRWV Q3 2025 · +$488.3M ÷ $2,388.9M = 20% [computed]',
+    nt: 'NBIS Q3 2025 · −$3.7M ÷ $955.5M ≈ 0% [computed]' },
+  { q: 'Q4 ’25', c: 70, n: 76,
+    ct: 'CRWV Q4 2025 · +$2,849.2M ÷ $4,059.8M = 70% [computed]',
+    nt: 'NBIS Q4 2025 · +$1,561.9M ÷ $2,056.0M = 76% [computed] · first Microsoft tranche' },
+  { q: 'Q1 ’26', c: -9, n: 129,
+    ct: 'CRWV Q1 2026 · −$662M ÷ $7,695M = −9% [computed]',
+    nt: 'NBIS Q1 2026 · +$3,200.6M ÷ $2,472.9M = 129% [computed] · the only customer-outfunded quarter at either firm' },
+  { q: 'Q2 ’26', c: 34, n: 21,
+    ct: 'CRWV Q2 2026 · +$2,169M ÷ $6,422M = 34% [computed]',
+    nt: 'NBIS Q2 2026 · +$1,197.1M ÷ $5,657.4M = 21% [computed]' },
+];
+const covLab = (v: number) => (v === 0 ? '~0' : v < 0 ? `−${Math.abs(v)}` : `${v}`);
+
+// ---- Chart 4: NBIS ACV per MW ladder, $M [letter, approximate] ------------
+// Three labeled steps from the shareholder-letter infographic. The two
+// upper steps are stated as floors ("more than"); drawn with a dashed
+// whisker above the bar so the floor reads as a floor.
+const W4 = 560, H4 = 250, T4 = 30, B4 = 46, L4 = 54, R4 = 20;
+const y4 = (v: number) => T4 + (1 - v / 50) * (H4 - T4 - B4);
+const Y4_TICKS = [0, 10, 20, 30, 40, 50];
+const BW4 = 104;
+const x4 = (i: number) => L4 + ((i + 0.5) / 3) * (W4 - L4 - R4);
+const LADDER = [
+  { k: '2026 base', v: 12, l: '$12M', gt: false,
+    t: '2026 base · approximately $12M ACV per MW · shareholder letter infographic ("all numbers are approximate")' },
+  { k: 'Q2 deals', v: 20, l: '>$20M', gt: true,
+    t: 'Q2 2026 landmark deals · more than $20M ACV per MW · letter: "an average yield of more than $20 million per megawatt", $20–25M on the four landmark deals' },
+  { k: 'Q3 short-term', v: 40, l: '>$40M', gt: true,
+    t: 'Q3 2026 short-term capacity deals · more than $40M ACV per MW · letter: "price opportunity in the $40-50 million per MW range and we signed our first one this week"' },
+];
+
+// ---- Chart 5: debt composition at Jun 30, 2026, $B · one dollar scale -----
+// Paired horizontal stacked bars. Within each bar, one hue stepped by
+// lightness encodes an ORDERED class: solid = secured, mid = collateral
+// basis not stated in the filing, light = unsecured. Steps validated with
+// the dataviz six-checks script against both theme surfaces (adjacent-step
+// normal-vision dE 15.4 light / 18.8 dark; lightness monotonic both modes).
+// Identity is carried by the per-segment direct labels and 2px surface
+// gaps, never by opacity alone. CRWV segments are gross principal from the
+// 10-Q schedule; NBIS is carrying value (the delta to principal is
+// accretion, said in the notes).
+const W5 = 700, H5 = 206, L5 = 118, R5 = 24;
+const x5 = (v: number) => L5 + (v / 36) * (W5 - L5 - R5);
+const X5_TICKS = [0, 10, 20, 30];
+const BH5 = 40, CRWV_Y5 = 36, NBIS_Y5 = 118;
+type Seg5 = { k: string; a: string; v: number; op: number; t: string };
+const seg5 = (rows: Seg5[]) => {
+  let c = 0;
+  return rows.map((r, i) => {
+    const x0 = x5(c);
+    c += r.v;
+    return { ...r, x: x0 + (i ? 1 : 0), w: Math.max(x5(c) - x0 - (i ? 1 : 0) - 1, 1.5) };
+  });
+};
+const CRWV_COMP = seg5([
+  { k: 'DDTLs', a: '$13.6B · secured', v: 13.643, op: 1,
+    t: 'DDTL facilities 1.0-5.0 · $13,643M gross drawn (facility sizes $2.3B/$7.6B/$3.0B/$2.6B/$8.5B/$3.1B) · secured; 10-Q: "collateralized with the assets underlying the contributed contracts and the pledged contractual cash flows" · DDTL 4.0 ($2,837M) non-recourse · eff. rates 7-15%; DDTL 4.0 SOFR + 2.25%, DDTL 5.0 SOFR + 4.50%' },
+  { k: 'Vendor', a: '$5.3B', v: 5.291, op: 0.55,
+    t: 'OEM and software license financing $5,102M (recourse $4,220M eff. 11%; non-recourse $882M eff. 9%) + Magnetar Loan (MagAI deposit obligation) $189M (eff. 12%) · collateral basis not stated in the 10-Q' },
+  { k: 'Senior notes', a: '$10.0B · unsec.', v: 10.029, op: 0.38,
+    t: 'Five senior note series · 2030 $2,000M · 2031 9.00% $1,750M · 2031 9.75% $2,750M · 2032 9.625% $1,250M · 2032 EUR (EUR 2,000M) $2,279M 8.50% · "The Senior Notes are unsecured obligations"' },
+  { k: 'Converts', a: '$6.6B · unsec.', v: 6.588, op: 0.38,
+    t: '2031 Convertible Senior Notes $2,588M 1.75% due Dec 2031 + 2032 Convertible Senior Notes $4,000M 1.75% due Oct 2032 · unsecured' },
+]);
+const NBIS_COMP = seg5([
+  { k: 'Convertible notes', a: '$8.5B · unsecured', v: 8.5457, op: 0.38,
+    t: 'Six senior unsecured convertible series · Jun 2025: $500M 2.00% due 2029 + $500M 3.00% due 2031 · Sep 2025: ~$1.58B 1.00% due 2030 + ~$1.58B 2.75% due 2032 · Mar 2026: $2,587.5M 1.25% due 2031 + $1,750M 2.625% due 2033 · $8,545.7M carrying vs ~$8,500M original principal (accretion)' },
+]);
+const NBIS_JULY = {
+  v: 0.775,
+  t: 'Secured facility · $775M · SOFR + 2.50% · raised July 2026, after quarter end · letter: "backed by deployed GPU infrastructure and contracted cash flows from an agreement with an investment-grade customer"',
+};
+---
+<Base
+  title="Two Order Books, Two Funding Machines · CCIR Research"
+  description="CoreWeave and Nebius demand read from cash and contracts: $9.7B and $6.0B of customer prepayments at June 30, feeding two opposite funding machines."
+>
+  <section class="wrap top">
+
+    <div class="page-head">
+      <div class="kicker">Market Intelligence · Research Note · {AS_OF}</div>
+      <h1>Two Order Books, Two Funding Machines</h1>
+      <p class="standfirst lede">
+        CoreWeave reported second-quarter results on August&nbsp;11 and
+        Nebius on August&nbsp;12, 2026. The two order books look alike.
+        The funding machines behind them run in opposite directions.
+      </p>
+    </div>
+
+    <div class="stats" role="list">
+      <div class="stat" role="listitem">
+        <div class="v">$2.6B</div>
+        <div class="k">CoreWeave Q2 revenue</div>
+        <div class="s">&#9650; 2.1&times; vs Q2 2025</div>
+      </div>
+      <div class="stat" role="listitem">
+        <div class="v">$582M</div>
+        <div class="k">Nebius Q2 revenue</div>
+        <div class="s">&#9650; 5.5&times; vs Q2 2025</div>
+      </div>
+      <div class="stat" role="listitem">
+        <div class="v">$29.0B</div>
+        <div class="k">CoreWeave non-convertible debt</div>
+      </div>
+      <div class="stat" role="listitem">
+        <div class="v">$775M</div>
+        <div class="k">Nebius non-convertible debt</div>
+      </div>
+    </div>
+    <p class="stats-basis">Revenue compares Q2 2026 with Q2 2025.
+      Debt is gross principal at June&nbsp;30, 2026; convertible notes,
+      which convert to shares above set prices and are often read as
+      quasi-equity, are shown separately. The Nebius figure is its
+      secured facility raised in July, after quarter end.</p>
+
+    <figure class="fig">
+      <div class="fig-title">Deferred revenue ÷ total debt, % · Dec ’23 – Jun ’26</div>
+      <div class="legend">
+        <span class="lg"><span class="sw" style={`background:${C_CRWV}`}></span>CoreWeave</span>
+        <span class="lg"><span class="sw" style={`background:${C_NBIS}`}></span>Nebius</span>
+      </div>
+      <svg viewBox={`0 0 ${XW} ${H2}`} role="img" aria-label="Deferred revenue as a percent of total debt. CoreWeave falls from 132 percent in December 2023 to 28 percent in June 2026. Nebius starts at 2 percent in June 2025, dips to 0.4, then rises to 70 percent in June 2026. Both series print 38 percent in December 2025, where the lines cross. A dashed line marks 100 percent, prepayments equal to the whole debt stack.">
+        {Y2_TICKS.map((t) => (
+          <>
+            <line x1={XL} y1={y2(t)} x2={XW - XR} y2={y2(t)} class="grid" />
+            <text x={XL - 8} y={y2(t) + 3} class="tick t-end">{t}</text>
+          </>
+        ))}
+        <line x1={XL} y1={y2(100)} x2={XW - XR} y2={y2(100)} stroke="var(--ink-faint)" stroke-width="1.2" stroke-dasharray="4 4" />
+        <text x={XW - XR - 4} y={y2(100) - 7} class="rowsub t-end lab-halo">prepay = total debt</text>
+        {X_TICKS.map((t) => (
+          <text x={xm(t.m)} y={H2 - B2 + 20} class="tick t-mid">{t.l}</text>
+        ))}
+        <path d={crwvPdPath} fill="none" stroke={C_CRWV} stroke-width="2" stroke-linejoin="round" />
+        <path d={nbisPdPath} fill="none" stroke={C_NBIS} stroke-width="2" stroke-linejoin="round" />
+        {CRWV_PD.map((p) => (
+          <circle cx={xm(p.m)} cy={y2(p.p)} r="3.6" fill={C_CRWV} stroke="var(--surface)" stroke-width="2">
+            <title>{`CoreWeave · ${p.t}`}</title>
+          </circle>
+        ))}
+        {NBIS_PD.map((p) => (
+          <circle cx={xm(p.m)} cy={y2(p.p)} r="3.6" fill={C_NBIS} stroke="var(--surface)" stroke-width="2">
+            <title>{`Nebius · ${p.t}`}</title>
+          </circle>
+        ))}
+        <text x={xm(0) + 8} y={y2(132) - 8} class="dlab" fill={C_CRWV}>132%</text>
+        <text x={xm(30) + 10} y={y2(28) + 3} class="dlab" fill={C_CRWV}>CRWV 28%</text>
+        <text x={xm(30) + 10} y={y2(70) + 3} class="dlab" fill={C_NBIS}>NBIS 70%</text>
+      </svg>
+      <figcaption class="fig-foot">
+        <p class="fig-read">CoreWeave&rsquo;s falling line is a
+        denominator story: its prepayments grew about five-fold from
+        the end of 2023 while its borrowings grew more than
+        twenty-fold. Nebius&rsquo;s rising line is the numerator: prepayments
+        growing faster than the debt beneath them.</p>
+      <details class="fig-details">
+          <summary>Chart notes</summary>
+          <ul class="fig-notes-list">
+            <li>Computed: total deferred revenue divided by the carrying
+            value of total debt, current plus non-current, at each period
+            end. Hover any point for the filed inputs.</li>
+            <li>Nebius is drawn from June 2025; before that its debt was
+            near nil and the ratio is not meaningful.</li>
+            <li>Both series print 38% at December&nbsp;31, 2025, where
+            the lines cross.</li>
+            <li>CoreWeave's June 2026 denominator is the four
+            balance-sheet debt lines summed, $35.1&nbsp;billion net
+            carrying value.</li>
+            <li>Total debt is borrowings at net carrying value and excludes
+            lease liabilities, which both companies report separately under
+            ASC 842: $16.5B at CoreWeave and $1.5B non-current at Nebius at
+            June 30, 2026. Including leases moves the pair from 28% / 70% to
+            about 19% / 59% [computed; Nebius does not separately disclose
+            its current lease portion, so its adjusted figure is slightly
+            understated]. The ordering does not change.</li>
+          </ul>
+        </details>
+      </figcaption>
+    </figure>
+
+    <h2>1 · The Guidance Layer</h2>
+    <p>
+      Nebius wrote that it is "reaffirming our full-year 2026 guidance
+      across all metrics" and raised its year-end contracted-power
+      guide from more than 4&nbsp;GW to
+      5&nbsp;GW.<sup class="fnr"><a href="#fn1">1</a></sup> CoreWeave
+      raised its full-year revenue guide and its capital expenditure
+      (capex) guide.<sup class="fnr"><a href="#fn2">2</a></sup> A year
+      ago both companies guided far lower. The table shows the same
+      measures twelve months apart.
+    </p>
+    <div class="gtable-wrap">
+      <table class="gtable">
+        <thead>
+          <tr><th></th><th>August 2025</th><th>August 2026</th><th>Change</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>CoreWeave full-year revenue guide<sup class="fnr"><a href="#fn2">2</a></sup></td>
+            <td>$5.15–5.35B <span class="dim">(FY25)</span></td>
+            <td>$12.4–13.2B <span class="dim">(FY26)</span></td>
+            <td>~2.4×</td></tr>
+          <tr><td>CoreWeave capex guide<sup class="fnr"><a href="#fn2">2</a></sup></td>
+            <td>$20–23B <span class="dim">(FY25)</span></td>
+            <td>$35–39B <span class="dim">(FY26)</span></td>
+            <td>~1.7×</td></tr>
+          <tr><td>CoreWeave Q2 revenue</td>
+            <td>$1.2B</td>
+            <td>$2.6B</td>
+            <td>2.1×</td></tr>
+          <tr><td>Nebius year-end ARR guide</td>
+            <td>$0.9–1.1B <span class="dim">(YE25)</span></td>
+            <td>$7–9B <span class="dim">(YE26)</span></td>
+            <td>~8×</td></tr>
+          <tr><td>Nebius Q2 revenue</td>
+            <td>$105.1M</td>
+            <td>$582.3M</td>
+            <td>5.5×</td></tr>
+          <tr><td>Nebius contracted-power guide<sup class="fnr"><a href="#fn1">1</a></sup></td>
+            <td>&gt;1 GW <span class="dim">(YE25)</span></td>
+            <td>5 GW <span class="dim">(YE26)</span></td>
+            <td>~5×</td></tr>
+        </tbody>
+      </table>
+      <p class="gtable-note">ARR is annual recurring revenue. Change
+      column compares range midpoints; the power row compares stated
+      floors. Guide sources and dates are in Sources &amp; method.</p>
+    </div>
+
+    <h2>2 · The Cash Evidence</h2>
+    <p>
+      Both figures come from balance sheets on EDGAR, dated
+      June&nbsp;30, 2026.
+      CoreWeave's 10-Q, filed August&nbsp;12, puts deferred revenue at
+      $9.7&nbsp;billion, up from $8.2&nbsp;billion at year-end. Nebius
+      reports $6.0&nbsp;billion, split $1.0&nbsp;billion current and
+      $5.0&nbsp;billion non-current, up from $1.6&nbsp;billion at
+      year-end 2025. Deferred revenue here is
+      cash customers have already paid for compute not yet delivered.
+    </p>
+    <p>
+      The Nebius balance now stands at about 70% of its
+      $8.5&nbsp;billion debt stack. Customers fund its buildout at
+      nearly the scale lenders do.
+    </p>
+
+    <figure class="fig">
+      <div class="fig-title">Deferred revenue, $B · Dec ’23 – Jun ’26 · EDGAR balance sheets</div>
+      <div class="legend">
+        <span class="lg"><span class="sw" style={`background:${C_CRWV}`}></span>CoreWeave</span>
+        <span class="lg"><span class="sw" style={`background:${C_NBIS}`}></span>Nebius</span>
+      </div>
+      <svg viewBox={`0 0 ${XW} ${H1}`} role="img" aria-label="Deferred revenue in billions of dollars, December 2023 to June 2026. CoreWeave rises from 2.0 to 9.7 billion in a broad ramp with a dip in the first quarter of 2026. Nebius holds near zero until the third quarter of 2025, then steps to 1.6, 4.8, and 6.0 billion.">
+        {Y1_TICKS.map((t) => (
+          <>
+            <line x1={XL} y1={y1(t)} x2={XW - XR} y2={y1(t)} class="grid" />
+            <text x={XL - 8} y={y1(t) + 3} class="tick t-end">{t}</text>
+          </>
+        ))}
+        {X_TICKS.map((t) => (
+          <text x={xm(t.m)} y={H1 - B1 + 20} class="tick t-mid">{t.l}</text>
+        ))}
+        <path d={crwvDrPath} fill="none" stroke={C_CRWV} stroke-width="2" stroke-linejoin="round" />
+        <path d={nbisDrPath} fill="none" stroke={C_NBIS} stroke-width="2" stroke-linejoin="round" />
+        {CRWV_DR.map((p) => (
+          <circle cx={xm(p.m)} cy={y1(p.v)} r="3.6" fill={C_CRWV} stroke="var(--surface)" stroke-width="2">
+            <title>{`CoreWeave · ${p.t}`}</title>
+          </circle>
+        ))}
+        {NBIS_DR.map((p) => (
+          <circle cx={xm(p.m)} cy={y1(p.v)} r="3.6" fill={C_NBIS} stroke="var(--surface)" stroke-width="2">
+            <title>{`Nebius · ${p.t}`}</title>
+          </circle>
+        ))}
+        <text x={xm(30) + 10} y={y1(9.692) + 3} class="dlab" fill={C_CRWV}>CRWV $9.7B</text>
+        <text x={xm(30) + 10} y={y1(5.9752) + 3} class="dlab" fill={C_NBIS}>NBIS $6.0B</text>
+        <text x={xm(24) - 6} y={y1(1.5775) - 10} class="anno t-end">Q4 ’25 · first Microsoft tranche</text>
+      </svg>
+      <figcaption class="fig-foot">
+        <details class="fig-details">
+          <summary>Chart notes</summary>
+          <ul class="fig-notes-list">
+            <li>Total deferred revenue, current plus non-current, at
+            each period end. Hover any point for the dated figure and
+            its filing.</li>
+            <li>CoreWeave's 2023 and 2024 marks are year-end prints from
+            the 424B4 prospectus; quarterly from Q1 2025.</li>
+            <li>Nebius reported a single near-zero line through Q3 2025,
+            mostly its edtech business, so its series is drawn as steps
+            between reported balances.</li>
+          </ul>
+        </details>
+      </figcaption>
+    </figure>
+
+    <h2>3 · The Contract Evidence · CoreWeave</h2>
+    <p>
+      The August&nbsp;11 call supplied the contract side.<sup class="fnr"><a href="#fn2">2</a></sup>
+      The chief financial officer cited an "approximately 25% increase across SKUs" in
+      July. A SKU here is a listed product configuration. That is
+      contract pricing.
+    </p>
+    <p>
+      The call also described "an A100 contract that extends into
+      2029."<sup class="fnr"><a href="#fn2">2</a></sup> That is a 2020
+      chip taking new multi-year commitments, with old-generation
+      average selling prices (ASP) at or above a year ago. What the chip
+      itself trades for sits on our
+      <a href="/hardware">hardware record</a>.
+    </p>
+
+    <h2>4 · The Contract Evidence · Nebius</h2>
+    <p>
+      Nebius's second-quarter shareholder letter reports "four
+      landmark deals" at "an average total
+      contract value (TCV) of more than $1&nbsp;billion each, and a
+      yield of $20-25&nbsp;million per megawatt." Two are named,
+      Reflection and Cohere. The letter describes the other two only as
+      a US AI lab and a US quantitative trading firm.
+      "TCV of Q2 wins grew nearly 4x quarter-over-quarter."
+    </p>
+    <p>
+      The prepay terms are stated as deal economics: "70% of deals
+      including prepayments, covering 50-60% of the associated capex,"
+      with an expected payback of "1 year and 10 months, down from our
+      two-to-three year payback period
+      previously."<sup class="fnr"><a href="#fn3">3</a></sup> The letter
+      also reports "more than 30% higher pricing on older-generation
+      GPUs versus Q1," which pairs with CoreWeave's old-generation ASP
+      line. Both books are repricing old silicon upward. Nebius presents
+      its deal yields as a ladder; the chart below shows it in annual
+      contract value (ACV) per megawatt.
+    </p>
+    <p>
+      The August&nbsp;12 call put those numbers into a deal
+      architecture. Arkady
+      Volozh, the chief executive, described three types. Mid-term
+      contracts of one to three years are the core, at "a yield of
+      $20&nbsp;million-$25&nbsp;million per
+      megawatt."<sup class="fnr"><a href="#fn4">4</a></sup> The
+      second type is "shorter-duration capacity, typically for up to
+      six months," for customers "ready to pay a significant
+      premium": "We are negotiating deals for
+      $40&nbsp;million-$50&nbsp;million per megawatt range, and
+      sometimes above."<sup class="fnr"><a href="#fn4">4</a></sup>
+      Marc Boroditsky, the chief revenue officer, said the company is
+      "deliberately allocating a portion of capacity for short-term
+      and immediate needs because that is where we currently see the
+      highest potential for combined realized
+      value."<sup class="fnr"><a href="#fn4">4</a></sup> The third
+      type is "long-term contracts with investment-grade customers."
+      Volozh said they "help us to finance our build-out faster and
+      more efficiently," and that "with $40&nbsp;billion in
+      contracted backlog, we will do more of
+      this."<sup class="fnr"><a href="#fn4">4</a></sup>
+     How much capacity sits in each book is not disclosed.
+      Six months is also not the short end of this market.
+      SpaceX&rsquo;s largest compute agreement can be exited on ninety
+      days&rsquo; notice, the fully price-exposed end of the same
+      spectrum. We read that book in
+      <a href="/research/the-nearer-frontier">The Nearer Frontier</a>.</p>
+
+    <figure class="fig">
+      <div class="fig-title">Nebius ACV per MW, $M · 2026 base → Q3 ’26 deals · shareholder letter, approximate</div>
+      <svg viewBox={`0 0 ${W4} ${H4}`} role="img" aria-label="Three steps of annual contract value per megawatt: 12 million dollars for the 2026 base, more than 20 million for second-quarter deals, more than 40 million for third-quarter short-term deals. The letter marks all numbers as approximate.">
+        {Y4_TICKS.map((t) => (
+          <>
+            <line x1={L4} y1={y4(t)} x2={W4 - R4} y2={y4(t)} class="grid" />
+            <text x={L4 - 8} y={y4(t) + 3} class="tick t-end">{t}</text>
+          </>
+        ))}
+        <line x1={L4} y1={y4(0)} x2={W4 - R4} y2={y4(0)} class="axis" />
+        {LADDER.map((s, i) => (
+          <>
+            <rect x={x4(i) - BW4 / 2} y={y4(s.v)} width={BW4}
+                  height={y4(0) - y4(s.v)} rx="4" fill={C_NBIS} opacity="0.9">
+              <title>{s.t}</title>
+            </rect>
+            {s.gt && (
+              <line x1={x4(i)} y1={y4(s.v) - 2} x2={x4(i)} y2={y4(s.v) - 16}
+                    stroke={C_NBIS} stroke-width="2" stroke-dasharray="3 3" />
+            )}
+            <text x={x4(i)} y={y4(s.v) - (s.gt ? 22 : 8)} class="dlab t-mid" fill={C_NBIS}>{s.l}</text>
+            <text x={x4(i)} y={H4 - B4 + 20} class="tick t-mid">{s.k}</text>
+          </>
+        ))}
+      </svg>
+      <figcaption class="fig-foot">
+        <details class="fig-details">
+          <summary>Chart notes</summary>
+          <ul class="fig-notes-list">
+            <li>From the infographic in the letter of
+            August&nbsp;12, 2026, which states "all numbers
+            are approximate," on a revenue-recognition basis excluding
+            any prepayment.</li>
+            <li>The two upper steps are floors: the letter gives "more
+            than $20&nbsp;million" for Q2 deals and a
+            "$40-50&nbsp;million per MW range" for Q3 short-term
+            capacity, with the first such deal signed the week of the
+            letter.</li>
+            <li>The dashed whisker marks a stated floor, not a measured
+            top.</li>
+          </ul>
+        </details>
+      </figcaption>
+    </figure>
+
+    <h2>5 · The Scale of the Demand</h2>
+    <p>
+      Nebius states the scale plainly. The strongest single line in
+      the letter:
+    </p>
+    <p class="epigraph">
+      "We could sell our entire 2027 capacity on these terms today. We
+      are deliberately not doing so because we see higher value in
+      retaining some capacity for immediate customer needs."
+    </p>
+    <p>
+      The letter counts "more than $40&nbsp;billion of customer
+      commitments." Four billion-dollar deals in one quarter, and a
+      new short-term lane at "$40-50&nbsp;million per MW," signed
+      first the week of the letter. On the
+      call, Boroditsky said a pilot capacity auction for Blackwell
+      chips cleared "15% higher than we have ever seen before, and
+      20% higher than our pipeline for
+      Blackwells."<sup class="fnr"><a href="#fn4">4</a></sup> On its
+      own ladder, the shortest commitments carry the highest
+      per-megawatt prices.
+    </p>
+    <p>
+      CoreWeave's account matches.<sup class="fnr"><a href="#fn2">2</a></sup>
+      Management described near-term capacity as "effectively sold out" and said
+      it expects "demand to meaningfully exceed supply for years."
+      Backlog stood at $104&nbsp;billion at June&nbsp;30 on the
+      company's own definition, which adds estimates of future payments
+      to remaining performance obligations
+      (RPO).<sup class="fnr"><a href="#fn5">5</a></sup> RPO is
+      contracted revenue not yet delivered. The 10-Q filed
+      August&nbsp;12 tags RPO itself at $103.7&nbsp;billion. The call
+      described "over $25 billion of net new customer commitments
+      added in the early weeks of Q3," and booked ARR for its managed
+      inference platform growing from $1&nbsp;million to more than
+      $100&nbsp;million since launch. July's repricing of approximately 25% across SKUs is
+      the price leg of the same book.
+    </p>
+    <p>
+      What follows is our reading of those disclosures, not a company
+      claim. A rising order book alone is
+      ambiguous, because backlogs grow in balanced markets too. Here
+      both order books rise while unit prices rise across every tenor,
+      and the shortest commitments carry the highest per-megawatt
+      prices. That combination is the signature of demand outrunning
+      supply. Both managements say so in their own words. The prices
+      behave as if they are right.
+    </p>
+
+    <h2>6 · The Funding Split</h2>
+    <p>
+      Same demand, two opposite machines.
+      The cost of the two machines shows on the income statement.
+      CoreWeave’s interest expense reached $640&nbsp;million in the
+      second quarter, up from $267&nbsp;million a year earlier. That is
+      an annualized run rate near $2.6&nbsp;billion against the 9 to 15
+      percent paper above. The coupons on Nebius’s convertible notes
+      run 1.00 to 3.00 percent. Scaled to revenue, the two stacks sit at nearly the same
+      altitude: each company carries roughly fourteen quarters of
+      revenue in debt [computed]. What differs is construction, not
+      scale.</p>
+    <p>
+      The borrowing side shows the split in one view: what each company
+      owes at June&nbsp;30, and what is pledged against it. CoreWeave's
+      largest block is its delayed draw term loan (DDTL) facilities:
+      loans drawn in tranches as contracts are pledged.
+    </p>
+
+    <figure class="fig">
+      <div class="fig-title">Debt composition at Jun 30, 2026, $B · one dollar scale · 10-Q / 6-K</div>
+      <div class="legend">
+        <span class="lg"><span class="sw" style={`background:${C_CRWV}`}></span><span class="sw" style={`background:${C_NBIS}`}></span>secured · solid</span>
+        <span class="lg"><span class="sw" style={`background:${C_CRWV};opacity:0.55`}></span>collateral not stated · mid</span>
+        <span class="lg"><span class="sw" style={`background:${C_CRWV};opacity:0.38`}></span><span class="sw" style={`background:${C_NBIS};opacity:0.38`}></span>unsecured · light</span>
+      </div>
+      <svg viewBox={`0 0 ${W5} ${H5}`} role="img" aria-label="Debt composition at June 30, 2026 on one dollar scale. CoreWeave, 35.6 billion dollars gross: DDTL facilities 13.6 billion secured, drawn solid; vendor financing 5.3 billion, collateral basis not stated, drawn mid; senior notes 10.0 billion and convertible notes 6.6 billion unsecured, drawn light. Nebius, 8.5 billion: all unsecured convertible notes, with a 775 million dollar secured facility raised in July, after quarter end, drawn solid at the start of the row, separated from the June 30 bar by a gap. Computed secured shares: 38 percent of CoreWeave's gross debt; zero at Nebius at June 30, about 9 percent counting the July facility.">
+        {X5_TICKS.map((t) => (
+          <>
+            <line x1={x5(t)} y1={26} x2={x5(t)} y2={178} class="grid" />
+            <text x={x5(t)} y={196} class="tick t-mid">{t}</text>
+          </>
+        ))}
+        <text x={W5 - R5} y={196} class="tick t-end">$B</text>
+
+        <text x={L5 - 10} y={CRWV_Y5 + 17} class="dlab t-end" fill={C_CRWV}>CoreWeave</text>
+        <text x={L5 - 10} y={CRWV_Y5 + 30} class="rowsub t-end">$35.6B gross</text>
+        {CRWV_COMP.map((s) => (
+          <>
+            <rect x={s.x} y={CRWV_Y5} width={s.w} height={BH5} rx="3"
+                  fill={C_CRWV} fill-opacity={s.op}>
+              <title>{`CoreWeave · ${s.t}`}</title>
+            </rect>
+            <text x={s.x + 8} y={CRWV_Y5 + 17} class="dlab"
+                  fill={s.op === 1 ? '#fff' : 'var(--ink)'}>{s.k}</text>
+            <text x={s.x + 8} y={CRWV_Y5 + 30} class="segsub"
+                  fill={s.op === 1 ? '#fff' : 'var(--ink)'} opacity="0.85">{s.a}</text>
+          </>
+        ))}
+        <text x={L5} y={CRWV_Y5 + BH5 + 14} class="rowsub">secured 38% of gross debt [computed]</text>
+
+        <text x={L5 - 10} y={NBIS_Y5 + 17} class="dlab t-end" fill={C_NBIS}>Nebius</text>
+        <text x={L5 - 10} y={NBIS_Y5 + 30} class="rowsub t-end">$8.5B</text>
+        <rect x={L5} y={NBIS_Y5} width={x5(0.775) - L5} height={BH5} rx="3"
+              fill={C_NBIS} stroke="none">
+          <title>{`Nebius · ${NBIS_JULY.t}`}</title>
+        </rect>
+        {NBIS_COMP.map((s) => (
+          <>
+            <rect x={s.x + (x5(0.775) - L5) + 3} y={NBIS_Y5} width={s.w} height={BH5} rx="3"
+                  fill={C_NBIS} fill-opacity={s.op}>
+              <title>{`Nebius · ${s.t}`}</title>
+            </rect>
+            <text x={s.x + (x5(0.775) - L5) + 11} y={NBIS_Y5 + 17} class="dlab" fill="var(--ink)">{s.k}</text>
+            <text x={s.x + (x5(0.775) - L5) + 11} y={NBIS_Y5 + 30} class="segsub" fill="var(--ink)" opacity="0.85">{s.a}</text>
+          </>
+        ))}
+        <text x={L5} y={NBIS_Y5 - 7} class="segsub" fill={C_NBIS}>$775M secured · raised July · SOFR + 2.50%</text>
+        <text x={L5} y={NBIS_Y5 + BH5 + 14} class="rowsub">secured 0% at Jun 30 · ~9% with the July facility [computed]</text>
+      </svg>
+      <figcaption class="fig-foot">
+        <details class="fig-details">
+          <summary>Chart notes</summary>
+          <ul class="fig-notes-list">
+            <li>CoreWeave segments are gross principal from the 10-Q debt
+            schedule, $35,551M ($35,068M net of discounts and issuance
+            costs). Nebius is the carrying value, $8,545.7M, against about
+            $8,500M of original principal; the difference is accretion on
+            the June 2025 notes, which accrete to 120% and 125% of
+            principal at maturity. Hover any segment for the instrument
+            detail.</li>
+            <li>CoreWeave DDTL detail (gross drawn, effective rate,
+            maturity): 1.0 $1,300M 15% Mar&nbsp;2028 · 2.0 $3,190M 11%
+            Aug&nbsp;2030 · 2.1 $3,000M 9% Mar&nbsp;2031 · 3.0 $2,215M 9%
+            Aug&nbsp;2030 · 5.0 $1,101M 9% Nov&nbsp;2031 (SOFR&nbsp;+
+            4.50%, $3.1B facility) · 4.0 $2,837M 7% Mar&nbsp;2032
+            (SOFR&nbsp;+ 2.25% floating / Treasury&nbsp;+ 2.00% fixed,
+            $8.5B facility, non-recourse). The 10-Q describes the DDTLs as
+            "collateralized with the assets underlying the contributed
+            contracts and the pledged contractual cash flows"; the
+            bankruptcy-remote borrower entities held $18.2B of non-current
+            and $2.6B of current pledged assets at June&nbsp;30, plus
+            $3.3B and $155M at the DDTL 4.0 borrower.</li>
+            <li>CoreWeave senior notes and converts are stated "unsecured
+            obligations." The senior secured revolver ($2.5B capacity) was
+            undrawn at June&nbsp;30 and is not a bar segment. Vendor
+            financing (OEM and software license, $5,102M) and the MagAI
+            deposit obligation ($189M) carry no stated collateral in the
+            filing, so they are drawn as their own class.</li>
+            <li>Computed secured shares: CoreWeave $13,643M DDTLs ÷
+            $35,551M gross = 38% (39% of net). If vendor financing were
+            treated as equipment-secured the share would be 53%; the
+            filing does not say, so the lower figure is used. Nebius
+            secured debt at June&nbsp;30 was zero; $775M ÷ $8,545.7M = 9%
+            measures the July facility against the June&nbsp;30 stack.</li>
+            <li>Nebius pre-funded warrants ($2.0B, Q1) and treasury share
+            sales ($2.8B gross, Q2) are equity, not debt, and are not in
+            the bar.</li>
+            <li>Segment labels are rounded independently; the underlying
+            figures sum to $35,551M gross.</li>
+          </ul>
+        </details>
+      </figcaption>
+    </figure>
+
+    <div class="gtable-wrap">
+      <table class="gtable">
+        <thead>
+          <tr><th>Instrument</th><th>Amount</th><th>Secured?</th><th>Rate where disclosed</th></tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4" class="grp">CoreWeave · $35.6B gross · $35.1B net carrying</td></tr>
+          <tr><td>DDTL facilities, six (1.0–5.0)</td><td>$13.6B</td>
+            <td>Yes · GPUs and contracted cash flows</td>
+            <td>SOFR (Secured Overnight Financing Rate) + 2.25–4.50% on 2026 facilities; eff. 7–15%</td></tr>
+          <tr><td>Senior notes, five series 2030–2032</td><td>$10.0B</td>
+            <td>No</td><td>8.50–9.75% coupons</td></tr>
+          <tr><td>Convertible senior notes, 2031 and 2032</td><td>$6.6B</td>
+            <td>No</td><td>1.75%</td></tr>
+          <tr><td>OEM (original equipment manufacturer) and software license financing</td><td>$5.1B</td>
+            <td>Not stated</td><td>eff. 9–11%</td></tr>
+          <tr><td>MagAI deposit obligation</td><td>$189M</td>
+            <td>Not stated</td><td>eff. 12%</td></tr>
+          <tr><td>Revolving credit facility <span class="dim">($2.5B capacity)</span></td><td>$0 drawn</td>
+            <td>Yes</td><td>eff. 7%</td></tr>
+          <tr><td colspan="4" class="grp">Nebius · $8.5B carrying at Jun 30 · all convertible notes · plus July facility</td></tr>
+          <tr><td>Convertible notes, Jun 2025 <span class="dim">(due 2029, 2031)</span></td><td>$1.0B</td>
+            <td>No</td><td>2.00% / 3.00%</td></tr>
+          <tr><td>Convertible notes, Sep 2025 <span class="dim">(due 2030, 2032)</span></td><td>$3.2B</td>
+            <td>No</td><td>1.00% / 2.75%</td></tr>
+          <tr><td>Convertible notes, Mar 2026 <span class="dim">(due 2031, 2033)</span></td><td>$4.3B</td>
+            <td>No</td><td>1.25% / 2.625%</td></tr>
+          <tr><td>Secured facility, raised July 2026 <span class="dim">(post-quarter)</span></td><td>$775M</td>
+            <td>Yes · GPUs and contracted cash flows</td><td>SOFR + 2.50%</td></tr>
+        </tbody>
+      </table>
+      <p class="gtable-note">CoreWeave amounts are gross principal from
+      the 10-Q debt schedule; Nebius amounts are original principal from
+      its convertible-notes 6-Ks, and its $8.5B carrying value adds
+      accretion. Secured shares [computed]: 38% of CoreWeave's gross debt;
+      0% at Nebius at June&nbsp;30, about 9% counting the July facility.
+      Accession numbers and details in Sources&nbsp;&amp; method.</p>
+    </div>
+
+    <p>
+      CoreWeave's prepay is a standing convention. Its filings state
+      that "the weighted-average prepayment across all our active
+      contracts was 15% to 25% of the TCV," restated each period since
+      the S-1. Deferred revenue grew from $2.0&nbsp;billion in 2023 to
+      $4.1&nbsp;billion in 2024 to $9.7&nbsp;billion at June&nbsp;30,
+      2026. Debt compounded faster, from $1.5&nbsp;billion to
+      $35.1&nbsp;billion of carrying value over the same span. So the
+      prepay balance fell from 132% of total debt to 28%, and prepay
+      inflow covered 40% of 2025 capex against 11% in the first half
+      of 2026.
+    </p>
+    <p>
+      The 10-Q's funding sentence lists "debt and equity securities
+      issuances, delayed draw term loan facilities, OEM financing
+      arrangements, and cash from our balance sheet." Deferred revenue
+      is not on the list. Prepayments appear instead under credit risk:
+      protection against a customer failing, not a funding source.
+      Demand becomes collateral, and the company borrows against the
+      book.
+    </p>
+    <p>
+      Nebius held under $20&nbsp;million of deferred revenue until
+      Q3 2025. It then added $6.0&nbsp;billion in three quarters, led by two
+      named contracts: Microsoft, at up to $17.4&nbsp;billion of
+      committed fees with about $7.0&nbsp;billion of upfront payments,
+      and the first Meta agreement at about $2.9&nbsp;billion. The
+      filings state the use directly: "Cash flow coming from the
+      Agreement will be utilized to finance part of the capital
+      expenditure associated with the Agreement." The prepay balance
+      rose from 0.4% of total debt in September 2025 to 70% at
+      June&nbsp;30. In Q1 2026 prepay inflow reached 129% of that
+      quarter's capex, the only customer-outfunded quarter at either
+      firm. Demand becomes cash, and customers fund the buildout
+      directly.
+    </p>
+
+    <figure class="fig">
+      <div class="fig-title">Quarterly change in deferred revenue ÷ quarterly capex, % · Q1 ’25 – Q2 ’26</div>
+      <div class="legend">
+        <span class="lg"><span class="sw" style={`background:${C_CRWV}`}></span>CoreWeave</span>
+        <span class="lg"><span class="sw" style={`background:${C_NBIS}`}></span>Nebius</span>
+      </div>
+      <svg viewBox={`0 0 ${W3} ${H3}`} role="img" aria-label="Grouped bars of quarterly prepay inflow as a percent of quarterly capex, first quarter 2025 through second quarter 2026. CoreWeave ranges from minus 9 to 70 percent. Nebius is near zero through the third quarter of 2025, then 76, 129, and 21 percent. A dashed line marks 100 percent, a quarter fully funded by prepayments. Only the Nebius first quarter 2026 bar crosses it.">
+        {Y3_TICKS.map((t) => (
+          <>
+            <line x1={L3} y1={y3(t)} x2={W3 - R3} y2={y3(t)} class="grid" />
+            <text x={L3 - 8} y={y3(t) + 3} class="tick t-end">{t}</text>
+          </>
+        ))}
+        <line x1={L3} y1={y3(100)} x2={W3 - R3} y2={y3(100)} stroke="var(--ink-faint)" stroke-width="1.2" stroke-dasharray="4 4" />
+        {COV.map((g, i) => {
+          const cx0 = gx(i) - BW3 - 3;
+          const nx0 = gx(i) + 3;
+          const cTop = Math.min(y3(g.c), y3(0));
+          const nTop = Math.min(y3(g.n), y3(0));
+          return (
+            <>
+              <rect x={cx0} y={cTop} width={BW3}
+                    height={Math.max(Math.abs(y3(g.c) - y3(0)), 1.5)} rx="3"
+                    fill={C_CRWV} opacity="0.9">
+                <title>{g.ct}</title>
+              </rect>
+              <rect x={nx0} y={nTop} width={BW3}
+                    height={Math.max(Math.abs(y3(g.n) - y3(0)), 1.5)} rx="3"
+                    fill={C_NBIS} opacity="0.9">
+                <title>{g.nt}</title>
+              </rect>
+              <text x={cx0 + BW3 / 2} y={g.c < 0 ? y3(g.c) + 14 : y3(g.c) - 6}
+                    class="dlab t-mid" fill={C_CRWV}>{covLab(g.c)}</text>
+              <text x={nx0 + BW3 / 2} y={g.n < 0 ? y3(g.n) + 14 : y3(g.n) - 6}
+                    class="dlab t-mid" fill={C_NBIS}>{covLab(g.n)}</text>
+              <text x={gx(i)} y={H3 - B3 + 22} class="tick t-mid">{g.q}</text>
+            </>
+          );
+        })}
+        <line x1={L3} y1={y3(0)} x2={W3 - R3} y2={y3(0)} class="axis" />
+        <text x={W3 - R3 - 4} y={y3(100) - 19} class="rowsub t-end lab-halo">quarter fully funded</text>
+        <text x={W3 - R3 - 4} y={y3(100) - 7} class="rowsub t-end lab-halo">by prepayments</text>
+      </svg>
+      <figcaption class="fig-foot">
+        <details class="fig-details">
+          <summary>Chart notes</summary>
+          <ul class="fig-notes-list">
+            <li>Computed: change in total deferred revenue during the
+            quarter, divided by that quarter's purchases of property and
+            equipment from the cash-flow statement; quarterly capex
+            derived from year-to-date figures where the filing reports
+            year-to-date. Hover any bar for the dollar figures.</li>
+            <li>A negative bar means consumption of prepayments outran
+            new inflow.</li>
+            <li>Longer windows, same arithmetic: CoreWeave full-year
+            2023 67%, 2024 24%, 2025 40%, first-half 2026 11%; Nebius
+            first-half 2026 54%.</li>
+          </ul>
+        </details>
+      </figcaption>
+    </figure>
+
+    <h2>Our Read</h2>
+    <p>
+      Two order books, two funding machines. The demand is real and in
+      many cases paid for in advance: $9.7&nbsp;billion of customer
+      prepayments sit on one balance sheet and $6.0&nbsp;billion on
+      the other. What
+      differs is how each company grows into that demand. The
+      difference runs through everything above: the tenor of the book,
+      the source of the funding, and who carries the price of compute.
+    </p>
+    <p>
+      The funding split carries a price position with it. Nebius says
+      it could sell its entire 2027 capacity today and is deliberately
+      not doing so; it is piloting capacity auctions and pricing its
+      shortest commitments highest. That is a company pressing to
+      capture the economic rents of today's scarcity. Nebius's
+      short-term contracts are a position on near-term pricing, and
+      management says so: the chief financial officer tied the
+      decision to retain capacity to "confidence with respect to
+      future pricing
+      dynamics."<sup class="fnr"><a href="#fn4">4</a></sup> The
+      position carries the exposure both ways. The short-term book
+      harvests the premium while scarcity holds. It is the first
+      thing to reprice downward if demand fades, while contracts
+      locked years ahead keep paying. What limits the exposure is not
+      the tenor but the allocation: only a portion of capacity is held
+      back, with the long-term investment-grade contracts beneath it. CoreWeave's
+      chief financial officer says its economics "do not rely on
+      recontracting after initial customer term," on what it calls a
+      typical five-year
+      contract.<sup class="fnr"><a href="#fn2">2</a></sup> Both companies
+      pledge the same collateral when they borrow: GPUs and the
+      contracts on them. Nebius's first secured facility is backed by
+      "deployed GPU infrastructure and contracted cash flows," the
+      same recipe as CoreWeave's. The difference is share, not kind:
+      that facility is about 9% of Nebius's debt [computed: $775M of
+      $8.5B], while borrowing against the book is CoreWeave's primary
+      machine. One order book is built to harvest the current price of
+      compute; the other is built, above all, to be borrowed against.
+    </p>
+
+    <div class="fnotes">
+      <details class="tail-details" id="fnotes-details">
+        <summary><h2>Footnotes</h2></summary>
+      <ol>
+        <li id="fn1">
+          A year-end 2026 guide, not a measurement. The letter prints
+          no second-quarter actual for contracted power. The latest
+          stated actual remains more than 3.5&nbsp;GW, given at
+          Q1 2026.
+        </li>
+        <li id="fn2">
+          CoreWeave call quotes and call-sourced figures, including the
+          full-year 2026 revenue and capex guides, the commitment
+          additions since quarter-end, and the inference-ARR figure,
+          are verified against the corrected transcript of the
+          August&nbsp;11, 2026 call posted on CoreWeave's investor
+          site. The year-ago full-year 2025 guide is also
+          call-sourced: the written Q2 2025 release deferred guidance
+          to the call, and the quote here is from the corrected
+          transcript of the August&nbsp;12, 2025 call posted on
+          CoreWeave's investor site.
+        </li>
+        <li id="fn3">
+          Company estimate. The letter footnotes the payback as based
+          on forecast costs and contracted future capacity, "including
+          capacity not yet built."
+        </li>
+        <li id="fn4">
+          Nebius call quotes are verified against two independent
+          transcripts of the August&nbsp;12, 2026 earnings call; the
+          company had not posted an official replay at publication.
+          Nebius shareholder-letter quotes are checked against the
+          EDGAR exhibit.
+        </li>
+        <li id="fn5">
+          RPO is remaining performance obligations, the contracted
+          revenue not yet delivered.
+          Backlog definitions are not comparable across companies.
+          CoreWeave's $104&nbsp;billion is its own construction, RPO
+          plus estimates of future payments. Read orderings across
+          issuers, never ratios. The filed RPO figure is
+          $103.7&nbsp;billion at June&nbsp;30, 2026.
+        </li>
+      </ol>
+      </details>
+    </div>
+
+    <div class="metho">
+      <details class="tail-details">
+        <summary><h2>Sources &amp; Method</h2></summary>
+      <p>
+        CoreWeave figures are from its 10-Q for the quarter ended
+        June&nbsp;30, 2026 (filed 2026-08-12, EDGAR accession
+        0001769628-26-000366; the debt composition is its Note&nbsp;10
+        instrument schedule and narrative), its 10-K for 2025
+        (filed 2026-03-02), the quarterly 10-Qs of 2025, and the
+        424B4 prospectus of 2025-03-31, which carries the 2023 and
+        2024 balance sheets. CoreWeave's Q2 2025 revenue is from the
+        earnings press release furnished as Exhibit 99.1 to its 8-K
+        filed 2025-08-12; its year-ago full-year 2025 guide is from
+        the corrected transcript of the August&nbsp;12, 2025 earnings
+        call posted on the company's investor site (see footnote 2).
+        Nebius figures are from its results
+        exhibits furnished on Form 6-K, including the Q2 2026 press
+        release and shareholder letter filed 2026-08-12 (accession
+        0001104659-26-094568), the Q2 2025
+        press release and shareholder letter filed 2025-08-07, the
+        Q4 2025 shareholder letter filed 2026-02-12, the Q1 2026
+        shareholder letter filed 2026-05-13, its interim
+        financial statements, and its 20-F annual reports; Nebius is a
+        foreign private issuer and files no 10-Qs. The Nebius
+        convertible-notes terms are from its offering 6-Ks: the
+        June&nbsp;2025 private placement (6-K filed 2025-06-05,
+        accession 0001104659-25-056817), the September&nbsp;2025
+        offering (terms 6-K filed 2025-09-11; closing 6-K filed
+        2025-09-15, accession 0001104659-25-089969), and the
+        March&nbsp;2026 offering (terms 6-K filed 2026-03-18; closing
+        6-K filed 2026-03-20, accession 0001104659-26-032735). The
+        $775M July secured facility is from the Q2 2026 shareholder
+        letter. Letter quotes were
+        checked verbatim against the EDGAR exhibits. All ratios shown
+        as computed are calculated by CCIR from those filings, not company
+        disclosures, and each chart's hover text carries the inputs.
+      </p>
+      <p>
+        Data notes. Nebius's December 2024 deferred revenue prints as
+        $16.5M in contemporaneous releases and $16.3M in later
+        comparative columns after the Toloka deconsolidation; we use
+        the contemporaneous figure. CoreWeave's June 2026 balance sheet
+        splits debt into four recourse and non-recourse lines; the
+        total here sums them, $35,068M net carrying value against
+        $35,551M gross principal. CoreWeave's FY2024 cash-flow
+        deferred-revenue change (+$2,049M) differs from the balance
+        delta (+$2,059M) by acquisition effects. CoreWeave's RPO priors, for
+        reference, are XBRL-tagged filed figures: $60.7B at
+        December&nbsp;31, 2025 (10-K) and $98.8B at March&nbsp;31, 2026
+        (Q1 10-Q). The year-over-year
+        guidance multiples in section&nbsp;1 use range midpoints:
+        $12.8B&nbsp;÷&nbsp;$5.25B&nbsp;=&nbsp;2.4x and
+        $8.0B&nbsp;÷&nbsp;$1.0B&nbsp;=&nbsp;8x; the quarter multiple
+        is $2,575M&nbsp;÷&nbsp;$1,212.8M&nbsp;=&nbsp;2.1x. Debt-composition
+        notes: CoreWeave's schedule ties as $31,832M recourse plus
+        $3,719M non-recourse gross, less $483M of discounts and issuance
+        costs, to $35,068M net; the DDTL group in section&nbsp;6 sums
+        $1,300M&nbsp;+ $3,190M&nbsp;+ $3,000M&nbsp;+ $2,215M&nbsp;+
+        $1,101M&nbsp;+ $2,837M&nbsp;=&nbsp;$13,643M, matching the
+        MD&amp;A's "$13.6 billion outstanding under our delayed draw
+        term loan facilities." The secured-share bounds reflect that the
+        10-Q does not state a collateral pledge for the OEM and software
+        license financing. Nebius's September&nbsp;2025 convert series
+        are disclosed only as "approximately $1.58 billion" per series
+        (~$3.16B total); its June&nbsp;2025 notes accrete to 120% and
+        125% of principal at maturity, which is why the $8,545.7M
+        carrying value exceeds the ~$8,500M of original principal; the
+        March&nbsp;2026 $262.5M overallotment on the 2033 notes was not
+        exercised (second-quarter convert proceeds are nil in the cash
+        flow statement). The $775M secured facility was raised in July
+        2026 and is therefore not in the June&nbsp;30 debt balance.
+        Page prose rounds to
+        billions at one decimal; exact filed inputs stay in these notes
+        and in the chart hover text. Research notes are dated, not
+        updated in place.
+      </p>
+      </details>
+    </div>
+  </section>
+  <script is:inline id="fn-autopen">
+    // Footnote links must open the collapsed section they target.
+    function openForHash() {
+      var h = location.hash;
+      if (!h) return;
+      var el = document.querySelector(h);
+      if (!el) return;
+      var d = el.closest('details');
+      if (d && !d.open) { d.open = true; el.scrollIntoView(); }
+    }
+    window.addEventListener('hashchange', openForHash);
+    openForHash();
+  </script>
+
+  <style>
+    .top { padding-top: 28px; max-width: 760px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .top h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      font-weight: var(--weight-display, 600);
+      letter-spacing: -0.005em;
+      color: var(--ink);
+      border-top: 1px solid var(--rule);
+      padding-top: 16px;
+      margin-top: 34px;
+    }
+    .draft-band {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: #c96f06; border: 1px dashed #c96f06; border-radius: 4px;
+      padding: 6px 10px; margin-bottom: 18px;
+    }
+    .tail-details > summary {
+      cursor: pointer; list-style: none; width: fit-content;
+    }
+    .tail-details > summary::-webkit-details-marker { display: none; }
+    .tail-details > summary h2::before {
+      content: "B8 "; font-size: 0.8em; color: var(--ink-faint);
+    }
+    .tail-details[open] > summary h2::before { content: "BE "; }
+    .fig-read {
+      font-size: var(--fs-s);
+      color: var(--ink-dim);
+      margin: 8px 0 2px;
+      max-width: 72ch;
+    }
+    .gtable-wrap { overflow-x: auto; margin: 14px 0 22px; }
+    .gtable {
+      border-collapse: collapse; width: 100%; min-width: 540px;
+      font-size: var(--fs-s); font-variant-numeric: tabular-nums;
+    }
+    .gtable th, .gtable td {
+      text-align: left; padding: 7px 12px 7px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .gtable th {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--ink-dim); font-weight: var(--weight-strong);
+    }
+    .gtable .dim { color: var(--ink-faint); font-size: var(--fs-xs); }
+    .gtable .grp {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--ink-dim); font-weight: var(--weight-strong);
+      padding-top: 14px;
+    }
+    .gtable-note {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-faint); margin: 8px 0 0;
+    }
+    .stats-basis {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+      margin: 6px 0 18px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 16px 0;
+      margin: 22px 0 10px;
+    }
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+    .stat .v {
+      font-family: var(--font-mono);
+      font-size: var(--fs-2xl);
+      font-weight: var(--weight-strong);
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.15;
+    }
+    .stat .k {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+    .stat .s {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-faint);
+      margin-top: 3px;
+    }
+    .epigraph {
+      font-style: italic; color: var(--ink-dim);
+      border-left: 2px solid var(--rule); padding-left: 14px; margin: 22px 0;
+    }
+    .fig { margin: 28px 0; }
+    .fig svg { width: 100%; height: auto; display: block; }
+    .fig-title {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      letter-spacing: 0.05em; text-transform: uppercase;
+      color: var(--ink-dim); font-weight: 600; margin-bottom: 10px;
+    }
+    figcaption {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-dim); line-height: 1.55; margin-top: 8px; max-width: 90ch;
+    }
+    .fig-foot {
+      display: flex; flex-direction: column; gap: 2px;
+      margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule);
+    }
+    .fig-details { margin-top: 2px; }
+    .fig-details summary {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-dim); letter-spacing: 0.04em;
+      text-transform: uppercase; cursor: pointer; width: fit-content;
+    }
+    .fig-notes-list {
+      margin: 6px 0 2px; padding-left: 18px;
+      display: flex; flex-direction: column; gap: 3px; max-width: 90ch;
+    }
+    .fig-notes-list li {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-dim); line-height: 1.6;
+    }
+    .grid { stroke: var(--rule); stroke-width: 1; }
+    .axis { stroke: var(--ink-faint); stroke-width: 1; }
+    .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim); }
+    .t-end { text-anchor: end; }
+    .t-mid { text-anchor: middle; }
+    .anno { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+    .lab-halo { stroke: var(--surface); stroke-width: 3.5px; paint-order: stroke; stroke-linejoin: round; }
+    .dlab { font-family: var(--font-mono); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .rowsub { font-family: var(--font-mono); font-size: 9.5px; fill: var(--ink-faint); }
+    .segsub { font-family: var(--font-mono); font-size: 9.5px; font-variant-numeric: tabular-nums; }
+    .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 8px; }
+    .lg { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); display: inline-flex; align-items: center; gap: 6px; }
+    .sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+    .fnr { font-family: var(--font-mono); font-size: 0.72em; }
+    .fnr a { color: var(--ink-faint); text-decoration: none; }
+    .fnr a:hover { color: var(--accent); }
+    .fnotes { margin-top: 40px; border-top: 1px solid var(--rule); padding-top: 4px; }
+    .fnotes ol {
+      max-width: 80ch;
+      padding-left: 20px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      line-height: 1.6;
+    }
+    .fnotes li { margin-bottom: 8px; }
+    .fnotes li:target { color: var(--ink); }
+    .metho { margin-top: 40px; border-top: 1px solid var(--rule); padding-top: 4px; }
+    .metho p {
+      font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-dim); line-height: 1.6; max-width: 90ch;
+    }
+  </style>
+</Base>
