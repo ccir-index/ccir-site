@@ -46,8 +46,11 @@ const innerW = x1 - x0;
 const innerH = y1 - y0;
 
 const MAX_MONTHS = 36;
+// OD column inset off the y-axis so the >$10 OD dots don't sit on the
+// $10/$12 tick labels (reinstatement polish, 2026-08-12).
+const OD_INSET = 22;
 const xOf = (months: number) =>
-  x0 + innerW * (Math.sqrt(months) / Math.sqrt(MAX_MONTHS));
+  x0 + OD_INSET + (innerW - OD_INSET) * (Math.sqrt(months) / Math.sqrt(MAX_MONTHS));
 
 const Y_MIN = 0;
 const Y_MAX = 12; // raised from 10 at reinstatement — H100/H200 OD print >$10
