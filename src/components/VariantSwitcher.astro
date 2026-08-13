@@ -1,15 +1,17 @@
 ---
 /*
-  DEV-ONLY (variant round 2, 2026-08-13): bottom-right pill for comparing
-  C (baked-in default) against E/F/G explorations. Persists in localStorage
-  ('ccir-variant'); the Base boot script applies it before first paint.
-  Delete with the data-variant blocks in tokens.css when the round closes.
+  DEV-ONLY (accent round, 2026-08-13): bottom-right pill. Type is decided
+  (F: Space Grotesk display, mono strictly for data/labels); this round
+  A/B/Cs the ACCENT on top of F's type, with C kept as reference baseline.
+  Persists in localStorage ('ccir-variant'); the Base boot script applies it
+  before first paint. Delete with the data-variant blocks in tokens.css when
+  the accent is decided.
 */
 const VARIANTS = [
-  { id: '', code: 'C', label: 'Terminal-pro — JetBrains Mono, blue (baked-in)' },
-  { id: 'e-plexmono', code: 'E', label: 'Plex Mono voice — calmer mono personality' },
-  { id: 'f-grotesk', code: 'F', label: 'Grotesque heads — Space Grotesk display, mono strictly for data' },
-  { id: 'g-amber', code: 'G', label: 'Amber terminal — single warm accent on near-black' },
+  { id: '', code: 'C', label: 'Reference baseline — JetBrains Mono display, blue (baked-in)' },
+  { id: 'f-blue', code: 'F·BLUE', label: 'F as it stands — Space Grotesk display, single blue accent' },
+  { id: 'f-amber', code: 'F·AMBER', label: 'F type + single amber accent (warm terminal)' },
+  { id: 'f-duo', code: 'F·DUO', label: 'F type + two roles: blue wayfinding, amber data emphasis' },
 ];
 ---
 <div id="vsw" aria-label="Style variant switcher (dev only)">

@@ -171,44 +171,63 @@ html[data-theme="editorial"] {
 }
 
 /* ===========================================================================
-   DEV-ONLY — VARIANT ROUND 2 (owner request, 2026-08-13). C (the baked-in
-   tokens above) is the default; E/F/G are explorations WITHIN C's structure
-   (dense, near-black/monochrome, blue-or-single-accent, terminal register
-   for data + editorial register for notes) varying TYPE and ACCENT only.
+   DEV-ONLY — ACCENT ROUND (owner request, 2026-08-13). The TYPE decision is
+   made: F's direction (Space Grotesk display, mono STRICTLY for data, labels,
+   chrome). This round A/B/Cs the ACCENT on top of F's type; C (the baked-in
+   tokens above, JetBrains Mono display + blue) stays the attribute-free
+   reference baseline. E and G are superseded and deleted.
    Applied via <html data-variant="…"> from the switcher pill + boot script.
    Delete these blocks + VariantSwitcher.astro + the Space Grotesk font line
-   when the round is decided.
+   when the accent is decided (then bake the winner into the tokens above).
+
+   Accent steps are AA-checked derivatives of the brand pair
+   (#3b82f6 blue / #c96f06 orange — the social-card colors):
+     blue   #5b9dff 7.0:1 on #050607 · #1d4ed8 5.7:1 on #fafbfc
+     amber  #e8a33d 9.6:1 on #050607 · #996300 5.6:1 on #fafbfc
    =========================================================================== */
 
-/* E — PLEX MONO VOICE. Same architecture, calmer mono personality:
-   IBM Plex Mono carries headings and data instead of JetBrains Mono.
-   Tests whether JetBrains' strong flavor is what reads "too much". */
-html[data-variant="e-plexmono"] {
-  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-}
-
-/* F — GROTESQUE HEADS. Headings pull back from full-mono: Space Grotesk
-   (tight grotesque) for display; mono stays STRICTLY for data, labels, and
-   chrome. Tests whether the all-mono hero is the point of doubt. */
-html[data-variant="f-grotesk"] {
+/* Shared type layer — F's chosen direction, common to all three options. */
+html[data-variant="f-blue"],
+html[data-variant="f-amber"],
+html[data-variant="f-duo"] {
   --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
   --weight-display: 600;
 }
 
-/* G — AMBER TERMINAL. Identical type to C; the single accent shifts warm —
-   amber on near-black (a nod to the old terminal brand pair). One accent
-   only. AA: #e8a33d 9.6:1 on #050607; #996300 5.6:1 on #fafbfc. */
-html[data-variant="g-amber"] {
+/* F·BLUE — F as it stands: single blue accent (C's baked-in blue tokens).
+   No color overrides; the shared type layer above is the whole variant. */
+
+/* F·AMBER — F's type + the single warm accent (G's AA-checked values).
+   One accent only: wayfinding and data emphasis share the amber. */
+html[data-variant="f-amber"] {
   --accent: #e8a33d;
   --accent-2: #f2bc6a;
   --link: #e8a33d;
   --link-dim: #b8842f;
   --info: #e8a33d;
 }
-html[data-theme="editorial"][data-variant="g-amber"] {
+html[data-theme="editorial"][data-variant="f-amber"] {
   --accent: #996300;
   --accent-2: #b57807;
   --link: #996300;
   --link-dim: #a98136;
   --info: #996300;
+}
+
+/* F·DUO — F's type + a TWO-ROLE color system. STRICT roles, never
+   decorative:
+     blue  = wayfinding ONLY  → --link/--link-dim (links, breadcrumbs,
+             active nav) stay on C's blue steps; controls ride --link.
+     amber = data emphasis ONLY → --accent/--accent-2 (highlighted values,
+             emphasis borders, single-series marks) flip warm; kickers pick
+             up the amber via --kicker-ink (base.css falls back to ink-dim
+             when the token is unset, i.e. in every other variant). */
+html[data-variant="f-duo"] {
+  --accent: #e8a33d;
+  --accent-2: #f2bc6a;
+  --kicker-ink: var(--accent);
+}
+html[data-theme="editorial"][data-variant="f-duo"] {
+  --accent: #996300;
+  --accent-2: #b57807;
 }

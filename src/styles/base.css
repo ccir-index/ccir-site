@@ -40,7 +40,9 @@ main { min-height: calc(100vh - 200px); }
   font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eye);
-  color: var(--ink-dim);
+  /* --kicker-ink is set only by the dev-only F·DUO variant (tokens.css),
+     where kickers carry the data-emphasis amber; unset everywhere else. */
+  color: var(--kicker-ink, var(--ink-dim));
   font-weight: var(--weight-strong);
 }
 
@@ -151,7 +153,9 @@ table.data tbody tr:hover td { background: var(--surface-3); }
 .crumbs a { color: var(--link); }
 .crumbs a:hover { text-decoration: underline; }
 .crumbs .crumb-sep { color: var(--ink-faint); }
-.crumbs .crumb-here { color: var(--accent); }
+/* "you are here" is wayfinding — rides --link so the two-role variant keeps
+   the whole crumb row in the wayfinding hue (identical elsewhere). */
+.crumbs .crumb-here { color: var(--link); }
 .crumbs .crumb-asof { margin-left: auto; color: var(--ink-dim); font-weight: var(--weight-body); white-space: nowrap; }
 
 /* Standard table frame: head strip · table · collapsible method foot. */
