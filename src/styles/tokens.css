@@ -1,40 +1,42 @@
 /*
-  Design tokens — TERMINAL-PRO, the chosen design (owner decision,
-  2026-08-13; formerly "variant C" of the redesign/v1 comparison, now the
-  only design; the A/B/D variant system is deleted).
+  Design tokens — TERMINAL-PRO / DUO, the final design (owner decision,
+  2026-08-13: F·DUO from the redesign/v1 accent round, now baked in;
+  the variant system is deleted).
 
   IDENTITY
     Near-black (dark) / gray-white (light) monochrome surfaces.
-    BLUE IS THE ONLY ACCENT — data emphasis and wayfinding share one hue;
-    hierarchy comes from weight and lightness, never from a second hue.
-    JetBrains Mono carries headings and data (tabular by construction);
-    IBM Plex Sans carries running text at dense sizes.
+    TWO-ROLE COLOR, STRICT AND NEVER DECORATIVE:
+      blue  = WAYFINDING ONLY  → --link/--link-dim (links, breadcrumbs,
+              active nav, chrome controls).
+      amber = DATA EMPHASIS ONLY → --accent/--accent-2 (highlighted
+              values, kickers, emphasis borders, single-series marks).
+    Both are AA-checked per-theme steps of the brand pair
+    (#3b82f6 blue / #c96f06 orange — the social-card colors).
+    Space Grotesk carries display; mono (JetBrains) is STRICTLY for data,
+    labels, and chrome (tabular by construction); IBM Plex Sans carries
+    running text.
 
   Two themes ship side by side; ThemeToggle flips `data-theme` on <html>,
-  persisted in localStorage. Light mode is "terminal-pro in daylight":
-  the same type system, scale, and density — only the surface/ink axis
-  flips, and the blue steps down for AA on white.
+  persisted in localStorage. Light mode is the same system with the
+  surface/ink axis flipped and both hues stepped down for AA on white.
 
     [data-theme="terminal"]  → dark (default)
     [data-theme="editorial"] → light
-
-  ORANGE (#c96f06) is DEMOTED from the UI palette: no kicker, accent rule,
-  or data emphasis uses it anymore. It remains defined as a brand token
-  only because the social/OG cards still ship in the old two-color style
-  (their restyle is a separate, owner-directed follow-up) and MI badges
-  ride --warn. Do not reintroduce it into page chrome.
 
   Chart-LOCAL palettes (e.g. TermCurveChart's series custom properties,
   /tokens' --tok-c*) are chart-scoped and deliberately untouched — series
   hues are not UI accents.
 
   AA floors (checked): dark ink 13.9:1 on #050607, dim 6.0:1; light ink
-  15.9:1 on #fafbfc, dim 6.2:1; accent blue 7.0:1 (dark) / 5.7:1 (light).
+  15.9:1 on #fafbfc, dim 6.2:1; blue 7.0:1 (dark) / 5.7:1 (light);
+  amber 9.6:1 (dark) / 5.6:1 (light).
 */
 
 :root {
+  /* Brand anchors (social/OG-card pair). The UI never uses these raw —
+     it uses the AA-checked per-theme steps below (--link / --accent). */
   --brand-blue: #3b82f6;
-  --brand-orange: #c96f06; /* OG-card legacy only — see header note */
+  --brand-orange: #c96f06;
 }
 
 :root,
@@ -51,10 +53,10 @@ html[data-theme="terminal"] {
   --ink-dim: #8a9096;  /* 6.0:1 */
   --ink-faint: #5c6167;
 
-  /* Blue is the only accent. */
-  --accent: #5b9dff;   /* 7.0:1 on the surface */
-  --accent-2: #82b4ff;
-  --link: #5b9dff;
+  /* Two-role color: amber = data emphasis, blue = wayfinding. */
+  --accent: #e8a33d;   /* 9.6:1 on #050607 — data emphasis only */
+  --accent-2: #f2bc6a;
+  --link: #5b9dff;     /* 7.0:1 — wayfinding only */
   --link-dim: #4a83d4;
   --pos: #4d9678;
   --neg: #b35b5b;
@@ -69,8 +71,8 @@ html[data-theme="terminal"] {
 
   /* Type — JetBrains Mono headings + data, Plex Sans text. */
   --font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  --font-display: var(--font-mono);
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
   --font-body: var(--font-sans);
 
   --weight-body: 400;
@@ -118,10 +120,10 @@ html[data-theme="editorial"] {
   --ink-dim: #575e66;  /* 6.2:1 */
   --ink-faint: #8a9096;
 
-  /* The same single blue, stepped down for AA at dense text sizes. */
-  --accent: #1d4ed8;   /* 5.7:1 on #fafbfc */
-  --accent-2: #2563eb;
-  --link: #1d4ed8;
+  /* The same two roles, stepped down for AA at dense text sizes. */
+  --accent: #996300;   /* 5.6:1 on #fafbfc — data emphasis only */
+  --accent-2: #b57807;
+  --link: #1d4ed8;     /* 5.7:1 — wayfinding only */
   --link-dim: #4a6fc4;
   --pos: #217a50;
   --neg: #b03a3a;
@@ -135,8 +137,8 @@ html[data-theme="editorial"] {
   --tier-t3: #aab0b6;
 
   --font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, Menlo, monospace;
-  --font-display: var(--font-mono);
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
   --font-body: var(--font-sans);
 
   --weight-body: 400;
@@ -168,66 +170,4 @@ html[data-theme="editorial"] {
   --density: editorial;
 
   color-scheme: light;
-}
-
-/* ===========================================================================
-   DEV-ONLY — ACCENT ROUND (owner request, 2026-08-13). The TYPE decision is
-   made: F's direction (Space Grotesk display, mono STRICTLY for data, labels,
-   chrome). This round A/B/Cs the ACCENT on top of F's type; C (the baked-in
-   tokens above, JetBrains Mono display + blue) stays the attribute-free
-   reference baseline. E and G are superseded and deleted.
-   Applied via <html data-variant="…"> from the switcher pill + boot script.
-   Delete these blocks + VariantSwitcher.astro + the Space Grotesk font line
-   when the accent is decided (then bake the winner into the tokens above).
-
-   Accent steps are AA-checked derivatives of the brand pair
-   (#3b82f6 blue / #c96f06 orange — the social-card colors):
-     blue   #5b9dff 7.0:1 on #050607 · #1d4ed8 5.7:1 on #fafbfc
-     amber  #e8a33d 9.6:1 on #050607 · #996300 5.6:1 on #fafbfc
-   =========================================================================== */
-
-/* Shared type layer — F's chosen direction, common to all three options. */
-html[data-variant="f-blue"],
-html[data-variant="f-amber"],
-html[data-variant="f-duo"] {
-  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
-  --weight-display: 600;
-}
-
-/* F·BLUE — F as it stands: single blue accent (C's baked-in blue tokens).
-   No color overrides; the shared type layer above is the whole variant. */
-
-/* F·AMBER — F's type + the single warm accent (G's AA-checked values).
-   One accent only: wayfinding and data emphasis share the amber. */
-html[data-variant="f-amber"] {
-  --accent: #e8a33d;
-  --accent-2: #f2bc6a;
-  --link: #e8a33d;
-  --link-dim: #b8842f;
-  --info: #e8a33d;
-}
-html[data-theme="editorial"][data-variant="f-amber"] {
-  --accent: #996300;
-  --accent-2: #b57807;
-  --link: #996300;
-  --link-dim: #a98136;
-  --info: #996300;
-}
-
-/* F·DUO — F's type + a TWO-ROLE color system. STRICT roles, never
-   decorative:
-     blue  = wayfinding ONLY  → --link/--link-dim (links, breadcrumbs,
-             active nav) stay on C's blue steps; controls ride --link.
-     amber = data emphasis ONLY → --accent/--accent-2 (highlighted values,
-             emphasis borders, single-series marks) flip warm; kickers pick
-             up the amber via --kicker-ink (base.css falls back to ink-dim
-             when the token is unset, i.e. in every other variant). */
-html[data-variant="f-duo"] {
-  --accent: #e8a33d;
-  --accent-2: #f2bc6a;
-  --kicker-ink: var(--accent);
-}
-html[data-theme="editorial"][data-variant="f-duo"] {
-  --accent: #996300;
-  --accent-2: #b57807;
 }

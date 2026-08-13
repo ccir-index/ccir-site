@@ -37,7 +37,7 @@
 
 import type { Chart, Plugin } from 'chart.js';
 
-const MONO = 'IBM Plex Mono, ui-monospace, Menlo, monospace';
+const MONO = 'JetBrains Mono, ui-monospace, Menlo, monospace';
 
 /** Right-hand layout padding that keeps last-value labels from clipping. */
 export const LAST_VALUE_GUTTER = 56;

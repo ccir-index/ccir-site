@@ -14,7 +14,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Blue is the only accent — wayfinding and data emphasis share it. */
+/* Two-role color, strict: blue (--link) = wayfinding only; amber (--accent)
+   = data emphasis only. Never decorative. */
 a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
@@ -40,9 +41,8 @@ main { min-height: calc(100vh - 200px); }
   font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eye);
-  /* --kicker-ink is set only by the dev-only F·DUO variant (tokens.css),
-     where kickers carry the data-emphasis amber; unset everywhere else. */
-  color: var(--kicker-ink, var(--ink-dim));
+  /* Kickers carry the data-emphasis amber (two-role system). */
+  color: var(--accent);
   font-weight: var(--weight-strong);
 }
 
@@ -153,8 +153,7 @@ table.data tbody tr:hover td { background: var(--surface-3); }
 .crumbs a { color: var(--link); }
 .crumbs a:hover { text-decoration: underline; }
 .crumbs .crumb-sep { color: var(--ink-faint); }
-/* "you are here" is wayfinding — rides --link so the two-role variant keeps
-   the whole crumb row in the wayfinding hue (identical elsewhere). */
+/* "you are here" is wayfinding — the whole crumb row stays in the blue. */
 .crumbs .crumb-here { color: var(--link); }
 .crumbs .crumb-asof { margin-left: auto; color: var(--ink-dim); font-weight: var(--weight-body); white-space: nowrap; }
 

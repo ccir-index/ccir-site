@@ -1,14 +1,23 @@
 ---
 import '../styles/tokens.css';
 import '../styles/base.css';
+// Self-hosted faces (@fontsource), subset to the weights actually used:
+//   Space Grotesk 600           — display (headings) only
+//   JetBrains Mono 400/400i/500/600 — data, labels, chrome
+//   IBM Plex Sans 400/400i/600  — running text
+// Heavier weights (700) in chart SVGs synthesize from 600, as they always
+// have. Astro bundles the woff2 files; no external font host remains.
+import '@fontsource/space-grotesk/600.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/400-italic.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource/jetbrains-mono/600.css';
+import '@fontsource/ibm-plex-sans/400.css';
+import '@fontsource/ibm-plex-sans/400-italic.css';
+import '@fontsource/ibm-plex-sans/600.css';
 import Masthead from '../components/Masthead.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Tape from '../components/Tape.astro';
-// DEV-ONLY (accent round, 2026-08-13): C / F·BLUE / F·AMBER / F·DUO pill.
-// Delete this import + component + the data-variant blocks in tokens.css
-// when the accent is decided; the Space Grotesk font line then graduates
-// to permanent (F's type direction is the chosen one).
-import VariantSwitcher from '../components/VariantSwitcher.astro';
 import { meta } from '../data/snapshot';
 
 interface Props {
@@ -129,16 +138,6 @@ const articleLd = article
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- Terminal-pro face set: JetBrains Mono (headings + data), IBM Plex Sans
-       (text), IBM Plex Mono (mono fallback). Space Grotesk carries display
-       under the F options (the chosen type direction; bakes in with the
-       accent decision). -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
-    rel="stylesheet"
-  />
   <script is:inline>
     (function () {
       try {
@@ -146,16 +145,9 @@ const articleLd = article
         if (t === 'editorial' || t === 'terminal') {
           document.documentElement.setAttribute('data-theme', t);
         }
-        // Accent round (dev-only): apply the persisted exploration before
-        // first paint. C = no attribute (the baked-in tokens). Ids from the
-        // retired E/F/G round migrate to their successors; anything else is
-        // cleared.
-        var OK = { 'f-blue': 1, 'f-amber': 1, 'f-duo': 1 };
-        var MIGRATE = { 'f-grotesk': 'f-blue', 'g-amber': 'f-amber' };
-        var v = localStorage.getItem('ccir-variant');
-        if (v && MIGRATE[v]) { v = MIGRATE[v]; localStorage.setItem('ccir-variant', v); }
-        if (v && OK[v]) document.documentElement.setAttribute('data-variant', v);
-        else if (v) localStorage.removeItem('ccir-variant');
+        // The design is decided (F·DUO baked in); clear stale keys from the
+        // retired dev-only variant rounds.
+        localStorage.removeItem('ccir-variant');
       } catch (e) {}
     })();
   </script>
@@ -168,7 +160,6 @@ const articleLd = article
     <slot />
   </main>
   <SiteFooter />
-  <VariantSwitcher />
   <style>
     .skip-link {
       position: absolute;
