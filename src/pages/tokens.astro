@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
 import LabMark from '../components/LabMark.astro';
 import {
   frontier, served, frontierDays, frontierLatestDay,
@@ -307,11 +308,12 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   description="Daily record of posted token prices from model owners' own price lists — OpenAI, Anthropic, Google, DeepSeek, Moonshot, xAI, Meta, Alibaba, Z.AI, MiniMax, Mistral and more — plus cross-provider medians for open-weight models served by three or more independent providers. USD per 1M tokens."
   ogImage="/og/tokens.png?v=2"
 >
-  <section class="wrap top">
-    <div class="kicker">
-      Token prices · USD per 1M tokens{modelsTracked > 0 ? ` · ${modelsTracked} models` : ''}
-    </div>
-    <h1>Token Prices</h1>
+  <section class="wrap page-top">
+    <PageHeader
+      title="Token Prices"
+      kicker={`Benchmark · USD per 1M tokens${modelsTracked > 0 ? ` · ${modelsTracked} models` : ''}`}
+      asOf={servedAsOf}
+    />
   </section>
 
   <section class="wrap">

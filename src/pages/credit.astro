@@ -16,6 +16,7 @@
   drawn whenever a label had to move away from its mark.
 */
 import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
 import creditData from '../data/credit_instruments.json';
 import CreditIssuanceChart from '../components/CreditIssuanceChart.astro';
 
@@ -519,10 +520,9 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       <a class="apps-nav-link" href="#methodology">Method</a>
     </div>
   </nav>
-  <section class="wrap top">
+  <section class="wrap page-top">
     <div class="hero-solo">
-      <div class="kicker">Market Intelligence · Compute Credit · as of {AS_OF}</div>
-      <h1>Compute Credit Tracker</h1>
+      <PageHeader title="Compute Credit Tracker" kicker="Market Intelligence · Compute Credit" asOf={AS_OF} />
       <p class="standfirst lede">
         The debt stack behind AI compute: GPU-backed loans and the credit
         around them, tracked as filed. {instruments.length}

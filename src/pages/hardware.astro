@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
 import hw from '../data/hardware_panels.json';
 import { ivCards } from '../lib/ivmodel';
 
@@ -234,9 +235,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       contentUrl: 'https://ccir.io/hardware/series.csv',
     }],
   })} />
-  <section class="wrap top">
-    <header class="page-head">
-      <h1>The Secondary Market</h1>
+  <section class="wrap page-top">
+    <PageHeader title="The Secondary Market" kicker="Market Intelligence · Hardware Residual" asOf={hw.as_of}>
       <p class="subhead">What a deployed GPU is worth as an earning asset, and what machines list and sell for.</p>
       <p class="standfirst">
         This page publishes one value per chip: what a machine is worth
@@ -251,7 +251,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         lanes. They are inputs to recovery analysis, not a recovery
         estimate.
       </p>
-    </header>
+    </PageHeader>
 
     <section class="sec iv">
       <h2><span class="n">§</span> Income-derived value</h2>

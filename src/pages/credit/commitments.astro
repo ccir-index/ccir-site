@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import mon from '../../data/commitments_monitor.json';
 
 /*
@@ -41,10 +42,13 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
     </div>
   </nav>
 
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Credit · living surface · updated each filing season</div>
-      <h1>AI Commitments Monitor: $2.6 Trillion Signed, Not Yet Delivered</h1>
+  <section class="wrap page-top">
+    <PageHeader
+      title="AI Commitments Monitor: $2.6 Trillion Signed, Not Yet Delivered"
+      crumbs={[{ href: '/credit', label: 'Credit' }]}
+      kicker="Commitments · updated each filing season"
+      asOf={mon.as_of}
+    >
       <p class="standfirst">
         Meta, Alphabet, Microsoft, Oracle and Amazon have signed
         <strong>{fmtB(sumL + sumP, 0)}</strong> of AI infrastructure
@@ -66,7 +70,7 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
         window and traces to an accession number. As of {mon.as_of}.
         Next expected update: {mon.next_expected}.
       </p>
-    </header>
+    </PageHeader>
 
     <div class="tiles">
       <div class="tile tile-lead"><div class="tlab">Signed, not yet delivered</div><div class="tval">{fmtB(sumL + sumP, 0)}</div></div>

@@ -1,5 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import CiteBlock from '../components/CiteBlock.astro';
 import TierDefinitions from '../components/TierDefinitions.astro';
 import { meta, premiumChipsList, headlineValue, headlineStatOf,
          homeOdCell, homeIntCell } from '../data/snapshot';
@@ -80,10 +82,8 @@ function cellTitle(c: Rate): string {
     license: 'https://ccir.io/documents/data-terms',
     isAccessibleForFree: true,
   })} />
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Reference Rates · US &amp; EU · {meta.as_of_date}</div>
-      <h1>Reference Rates</h1>
+  <section class="wrap page-top">
+    <PageHeader title="Reference Rates" kicker="Benchmark · US &amp; EU" asOf={meta.as_of_date}>
       <p class="standfirst">
         Guaranteed and interruptible on-demand reference rates per chip across
         the three operator segments. Every cell is a published, citable series,
@@ -91,7 +91,7 @@ function cellTitle(c: Rate): string {
         <a href="/term">/term</a>. Regional breakouts and every other grain are
         on <a href="/explorer">/explorer</a>.
       </p>
-    </header>
+    </PageHeader>
 
     <div class="table-wrap">
       <div class="table-head">
@@ -185,62 +185,15 @@ function cellTitle(c: Rate): string {
     <section class="defs-section">
       <TierDefinitions headerless={true} />
     </section>
+    <CiteBlock what="GPU Reference Rates" path="/rates" date={meta.as_of_date} />
   </section>
 
   <style>
-    .top { padding-top: 32px; }
-    .page-head { margin-bottom: 20px; max-width: 80ch; }
-    .page-head h1 {
-      font-family: var(--font-display);
-      font-size: var(--fs-3xl);
-      line-height: var(--lh-display);
-      font-weight: var(--weight-display);
-      margin: 6px 0 12px;
-    }
-    .standfirst a { color: var(--accent); }
-
-    .table-wrap {
-      border: 1px solid var(--rule);
-      background: var(--surface);
-      overflow-x: auto;
-    }
+    /* Page chrome (.page-top/.page-head/.table-*) is global — base.css. */
     /* The interruptible ladder is a second table on the same page, not a
        continuation of the first — space it so the two read as a pair without
        merging into one block. */
     .int-wrap { margin-top: 28px; }
-    .table-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 9px 16px;
-      border-bottom: 1px solid var(--rule-2);
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-eye);
-    }
-    .th-scope { color: var(--ink); font-weight: var(--weight-strong); }
-    .th-meta { color: var(--ink-dim); white-space: nowrap; }
-    .table-foot {
-      border-top: 1px solid var(--rule-2);
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-faint);
-      letter-spacing: 0.02em;
-    }
-    .table-foot summary {
-      padding: 8px 16px;
-      cursor: pointer;
-      list-style: none;
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-eye);
-      user-select: none;
-    }
-    .table-foot summary::-webkit-details-marker { display: none; }
-    .table-foot summary::after { content: ' +'; }
-    .table-foot[open] summary::after { content: ' −'; }
-    .table-foot .tf-body { padding: 0 16px 8px; line-height: 1.6; }
     table.ladder-table { width: 100%; border-collapse: collapse; }
     table.ladder-table th.chip-col { text-align: left; width: 30%; }
     table.ladder-table th.tier-col { text-align: center; padding: 10px 18px; }
