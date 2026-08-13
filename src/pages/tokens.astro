@@ -465,6 +465,14 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       ))}
     </div>
 
+    <p class="foot-note scope-note">
+      Scope: these are standard self-serve rates, the price a buyer pays
+      without a contract. Batch, provisioned-throughput and committed-spend
+      tiers are separate prices and are not pooled into these figures, so a
+      large buyer's realized rate sits below them. Cached input is shown
+      wherever the owner posts it.
+    </p>
+
     <div class="chart-block">
       <div class="chart-title mono">
         gpt-5.6 output price by tier · log scale · {chartDays[0]} → {frontierLatestDay}
@@ -668,6 +676,13 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   .chart-note, .foot-note {
     font-size: var(--fs-sm); color: var(--ink-soft, var(--ink));
     max-width: 640px; margin-top: 10px;
+  }
+
+  /* Scope disclosure sits under the whole first-party grid, not one
+     provider, so it gets a rule above it to read as a section note. */
+  .scope-note {
+    max-width: 78ch; margin-top: 18px; padding-top: 12px;
+    border-top: 1px solid var(--rule, var(--ink-faint, #2a2a2a));
   }
 
   .spark-cell { padding-right: 10px; }
