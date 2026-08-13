@@ -5858,6 +5858,40 @@
     "url": "https://www.prnewswire.com/news-releases/databank-raises-1-1-billion-in-hyperscale-asset-securitization-302565290.html"
    },
    "as_of": "2026-08-09"
+  },
+  {
+   "as_of": "2026-08-13",
+   "collateral_class": "gpu",
+   "entity": "Asset-backed SPV (per company release framing)",
+   "id": "lambda-tlb-926",
+   "instrument_type": "credit_facility",
+   "issued": "2026-08-12",
+   "issuer": "Lambda",
+   "issuer_type": "private",
+   "lenders": [
+    "Morgan Stanley (lead left arranger, bookrunner, administrative agent)",
+    "MUFG (joint bookrunner)",
+    "Syndicate not named"
+   ],
+   "maturity": "2030-12-31",
+   "maturity_note": "Fully amortizing; company states the profile is aligned with contracted cash flows and the useful life of the underlying GPU infrastructure",
+   "name": "$926M senior secured Term Loan B (Moody's Baa2 — first IG-rated TLB by a private neocloud, per company)",
+   "rate": {
+    "kind": "sofr_spread",
+    "note": "SOFR + 3.00% at 99.5 OID; tightened 75bp during syndication (company release)",
+    "value": 3.0
+   },
+   "security": "GPU servers and related infrastructure funded by the facility, plus contracted cash flows from an unnamed investment-grade offtaker (first lien)",
+   "seniority": "Senior secured (first lien)",
+   "size_note": "Priced 2026-08-12; expected close August 2026 subject to customary conditions. Moody's Baa2. Company frames as heavily oversubscribed. Proceeds fund acquisition and installation of GPU servers dedicated to an investment-grade offtaker (not named). Press (Bloomberg 8/12) ties the purchase to NVIDIA chips; offtaker identity NOT disclosed - not carried",
+   "size_usd_m": 926,
+   "source": {
+    "date": "2026-08-12",
+    "doc": "Lambda company release: 'Lambda Prices $926 Million Senior Secured Term Loan B Facility, the First Investment-Grade-Rated Term Loan B Financing by a Private Neocloud'",
+    "url": "https://lambda.ai/blog/lambda-prices-926-million-senior-secured-term-loan-b-facility"
+   },
+   "status": "confirmed",
+   "ticker": null
   }
  ],
  "retired": [
