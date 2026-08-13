@@ -5892,6 +5892,38 @@
    },
    "status": "confirmed",
    "ticker": null
+  },
+  {
+   "as_of": "2026-08-13",
+   "collateral_class": "gpu",
+   "entity": "Nscale Ward County Borrower SPV, LLC (bankruptcy-remote; Nscale Ward County LLC = data center tenant and affiliate guarantor; land owned by third-party DC operator)",
+   "id": "nscale-ward-ddtl-baa1",
+   "instrument_type": "credit_facility",
+   "issued": "2026-08-12",
+   "issuer": "Nscale",
+   "issuer_type": "private",
+   "lenders": [
+    "Fixed + floating commitments; lenders not named (fixed-rate investors described by Moody's as high credit quality)"
+   ],
+   "maturity": "Undisclosed",
+   "maturity_note": "Fully amortizing within the 6-year take-or-pay contract term; floating tranche >=85% hedged through maturity; last forecast funding date February 2027",
+   "name": "Up to $1.831B senior secured DDTL (Moody's first-time Baa1, stable — Ward County, TX GPU-as-a-service SPV)",
+   "rate": {
+    "kind": "undisclosed",
+    "note": "Fixed + floating mix; pricing not disclosed in the rating action",
+    "value": null
+   },
+   "security": "GPU infrastructure (NVIDIA GB300 and VR200/Vera Rubin systems, ~275 MW IT load) and related networking/storage/cooling at a Ward County, Texas data center campus; 6-year availability-based fixed-price take-or-pay GPU-as-a-service contract with an unnamed hyperscaler rated at least Aa3; direct agreements with the customer and the data center operator; strict funding conditions (Level 3 commissioning + power + hedges as draw conditions)",
+   "seniority": "Senior secured",
+   "size_note": "Moody's assigned first-time Baa1 (stable) 2026-08-12 — one day after Lambda's Baa2; second IG GPU project rating in 24 hours, third overall (after CRWV DDTL 4.0 A3). Customer = unnamed hyperscaler rated at least Aa3; large per-tranche prepayments substitute for cash equity (no cash equity in the GPU financing; Moody's notes equity distributions exceed the separate DC-financing equity needs by commissioning). Moody's DSCR avg ~1.33x (range 1.15-1.40x); DSRA sized at 67% of next payment/2 months + 3-month opex reserve; BTM generation procurement pending for tranche 3; Dell service agreement covers 3 of 6 years; VR200 has no operating track record (stabilization period negotiated). Separate instrument from the Feb-2026 $1.4B Nscale GPU DDTL (Blue Owl BDC-disclosed, S+500, Europe clusters).",
+   "size_usd_m": 1831,
+   "source": {
+    "date": "2026-08-12",
+    "doc": "Moody's Ratings rating action 'Moody's Ratings assigns first-time Baa1 rating to Nscale Ward County Borrower SPV, LLC; outlook stable' (New York, 2026-08-12; on file)",
+    "url": "https://ratings.moodys.com"
+   },
+   "status": "confirmed",
+   "ticker": null
   }
  ],
  "retired": [
