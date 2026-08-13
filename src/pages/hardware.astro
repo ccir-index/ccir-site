@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import hw from '../data/hardware_panels.json';
+import ChipLink from '../components/ChipLink.astro';
 import { ivCards } from '../lib/ivmodel';
 
 // Secondary-market hardware price tape — observed executed prices (eBay
@@ -589,7 +590,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
             const ageYr = ((mk(hw.as_of.slice(0, 7)) - mk(ga)) / 12).toFixed(1);
             return (
               <tr>
-                <td class="gen">{m.label}</td>
+                {/* Links resolve only on the exact registry variant (identity
+                    lock) — A100-40 / PCIe rows stay plain text. */}
+                <td class="gen"><ChipLink chip={m.key} label={m.label} /></td>
                 <td class="num dim">{ga.slice(0, 4)}</td>
                 <td class="num dim">{ageYr}y</td>
                 <td class="num strong">{fmtUsd(t90)}</td>

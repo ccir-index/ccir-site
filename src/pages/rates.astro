@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import CiteBlock from '../components/CiteBlock.astro';
+import ChipLink from '../components/ChipLink.astro';
 import TierDefinitions from '../components/TierDefinitions.astro';
 import { meta, premiumChipsList, headlineValue, headlineStatOf,
          homeOdCell, homeIntCell } from '../data/snapshot';
@@ -112,7 +113,7 @@ function cellTitle(c: Rate): string {
         <tbody>
           {ladder.map(({ chip, cells }) => (
             <tr>
-              <td class="chip-cell"><div class="chip-name">{chipDisplay(chip)}</div></td>
+              <td class="chip-cell"><div class="chip-name"><ChipLink chip={chip} label={chipDisplay(chip)} /></div></td>
               {TIERS.map((t) => {
                 const c = cells[t];
                 if (!c) return <td class="num empty">—</td>;
@@ -135,7 +136,7 @@ function cellTitle(c: Rate): string {
         </div>
       </details>
     </div>
-    <a class="chip-pointer" href="/chip/h100">H100 instrument page · pilot →</a>
+    <a class="chip-pointer" href="/chips">Chip instrument pages →</a>
 
     {intLadder.length > 0 && (
       <div class="table-wrap int-wrap">
@@ -157,7 +158,7 @@ function cellTitle(c: Rate): string {
           <tbody>
             {intLadder.map(({ chip, cells }) => (
               <tr>
-                <td class="chip-cell"><div class="chip-name">{chipDisplay(chip)}</div></td>
+                <td class="chip-cell"><div class="chip-name"><ChipLink chip={chip} label={chipDisplay(chip)} /></div></td>
                 {TIERS.map((t) => {
                   const c = cells[t];
                   if (!c) return <td class="num empty">—</td>;

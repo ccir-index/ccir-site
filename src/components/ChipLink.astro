@@ -1,0 +1,24 @@
+---
+/*
+  ChipLink — renders a chip name as a quiet wayfinding link to its
+  instrument page when the registry has one (chipRoute), else as plain
+  text. Tables render every silicon label through this component and need
+  no edits when a new chip page ships.
+
+  `chip` takes a rates token ('H100') or a hardware model key
+  ('H100-80-SXM5'); `label` overrides the visible text (defaults to the
+  chip string). Styling is the global .chip-link quiet-link pattern
+  (base.css): ink at rest with a faint blue underline cue, full blue on
+  hover — wayfinding role, no table noise.
+*/
+import { chipRoute } from '../data/chips';
+
+interface Props {
+  chip: string;
+  label?: string;
+}
+const { chip, label } = Astro.props;
+const href = chipRoute(chip);
+const text = label ?? chip;
+---
+{href ? <a class="chip-link" href={href}>{text}</a> : text}

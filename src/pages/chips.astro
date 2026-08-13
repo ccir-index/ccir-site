@@ -1,0 +1,147 @@
+---
+/*
+  /chips — chip instrument index (redesign/v1, 2026-08-13).
+
+  One compact row per registry chip: identity + the four stat-band figures,
+  each the SAME cell its instrument page (and the underlying surface)
+  prints — inherit, never mint. Committed cells are market intelligence
+  and carry the MI mark. Rows link to /chip/<slug>.
+*/
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import {
+  homeOdCell, homeIntCell, tierOdCell, headlineValue, headlineStatOf, meta,
+} from '../data/snapshot';
+import { wpSpread } from '../data/committed_mi';
+import hw from '../data/hardware_panels.json';
+import { CHIPS } from '../data/chips';
+import type { Term } from '../data/types';
+
+const fmt = (n: number, dp = 2) => n.toFixed(dp);
+const fmtUsd = (v: number | null | undefined) =>
+  v == null ? '—' : '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+const TENORS: Term[] = ['3M', '6M', '1Y', '2Y', '3Y'];
+
+const rows = CHIPS.map((def) => {
+  const spot = homeOdCell('T2', def.id);
+  const intr = homeIntCell('T2', def.id);
+  const odAnchor = tierOdCell('T2', def.id, 'ALL');
+  const odAnchorValue = odAnchor ? headlineValue(odAnchor) : null;
+  // Longest published tenor — the same headline the chip page prints.
+  let committed: { term: Term; value: number; n: number } | null = null;
+  if (odAnchorValue != null) {
+    for (const term of TENORS) {
+      const sp = wpSpread(def.id, term);
+      if (sp) committed = { term, value: odAnchorValue * (1 + sp.spread), n: sp.n_pairs };
+    }
+  }
+  const hwModel = (hw.models as any[]).find((m) => m.key === def.hwKey);
+  const ask = hwModel?.ask as { med: number | null; n: number } | undefined;
+  return { def, spot, intr, committed, ask };
+});
+---
+<Base
+  title="GPU Chips — Instrument Pages · CCIR"
+  description="Per-chip instrument pages: guaranteed and interruptible on-demand reference rates, committed term structure, and secondary-market hardware asks — H100, H200, A100. Every figure inherits from the surface that publishes it."
+>
+  <section class="wrap page-top">
+    <PageHeader
+      title="Chips"
+      crumbs={[{ href: '/', label: 'CCIR' }]}
+      kicker="Instruments"
+      asOf={meta.as_of_date}
+    >
+      <p class="standfirst">
+        One page per chip, four lanes per page: spot, committed, interruptible,
+        and secondary hardware. Every figure below is the same cell the
+        instrument page — and the surface behind it — prints.
+      </p>
+    </PageHeader>
+
+    <div class="table-wrap">
+      <div class="table-head">
+        <span class="th-scope">Chip instruments · T2 Neocloud headline band</span>
+        <span class="th-meta">as of {meta.as_of_date}</span>
+      </div>
+      <table class="data">
+        <thead>
+          <tr>
+            <th class="chip-col">Silicon</th>
+            <th class="id-col">Identity</th>
+            <th>Spot · GTD<br />USD/GPU-hr</th>
+            <th>Committed<br />USD/GPU-hr</th>
+            <th>Interruptible<br />USD/GPU-hr</th>
+            <th>Secondary ask<br />USD/unit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(({ def, spot, intr, committed, ask }) => (
+            <tr>
+              <td class="chip-cell">
+                <a class="chip-page-link" href={`/chip/${def.slug}`}>{def.name} →</a>
+              </td>
+              <td class="id-cell">{def.formFactor} {def.memory} · {def.generation} · {def.introduced.slice(0, 4)}</td>
+              <td class="num strongv">{spot ? `$${fmt(headlineValue(spot))}` : '—'}{spot && <span class="cellmeta">n={spot.n_sources} · {headlineStatOf(spot)}</span>}</td>
+              <td class="num">{committed ? `$${fmt(committed.value)}` : '—'}{committed && <span class="cellmeta">{committed.term} · {committed.n} pairs · MI</span>}</td>
+              <td class="num">{intr ? `$${fmt(headlineValue(intr))}` : '—'}{intr && <span class="cellmeta">n={intr.n_sources} · {headlineStatOf(intr)}</span>}</td>
+              <td class="num">{ask?.med != null ? fmtUsd(ask.med) : '—'}{ask?.med != null && <span class="cellmeta">{def.hwLabel} · n={ask.n} · {hw.as_of}</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <details class="table-foot">
+        <summary>Construction</summary>
+        <div class="tf-body">
+          Spot / interruptible = the /rates T2 ladder cells (on-demand asks,
+          form and region pooled). Committed = the /term construction: the
+          longest published tenor implied off the on-demand anchor by the
+          within-provider spread — market intelligence, not a citable
+          reference rate. Secondary ask = the /hardware posted-ask median
+          for the one locked variant per chip. Lanes are never blended; an
+          em dash is a cell below the publication floor.
+        </div>
+      </details>
+    </div>
+
+    <p class="roster-note">
+      A chip joins this index when both a hardware ask and a T2 rates cell
+      exist for it. Chips whose hardware record has not yet formed
+      (B200, B300, GB200) are on their surfaces but carry no instrument
+      page yet.
+    </p>
+  </section>
+
+  <style>
+    .chip-col { width: 18%; }
+    .id-col { width: 22%; }
+    table.data th { text-align: right; }
+    table.data th.chip-col, table.data th.id-col { text-align: left; }
+    .id-cell {
+      text-align: left;
+      color: var(--ink-dim);
+      white-space: nowrap;
+    }
+    .chip-cell { white-space: nowrap; }
+    .chip-page-link {
+      color: var(--link);
+      font-weight: var(--weight-strong);
+    }
+    td.strongv { color: var(--accent); font-weight: var(--weight-strong); }
+    .cellmeta {
+      display: block;
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      font-weight: var(--weight-body);
+      margin-top: 2px;
+    }
+    .roster-note {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      line-height: 1.7;
+      max-width: 720px;
+      margin: 14px 0 0;
+    }
+  </style>
+</Base>

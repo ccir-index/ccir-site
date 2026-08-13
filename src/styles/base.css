@@ -216,6 +216,23 @@ table.data tbody tr:hover td { background: var(--surface-3); }
 .sec-head { margin-bottom: 14px; max-width: 84ch; }
 .sec-head h2 { font-size: var(--fs-2xl); margin: 4px 0 10px; }
 
+/* Quiet wayfinding link — chip names (and similar labels) inside dense
+   tables, where a full blue link per row would be noise. Ink at rest with
+   a faint blue underline cue; full blue on hover/focus. Wayfinding role:
+   the cue and hover ride --link, never --accent. */
+a.chip-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+a.chip-link:hover,
+a.chip-link:focus-visible {
+  color: var(--link);
+  text-decoration-color: var(--link);
+}
+
 /* Tier badge — short code (T1 / T2 / T3) */
 .tier-badge {
   font-family: var(--font-mono);

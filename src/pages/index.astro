@@ -4,6 +4,7 @@ import {
   headlineRates, meta, premiumChipsList, homeOdCell, homeIntCell, headlineValue, headlineStatOf,
 } from '../data/snapshot';
 import { wpSpread } from '../data/committed_mi';
+import ChipLink from '../components/ChipLink.astro';
 import { TIERS, TIER_LABELS_SHORT, TERM_DISPLAY } from '../data/types';
 import type { Rate, Term, Tier } from '../data/types';
 import creditData from '../data/credit_instruments.json';
@@ -152,7 +153,7 @@ const researchGroups: ResearchGroup[] = [
               <tbody>
                 {ladder.map(({ chip, cells }) => (
                   <tr>
-                    <td class="chip-cell">{chip.replace(/-/g, ' ')}</td>
+                    <td class="chip-cell"><ChipLink chip={chip} label={chip.replace(/-/g, ' ')} /></td>
                     {TIERS.map((t) => {
                       const c = cells[t];
                       if (!c) return <td class="num empty">—</td>;
@@ -200,7 +201,7 @@ const researchGroups: ResearchGroup[] = [
               <tbody>
                 {intLadder.map(({ chip, cells }) => (
                   <tr>
-                    <td class="chip-cell">{chip.replace(/-/g, ' ')}</td>
+                    <td class="chip-cell"><ChipLink chip={chip} label={chip.replace(/-/g, ' ')} /></td>
                     {TIERS.map((t) => {
                       const c = cells[t];
                       if (!c) return <td class="num empty">—</td>;
@@ -228,6 +229,9 @@ const researchGroups: ResearchGroup[] = [
           </div>
         </div>
       </div>
+      <!-- Outside the mirrored cards (mirror rule): one quiet pointer for
+           the pair, not a per-card footer row. -->
+      <a class="chips-pointer" href="/chips">All chips →</a>
       <p class="grade-defs">
         The guaranteed grade prices committed capacity. The interruptible
         grade prices spare capacity. Same silicon, same panel
@@ -336,6 +340,18 @@ const researchGroups: ResearchGroup[] = [
       text-decoration: none;
     }
     .term-pointer:hover { color: var(--link); }
+    /* Quiet index pointer for the card pair — sits outside both cards. */
+    .chips-pointer {
+      display: inline-block;
+      margin: 10px 0 0;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--ink-dim);
+      text-decoration: none;
+    }
+    .chips-pointer:hover { color: var(--link); }
     .block-link {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);

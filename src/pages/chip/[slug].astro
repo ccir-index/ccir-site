@@ -1,21 +1,22 @@
 ---
 /*
-  /chip/h100 — chip instrument page PILOT (redesign/v1, 2026-08-13).
+  /chip/<slug> — chip instrument pages (redesign/v1; H100 pilot generalized
+  2026-08-13, driven by the chip registry in src/data/chips.ts).
 
   THE RULE: INHERIT, NEVER MINT. Every number on this page is a cell an
   existing surface already publishes, computed by that surface's own code
   path, at that surface's scope:
 
-    Spot          homeOdCell('T2','H100')       — the exact /rates guaranteed
+    Spot          homeOdCell('T2', id)          — the exact /rates guaranteed
                                                   ladder cell (snapshot.ts).
-    Interruptible homeIntCell('T2','H100')      — the exact /rates
+    Interruptible homeIntCell('T2', id)         — the exact /rates
                                                   interruptible ladder cell.
-    Committed     tierOdCell('T2','H100','ALL') anchor stepped by
-                  wpSpread('H100', tenor)       — TermCurveChart's own
+    Committed     tierOdCell('T2', id, 'ALL') anchor stepped by
+                  wpSpread(id, tenor)           — TermCurveChart's own
                                                   odPoint/tenorPoint math
                                                   (committed_mi.ts), longest
                                                   published tenor.
-    Secondary ask hw.models['H100-80-SXM5'].ask — /hardware's posted-ask
+    Secondary ask hw.models[def.hwKey].ask      — /hardware's posted-ask
                                                   median (hardware_panels).
     Rates trend   seriesHistory(spot.series_id) — the published headline
                                                   history (explorer's spark
@@ -24,13 +25,14 @@
                                                   3-month rolling medians.
 
   No cell is computed here that no surface computes. Lanes never blend.
-  H100 identity is locked to SXM 80GB wherever a surface distinguishes it
-  (committed_mi maps H100 → h100-sxm-80gb; hardware key H100-80-SXM5);
-  the rates cells are the same pooled H100 series /rates prints.
+  Identity is locked per registry entry (hwKey pins ONE hardware variant;
+  committed_mi maps the chip token to its own silicon_id lock; the rates
+  cells are the same pooled per-chip series /rates prints).
 
   Committed values are MARKET INTELLIGENCE, badged, never citable.
   No % change is printed anywhere on this page.
-  Pilot: noindex, no OG card, no masthead entry (footer + /rates pointer).
+  A tile whose computing surface publishes nothing prints an em dash; a
+  module with no charted record says so — nothing is substituted.
 */
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
@@ -40,13 +42,20 @@ import {
 } from '../../data/snapshot';
 import { wpSpread } from '../../data/committed_mi';
 import hw from '../../data/hardware_panels.json';
+import { CHIPS, type ChipDef } from '../../data/chips';
 import type { Rate, Term } from '../../data/types';
+
+export function getStaticPaths() {
+  return CHIPS.map((c) => ({ params: { slug: c.slug }, props: { def: c } }));
+}
+const { def } = Astro.props as { def: ChipDef };
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 const fmtUsd = (v: number | null | undefined) =>
   v == null ? '—' : '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
-const CHIP = 'H100';
+const CHIP = def.id;
+const introYear = def.introduced.slice(0, 4);
 
 // --- rates lane (same cells as /rates) -------------------------------------
 const spot = homeOdCell('T2', CHIP);
@@ -70,11 +79,11 @@ const tenorPts: TenorPt[] = odAnchorValue == null ? [] : TENORS.flatMap(({ term,
   return [{ term, months, value: odAnchorValue * (1 + sp.spread), n: sp.n_pairs, prov: sp.n_pairs < 3 }];
 });
 // Headline committed tile = the longest published tenor, matching the end
-// of /term's H100 line.
+// of /term's line for this chip.
 const committed = tenorPts.length ? tenorPts[tenorPts.length - 1]! : null;
 
 // --- hardware lane (same cells as /hardware) -------------------------------
-const hwModel = (hw.models as any[]).find((m) => m.key === 'H100-80-SXM5');
+const hwModel = (hw.models as any[]).find((m) => m.key === def.hwKey);
 const ask = hwModel?.ask as { med: number | null; n: number } | undefined;
 const t90 = hwModel?.t90 as { med: number | null; n: number } | undefined;
 
@@ -142,20 +151,70 @@ const hwPath = (() => {
     })
     .join(' ');
 })();
+
+// --- lifecycle strip: the four-phase arc, current phase per registry -------
+const PHASES: { key: ChipDef['phase']; eye: string; text: string }[] = [
+  { key: 'launch', eye: `${introYear} · Launch`, text: def.launchText },
+  { key: 'prime', eye: 'Prime flow', text: 'Rented on guaranteed and interruptible terms; the benchmark records the posted asks daily.' },
+  { key: 'collateral', eye: 'Collateral', text: 'GPU fleets appear as filed collateral in GPU-backed facilities — tracked, as filed, on /credit.' },
+  { key: 'residual', eye: 'Residual', text: 'Secondary asks and executed sales recorded on /hardware; freed capacity re-lets at the prevailing rate.' },
+];
+
+// --- SEO -------------------------------------------------------------------
+const SITE = 'https://ccir.io';
+const pageTitle = `${def.name} Rental Price — CCIR Reference Rates`;
+const pageDescription =
+  `Daily published reference rates for the ${def.name} (${def.formFactor} ${def.memory}): ` +
+  `guaranteed and interruptible on-demand USD/GPU-hr, committed term structure, ` +
+  `and secondary-market hardware asks. Every figure inherits from the surface that publishes it.`;
+
+// Dataset schema: this page is a published data surface (daily series with
+// stated methodology), not an article and not a product offer — no offers,
+// reviews, or ratings markup. Claims mirror what the page prints.
+const datasetLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: `CCIR ${def.short} rental reference rates`,
+  description:
+    `Daily reference rates for ${def.name} (${def.formFactor} ${def.memory}) GPU rental: ` +
+    `guaranteed and interruptible on-demand rates in USD per GPU-hour by operator segment, ` +
+    `committed term structure (market intelligence), and secondary-market hardware asks in USD per unit.`,
+  url: `${SITE}/chip/${def.slug}`,
+  creator: { '@id': `${SITE}/#org` },
+  publisher: { '@id': `${SITE}/#org` },
+  isAccessibleForFree: true,
+  dateModified: meta.as_of_date,
+  keywords: [
+    `${def.short} rental price`,
+    `${def.short} GPU price per hour`,
+    `${def.name}`,
+    'GPU reference rates',
+    'GPU rental benchmark',
+  ],
+  measurementTechnique:
+    `Publicly posted asks aggregated per operator segment; headline = panel mean at n>=10, else median. Methodology: ${SITE}/documents/methodology`,
+  variableMeasured: [
+    { '@type': 'PropertyValue', name: 'Guaranteed on-demand rate', unitText: 'USD per GPU-hour' },
+    { '@type': 'PropertyValue', name: 'Interruptible on-demand rate', unitText: 'USD per GPU-hour' },
+    { '@type': 'PropertyValue', name: 'Committed term rate (market intelligence)', unitText: 'USD per GPU-hour' },
+    { '@type': 'PropertyValue', name: 'Secondary-market posted ask', unitText: 'USD per unit' },
+  ],
+});
 ---
 <Base
-  title="NVIDIA H100 — Instrument Page (Pilot) · CCIR"
-  description="One page per chip: the H100 across CCIR's published surfaces — guaranteed and interruptible on-demand rates, committed term structure, and secondary-market hardware prices. Every figure inherits from the surface that publishes it."
-  noindex={true}
+  title={pageTitle}
+  description={pageDescription}
+  ogImage={`/og/chip-${def.slug}.png`}
 >
+  <script slot="head" is:inline type="application/ld+json" set:html={datasetLd} />
   <section class="wrap page-top">
     <PageHeader
-      title="NVIDIA H100"
-      crumbs={[{ href: '/', label: 'CCIR' }, { href: '/rates', label: 'Chips' }]}
-      kicker="H100"
+      title={def.name}
+      crumbs={[{ href: '/', label: 'CCIR' }, { href: '/chips', label: 'Chips' }]}
+      kicker={def.short}
       asOf={meta.as_of_date}
     >
-      <p class="id-meta">SXM · 80GB · HOPPER · INTRODUCED 2022</p>
+      <p class="id-meta">{def.formFactor} · {def.memory} · {def.generation.toUpperCase()} · INTRODUCED {introYear}</p>
       {counts && <p class="id-counts">{counts}</p>}
       <p class="standfirst">
         One chip across the published surfaces. Every figure on this page is
@@ -199,7 +258,7 @@ const hwPath = (() => {
         ) : <span class="st-value">—</span>}
       </div>
       <div class="stat">
-        <span class="st-lane">Secondary ask · SXM5 80GB</span>
+        <span class="st-lane">Secondary ask · {def.hwLabel}</span>
         {ask?.med != null ? (
           <>
             <span class="st-value" title={`posted ask median, current (multi-source) · n=${ask.n} asks · /hardware`}>{fmtUsd(ask.med)}</span>
@@ -224,7 +283,7 @@ const hwPath = (() => {
         {sparkPath ? (
           <figure class="mod-fig">
             <svg viewBox={`0 0 ${SW} ${SH}`} role="img"
-              aria-label={`H100 guaranteed on-demand published headline, ${histWindow}.`}>
+              aria-label={`${def.short} guaranteed on-demand published headline, ${histWindow}.`}>
               <path d={sparkPath} class="line" />
             </svg>
             <figcaption class="mod-chrome">
@@ -246,7 +305,7 @@ const hwPath = (() => {
         {termPath && odAnchorValue != null ? (
           <figure class="mod-fig">
             <svg viewBox={`0 0 ${TW} ${TH}`} role="img"
-              aria-label={`H100 committed levels by tenor, implied off the on-demand anchor.`}>
+              aria-label={`${def.short} committed levels by tenor, implied off the on-demand anchor.`}>
               <path d={termPath} class="line" />
               <circle cx={tx(0)} cy={ty(odAnchorValue)} r="3" class="pt" />
               <text x={tx(0)} y={ty(odAnchorValue) - 7} class="pt-lab" text-anchor="start">OD ${fmt(odAnchorValue)}</text>
@@ -283,7 +342,7 @@ const hwPath = (() => {
         {hwPath ? (
           <figure class="mod-fig">
             <svg viewBox={`0 0 ${HW_W} ${HW_H}`} role="img"
-              aria-label={`H100 executed secondary-market sale prices, 3-month rolling median, ${hwWindow}.`}>
+              aria-label={`${def.short} executed secondary-market sale prices, 3-month rolling median, ${hwWindow}.`}>
               <path d={hwPath} class="line" />
             </svg>
             <figcaption class="mod-chrome">
@@ -292,33 +351,29 @@ const hwPath = (() => {
           </figure>
         ) : <p class="mod-chrome">No executed record charted for this model.</p>}
         <p class="mod-line">
-          Executed sale prices for the SXM5 80GB unit{t90?.med != null && <> — trailing-90-day executed median {fmtUsd(t90.med)} (n={t90.n})</>}{ask?.med != null && <>; current posted ask median {fmtUsd(ask.med)} (n={ask.n})</>}. Asks and executed prints stay in separate lanes.
+          Executed sale prices for the {def.hwLabel} unit{t90?.med != null && <> — trailing-90-day executed median {fmtUsd(t90.med)} (n={t90.n})</>}{ask?.med != null && <>; current posted ask median {fmtUsd(ask.med)} (n={ask.n})</>}. Asks and executed prints stay in separate lanes.
         </p>
       </section>
     </div>
 
-    <!-- Lifecycle strip -->
+    <!-- Lifecycle strip — current phase highlighted per registry -->
     <section class="lifecycle">
       <header class="mod-head">
         <span class="kicker">Asset arc · as recorded</span>
       </header>
       <ol class="arc">
-        <li class="arc-step">
-          <span class="arc-eye">2022 · Launch</span>
-          <span class="arc-text">SXM5 80GB general availability, October 2022.</span>
-        </li>
-        <li class="arc-step">
-          <span class="arc-eye">Prime flow</span>
-          <span class="arc-text">Rented on guaranteed and interruptible terms; the benchmark records the posted asks daily.</span>
-        </li>
-        <li class="arc-step">
-          <span class="arc-eye">Collateral</span>
-          <span class="arc-text">H100 fleets appear as filed collateral in GPU-backed facilities — tracked, as filed, on <a href="/credit">/credit</a>.</span>
-        </li>
-        <li class="arc-step">
-          <span class="arc-eye">Residual</span>
-          <span class="arc-text">Secondary asks and executed sales recorded on <a href="/hardware">/hardware</a>; freed capacity re-lets at the prevailing rate.</span>
-        </li>
+        {PHASES.map((ph) => (
+          <li class:list={['arc-step', { 'arc-now': ph.key === def.phase }]}>
+            <span class="arc-eye">{ph.eye}{ph.key === def.phase && <span class="arc-tag">current</span>}</span>
+            <span class="arc-text">
+              {ph.key === 'collateral'
+                ? <>GPU fleets appear as filed collateral in GPU-backed facilities — tracked, as filed, on <a href="/credit">/credit</a>.</>
+                : ph.key === 'residual'
+                  ? <>Secondary asks and executed sales recorded on <a href="/hardware">/hardware</a>; freed capacity re-lets at the prevailing rate.</>
+                  : ph.text}
+            </span>
+          </li>
+        ))}
       </ol>
     </section>
   </section>
@@ -511,12 +566,25 @@ const hwPath = (() => {
       letter-spacing: var(--tracking-eye);
       color: var(--accent);
       font-weight: var(--weight-strong);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
     }
     .arc-text {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       color: var(--ink-dim);
       line-height: 1.65;
+    }
+    /* Current phase — amber left rule + tag (data emphasis role). */
+    .arc-now { box-shadow: inset 2px 0 0 0 var(--accent); }
+    .arc-now .arc-text { color: var(--ink); }
+    .arc-tag {
+      font-size: calc(var(--fs-xs) - 2px);
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+      padding: 0 5px;
     }
   </style>
 </Base>

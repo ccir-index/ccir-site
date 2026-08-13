@@ -13,6 +13,7 @@ import TermCurveChart from '../components/TermCurveChart.astro';
 // OCI, n=4). Per-provider ladders below remain the within-book view.
 import HyperscalerTermChart from '../components/HyperscalerTermChart.astro';
 import { meta } from '../data/snapshot';
+import { CHIPS } from '../data/chips';
 // Implied-forwards section CUT (John 2026-07-02): with the par curve's OD
 // anchor moving to the pooled NEOCLOUD band OD (apples-to-apples), the
 // derived step chart adds confusion without adding signal for most readers.
@@ -68,6 +69,13 @@ import { meta } from '../data/snapshot';
       </header>
 
       <TermCurveChart />
+      <p class="instrument-note">
+        Per-chip instrument pages:
+        {CHIPS.map((c, i) => (
+          <>{i > 0 && ' · '}<a href={`/chip/${c.slug}`}>{c.short}</a></>
+        ))}
+        &nbsp;· <a href="/chips">all chips →</a>
+      </p>
       <p class="population-note">
         The curve above is computed from operators that post tenor ladders:
         committed rates quoted as discounts to their own on-demand asks.
@@ -105,6 +113,14 @@ import { meta } from '../data/snapshot';
     }
 
     .curve-section { margin: 0 0 36px; }
+
+    .instrument-note {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      margin: 14px 0 0;
+    }
+    .instrument-note a { color: var(--link); }
 
     .population-note {
       font-family: var(--font-mono);
