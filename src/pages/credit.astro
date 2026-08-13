@@ -96,6 +96,46 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 // --- facets ------------------------------------------------------------------
+// Rated-ladder grid: lines from rows carrying facility_ratings. The config
+// only groups multi-instrument packages and sets short labels; any new
+// register row with facility_ratings joins automatically as its own line.
+const GRADE_RANK: Record<string, number> = {
+  'A': 1, 'A (low)': 2, 'A3': 3, 'Baa1': 4, 'Baa2': 5, 'Baa3': 6,
+  'Ba1': 7, 'Ba2': 8, 'BB+': 8.5, 'Ba3': 9, 'BB': 9.5, 'BB-': 10,
+};
+const RATED_LINES = [
+  { ids: ['iren-hw3-ddtl', 'iren-hw3-notes'], label: 'USPP + DDTL package' },
+  { ids: ['crwv-ddtl-4'], label: 'DDTL 4.0' },
+  { ids: ['nscale-ward-ddtl-baa1'], label: 'DDTL (Ward County SPV)' },
+  { ids: ['lambda-tlb-926'], label: 'Term Loan B' },
+  { ids: ['crwv-ddtl-5'], label: 'DDTL 5.0' },
+  { ids: ['crwv-ddtl-2600-2026'], label: 'DDTL 5.5' },
+];
+const ratedCovered = new Set(RATED_LINES.flatMap((l) => l.ids));
+const ratedExtras = instruments
+  .filter((i: any) => i.facility_ratings?.length && !ratedCovered.has(i.id))
+  .map((i: any) => ({ ids: [i.id], label: i.instrument_type }));
+const fmtLadderSize = (m: number) =>
+  m >= 1000 ? `$${+(m / 1000).toFixed(2)}B` : `$${Math.round(m)}M`;
+const ratedLadder = [...RATED_LINES, ...ratedExtras]
+  .map((l) => {
+    const rows = l.ids.map((id) => byId.get(id)).filter(Boolean) as any[];
+    if (!rows.length || !rows[0].facility_ratings?.length) return null;
+    const fr = [...new Map(rows.flatMap((r) => r.facility_ratings)
+      .map((x: any) => [`${x.grade}|${x.agency}`, x])).values()] as any[];
+    return {
+      grades: fr.map((x) => `${x.grade} (${x.agency})`).join(' · '),
+      rank: Math.min(...fr.map((x) => GRADE_RANK[x.grade] ?? 99)),
+      public: fr.map((x) => x.public).sort()[0],
+      issuer: rows[0].issuer,
+      name: l.label,
+      size: fmtLadderSize(rows.reduce((a, r) => a + (r.size_usd_m || 0), 0)),
+      offtaker: rows[0].offtaker_label ?? '—',
+    };
+  })
+  .filter(Boolean)
+  .sort((a: any, b: any) => a.rank - b.rank || a.public.localeCompare(b.public));
+
 const issuers = [...new Set(instruments.map((i: any) => i.issuer))];
 const types = [...new Set(instruments.map((i: any) => i.instrument_type))];
 
@@ -860,6 +900,44 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       </details>
     </div>
 
+    <!-- Rated GPU-collateral financings — grade ladder (data-driven from
+         facility_ratings; new rated deals join by register edit) -->
+    <div class="rated-head" id="rated">
+      <h2>Rated GPU-collateral financings</h2>
+      <p class="standfirst">
+        Every GPU-collateral financing carrying a public agency grade.
+        Grades are the comparable axis across these deals; formats and
+        tranches differ, so spreads are not lined up here. Dates are when
+        each rating first entered the public record. The class boundary is
+        ownership of the compute: the borrower owns and pledges the GPUs.
+        Anatomy of the August pair in
+        <a href="/research/the-rating-case-goes-investment-grade">the
+        rating-case note</a>.
+      </p>
+    </div>
+    <div class="table-wrap rated-wrap">
+      <table class="data rated-grid">
+        <thead>
+          <tr>
+            <th>Grade</th><th>On record</th><th>Issuer</th>
+            <th>Financing</th><th>Size</th><th>Offtaker</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ratedLadder.map((l: any) => (
+            <tr>
+              <td class="grade">{l.grades}</td>
+              <td class="mono-dim">{l.public}</td>
+              <td>{l.issuer}</td>
+              <td>{l.name}</td>
+              <td class="num">{l.size}</td>
+              <td>{l.offtaker}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
     <!-- Ledger table -->
     <div class="ledger-head" id="ledger">
       <h2>Instrument ledger</h2>
@@ -1475,6 +1553,15 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     }
 
     /* --- filters + table --------------------------------------------------- */
+    .rated-head { margin: 8px 0 14px; max-width: 84ch; }
+    .rated-wrap { margin-bottom: 34px; }
+    .rated-grid td.grade {
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+      white-space: nowrap;
+    }
+    .rated-grid td.mono-dim { color: var(--ink-dim); white-space: nowrap; }
+    .rated-grid td.num { text-align: right; white-space: nowrap; }
     .ledger-head { margin: 8px 0 14px; max-width: 84ch; }
     .filters {
       display: flex;
