@@ -288,13 +288,13 @@ function scnPct(s){
   return wlist>0?rate/wlist*100:null;
 }
 const OPCOL={"CoreWeave":"#4a86d6","Nebius":"#e08a2e","IREN":"#9b6ad6","Applied Digital":"#9a9a3d"};
-const QLAB=["Sep'24","Dec'24","Mar'25","Jun'25","Sep'25","Dec'25","Mar'26"];
+const QLAB=["Sep'24","Dec'24","Mar'25","Jun'25","Sep'25","Dec'25","Mar'26","Jun'26"];
 function drawTrend(){
   const host=document.getElementById("trendcard"); if(!host)return;
   const pts=SCN.map((s,i)=>({i,op:s.op,idx:s.idx,q:s.q,pct:scnPct(s),stale:s.stale,prov:s.prov})).filter(p=>p.pct!=null);
   if(!pts.length){host.innerHTML="";return;}
   const W=720,H=240,pl=44,pr=12,pt=28,pb=42, iw=W-pl-pr, ih=H-pt-pb;
-  const xmin=0,xmax=6, ymax=100;                    // y = discount to OD (1 − realized/OD)
+  const xmin=0,xmax=7, ymax=100;                    // y = discount to OD (1 − realized/OD)
   const X=idx=>pl+(idx-xmin)/(xmax-xmin)*iw, Y=v=>pt+ih-(v/ymax)*ih;
   let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:760px">`;
   for(let v=0;v<=ymax;v+=20){const y=Y(v);
@@ -333,7 +333,7 @@ function drawLevels(){
   const pts=SCN.map((s,i)=>({i,op:s.op,idx:s.idx,q:s.q,rate:scnRate(s),stale:s.stale,prov:s.prov})).filter(p=>p.rate!=null);
   if(!pts.length){host.innerHTML="";return;}
   const W=720,H=168,pl=42,pr=12,pt=14,pb=30, iw=W-pl-pr, ih=H-pt-pb;     // compact companion to the discount chart
-  const xmin=0,xmax=6, ymax=Math.max(2,Math.ceil(Math.max(...pts.map(p=>p.rate))*2)/2);
+  const xmin=0,xmax=7, ymax=Math.max(2,Math.ceil(Math.max(...pts.map(p=>p.rate))*2)/2);
   const X=idx=>pl+(idx-xmin)/(xmax-xmin)*iw, Y=v=>pt+ih-(v/ymax)*ih;
   let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:760px">`;
   for(let v=0;v<=ymax+1e-9;v+=0.5){const y=Y(v);
