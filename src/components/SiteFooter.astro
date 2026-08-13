@@ -2,11 +2,11 @@
 /*
   SiteFooter (redesign/v1) — disclosure line + full sitemap.
 
-  Before this, the footer carried four links and most monitor pages
-  (/markets, /marketplace, /vast, /observatory, /market-data) were
-  reachable only through in-prose links. A benchmark administrator's
+  Before this, the footer carried four links and several monitor pages
+  were reachable only through in-prose links. A benchmark administrator's
   footer is its registry: every public surface, grouped by role, plus
-  the governance documents on every page.
+  the governance documents on every page. (Six thin monitors retired
+  2026-08-13; their routes 301 in public/_redirects.)
 */
 import { meta } from '../data/snapshot';
 
@@ -18,7 +18,6 @@ const cols: Col[] = [
     { href: '/rates', label: 'Reference Rates' },
     { href: '/term', label: 'Term Structure' },
     { href: '/tokens', label: 'Token Prices' },
-    { href: '/spreads', label: 'Segment Spreads' },
     { href: '/explorer', label: 'Series Explorer' },
     { href: '/data/rates_daily.csv', label: 'Rates CSV' },
   ] },
@@ -33,10 +32,6 @@ const cols: Col[] = [
     { href: '/realized/', label: 'Realized vs Rate Card' },
     { href: '/utilization', label: 'Utilization' },
     { href: '/basis', label: 'Clearing Basis' },
-    { href: '/markets', label: 'Provider Series' },
-    { href: '/marketplace', label: 'Marketplaces' },
-    { href: '/vast', label: 'Vast Observatory' },
-    { href: '/observatory', label: 'Cross-Provider' },
   ] },
   { head: 'Research', links: [
     { href: '/research', label: 'All Research' },
