@@ -236,7 +236,7 @@ const datasetLd = JSON.stringify({
       kicker={def.short}
       asOf={meta.as_of_date}
     >
-      <p class="id-meta">{def.formFactor} · {def.memory} · {def.generation.toUpperCase()} · {def.introducedAssumed ? `VINTAGE ${introYear} (ASSUMED)` : `INTRODUCED ${introYear}`}</p>
+      <p class="id-meta">{def.formFactor} · {def.memory} · {def.generation.toUpperCase()} · INTRODUCED {introYear}</p>
       <p class="standfirst">
         One chip across the published surfaces. Every figure on this page is
         the same cell, from the same code path, as the surface it links to —
@@ -610,6 +610,13 @@ const datasetLd = JSON.stringify({
       color: var(--accent);
       border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
       padding: 0 5px;
+    }
+
+    /* Phone: the 8px marks (model-output / MI / current tag) get a
+       legibility floor; tiles are stacked full-width so the extra size
+       costs nothing. */
+    @media (max-width: 480px) {
+      .st-mi, .mi-inline, .arc-tag { font-size: 10px; }
     }
   </style>
 </Base>

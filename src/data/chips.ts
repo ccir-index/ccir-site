@@ -60,12 +60,8 @@ export interface ChipDef {
   formFactor: string;
   memory: string;
   generation: string;
-  /** YYYY-MM from /hardware's GA map (or the ivmodel vintage where the
-      GA map has no entry — see introducedAssumed) */
+  /** YYYY-MM from /hardware's GA map (or otherwise documented per entry) */
   introduced: string;
-  /** true when the date is the ivmodel's ASSUMED vintage, not a recorded
-      GA month — the page prints it as assumed */
-  introducedAssumed?: boolean;
   /** hardware_panels model key — the ONE variant the hardware lane reads
       (for derived-mode chips: the prospective key ivmodel uses) */
   hwKey: string;
@@ -119,10 +115,12 @@ export const CHIPS: ChipDef[] = [
     formFactor: 'SXM',
     memory: '180GB',
     generation: 'Blackwell',
-    // No GA-map entry: this is the ivmodel vintage (2025 + 2/12), which
-    // /hardware itself states as assumed ("vintage assumed").
+    // Intro year OWNER-CONFIRMED 2026-08-13 (not in the site's GA map;
+    // matches the ivmodel vintage 2025 + 2/12). The identity line prints
+    // the plain family pattern "INTRODUCED 2025". /hardware's own IV card
+    // keeps its separate "vintage assumed" model disclosure — that label
+    // is /hardware's and is not changed by this entry.
     introduced: '2025-03',
-    introducedAssumed: true,
     hwKey: 'B200-180-SXM6',
     hwLabel: 'SXM 180GB',
     launchText: 'SXM 180GB; 2025 volume availability — vintage stated as assumed on the /hardware model.',

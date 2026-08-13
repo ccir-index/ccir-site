@@ -232,6 +232,17 @@ a.chip-link:focus-visible {
   color: var(--link);
   text-decoration-color: var(--link);
 }
+/* Touch: expand the hit area beyond the small table label without
+   changing layout or desktop density (rows stay dense; the invisible
+   ::after absorbs the tap). */
+@media (pointer: coarse) {
+  a.chip-link { position: relative; }
+  a.chip-link::after {
+    content: "";
+    position: absolute;
+    inset: -13px -8px;
+  }
+}
 
 /* Tier badge — short code (T1 / T2 / T3) */
 .tier-badge {

@@ -230,13 +230,18 @@ function isActive(n: Item): boolean {
     .nav::-webkit-scrollbar { display: none; }
     .nav-group { padding: 0 14px; }
     .nav-items { gap: 14px; }
-    .nav-link { flex-shrink: 0; white-space: nowrap; }
+    /* Touch tap targets: the scroll-strip links pad vertically to a
+       >=40px hit box (22px text row + 12px each side). Desktop density
+       is untouched — this only applies inside the mobile band. */
+    .nav-link { flex-shrink: 0; white-space: nowrap; padding: 15px 0; }
   }
 
   @media (max-width: 720px) {
     .top-rule-inner { flex-wrap: wrap; gap: 4px 14px; }
     .masthead-band { padding-top: 10px; padding-bottom: 8px; }
     .brand-mark { font-size: var(--fs-xl); }
+    /* Utility links get a real tap box on phones. */
+    .utility a { display: inline-block; padding: 13px 2px; }
   }
 
   @media (max-width: 560px) {

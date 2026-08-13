@@ -87,7 +87,7 @@ const rows = CHIPS.map((def) => {
               <td class="chip-cell">
                 <a class="chip-page-link" href={`/chip/${def.slug}`}>{def.name} →</a>
               </td>
-              <td class="id-cell">{def.formFactor} {def.memory} · {def.generation} · {def.introduced.slice(0, 4)}{def.introducedAssumed ? ' (assumed)' : ''}</td>
+              <td class="id-cell">{def.formFactor} {def.memory} · {def.generation} · {def.introduced.slice(0, 4)}</td>
               <td class="num strongv">{spot ? `$${fmt(headlineValue(spot))}` : '—'}{spot && <span class="cellmeta">{headlineStatOf(spot)}</span>}</td>
               <td class="num">{committed ? `$${fmt(committed.value)}` : '—'}{committed && <span class="cellmeta">{committed.term} · MI</span>}</td>
               <td class="num">{intr ? `$${fmt(headlineValue(intr))}` : '—'}{intr && <span class="cellmeta">{headlineStatOf(intr)}</span>}</td>

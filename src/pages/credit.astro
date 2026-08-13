@@ -1494,6 +1494,10 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       padding: 6px 8px;
     }
     .filters input { min-width: 240px; flex: 1 1 240px; max-width: 360px; }
+    /* A select's intrinsic width is its longest option (issuer/lender
+       names run long) — cap it so it can never widen the page body on
+       phones; the popup list still shows full option text. */
+    .filters select { max-width: 100%; min-width: 0; }
     .filters .count {
       margin-left: auto;
       font-size: var(--fs-xs);
