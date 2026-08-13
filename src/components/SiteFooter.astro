@@ -1,0 +1,182 @@
+---
+/*
+  SiteFooter (redesign/v1) — disclosure line + full sitemap.
+
+  Before this, the footer carried four links and most monitor pages
+  (/markets, /marketplace, /vast, /observatory, /market-data) were
+  reachable only through in-prose links. A benchmark administrator's
+  footer is its registry: every public surface, grouped by role, plus
+  the governance documents on every page.
+*/
+import { meta } from '../data/snapshot';
+
+interface Link { href: string; label: string }
+interface Col { head: string; links: Link[] }
+
+const cols: Col[] = [
+  { head: 'Benchmark', links: [
+    { href: '/rates', label: 'Reference Rates' },
+    { href: '/term', label: 'Term Structure' },
+    { href: '/tokens', label: 'Token Prices' },
+    { href: '/spreads', label: 'Segment Spreads' },
+    { href: '/explorer', label: 'Series Explorer' },
+    { href: '/data/rates_daily.csv', label: 'Rates CSV' },
+  ] },
+  { head: 'Credit & Hardware', links: [
+    { href: '/credit', label: 'Credit Tracker' },
+    { href: '/credit/series', label: 'Credit Series' },
+    { href: '/credit/commitments', label: 'Commitments' },
+    { href: '/hardware', label: 'Hardware Prices' },
+    { href: '/chip-economics', label: 'Chip Economics' },
+  ] },
+  { head: 'Monitors', links: [
+    { href: '/realized/', label: 'Realized vs Rate Card' },
+    { href: '/utilization', label: 'Utilization' },
+    { href: '/basis', label: 'Clearing Basis' },
+    { href: '/markets', label: 'Provider Series' },
+    { href: '/marketplace', label: 'Marketplaces' },
+    { href: '/vast', label: 'Vast Observatory' },
+    { href: '/observatory', label: 'Cross-Provider' },
+  ] },
+  { head: 'Research', links: [
+    { href: '/research', label: 'All Research' },
+    { href: '/research/gpu-as-income-asset', label: 'GPU as Income Asset' },
+    { href: '/research/compute-contracts', label: 'The Compute Contract' },
+    { href: '/research/gpu-spv', label: 'The GPU SPV' },
+    { href: '/research/compute-glossary', label: 'Compute Glossary' },
+  ] },
+  { head: 'Administration', links: [
+    { href: '/documents/methodology', label: 'Methodology' },
+    { href: '/documents/governance', label: 'Governance' },
+    { href: '/documents/change-management', label: 'Change Management' },
+    { href: '/documents/changelog', label: 'Change Log' },
+    { href: '/documents/data-terms', label: 'Data Terms' },
+    { href: '/documents/iosco', label: 'IOSCO Alignment' },
+    { href: '/applications', label: 'Applications' },
+    { href: '/contact', label: 'Contact' },
+  ] },
+];
+---
+<footer class="site-footer">
+  <div class="wrap disclosure-foot">
+    <strong>Independent · Observable · Posted · No positions in the markets we measure</strong>
+    Every rate is sourced from publicly-accessible, provider-operated
+    pricing pages and official documentation — no solicited quotes, no
+    broker-mediated prices, no sponsored feeds. CCIR holds no positions
+    in the markets it measures and clears no trades.
+  </div>
+  <nav class="wrap footer-map" aria-label="Site map">
+    {cols.map((c) => (
+      <div class="fcol">
+        <div class="fcol-head">{c.head}</div>
+        {c.links.map((l) => <a href={l.href}>{l.label}</a>)}
+      </div>
+    ))}
+  </nav>
+  <div class="wrap footer-inner">
+    <div class="lhs">
+      <strong>CCIR</strong> · Citable reference rates and independent
+      analysis of the GPU compute market, updated each morning by 07:30 ET.
+    </div>
+    <div class="rhs">
+      <span class="social">
+        <a href="https://www.linkedin.com/company/compute-credit-index-research/" aria-label="CCIR on LinkedIn" rel="me noopener" target="_blank">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8h4V24h-4V8zm7.5 0h3.83v2.2h.05c.53-1 1.84-2.2 3.78-2.2 4.04 0 4.79 2.66 4.79 6.11V24h-4v-7.09c0-1.69-.03-3.86-2.36-3.86-2.36 0-2.72 1.84-2.72 3.74V24h-4V8z"/></svg>
+        </a>
+        <a href="https://x.com/CCIR_IO" aria-label="CCIR on X" rel="me noopener" target="_blank">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+      </span>
+    </div>
+  </div>
+  <div class="wrap runid">
+    Compute Credit Index Research LLC · Delaware · formed 2026-03-11
+    <span aria-hidden="true"> · </span>run_id · {meta.run_id}
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--rule-2);
+    background: var(--surface-2);
+    padding: 22px 0 24px;
+    margin-top: 56px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-dim);
+    line-height: 1.55;
+  }
+  .disclosure-foot {
+    max-width: 880px;
+    font-family: var(--font-body);
+    font-size: var(--fs-md);
+    color: var(--ink);
+    line-height: 1.55;
+    margin-bottom: 20px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .disclosure-foot strong {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    font-weight: var(--weight-strong);
+    margin-bottom: 6px;
+  }
+  .footer-map {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 20px 24px;
+    padding-bottom: 20px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .fcol { display: flex; flex-direction: column; gap: 6px; }
+  .fcol-head {
+    color: var(--ink);
+    font-weight: var(--weight-strong);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    margin-bottom: 2px;
+  }
+  .fcol a { color: var(--ink-dim); }
+  .fcol a:hover { color: var(--link); text-decoration: none; }
+  @media (max-width: 900px) { .footer-map { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .footer-map { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .footer-inner {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .footer-inner .lhs { max-width: 720px; }
+  .footer-inner .lhs strong { color: var(--ink); font-weight: var(--weight-strong); }
+  .footer-inner .rhs {
+    margin-left: auto;
+    display: flex;
+    gap: 16px;
+  }
+  .footer-inner .rhs .social {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .footer-inner .rhs .social a { display: inline-flex; color: var(--ink-dim); }
+  .footer-inner .rhs .social a:hover { color: var(--link); }
+  .footer-inner .rhs .social svg {
+    width: 15px;
+    height: 15px;
+    fill: currentColor;
+    display: block;
+  }
+  .runid {
+    margin-top: 10px;
+    color: var(--ink-faint);
+    font-size: calc(var(--fs-xs) - 1px);
+    letter-spacing: 0.04em;
+  }
+</style>

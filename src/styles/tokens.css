@@ -2,12 +2,30 @@
   Dual-mode design tokens. Two themes ship side by side; ThemeToggle flips
   the `data-theme` attribute on <html>, persisted in localStorage.
 
-    [data-theme="terminal"]  → Bloomberg-dark, mono-dense, amber accent
-    [data-theme="editorial"] → WSJ-cream, serif lead, navy accent
+    [data-theme="terminal"]  → Bloomberg-dark, mono-dense, orange accent
+    [data-theme="editorial"] → WSJ-cream, serif lead, orange accent
 
   Status palette (--pos / --neg / --warn / --info) is shared semantically
   across both themes; contrast is tuned per theme.
+
+  BRAND PAIR (redesign/v1, 2026-08-12) — the social-card pair is now the
+  site pair. Two accents, two jobs, one meaning everywhere:
+
+    --brand-orange #c96f06 → DATA EMPHASIS: headline rates, kickers,
+      accent rules, chart accents. Expressed per theme via --accent
+      (lifted on dark, darkened on cream for AA text contrast).
+    --brand-blue   #3b82f6 → WAYFINDING: links, nav active states,
+      breadcrumbs, footer links. Expressed per theme via --link.
+
+  Orange says "the data speaks here"; blue says "you can go somewhere".
+  Never swap the jobs. Chart series identities are unchanged by this —
+  --accent stays the single-hue chart emphasis it always was.
 */
+
+:root {
+  --brand-blue: #3b82f6;
+  --brand-orange: #c96f06;
+}
 
 :root,
 html[data-theme="terminal"] {
@@ -23,8 +41,10 @@ html[data-theme="terminal"] {
   --ink-dim: #9a9991;
   --ink-faint: #6b6a64;
 
-  --accent: #ff9100;
+  --accent: #ff9100;   /* brand orange, lifted for the dark surface */
   --accent-2: #ffb400;
+  --link: #6da2f8;     /* brand blue, lifted for AA at text sizes on dark */
+  --link-dim: #4f83d6;
   --pos: #3aa676;
   --neg: #c44a4a;
   --warn: #d68a2a;
@@ -88,16 +108,18 @@ html[data-theme="editorial"] {
   --ink-dim: #5b5852;
   --ink-faint: #8e8a82;
 
-  --accent: #143055;
-  --accent-2: #1f4a7d;
+  --accent: #a85a04;   /* brand orange, darkened for AA at text sizes on cream */
+  --accent-2: #c96f06; /* raw brand orange — large marks and display sizes */
+  --link: #1d4ed8;     /* brand blue, darkened for AA at text sizes on cream */
+  --link-dim: #3b62b8;
   --pos: #2c8055;
   --neg: #a84040;
   --warn: #b26e1e;
   --info: #2d6a94;
   --neutral: #6b7176;
 
-  /* T-tier ramp — navy dominant, mid grey middle, light grey tail */
-  --tier-t1: #143055;
+  /* T-tier ramp — orange dominant, mid grey middle, light grey tail */
+  --tier-t1: #a85a04;
   --tier-t2: #6e6c66;
   --tier-t3: #b8b3a4;
 
