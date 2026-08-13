@@ -526,8 +526,8 @@ const cLabelItems: LabIn[] = leasebackCfg.map((p) => ({
 const cLabels = layoutLabels(cLabelItems, cObstacles);
 ---
 <Base
-  title="Compute Credit Tracker — GPU-Backed Loans & Financing, As Filed · CCIR"
-  description="GPU-backed loans and compute financing tracked as filed — CoreWeave, Crusoe, Nscale, Applied Digital, Core Scientific, IREN, Soluna, Hut 8, TeraWulf, Lambda and 30+ more issuers. Coupons, spreads, collateral, and lenders from SEC filings and lender releases, source linked on every row."
+  title="Compute Credit Tracker — GPU-Backed Loans, Collateral & Credit Risk, As Filed · CCIR"
+  description="GPU-backed loans and compute financing tracked as filed — coupons, spreads, collateral treatment, lenders and agency ratings, source linked on every row. Credit-risk reference for AI infrastructure lending: how GPU collateral is treated, what rated GPU financings carry, and which counterparties sit behind them. CoreWeave, Crusoe, Nscale, Applied Digital, Core Scientific, IREN, Soluna, Hut 8, TeraWulf, Lambda and 30+ more issuers, from SEC filings and lender releases."
   ogImage="/og/credit.png"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
@@ -540,11 +540,21 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     temporalCoverage: '2023-01/..',
     spatialCoverage: 'United States',
     keywords: [
+      // supply side — what the instrument is
       'GPU-backed credit', 'GPU-backed loans', 'GPU-backed lending',
       'GPU-backed financing', 'track GPU-backed credit', 'GPU financing',
       'compute credit', 'compute infrastructure financing', 'GPU collateral',
       'AI infrastructure debt', 'GPU DDTL', 'delayed draw term loan GPU',
       'CoreWeave debt', 'GPU securitization', 'compute credit spreads',
+      // risk side — how a credit or risk function searches for the same thing
+      'AI infrastructure credit risk', 'GPU financing credit risk',
+      'data center credit risk', 'neocloud credit risk',
+      'GPU collateral valuation', 'GPU collateral treatment',
+      'compute counterparty exposure', 'AI lending concentration risk',
+      'GPU loan covenants', 'rated GPU financings',
+      'GPU project finance ratings', 'take-or-pay compute contracts',
+      'credit risk reference data', 'AI infrastructure underwriting',
+      'residual value risk GPU', 'enterprise risk management AI compute',
     ],
     license: 'https://ccir.io/documents/data-terms',
     isAccessibleForFree: true,
