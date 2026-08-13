@@ -17,6 +17,7 @@
   page is a CCIR valuation, estimate, or opinion of value.
 */
 import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import creditData from '../../data/credit_instruments.json';
 import filedMarks from '../../data/filed_marks.json';
 import refiVelocity from '../../data/refi_velocity.json';
@@ -277,10 +278,14 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
     </div>
   </nav>
 
-  <section class="wrap top">
+  <section class="wrap page-top">
     <div class="hero-solo">
-      <div class="kicker">Market Intelligence · Compute Credit · as of {AS_OF}</div>
-      <h1>Credit Reference Series</h1>
+      <PageHeader
+        title="Credit Reference Series"
+        crumbs={[{ href: '/credit', label: 'Credit' }]}
+        kicker="Reference Series"
+        asOf={AS_OF}
+      />
       <p class="standfirst lede">
         The derived layer of the credit record. The
         <a href="/credit">instrument tracker</a> reproduces each facility as
@@ -685,7 +690,7 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
   .apps-nav-link:hover { color: var(--ink); text-decoration: none; }
   .hub-group { display: inline-flex; align-items: center; gap: 10px; }
   .hub-link { font-weight: var(--weight-strong); }
-  .hub-on { color: var(--accent); }
+  .hub-on { color: var(--link); }
   .hub-sep { color: var(--ink-faint); }
   .hub-divider {
     width: 1px;

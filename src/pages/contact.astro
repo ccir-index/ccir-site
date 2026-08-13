@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
 import { meta } from '../data/snapshot';
 
 const citation = [
@@ -57,10 +58,8 @@ const audiences = [
   description="Contact CCIR — citation and use questions for lender and borrower counsel, rating agencies, and regulators; data partnerships for operators, lenders, and venues."
   showTape={false}
 >
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Contact · {meta.as_of_date}</div>
-      <h1>Contact the Administrator</h1>
+  <section class="wrap page-top">
+    <PageHeader title="Contact the Administrator" kicker="Contact" asOf={meta.as_of_date} display>
       <p class="standfirst">
         CCIR publishes citable reference series for the GPU compute market and
         independent analysis built on them. We operate no marketplace and no
@@ -68,7 +67,7 @@ const audiences = [
         credit agreement, a rating analysis, or a surveillance report) or
         about contributing data to the reference.
       </p>
-    </header>
+    </PageHeader>
 
     <a class="contact-card contact-card-top" href="mailto:research@ccir.io">
       <div class="cc-kicker">Email the administrator</div>
@@ -217,8 +216,8 @@ const audiences = [
       font-weight: var(--weight-strong);
     }
     .aud-body {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
       color: var(--ink-dim);
       line-height: 1.6;
       margin: 0;

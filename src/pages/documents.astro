@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
 import { meta } from '../data/snapshot';
 
 const docs = [
@@ -57,17 +58,15 @@ const docs = [
   description="CCIR's public methodology, change-management, and governance documents — the reference documents a citation of any CCIR series relies on."
   showTape={false}
 >
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Documents · {meta.as_of_date}</div>
-      <h1>Reference Documents</h1>
+  <section class="wrap page-top">
+    <PageHeader title="Reference Documents" kicker="Documents" asOf={meta.as_of_date} display>
       <p class="standfirst">
         The documents a citation of a CCIR series relies on: what the numbers
         measure, how changes to the measurement are governed, and who stands
         behind them. Deliberately short: each describes current practice, not
         aspiration.
       </p>
-    </header>
+    </PageHeader>
 
     <div class="doc-list">
       {docs.map((d) => (
@@ -127,8 +126,8 @@ const docs = [
       margin: 0;
     }
     .doc-blurb {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
       color: var(--ink-dim);
       line-height: 1.6;
       margin: 0;
@@ -142,8 +141,8 @@ const docs = [
       letter-spacing: var(--tracking-eye);
     }
     .iosco-note {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
       color: var(--ink-dim);
       line-height: 1.65;
       max-width: 80ch;

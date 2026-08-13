@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 
 /*
   Dated research note — frozen to Nebius Group's ~$775M senior secured debt
@@ -94,6 +95,8 @@ const RELEASE_URL = 'https://nebius.com/newsroom/nebius-raises-775-million-in-fi
         SEC accession 0001104659-26-029863.
       </p>
     </section>
+
+    <NoteFooter title="Nebius’s First Secured Debt: A $775M GPU-Backed Facility" published="2026-07-20" />
   </section>
 
   <style>
@@ -125,6 +128,6 @@ const RELEASE_URL = 'https://nebius.com/newsroom/nebius-raises-775-million-in-fi
       padding-top: 8px;
       max-width: 74ch;
     }
-    .footnote a { color: var(--accent); }
+    .footnote a { color: var(--link); }
   </style>
 </Base>

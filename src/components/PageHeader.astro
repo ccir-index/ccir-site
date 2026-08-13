@@ -1,0 +1,45 @@
+---
+/*
+  PageHeader — the one page-head grammar (redesign/v1).
+
+  Row 1: breadcrumb trail (blue, navigable) · terminal segment (orange, here)
+         · as-of date right-aligned.
+  Row 2: h1 (fs-3xl for data surfaces; display=true → fs-hero for notes/docs).
+  Slot:  standfirst paragraph(s) — pass <p class="standfirst">…</p>.
+
+  Replaces the per-page .page-head/.kicker blocks that drifted across ~30
+  pages (h1 sizes fs-hero vs fs-3xl, max-widths 80/82/84ch, ad-hoc kickers).
+  Styling lives in base.css (.page-head, .crumbs) so pages carry no copies.
+*/
+interface Crumb { href: string; label: string }
+interface Props {
+  title: string;
+  /** Trail of parent surfaces, e.g. [{href:'/credit',label:'Credit'}]. */
+  crumbs?: Crumb[];
+  /** Terminal (non-link) kicker segment, e.g. 'Reference Rates · US & EU'. */
+  kicker?: string;
+  /** Right-aligned dateline, e.g. meta.as_of_date. */
+  asOf?: string;
+  /** Prefix for the dateline. Default 'as of'. */
+  asOfLabel?: string;
+  /** true → hero-size h1 (research notes, documents). */
+  display?: boolean;
+}
+const { title, crumbs = [], kicker, asOf, asOfLabel = 'as of', display = false } = Astro.props;
+---
+<header class:list={['page-head', { 'page-head--display': display }]}>
+  {(crumbs.length > 0 || kicker || asOf) && (
+    <div class="crumbs">
+      {crumbs.map((c) => (
+        <>
+          <a href={c.href}>{c.label}</a>
+          <span class="crumb-sep" aria-hidden="true">/</span>
+        </>
+      ))}
+      {kicker && <span class="crumb-here">{kicker}</span>}
+      {asOf && <span class="crumb-asof">{asOfLabel} {asOf}</span>}
+    </div>
+  )}
+  <h1>{title}</h1>
+  <slot />
+</header>

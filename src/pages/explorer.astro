@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
 import { headlineRates, meta, headlineStatOf, seriesHistory } from '../data/snapshot';
 import { TIERS, TIER_LABELS, REGION_LABELS } from '../data/types';
 
@@ -97,9 +98,8 @@ const rows = source.map((r) => ({
   description="The whole compute market, unfiltered — every series, every chip, every grain. Filter by segment, chip, form, interruptibility, and region."
   ogImage="/og/explorer.png"
 >
-  <section class="wrap top">
-    <div class="kicker">Series Explorer · {meta.as_of_date}</div>
-    <h1>The Whole Market, Unfiltered</h1>
+  <section class="wrap page-top">
+    <PageHeader title="The Whole Market, Unfiltered" kicker="Series Explorer" asOf={meta.as_of_date} />
     <p class="standfirst lede">
       Every grain we track: {rows.length} series across {chips.length} chips
       and three operator segments (Hyperscaler / Neocloud / Marketplace), broken

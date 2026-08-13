@@ -30,15 +30,16 @@
     transition: color 120ms, background 120ms;
   }
   #theme-toggle .seg + .seg { border-left: 1px solid var(--rule-2); }
-  #theme-toggle:hover { border-color: var(--accent); }
+  /* Chrome control — wayfinding side of the palette, rides --link. */
+  #theme-toggle:hover { border-color: var(--link); }
 
   :global(html[data-theme="terminal"]) #theme-toggle .seg[data-theme-target="terminal"] {
-    color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--link);
+    background: color-mix(in srgb, var(--link) 14%, transparent);
   }
   :global(html[data-theme="editorial"]) #theme-toggle .seg[data-theme-target="editorial"] {
-    color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--link);
+    background: color-mix(in srgb, var(--link) 14%, transparent);
   }
 </style>
 

@@ -24,6 +24,17 @@
 /research/rent-and-launch-price     /research/rent-and-msrp   301
 /research/unfinancialized-compute   /credit                   301
 
+# --- Monitor retirement (redesign/v1, 2026-08-13) --------------------------
+# Six thin monitor surfaces retired; pages deleted so these rules are live
+# (a matching static file would shadow them — see note above). /observatory
+# redirects to its successor surface; the rest fold into the benchmark.
+/markets                            /rates                    301
+/marketplace                        /rates                    301
+/vast                               /rates                    301
+/market-data                        /rates                    301
+/spreads                            /rates                    301
+/observatory                        /utilization              301
+
 # scale-draft was committed by accident inside the 2026-08-09 SEO cleanup
 # above, went live unlinked but sitemapped, and carried no noindex. Page
 # deleted 2026-08-10; 301 here so anything Google crawled in that window

@@ -42,7 +42,7 @@ const DEFAULT_CHIP = 'h100-sxm';
     isAccessibleForFree: true,
   })} />
   <section class="wrap ai-page">
-    <div class="kicker">CCIR · SUPPLY OBSERVATORY <span class="mi-tag">Market&nbsp;Intelligence</span></div>
+    <div class="kicker">Monitor · Supply &amp; utilization<span class="mi-tag">Market&nbsp;Intelligence</span></div>
     <h1>Utilization &amp; Availability</h1>
     <p class="deck">
       Two lenses on GPU supply. <strong>Utilization</strong>: of the capacity the
@@ -170,7 +170,7 @@ const DEFAULT_CHIP = 'h100-sxm';
     const fmtDate = (iso) => { const p = String(iso).split('-'); return p.length === 3 ? `${MONTHS[+p[1]-1]} ${+p[2]}` : iso; };
     const catAxis = (ink) => ({
       ticks: { color: ink, autoSkip: true, maxTicksLimit: 7, maxRotation: 0,
-               font: { family: 'IBM Plex Mono', size: 10 } },
+               font: { family: 'JetBrains Mono', size: 10 } },
       grid: { display: false },
     });
     const $ = (id) => document.getElementById(id);
@@ -250,12 +250,12 @@ const DEFAULT_CHIP = 'h100-sxm';
     const baseLineOpts = (ink, gridc) => ({
       responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
       scales: {
-        y: { min: 0, max: 100, ticks: { color: ink, callback: (v) => v + '%', font: { family: 'IBM Plex Mono' } }, grid: { color: gridc } },
+        y: { min: 0, max: 100, ticks: { color: ink, callback: (v) => v + '%', font: { family: 'JetBrains Mono' } }, grid: { color: gridc } },
         x: catAxis(ink),
       },
       plugins: {
         legend: { display: true, position: 'top', align: 'end',
-          labels: { color: ink, boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'line', font: { family: 'IBM Plex Mono', size: 11 } } },
+          labels: { color: ink, boxWidth: 10, boxHeight: 10, usePointStyle: true, pointStyle: 'line', font: { family: 'JetBrains Mono', size: 11 } } },
         tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${c.parsed.y == null ? '—' : c.parsed.y.toFixed(0) + '%'}` } },
       },
     });

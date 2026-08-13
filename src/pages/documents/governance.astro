@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { meta } from '../../data/snapshot';
 ---
 <Base
@@ -8,15 +9,13 @@ import { meta } from '../../data/snapshot';
   description="CCIR administrator identity, independence and conflicts posture, and the procedure for queries and complaints about published series."
   showTape={false}
 >
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Documents · Governance · as published {meta.as_of_date}</div>
-      <h1>Governance &amp; Complaints</h1>
+  <section class="wrap page-top">
+    <PageHeader title="Governance & Complaints" crumbs={[{ href: '/documents', label: 'Documents' }]} kicker="Governance" asOf={meta.as_of_date} asOfLabel="as published" display>
       <p class="standfirst">
         Who publishes the series, the conflicts posture they are published
         under, and how to challenge a number.
       </p>
-    </header>
+    </PageHeader>
 
     <section class="sec">
       <h2><span class="n">01</span> Administrator</h2>

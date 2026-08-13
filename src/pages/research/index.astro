@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { meta } from '../../data/snapshot';
 
 // Research hub — re-planed into three species as the primary axis, so a reader
@@ -109,12 +110,10 @@ const restPrimers = primers.filter((p) => !p.flagship);
   description="CCIR research — primers on how compute is priced and financed, standing market monitors updated daily, and dated dispatches that are never revised in place."
   ogImage="/og/research.png"
 >
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Research · {meta.as_of_date}</div>
-      <h1>Research</h1>
+  <section class="wrap page-top">
+    <PageHeader title="Research" kicker="Primers · Monitors · Dispatches" asOf={meta.as_of_date}>
       <p class="thesis">{thesis}</p>
-    </header>
+    </PageHeader>
 
     <!-- PRIMERS -->
     <section class="tier">
@@ -192,8 +191,8 @@ const restPrimers = primers.filter((p) => !p.flagship);
       margin: 6px 0 10px;
     }
     .thesis {
-      font-family: var(--font-body);
-      font-size: var(--fs-md);
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
       color: var(--ink-dim);
       line-height: 1.6;
       margin: 0;
@@ -239,7 +238,7 @@ const restPrimers = primers.filter((p) => !p.flagship);
     .flagship:hover {
       background: var(--surface-2);
       text-decoration: none;
-      box-shadow: inset 0 0 0 1px var(--accent), 0 0 22px -10px var(--accent);
+      box-shadow: inset 0 0 0 1px var(--link), 0 0 22px -10px var(--link);
     }
     .fl-eye {
       display: block;
@@ -258,12 +257,12 @@ const restPrimers = primers.filter((p) => !p.flagship);
       letter-spacing: -0.01em;
       margin-bottom: 7px;
     }
-    .flagship:hover .fl-title { color: var(--accent); }
+    .flagship:hover .fl-title { color: var(--link); }
     .fl-title, .fl-blurb, .p-title, .m-title, .d-title { transition: color 0.18s ease; }
     .fl-blurb {
       display: block;
-      font-family: var(--font-body);
-      font-size: var(--fs-md);
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
       color: var(--ink-dim);
       line-height: 1.55;
       max-width: 72ch;
@@ -300,10 +299,10 @@ const restPrimers = primers.filter((p) => !p.flagship);
     .primer:hover {
       background: var(--surface-2);
       text-decoration: none;
-      box-shadow: inset 0 0 0 1px var(--accent);
+      box-shadow: inset 0 0 0 1px var(--link);
       z-index: 1;
     }
-    .primer:hover .p-title { color: var(--accent); }
+    .primer:hover .p-title { color: var(--link); }
     .p-title {
       font-family: var(--font-display);
       font-size: var(--fs-md);
@@ -311,8 +310,8 @@ const restPrimers = primers.filter((p) => !p.flagship);
       letter-spacing: -0.005em;
     }
     .p-blurb {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
       color: var(--ink-dim);
       line-height: 1.5;
     }
@@ -347,11 +346,11 @@ const restPrimers = primers.filter((p) => !p.flagship);
     .monitor:hover {
       background: var(--surface-2);
       text-decoration: none;
-      box-shadow: inset 2px 0 0 0 var(--accent);
+      box-shadow: inset 2px 0 0 0 var(--link);
     }
-    .monitor:hover .m-title { color: var(--accent); }
+    .monitor:hover .m-title { color: var(--link); }
     .m-title { font-family: var(--font-display); font-size: var(--fs-sm); font-weight: var(--weight-display); }
-    .m-blurb { font-family: var(--font-body); font-size: var(--fs-xs); color: var(--ink-dim); line-height: 1.45; }
+    .m-blurb { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); line-height: 1.5; }
 
     /* ---- Dispatches ---- */
     .dispatch-list {
@@ -374,9 +373,9 @@ const restPrimers = primers.filter((p) => !p.flagship);
     .dispatch:hover {
       background: var(--surface-2);
       text-decoration: none;
-      box-shadow: inset 3px 0 0 0 var(--accent);
+      box-shadow: inset 3px 0 0 0 var(--link);
     }
-    .dispatch:hover .d-title { color: var(--accent); }
+    .dispatch:hover .d-title { color: var(--link); }
     .d-date {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
@@ -407,8 +406,8 @@ const restPrimers = primers.filter((p) => !p.flagship);
     }
     .d-tag.tag-credit { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--rule)); }
     .d-blurb {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
       color: var(--ink-dim);
       line-height: 1.5;
     }

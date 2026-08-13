@@ -1,0 +1,622 @@
+---
+/*
+  /chip/<slug> — chip instrument pages (redesign/v1; H100 pilot generalized
+  2026-08-13, driven by the chip registry in src/data/chips.ts).
+
+  THE RULE: INHERIT, NEVER MINT. Every number on this page is a cell an
+  existing surface already publishes, computed by that surface's own code
+  path, at that surface's scope:
+
+    Spot          homeOdCell('T2', id)          — the exact /rates guaranteed
+                                                  ladder cell (snapshot.ts).
+    Interruptible homeIntCell('T2', id)         — the exact /rates
+                                                  interruptible ladder cell.
+    Committed     tierOdCell('T2', id, 'ALL') anchor stepped by
+                  wpSpread(id, tenor)           — TermCurveChart's own
+                                                  odPoint/tenorPoint math
+                                                  (committed_mi.ts), longest
+                                                  published tenor.
+    Hardware headline  ivCards[def.hwKey]       — /hardware's income-derived
+                                                  model-implied unit value
+                                                  (src/lib/ivmodel, the same
+                                                  single source /hardware and
+                                                  its share card read). A
+                                                  model output, marked as
+                                                  such, never a transacted
+                                                  price. Posted asks + the
+                                                  executed trend stay in the
+                                                  hardware MODULE, labeled as
+                                                  the observed record.
+    Rates trend   seriesHistory(spot.series_id) — the published headline
+                                                  history (explorer's spark
+                                                  source).
+    Hardware trend hw model monthly med3        — /hardware's executed
+                                                  3-month rolling medians.
+
+  No cell is computed here that no surface computes. Lanes never blend.
+  Identity is locked per registry entry (hwKey pins ONE hardware variant;
+  committed_mi maps the chip token to its own silicon_id lock; the rates
+  cells are the same pooled per-chip series /rates prints).
+
+  Committed values are MARKET INTELLIGENCE, badged, never citable.
+  No % change is printed anywhere on this page.
+  No n counts are printed anywhere in the chip family (owner, 2026-08-13):
+  panel-depth and dispersion chrome live on the surface pages one click
+  away. Lane labels, as-of dates, and window labels stay.
+  A tile whose computing surface publishes nothing prints an em dash; a
+  module with no charted record says so — nothing is substituted.
+*/
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import {
+  homeOdCell, homeIntCell, tierOdCell, headlineValue, headlineStatOf,
+  seriesHistory, meta,
+} from '../../data/snapshot';
+import { wpSpread } from '../../data/committed_mi';
+import hw from '../../data/hardware_panels.json';
+import { ivCards } from '../../lib/ivmodel';
+import { CHIPS, type ChipDef } from '../../data/chips';
+import type { Rate, Term } from '../../data/types';
+
+export function getStaticPaths() {
+  return CHIPS.map((c) => ({ params: { slug: c.slug }, props: { def: c } }));
+}
+const { def } = Astro.props as { def: ChipDef };
+
+const fmt = (n: number, dp = 2) => n.toFixed(dp);
+const fmtUsd = (v: number | null | undefined) =>
+  v == null ? '—' : '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+// /hardware's own compact-thousands form for the sensitivity band.
+// (No regex literal here: a frontmatter regex breaks @astrojs/compiler's
+// getStaticPaths hoisting — it emits a duplicate export into the body.)
+const fmtK = (v: number) => {
+  if (v < 1000) return '$' + Math.round(v);
+  const s = (v / 1000).toFixed(1);
+  return '$' + (s.endsWith('.0') ? s.slice(0, -2) : s) + 'k';
+};
+
+const CHIP = def.id;
+const introYear = def.introduced.slice(0, 4);
+
+// --- rates lane (same cells as /rates) -------------------------------------
+const spot = homeOdCell('T2', CHIP);
+const intr = homeIntCell('T2', CHIP);
+
+// --- term lane (same math as TermCurveChart) -------------------------------
+const odAnchor = tierOdCell('T2', CHIP, 'ALL');
+const odAnchorValue = odAnchor ? headlineValue(odAnchor) : null;
+
+const TENORS: { term: Term; months: number }[] = [
+  { term: '3M', months: 3 },
+  { term: '6M', months: 6 },
+  { term: '1Y', months: 12 },
+  { term: '2Y', months: 24 },
+  { term: '3Y', months: 36 },
+];
+interface TenorPt { term: Term; months: number; value: number; n: number; prov: boolean }
+const tenorPts: TenorPt[] = odAnchorValue == null ? [] : TENORS.flatMap(({ term, months }) => {
+  const sp = wpSpread(CHIP, term);
+  if (!sp) return [];
+  return [{ term, months, value: odAnchorValue * (1 + sp.spread), n: sp.n_pairs, prov: sp.n_pairs < 3 }];
+});
+// Headline committed tile = the longest published tenor, matching the end
+// of /term's line for this chip.
+const committed = tenorPts.length ? tenorPts[tenorPts.length - 1]! : null;
+
+// --- hardware lane ---------------------------------------------------------
+// Headline: /hardware's income-derived model-implied unit value — the same
+// ivCards entry /hardware renders (uniform basis across the chip family).
+// Module: the posted/executed record, where hardware_panels carries the key.
+const iv = ivCards.find((c) => c.key === def.hwKey) ?? null;
+const hwModel = (hw.models as any[]).find((m) => m.key === def.hwKey);
+const ask = hwModel?.ask as { med: number | null; n: number } | undefined;
+const t90 = hwModel?.t90 as { med: number | null; n: number } | undefined;
+
+// No n counts anywhere in the chip family — the tooltip carries the citable
+// series id and stat only; depth/dispersion live on the surface pages.
+function cellTitle(c: Rate): string {
+  return `${c.series_id} · ${headlineStatOf(c)} headline`;
+}
+
+// --- rates trend: the published headline series, as published --------------
+// No % is printed: the 2026-08-08 scope seam bars quoting change across it
+// on region-ALL cells; the line shows the series, the surface page owns
+// any change framing.
+const hist = spot ? seriesHistory(spot.series_id) : [];
+const histPts = hist.map((h) => h.headline);
+const histWindow = hist.length ? `${hist[0]!.date} → ${hist[hist.length - 1]!.date}` : '';
+const SW = 320, SH = 84, SPL = 8, SPR = 8, SPT = 10, SPB = 10;
+const sparkPath = (() => {
+  if (histPts.length < 2) return '';
+  const lo = Math.min(...histPts), hi = Math.max(...histPts);
+  const span = hi - lo || 1;
+  return histPts
+    .map((v, i) => {
+      const x = SPL + (i / (histPts.length - 1)) * (SW - SPL - SPR);
+      const y = SPT + (1 - (v - lo) / span) * (SH - SPT - SPB);
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+})();
+
+// --- term mini-curve geometry (sqrt-month axis, like /term) ----------------
+const TW = 320, TH = 140, TPL = 34, TPR = 46, TPT = 12, TPB = 24;
+const tMaxMonths = 36;
+const tx = (m: number) => TPL + (Math.sqrt(m) / Math.sqrt(tMaxMonths)) * (TW - TPL - TPR);
+const tVals = odAnchorValue == null ? [] : [odAnchorValue, ...tenorPts.map((p) => p.value)];
+const tLo = tVals.length ? Math.min(...tVals) * 0.92 : 0;
+const tHi = tVals.length ? Math.max(...tVals) * 1.06 : 1;
+const ty = (v: number) => TPT + (1 - (v - tLo) / (tHi - tLo || 1)) * (TH - TPT - TPB);
+const termPath = odAnchorValue == null ? '' : [
+  `M${tx(0).toFixed(1)},${ty(odAnchorValue).toFixed(1)}`,
+  ...tenorPts.map((p) => `L${tx(p.months).toFixed(1)},${ty(p.value).toFixed(1)}`),
+].join(' ');
+
+// --- hardware mini-trend: monthly executed med3, the /hardware chart lane --
+type HwPt = { m: string; med: number | null; n: number; units: number; med3: number | null; n3: number };
+const hwMonthly: HwPt[] = (hwModel?.monthly ?? []) as HwPt[];
+const hwLine = hwMonthly.filter((p) => p.med3 != null);
+const hwWindow = hwLine.length ? `${hwLine[0]!.m} → ${hwLine[hwLine.length - 1]!.m}` : '';
+const HW_W = 320, HW_H = 84, HPL = 8, HPR = 8, HPT = 10, HPB = 10;
+const hwPath = (() => {
+  if (hwLine.length < 2) return '';
+  const vals = hwLine.map((p) => p.med3!) ;
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const span = hi - lo || 1;
+  return hwLine
+    .map((p, i) => {
+      const x = HPL + (i / (hwLine.length - 1)) * (HW_W - HPL - HPR);
+      const y = HPT + (1 - (p.med3! - lo) / span) * (HW_H - HPT - HPB);
+      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
+})();
+
+// --- lifecycle strip: the four-phase arc, current phase per registry -------
+const PHASES: { key: ChipDef['phase']; eye: string; text: string }[] = [
+  { key: 'launch', eye: `${introYear} · Launch`, text: def.launchText },
+  { key: 'prime', eye: 'Prime flow', text: 'Rented on guaranteed and interruptible terms; the benchmark records the posted asks daily.' },
+  { key: 'collateral', eye: 'Collateral', text: 'GPU fleets appear as filed collateral in GPU-backed facilities — tracked, as filed, on /credit.' },
+  { key: 'residual', eye: 'Residual', text: 'Secondary asks and executed sales recorded on /hardware; freed capacity re-lets at the prevailing rate.' },
+];
+
+// --- SEO -------------------------------------------------------------------
+const SITE = 'https://ccir.io';
+const pageTitle = `${def.name} Rental Price — CCIR Reference Rates`;
+const pageDescription =
+  `Daily published reference rates for the ${def.name} (${def.formFactor} ${def.memory}): ` +
+  `guaranteed and interruptible on-demand USD/GPU-hr, committed term structure, ` +
+  `secondary-market record, and an income-derived model-implied unit value. ` +
+  `Every figure inherits from the surface that publishes it.`;
+
+// Dataset schema: this page is a published data surface (daily series with
+// stated methodology), not an article and not a product offer — no offers,
+// reviews, or ratings markup. Claims mirror what the page prints.
+const datasetLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: `CCIR ${def.short} rental reference rates`,
+  description:
+    `Daily reference rates for ${def.name} (${def.formFactor} ${def.memory}) GPU rental: ` +
+    `guaranteed and interruptible on-demand rates in USD per GPU-hour by operator segment, ` +
+    `committed term structure (market intelligence), the secondary-market record, ` +
+    `and an income-derived model-implied unit value in USD per unit.`,
+  url: `${SITE}/chip/${def.slug}`,
+  creator: { '@id': `${SITE}/#org` },
+  publisher: { '@id': `${SITE}/#org` },
+  isAccessibleForFree: true,
+  dateModified: meta.as_of_date,
+  keywords: [
+    `${def.short} rental price`,
+    `${def.short} GPU price per hour`,
+    `${def.name}`,
+    'GPU reference rates',
+    'GPU rental benchmark',
+  ],
+  measurementTechnique:
+    `Publicly posted asks aggregated per operator segment; headline = panel mean at n>=10, else median. Methodology: ${SITE}/documents/methodology`,
+  variableMeasured: [
+    { '@type': 'PropertyValue', name: 'Guaranteed on-demand rate', unitText: 'USD per GPU-hour' },
+    { '@type': 'PropertyValue', name: 'Interruptible on-demand rate', unitText: 'USD per GPU-hour' },
+    { '@type': 'PropertyValue', name: 'Committed term rate (market intelligence)', unitText: 'USD per GPU-hour' },
+    { '@type': 'PropertyValue', name: 'Model-implied unit value (income-derived)', unitText: 'USD per unit' },
+  ],
+});
+---
+<Base
+  title={pageTitle}
+  description={pageDescription}
+  ogImage={`/og/chip-${def.slug}.png`}
+>
+  <script slot="head" is:inline type="application/ld+json" set:html={datasetLd} />
+  <section class="wrap page-top">
+    <PageHeader
+      title={def.name}
+      crumbs={[{ href: '/', label: 'CCIR' }, { href: '/chips', label: 'Chips' }]}
+      kicker={def.short}
+      asOf={meta.as_of_date}
+    >
+      <p class="id-meta">{def.formFactor} · {def.memory} · {def.generation.toUpperCase()} · INTRODUCED {introYear}</p>
+      <p class="standfirst">
+        One chip across the published surfaces. Every figure on this page is
+        the same cell, from the same code path, as the surface it links to —
+        nothing is computed here that is not already published there. Lanes
+        are never blended.
+      </p>
+    </PageHeader>
+
+    <!-- Stat band — T2 (Neocloud) headline band -->
+    <div class="stat-band">
+      <div class="stat">
+        <span class="st-lane">Spot · Guaranteed · T2 Neocloud</span>
+        {spot ? (
+          <>
+            <span class="st-value" title={cellTitle(spot)}>${fmt(headlineValue(spot))}</span>
+            <span class="st-unit">USD/GPU-hr</span>
+            <span class="st-meta">on-demand ask · {headlineStatOf(spot)} · as of {meta.as_of_date}</span>
+          </>
+        ) : <span class="st-value">—</span>}
+      </div>
+      <div class="stat">
+        <span class="st-lane">Committed · {committed?.term ?? '—'} · T2 Neocloud</span>
+        {committed && odAnchorValue != null ? (
+          <>
+            <span class="st-value" title={`${CHIP} ${committed.term}: $${fmt(odAnchorValue)} on-demand anchor stepped by the within-provider committed spread — the /term construction`}>${fmt(committed.value)}</span>
+            <span class="st-unit">USD/GPU-hr</span>
+            <span class="st-meta">implied off OD anchor{committed.prov ? ' · provisional' : ''}</span>
+            <span class="st-mi">Market intelligence — not a citable reference rate</span>
+          </>
+        ) : <span class="st-value">—</span>}
+      </div>
+      <div class="stat">
+        <span class="st-lane">Interruptible · T2 Neocloud</span>
+        {intr ? (
+          <>
+            <span class="st-value" title={cellTitle(intr)}>${fmt(headlineValue(intr))}</span>
+            <span class="st-unit">USD/GPU-hr</span>
+            <span class="st-meta">on-demand ask, revocable occupancy · {headlineStatOf(intr)} · as of {meta.as_of_date}</span>
+          </>
+        ) : <span class="st-value">—</span>}
+      </div>
+      <div class="stat">
+        <span class="st-lane">Model-implied value · {def.hwLabel}</span>
+        {iv ? (
+          <>
+            <span class="st-value" title={`income-derived model output — /hardware's own figure, recomputed on each daily data refresh`}>{fmtUsd(iv.base)}</span>
+            <span class="st-unit">USD/unit</span>
+            <span class="st-meta">income-derived · sensitivity {fmtK(iv.lo)}–{fmtK(iv.hi)} · curve to {iv.curveTo}</span>
+            <span class="st-mi">Model output — not a transacted price</span>
+          </>
+        ) : <span class="st-value">—</span>}
+      </div>
+    </div>
+    <p class="band-note">
+      Four lanes, one chip, never blended: a guaranteed hourly ask, an implied
+      committed level, a revocable-occupancy ask, and an income-derived
+      model value per unit. The posted and executed secondary-market record
+      sits in the hardware panel below.
+    </p>
+
+    <!-- Surface modules -->
+    <div class="modules">
+      <section class="module">
+        <header class="mod-head">
+          <span class="kicker">Rates</span>
+          <a class="mod-link" href="/rates">Full ladder →</a>
+        </header>
+        {sparkPath ? (
+          <figure class="mod-fig">
+            <svg viewBox={`0 0 ${SW} ${SH}`} role="img"
+              aria-label={`${def.short} guaranteed on-demand published headline, ${histWindow}.`}>
+              <path d={sparkPath} class="line" />
+            </svg>
+            <figcaption class="mod-chrome">
+              {spot?.series_id} · published headline · {histWindow}
+            </figcaption>
+          </figure>
+        ) : <p class="mod-chrome">No bundled history for this series.</p>}
+        <p class="mod-line">
+          The guaranteed on-demand headline as printed on the rates ladder,
+          daily.
+        </p>
+      </section>
+
+      <section class="module">
+        <header class="mod-head">
+          <span class="kicker">Term</span>
+          <a class="mod-link" href="/term">Term structure →</a>
+        </header>
+        {termPath && odAnchorValue != null ? (
+          <figure class="mod-fig">
+            <svg viewBox={`0 0 ${TW} ${TH}`} role="img"
+              aria-label={`${def.short} committed levels by tenor, implied off the on-demand anchor.`}>
+              <path d={termPath} class="line" />
+              <circle cx={tx(0)} cy={ty(odAnchorValue)} r="3" class="pt" />
+              <text x={tx(0)} y={ty(odAnchorValue) - 7} class="pt-lab" text-anchor="start">OD ${fmt(odAnchorValue)}</text>
+              {tenorPts.map((p) => (
+                <>
+                  {p.prov
+                    ? <circle cx={tx(p.months)} cy={ty(p.value)} r="3" class="pt pt-prov" />
+                    : <circle cx={tx(p.months)} cy={ty(p.value)} r="3" class="pt" />}
+                  <text x={tx(p.months)} y={TH - 8} class="ax-lab" text-anchor="middle">{p.term}</text>
+                </>
+              ))}
+              {committed && (
+                <text x={tx(committed.months) + 8} y={ty(committed.value) + 4} class="pt-lab" text-anchor="start">${fmt(committed.value)}</text>
+              )}
+            </svg>
+            <figcaption class="mod-chrome">
+              implied off the OD anchor · within-provider spreads · hollow = provisional
+            </figcaption>
+          </figure>
+        ) : <p class="mod-chrome">No committed tenors published for this chip.</p>}
+        <p class="mod-line">
+          Posted committed asks by tenor, each level implied off the
+          on-demand anchor by that operator population's own spread.
+          <span class="mi-inline">Market intelligence — not a citable reference rate.</span>
+        </p>
+      </section>
+
+      <section class="module">
+        <header class="mod-head">
+          <span class="kicker">Hardware</span>
+          <a class="mod-link" href="/hardware">Secondary market →</a>
+        </header>
+        {hwPath ? (
+          <figure class="mod-fig">
+            <svg viewBox={`0 0 ${HW_W} ${HW_H}`} role="img"
+              aria-label={`${def.short} executed secondary-market sale prices, 3-month rolling median, ${hwWindow}.`}>
+              <path d={hwPath} class="line" />
+            </svg>
+            <figcaption class="mod-chrome">
+              executed sales, 3-mo rolling median · {hwWindow} · as of {hw.as_of}
+            </figcaption>
+          </figure>
+        ) : <p class="mod-chrome">No posted or executed secondary-market record for this model yet.</p>}
+        {hwModel ? (
+          <p class="mod-line">
+            The observed record for the {def.hwLabel} unit{t90?.med != null && <> — trailing-90-day executed median {fmtUsd(t90.med)}</>}{ask?.med != null && <>; current posted ask median {fmtUsd(ask.med)}</>}. Asks and executed prints stay in separate lanes, and neither is the model-implied headline above.
+          </p>
+        ) : (
+          <p class="mod-line">
+            No posted secondary-market asks are on the record yet for the
+            {' '}{def.hwLabel} unit. The headline above is /hardware's
+            income-derived model output — modeled only, not triangulated
+            against an ask or executed lane.
+          </p>
+        )}
+      </section>
+    </div>
+
+    <!-- Lifecycle strip — current phase highlighted per registry -->
+    <section class="lifecycle">
+      <header class="mod-head">
+        <span class="kicker">Asset arc · as recorded</span>
+      </header>
+      <ol class="arc">
+        {PHASES.map((ph) => (
+          <li class:list={['arc-step', { 'arc-now': ph.key === def.phase }]}>
+            <span class="arc-eye">{ph.eye}{ph.key === def.phase && <span class="arc-tag">current</span>}</span>
+            <span class="arc-text">
+              {ph.key === 'collateral'
+                ? <>GPU fleets appear as filed collateral in GPU-backed facilities — tracked, as filed, on <a href="/credit">/credit</a>.</>
+                : ph.key === 'residual'
+                  ? <>Secondary asks and executed sales recorded on <a href="/hardware">/hardware</a>; freed capacity re-lets at the prevailing rate.</>
+                  : ph.text}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </section>
+
+  <style>
+    .id-meta {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      margin: 0 0 4px;
+    }
+
+    /* Stat band */
+    .stat-band {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+    @media (max-width: 900px) { .stat-band { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .stat-band { grid-template-columns: 1fr; } }
+    .stat {
+      background: var(--surface);
+      padding: 13px 15px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .st-lane {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--ink-dim);
+      font-weight: var(--weight-strong);
+    }
+    .st-value {
+      font-family: var(--font-mono);
+      font-size: var(--fs-2xl);
+      font-weight: var(--weight-strong);
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      cursor: help;
+    }
+    .st-unit {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-faint);
+    }
+    .st-meta {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+    .st-mi {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 2px);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--warn);
+    }
+    .band-note {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      line-height: 1.6;
+      max-width: 760px;
+      margin: 12px 0 0;
+    }
+
+    /* Modules */
+    .modules {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+      margin: 36px 0 0;
+    }
+    @media (max-width: 900px) { .modules { grid-template-columns: 1fr; } }
+    .module {
+      border: 1px solid var(--rule);
+      background: var(--surface);
+      padding: 14px 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .mod-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 8px;
+    }
+    .mod-link {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--link);
+    }
+    .mod-fig { margin: 0; }
+    .mod-fig svg { width: 100%; height: auto; display: block; }
+    .mod-fig .line {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+    .mod-fig .pt { fill: var(--accent); stroke: var(--surface); stroke-width: 1.5; }
+    .mod-fig .pt-prov { fill: var(--surface); stroke: var(--accent); stroke-width: 1.5; }
+    .mod-fig .pt-lab {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      fill: var(--ink);
+      font-weight: 600;
+    }
+    .mod-fig .ax-lab {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      fill: var(--ink-faint);
+      letter-spacing: 0.04em;
+    }
+    .mod-chrome {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-faint);
+      line-height: 1.6;
+      margin: 6px 0 0;
+      letter-spacing: 0.02em;
+    }
+    .mod-line {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      line-height: 1.65;
+      margin: 0;
+    }
+    .mi-inline {
+      display: block;
+      margin-top: 4px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 2px);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--warn);
+    }
+
+    /* Lifecycle strip */
+    .lifecycle { margin: 36px 0 0; }
+    .arc {
+      list-style: none;
+      margin: 12px 0 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      counter-reset: arc;
+    }
+    @media (max-width: 900px) { .arc { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .arc { grid-template-columns: 1fr; } }
+    .arc-step {
+      background: var(--surface);
+      padding: 12px 15px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .arc-eye {
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .arc-text {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      line-height: 1.65;
+    }
+    /* Current phase — amber left rule + tag (data emphasis role). */
+    .arc-now { box-shadow: inset 2px 0 0 0 var(--accent); }
+    .arc-now .arc-text { color: var(--ink); }
+    .arc-tag {
+      font-size: calc(var(--fs-xs) - 2px);
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+      padding: 0 5px;
+    }
+
+    /* Phone: the 8px marks (model-output / MI / current tag) get a
+       legibility floor; tiles are stacked full-width so the extra size
+       costs nothing. */
+    @media (max-width: 480px) {
+      .st-mi, .mi-inline, .arc-tag { font-size: 10px; }
+    }
+  </style>
+</Base>

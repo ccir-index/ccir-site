@@ -23,6 +23,7 @@
   hue, page-consistent.
 */
 import fs from 'node:fs';
+import path from 'node:path';
 import { meta } from '../data/snapshot';
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
@@ -79,8 +80,12 @@ const TENOR_MONTHS = [
 interface ChipPoint { months: number; value: number; provs: Record<string, number> }
 
 function chipPoints(file: string): ChipPoint[] {
+  // process.cwd() (the project root under both `astro dev` and `astro build`)
+  // instead of import.meta.url: the latter trips a Vite dev-transform bug
+  // ("Cannot split a chunk that has already been edited") that 500s /term in
+  // dev only — pre-existing on main, reproduced at the redesign base commit.
   const raw = fs
-    .readFileSync(new URL(`../../public/data/${file}`, import.meta.url), 'utf-8')
+    .readFileSync(path.join(process.cwd(), 'public', 'data', file), 'utf-8')
     .trim()
     .split(/\r?\n/);
   const header = raw[0]!.split(',');

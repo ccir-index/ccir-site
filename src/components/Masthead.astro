@@ -1,31 +1,50 @@
 ---
+/*
+  Masthead (redesign/v1) — two rows.
+
+  Row 1 (utility): the independence claim · Applications / Documents /
+  Contact · dateline + cadence. Non-market destinations live here so the
+  primary band carries market surfaces only.
+
+  Row 2 (primary): brand block + grouped nav. Groups mirror the surface
+  architecture — flow (Rates/Term/Tokens), financing (Credit), residual
+  (Hardware), analysis (Research), data (Explorer) — with hairline
+  dividers and a tiny role overline per group on wide viewports.
+
+  All hrefs unchanged from the previous nav; 'Secondary Market' is
+  relabeled 'Hardware' (same /hardware route).
+*/
 import ThemeToggle from './ThemeToggle.astro';
 import { meta } from '../data/snapshot';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const nav = [
-  { href: '/rates', label: 'Rates' },
-  // Term promoted to top-level 2026-08-05 (it lost its landing-page panel
-  // to the interruptible ladder; the tenor dimension is a pillar, not a
-  // research note).
-  { href: '/term', label: 'Term' },
-  // Token posted-price surface (2026-08-05): frontier first-party + served
-  // open-weight — the second leg of the compute-vs-token decomposition.
-  { href: '/tokens', label: 'Tokens' },
-  // Research is a hub (monitors + dated notes) — light it up on every piece
-  // it houses, including /research/* note subroutes.
-  { href: '/research', label: 'Research',
-    match: ['/research', '/intelligence', '/basis', '/spreads',
-            '/realized', '/chip-economics', '/utilization', '/observatory',
-            '/availability', '/markets', '/marketplace', '/vast'] },
-  { href: '/credit', label: 'Credit' },
-  { href: '/hardware', label: 'Secondary', label2: 'Market' },
-  { href: '/explorer', label: 'Explorer' },
-  { href: '/applications', label: 'Applications' },
-  { href: '/contact', label: 'Contact' },
+
+interface Item { href: string; label: string; match?: string[] }
+interface Group { role: string; items: Item[] }
+
+const groups: Group[] = [
+  { role: 'flow', items: [
+    { href: '/rates', label: 'Rates' },
+    { href: '/term', label: 'Term' },
+    { href: '/tokens', label: 'Tokens' },
+  ] },
+  { role: 'financing', items: [
+    { href: '/credit', label: 'Credit' },
+  ] },
+  { role: 'residual', items: [
+    { href: '/hardware', label: 'Hardware' },
+  ] },
+  { role: 'analysis', items: [
+    { href: '/research', label: 'Research',
+      match: ['/research', '/intelligence', '/basis', '/realized',
+              '/chip-economics', '/utilization', '/availability'] },
+  ] },
+  { role: 'data', items: [
+    { href: '/explorer', label: 'Explorer' },
+  ] },
 ];
 
-function isActive(n: { href: string; match?: string[] }): boolean {
+function isActive(n: Item): boolean {
   const group = n.match ?? [n.href];
   return group.some((g) => path === g || path.startsWith(g + '/'));
 }
@@ -34,6 +53,11 @@ function isActive(n: { href: string; match?: string[] }): boolean {
   <div class="top-rule">
     <div class="wrap top-rule-inner">
       <span class="claim">No positions in the markets we measure</span>
+      <nav class="utility" aria-label="Utility">
+        <a href="/applications" class:list={[{ on: isActive({ href: '/applications', label: '' }) }]}>Applications</a>
+        <a href="/documents" class:list={[{ on: isActive({ href: '/documents', label: '' }) }]}>Documents</a>
+        <a href="/contact" class:list={[{ on: isActive({ href: '/contact', label: '' }) }]}>Contact</a>
+      </nav>
       <span class="top-meta">
         <span class="dateline">AS OF {meta.as_of_date}</span>
         <span class="sep" aria-hidden="true">·</span>
@@ -48,12 +72,20 @@ function isActive(n: { href: string; match?: string[] }): boolean {
       <span class="brand-mark">CCIR</span>
       <span class="brand-name">Compute Credit<br />Index Research</span>
     </a>
-    <nav class="nav">
-      {nav.map((n) => (
-        <a
-          href={n.href}
-          class:list={['nav-link', { on: isActive(n), stacked: !!n.label2 }]}
-        >{n.label}{n.label2 && <span class="nav-l2">{n.label2}</span>}</a>
+    <nav class="nav" aria-label="Primary">
+      {groups.map((g, i) => (
+        <div class:list={['nav-group', { first: i === 0 }]}>
+          <span class="nav-role" aria-hidden="true">{g.role}</span>
+          <div class="nav-items">
+            {g.items.map((n) => (
+              <a
+                href={n.href}
+                class:list={['nav-link', { on: isActive(n) }]}
+                aria-current={isActive(n) ? 'page' : undefined}
+              >{n.label}</a>
+            ))}
+          </div>
+        </div>
       ))}
     </nav>
     <div class="masthead-tools">
@@ -65,7 +97,7 @@ function isActive(n: { href: string; match?: string[] }): boolean {
 <style>
   .masthead { background: var(--surface); border-bottom: 1px solid var(--rule-2); }
 
-  /* Row 1 — the claim, the date, the cadence. Nothing else. */
+  /* Row 1 — claim · utility links · date/cadence. */
   .top-rule {
     background: var(--surface-2);
     border-bottom: 1px solid var(--rule);
@@ -73,7 +105,7 @@ function isActive(n: { href: string; match?: string[] }): boolean {
   .top-rule-inner {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
     padding-top: 6px;
     padding-bottom: 6px;
     font-family: var(--font-mono);
@@ -85,13 +117,22 @@ function isActive(n: { href: string; match?: string[] }): boolean {
     color: var(--accent);
     font-weight: var(--weight-strong);
   }
-  .top-meta {
+  .utility {
+    display: inline-flex;
+    gap: 14px;
     margin-left: auto;
+  }
+  .utility a { color: var(--ink-dim); }
+  .utility a:hover { color: var(--link); text-decoration: none; }
+  .utility a.on { color: var(--link); }
+  .top-meta {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     color: var(--ink-dim);
     white-space: nowrap;
+    padding-left: 16px;
+    border-left: 1px solid var(--rule);
   }
   .dateline { color: var(--ink); font-weight: var(--weight-strong); }
   .sep { color: var(--ink-faint); }
@@ -104,11 +145,11 @@ function isActive(n: { href: string; match?: string[] }): boolean {
     box-shadow: 0 0 6px var(--pos);
   }
 
-  /* Row 2 — identity and navigation. */
+  /* Row 2 — identity and grouped navigation. */
   .masthead-band {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 28px;
     padding-top: 12px;
     padding-bottom: 12px;
   }
@@ -136,49 +177,83 @@ function isActive(n: { href: string; match?: string[] }): boolean {
     color: var(--ink-dim);
     line-height: 1.45;
   }
-  .nav { display: flex; gap: 22px; align-items: center; }
-  .nav-link.stacked { line-height: 1.25; padding: 0; }
-  .nav-l2 { display: block; }
+
+  .nav { display: flex; align-items: stretch; }
+  .nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0 18px;
+    border-left: 1px solid var(--rule);
+  }
+  .nav-group.first { border-left: none; padding-left: 0; }
+  .nav-role {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    line-height: 1;
+  }
+  .nav-items { display: flex; gap: 18px; }
   .nav-link {
     font-family: var(--font-mono);
     font-size: var(--fs-xs);
     text-transform: uppercase;
     letter-spacing: var(--tracking-eye);
     color: var(--ink-dim);
-    padding: 4px 0;
+    padding: 3px 0 4px;
     border-bottom: 1px solid transparent;
   }
   .nav-link:hover { color: var(--ink); text-decoration: none; }
-  .nav-link.on { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-link.on { color: var(--link); border-bottom-color: var(--link); }
   .masthead-tools { margin-left: auto; flex-shrink: 0; }
+
+  /* Wide-but-not-huge: drop the role overlines before anything wraps. */
+  @media (max-width: 1100px) {
+    .nav-role { display: none; }
+    .nav-group { justify-content: center; }
+  }
 
   /* Mobile — contain nav overflow inside the band itself
      instead of pushing the whole page wider than the viewport. */
-  @media (max-width: 860px) {
+  @media (max-width: 880px) {
     .masthead-band { gap: 16px; flex-wrap: wrap; }
     .nav {
       order: 3;
       flex: 1 1 100%;
-      gap: 16px;
       overflow-x: auto;
       min-width: 0;
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
     .nav::-webkit-scrollbar { display: none; }
-    .nav-link { flex-shrink: 0; white-space: nowrap; }
+    .nav-group { padding: 0 14px; }
+    .nav-items { gap: 14px; }
+    /* Touch tap targets: the scroll-strip links pad vertically to a
+       >=40px hit box (22px text row + 12px each side). Desktop density
+       is untouched — this only applies inside the mobile band. */
+    .nav-link { flex-shrink: 0; white-space: nowrap; padding: 15px 0; }
   }
 
   @media (max-width: 720px) {
-    .top-rule-inner { flex-wrap: wrap; gap: 4px 16px; }
-    .top-meta { margin-left: auto; }
+    .top-rule-inner { flex-wrap: wrap; gap: 4px 14px; }
     .masthead-band { padding-top: 10px; padding-bottom: 8px; }
     .brand-mark { font-size: var(--fs-xl); }
+    /* Utility links get a real tap box on phones. */
+    .utility a { display: inline-block; padding: 13px 2px; }
+  }
+
+  @media (max-width: 560px) {
+    .claim { flex-basis: 100%; }
+    .utility { margin-left: 0; }
+    .top-meta { margin-left: auto; }
   }
 
   @media (max-width: 480px) {
     .brand-name { display: none; }
     .status { display: none; }
     .sep { display: none; }
+    .top-meta { padding-left: 0; border-left: none; }
   }
 </style>

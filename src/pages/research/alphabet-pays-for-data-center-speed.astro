@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 
 /*
   Dated research note — frozen to Alphabet's Q2 2026 10-Q
@@ -301,6 +302,8 @@ const c3x = (v: number) => (v / 2.1) * (C3W - C3L - C3R);
         publishes reference data and records.
       </p>
     </section>
+
+    <NoteFooter title="Buying, Building, Renting, Guaranteeing: How Alphabet Pays to Obtain Compute Capacity at Speed" published="2026-07-24" />
   </section>
 
   <style>
@@ -325,7 +328,7 @@ const c3x = (v: number) => (v / 2.1) * (C3W - C3L - C3R);
     }
     .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
     .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
-    .sec a { color: var(--accent); }
+    .sec a { color: var(--link); }
     .chart-fig { margin: 18px 0 22px; max-width: 700px; }
     .chart-box { border: 1px solid var(--rule); background: var(--surface); }
     .chart-box svg { display: block; width: 100%; height: auto; }
@@ -366,6 +369,6 @@ const c3x = (v: number) => (v / 2.1) * (C3W - C3L - C3R);
       padding-top: 8px;
       max-width: 74ch;
     }
-    .footnote a { color: var(--accent); }
+    .footnote a { color: var(--link); }
   </style>
 </Base>

@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 
 // Calibrated to the Common Crawl provider-primary backfill, stepped-panel
 // recompute of 2026-07-06. Research notes are dated, not updated in place.
@@ -217,6 +218,8 @@ const last = D[D.length - 1];
         providers is the recoverable archive, not the full market.
       </p>
     </section>
+
+    <NoteFooter title="The Commitment Discount: Three Years of H100 Posted Prices" published="2026-07-06" />
   </section>
 
   <script is:inline define:vars={{ D, W, H, PADL, PADR, PADT, SPREAD_H }}>

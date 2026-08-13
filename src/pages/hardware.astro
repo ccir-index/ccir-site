@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
 import hw from '../data/hardware_panels.json';
+import ChipLink from '../components/ChipLink.astro';
 import { ivCards } from '../lib/ivmodel';
 
 // Secondary-market hardware price tape — observed executed prices (eBay
@@ -234,9 +236,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       contentUrl: 'https://ccir.io/hardware/series.csv',
     }],
   })} />
-  <section class="wrap top">
-    <header class="page-head">
-      <h1>The Secondary Market</h1>
+  <section class="wrap page-top">
+    <PageHeader title="The Secondary Market" kicker="Market Intelligence · Hardware Residual" asOf={hw.as_of}>
       <p class="subhead">What a deployed GPU is worth as an earning asset, and what machines list and sell for.</p>
       <p class="standfirst">
         This page publishes one value per chip: what a machine is worth
@@ -251,7 +252,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         lanes. They are inputs to recovery analysis, not a recovery
         estimate.
       </p>
-    </header>
+    </PageHeader>
 
     <section class="sec iv">
       <h2><span class="n">§</span> Income-derived value</h2>
@@ -589,7 +590,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
             const ageYr = ((mk(hw.as_of.slice(0, 7)) - mk(ga)) / 12).toFixed(1);
             return (
               <tr>
-                <td class="gen">{m.label}</td>
+                {/* Links resolve only on the exact registry variant (identity
+                    lock) — A100-40 / PCIe rows stay plain text. */}
+                <td class="gen"><ChipLink chip={m.key} label={m.label} /></td>
                 <td class="num dim">{ga.slice(0, 4)}</td>
                 <td class="num dim">{ageYr}y</td>
                 <td class="num strong">{fmtUsd(t90)}</td>
@@ -845,7 +848,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       font-weight: var(--weight-display);
       margin: 6px 0 12px;
     }
-    .standfirst a { color: var(--accent); }
+    .standfirst a { color: var(--link); }
     .forward { margin-top: 6px; }
     .secintro { max-width: 72ch; color: var(--ink-dim); }
     .cta-box {
@@ -858,7 +861,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     }
     .cta-box p { margin: 0 0 10px; }
     .cta-box p:last-child { margin-bottom: 0; }
-    .cta-box a { color: var(--accent); }
+    .cta-box a { color: var(--link); }
     .subhead {
       font-family: var(--font-display);
       font-size: var(--fs-lg);
@@ -896,8 +899,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .ln-other { stroke: var(--arch-other); }
     .lab-other { fill: var(--arch-other); }
     .ln-exec { stroke-width: 2.6; }
-    .asklab { font-family: var(--font-sans); font-size: 10px; fill: var(--ink-dim); letter-spacing: 0.04em; }
-    .panel-lab { font-family: var(--font-sans); font-size: 13px; font-weight: 600; }
+    .asklab { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim); letter-spacing: 0.04em; }
+    .panel-lab { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
     .sw-execk { background: var(--ink); height: 4px; }
 
     .chart-fig { margin: 0 0 22px; max-width: 962px; }
@@ -910,8 +913,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       font-weight: var(--weight-strong);
       margin: 0 0 6px;
     }
-    .rowlab { font-family: var(--font-sans); font-size: 12.5px; fill: var(--ink); font-weight: 600; letter-spacing: 0.01em; }
-    .rowval { font-family: var(--font-sans); font-size: 11.5px; fill: var(--ink-dim); }
+    .rowlab { font-family: var(--font-mono); font-size: 12.5px; fill: var(--ink); font-weight: 600; letter-spacing: 0.01em; }
+    .rowval { font-family: var(--font-mono); font-size: 11.5px; fill: var(--ink-dim); }
     .dumbline { stroke: var(--ink-faint); stroke-width: 1.2; opacity: 0.7; }
     .execpt { fill: var(--accent); }
     .askpt2 { fill: var(--surface); stroke: var(--ink-dim); stroke-width: 1.6; }
@@ -922,13 +925,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .grid { stroke: var(--rule); stroke-width: 1; opacity: 0.7; }
     .episode { fill: var(--accent); opacity: 0.07; }
     .eplab {
-      font-family: var(--font-sans);
+      font-family: var(--font-mono);
       font-size: 10px;
       fill: var(--ink-faint);
       letter-spacing: 0.05em;
       text-transform: uppercase;
     }
-    .tick { font-family: var(--font-sans); font-size: 11.5px; fill: var(--ink-faint); }
+    .tick { font-family: var(--font-mono); font-size: 11.5px; fill: var(--ink-faint); }
     .ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
     .ln-thin { stroke-width: 1.2; stroke-dasharray: 3 4; opacity: 0.75; }
     .ln-volta { stroke: var(--arch-volta); }
@@ -947,9 +950,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .ap-ampere { stroke: var(--arch-ampere); }
     .ap-a10040 { stroke: var(--arch-a10040); }
     .ap-hopper { stroke: var(--arch-hopper); }
-    .leglab { font-family: var(--font-sans); font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
+    .leglab { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
     .scaletag {
-      font-family: var(--font-sans);
+      font-family: var(--font-mono);
       font-size: 10.5px;
       fill: var(--ink-faint);
       text-transform: uppercase;

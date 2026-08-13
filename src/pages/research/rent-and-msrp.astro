@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 import ratios from '../../data/rent_ratio_panels.json';
 
 // Ratio-by-age, small multiples: one panel per generation (five stepped
@@ -157,7 +158,7 @@ const bwTable = [
           posted rates, an imputed per-chip facility rent, and overhead at
           20% of realized revenue, from operator filings and published
           CCIR work), <strong>V100 recovered its MSRP in 31 months and
-          A100 in 37. H100, at 42 months, stands at 0.83× and has not yet
+          <a href="/chip/a100">A100</a> in 37. <a href="/chip/h100">H100</a>, at 42 months, stands at 0.83× and has not yet
           crossed.</strong>
         </li>
         <li>
@@ -326,7 +327,7 @@ const bwTable = [
         stands at 1.53×; H100, at 42 months old, stands at 0.83× and has
         not yet crossed</strong>. These are paces at or inside the
         3-to-5-year amortization schedules lenders in this market write,
-        with only the two oldest generations through. H200 and B200 are 24
+        with only the two oldest generations through. <a href="/chip/h200">H200</a> and B200 are 24
         and 16 months into their windows. These are elections, stated so the
         arithmetic can be reproduced or re-elected. CCIR publishes the
         prices, not the elections.
@@ -530,6 +531,8 @@ const bwTable = [
         window, not of the next one.
       </p>
     </section>
+
+    <NoteFooter title="Rent and MSRP: Five Generations of Posted Prices" published="2026-07-08" updated="2026-07-11" />
   </section>
 
   <script is:inline>

@@ -4,8 +4,18 @@ import {
   headlineRates, meta, premiumChipsList, homeOdCell, homeIntCell, headlineValue, headlineStatOf,
 } from '../data/snapshot';
 import { wpSpread } from '../data/committed_mi';
+import ChipLink from '../components/ChipLink.astro';
 import { TIERS, TIER_LABELS_SHORT, TERM_DISPLAY } from '../data/types';
 import type { Rate, Term, Tier } from '../data/types';
+import creditData from '../data/credit_instruments.json';
+
+// --- surface band (redesign/v1) -------------------------------------------
+// The other three surfaces, few words each. The credit stat reuses /credit's
+// own computation (collateral_class === 'gpu', filed sizes summed) so the
+// tile and the tracker can never disagree.
+const creditGpuRows = creditData.instruments.filter((i: any) => i.collateral_class === 'gpu');
+const creditGpuUsdB = Math.round(creditGpuRows.reduce((a: number, i: any) => a + i.size_usd_m, 0) / 1000);
+const creditN = creditData.instruments.length;
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 
@@ -24,20 +34,23 @@ const chips = (() => {
   const live = premiumChipsList();
   return (live.length > 0 ? live : ['B200', 'H200', 'H100', 'A100']);
 })();
-const ladder = chips
-  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeOdCell(t, chip)])) as Record<Tier, Rate | undefined> }))
-  .filter((row) => TIERS.some((t) => row.cells[t]));
 
-// --- interruptible ladder (LOCALHOST PREVIEW, 2026-08-04) ------------------
-// Second grade of the same survey: identical panel construction, identical
-// cell-selection rule (homeIntCell), revocable-occupancy products. Below-
-// floor cells print an em dash and fill as the INT panel deepens. No ratio
-// against the guaranteed ladder is printed anywhere — different panel
-// compositions. Replaces the term panel in this preview; /term surfacing
-// decision pending.
-const intLadder = chips
-  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeIntCell(t, chip)])) as Record<Tier, Rate | undefined> }))
-  .filter((row) => TIERS.some((t) => row.cells[t]));
+// The two grade cards are EXACT MIRRORS (owner, 2026-08-13): one shared row
+// list drives both tables — a chip with cells in either grade renders in
+// both, the gradeless side printing em dashes — so row counts, row heights,
+// and every horizontal rule line up across the pair.
+const rowChips = chips.filter((chip) =>
+  TIERS.some((t) => homeOdCell(t, chip)) || TIERS.some((t) => homeIntCell(t, chip)));
+const ladder = rowChips
+  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeOdCell(t, chip)])) as Record<Tier, Rate | undefined> }));
+
+// --- interruptible ladder (second grade of the same survey) ----------------
+// Identical panel construction, identical cell-selection rule (homeIntCell),
+// revocable-occupancy products. Below-floor cells print an em dash and fill
+// as the INT panel deepens. No ratio against the guaranteed ladder is
+// printed anywhere — different panel compositions.
+const intLadder = rowChips
+  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeIntCell(t, chip)])) as Record<Tier, Rate | undefined> }));
 
 // --- committed term panel (companion to the ladder; mirrors /term) --------
 // Anchor = the region-pooled Neocloud H100 GTD OD headline — the same cell
@@ -125,7 +138,7 @@ const researchGroups: ResearchGroup[] = [
           </div>
           <div class="table-wrap">
             <div class="table-head">
-              <span class="th-scope">On-demand, guaranteed · US &amp; EU</span>
+              <span class="th-scope">On-demand · US &amp; EU</span>
               <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
             </div>
             <table class="data ladder-table">
@@ -140,7 +153,7 @@ const researchGroups: ResearchGroup[] = [
               <tbody>
                 {ladder.map(({ chip, cells }) => (
                   <tr>
-                    <td class="chip-cell">{chip.replace(/-/g, ' ')}</td>
+                    <td class="chip-cell"><ChipLink chip={chip} label={chip.replace(/-/g, ' ')} /></td>
                     {TIERS.map((t) => {
                       const c = cells[t];
                       if (!c) return <td class="num empty">—</td>;
@@ -173,7 +186,7 @@ const researchGroups: ResearchGroup[] = [
           </div>
           <div class="table-wrap">
             <div class="table-head">
-              <span class="th-scope">On-demand, interruptible · US &amp; EU</span>
+              <span class="th-scope">On-demand · US &amp; EU</span>
               <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
             </div>
             <table class="data ladder-table">
@@ -188,7 +201,7 @@ const researchGroups: ResearchGroup[] = [
               <tbody>
                 {intLadder.map(({ chip, cells }) => (
                   <tr>
-                    <td class="chip-cell">{chip.replace(/-/g, ' ')}</td>
+                    <td class="chip-cell"><ChipLink chip={chip} label={chip.replace(/-/g, ' ')} /></td>
                     {TIERS.map((t) => {
                       const c = cells[t];
                       if (!c) return <td class="num empty">—</td>;
@@ -212,9 +225,13 @@ const researchGroups: ResearchGroup[] = [
                 the two ladders is printed — the panels differ in composition
               </div>
             </details>
+            <a class="term-pointer" href="/explorer">All interruptible series →</a>
           </div>
         </div>
       </div>
+      <!-- Outside the mirrored cards (mirror rule): one quiet pointer for
+           the pair, not a per-card footer row. -->
+      <a class="chips-pointer" href="/chips">All chips →</a>
       <p class="grade-defs">
         The guaranteed grade prices committed capacity. The interruptible
         grade prices spare capacity. Same silicon, same panel
@@ -222,7 +239,35 @@ const researchGroups: ResearchGroup[] = [
       </p>
     </section>
 
-    <!-- Layer 2 — research, in the hub's own taxonomy -->
+    <!-- Layer 2 — the other surfaces: financing, residual, tokens, data -->
+    <section class="surface-band">
+      <a class="surface" href="/credit">
+        <span class="s-kicker">Financing</span>
+        <span class="s-title">Credit</span>
+        <span class="s-line">GPU-backed debt as filed — {creditN} instruments tracked, ${creditGpuUsdB}B secured directly by the GPUs.</span>
+        <span class="s-go">Credit tracker →</span>
+      </a>
+      <a class="surface" href="/hardware">
+        <span class="s-kicker">Residual</span>
+        <span class="s-title">Hardware</span>
+        <span class="s-line">Executed used-GPU prices beside current posted asks, by generation.</span>
+        <span class="s-go">Hardware prices →</span>
+      </a>
+      <a class="surface" href="/tokens">
+        <span class="s-kicker">Tokens</span>
+        <span class="s-title">Token Prices</span>
+        <span class="s-line">Posted per-token prices: frontier first-party and served open-weight.</span>
+        <span class="s-go">Token surface →</span>
+      </a>
+      <a class="surface" href="/explorer">
+        <span class="s-kicker">Data</span>
+        <span class="s-title">Explorer</span>
+        <span class="s-line">Every published series by chip, segment, tenor, and region.</span>
+        <span class="s-go">Series explorer →</span>
+      </a>
+    </section>
+
+    <!-- Layer 3 — research, in the hub's own taxonomy -->
     <section class="mi-block">
       <div class="block-head">
         <span class="kicker">Research</span>
@@ -242,15 +287,6 @@ const researchGroups: ResearchGroup[] = [
         ))}
       </div>
     </section>
-
-    <!-- Layer 3 — credit -->
-    <a class="credit-strip" href="/credit">
-      <div class="cs-text">
-        <span class="kicker">Credit</span>
-        <span class="cs-line">GPU-backed debt: issuance, spreads, and the borrowers financing the buildout.</span>
-      </div>
-      <span class="cs-foot">Credit tracker →</span>
-    </a>
 
     <p class="data-line">
       CCIR publishes citable reference series from observed prices and holds
@@ -280,7 +316,7 @@ const researchGroups: ResearchGroup[] = [
       gap: 12px;
       margin-bottom: 10px;
     }
-    .block-link { color: var(--accent); }
+    .block-link { color: var(--link); }
     .grade-defs {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
@@ -289,9 +325,13 @@ const researchGroups: ResearchGroup[] = [
       margin: 14px 0 0;
       max-width: 760px;
     }
+    /* Pointer row — a structural footer row on BOTH cards (mirror rule):
+       same padding and border as the table-foot summary row, so the two
+       cards close at identical heights with aligned rules. */
     .term-pointer {
-      display: inline-block;
-      margin-top: 10px;
+      display: block;
+      padding: 8px 16px;
+      border-top: 1px solid var(--rule-2);
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       text-transform: uppercase;
@@ -299,7 +339,19 @@ const researchGroups: ResearchGroup[] = [
       color: var(--ink-dim);
       text-decoration: none;
     }
-    .term-pointer:hover { color: var(--accent); }
+    .term-pointer:hover { color: var(--link); }
+    /* Quiet index pointer for the card pair — sits outside both cards. */
+    .chips-pointer {
+      display: inline-block;
+      margin: 10px 0 0;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--ink-dim);
+      text-decoration: none;
+    }
+    .chips-pointer:hover { color: var(--link); }
     .block-link {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
@@ -325,10 +377,18 @@ const researchGroups: ResearchGroup[] = [
     }
 
     .table-wrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; }
+    /* MIRROR RULE (owner, 2026-08-13): the two grade cards must close at
+       identical heights with every horizontal rule aligned. Both headers
+       carry the IDENTICAL scope line ("On-demand · US & EU" — the grade
+       word lives in the kicker directly above, so repeating it here was
+       redundancy that also forced the longer INTERRUPTIBLE header to wrap
+       at side-by-side widths). Identical text = identical height by
+       construction; nowrap guards both lines. */
     .table-head {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
+      flex-wrap: nowrap;
       gap: 12px;
       padding: 9px 16px;
       border-bottom: 1px solid var(--rule-2);
@@ -337,8 +397,8 @@ const researchGroups: ResearchGroup[] = [
       text-transform: uppercase;
       letter-spacing: var(--tracking-eye);
     }
-    .th-scope { color: var(--ink); font-weight: var(--weight-strong); }
-    .th-meta { color: var(--ink-dim); white-space: nowrap; }
+    .th-scope { color: var(--ink); font-weight: var(--weight-strong); white-space: nowrap; }
+    .th-meta { color: var(--ink-dim); white-space: nowrap; font-size: calc(var(--fs-xs) - 1px); }
     .table-foot {
       border-top: 1px solid var(--rule-2);
       font-family: var(--font-mono);
@@ -455,7 +515,7 @@ const researchGroups: ResearchGroup[] = [
       text-decoration: none;
       color: var(--ink);
     }
-    .rg-item:hover .rg-title { color: var(--accent); }
+    .rg-item:hover .rg-title { color: var(--link); }
     .rg-kicker {
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 2px);
@@ -470,38 +530,71 @@ const researchGroups: ResearchGroup[] = [
       line-height: 1.35;
     }
 
-    .credit-strip {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 18px 20px;
+    /* The other three surfaces + the explorer, one hairline band. */
+    .surface-band {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--rule);
       border: 1px solid var(--rule);
-      border-left: 2px solid var(--accent);
+      margin: 0 0 40px;
+    }
+    @media (max-width: 900px) { .surface-band { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .surface-band { grid-template-columns: 1fr; } }
+    .surface {
       background: var(--surface);
+      padding: 15px 17px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
       text-decoration: none;
       color: var(--ink);
-      margin: 0 0 28px;
+      transition: background 0.16s ease, box-shadow 0.16s ease;
     }
-    .credit-strip:hover { background: var(--surface-2); text-decoration: none; }
-    .cs-text { display: flex; flex-direction: column; gap: 5px; }
-    .cs-line { font-family: var(--font-body); font-size: var(--fs-sm); color: var(--ink); line-height: 1.5; }
-    .cs-foot {
+    .surface:hover {
+      background: var(--surface-2);
+      text-decoration: none;
+      box-shadow: inset 0 0 0 1px var(--link);
+      z-index: 1;
+    }
+    .surface:hover .s-title { color: var(--link); }
+    .s-kicker {
       font-family: var(--font-mono);
-      font-size: var(--fs-xs);
+      font-size: calc(var(--fs-xs) - 1px);
       color: var(--accent);
       text-transform: uppercase;
       letter-spacing: var(--tracking-eye);
-      white-space: nowrap;
+      font-weight: var(--weight-strong);
+    }
+    .s-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      font-weight: var(--weight-display);
+      transition: color 0.16s ease;
+    }
+    .s-line {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      line-height: 1.6;
+    }
+    .s-go {
+      margin-top: auto;
+      padding-top: 6px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--link);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
     }
 
     .data-line {
       margin: 0 0 24px;
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
       color: var(--ink-dim);
-      line-height: 1.6;
+      line-height: 1.7;
     }
-    .data-line a { color: var(--accent); }
+    .data-line a { color: var(--link); }
   </style>
 </Base>

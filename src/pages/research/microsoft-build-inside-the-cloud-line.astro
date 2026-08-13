@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 
 /*
   Dated research note — frozen to Microsoft's FY2026 10-K
@@ -354,6 +355,8 @@ const c1x = (i: number) => C1L + 60 + i * 200;
         reference data and records.
       </p>
     </section>
+
+    <NoteFooter title="Five Builders, One Covered Quadrant: Microsoft’s FY2026" published="2026-07-30" />
   </section>
 
   <style>
@@ -378,7 +381,7 @@ const c1x = (i: number) => C1L + 60 + i * 200;
     }
     .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
     .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
-    .sec a { color: var(--accent); }
+    .sec a { color: var(--link); }
     .sec ul {
       font-family: var(--font-body); font-size: var(--fs-md);
       color: var(--ink); line-height: 1.65; margin: 0 0 13px;
@@ -418,6 +421,6 @@ const c1x = (i: number) => C1L + 60 + i * 200;
       padding-top: 8px;
       max-width: 74ch;
     }
-    .footnote a { color: var(--accent); }
+    .footnote a { color: var(--link); }
   </style>
 </Base>

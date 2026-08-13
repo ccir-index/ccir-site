@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 
 /*
   Dated research note — frozen to the filing set available 2026-07-22:
@@ -481,6 +482,8 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
         advice. CCIR publishes reference data and records.
       </p>
     </section>
+
+    <NoteFooter title="Breaking Down Big Tech’s $1.65 Trillion “Hidden Debt”" published="2026-07-22" />
   </section>
 
   <style>
@@ -539,6 +542,6 @@ const c5x = (v: number) => (v / 9) * (C5W - C5L - C5R);
       padding-top: 8px;
       max-width: 74ch;
     }
-    .footnote a { color: var(--accent); }
+    .footnote a { color: var(--link); }
   </style>
 </Base>

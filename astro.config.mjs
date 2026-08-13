@@ -13,6 +13,10 @@ export default defineConfig({
     sitemap({
       lastmod: new Date(),
       changefreq: 'daily',
+      // /realized is a hand-built static tool in public/ — outside the
+      // Astro page graph, so the integration cannot discover it. Listed
+      // here so the sitemap matches its canonical (set in the file).
+      customPages: [`${SITE}/realized`],
       // trailingSlash:'never' strips the root to the bare origin
       // (https://ccir.io), but the homepage canonical Google selects is
       // https://ccir.io/ — so the homepage never matched the sitemap ("No

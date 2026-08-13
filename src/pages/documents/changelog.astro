@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { meta } from '../../data/snapshot';
 
 // Methodology change log — the site-visible record of versions, panel
@@ -177,10 +178,8 @@ const entries = [
   description="The running record of CCIR methodology versions, panel changes, and series notices — each change announced with its effective date, anticipated effect, and comment window."
   showTape={false}
 >
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Documents · Change Log · as published {meta.as_of_date}</div>
-      <h1>Methodology Change Log</h1>
+  <section class="wrap page-top">
+    <PageHeader title="Methodology Change Log" crumbs={[{ href: '/documents', label: 'Documents' }]} kicker="Change Log" asOf={meta.as_of_date} asOfLabel="as published" display>
       <p class="standfirst">
         The record of changes to what the published series measure.
         Pending changes are announced with an estimated impact and a
@@ -190,7 +189,7 @@ const entries = [
         governs classification. Comments:
         <a href="mailto:research@ccir.io">research@ccir.io</a>.
       </p>
-    </header>
+    </PageHeader>
 
     <div class="log">
       {entries.map((e) => (

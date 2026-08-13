@@ -14,7 +14,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-a { color: var(--accent); text-decoration: none; }
+/* Two-role color, strict: blue (--link) = wayfinding only; amber (--accent)
+   = data emphasis only. Never decorative. */
+a { color: var(--link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 h1, h2, h3, h4 {
@@ -39,15 +41,19 @@ main { min-height: calc(100vh - 200px); }
   font-size: var(--fs-xs);
   text-transform: uppercase;
   letter-spacing: var(--tracking-eye);
-  color: var(--ink-dim);
+  /* Kickers carry the data-emphasis amber (two-role system). */
+  color: var(--accent);
   font-weight: var(--weight-strong);
 }
 
-/* "standfirst" — the larger sans-serif lede sentence under a serif headline */
+/* "standfirst" — the lede sentence under a headline. MONO: heroes and page
+   heads are data-dense contexts (owner rule, 2026-08-13); Plex Sans is
+   reserved for sustained multi-paragraph prose, never a one-off sentence
+   sitting in mono company. */
 .standfirst {
-  font-family: var(--font-body);
-  font-size: var(--fs-lg);
-  line-height: 1.55;
+  font-family: var(--font-mono);
+  font-size: var(--fs-md);
+  line-height: 1.6;
   color: var(--ink);
   margin: 0 0 8px;
   max-width: var(--measure-prose, 64ch);
@@ -106,9 +112,137 @@ table.data tbody tr:hover td { background: var(--surface-3); }
   font-size: var(--fs-sm);
   color: var(--ink-dim);
   margin: 16px 0 24px;
-  font-family: var(--font-body);
+  font-family: var(--font-mono);
+  line-height: 1.6;
 }
 .disclosure strong { color: var(--ink); font-weight: var(--weight-strong); }
+
+/* -------------------------------------------------------------------------
+   SHARED PAGE CHROME (redesign/v1). One header grammar, one table frame,
+   one banner — previously re-declared with drifting values in ~30 pages.
+   Pages may still carry scoped overrides; new and touched pages use these.
+   ------------------------------------------------------------------------- */
+
+.page-top { padding-top: 32px; }
+
+.page-head { margin-bottom: 20px; max-width: 82ch; }
+.page-head h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  line-height: var(--lh-display);
+  font-weight: var(--weight-display);
+  margin: 6px 0 12px;
+  letter-spacing: -0.01em;
+}
+/* Research notes and document pages carry the display size. */
+.page-head--display h1 { font-size: var(--fs-hero); }
+
+/* Breadcrumb row — sits where the kicker sits, same voice, blue = navigable. */
+.crumbs {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eye);
+  color: var(--ink-dim);
+  font-weight: var(--weight-strong);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+}
+.crumbs a { color: var(--link); }
+.crumbs a:hover { text-decoration: underline; }
+.crumbs .crumb-sep { color: var(--ink-faint); }
+/* "you are here" is wayfinding — the whole crumb row stays in the blue. */
+.crumbs .crumb-here { color: var(--link); }
+.crumbs .crumb-asof { margin-left: auto; color: var(--ink-dim); font-weight: var(--weight-body); white-space: nowrap; }
+
+/* Standard table frame: head strip · table · collapsible method foot. */
+.table-wrap {
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  overflow-x: auto;
+}
+.table-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--rule-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eye);
+}
+.th-scope { color: var(--ink); font-weight: var(--weight-strong); }
+.th-meta { color: var(--ink-dim); white-space: nowrap; }
+.table-foot {
+  border-top: 1px solid var(--rule-2);
+  font-family: var(--font-mono);
+  font-size: calc(var(--fs-xs) - 1px);
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+.table-foot summary {
+  padding: 8px 16px;
+  cursor: pointer;
+  list-style: none;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-eye);
+  user-select: none;
+}
+.table-foot summary::-webkit-details-marker { display: none; }
+.table-foot summary::after { content: ' +'; }
+.table-foot[open] summary::after { content: ' −'; }
+.table-foot .tf-body { padding: 0 16px 8px; line-height: 1.6; }
+
+/* Market-intelligence banner — the scope disclaimer under a page head. */
+.mi-banner {
+  margin: 0 0 28px;
+  padding: 12px 16px;
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--accent);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--ink);
+  line-height: 1.65;
+  max-width: 84ch;
+}
+.mi-banner strong { color: var(--accent); }
+
+/* Section head inside a page — kicker + h2. */
+.sec-head { margin-bottom: 14px; max-width: 84ch; }
+.sec-head h2 { font-size: var(--fs-2xl); margin: 4px 0 10px; }
+
+/* Quiet wayfinding link — chip names (and similar labels) inside dense
+   tables, where a full blue link per row would be noise. Ink at rest with
+   a faint blue underline cue; full blue on hover/focus. Wayfinding role:
+   the cue and hover ride --link, never --accent. */
+a.chip-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--link) 40%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+a.chip-link:hover,
+a.chip-link:focus-visible {
+  color: var(--link);
+  text-decoration-color: var(--link);
+}
+/* Touch: expand the hit area beyond the small table label without
+   changing layout or desktop density (rows stay dense; the invisible
+   ::after absorbs the tap). */
+@media (pointer: coarse) {
+  a.chip-link { position: relative; }
+  a.chip-link::after {
+    content: "";
+    position: absolute;
+    inset: -13px -8px;
+  }
+}
 
 /* Tier badge — short code (T1 / T2 / T3) */
 .tier-badge {
@@ -124,3 +258,49 @@ table.data tbody tr:hover td { background: var(--surface-3); }
 .tier-badge-t1 { color: var(--tier-t1); border-color: color-mix(in srgb, var(--tier-t1) 55%, transparent); background: color-mix(in srgb, var(--tier-t1) 12%, transparent); }
 .tier-badge-t2 { color: var(--tier-t2); border-color: color-mix(in srgb, var(--tier-t2) 55%, transparent); background: color-mix(in srgb, var(--tier-t2) 12%, transparent); }
 .tier-badge-t3 { color: var(--tier-t3); border-color: color-mix(in srgb, var(--tier-t3) 60%, transparent); background: color-mix(in srgb, var(--tier-t3) 14%, transparent); }
+
+/* -------------------------------------------------------------------------
+   TWO REGISTERS, ONE IDENTITY (owner, 2026-08-13).
+
+   terminal  (default) — data surfaces: mono-forward, dense. The rules above
+                         ARE this register; no override needed.
+   editorial           — research notes + /documents pages: sustained
+                         reading. Plex Sans prose at reading size, generous
+                         leading, ~66ch measure, mono headings kept as the
+                         family signature but with calmer spacing.
+
+   Applied via <body data-register="…"> from Base.astro (route-derived).
+   DATA EMBEDS INSIDE EDITORIAL PAGES (tables, stat tiles, figure chrome,
+   banners, footnote chrome) keep the terminal register — that contrast is
+   the design's signature. These rules therefore target only the prose
+   containers (.sec p/li/dd, .gloss dd, .entry-body, .prose) and the page
+   head, never table/figure internals. Astro scoped styles are :where()-
+   scoped (zero specificity), so these register rules win without !important.
+   ------------------------------------------------------------------------- */
+[data-register="editorial"] {
+  --measure-prose: 66ch;
+}
+/* Prose at reading size. */
+[data-register="editorial"] :is(.sec, .gloss, .log) :is(p, li, dd),
+[data-register="editorial"] .entry-body,
+[data-register="editorial"] .prose {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+}
+[data-register="editorial"] :is(.sec, .gloss) :is(p, dd),
+[data-register="editorial"] .entry-body,
+[data-register="editorial"] .prose {
+  max-width: var(--measure-prose);
+}
+/* The standfirst reads with the prose here, not with the data chrome. */
+[data-register="editorial"] .standfirst {
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.65;
+}
+/* Mono headings stay — at editorial scale and spacing, not terminal density. */
+[data-register="editorial"] .page-head { margin-bottom: 28px; }
+[data-register="editorial"] .page-head h1 { margin: 10px 0 16px; }
+[data-register="editorial"] .sec-head { margin-bottom: 18px; }
+[data-register="editorial"] .sec-head h2 { margin: 6px 0 12px; }
