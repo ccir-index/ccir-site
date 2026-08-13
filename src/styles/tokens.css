@@ -157,6 +157,220 @@ html[data-theme="editorial"] {
   color-scheme: light;
 }
 
+/* =========================================================================
+   DEV-ONLY STYLE VARIANTS (redesign/v1) — owner comparison, 2026-08-13.
+
+   Four schemes selected by `data-variant` on <html>, persisted under
+   localStorage `ccir-variant`, switched by components/VariantSwitcher.astro
+   (the single dev-only import in Base.astro — delete both before merge,
+   or promote the chosen variant's values into the theme blocks above).
+
+     A (attribute absent)      → the redesign baseline: terminal dark,
+                                 orange data / blue wayfinding.
+                                 TYPE: IBM Plex Serif display · Plex Sans
+                                 text · Plex Mono data.
+     B data-variant="modern-light" → light-first institutional-modern:
+                                 white surfaces, generous space, larger
+                                 type, soft contrast (FRED/OWID).
+                                 TYPE: Space Grotesk display (grotesque) ·
+                                 Source Sans 3 text (humanist) · Plex Mono
+                                 data.
+     C data-variant="terminal-pro" → near-black, monochrome grays, blue
+                                 as the ONLY accent, mono-forward, max
+                                 density (Bloomberg-adjacent restraint).
+                                 TYPE: JetBrains Mono for headings AND
+                                 data · Plex Sans text at dense sizes.
+     D data-variant="print"    → paper off-white, hairline rules, ink-dark
+                                 text (print-journal energy).
+                                 TYPE: Newsreader display (editorial serif,
+                                 optical sizing) · Source Serif 4 text ·
+                                 Plex Mono data.
+
+   Variant faces load from Google Fonts in Base.astro (dev-only link).
+   Tabular numerals hold in every variant: base.css sets
+   font-feature-settings "tnum" on body (inherited across family changes)
+   and table.data forces font-variant-numeric: tabular-nums; monospace
+   data faces are tabular by construction.
+   Faces considered and rejected: Playfair Display (fashion register, no
+   text companion), EB Garamond (old-style proportional figures, weak at
+   screen text sizes), Inter for B's text (neo-grotesque — pairing two
+   grotesques flattens the hierarchy), Roboto family (no distinct voice).
+
+   The switcher also pins data-theme (B/D→editorial, C→terminal) so the
+   theme-scoped chart tokens underneath stay light/dark-coherent; these
+   blocks sit AFTER the theme blocks so equal-specificity ties resolve to
+   the variant. Body text is ≥ AA in every variant.
+   ========================================================================= */
+
+html[data-variant="modern-light"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f6f7f9;
+  --surface-3: #eef0f3;
+  --rule: #e3e6ea;
+  --rule-2: #cdd2d8;
+
+  --ink: #1a1d21;      /* 16.2:1 on #fff */
+  --ink-dim: #5a6572;  /* 6.4:1 */
+  --ink-faint: #848e99;
+
+  --accent: #a85a04;   /* brand orange, AA on white */
+  --accent-2: #c96f06;
+  --link: #2563eb;     /* 5.2:1 */
+  --link-dim: #4a7ade;
+  --pos: #15803d;
+  --neg: #b91c1c;
+  --warn: #b45309;
+  --info: #0e7490;
+  --neutral: #6b7176;
+
+  --tier-t1: #a85a04;
+  --tier-t2: #5a6572;
+  --tier-t3: #aab3bc;
+
+  /* Grotesque display over humanist text: Space Grotesk carries the
+     headlines (tight leading, slight negative tracking suits it), Source
+     Sans 3 carries reading text, Plex Mono keeps the data. */
+  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "IBM Plex Sans", system-ui, sans-serif;
+  --weight-display: 600;
+
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 15px;
+  --fs-md: 16px;
+  --fs-lg: 19px;
+  --fs-xl: 26px;
+  --fs-2xl: clamp(28px, 4vw, 34px);
+  --fs-3xl: clamp(32px, 5vw, 46px);
+  --fs-hero: clamp(38px, 6.5vw, 60px);
+  --lh-base: 1.65;
+  --lh-display: 1.08;
+  --tracking-eye: 0.08em;
+
+  --rad: 8px;
+  --pad-cell-y: 10px;
+  --pad-cell-x: 14px;
+  --pad-panel: 24px;
+  --row-h: 38px;
+
+  color-scheme: light;
+}
+
+html[data-variant="terminal-pro"] {
+  --bg: #050607;
+  --surface: #0a0c0e;
+  --surface-2: #0e1114;
+  --surface-3: #14181c;
+  --rule: #22262a;
+  --rule-2: #33383d;
+
+  --ink: #d7dbde;      /* 13.9:1 on #050607 */
+  --ink-dim: #8a9096;  /* 6.0:1 */
+  --ink-faint: #5c6167;
+
+  /* Blue is the only accent — data emphasis and wayfinding share it;
+     hierarchy comes from weight and lightness, not hue. */
+  --accent: #5b9dff;   /* 7.0:1 on the surface */
+  --accent-2: #82b4ff;
+  --link: #5b9dff;
+  --link-dim: #4a83d4;
+  --pos: #4d9678;
+  --neg: #b35b5b;
+  --warn: #b98a4a;
+  --info: #5b9dff;
+  --neutral: #6b7176;
+
+  --tier-t1: #cfd4d9;
+  --tier-t2: #8a9096;
+  --tier-t3: #545a60;
+
+  /* Mono-forward: JetBrains Mono for headings AND data (tabular by
+     construction, wider counters than Plex Mono, reads as an instrument);
+     Plex Sans stays for running text at dense sizes. */
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --font-display: var(--font-mono);
+  --font-body: var(--font-sans);
+  --weight-display: 600;
+
+  --fs-xs: 10px;
+  --fs-sm: 11px;
+  --fs-base: 12px;
+  --fs-md: 13px;
+  --fs-lg: 15px;
+  --fs-xl: 18px;
+  --fs-2xl: clamp(20px, 3vw, 24px);
+  --fs-3xl: clamp(22px, 4vw, 30px);
+  --fs-hero: clamp(24px, 5vw, 34px);
+  --lh-base: 1.45;
+  --lh-display: 1.25;
+  --tracking-eye: 0.08em;
+
+  --rad: 0px;
+  --pad-cell-y: 5px;
+  --pad-cell-x: 10px;
+  --pad-panel: 12px;
+  --row-h: 26px;
+
+  color-scheme: dark;
+}
+
+html[data-variant="print"] {
+  --bg: #faf6ef;
+  --surface: #fdfbf6;
+  --surface-2: #f3eee3;
+  --surface-3: #ebe5d7;
+  --rule: #d8d2c4;
+  --rule-2: #b8b1a0;
+
+  --ink: #17140f;      /* 15.6:1 on #faf6ef */
+  --ink-dim: #57524a;  /* 6.8:1 */
+  --ink-faint: #8a847a;
+
+  --accent: #a85a04;
+  --accent-2: #c96f06;
+  --link: #274f9c;     /* 7.2:1 — ink-navy, print-link register */
+  --link-dim: #4b6ba8;
+  --pos: #2c8055;
+  --neg: #a84040;
+  --warn: #b26e1e;
+  --info: #2d6a94;
+  --neutral: #6b7176;
+
+  --tier-t1: #a85a04;
+  --tier-t2: #57524a;
+  --tier-t3: #a9a294;
+
+  /* Real editorial serifs: Newsreader (optical sizing — display cuts at
+     headline sizes, no faux-bolding) over Source Serif 4 text; Plex Mono
+     keeps the data so tables never go proportional. */
+  --font-serif: "Newsreader", "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --font-display: var(--font-serif);
+  --font-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --weight-display: 600;
+
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 15px;
+  --fs-md: 16px;
+  --fs-lg: 20px;
+  --fs-xl: 26px;
+  --fs-2xl: clamp(28px, 4vw, 34px);
+  --fs-3xl: clamp(32px, 5vw, 46px);
+  --fs-hero: clamp(38px, 6vw, 58px);
+  --lh-base: 1.7;
+  --lh-display: 1.1;
+  --tracking-eye: 0.14em;
+
+  --rad: 0px;
+  --pad-cell-y: 9px;
+  --pad-cell-x: 14px;
+  --pad-panel: 20px;
+  --row-h: 34px;
+
+  color-scheme: light;
+}
+
 /* -------------------------------------------------------------------------
    /vast-scoped tokens — terminal amplification.
    Scope: only consumed inside `.vast-page` on /vast. Other pages unaffected.
