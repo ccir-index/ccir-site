@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { meta } from '../../data/snapshot';
 ---
 <Base
@@ -8,16 +9,14 @@ import { meta } from '../../data/snapshot';
   description="How CCIR methodology changes are classified, disclosed, and versioned; material-change definition; restatements versus series breaks."
   showTape={false}
 >
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Documents · Change Management · as published {meta.as_of_date}</div>
-      <h1>Change Management Policy</h1>
+  <section class="wrap page-top">
+    <PageHeader title="Change Management Policy" crumbs={[{ href: '/documents', label: 'Documents' }]} kicker="Change Management" asOf={meta.as_of_date} asOfLabel="as published" display>
       <p class="standfirst">
         A reference series is only useful if the reader knows when and how the
         measurement underneath it can change. This policy governs every change
         to the <a href="/documents/methodology">Methodology</a>.
       </p>
-    </header>
+    </PageHeader>
 
     <section class="sec">
       <h2><span class="n">01</span> Versioning</h2>

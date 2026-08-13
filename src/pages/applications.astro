@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
 import {
   headlineRates, meta, headlineValue, headlineStatOf,
   neocloudCommittedCell, neocloudCommittedTenors,
@@ -259,8 +260,8 @@ const toc = [
       ))}
     </div>
   </nav>
-  <section class="wrap top">
-    <h1>Applications</h1>
+  <section class="wrap page-top">
+    <PageHeader title="Applications" kicker="Worked Drafting Examples" asOf={meta.as_of_date} display />
     <p class="dek">
       Worked drafting examples showing how a CCIR rate fits into established
       commodity-credit-document conventions. Each example references a

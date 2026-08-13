@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { meta } from '../../data/snapshot';
 ---
 <Base
@@ -8,15 +9,13 @@ import { meta } from '../../data/snapshot';
   description="Terms governing use of CCIR's published series and data — viewing, quotation and citation with attribution, and the permission requirement for systematic retrieval or redistribution."
   showTape={false}
 >
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Documents · Data Terms · as published {meta.as_of_date}</div>
-      <h1>Data Terms</h1>
+  <section class="wrap page-top">
+    <PageHeader title="Data Terms" crumbs={[{ href: '/documents', label: 'Documents' }]} kicker="Data Terms" asOf={meta.as_of_date} asOfLabel="as published" display>
       <p class="standfirst">
         What may be done with the published series without asking, and what
         requires written permission.
       </p>
-    </header>
+    </PageHeader>
 
     <section class="sec">
       <h2><span class="n">01</span> Scope and Ownership</h2>

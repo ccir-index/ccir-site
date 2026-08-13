@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { meta } from '../../data/snapshot';
 
 type Status = 'addressed' | 'design' | 'na' | 'part' | 'gap';
@@ -252,17 +253,15 @@ const counts = groups
   description="A principle-by-principle self-assessment of CCIR's published practice against the IOSCO Principles for Financial Benchmarks (FR07/13, July 2013). Not a compliance claim; gaps are stated."
   showTape={false}
 >
-  <section class="wrap top">
-    <header class="page-head">
-      <div class="kicker">Documents · Standards · as published {meta.as_of_date}</div>
-      <h1>IOSCO Principles Self&#8209;Assessment</h1>
+  <section class="wrap page-top">
+    <PageHeader title="IOSCO Principles Self‑Assessment" crumbs={[{ href: '/documents', label: 'Documents' }]} kicker="Standards" asOf={meta.as_of_date} asOfLabel="as published" display>
       <p class="standfirst">
         CCIR designs and operates its series with reference to the IOSCO
         <em>Principles for Financial Benchmarks</em> (FR07/13, July 2013).
         The crosswalk below maps each of the nineteen Principles to CCIR&rsquo;s
         published practice, document by document.
       </p>
-    </header>
+    </PageHeader>
 
     <aside class="basis">
       <p>

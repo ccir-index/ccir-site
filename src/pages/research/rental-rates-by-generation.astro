@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 import cohorts from '../../data/cohort_panels.json';
 
 // Stepped cohort chart: posted panel median per chip, monthly, log scale.
@@ -371,6 +372,8 @@ const fitLines = CHIPS.map((c) => {
         </p>
       </div>
     </details>
+
+    <NoteFooter title="GPU Rental Rates by Generation: Nine Years of Posted Prices" published="2026-07-08" />
   </section>
 
   <style>

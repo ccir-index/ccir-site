@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 
 // Calibrated to the 2026-07-06 snapshot. Research notes are dated and not
 // updated in place — a re-run gets a new note.
@@ -339,6 +340,8 @@ const wattTable = [
         are visible in the <a href="/explorer">Explorer</a>.
       </p>
     </section>
+
+    <NoteFooter title="Rent and Age: Five Generations" published="2026-07-06" />
   </section>
 
   <style>

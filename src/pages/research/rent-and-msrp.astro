@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 import ratios from '../../data/rent_ratio_panels.json';
 
 // Ratio-by-age, small multiples: one panel per generation (five stepped
@@ -530,6 +531,8 @@ const bwTable = [
         window, not of the next one.
       </p>
     </section>
+
+    <NoteFooter title="Rent and MSRP: Five Generations of Posted Prices" published="2026-07-08" updated="2026-07-11" />
   </section>
 
   <script is:inline>

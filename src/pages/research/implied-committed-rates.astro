@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
 
 /*
   Dated research note — implied committed rates backed out of publicly
@@ -367,6 +368,8 @@ const c2x = (v: number) => (v / 5.8) * (C2W - C2L - C2R);
         reference data and records.
       </p>
     </section>
+
+    <NoteFooter title="Implied Committed Rates: What the Big Compute Deals Pay per GPU-Hour" published="2026-07-30" />
   </section>
 
   <style>
