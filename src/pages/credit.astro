@@ -131,6 +131,14 @@ const ratedLadder = [...RATED_LINES, ...ratedExtras]
       name: l.label,
       size: fmtLadderSize(rows.reduce((a, r) => a + (r.size_usd_m || 0), 0)),
       offtaker: rows[0].offtaker_label ?? '—',
+      // Anchor into the ledger below. A package line covers more than one
+      // ledger row; we jump to the first and name the rest in the tooltip,
+      // because the jump handler clears filters and the constituents of a
+      // package are adjacent under the same issuer.
+      rid: `row-${rows[0].id}`,
+      rowNames: rows.length > 1
+        ? `Ledger rows: ${rows.map((r) => r.name).join(' · ')}`
+        : `Ledger row: ${rows[0].name}`,
     };
   })
   .filter(Boolean)
@@ -929,7 +937,10 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
               <td class="grade">{l.grades}</td>
               <td class="mono-dim">{l.public}</td>
               <td>{l.issuer}</td>
-              <td>{l.name}</td>
+              <td>
+                <a class="hot rated-link" href={`#${l.rid}`}
+                   data-row={l.rid} title={l.rowNames}>{l.name}</a>
+              </td>
               <td class="num">{l.size}</td>
               <td>{l.offtaker}</td>
             </tr>
@@ -1230,13 +1241,18 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       q.addEventListener('input', apply);
       apply();
 
-      // --- chart mark -> ledger row -----------------------------------------
-      // Clicking a data point (or its label) clears filters so the row is
-      // visible, scrolls it to center, and flashes it.
-      document.querySelectorAll('svg .hot[data-row]').forEach(function (el) {
-        el.addEventListener('click', function () {
+      // --- chart mark / rated ladder -> ledger row ---------------------------
+      // Clicking a data point (or its label, or a rated-ladder financing
+      // link) clears filters so the row is visible, scrolls it to center, and
+      // flashes it. The ladder links are real anchors, so they still jump with
+      // JS off; preventDefault here stops the browser's own jump from racing
+      // the smooth scroll, and is a no-op on the SVG marks.
+      document.querySelectorAll('svg .hot[data-row], .rated-grid a[data-row]')
+        .forEach(function (el) {
+        el.addEventListener('click', function (ev) {
           var row = document.getElementById(el.getAttribute('data-row'));
           if (!row) return;
+          ev.preventDefault();
           selIssuer.value = ''; selType.value = ''; selSen.value = '';
           selStatus.value = ''; selLender.value = ''; q.value = '';
           apply();
@@ -1562,6 +1578,18 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     }
     .rated-grid td.mono-dim { color: var(--ink-dim); white-space: nowrap; }
     .rated-grid td.num { text-align: right; white-space: nowrap; }
+    /* Financing name jumps to the instrument's ledger row below — wayfinding,
+       so blue, never the amber that carries the grade. */
+    .rated-grid a.rated-link {
+      color: var(--link);
+      text-decoration: none;
+      border-bottom: 1px solid color-mix(in srgb, var(--link) 35%, transparent);
+    }
+    .rated-grid a.rated-link:hover,
+    .rated-grid a.rated-link:focus-visible {
+      color: var(--link-dim);
+      border-bottom-color: var(--link-dim);
+    }
     .ledger-head { margin: 8px 0 14px; max-width: 84ch; }
     .filters {
       display: flex;
