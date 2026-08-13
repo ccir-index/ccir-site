@@ -1,0 +1,296 @@
+---
+import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
+
+/*
+  Dated research note — frozen to the Moody's rating actions of 2026-08-11
+  (first-time Baa2, Lambda Compute II LLC) and 2026-08-12 (first-time Baa1,
+  Nscale Ward County Borrower SPV, LLC). Sequel to the 2026-07-17 note
+  "A GPU Lease Rate Enters the Rating Case" (fitch-coreweave-ddtl-5-5).
+  Research notes are dated, not updated in place; the living surfaces are
+  /credit (instrument ledger), /term and /rates (reference rates). Sources:
+  the two Moody's actions above; Fitch rating action commentaries of
+  2026-04-30, 2026-05-15 and 2026-07-16; IREN closing release of 2026-06-01;
+  CoreWeave DDTL 4.0 lender materials (March 2026). This page must not
+  import the live datasets.
+*/
+const AS_OF = '2026-08-13';
+---
+<Base
+  title="The Rating Case Goes Investment Grade · CCIR Research"
+  description="Moody's assigned first-time investment-grade ratings to two GPU financings in two days: Baa2 to Lambda's $926M term loan, Baa1 to Nscale's $1.83B facility. Six rated financings now sit on the register; the counterparty opens the grade, the structure sets the notch."
+  ogImage="/og/the-rating-case-goes-investment-grade.png"
+  article={{ published: '2026-08-13' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {AS_OF} · rating actions of 2026-08-11 and 2026-08-12</div>
+      <h1>The Rating Case Goes Investment Grade</h1>
+    </header>
+
+    <section class="sec">
+      <p>
+        In July <a href="/research/fitch-coreweave-ddtl-5-5">we wrote</a> that
+        a GPU lease rate had entered the rating case. Fitch had assigned BB+
+        to CoreWeave's $2.6 billion delayed-draw term loan, and the income of
+        a GPU fleet became something a rating agency underwrites. That note
+        ended one notch below investment grade.
+      </p>
+      <p>
+        This week Moody's added two investment-grade prints in two days. On
+        August 11 it assigned a first-time Baa2 to Lambda Compute II LLC, the
+        special-purpose borrower under Lambda's $926 million senior secured
+        term loan. On August 12 it assigned a first-time Baa1 to Nscale Ward
+        County Borrower SPV, LLC, under a delayed-draw facility of up to
+        $1.831 billion. Both ratings carry stable outlooks. Both borrowers
+        are special-purpose entities of private companies that Moody's
+        describes in identical words: &ldquo;a private AI-focused company
+        providing GPU cloud computing platforms and AI infrastructure
+        solutions.&rdquo;
+      </p>
+      <p>
+        The two actions arrive with an unusual gift. They were written a day
+        apart, by the same agency, on the same asset class, under the same
+        project-finance methodology. Read together, they are as close to a
+        controlled experiment as credit markets produce. The variable they
+        isolate is not the chips and not the customer. It is the structure.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">01</span> The curve, five months in</h2>
+      <p>
+        No GPU-collateral instrument carried a public rating before March 31
+        of this year. The register now holds six rated financings:
+      </p>
+      <div class="tbl-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>On the record</th>
+              <th>Financing</th>
+              <th>Offtaker</th>
+              <th>Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Jun 1</td>
+              <td>IREN $3.65B USPP + DDTL</td>
+              <td>Microsoft take-or-pay</td>
+              <td>A (Fitch) · A low (DBRS)</td>
+            </tr>
+            <tr>
+              <td>Mar 31</td>
+              <td>CoreWeave $8.5B DDTL 4.0</td>
+              <td>Meta take-or-pay</td>
+              <td>A3 (Moody's) · A low (DBRS)</td>
+            </tr>
+            <tr>
+              <td>Aug 12</td>
+              <td>Nscale $1.83B DDTL</td>
+              <td>hyperscaler take-or-pay</td>
+              <td>Baa1 (Moody's)</td>
+            </tr>
+            <tr>
+              <td>Aug 11</td>
+              <td>Lambda $926M term loan B</td>
+              <td>NVIDIA take-or-pay</td>
+              <td>Baa2 (Moody's)</td>
+            </tr>
+            <tr>
+              <td>Apr 30</td>
+              <td>CoreWeave $3.1B DDTL 5.0</td>
+              <td>two unrated customers</td>
+              <td>Ba2 (Moody's) · BB+ (Fitch)</td>
+            </tr>
+            <tr>
+              <td>Jul 16</td>
+              <td>CoreWeave $2.6B DDTL 5.5</td>
+              <td>unrated customers</td>
+              <td>Ba2 (Moody's) · BB+ (Fitch)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Dates are when each rating first entered the public record: agency
+        action dates where published, IREN's via the closing release that
+        disclosed its grades. The IREN financing is one package in two
+        instruments, a $2.10 billion US private placement and a $1.55 billion
+        delayed-draw loan; the company reports it as the first GPU financing
+        in the US private placement market.
+      </p>
+      <p>
+        Grades are the comparable axis across these deals; formats, tranches
+        and discounts differ, so we do not line up their spreads. The pattern
+        reads directly. Every financing with a rated take-or-pay counterparty
+        sits in investment grade. Every financing without one sits below it.
+        The strongest counterparty on the record carries the highest grade.
+      </p>
+      <p>
+        Coverage is narrower than the headlines suggest. Moody's has rated
+        four of the six; Fitch three; DBRS two. S&amp;P, which has rated
+        data-center securitizations since 2018, has issued no rating on GPU
+        collateral. KBRA published a framework for the asset class in July
+        and has yet to rate a deal under it. Lambda's facility is the first
+        rated term loan B from a private GPU cloud on the public record; the
+        format matters because a term loan B is distributed, tradeable paper,
+        and tradeable paper eventually prints public marks. Private channels
+        stay invisible to this record, so every first here is a first we can
+        document, not a first in the world.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Two borrowers, one day, one notch</h2>
+      <p>
+        The Lambda facility finances GB300 systems at a single QScale data
+        center in Quebec, delivering GPU services to NVIDIA under a
+        take-or-pay master services agreement assigned to lenders as
+        collateral. The Nscale facility finances GB300 and VR200 systems at a
+        Ward County, Texas campus serving roughly 275 megawatts of IT load,
+        under a six-year take-or-pay contract with an unnamed hyperscaler
+        Moody's identifies only as rated at least Aa3. The Nscale action is
+        the first financing on the record to cover Vera Rubin systems.
+      </p>
+      <p>
+        Lambda's customer carries the higher rating. Lambda received the
+        lower grade. The two rationales, read side by side, itemize why.
+      </p>
+      <p>
+        Nscale's structure holds what Lambda's lacks. Moody's cites Nscale's
+        &ldquo;direct agreements with key counterparties in case of
+        bankruptcy of the Issuer&rdquo; among the rating's supports. On
+        Lambda, the same agency writes that &ldquo;the non-recourse GPU
+        project financings we have rated have benefited from direct
+        agreements that provide customer-facing lender protections, including
+        cure and step-in rights, termination forbearance,
+        replacement-operator mechanics and, in some cases, a replacement
+        customer contract,&rdquo; and counts their absence as a constraint.
+        Without one, Lambda's lenders can take the collateral and the
+        contracts but have no pre-agreed framework with NVIDIA to preserve
+        the revenue if Lambda stumbles as operator.
+      </p>
+      <p>
+        The coverage math points the same way. Moody's forecasts Nscale's
+        debt service coverage at about 1.33x on average against Lambda's
+        1.20x. Nscale's draw conditions are stricter: Level 3 commissioning,
+        procured power and executed hedges are all conditions to funding.
+        Both borrowers hold three-month operating reserves; both hold
+        debt-service reserves Moody's calls thin against the six-month norm
+        for fully amortizing project debt.
+      </p>
+      <p>
+        Neither deal escapes the risks the agency names in both actions:
+        power cost variability, first-time data-center operators,
+        service-level regimes that dock revenue for downtime, and execution
+        risk on liquid-cooled rack integration. The notch between Baa1 and
+        Baa2 is what remains after the common risks cancel. It is the price
+        of structure, set by the one agency that graded both in the same
+        week.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> What the underwriting put on the record</h2>
+      <p>
+        Rating rationales disclose assumptions that no filing publishes.
+        These two put numbers on the record that our other surfaces track
+        daily.
+      </p>
+      <p>
+        Moody's models Lambda's project at 70 percent GPU utilization and a
+        power usage effectiveness of 1.20. A rating agency has now published
+        the utilization assumption it underwrites GPU cash flows at, and it
+        is a number, not a range. Moody's models Nscale's coverage between
+        1.15x and 1.40x across the amortization period, names power cost as
+        the primary source of cash-flow volatility in both projects, and
+        notes that Nscale's GPU financing was funded without cash equity:
+        per-tranche customer prepayments stand in for it, and equity
+        distributions exceed the sponsor's contributions to the related
+        data-center financing by the time commissioning completes.
+      </p>
+      <p>
+        The debt fully amortizes inside the customer contract in both deals.
+        Lenders in both are underwriting GPU income schedules that run to
+        December 2030 and beyond. GPU income duration, an analyst assumption
+        twelve months ago, is now a quantity two rated structures carry on
+        their amortization tables.
+      </p>
+      <p>
+        One more distinction belongs to the record we keep rather than the
+        rating file. Moody's describes both sponsors identically. Our price
+        panel does not. Lambda operates a posted-price cloud that contributes
+        to fifty-one published benchmark cells today. Nscale has never posted
+        a price our capture can see; its business, as rated, is contracted
+        wholesale delivery to one counterparty at a time. The agency graded
+        the same species twice. The price record sees two different animals,
+        and the grades came out one notch apart in the direction the
+        structures explain.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> What the register records next</h2>
+      <p>
+        Three observable events would extend this note. A secondary trading
+        level on the Lambda term loan, which would be the first public mark
+        on GPU-collateral credit. A rating action from an agency not yet in
+        the asset class, where S&amp;P's absence and KBRA's unused framework
+        are the open seats. And a refinancing of the unrated CoreWeave
+        facilities into rated format, which would price the same collateral
+        twice under the two regimes. The register carries all five facilities
+        and will carry what follows. <a href="/credit">ccir.io/credit</a>.
+      </p>
+      <p class="footnote">
+        Sources: Moody's rating actions of 2026-08-11 (Lambda Compute II
+        LLC) and 2026-08-12 (Nscale Ward County Borrower SPV, LLC); Fitch
+        rating action commentaries of 2026-04-30, 2026-05-15 and 2026-07-16;
+        IREN closing release of 2026-06-01; CoreWeave DDTL 4.0 lender
+        materials (March 2026); issuer releases as dated; the CCIR credit
+        register (<a href="/credit">/credit</a>). Dated note, frozen to the
+        actions above; the living surfaces are
+        <a href="/credit">/credit</a>, <a href="/rates">/rates</a> and
+        <a href="/term">/term</a>.
+      </p>
+    </section>
+
+    <NoteFooter title="The Rating Case Goes Investment Grade" published="2026-08-13" />
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .tbl-wrap { overflow-x: auto; margin: 14px 0 18px; }
+    .tbl-wrap table.data { min-width: 620px; }
+    .tbl-wrap table.data th,
+    .tbl-wrap table.data td { text-align: left; white-space: nowrap; }
+    .footnote {
+      font-size: var(--fs-sm);
+      color: var(--ink-faint);
+      border-top: 1px solid var(--rule);
+      padding-top: 8px;
+      max-width: 74ch;
+    }
+  </style>
+</Base>
