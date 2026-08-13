@@ -1,0 +1,58 @@
+---
+/*
+  CiteBlock (redesign/v1) — FRED-pattern suggested citation.
+
+  A copy-ready citation string at the foot of a data surface or research
+  note. The retrieval/as-of date comes from the page so the citation and
+  the page can never disagree. Built to be cited is the product; this is
+  the mechanism.
+*/
+interface Props {
+  /** What is being cited, e.g. 'GPU Reference Rates' or a note title. */
+  what: string;
+  /** Canonical path, e.g. '/rates'. */
+  path: string;
+  /** The as-of or published date, ISO. */
+  date: string;
+  /** 'series' → 'retrieved'; 'note' → 'published'. */
+  kind?: 'series' | 'note';
+}
+const { what, path, date, kind = 'series' } = Astro.props;
+const url = `https://ccir.io${path}`;
+const cite =
+  kind === 'series'
+    ? `Compute Credit Index Research, ${what}, ${url}, retrieved ${date}.`
+    : `Compute Credit Index Research, “${what},” ${date}, ${url}.`;
+---
+<div class="cite-block">
+  <span class="cite-eye">Suggested citation</span>
+  <code class="cite-text" id="cite-text">{cite}</code>
+</div>
+
+<style>
+  .cite-block {
+    margin: 36px 0 0;
+    padding: 12px 16px;
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--accent);
+    background: var(--surface);
+    max-width: 84ch;
+  }
+  .cite-eye {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: calc(var(--fs-xs) - 1px);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+    color: var(--accent);
+    font-weight: var(--weight-strong);
+    margin-bottom: 5px;
+  }
+  .cite-text {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--ink-dim);
+    line-height: 1.6;
+    user-select: all;
+  }
+</style>

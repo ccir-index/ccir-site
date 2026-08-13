@@ -1,0 +1,60 @@
+---
+/*
+  NoteFooter (redesign/v1) — one closing chrome for every research note.
+
+  Rule · suggested citation (FRED pattern) · wayfinding row back to the
+  hub and the methodology. Notes previously ended mid-air: last section,
+  then the site footer. Prose above this component is never touched.
+*/
+import CiteBlock from './CiteBlock.astro';
+
+interface Props {
+  title: string;
+  /** Published date, ISO. */
+  published: string;
+  /** Optional restatement/update date, ISO. */
+  updated?: string;
+}
+const { title, published, updated } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '').replace(/\.html$/, '');
+---
+<footer class="note-foot">
+  <CiteBlock what={title} path={path} date={published} kind="note" />
+  <div class="nf-row">
+    <span class="nf-dates">
+      Published {published}{updated && ` · updated ${updated}`}
+    </span>
+    <nav class="nf-links" aria-label="Note navigation">
+      <a href="/research">← All research</a>
+      <a href="/documents/methodology">Methodology</a>
+      <a href="/contact">Cite or reuse</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .note-foot { margin: 8px 0 0; max-width: 84ch; }
+  .nf-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px 20px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+  }
+  .nf-dates { color: var(--ink-faint); letter-spacing: 0.02em; }
+  .nf-links {
+    margin-left: auto;
+    display: inline-flex;
+    gap: 16px;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-eye);
+  }
+  .nf-links a { color: var(--link); }
+  @media (max-width: 560px) {
+    .nf-links { margin-left: 0; }
+  }
+</style>

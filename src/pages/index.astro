@@ -6,6 +6,15 @@ import {
 import { wpSpread } from '../data/committed_mi';
 import { TIERS, TIER_LABELS_SHORT, TERM_DISPLAY } from '../data/types';
 import type { Rate, Term, Tier } from '../data/types';
+import creditData from '../data/credit_instruments.json';
+
+// --- surface band (redesign/v1) -------------------------------------------
+// The other three surfaces, few words each. The credit stat reuses /credit's
+// own computation (collateral_class === 'gpu', filed sizes summed) so the
+// tile and the tracker can never disagree.
+const creditGpuRows = creditData.instruments.filter((i: any) => i.collateral_class === 'gpu');
+const creditGpuUsdB = Math.round(creditGpuRows.reduce((a: number, i: any) => a + i.size_usd_m, 0) / 1000);
+const creditN = creditData.instruments.length;
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 
@@ -222,7 +231,35 @@ const researchGroups: ResearchGroup[] = [
       </p>
     </section>
 
-    <!-- Layer 2 — research, in the hub's own taxonomy -->
+    <!-- Layer 2 — the other surfaces: financing, residual, tokens, data -->
+    <section class="surface-band">
+      <a class="surface" href="/credit">
+        <span class="s-kicker">Financing</span>
+        <span class="s-title">Credit</span>
+        <span class="s-line">GPU-backed debt as filed — ${creditGpuUsdB}B GPU-collateralized across {creditN} tracked instruments.</span>
+        <span class="s-go">Credit tracker →</span>
+      </a>
+      <a class="surface" href="/hardware">
+        <span class="s-kicker">Residual</span>
+        <span class="s-title">Hardware</span>
+        <span class="s-line">Executed used-GPU prices beside current posted asks, by generation.</span>
+        <span class="s-go">Hardware prices →</span>
+      </a>
+      <a class="surface" href="/tokens">
+        <span class="s-kicker">Tokens</span>
+        <span class="s-title">Token Prices</span>
+        <span class="s-line">Posted per-token prices: frontier first-party and served open-weight.</span>
+        <span class="s-go">Token surface →</span>
+      </a>
+      <a class="surface" href="/explorer">
+        <span class="s-kicker">Data</span>
+        <span class="s-title">Explorer</span>
+        <span class="s-line">Every published series by chip, segment, tenor, and region.</span>
+        <span class="s-go">Series explorer →</span>
+      </a>
+    </section>
+
+    <!-- Layer 3 — research, in the hub's own taxonomy -->
     <section class="mi-block">
       <div class="block-head">
         <span class="kicker">Research</span>
@@ -242,15 +279,6 @@ const researchGroups: ResearchGroup[] = [
         ))}
       </div>
     </section>
-
-    <!-- Layer 3 — credit -->
-    <a class="credit-strip" href="/credit">
-      <div class="cs-text">
-        <span class="kicker">Credit</span>
-        <span class="cs-line">GPU-backed debt: issuance, spreads, and the borrowers financing the buildout.</span>
-      </div>
-      <span class="cs-foot">Credit tracker →</span>
-    </a>
 
     <p class="data-line">
       CCIR publishes citable reference series from observed prices and holds
@@ -280,7 +308,7 @@ const researchGroups: ResearchGroup[] = [
       gap: 12px;
       margin-bottom: 10px;
     }
-    .block-link { color: var(--accent); }
+    .block-link { color: var(--link); }
     .grade-defs {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
@@ -299,7 +327,7 @@ const researchGroups: ResearchGroup[] = [
       color: var(--ink-dim);
       text-decoration: none;
     }
-    .term-pointer:hover { color: var(--accent); }
+    .term-pointer:hover { color: var(--link); }
     .block-link {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
@@ -455,7 +483,7 @@ const researchGroups: ResearchGroup[] = [
       text-decoration: none;
       color: var(--ink);
     }
-    .rg-item:hover .rg-title { color: var(--accent); }
+    .rg-item:hover .rg-title { color: var(--link); }
     .rg-kicker {
       font-family: var(--font-mono);
       font-size: calc(var(--fs-xs) - 2px);
@@ -470,29 +498,62 @@ const researchGroups: ResearchGroup[] = [
       line-height: 1.35;
     }
 
-    .credit-strip {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 18px 20px;
+    /* The other three surfaces + the explorer, one hairline band. */
+    .surface-band {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--rule);
       border: 1px solid var(--rule);
-      border-left: 2px solid var(--accent);
+      margin: 0 0 40px;
+    }
+    @media (max-width: 900px) { .surface-band { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .surface-band { grid-template-columns: 1fr; } }
+    .surface {
       background: var(--surface);
+      padding: 15px 17px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
       text-decoration: none;
       color: var(--ink);
-      margin: 0 0 28px;
+      transition: background 0.16s ease, box-shadow 0.16s ease;
     }
-    .credit-strip:hover { background: var(--surface-2); text-decoration: none; }
-    .cs-text { display: flex; flex-direction: column; gap: 5px; }
-    .cs-line { font-family: var(--font-body); font-size: var(--fs-sm); color: var(--ink); line-height: 1.5; }
-    .cs-foot {
+    .surface:hover {
+      background: var(--surface-2);
+      text-decoration: none;
+      box-shadow: inset 0 0 0 1px var(--link);
+      z-index: 1;
+    }
+    .surface:hover .s-title { color: var(--link); }
+    .s-kicker {
       font-family: var(--font-mono);
-      font-size: var(--fs-xs);
+      font-size: calc(var(--fs-xs) - 1px);
       color: var(--accent);
       text-transform: uppercase;
       letter-spacing: var(--tracking-eye);
-      white-space: nowrap;
+      font-weight: var(--weight-strong);
+    }
+    .s-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-lg);
+      font-weight: var(--weight-display);
+      transition: color 0.16s ease;
+    }
+    .s-line {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+    .s-go {
+      margin-top: auto;
+      padding-top: 6px;
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--link);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
     }
 
     .data-line {
@@ -502,6 +563,6 @@ const researchGroups: ResearchGroup[] = [
       color: var(--ink-dim);
       line-height: 1.6;
     }
-    .data-line a { color: var(--accent); }
+    .data-line a { color: var(--link); }
   </style>
 </Base>
