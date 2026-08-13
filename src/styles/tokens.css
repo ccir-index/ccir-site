@@ -169,3 +169,46 @@ html[data-theme="editorial"] {
 
   color-scheme: light;
 }
+
+/* ===========================================================================
+   DEV-ONLY — VARIANT ROUND 2 (owner request, 2026-08-13). C (the baked-in
+   tokens above) is the default; E/F/G are explorations WITHIN C's structure
+   (dense, near-black/monochrome, blue-or-single-accent, terminal register
+   for data + editorial register for notes) varying TYPE and ACCENT only.
+   Applied via <html data-variant="…"> from the switcher pill + boot script.
+   Delete these blocks + VariantSwitcher.astro + the Space Grotesk font line
+   when the round is decided.
+   =========================================================================== */
+
+/* E — PLEX MONO VOICE. Same architecture, calmer mono personality:
+   IBM Plex Mono carries headings and data instead of JetBrains Mono.
+   Tests whether JetBrains' strong flavor is what reads "too much". */
+html[data-variant="e-plexmono"] {
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+
+/* F — GROTESQUE HEADS. Headings pull back from full-mono: Space Grotesk
+   (tight grotesque) for display; mono stays STRICTLY for data, labels, and
+   chrome. Tests whether the all-mono hero is the point of doubt. */
+html[data-variant="f-grotesk"] {
+  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, sans-serif;
+  --weight-display: 600;
+}
+
+/* G — AMBER TERMINAL. Identical type to C; the single accent shifts warm —
+   amber on near-black (a nod to the old terminal brand pair). One accent
+   only. AA: #e8a33d 9.6:1 on #050607; #996300 5.6:1 on #fafbfc. */
+html[data-variant="g-amber"] {
+  --accent: #e8a33d;
+  --accent-2: #f2bc6a;
+  --link: #e8a33d;
+  --link-dim: #b8842f;
+  --info: #e8a33d;
+}
+html[data-theme="editorial"][data-variant="g-amber"] {
+  --accent: #996300;
+  --accent-2: #b57807;
+  --link: #996300;
+  --link-dim: #a98136;
+  --info: #996300;
+}

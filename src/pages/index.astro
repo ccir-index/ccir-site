@@ -33,20 +33,23 @@ const chips = (() => {
   const live = premiumChipsList();
   return (live.length > 0 ? live : ['B200', 'H200', 'H100', 'A100']);
 })();
-const ladder = chips
-  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeOdCell(t, chip)])) as Record<Tier, Rate | undefined> }))
-  .filter((row) => TIERS.some((t) => row.cells[t]));
 
-// --- interruptible ladder (LOCALHOST PREVIEW, 2026-08-04) ------------------
-// Second grade of the same survey: identical panel construction, identical
-// cell-selection rule (homeIntCell), revocable-occupancy products. Below-
-// floor cells print an em dash and fill as the INT panel deepens. No ratio
-// against the guaranteed ladder is printed anywhere — different panel
-// compositions. Replaces the term panel in this preview; /term surfacing
-// decision pending.
-const intLadder = chips
-  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeIntCell(t, chip)])) as Record<Tier, Rate | undefined> }))
-  .filter((row) => TIERS.some((t) => row.cells[t]));
+// The two grade cards are EXACT MIRRORS (owner, 2026-08-13): one shared row
+// list drives both tables — a chip with cells in either grade renders in
+// both, the gradeless side printing em dashes — so row counts, row heights,
+// and every horizontal rule line up across the pair.
+const rowChips = chips.filter((chip) =>
+  TIERS.some((t) => homeOdCell(t, chip)) || TIERS.some((t) => homeIntCell(t, chip)));
+const ladder = rowChips
+  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeOdCell(t, chip)])) as Record<Tier, Rate | undefined> }));
+
+// --- interruptible ladder (second grade of the same survey) ----------------
+// Identical panel construction, identical cell-selection rule (homeIntCell),
+// revocable-occupancy products. Below-floor cells print an em dash and fill
+// as the INT panel deepens. No ratio against the guaranteed ladder is
+// printed anywhere — different panel compositions.
+const intLadder = rowChips
+  .map((chip) => ({ chip, cells: Object.fromEntries(TIERS.map((t) => [t, homeIntCell(t, chip)])) as Record<Tier, Rate | undefined> }));
 
 // --- committed term panel (companion to the ladder; mirrors /term) --------
 // Anchor = the region-pooled Neocloud H100 GTD OD headline — the same cell
@@ -134,7 +137,7 @@ const researchGroups: ResearchGroup[] = [
           </div>
           <div class="table-wrap">
             <div class="table-head">
-              <span class="th-scope">On-demand, guaranteed · US &amp; EU</span>
+              <span class="th-scope">On-demand · US &amp; EU</span>
               <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
             </div>
             <table class="data ladder-table">
@@ -182,7 +185,7 @@ const researchGroups: ResearchGroup[] = [
           </div>
           <div class="table-wrap">
             <div class="table-head">
-              <span class="th-scope">On-demand, interruptible · US &amp; EU</span>
+              <span class="th-scope">On-demand · US &amp; EU</span>
               <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
             </div>
             <table class="data ladder-table">
@@ -221,6 +224,7 @@ const researchGroups: ResearchGroup[] = [
                 the two ladders is printed — the panels differ in composition
               </div>
             </details>
+            <a class="term-pointer" href="/explorer">All interruptible series →</a>
           </div>
         </div>
       </div>
@@ -317,9 +321,13 @@ const researchGroups: ResearchGroup[] = [
       margin: 14px 0 0;
       max-width: 760px;
     }
+    /* Pointer row — a structural footer row on BOTH cards (mirror rule):
+       same padding and border as the table-foot summary row, so the two
+       cards close at identical heights with aligned rules. */
     .term-pointer {
-      display: inline-block;
-      margin-top: 10px;
+      display: block;
+      padding: 8px 16px;
+      border-top: 1px solid var(--rule-2);
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       text-transform: uppercase;
@@ -353,10 +361,18 @@ const researchGroups: ResearchGroup[] = [
     }
 
     .table-wrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; }
+    /* MIRROR RULE (owner, 2026-08-13): the two grade cards must close at
+       identical heights with every horizontal rule aligned. Both headers
+       carry the IDENTICAL scope line ("On-demand · US & EU" — the grade
+       word lives in the kicker directly above, so repeating it here was
+       redundancy that also forced the longer INTERRUPTIBLE header to wrap
+       at side-by-side widths). Identical text = identical height by
+       construction; nowrap guards both lines. */
     .table-head {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
+      flex-wrap: nowrap;
       gap: 12px;
       padding: 9px 16px;
       border-bottom: 1px solid var(--rule-2);
@@ -365,8 +381,8 @@ const researchGroups: ResearchGroup[] = [
       text-transform: uppercase;
       letter-spacing: var(--tracking-eye);
     }
-    .th-scope { color: var(--ink); font-weight: var(--weight-strong); }
-    .th-meta { color: var(--ink-dim); white-space: nowrap; }
+    .th-scope { color: var(--ink); font-weight: var(--weight-strong); white-space: nowrap; }
+    .th-meta { color: var(--ink-dim); white-space: nowrap; font-size: calc(var(--fs-xs) - 1px); }
     .table-foot {
       border-top: 1px solid var(--rule-2);
       font-family: var(--font-mono);
@@ -541,10 +557,10 @@ const researchGroups: ResearchGroup[] = [
       transition: color 0.16s ease;
     }
     .s-line {
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
       color: var(--ink-dim);
-      line-height: 1.5;
+      line-height: 1.6;
     }
     .s-go {
       margin-top: auto;
@@ -558,10 +574,10 @@ const researchGroups: ResearchGroup[] = [
 
     .data-line {
       margin: 0 0 24px;
-      font-family: var(--font-body);
-      font-size: var(--fs-sm);
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
       color: var(--ink-dim);
-      line-height: 1.6;
+      line-height: 1.7;
     }
     .data-line a { color: var(--link); }
   </style>

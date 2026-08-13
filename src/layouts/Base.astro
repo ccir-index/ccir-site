@@ -4,6 +4,10 @@ import '../styles/base.css';
 import Masthead from '../components/Masthead.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Tape from '../components/Tape.astro';
+// DEV-ONLY (variant round 2, 2026-08-13): C/E/F/G comparison pill. Delete
+// this import + component + the data-variant blocks in tokens.css + the
+// Space Grotesk font line when the owner decides.
+import VariantSwitcher from '../components/VariantSwitcher.astro';
 import { meta } from '../data/snapshot';
 
 interface Props {
@@ -14,6 +18,13 @@ interface Props {
   noindex?: boolean;
   /** Research-note structured data: ISO dates; renders Article JSON-LD. */
   article?: { published: string; modified?: string };
+  /**
+   * Typographic register (owner, 2026-08-13). One identity, two registers:
+   * "terminal" (default) for data surfaces; "editorial" for sustained
+   * reading — research notes and /documents pages get it automatically by
+   * route, overridable here. Drives [data-register] rules in base.css.
+   */
+  register?: 'terminal' | 'editorial';
 }
 
 const {
@@ -27,7 +38,15 @@ const {
   ogImage = '/og-default.png',
   noindex = false,
   article,
+  register,
 } = Astro.props;
+
+// Register by route: every /research/<slug> note (the hub at /research stays
+// terminal) and every /documents/<slug> page reads in the editorial register.
+const isEditorialRoute =
+  /^\/research\/.+/.test(Astro.url.pathname) ||
+  /^\/documents\/.+/.test(Astro.url.pathname);
+const pageRegister = register ?? (isEditorialRoute ? 'editorial' : 'terminal');
 
 const SITE = 'https://ccir.io';
 const canonicalPath = Astro.url.pathname
@@ -112,9 +131,10 @@ const articleLd = article
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <!-- Terminal-pro face set: JetBrains Mono (headings + data), IBM Plex Sans
-       (text), IBM Plex Mono (mono fallback in the stack). -->
+       (text), IBM Plex Mono (mono fallback; variant E's display face).
+       Space Grotesk is DEV-ONLY for variant F — drop it with the round. -->
   <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
     rel="stylesheet"
   />
   <script is:inline>
@@ -124,15 +144,18 @@ const articleLd = article
         if (t === 'editorial' || t === 'terminal') {
           document.documentElement.setAttribute('data-theme', t);
         }
-        // The redesign/v1 A-D variant comparison is over (terminal-pro won
-        // and is now the base tokens); clear the leftover key so a stale
-        // data-variant can never resurrect.
-        localStorage.removeItem('ccir-variant');
+        // Variant round 2 (dev-only): apply the persisted exploration before
+        // first paint. C = no attribute (the baked-in tokens). Stale values
+        // from the retired A-D round fall through and are cleared.
+        var OK = { 'e-plexmono': 1, 'f-grotesk': 1, 'g-amber': 1 };
+        var v = localStorage.getItem('ccir-variant');
+        if (v && OK[v]) document.documentElement.setAttribute('data-variant', v);
+        else if (v) localStorage.removeItem('ccir-variant');
       } catch (e) {}
     })();
   </script>
 </head>
-<body>
+<body data-register={pageRegister}>
   <a class="skip-link" href="#main">Skip to content</a>
   <Masthead />
   {showTape && <Tape />}
@@ -140,6 +163,7 @@ const articleLd = article
     <slot />
   </main>
   <SiteFooter />
+  <VariantSwitcher />
   <style>
     .skip-link {
       position: absolute;

@@ -1,0 +1,82 @@
+---
+/*
+  DEV-ONLY (variant round 2, 2026-08-13): bottom-right pill for comparing
+  C (baked-in default) against E/F/G explorations. Persists in localStorage
+  ('ccir-variant'); the Base boot script applies it before first paint.
+  Delete with the data-variant blocks in tokens.css when the round closes.
+*/
+const VARIANTS = [
+  { id: '', code: 'C', label: 'Terminal-pro — JetBrains Mono, blue (baked-in)' },
+  { id: 'e-plexmono', code: 'E', label: 'Plex Mono voice — calmer mono personality' },
+  { id: 'f-grotesk', code: 'F', label: 'Grotesque heads — Space Grotesk display, mono strictly for data' },
+  { id: 'g-amber', code: 'G', label: 'Amber terminal — single warm accent on near-black' },
+];
+---
+<div id="vsw" aria-label="Style variant switcher (dev only)">
+  <span class="vsw-tag">STYLE</span>
+  {VARIANTS.map((v) => (
+    <button class="vsw-btn" data-variant-id={v.id} title={v.label}>{v.code}</button>
+  ))}
+</div>
+
+<script is:inline>
+  (function () {
+    var pill = document.getElementById('vsw');
+    if (!pill) return;
+    var btns = pill.querySelectorAll('.vsw-btn');
+    function paint() {
+      var cur = document.documentElement.getAttribute('data-variant') || '';
+      btns.forEach(function (b) {
+        b.classList.toggle('on', (b.getAttribute('data-variant-id') || '') === cur);
+      });
+    }
+    btns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = b.getAttribute('data-variant-id') || '';
+        try {
+          if (id) localStorage.setItem('ccir-variant', id);
+          else localStorage.removeItem('ccir-variant');
+        } catch (e) {}
+        if (id) document.documentElement.setAttribute('data-variant', id);
+        else document.documentElement.removeAttribute('data-variant');
+        paint();
+      });
+    });
+    paint();
+  })();
+</script>
+
+<style>
+  #vsw {
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 7px;
+    background: var(--surface-2);
+    border: 1px solid var(--rule-2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  }
+  .vsw-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-right: 2px;
+  }
+  .vsw-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink-dim);
+    background: transparent;
+    border: 1px solid var(--rule-2);
+    padding: 3px 7px;
+    cursor: pointer;
+  }
+  .vsw-btn:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .vsw-btn.on { color: var(--accent); border-color: var(--accent); }
+</style>

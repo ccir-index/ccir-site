@@ -896,8 +896,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .ln-other { stroke: var(--arch-other); }
     .lab-other { fill: var(--arch-other); }
     .ln-exec { stroke-width: 2.6; }
-    .asklab { font-family: var(--font-sans); font-size: 10px; fill: var(--ink-dim); letter-spacing: 0.04em; }
-    .panel-lab { font-family: var(--font-sans); font-size: 13px; font-weight: 600; }
+    .asklab { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim); letter-spacing: 0.04em; }
+    .panel-lab { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
     .sw-execk { background: var(--ink); height: 4px; }
 
     .chart-fig { margin: 0 0 22px; max-width: 962px; }
@@ -910,8 +910,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       font-weight: var(--weight-strong);
       margin: 0 0 6px;
     }
-    .rowlab { font-family: var(--font-sans); font-size: 12.5px; fill: var(--ink); font-weight: 600; letter-spacing: 0.01em; }
-    .rowval { font-family: var(--font-sans); font-size: 11.5px; fill: var(--ink-dim); }
+    .rowlab { font-family: var(--font-mono); font-size: 12.5px; fill: var(--ink); font-weight: 600; letter-spacing: 0.01em; }
+    .rowval { font-family: var(--font-mono); font-size: 11.5px; fill: var(--ink-dim); }
     .dumbline { stroke: var(--ink-faint); stroke-width: 1.2; opacity: 0.7; }
     .execpt { fill: var(--accent); }
     .askpt2 { fill: var(--surface); stroke: var(--ink-dim); stroke-width: 1.6; }
@@ -922,13 +922,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .grid { stroke: var(--rule); stroke-width: 1; opacity: 0.7; }
     .episode { fill: var(--accent); opacity: 0.07; }
     .eplab {
-      font-family: var(--font-sans);
+      font-family: var(--font-mono);
       font-size: 10px;
       fill: var(--ink-faint);
       letter-spacing: 0.05em;
       text-transform: uppercase;
     }
-    .tick { font-family: var(--font-sans); font-size: 11.5px; fill: var(--ink-faint); }
+    .tick { font-family: var(--font-mono); font-size: 11.5px; fill: var(--ink-faint); }
     .ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
     .ln-thin { stroke-width: 1.2; stroke-dasharray: 3 4; opacity: 0.75; }
     .ln-volta { stroke: var(--arch-volta); }
@@ -947,9 +947,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .ap-ampere { stroke: var(--arch-ampere); }
     .ap-a10040 { stroke: var(--arch-a10040); }
     .ap-hopper { stroke: var(--arch-hopper); }
-    .leglab { font-family: var(--font-sans); font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
+    .leglab { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.01em; }
     .scaletag {
-      font-family: var(--font-sans);
+      font-family: var(--font-mono);
       font-size: 10.5px;
       fill: var(--ink-faint);
       text-transform: uppercase;
