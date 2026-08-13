@@ -91,7 +91,7 @@ Using only public filings, we estimate the other end — what each operator actu
 <script>
 const CHIPS=["A100","H100","H200","B200","GB200","GB300"];
 const COL={A100:"#3fa3a3",H100:"#4a86d6",H200:"#3a9b6e",B200:"#d6b84a",GB200:"#e08a2e",GB300:"#c46ad6"};
-let D,SCN,cur=0,mix={},act={},com={},cost={},tilt=0;
+let D,SCN,cur=0,mix={},act={},com={},cost={},tilt=0,carve=0;
 
 function boot(){
   if(typeof EXPLORER_DATA==="undefined"){document.getElementById("app").innerHTML=
@@ -171,13 +171,20 @@ function load(i){cur=+i;const s=SCN[i];mix={...s.mix};act={};com={};
   const sc=document.getElementById("scn"); if(sc)sc.value=i;   // keep dropdown in sync with loaded scenario
   const ad=(s.act_default!=null)?s.act_default:null;           // per-scenario in-service default (low where the buildout ran ahead of revenue, e.g. IREN FY26)
   CHIPS.forEach(ch=>{act[ch]=ad!=null?ad:(ACT_DEFAULT[ch]!=null?ACT_DEFAULT[ch]:100);com[ch]=Math.round(s.bookc||100);cost[ch]=(D.cost&&D.cost[ch])||0;});
-  tilt=0.5;document.getElementById("tilt").value=50;buildGrid();buildCosts();render();} // default = 50% scarcity (half the dispersion; keeps H100 above all-in cost)
+  carve=0;tilt=0.5;document.getElementById("tilt").value=50;buildGrid();buildCosts();render();} // default = 50% scarcity (half the dispersion; keeps H100 above all-in cost)
 function buildCosts(){
   const cg=document.getElementById("costgrid"); if(!cg)return; cg.innerHTML="";
   const base=SCN[cur].mix, L=A(SCN[cur].op);
   CHIPS.forEach(ch=>{ if(!((base[ch]>0)&&L[ch]!=null))return;
     cg.insertAdjacentHTML("beforeend",`<span class="ci"><span style="color:${COL[ch]}">${ch}</span> $<input type="number" data-ch="${ch}" value="${Math.round(cost[ch]/1000)}" min="5" max="120" step="1">k</span>`);});
-  cg.querySelectorAll("input").forEach(inp=>inp.oninput=e=>{cost[e.target.dataset.ch]=(+e.target.value)*1000; render();});
+  // non-GPU carve-out: share of the tech-equipment line excluded as storage/CPU/network-only gear.
+  // Default 0 — per-chip costs are calibrated INCLUSIVE of a per-GPU non-GPU allocation (YE24 disclosed
+  // $36.6k/GPU anchor), so a nonzero default would double-count. Lever exists for users who think the
+  // non-GPU share has grown beyond that allocation.
+  if(SCN[cur].ppe!=null)
+    cg.insertAdjacentHTML("beforeend",`<span class="ci" title="share of tech-equipment PP&E excluded as non-GPU (storage/CPU/network-only gear); per-chip costs already carry a per-GPU allocation, so 0 is the calibrated default">non-GPU <input type="number" id="carveinp" value="${carve}" min="0" max="30" step="1">%</span>`);
+  cg.querySelectorAll("input[data-ch]").forEach(inp=>inp.oninput=e=>{cost[e.target.dataset.ch]=(+e.target.value)*1000; render();});
+  const ci=document.getElementById("carveinp"); if(ci)ci.oninput=e=>{carve=Math.max(0,Math.min(30,+e.target.value||0)); render();};
 }
 const dfac=ch=>(1-tilt)+tilt*D.dtilt[ch];
 function cterm(op,ch,L,tier){const tr=(D.termrates||{})[op]||{};const t=tr[ch]&&(tr[ch].y3!=null?tr[ch].y3:tr[ch].y1);
@@ -194,8 +201,8 @@ function render(){
   // DERIVED: count = PP&E ÷ mix-weighted cost; realized = revenue ÷ (avg count × hrs) — both move with the mix.
   const HRS=D.hours||2190, derive=(s.ppe!=null&&s.ppe_begin!=null&&s.rev!=null&&D.cost);
   let R, totalk;
-  if(derive){const mc=present.reduce((a,ch)=>a+w[ch]*cost[ch],0);
-    const endk=s.ppe*1000/mc, begk=s.ppe_begin*1000/mc, avgk=(endk+begk)/2;
+  if(derive){const mc=present.reduce((a,ch)=>a+w[ch]*cost[ch],0), eff=1-(carve||0)/100;
+    const endk=s.ppe*eff*1000/mc, begk=s.ppe_begin*eff*1000/mc, avgk=(endk+begk)/2;
     totalk=endk; R=s.rev*1000/(avgk*HRS);
   } else { R=s.R; totalk=s.deployed; }
   // solve: R = Σ w_c · act_c · r_c , r_c = k·dfac·L_c
@@ -254,7 +261,7 @@ function render(){
         <div class="hdr">chip</div><div class="hdr n">GPUs</div><div class="hdr k">$/GPU</div>${haveRev?'<div class="hdr r">rev/q</div>':''}
         ${rows}
         <div class="c tot">total</div><div class="n tot">${totalk.toFixed(0)}k</div><div class="k tot">$${avgk.toFixed(0)}k</div>${haveRev?`<div class="r tot">$${cm(s.rev)}M</div>`:''}</div>
-      <div style="opacity:.65;margin-top:5px;font-size:10px">${havePPE?`$${(s.ppe/1000).toFixed(1)}B GPU systems (incl networking, not bare chips); `:''}${haveRev?`per-chip rev = share of reported $${cm(s.rev)}M — ties to filings`:'cost-weighted count'}</div>`;
+      <div style="opacity:.65;margin-top:5px;font-size:10px">${havePPE?`$${(s.ppe/1000).toFixed(1)}B GPU systems (incl networking, not bare chips)${carve>0?` · ${carve}% carved out as non-GPU`:''}; `:''}${haveRev?`per-chip rev = share of reported $${cm(s.rev)}M — ties to filings`:'cost-weighted count'}</div>`;
   } else fl.innerHTML="";
   const nMkt=present.filter(assumedOD).length;
   document.getElementById("note").innerHTML=
