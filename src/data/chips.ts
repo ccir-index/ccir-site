@@ -19,9 +19,22 @@
   same cell); the committed lane maps through committed_mi's own
   chip -> silicon_id lock.
 
+  HARDWARE LANE (owner, 2026-08-13). The stat-band hardware tile is
+  UNIFORM across chips: /hardware's income-derived model-implied unit
+  value (src/lib/ivmodel's ivCards — the single source of truth /hardware
+  and its share card already read), carrying the model-output mark. One
+  comparable basis, never presented as a transacted price.
+  Posted asks are NOT deleted: pages whose hwKey exists in
+  hardware_panels keep the posted-ask median, n, and executed trend in
+  the hardware MODULE — observed record and model output clearly labeled,
+  never blended. The ask-vs-no-record distinction is data-driven (does
+  hardware_panels carry the hwKey?) and only affects the module; B200's
+  module states that no posted asks are on the record yet. When real B200
+  asks land under its hwKey, the module picks them up by data alone.
+
   EXCLUDED as of 2026-08-13 (data, not preference):
-    - B200 / B300 / GB200 / GB300: no hardware model in hardware_panels
-      (no secondary ask) — hardware tile impossible.
+    - B300 / GB200 / GB300: no hardware lane of either kind (no posted
+      asks and no ivmodel entry).
     - V100: hardware asks exist but no T2 rates cell.
     - L40S / RTX A6000: pass the data gate, but their generation/identity
       facts are not stated anywhere on the site and they sit outside the
@@ -47,9 +60,14 @@ export interface ChipDef {
   formFactor: string;
   memory: string;
   generation: string;
-  /** YYYY-MM from /hardware's GA map */
+  /** YYYY-MM from /hardware's GA map (or the ivmodel vintage where the
+      GA map has no entry — see introducedAssumed) */
   introduced: string;
-  /** hardware_panels model key — the ONE variant the hardware lane reads */
+  /** true when the date is the ivmodel's ASSUMED vintage, not a recorded
+      GA month — the page prints it as assumed */
+  introducedAssumed?: boolean;
+  /** hardware_panels model key — the ONE variant the hardware lane reads
+      (for derived-mode chips: the prospective key ivmodel uses) */
   hwKey: string;
   /** unit wording for the secondary-ask tile (matches hw label) */
   hwLabel: string;
@@ -91,6 +109,25 @@ export const CHIPS: ChipDef[] = [
     launchText: 'SXM 141GB general availability, April 2024.',
     // 2024 silicon renting on guaranteed and interruptible terms across
     // the panel — prime rental flow.
+    phase: 'prime',
+  },
+  {
+    slug: 'b200',
+    id: 'B200',
+    name: 'NVIDIA B200',
+    short: 'B200',
+    formFactor: 'SXM',
+    memory: '180GB',
+    generation: 'Blackwell',
+    // No GA-map entry: this is the ivmodel vintage (2025 + 2/12), which
+    // /hardware itself states as assumed ("vintage assumed").
+    introduced: '2025-03',
+    introducedAssumed: true,
+    hwKey: 'B200-180-SXM6',
+    hwLabel: 'SXM 180GB',
+    launchText: 'SXM 180GB; 2025 volume availability — vintage stated as assumed on the /hardware model.',
+    // 2025 silicon renting on guaranteed and interruptible terms — prime
+    // rental flow; no secondary-market record has formed yet.
     phase: 'prime',
   },
   {

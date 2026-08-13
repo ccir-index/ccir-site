@@ -13,13 +13,18 @@ import {
   homeOdCell, homeIntCell, tierOdCell, headlineValue, headlineStatOf, meta,
 } from '../data/snapshot';
 import { wpSpread } from '../data/committed_mi';
-import hw from '../data/hardware_panels.json';
+import { ivCards } from '../lib/ivmodel';
 import { CHIPS } from '../data/chips';
 import type { Term } from '../data/types';
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 const fmtUsd = (v: number | null | undefined) =>
   v == null ? '—' : '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+const fmtK = (v: number) => {
+  if (v < 1000) return '$' + Math.round(v);
+  const s = (v / 1000).toFixed(1);
+  return '$' + (s.endsWith('.0') ? s.slice(0, -2) : s) + 'k';
+};
 
 const TENORS: Term[] = ['3M', '6M', '1Y', '2Y', '3Y'];
 
@@ -36,14 +41,15 @@ const rows = CHIPS.map((def) => {
       if (sp) committed = { term, value: odAnchorValue * (1 + sp.spread), n: sp.n_pairs };
     }
   }
-  const hwModel = (hw.models as any[]).find((m) => m.key === def.hwKey);
-  const ask = hwModel?.ask as { med: number | null; n: number } | undefined;
-  return { def, spot, intr, committed, ask };
+  // Uniform hardware basis (owner, 2026-08-13): /hardware's income-derived
+  // model-implied unit value — one comparable basis, labeled in the header.
+  const iv = ivCards.find((c) => c.key === def.hwKey) ?? null;
+  return { def, spot, intr, committed, iv };
 });
 ---
 <Base
   title="GPU Chips — Instrument Pages · CCIR"
-  description="Per-chip instrument pages: guaranteed and interruptible on-demand reference rates, committed term structure, and secondary-market hardware asks — H100, H200, A100. Every figure inherits from the surface that publishes it."
+  description="Per-chip instrument pages: guaranteed and interruptible on-demand reference rates, committed term structure, and income-derived unit values — H100, H200, B200, A100. Every figure inherits from the surface that publishes it."
 >
   <section class="wrap page-top">
     <PageHeader
@@ -72,20 +78,20 @@ const rows = CHIPS.map((def) => {
             <th>Spot · GTD<br />USD/GPU-hr</th>
             <th>Committed<br />USD/GPU-hr</th>
             <th>Interruptible<br />USD/GPU-hr</th>
-            <th>Secondary ask<br />USD/unit</th>
+            <th>Model-implied value<br />USD/unit · model output</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map(({ def, spot, intr, committed, ask }) => (
+          {rows.map(({ def, spot, intr, committed, iv }) => (
             <tr>
               <td class="chip-cell">
                 <a class="chip-page-link" href={`/chip/${def.slug}`}>{def.name} →</a>
               </td>
-              <td class="id-cell">{def.formFactor} {def.memory} · {def.generation} · {def.introduced.slice(0, 4)}</td>
-              <td class="num strongv">{spot ? `$${fmt(headlineValue(spot))}` : '—'}{spot && <span class="cellmeta">n={spot.n_sources} · {headlineStatOf(spot)}</span>}</td>
-              <td class="num">{committed ? `$${fmt(committed.value)}` : '—'}{committed && <span class="cellmeta">{committed.term} · {committed.n} pairs · MI</span>}</td>
-              <td class="num">{intr ? `$${fmt(headlineValue(intr))}` : '—'}{intr && <span class="cellmeta">n={intr.n_sources} · {headlineStatOf(intr)}</span>}</td>
-              <td class="num">{ask?.med != null ? fmtUsd(ask.med) : '—'}{ask?.med != null && <span class="cellmeta">{def.hwLabel} · n={ask.n} · {hw.as_of}</span>}</td>
+              <td class="id-cell">{def.formFactor} {def.memory} · {def.generation} · {def.introduced.slice(0, 4)}{def.introducedAssumed ? ' (assumed)' : ''}</td>
+              <td class="num strongv">{spot ? `$${fmt(headlineValue(spot))}` : '—'}{spot && <span class="cellmeta">{headlineStatOf(spot)}</span>}</td>
+              <td class="num">{committed ? `$${fmt(committed.value)}` : '—'}{committed && <span class="cellmeta">{committed.term} · MI</span>}</td>
+              <td class="num">{intr ? `$${fmt(headlineValue(intr))}` : '—'}{intr && <span class="cellmeta">{headlineStatOf(intr)}</span>}</td>
+              <td class="num">{iv ? fmtUsd(iv.base) : '—'}{iv && <span class="cellmeta">{def.hwLabel} · {fmtK(iv.lo)}–{fmtK(iv.hi)}</span>}</td>
             </tr>
           ))}
         </tbody>
@@ -97,18 +103,23 @@ const rows = CHIPS.map((def) => {
           form and region pooled). Committed = the /term construction: the
           longest published tenor implied off the on-demand anchor by the
           within-provider spread — market intelligence, not a citable
-          reference rate. Secondary ask = the /hardware posted-ask median
-          for the one locked variant per chip. Lanes are never blended; an
-          em dash is a cell below the publication floor.
+          reference rate. Model-implied value = /hardware's income-derived
+          model output for the one locked variant per chip (sensitivity band
+          beside each figure) — a model output, not a transacted price; the
+          posted and executed secondary-market record stays on /hardware and
+          each chip page. Lanes are never blended; an em dash is a cell
+          below the publication floor. Panel depth and dispersion live on
+          the surface pages.
         </div>
       </details>
     </div>
 
     <p class="roster-note">
-      A chip joins this index when both a hardware ask and a T2 rates cell
-      exist for it. Chips whose hardware record has not yet formed
-      (B200, B300, GB200) are on their surfaces but carry no instrument
-      page yet.
+      A chip joins this index when it carries a T2 rates cell and a
+      /hardware value lane — posted asks or the published income model.
+      B200's secondary market has no posted asks on the record yet; its
+      hardware figure is modeled only. B300 and GB200 carry neither lane
+      and have no instrument page yet.
     </p>
   </section>
 

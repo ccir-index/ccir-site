@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { el } from '../../lib/og';
 import { homeOdCell, homeIntCell, headlineValue, meta } from '../../data/snapshot';
-import hw from '../../data/hardware_panels.json';
+import { ivCards } from '../../lib/ivmodel';
 import { CHIPS } from '../../data/chips';
 
 export const prerender = true;
@@ -14,12 +14,15 @@ export const prerender = true;
   Share card for /chip/<slug> — one generator for every registry chip.
 
   Reads the SAME selectors the page renders from (homeOdCell / homeIntCell /
-  hardware ask median), so card and page cannot disagree; a below-floor cell
-  prints an em dash exactly like the page. Few words: chip name, identity
-  line, three figures with lane labels, as-of date.
+  the ivCards income model), so card and page cannot disagree; a below-floor
+  cell prints an em dash exactly like the page. Few words: chip name,
+  identity line, three figures with lane labels, as-of date. No n counts
+  (owner, 2026-08-13 — depth chrome lives on the surface pages).
 
-  Committed is deliberately absent: it is market intelligence and the card
-  format has no room for the mandatory not-citable mark.
+  The hardware figure is the model-implied value (uniform basis across the
+  family) and ALWAYS carries its model-output label — derived never prints
+  as posted. Committed is deliberately absent: it is market intelligence
+  and the card format has no room for the mandatory not-citable mark.
 
   Type mirrors the baked-in design: Space Grotesk 600 carries the chip name
   (display face), IBM Plex Mono the data and chrome (the card generators'
@@ -49,9 +52,7 @@ export const GET: APIRoute = async ({ props }) => {
   const def = props.def as (typeof CHIPS)[number];
   const spot = homeOdCell('T2', def.id);
   const intr = homeIntCell('T2', def.id);
-  const hwModel = (hw.models as any[]).find((m) => m.key === def.hwKey);
-  const askMed: number | null = hwModel?.ask?.med ?? null;
-  const askN: number = hwModel?.ask?.n ?? 0;
+  const iv = ivCards.find((c) => c.key === def.hwKey) ?? null;
 
   const fig = (lane: string, value: string, unit: string, metaLine: string) =>
     el('div', { display: 'flex', flexDirection: 'column', flexGrow: 1, flexBasis: 0, padding: '26px 28px', borderLeft: `1px solid ${T.rule}` }, [
@@ -85,15 +86,15 @@ export const GET: APIRoute = async ({ props }) => {
     fig('SPOT · GUARANTEED · T2',
       spot ? `$${headlineValue(spot).toFixed(2)}` : '—',
       'USD / GPU-HR',
-      spot ? `on-demand ask · n=${spot.n_sources}` : 'below the publication floor'),
+      spot ? 'on-demand ask' : 'below the publication floor'),
     fig('INTERRUPTIBLE · T2',
       intr ? `$${headlineValue(intr).toFixed(2)}` : '—',
       'USD / GPU-HR',
-      intr ? `revocable occupancy · n=${intr.n_sources}` : 'below the publication floor'),
-    fig('SECONDARY ASK',
-      askMed != null ? `$${Math.round(askMed).toLocaleString('en-US')}` : '—',
+      intr ? 'revocable occupancy' : 'below the publication floor'),
+    fig('MODEL-IMPLIED VALUE',
+      iv ? `$${Math.round(iv.base).toLocaleString('en-US')}` : '—',
       'USD / UNIT',
-      askMed != null ? `${def.hwLabel} · n=${askN} asks` : 'no posted-ask panel'),
+      iv ? 'income model — not a transacted price' : 'model not published'),
   ]);
 
   const foot = el('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `22px ${PAD}px 30px` }, [

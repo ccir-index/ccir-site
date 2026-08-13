@@ -16,8 +16,17 @@
                                                   odPoint/tenorPoint math
                                                   (committed_mi.ts), longest
                                                   published tenor.
-    Secondary ask hw.models[def.hwKey].ask      — /hardware's posted-ask
-                                                  median (hardware_panels).
+    Hardware headline  ivCards[def.hwKey]       — /hardware's income-derived
+                                                  model-implied unit value
+                                                  (src/lib/ivmodel, the same
+                                                  single source /hardware and
+                                                  its share card read). A
+                                                  model output, marked as
+                                                  such, never a transacted
+                                                  price. Posted asks + the
+                                                  executed trend stay in the
+                                                  hardware MODULE, labeled as
+                                                  the observed record.
     Rates trend   seriesHistory(spot.series_id) — the published headline
                                                   history (explorer's spark
                                                   source).
@@ -31,6 +40,9 @@
 
   Committed values are MARKET INTELLIGENCE, badged, never citable.
   No % change is printed anywhere on this page.
+  No n counts are printed anywhere in the chip family (owner, 2026-08-13):
+  panel-depth and dispersion chrome live on the surface pages one click
+  away. Lane labels, as-of dates, and window labels stay.
   A tile whose computing surface publishes nothing prints an em dash; a
   module with no charted record says so — nothing is substituted.
 */
@@ -42,6 +54,7 @@ import {
 } from '../../data/snapshot';
 import { wpSpread } from '../../data/committed_mi';
 import hw from '../../data/hardware_panels.json';
+import { ivCards } from '../../lib/ivmodel';
 import { CHIPS, type ChipDef } from '../../data/chips';
 import type { Rate, Term } from '../../data/types';
 
@@ -53,6 +66,14 @@ const { def } = Astro.props as { def: ChipDef };
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 const fmtUsd = (v: number | null | undefined) =>
   v == null ? '—' : '$' + v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+// /hardware's own compact-thousands form for the sensitivity band.
+// (No regex literal here: a frontmatter regex breaks @astrojs/compiler's
+// getStaticPaths hoisting — it emits a duplicate export into the body.)
+const fmtK = (v: number) => {
+  if (v < 1000) return '$' + Math.round(v);
+  const s = (v / 1000).toFixed(1);
+  return '$' + (s.endsWith('.0') ? s.slice(0, -2) : s) + 'k';
+};
 
 const CHIP = def.id;
 const introYear = def.introduced.slice(0, 4);
@@ -82,20 +103,19 @@ const tenorPts: TenorPt[] = odAnchorValue == null ? [] : TENORS.flatMap(({ term,
 // of /term's line for this chip.
 const committed = tenorPts.length ? tenorPts[tenorPts.length - 1]! : null;
 
-// --- hardware lane (same cells as /hardware) -------------------------------
+// --- hardware lane ---------------------------------------------------------
+// Headline: /hardware's income-derived model-implied unit value — the same
+// ivCards entry /hardware renders (uniform basis across the chip family).
+// Module: the posted/executed record, where hardware_panels carries the key.
+const iv = ivCards.find((c) => c.key === def.hwKey) ?? null;
 const hwModel = (hw.models as any[]).find((m) => m.key === def.hwKey);
 const ask = hwModel?.ask as { med: number | null; n: number } | undefined;
 const t90 = hwModel?.t90 as { med: number | null; n: number } | undefined;
 
-// --- header panel counts (from the data, not hardcoded) --------------------
-const counts = [
-  spot ? `rates n=${spot.n_sources}` : null,
-  committed ? `term n=${committed.n} pairs` : null,
-  ask?.med != null ? `hardware n=${ask.n} asks` : null,
-].filter(Boolean).join(' · ');
-
+// No n counts anywhere in the chip family — the tooltip carries the citable
+// series id and stat only; depth/dispersion live on the surface pages.
 function cellTitle(c: Rate): string {
-  return `${c.series_id} · ${headlineStatOf(c)}, n=${c.n_sources} · median ${fmt(c.price_median)} · mean ${fmt(c.price_mean)} · IQR ${fmt(c.price_p25)}–${fmt(c.price_p75)}`;
+  return `${c.series_id} · ${headlineStatOf(c)} headline`;
 }
 
 // --- rates trend: the published headline series, as published --------------
@@ -166,7 +186,8 @@ const pageTitle = `${def.name} Rental Price — CCIR Reference Rates`;
 const pageDescription =
   `Daily published reference rates for the ${def.name} (${def.formFactor} ${def.memory}): ` +
   `guaranteed and interruptible on-demand USD/GPU-hr, committed term structure, ` +
-  `and secondary-market hardware asks. Every figure inherits from the surface that publishes it.`;
+  `secondary-market record, and an income-derived model-implied unit value. ` +
+  `Every figure inherits from the surface that publishes it.`;
 
 // Dataset schema: this page is a published data surface (daily series with
 // stated methodology), not an article and not a product offer — no offers,
@@ -178,7 +199,8 @@ const datasetLd = JSON.stringify({
   description:
     `Daily reference rates for ${def.name} (${def.formFactor} ${def.memory}) GPU rental: ` +
     `guaranteed and interruptible on-demand rates in USD per GPU-hour by operator segment, ` +
-    `committed term structure (market intelligence), and secondary-market hardware asks in USD per unit.`,
+    `committed term structure (market intelligence), the secondary-market record, ` +
+    `and an income-derived model-implied unit value in USD per unit.`,
   url: `${SITE}/chip/${def.slug}`,
   creator: { '@id': `${SITE}/#org` },
   publisher: { '@id': `${SITE}/#org` },
@@ -197,7 +219,7 @@ const datasetLd = JSON.stringify({
     { '@type': 'PropertyValue', name: 'Guaranteed on-demand rate', unitText: 'USD per GPU-hour' },
     { '@type': 'PropertyValue', name: 'Interruptible on-demand rate', unitText: 'USD per GPU-hour' },
     { '@type': 'PropertyValue', name: 'Committed term rate (market intelligence)', unitText: 'USD per GPU-hour' },
-    { '@type': 'PropertyValue', name: 'Secondary-market posted ask', unitText: 'USD per unit' },
+    { '@type': 'PropertyValue', name: 'Model-implied unit value (income-derived)', unitText: 'USD per unit' },
   ],
 });
 ---
@@ -214,8 +236,7 @@ const datasetLd = JSON.stringify({
       kicker={def.short}
       asOf={meta.as_of_date}
     >
-      <p class="id-meta">{def.formFactor} · {def.memory} · {def.generation.toUpperCase()} · INTRODUCED {introYear}</p>
-      {counts && <p class="id-counts">{counts}</p>}
+      <p class="id-meta">{def.formFactor} · {def.memory} · {def.generation.toUpperCase()} · {def.introducedAssumed ? `VINTAGE ${introYear} (ASSUMED)` : `INTRODUCED ${introYear}`}</p>
       <p class="standfirst">
         One chip across the published surfaces. Every figure on this page is
         the same cell, from the same code path, as the surface it links to —
@@ -232,7 +253,7 @@ const datasetLd = JSON.stringify({
           <>
             <span class="st-value" title={cellTitle(spot)}>${fmt(headlineValue(spot))}</span>
             <span class="st-unit">USD/GPU-hr</span>
-            <span class="st-meta">on-demand ask · {headlineStatOf(spot)} · n={spot.n_sources} · as of {meta.as_of_date}</span>
+            <span class="st-meta">on-demand ask · {headlineStatOf(spot)} · as of {meta.as_of_date}</span>
           </>
         ) : <span class="st-value">—</span>}
       </div>
@@ -240,9 +261,9 @@ const datasetLd = JSON.stringify({
         <span class="st-lane">Committed · {committed?.term ?? '—'} · T2 Neocloud</span>
         {committed && odAnchorValue != null ? (
           <>
-            <span class="st-value" title={`${CHIP} ${committed.term}: $${fmt(odAnchorValue)} on-demand anchor stepped by the within-provider committed spread (${committed.n} provider pairs) — the /term construction`}>${fmt(committed.value)}</span>
+            <span class="st-value" title={`${CHIP} ${committed.term}: $${fmt(odAnchorValue)} on-demand anchor stepped by the within-provider committed spread — the /term construction`}>${fmt(committed.value)}</span>
             <span class="st-unit">USD/GPU-hr</span>
-            <span class="st-meta">implied off OD anchor · {committed.n} provider pairs{committed.prov ? ' · provisional' : ''}</span>
+            <span class="st-meta">implied off OD anchor{committed.prov ? ' · provisional' : ''}</span>
             <span class="st-mi">Market intelligence — not a citable reference rate</span>
           </>
         ) : <span class="st-value">—</span>}
@@ -253,24 +274,27 @@ const datasetLd = JSON.stringify({
           <>
             <span class="st-value" title={cellTitle(intr)}>${fmt(headlineValue(intr))}</span>
             <span class="st-unit">USD/GPU-hr</span>
-            <span class="st-meta">on-demand ask, revocable occupancy · {headlineStatOf(intr)} · n={intr.n_sources} · as of {meta.as_of_date}</span>
+            <span class="st-meta">on-demand ask, revocable occupancy · {headlineStatOf(intr)} · as of {meta.as_of_date}</span>
           </>
         ) : <span class="st-value">—</span>}
       </div>
       <div class="stat">
-        <span class="st-lane">Secondary ask · {def.hwLabel}</span>
-        {ask?.med != null ? (
+        <span class="st-lane">Model-implied value · {def.hwLabel}</span>
+        {iv ? (
           <>
-            <span class="st-value" title={`posted ask median, current (multi-source) · n=${ask.n} asks · /hardware`}>{fmtUsd(ask.med)}</span>
+            <span class="st-value" title={`income-derived model output — /hardware's own figure, recomputed on each daily data refresh`}>{fmtUsd(iv.base)}</span>
             <span class="st-unit">USD/unit</span>
-            <span class="st-meta">posted ask median · n={ask.n} asks · as of {hw.as_of}</span>
+            <span class="st-meta">income-derived · sensitivity {fmtK(iv.lo)}–{fmtK(iv.hi)} · curve to {iv.curveTo}</span>
+            <span class="st-mi">Model output — not a transacted price</span>
           </>
         ) : <span class="st-value">—</span>}
       </div>
     </div>
     <p class="band-note">
       Four lanes, one chip, never blended: a guaranteed hourly ask, an implied
-      committed level, a revocable-occupancy ask, and a per-unit hardware ask.
+      committed level, a revocable-occupancy ask, and an income-derived
+      model value per unit. The posted and executed secondary-market record
+      sits in the hardware panel below.
     </p>
 
     <!-- Surface modules -->
@@ -322,8 +346,7 @@ const datasetLd = JSON.stringify({
               )}
             </svg>
             <figcaption class="mod-chrome">
-              implied off the OD anchor · within-provider spreads ·
-              {tenorPts.map((p) => ` ${p.term} n=${p.n}`).join(' ·')} · hollow = provisional
+              implied off the OD anchor · within-provider spreads · hollow = provisional
             </figcaption>
           </figure>
         ) : <p class="mod-chrome">No committed tenors published for this chip.</p>}
@@ -349,10 +372,19 @@ const datasetLd = JSON.stringify({
               executed sales, 3-mo rolling median · {hwWindow} · as of {hw.as_of}
             </figcaption>
           </figure>
-        ) : <p class="mod-chrome">No executed record charted for this model.</p>}
-        <p class="mod-line">
-          Executed sale prices for the {def.hwLabel} unit{t90?.med != null && <> — trailing-90-day executed median {fmtUsd(t90.med)} (n={t90.n})</>}{ask?.med != null && <>; current posted ask median {fmtUsd(ask.med)} (n={ask.n})</>}. Asks and executed prints stay in separate lanes.
-        </p>
+        ) : <p class="mod-chrome">No posted or executed secondary-market record for this model yet.</p>}
+        {hwModel ? (
+          <p class="mod-line">
+            The observed record for the {def.hwLabel} unit{t90?.med != null && <> — trailing-90-day executed median {fmtUsd(t90.med)}</>}{ask?.med != null && <>; current posted ask median {fmtUsd(ask.med)}</>}. Asks and executed prints stay in separate lanes, and neither is the model-implied headline above.
+          </p>
+        ) : (
+          <p class="mod-line">
+            No posted secondary-market asks are on the record yet for the
+            {' '}{def.hwLabel} unit. The headline above is /hardware's
+            income-derived model output — modeled only, not triangulated
+            against an ask or executed lane.
+          </p>
+        )}
       </section>
     </div>
 
@@ -386,13 +418,6 @@ const datasetLd = JSON.stringify({
       letter-spacing: var(--tracking-eye);
       color: var(--ink-dim);
       margin: 0 0 4px;
-    }
-    .id-counts {
-      font-family: var(--font-mono);
-      font-size: calc(var(--fs-xs) - 1px);
-      color: var(--ink-faint);
-      letter-spacing: 0.04em;
-      margin: 0 0 10px;
     }
 
     /* Stat band */
