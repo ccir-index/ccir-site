@@ -135,6 +135,7 @@ function cellTitle(c: Rate): string {
         </div>
       </details>
     </div>
+    <a class="chip-pointer" href="/chip/h100">H100 instrument page · pilot →</a>
 
     {intLadder.length > 0 && (
       <div class="table-wrap int-wrap">
@@ -194,6 +195,15 @@ function cellTitle(c: Rate): string {
        continuation of the first — space it so the two read as a pair without
        merging into one block. */
     .int-wrap { margin-top: 28px; }
+    .chip-pointer {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      color: var(--link);
+    }
     table.ladder-table { width: 100%; border-collapse: collapse; }
     table.ladder-table th.chip-col { text-align: left; width: 30%; }
     table.ladder-table th.tier-col { text-align: center; padding: 10px 18px; }
