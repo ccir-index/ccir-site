@@ -141,10 +141,14 @@ const articleLd = article
   <script is:inline>
     (function () {
       try {
-        var t = localStorage.getItem('ccir-theme');
+        // Key versioned at the 2026-08 redesign: pre-redesign 'ccir-theme'
+        // preferences (old editorial navy) are dropped so every returning
+        // visitor gets one fresh terminal landing; toggles persist via v2.
+        var t = localStorage.getItem('ccir-theme-v2');
         if (t === 'editorial' || t === 'terminal') {
           document.documentElement.setAttribute('data-theme', t);
         }
+        localStorage.removeItem('ccir-theme');
         // The design is decided (F·DUO baked in); clear stale keys from the
         // retired dev-only variant rounds.
         localStorage.removeItem('ccir-variant');
