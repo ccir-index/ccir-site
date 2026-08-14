@@ -1056,7 +1056,9 @@ const NBIS_JULY = {
     }
     .tail-details[open] > summary h2::before { content: "BE "; }
     .fig-read {
-      font-size: var(--fs-s);
+      /* was --fs-s, which does not exist; it silently inherited ~15px instead
+         of rendering small. Same typo previously found in the-nearer-frontier. */
+      font-size: var(--fs-sm);
       color: var(--ink-dim);
       margin: 8px 0 2px;
       max-width: 72ch;
@@ -1064,7 +1066,7 @@ const NBIS_JULY = {
     .gtable-wrap { overflow-x: auto; margin: 14px 0 22px; }
     .gtable {
       border-collapse: collapse; width: 100%; min-width: 540px;
-      font-size: var(--fs-s); font-variant-numeric: tabular-nums;
+      font-size: var(--fs-sm); font-variant-numeric: tabular-nums;
     }
     .gtable th, .gtable td {
       text-align: left; padding: 7px 12px 7px 0;
