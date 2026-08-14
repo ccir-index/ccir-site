@@ -1,11 +1,11 @@
 {
-  "as_of_date": "2026-08-13",
-  "published_at_ct": "2026-08-13T02:43:23-05:00",
-  "published_at_utc": "2026-08-13T07:43:23+00:00",
-  "run_id": "export-20260813T074247Z-a4b5079a",
+  "as_of_date": "2026-08-14",
+  "published_at_ct": "2026-08-14T02:37:25-05:00",
+  "published_at_utc": "2026-08-14T07:37:25+00:00",
+  "run_id": "export-20260814T073700Z-b23f29c4",
   "methodology_version": "v2.2.1",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
-  "contributing_today": 68,
+  "contributing_today": 67,
   "listings_history": {
     "chips": [
       "h100-sxm-80gb",
@@ -19,10 +19,10 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 48918,
+    "total_rows": 50253,
     "window_days": 90,
-    "window_end": "2026-08-13",
-    "window_start": "2026-05-16"
+    "window_end": "2026-08-14",
+    "window_start": "2026-05-17"
   },
   "marketplace_history": {
     "chips": [
@@ -43,57 +43,13 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 1288,
+    "total_rows": 1130,
     "window_days": 7,
-    "window_end": "2026-08-13",
-    "window_start": "2026-08-07"
+    "window_end": "2026-08-14",
+    "window_start": "2026-08-08"
   },
-  "vast": {
-    "chips_observed": [
-      "A100 PCIE",
-      "A100 SXM4",
-      "B200",
-      "H100 SXM",
-      "H200",
-      "L40",
-      "L40S",
-      "RTX 3090",
-      "RTX 4090",
-      "RTX 5090",
-      "RTX 6000Ada",
-      "RTX A6000"
-    ],
-    "latest_collected_at_utc": "2026-08-14 01:20:59.950642+00:00",
-    "n_chips": 12,
-    "n_offers_latest_cycle": 979,
-    "status": "ok",
-    "summary_file": "vast_summary.csv",
-    "window_days": 30,
-    "window_end": "2026-08-13",
-    "window_start": "2026-07-15"
-  },
-  "availability": {
-    "chips_observed": [
-      "a100-pcie-80gb",
-      "a100-sxm-80gb",
-      "b300",
-      "gh200",
-      "h100-pcie",
-      "h100-sxm",
-      "h200-sxm",
-      "l40s",
-      "rtx-pro-6000"
-    ],
-    "latest_collected_at_utc": "2026-08-14 01:22:58.464338+00:00",
-    "n_available_latest_cycle": 50,
-    "n_chips": 9,
-    "n_sku_regions_latest_cycle": 304,
-    "status": "ok",
-    "summary_file": "shadeform_summary.csv",
-    "window_days": 30,
-    "window_end": "2026-08-13",
-    "window_start": "2026-07-15"
-  },
+  "vast": null,
+  "availability": null,
   "utilization": {
     "chips": [
       "h100-sxm",
@@ -115,7 +71,7 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 323,
+    "occupancy_cycles": 327,
     "occupancy_series_start": "2026-05-13",
     "runpod_occupancy_chips": [],
     "runpod_occupancy_cycles": 0,
@@ -134,18 +90,18 @@
     "basket_version": "b1",
     "latest_input_usd_per_mtok": "0.31980000",
     "latest_output_usd_per_mtok": "1.07400000",
-    "models_tracked": 165,
+    "models_tracked": 166,
     "models_tracked_basis": {
       "definition": "distinct canonical_model_id across the published panel (n>=3 providers) and the latest day of the first-party posted-price series",
-      "frontier_as_of": "2026-08-13",
-      "frontier_latest_day": 134,
+      "frontier_as_of": "2026-08-14",
+      "frontier_latest_day": 135,
       "in_both_lanes": 22,
       "panel_n3_gate": 53,
       "roster_file": "token_models_tracked.csv"
     },
-    "n_days": 42,
+    "n_days": 43,
     "n_models_published": 53,
-    "series_end": "2026-08-13",
+    "series_end": "2026-08-14",
     "series_id": "CCIR-TOKEN-B1",
     "series_start": "2026-07-03",
     "status": "ok"
