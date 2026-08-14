@@ -870,7 +870,15 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       margin: -4px 0 10px;
     }
 
-    .top {
+    /* Chart palette. Scoped to .wrap (the page's six content sections), NOT
+       to .top — no element on this page carries a standalone `top` class.
+       The container is `page-top`, which a `.top` selector does not match, so
+       every --arch-* resolved to nothing: `stroke: var(--undefined)` is invalid
+       and drops the stroke, which blanked every executed line in the small
+       multiples, while `fill: var(--undefined)` fell back to black and made the
+       panel labels near-invisible on the dark theme. Regression from the
+       redesign rename; found 2026-08-14. */
+    .wrap {
       --arch-volta: #46688f;
       --arch-v10016: #0e9888;
       --arch-ampere: #c11f57;
@@ -878,7 +886,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       --arch-hopper: #b9770a;
       --arch-other: #6e6c66;
     }
-    :global(html[data-theme='terminal']) .top {
+    :global(html[data-theme='terminal']) .wrap {
       --arch-volta: #7ea8d8;
       --arch-v10016: #4fc3c3;
       --arch-ampere: #ff4d84;
