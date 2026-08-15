@@ -309,11 +309,14 @@ a.chip-link:focus-visible {
 [data-register="editorial"] .prose {
   max-width: var(--measure-prose);
 }
-/* The standfirst reads with the prose here, not with the data chrome. */
+/* The standfirst reads with the prose here, not with the data chrome. It sets
+   at prose size (2026-08-15). At 17px against a 16px body it read as a second
+   headline, which a long deck made worse. Keep decks to two sentences. */
 [data-register="editorial"] .standfirst {
   font-family: var(--font-body);
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.65;
+  color: var(--ink-dim);
 }
 /* Mono headings stay — at editorial scale and spacing, not terminal density. */
 [data-register="editorial"] .page-head { margin-bottom: 28px; }
