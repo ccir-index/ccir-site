@@ -203,6 +203,11 @@ const NBIS_JULY = {
       </p>
     </div>
 
+    <!-- Body sits in .sec like every other research note: that is the container
+         the editorial register styles (reading size + prose measure). Indentation
+         of the enclosed markup is left as-is to keep this a structural diff. -->
+    <section class="sec">
+
     <div class="stats" role="list">
       <div class="stat" role="listitem">
         <div class="v">$2.6B</div>
@@ -294,8 +299,8 @@ const NBIS_JULY = {
       </figcaption>
     </figure>
 
-    <h2>1 · The Guidance Layer</h2>
-    <p>
+    <h2><span class="n">01</span> The Guidance Layer</h2>
+    <p class="lede-para">
       Nebius wrote that it is "reaffirming our full-year 2026 guidance
       across all metrics" and raised its year-end contracted-power
       guide from more than 4&nbsp;GW to
@@ -342,7 +347,7 @@ const NBIS_JULY = {
       floors. Guide sources and dates are in Sources &amp; method.</p>
     </div>
 
-    <h2>2 · The Cash Evidence</h2>
+    <h2><span class="n">02</span> The Cash Evidence</h2>
     <p>
       Both figures come from balance sheets on EDGAR, dated
       June&nbsp;30, 2026.
@@ -408,7 +413,7 @@ const NBIS_JULY = {
       </figcaption>
     </figure>
 
-    <h2>3 · The Contract Evidence · CoreWeave</h2>
+    <h2><span class="n">03</span> The Contract Evidence · CoreWeave</h2>
     <p>
       The August&nbsp;11 call supplied the contract side.<sup class="fnr"><a href="#fn2">2</a></sup>
       The chief financial officer cited an "approximately 25% increase across SKUs" in
@@ -432,7 +437,7 @@ const NBIS_JULY = {
       print is the September quarter.
     </p>
 
-    <h2>4 · The Contract Evidence · Nebius</h2>
+    <h2><span class="n">04</span> The Contract Evidence · Nebius</h2>
     <p>
       Nebius's second-quarter shareholder letter reports "four
       landmark deals" at "an average total
@@ -528,7 +533,7 @@ const NBIS_JULY = {
       </figcaption>
     </figure>
 
-    <h2>5 · The Scale of the Demand</h2>
+    <h2><span class="n">05</span> The Scale of the Demand</h2>
     <p>
       Nebius states the scale plainly. The strongest single line in
       the letter:
@@ -577,7 +582,7 @@ const NBIS_JULY = {
       behave as if they are right.
     </p>
 
-    <h2>6 · The Funding Split</h2>
+    <h2><span class="n">06</span> The Funding Split</h2>
     <p>
       Same demand, two opposite machines.
       The cost of the two machines shows on the income statement.
@@ -1004,6 +1009,8 @@ const NBIS_JULY = {
       </details>
     </div>
 
+    </section>
+
     <NoteFooter title="Two Order Books, Two Funding Machines" published="2026-08-12" />
   </section>
   <script is:inline id="fn-autopen">
@@ -1031,6 +1038,13 @@ const NBIS_JULY = {
       margin: 6px 0 14px;
       letter-spacing: -0.01em;
     }
+    /* Section numbering prefix, same declaration every other note uses. */
+    .sec h2 .n {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
     .top h2 {
       font-family: var(--font-display);
       font-size: var(--fs-xl);
@@ -1055,7 +1069,7 @@ const NBIS_JULY = {
       content: "B8 "; font-size: 0.8em; color: var(--ink-faint);
     }
     .tail-details[open] > summary h2::before { content: "BE "; }
-    .fig-read {
+    .top .fig-read {
       /* was --fs-s, which does not exist; it silently inherited ~15px instead
          of rendering small. Same typo previously found in the-nearer-frontier. */
       font-size: var(--fs-sm);
@@ -1084,7 +1098,7 @@ const NBIS_JULY = {
       color: var(--ink-dim); font-weight: var(--weight-strong);
       padding-top: 14px;
     }
-    .gtable-note {
+    .top .gtable-note {
       font-family: var(--font-mono); font-size: var(--fs-xs);
       color: var(--ink-faint); margin: 8px 0 0;
     }
@@ -1157,7 +1171,7 @@ const NBIS_JULY = {
       margin: 6px 0 2px; padding-left: 18px;
       display: flex; flex-direction: column; gap: 3px; max-width: 90ch;
     }
-    .fig-notes-list li {
+    .top .fig-notes-list li {
       font-family: var(--font-mono); font-size: var(--fs-xs);
       color: var(--ink-dim); line-height: 1.6;
     }
@@ -1178,7 +1192,9 @@ const NBIS_JULY = {
     .fnr a { color: var(--ink-faint); text-decoration: none; }
     .fnr a:hover { color: var(--link); }
     .fnotes { margin-top: 40px; border-top: 1px solid var(--rule); padding-top: 4px; }
-    .fnotes ol {
+    /* .top prefix keeps figure/footnote chrome ahead of the editorial-register
+       .sec p / .sec li rules, which would otherwise raise it to reading size. */
+    .top .fnotes ol {
       max-width: 80ch;
       padding-left: 20px;
       font-family: var(--font-mono);
@@ -1186,10 +1202,16 @@ const NBIS_JULY = {
       color: var(--ink-dim);
       line-height: 1.6;
     }
-    .fnotes li { margin-bottom: 8px; }
+    .top .fnotes li {
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      line-height: 1.6;
+    }
     .fnotes li:target { color: var(--ink); }
     .metho { margin-top: 40px; border-top: 1px solid var(--rule); padding-top: 4px; }
-    .metho p {
+    .top .metho p {
       font-family: var(--font-mono); font-size: var(--fs-xs);
       color: var(--ink-dim); line-height: 1.6; max-width: 90ch;
     }

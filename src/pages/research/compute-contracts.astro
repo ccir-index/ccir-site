@@ -98,7 +98,7 @@ const msas = [
 
     <section class="sec" id="spectrum">
       <h2><span class="n">01</span> One Asset, Three Kinds of Paper</h2>
-      <p>
+      <p class="lede-para">
         The same accelerator earns under very different contracts depending on
         who is renting it and for how long. The rate cards CCIR tracks are the
         posted-ask layer of this spectrum: on-demand rates and committed asks
@@ -155,7 +155,11 @@ const msas = [
           <p>“Any amounts due under this Agreement shall not be withheld or
           offset by you against amounts due to you for any reason.”</p>
         </blockquote>
-        <figcaption>Source: <a href={EDGAR.tos} rel="noopener" target="_blank">docs.coreweave.com</a>, retrieved {DATED}.</figcaption>
+        <figcaption>
+          <details class="capnote"><summary>Basis</summary>
+            <span>Source: <a href={EDGAR.tos} rel="noopener" target="_blank">docs.coreweave.com</a>, retrieved {DATED}.</span>
+          </details>
+        </figcaption>
       </figure>
       <p>
         Marketplace venues sit at the same end with a different seller: on a
@@ -224,10 +228,14 @@ const msas = [
         <img src="/img/research/doc-msa-title.png" width="1100" height="760"
              alt="The first page of the CoreWeave–Microsoft Master Services Agreement as filed on EDGAR, showing the redaction legend, Microsoft Corporation as customer, and the opening definitions." loading="lazy" />
         <figcaption>
+          <details class="capnote"><summary>Basis</summary>
+            <span>
           As filed, the first page of the CoreWeave–Microsoft Master Services
           Agreement (<a href={EDGAR.msft} rel="noopener" target="_blank">Ex.
           10.23</a>). It shows the redaction legend, the counterparty, and the
           definitions the deal is built from.
+            </span>
+          </details>
         </figcaption>
       </figure>
       <p>
@@ -251,7 +259,11 @@ const msas = [
           Net 10 days less a <mark>[*]</mark>% discount on the invoiced
           amount&hellip; or&hellip; Net 60 days with <mark>[*]</mark>.</p>
         </blockquote>
-        <figcaption>Source: <a href={EDGAR.msft} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.23 to CoreWeave's Form S-1, accession 0001193125-25-044231.</figcaption>
+        <figcaption>
+          <details class="capnote"><summary>Basis</summary>
+            <span>Source: <a href={EDGAR.msft} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.23 to CoreWeave's Form S-1, accession 0001193125-25-044231.</span>
+          </details>
+        </figcaption>
       </figure>
       <p>
         Payment relief is specified mechanically. Under the Microsoft
@@ -275,7 +287,11 @@ const msas = [
           between fees paid and fees charged at CoreWeave's on-demand
           rates</strong>.”</p>
         </blockquote>
-        <figcaption>Source: <a href={EDGAR.msft} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.23. Emphasis added.</figcaption>
+        <figcaption>
+          <details class="capnote"><summary>Basis</summary>
+            <span>Source: <a href={EDGAR.msft} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.23. Emphasis added.</span>
+          </details>
+        </figcaption>
       </figure>
       <p>
         Read that limb (II) again: a committed customer who walks can be
@@ -349,17 +365,25 @@ const msas = [
           Services to its own customers, who will be considered End Users
           under the MSA.”</p>
         </blockquote>
-        <figcaption>Source: <a href={EDGAR.soluna} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.105 to Soluna Holdings' Form 10-Q, accession 0001493152-24-032123.</figcaption>
+        <figcaption>
+          <details class="capnote"><summary>Basis</summary>
+            <span>Source: <a href={EDGAR.soluna} rel="noopener" target="_blank">SEC EDGAR</a>, Ex. 10.105 to Soluna Holdings' Form 10-Q, accession 0001493152-24-032123.</span>
+          </details>
+        </figcaption>
       </figure>
       <figure class="photo doc-shot">
         <img src="/img/research/doc-soluna-pricing.png" width="1100" height="560"
              alt="The pricing schedule from the Soluna–HPE statement of work as filed: GPU as-a-Service, NVIDIA H100 SXM, priced per GPU-hour over a 36-month term, with rates redacted and the upfront payment shown." loading="lazy" />
         <figcaption>
+          <details class="capnote"><summary>Basis</summary>
+            <span>
           As filed, the pricing schedule of the Soluna–HPE statement of work
           (<a href={EDGAR.soluna} rel="noopener" target="_blank">Ex.
           10.105</a>, §3.6). GPU-as-a-Service, unit of measure the GPU-hour,
           36-month term, rates redacted [***] with the upfront payment and
           remaining balance left in.
+            </span>
+          </details>
         </figcaption>
       </figure>
       <p>

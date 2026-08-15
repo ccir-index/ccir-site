@@ -189,12 +189,17 @@ const E_XT = [0, 1, 2, 3, 4];
       </p>
     </div>
 
+    <!-- Body sits in .sec like every other research note: that is the container
+         the editorial register styles (reading size + prose measure). Indentation
+         of the enclosed markup is left as-is to keep this a structural diff. -->
+    <section class="sec">
+
     <figure class="photo">
       <img src="/img/research/nearer-frontier/hero_starbase.jpg" alt="The Starbase sign beside Texas State Highway 4, with Starship boosters and vehicles on the horizon." loading="eager" />
       <figcaption>Starbase, Texas. Photo: Jenny Hautmann, CC&nbsp;BY-SA&nbsp;4.0, via Wikimedia Commons.</figcaption>
     </figure>
 
-    <p>
+    <p class="lede-para">
       For two decades SpaceX was known for landing boosters and
       building the world's largest satellite network. It still does
       both. Its first quarterly filing as a public company, on
@@ -328,7 +333,7 @@ const E_XT = [0, 1, 2, 3, 4];
       what it leaves SpaceX carrying.
     </p>
 
-    <h2>1 · The speed and its clock</h2>
+    <h2><span class="n">01</span> The speed and its clock</h2>
 
     <figure class="photo">
       <img src="/img/research/nearer-frontier/turbine_sgta45_mobile.jpg" alt="A trailer-mounted mobile aeroderivative gas turbine unit installed at a power plant." loading="lazy" />
@@ -434,9 +439,15 @@ const E_XT = [0, 1, 2, 3, 4];
           );
         })}
       </svg>
-      <figcaption>Today's roughly 2&nbsp;GW is mostly the temporary
+      <figcaption>
+        <details class="capnote"><summary>Basis</summary>
+          <span>
+Today's roughly 2&nbsp;GW is mostly the temporary
       fleet, which is why it does not carry into the blue band. Sources
-      and the arithmetic behind both bands are below.</figcaption>
+      and the arithmetic behind both bands are below.
+          </span>
+        </details>
+      </figcaption>
       <details class="deriv">
         <summary>Derivation: how the 2.6–3.6 GW and the 13–16 GW are built</summary>
         <table class="ledger">
@@ -511,7 +522,7 @@ const E_XT = [0, 1, 2, 3, 4];
       side can walk on ninety days' notice. Nothing here is promised
       further out than the power is.
     </p>
-    <h2>2 · What everyone else contracted</h2>
+    <h2><span class="n">02</span> What everyone else contracted</h2>
 
     <p>
       The next two quarters are guided "very similar," which implies
@@ -555,8 +566,14 @@ const E_XT = [0, 1, 2, 3, 4];
           );
         })}
       </svg>
-      <figcaption>A longer bar means better covered. The line is a year
-      of spending earned back.</figcaption>
+      <figcaption>
+        <details class="capnote"><summary>Basis</summary>
+          <span>
+A longer bar means better covered. The line is a year
+      of spending earned back.
+          </span>
+        </details>
+      </figcaption>
       <details class="deriv">
         <summary>Basis, dates and two caveats</summary>
         <p>
@@ -629,8 +646,14 @@ const E_XT = [0, 1, 2, 3, 4];
         <text x={DL} y={DH - 8} class="tick">0</text>
         <text x={dxr(12)} y={DH - 8} class="tick t-end">12×</text>
       </svg>
-      <figcaption>Read the same way as above. A hollow bar can be
-      cancelled on ninety days' notice.</figcaption>
+      <figcaption>
+        <details class="capnote"><summary>Basis</summary>
+          <span>
+Read the same way as above. A hollow bar can be
+      cancelled on ninety days' notice.
+          </span>
+        </details>
+      </figcaption>
       <details class="deriv">
         <summary>What counts as backlog, and how far it compares</summary>
         <p>
@@ -712,7 +735,7 @@ const E_XT = [0, 1, 2, 3, 4];
       back on earnings or on signed contracts. SpaceX has neither.
     </p>
 
-    <h2>3 · SpaceX is long the price of compute</h2>
+    <h2><span class="n">03</span> SpaceX is long the price of compute</h2>
     <p>
       Management's case for the ninety-day exit is payback speed. The CFO
       told the August call that new compute capital pays back in under a year:
@@ -859,6 +882,8 @@ const E_XT = [0, 1, 2, 3, 4];
       </p>
     </div>
 
+    </section>
+
     <NoteFooter title="The Nearer Frontier: SpaceX’s Turn to Selling Compute" published="2026-08-10" />
   </section>
 
@@ -877,6 +902,13 @@ const E_XT = [0, 1, 2, 3, 4];
        which every other note in /research uses. Was mono/uppercase at a
        nonexistent --fs-s token, so it silently rendered at 15px and read as
        an eyebrow label rather than a section heading. Rule kept. */
+    /* Section numbering prefix, same declaration every other note uses. */
+    .sec h2 .n {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
     .top h2 {
       font-family: var(--font-display);
       font-size: var(--fs-xl);
@@ -992,7 +1024,9 @@ const E_XT = [0, 1, 2, 3, 4];
     .deriv > summary::-webkit-details-marker { display: none; }
     .deriv > summary::before { content: '▸ '; color: var(--accent); }
     .deriv[open] > summary::before { content: '▾ '; }
-    .deriv p {
+    /* .top prefix keeps this ahead of the editorial-register `.sec p` rule,
+       which would otherwise raise figure chrome to reading size. */
+    .top .deriv p {
       font-family: var(--font-mono); font-size: var(--fs-xs);
       color: var(--ink-dim); line-height: 1.55; margin: 6px 0 0; max-width: 90ch;
     }

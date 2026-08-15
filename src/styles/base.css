@@ -282,6 +282,12 @@ a.chip-link:focus-visible {
 }
 /* Prose at reading size. */
 [data-register="editorial"] :is(.sec, .gloss, .log) :is(p, li, dd),
+/* Some notes hang prose straight off the page wrapper with no .sec (2026-08-15:
+   the-nearer-frontier, two-order-books). Without this they fell back to the
+   12px terminal base AND to no measure, so they read small and ran the full
+   1200px while every other note sat at 66ch. */
+[data-register="editorial"] .wrap.top > :is(p, ul, ol),
+[data-register="editorial"] .wrap.top > :is(ul, ol) li,
 [data-register="editorial"] .entry-body,
 [data-register="editorial"] .prose {
   font-family: var(--font-body);
@@ -289,6 +295,7 @@ a.chip-link:focus-visible {
   line-height: 1.7;
 }
 [data-register="editorial"] :is(.sec, .gloss) :is(p, dd),
+[data-register="editorial"] .wrap.top > :is(p, ul, ol),
 [data-register="editorial"] .entry-body,
 [data-register="editorial"] .prose {
   max-width: var(--measure-prose);
@@ -310,6 +317,26 @@ a.chip-link:focus-visible {
    class rather than auto-applied to the first paragraph of every section:
    note structures vary and an automatic selector lands it on the wrong
    paragraph somewhere. Add .lede-para to the first paragraph of a note. */
+/* Figure basis, collapsed on arrival (2026-08-15). One click away for a reader
+   checking a number, out of the way for one who is not. Lives here rather than
+   in each note's scoped style so every <figcaption> can carry the same chrome;
+   notes that already declare it scoped keep their own copy, which wins. */
+.capnote > summary {
+  cursor: pointer;
+  list-style: none;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.capnote > summary::-webkit-details-marker { display: none; }
+.capnote > summary::after { content: " +"; }
+.capnote[open] > summary::after { content: " \2212"; }
+.capnote > summary:hover { color: var(--link); }
+.capnote > span { display: block; margin-top: 7px; }
+
 .lede-para::first-letter {
   float: left;
   font-size: 3.1em;

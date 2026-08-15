@@ -86,7 +86,7 @@ const wattTable = [
 
     <section class="sec">
       <h2><span class="n">01</span> What This Measures — and What It Doesn't</h2>
-      <p>
+      <p class="lede-para">
         This is the <strong>income leg only</strong>: what a chip earns per
         hour, by generation, across operator segments. It is not a residual
         value. Resale-market evidence (American Compute's
@@ -180,10 +180,14 @@ const wattTable = [
           <span class="lg"><span class="dotk dk-hollow"></span>hollow = workstation-class, outside the fit</span>
         </div>
         <figcaption class="tfoot">
+          <details class="capnote"><summary>Basis</summary>
+            <span>
           Neocloud guaranteed on-demand, $/GPU-hr on a log scale, against
           generation age. Headline stat per the published rule (mean where
           n≥10, else median). Single-date cross-section ({AS_OF}) — the
           fitted line is not a traced price history.
+            </span>
+          </details>
         </figcaption>
       </figure>
       <div class="twrap">

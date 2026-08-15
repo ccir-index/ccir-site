@@ -211,6 +211,8 @@ const fitLines = CHIPS.map((c) => {
         <span class="lg">solid = 3-month rolling median · faint steps = the raw monthly repricing path</span>
       </div>
       <figcaption class="tfoot">
+        <details class="capnote"><summary>Basis</summary>
+          <span>
         Posted panel-median guaranteed on-demand rate, $/GPU-hr, monthly, log
         scale, Oct 2017 – Apr 2026 (the archive's edge — one uniform right
         edge for every generation; the live CCIR panel continues from there).
@@ -219,12 +221,14 @@ const fitLines = CHIPS.map((c) => {
         monthly medians, drawn as the faint steps). Step-function repair:
         posted prices carry forward ≤6 months between captures. Shaded bands
         are the two demand episodes described in §02.
+          </span>
+        </details>
       </figcaption>
     </figure>
 
     <section class="sec">
       <h2><span class="n">01</span> The Paths</h2>
-      <p>
+      <p class="lede-para">
         Fitted annual rates of change on the panel median, months with n≥3
         only (the endpoint column is a compound annual growth rate, CAGR):
       </p>
