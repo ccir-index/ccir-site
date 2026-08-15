@@ -1,0 +1,56 @@
+---
+/*
+  ReadMore — a bordered callout sitting inside the prose, pointing at the
+  live surfaces or notes that carry a claim's construction (the Economist's
+  "Read more of our coverage" box).
+
+  Research notes are dated and frozen; the surfaces they read from are not.
+  A reader who wants today's number rather than the one printed here needs a
+  route to it at the point the claim is made, not from a link buried under
+  the footer.
+
+  <ReadMore title="The construction behind this">
+    <a href="/chip-economics">Chip Economics</a> — the four lenses
+    <a href="/rates">Reference rates</a> — the daily panel
+  </ReadMore>
+
+  Links are blue, which is wayfinding: amber stays on data.
+*/
+interface Props {
+  /** Small caps eyebrow above the links. */
+  title?: string;
+}
+const { title = 'Read more' } = Astro.props;
+---
+<aside class="readmore" role="complementary">
+  <p class="rm-eye">{title}</p>
+  <div class="rm-links"><slot /></div>
+</aside>
+
+<style>
+  .readmore {
+    max-width: var(--measure-prose);
+    margin: 28px 0;
+    padding: 14px 16px 15px;
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--link);
+    background: var(--surface);
+  }
+  .rm-eye {
+    margin: 0 0 9px;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .rm-links :global(a) {
+    display: block;
+    margin: 5px 0;
+    color: var(--link);
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+  .rm-links :global(a:hover) { text-decoration: underline; }
+  .rm-links :global(span) { color: var(--ink-dim); }
+</style>

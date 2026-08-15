@@ -304,3 +304,17 @@ a.chip-link:focus-visible {
 [data-register="editorial"] .page-head h1 { margin: 10px 0 16px; }
 [data-register="editorial"] .sec-head { margin-bottom: 18px; }
 [data-register="editorial"] .sec-head h2 { margin: 6px 0 12px; }
+
+
+/* Opening-paragraph drop cap (2026-08-15, Economist convention). OPT-IN via
+   class rather than auto-applied to the first paragraph of every section:
+   note structures vary and an automatic selector lands it on the wrong
+   paragraph somewhere. Add .lede-para to the first paragraph of a note. */
+.lede-para::first-letter {
+  float: left;
+  font-size: 3.1em;
+  line-height: 0.86;
+  padding: 0.04em 0.1em 0 0;
+  color: var(--accent);
+  font-weight: 600;
+}

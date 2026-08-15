@@ -13,13 +13,16 @@ export const prerender = true;
 // headlineValue) — card and page can never disagree. Below-floor cells
 // print an em dash, exactly like the page.
 
+// Mirrors the dark ("terminal") steps in src/styles/tokens.css, so the card
+// and the page it links to are the same design. Amber carries data emphasis;
+// blue (--link) is wayfinding and has no role on a share card.
 const T = {
-  bg: '#0b0c0e', surface2: '#14181d',
-  ink: '#e8e6e1', dim: '#9a9991', faint: '#6b6a64',
-  rule: '#2a2d31', rule2: '#3b3f44',
-  accent: '#ff9100',
+  bg: '#050607', surface2: '#14181c',
+  ink: '#d7dbde', dim: '#8a9096', faint: '#5c6167',
+  rule: '#22262a', rule2: '#33383d',
+  accent: '#e8a33d',
 };
-const T2_BAND = 'rgba(255, 145, 0, 0.06)';
+const T2_BAND = 'rgba(232, 163, 61, 0.07)';
 
 const SEGMENTS: Record<string, string> = {
   T1: 'HYP', T2: 'NEO', T3: 'MKT',

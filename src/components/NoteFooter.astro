@@ -8,6 +8,24 @@
 */
 import CiteBlock from './CiteBlock.astro';
 
+/*
+  MORE RESEARCH (2026-08-15). A note used to end on three text links, which
+  is a dead end after a long read. This surfaces the three most recent other
+  notes, excluding the one being read. The registry is deliberately a plain
+  list here rather than a glob: research notes are dated objects with curated
+  blurbs, and a glob would pick up drafts that are not linked from /research.
+*/
+const RECENT = [
+  { href: '/research/the-rating-case-goes-investment-grade', date: '2026-08-13',
+    tag: 'Credit', title: 'The Rating Case Goes Investment Grade' },
+  { href: '/research/two-order-books', date: '2026-08-12',
+    tag: 'Intelligence', title: 'Two Order Books, Two Funding Machines' },
+  { href: '/research/the-nearer-frontier', date: '2026-08-10',
+    tag: 'Intelligence', title: 'The Nearer Frontier: SpaceX’s Turn to Selling Compute' },
+  { href: '/research/microsoft-build-inside-the-cloud-line', date: '2026-07-30',
+    tag: 'Credit', title: 'Five Builders, One Covered Quadrant' },
+];
+
 interface Props {
   title: string;
   /** Published date, ISO. */
@@ -17,8 +35,22 @@ interface Props {
 }
 const { title, published, updated } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '').replace(/\.html$/, '');
+const more = RECENT.filter((r) => r.href !== path).slice(0, 3);
 ---
 <footer class="note-foot">
+  {more.length > 0 && (
+    <section class="nf-more" aria-label="More research">
+      <p class="nf-more-eye">More research</p>
+      <ul>
+        {more.map((r) => (
+          <li>
+            <a href={r.href}>{r.title}</a>
+            <span class="nf-more-meta">{r.tag} · {r.date}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
   <CiteBlock what={title} path={path} date={published} kind="note" />
   <div class="nf-row">
     <span class="nf-dates">
@@ -34,6 +66,40 @@ const path = Astro.url.pathname.replace(/\/$/, '').replace(/\.html$/, '');
 
 <style>
   .note-foot { margin: 8px 0 0; max-width: 84ch; }
+
+  .nf-more {
+    margin: 34px 0 26px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    max-width: var(--measure-prose);
+  }
+  .nf-more-eye {
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .nf-more ul { list-style: none; margin: 0; padding: 0; }
+  .nf-more li {
+    padding: 9px 0;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+  .nf-more li:last-child { border-bottom: 0; }
+  .nf-more a { color: var(--link); text-decoration: none; font-size: 0.96rem; }
+  .nf-more a:hover { text-decoration: underline; }
+  .nf-more-meta {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
   .nf-row {
     display: flex;
     align-items: baseline;

@@ -20,9 +20,15 @@ const serifDir = join(process.cwd(), 'node_modules/@fontsource/ibm-plex-serif/fi
 const serif400 = readFileSync(join(serifDir, 'ibm-plex-serif-latin-400-normal.woff'));
 const serif600 = readFileSync(join(serifDir, 'ibm-plex-serif-latin-600-normal.woff'));
 
+// Mirrors the dark ("terminal") steps in src/styles/tokens.css so a share
+// card and the page it links to are the same design. Keep these in sync by
+// hand: satori cannot read CSS custom properties.
+// `navy` is the legacy key name for the accent slot and is kept so the ~39
+// card templates need no edit; the value is the site's amber, which carries
+// data emphasis. Blue (--link) is wayfinding and has no role on a card.
 export const C = {
-  bg: '#0b0c0e', surface: '#111418', head: '#16191e', rule: '#23262b', rule2: '#3a3e45',
-  ink: '#e8e6e1', dim: '#9a958c', faint: '#6b675f', navy: '#ff9100',
+  bg: '#050607', surface: '#0a0c0e', head: '#0e1114', rule: '#22262a', rule2: '#33383d',
+  ink: '#d7dbde', dim: '#8a9096', faint: '#5c6167', navy: '#e8a33d',
 };
 
 // satori consumes the React element shape at runtime; build it with plain objects

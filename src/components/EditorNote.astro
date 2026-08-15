@@ -1,0 +1,54 @@
+---
+/*
+  EditorNote — a dated, visible correction or update line inside a research
+  note (the Economist convention).
+
+  WHY THIS EXISTS. Research notes are dated and are not rewritten in place.
+  But published figures can be restated when the underlying record is
+  corrected — a parser repair replayed across history moves cells that a note
+  has already quoted. When that happens the note must say so on its face
+  rather than silently changing. This is the surface for that.
+
+  Use it ONLY for a real restatement or correction. It is not a changelog and
+  not a place for additions; a note that needs new material is a new note.
+
+  <EditorNote date="2026-08-20">
+    The neocloud H100 figures in section 02 were restated after a capture
+    correction was replayed across 1 July to 13 August. Direction and
+    conclusion are unchanged; the levels moved.
+  </EditorNote>
+*/
+interface Props {
+  /** ISO date the restatement was applied. */
+  date: string;
+  /** Optional label override; defaults to "Editor's note". */
+  label?: string;
+}
+const { date, label = "Editor’s note" } = Astro.props;
+const shown = new Date(date + 'T00:00:00Z').toLocaleDateString('en-GB', {
+  day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC',
+});
+---
+<aside class="ednote" role="note">
+  <p>
+    <strong>{label} ({shown}):</strong>
+    <slot />
+  </p>
+</aside>
+
+<style>
+  .ednote {
+    max-width: var(--measure-prose);
+    margin: 26px 0;
+    padding: 12px 0 12px 14px;
+    border-left: 2px solid var(--accent);
+  }
+  .ednote p {
+    margin: 0;
+    font-style: italic;
+    color: var(--ink-dim);
+    font-size: 0.95rem;
+    line-height: 1.62;
+  }
+  .ednote strong { font-style: normal; color: var(--accent); font-weight: 600; }
+</style>
