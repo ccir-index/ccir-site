@@ -1,13 +1,88 @@
 ---
 import Base from '../layouts/Base.astro';
 
-// Chip Economics — Phase 0 (static). Inline data from the age-curve memo's
-// verified numbers (2026-07-06 snapshot), exactly how gpu-age-curve is built.
-// Phase 2 swaps this for normalized_daily.csv per the spec
+// Chip Economics — Phase 0 (static). Every exhibit on this page is computed
+// below from ONE rate per generation and the registry denominators, so a dot,
+// a table cell, a spread and a tooltip cannot disagree with each other.
+// Phase 2 swaps RATE/NSRC for normalized_daily.csv per the spec
 // (v2/ccir-v2-notebooks/drafts/normalized_rates_spec_2026_07.md §9).
-// Lens values: $/GB-hr = rate ÷ registry hbm_capacity_gb; spreads = (max−min)/mean.
-const PRINT_DATE = '2026-07-07';
-const SNAP_DATE = '2026-07-06';
+//
+// Basis: CRI-T2-{chip}-SXM-GTD-OD-ALL — Neocloud, guaranteed, on-demand.
+// Region ALL is the only region where all five generations publish together:
+// B300 prints a US cell on a minority of days and at n=3. Form factor is SXM
+// throughout so each numerator matches its SXM nameplate denominator.
+const PRINT_DATE = '2026-08-15';
+const SNAP_DATE = '2026-08-12';
+
+const GEN_ORDER = ['B300', 'B200', 'H200', 'H100', 'A100'];
+const REGISTRY = {
+  B300: { label: 'B300',      age: 0.8, ageLab: '~0.8y', arch: 'blackwell', gb: 288, bw: 8.0,  pf: 2.25, kw: 1.3, approx: true },
+  B200: { label: 'B200',      age: 1.4, ageLab: '~1.4y', arch: 'blackwell', gb: 180, bw: 8.0,  pf: 2.25, kw: 1.0 },
+  H200: { label: 'H200',      age: 2.1, ageLab: '~2.1y', arch: 'hopper',    gb: 141, bw: 4.8,  pf: 0.99, kw: 0.7 },
+  H100: { label: 'H100 SXM',  age: 3.7, ageLab: '~3.7y', arch: 'hopper',    gb: 80,  bw: 3.35, pf: 0.99, kw: 0.7 },
+  A100: { label: 'A100 80GB', age: 5.7, ageLab: '~5.7y', arch: 'ampere',    gb: 80,  bw: 2.0,  pf: 0.31, kw: 0.4 },
+};
+const RATE = { B300: 7.8500, B200: 6.4000, H200: 4.5000, H100: 3.8900, A100: 2.0840 };
+const NSRC = { B300: 9,      B200: 8,      H200: 14,     H100: 21,     A100: 11 };
+
+// y scales: two anchor ticks per lens, unchanged from first print so the
+// exhibits stay comparable across refreshes. x is generation age.
+const LENSES = [
+  { key: 'gb', name: 'Capacity',  unit: '$ / GB-hr',    y0: [0.02, 98.4], y1: [0.04, 30.9], dp: 4,
+    ticks: [[0.02, '.02'], [0.04, '.04']], labels: true,
+    kick: ['what the chip can hold', 'the size of model and context it can host'],
+    aria: 'dollars per gigabyte of HBM per hour' },
+  { key: 'bw', name: 'Bandwidth', unit: '$ / TB/s-hr',  y0: [0.50, 93.6], y1: [1.00, 21.2], dp: 3,
+    ticks: [[0.50, '.50'], [1.00, '1.00']], band: true,
+    kick: ['how fast it moves data', 'the dimension inference workloads buy'],
+    aria: 'dollars per terabyte-per-second of memory bandwidth per hour' },
+  { key: 'pf', name: 'Compute',   unit: '$ / PFLOP-hr', y0: [2, 119.2],   y1: [6, 25.7],    dp: 2,
+    ticks: [[2, '$2'], [4, '$4'], [6, '$6']],
+    kick: ['how fast it does arithmetic', 'training speed'],
+    aria: 'dollars per dense BF16 petaflop per hour' },
+  { key: 'kw', name: 'Power',     unit: '$ / kW-hr',    y0: [2, 125.5],   y1: [6, 44.4],    dp: 2,
+    ticks: [[2, '$2'], [4, '$4'], [6, '$6']],
+    kick: ['what it costs to keep lit', 'rent per watt against facility cost per watt'],
+    aria: 'dollars per kilowatt of TDP per hour' },
+];
+const X = (age) => +(36 + (221.8 - 36) / 6 * age).toFixed(1);
+const yFor = (lens, v) =>
+  +(lens.y0[1] + (v - lens.y0[0]) * (lens.y1[1] - lens.y0[1]) / (lens.y1[0] - lens.y0[0])).toFixed(1);
+
+const VAL = {};   // VAL[lensKey][gen] = number
+const STAT = {};  // STAT[lensKey] = { min, max, mean, spread }
+for (const lens of LENSES) {
+  VAL[lens.key] = {};
+  for (const g of GEN_ORDER) VAL[lens.key][g] = RATE[g] / REGISTRY[g][lens.key];
+  const vs = GEN_ORDER.map((g) => VAL[lens.key][g]);
+  const min = Math.min(...vs), max = Math.max(...vs);
+  const mean = vs.reduce((a, b) => a + b, 0) / vs.length;
+  STAT[lens.key] = { min, max, mean, spread: 100 * (max - min) / mean };
+}
+const fmt = (lens, g) => VAL[lens.key][g].toFixed(lens.dp);
+const pc = (k) => Math.round(STAT[k].spread);
+// label side per generation on the capacity panel (only panel carrying labels)
+const LABSIDE = { B300: 'below', B200: 'below', H200: 'right', H100: 'below', A100: 'left' };
+
+// §02 band, on the bandwidth lens
+const BAND = STAT.bw;
+// How often each lens is the tightest, over the recorded window (46 complete
+// days, 1 Jul – 15 Aug 2026; scratch/backfill_bandwidth_parity_20260815.py).
+// POWER now leads BANDWIDTH on this basis. Both compress the cross-section by
+// roughly two thirds; capacity and compute never come close to either. The
+// page reports the pair rather than crowning one.
+const BW_TIGHTEST_DAYS = 15, KW_TIGHTEST_DAYS = 31, BAND_DAYS = 46;
+// Recorded band, one row per complete day: [date, min, max, mean] on the
+// basis above. Composition seams (panel additions) are marked, not smoothed.
+const BAND_HISTORY = [['2026-07-01',0.8636,1.0545,0.9419],['2026-07-02',0.8650,1.0641,0.9615],['2026-07-03',0.8647,1.0592,0.9483],['2026-07-04',0.8650,1.0439,0.9471],['2026-07-05',0.8650,1.0443,0.9526],['2026-07-06',0.8650,1.0644,0.9566],['2026-07-07',0.8650,1.0622,0.9543],['2026-07-08',0.8363,1.0804,0.9672],['2026-07-09',0.8363,1.0642,0.9626],['2026-07-10',0.8363,1.0629,0.9401],['2026-07-11',0.8363,1.0313,0.9424],['2026-07-12',0.8363,1.0511,0.9488],['2026-07-13',0.8363,1.0245,0.9410],['2026-07-14',0.8363,1.1024,0.9769],['2026-07-15',0.7638,1.0912,0.9397],['2026-07-16',0.7638,1.0739,0.9300],['2026-07-17',0.7638,1.0721,0.9155],['2026-07-18',0.7638,1.0782,0.9217],['2026-07-19',0.7638,1.0855,0.9232],['2026-07-20',0.8000,1.0891,0.9311],['2026-07-21',0.8000,1.0868,0.9409],['2026-07-22',0.8000,1.0867,0.9268],['2026-07-23',0.8363,1.0885,0.9651],['2026-07-24',0.8363,1.0899,0.9549],['2026-07-25',0.8363,1.0884,0.9579],['2026-07-26',0.8000,1.0767,0.9440],['2026-07-27',0.8000,1.0741,0.9442],['2026-07-28',0.8000,1.0972,0.9518],['2026-07-29',0.8000,1.1394,0.9651],['2026-07-30',0.8000,1.0915,0.9555],['2026-07-31',0.8000,1.0761,0.9389],['2026-08-01',0.8363,1.0982,0.9506],['2026-08-02',0.8363,1.1143,0.9662],['2026-08-03',0.8363,1.0951,0.9522],['2026-08-04',0.8363,1.1005,0.9742],['2026-08-05',0.8363,1.0951,0.9694],['2026-08-06',0.8363,1.1074,0.9763],['2026-08-07',0.8363,1.1072,0.9671],['2026-08-08',0.8363,1.1071,0.9665],['2026-08-09',0.8363,1.1035,0.9759],['2026-08-10',0.8363,1.1176,0.9686],['2026-08-11',0.8000,1.1313,0.9641],['2026-08-12',0.8000,1.1613,0.9844],['2026-08-13',0.8000,1.1481,0.9803],['2026-08-14',0.8000,1.1249,0.9760],['2026-08-15',0.8000,1.1647,0.9840]];
+const SEAM_DATES = ['2026-07-15', '2026-08-13'];
+const bandSpread = (r) => 100 * (r[2] - r[1]) / r[3];
+const FIRST = BAND_HISTORY[0], LAST_CLEAN = BAND_HISTORY.find((r) => r[0] === SNAP_DATE);
+// §02 zoomed chart: axis padded around the recorded extremes, ticks at 0.10
+const ZMIN = 0.75, ZMAX = 1.10, ZY0 = 250, ZY1 = 37.3;
+const yb = (v) => +(ZY0 + (v - ZMIN) * (ZY1 - ZY0) / (ZMAX - ZMIN)).toFixed(1);
+const xb = (age) => +(46 + (524.1 - 46) / 6 * age).toFixed(1);
+const ZTICKS = [0.80, 0.90, 1.00, 1.10];
 ---
 <Base
   title="Chip Economics · CCIR"
@@ -44,120 +119,51 @@ const SNAP_DATE = '2026-07-06';
       <div class="heromult" id="heromult">
         <div class="lens-grid">
 
-          <!-- Panel 1: Capacity $/GB-hr -->
-          <div class="lens-panel">
-            <header class="lp-head">
-              <div class="lp-row">
-                <span class="lp-name">Capacity</span>
-                <span class="lp-unit">$ / GB-hr</span>
-                <span class="lp-spread">spread 56%</span>
-              </div>
-              <p class="lp-kick">what the chip can hold — <span class="kx">the size of model and context it can host</span></p>
-            </header>
-            <svg viewBox="0 0 240 210" role="img" aria-label="Capacity lens: dollars per gigabyte of HBM per hour against generation age. Values scatter from 0.0225 to 0.0403; cross-generation spread 56 percent.">
-              <line x1="36" x2="228" y1="98.4" y2="98.4" class="grid"/>
-              <line x1="36" x2="228" y1="30.9" y2="30.9" class="grid"/>
-              <text x="32" y="101.4" class="tick" text-anchor="end">.02</text>
-              <text x="32" y="33.9" class="tick" text-anchor="end">.04</text>
-              <line x1="36" x2="228" y1="166" y2="166" class="axisln"/>
-              <text x="36" y="180" class="tick" text-anchor="middle">0y</text>
-              <text x="128.9" y="180" class="tick" text-anchor="middle">3y</text>
-              <text x="221.8" y="180" class="tick" text-anchor="middle">6y</text>
-              <g class="gdot g-B300"><circle class="hit" cx="60.8" cy="73.8" r="13" tabindex="0" data-gen="B300" aria-label="B300, capacity lens, 2.7 cents per GB-hour"/><circle class="pt pt-blackwell" cx="60.8" cy="73.8" r="4.5"/><text x="60.8" y="87.8" class="ptlab lab-blackwell" text-anchor="middle">B300</text></g>
-              <g class="gdot g-B200"><circle class="hit" cx="79.4" cy="36.3" r="13" tabindex="0" data-gen="B200" aria-label="B200, capacity lens, 3.8 cents per GB-hour"/><circle class="pt pt-blackwell" cx="79.4" cy="36.3" r="4.5"/><text x="79.4" y="28.3" class="ptlab lab-blackwell" text-anchor="middle">B200</text></g>
-              <g class="gdot g-H200"><circle class="hit" cx="101" cy="66" r="13" tabindex="0" data-gen="H200" aria-label="H200, capacity lens, 3.0 cents per GB-hour"/><circle class="pt pt-hopper" cx="101" cy="66" r="4.5"/><text x="109" y="69" class="ptlab lab-hopper" text-anchor="start">H200</text></g>
-              <g class="gdot g-H100"><circle class="hit" cx="150.6" cy="29.9" r="13" tabindex="0" data-gen="H100" aria-label="H100, capacity lens, 4.0 cents per GB-hour"/><circle class="pt pt-hopper" cx="150.6" cy="29.9" r="4.5"/><text x="150.6" y="22" class="ptlab lab-hopper" text-anchor="middle">H100</text></g>
-              <g class="gdot g-A100"><circle class="hit" cx="212.5" cy="90" r="13" tabindex="0" data-gen="A100" aria-label="A100, capacity lens, 2.25 cents per GB-hour"/><circle class="pt pt-ampere" cx="212.5" cy="90" r="4.5"/><text x="204.5" y="93" class="ptlab lab-ampere" text-anchor="end">A100</text></g>
-            </svg>
-          </div>
-
-          <!-- Panel 2: Bandwidth $/TB/s-hr — the flat one -->
-          <div class="lens-panel lp-flat">
-            <header class="lp-head">
-              <div class="lp-row">
-                <span class="lp-name">Bandwidth</span>
-                <span class="lp-unit">$ / TB/s-hr</span>
-                <span class="lp-spread">spread 12%</span>
-              </div>
-              <p class="lp-kick">how fast it moves data — <span class="kx">the dimension inference workloads buy</span></p>
-            </header>
-            <svg viewBox="0 0 240 210" role="img" aria-label="Bandwidth lens: dollars per terabyte-per-second of memory bandwidth per hour against generation age. All five generations sit inside a narrow band from 0.87 to 0.98; cross-generation spread 12 percent.">
-              <rect x="36" y="24.1" width="192" height="16" class="bandfill"/>
-              <line x1="36" x2="228" y1="32.8" y2="32.8" class="bandmean"/>
-              <line x1="36" x2="228" y1="93.6" y2="93.6" class="grid"/>
-              <line x1="36" x2="228" y1="21.2" y2="21.2" class="grid"/>
-              <text x="32" y="96.6" class="tick" text-anchor="end">.50</text>
-              <text x="32" y="24.2" class="tick" text-anchor="end">1.00</text>
-              <line x1="36" x2="228" y1="166" y2="166" class="axisln"/>
-              <text x="36" y="180" class="tick" text-anchor="middle">0y</text>
-              <text x="128.9" y="180" class="tick" text-anchor="middle">3y</text>
-              <text x="221.8" y="180" class="tick" text-anchor="middle">6y</text>
-              <g class="gdot g-B300"><circle class="hit" cx="60.8" cy="24.1" r="13" tabindex="0" data-gen="B300" aria-label="B300, bandwidth lens, 98 cents per TB/s-hour"/><circle class="pt pt-blackwell" cx="60.8" cy="24.1" r="4.5"/></g>
-              <g class="gdot g-B200"><circle class="hit" cx="79.4" cy="40.1" r="13" tabindex="0" data-gen="B200" aria-label="B200, bandwidth lens, 87 cents per TB/s-hour"/><circle class="pt pt-blackwell" cx="79.4" cy="40.1" r="4.5"/></g>
-              <g class="gdot g-H200"><circle class="hit" cx="101" cy="40.1" r="13" tabindex="0" data-gen="H200" aria-label="H200, bandwidth lens, 87 cents per TB/s-hour"/><circle class="pt pt-hopper" cx="101" cy="40.1" r="4.5"/></g>
-              <g class="gdot g-H100"><circle class="hit" cx="150.6" cy="27" r="13" tabindex="0" data-gen="H100" aria-label="H100, bandwidth lens, 96 cents per TB/s-hour"/><circle class="pt pt-hopper" cx="150.6" cy="27" r="4.5"/></g>
-              <g class="gdot g-A100"><circle class="hit" cx="212.5" cy="35.7" r="13" tabindex="0" data-gen="A100" aria-label="A100, bandwidth lens, 90 cents per TB/s-hour"/><circle class="pt pt-ampere" cx="212.5" cy="35.7" r="4.5"/></g>
-            </svg>
-            <div class="lp-foot">flattest cross-section — see §02</div>
-          </div>
-
-          <!-- Panel 3: Compute $/PFLOP-hr -->
-          <div class="lens-panel">
-            <header class="lp-head">
-              <div class="lp-row">
-                <span class="lp-name">Compute</span>
-                <span class="lp-unit">$ / PFLOP-hr</span>
-                <span class="lp-spread">spread 68%</span>
-              </div>
-              <p class="lp-kick">how fast it does arithmetic — <span class="kx">training speed</span></p>
-            </header>
-            <svg viewBox="0 0 240 210" role="img" aria-label="Compute lens: dollars per dense BF16 petaflop per hour against generation age. Values fan out from 3.1 to 5.8, rising with age; cross-generation spread 68 percent.">
-              <line x1="36" x2="228" y1="119.2" y2="119.2" class="grid"/>
-              <line x1="36" x2="228" y1="72.5" y2="72.5" class="grid"/>
-              <line x1="36" x2="228" y1="25.7" y2="25.7" class="grid"/>
-              <text x="32" y="122.2" class="tick" text-anchor="end">$2</text>
-              <text x="32" y="75.5" class="tick" text-anchor="end">$4</text>
-              <text x="32" y="28.7" class="tick" text-anchor="end">$6</text>
-              <line x1="36" x2="228" y1="166" y2="166" class="axisln"/>
-              <text x="36" y="180" class="tick" text-anchor="middle">0y</text>
-              <text x="128.9" y="180" class="tick" text-anchor="middle">3y</text>
-              <text x="221.8" y="180" class="tick" text-anchor="middle">6y</text>
-              <g class="gdot g-B300"><circle class="hit" cx="60.8" cy="84.2" r="13" tabindex="0" data-gen="B300" aria-label="B300, compute lens, about 3.5 dollars per PFLOP-hour"/><circle class="pt pt-blackwell" cx="60.8" cy="84.2" r="4.5"/></g>
-              <g class="gdot g-B200"><circle class="hit" cx="79.4" cy="93.5" r="13" tabindex="0" data-gen="B200" aria-label="B200, compute lens, 3.1 dollars per PFLOP-hour"/><circle class="pt pt-blackwell" cx="79.4" cy="93.5" r="4.5"/></g>
-              <g class="gdot g-H200"><circle class="hit" cx="101" cy="67.8" r="13" tabindex="0" data-gen="H200" aria-label="H200, compute lens, 4.2 dollars per PFLOP-hour"/><circle class="pt pt-hopper" cx="101" cy="67.8" r="4.5"/></g>
-              <g class="gdot g-H100"><circle class="hit" cx="150.6" cy="88.8" r="13" tabindex="0" data-gen="H100" aria-label="H100, compute lens, 3.3 dollars per PFLOP-hour"/><circle class="pt pt-hopper" cx="150.6" cy="88.8" r="4.5"/></g>
-              <g class="gdot g-A100"><circle class="hit" cx="212.5" cy="30.4" r="13" tabindex="0" data-gen="A100" aria-label="A100, compute lens, 5.8 dollars per PFLOP-hour"/><circle class="pt pt-ampere" cx="212.5" cy="30.4" r="4.5"/></g>
-            </svg>
-          </div>
-
-          <!-- Panel 4: Power $/kW-hr -->
-          <div class="lens-panel">
-            <header class="lp-head">
-              <div class="lp-row">
-                <span class="lp-name">Power</span>
-                <span class="lp-unit">$ / kW-hr</span>
-                <span class="lp-spread">spread 43%</span>
-              </div>
-              <p class="lp-kick">what it costs to keep lit — <span class="kx">rent per watt against facility cost per watt</span></p>
-            </header>
-            <svg viewBox="0 0 240 210" role="img" aria-label="Power lens: dollars per kilowatt of TDP per hour against generation age. Values sort into two levels, 4.50 to 4.60 and 5.97 to 6.92; cross-generation spread 43 percent.">
-              <line x1="36" x2="228" y1="125.5" y2="125.5" class="grid"/>
-              <line x1="36" x2="228" y1="84.9" y2="84.9" class="grid"/>
-              <line x1="36" x2="228" y1="44.4" y2="44.4" class="grid"/>
-              <text x="32" y="128.5" class="tick" text-anchor="end">$2</text>
-              <text x="32" y="87.9" class="tick" text-anchor="end">$4</text>
-              <text x="32" y="47.4" class="tick" text-anchor="end">$6</text>
-              <line x1="36" x2="228" y1="166" y2="166" class="axisln"/>
-              <text x="36" y="180" class="tick" text-anchor="middle">0y</text>
-              <text x="128.9" y="180" class="tick" text-anchor="middle">3y</text>
-              <text x="221.8" y="180" class="tick" text-anchor="middle">6y</text>
-              <g class="gdot g-B300"><circle class="hit" cx="60.8" cy="44.4" r="13" tabindex="0" data-gen="B300" aria-label="B300, power lens, about 6 dollars per kilowatt-hour of TDP"/><circle class="pt pt-blackwell" cx="60.8" cy="44.4" r="4.5"/></g>
-              <g class="gdot g-B200"><circle class="hit" cx="79.4" cy="25.8" r="13" tabindex="0" data-gen="B200" aria-label="B200, power lens, 6.92 dollars per kilowatt-hour of TDP"/><circle class="pt pt-blackwell" cx="79.4" cy="25.8" r="4.5"/></g>
-              <g class="gdot g-H200"><circle class="hit" cx="101" cy="45" r="13" tabindex="0" data-gen="H200" aria-label="H200, power lens, 5.97 dollars per kilowatt-hour of TDP"/><circle class="pt pt-hopper" cx="101" cy="45" r="4.5"/></g>
-              <g class="gdot g-H100"><circle class="hit" cx="150.6" cy="72.8" r="13" tabindex="0" data-gen="H100" aria-label="H100, power lens, 4.60 dollars per kilowatt-hour of TDP"/><circle class="pt pt-hopper" cx="150.6" cy="72.8" r="4.5"/></g>
-              <g class="gdot g-A100"><circle class="hit" cx="212.5" cy="74.8" r="13" tabindex="0" data-gen="A100" aria-label="A100, power lens, 4.50 dollars per kilowatt-hour of TDP"/><circle class="pt pt-ampere" cx="212.5" cy="74.8" r="4.5"/></g>
-            </svg>
-          </div>
+          {LENSES.map((lens) => (
+            <div class={'lens-panel' + (lens.band ? ' lp-flat' : '')}>
+              <header class="lp-head">
+                <div class="lp-row">
+                  <span class="lp-name">{lens.name}</span>
+                  <span class="lp-unit">{lens.unit}</span>
+                  <span class="lp-spread">spread {pc(lens.key)}%</span>
+                </div>
+                <p class="lp-kick">{lens.kick[0]} — <span class="kx">{lens.kick[1]}</span></p>
+              </header>
+              <svg viewBox="0 0 240 210" role="img"
+                   aria-label={`${lens.name} lens: ${lens.aria} against generation age. Values run from ${STAT[lens.key].min.toFixed(lens.dp)} to ${STAT[lens.key].max.toFixed(lens.dp)}; cross-generation spread ${pc(lens.key)} percent.`}>
+                {lens.band && (
+                  <rect x="36" y={yFor(lens, STAT.bw.max)} width="192"
+                        height={+(yFor(lens, STAT.bw.min) - yFor(lens, STAT.bw.max)).toFixed(1)} class="bandfill"/>
+                )}
+                {lens.band && <line x1="36" x2="228" y1={yFor(lens, STAT.bw.mean)} y2={yFor(lens, STAT.bw.mean)} class="bandmean"/>}
+                {lens.ticks.map(([v, l]) => <line x1="36" x2="228" y1={yFor(lens, v)} y2={yFor(lens, v)} class="grid"/>)}
+                {lens.ticks.map(([v, l]) => <text x="32" y={+(yFor(lens, v) + 3).toFixed(1)} class="tick" text-anchor="end">{l}</text>)}
+                <line x1="36" x2="228" y1="166" y2="166" class="axisln"/>
+                <text x="36" y="180" class="tick" text-anchor="middle">0y</text>
+                <text x="128.9" y="180" class="tick" text-anchor="middle">3y</text>
+                <text x="221.8" y="180" class="tick" text-anchor="middle">6y</text>
+                {GEN_ORDER.map((g) => {
+                  const cx = X(REGISTRY[g].age), cy = yFor(lens, VAL[lens.key][g]);
+                  const side = LABSIDE[g];
+                  return (
+                    <g class={`gdot g-${g}`}>
+                      <circle class="hit" cx={cx} cy={cy} r="13" tabindex="0" data-gen={g}
+                              aria-label={`${REGISTRY[g].label}, ${lens.name.toLowerCase()} lens, ${fmt(lens, g)} ${lens.unit.replace('$ / ', 'dollars per ')}`}/>
+                      <circle class={`pt pt-${REGISTRY[g].arch}`} cx={cx} cy={cy} r="4.5"/>
+                      {lens.labels && (
+                        <text
+                          x={side === 'right' ? cx + 8 : side === 'left' ? cx - 8 : cx}
+                          y={side === 'below' ? +(cy + 14).toFixed(1) : side === 'above' ? +(cy - 8).toFixed(1) : +(cy + 3).toFixed(1)}
+                          class={`ptlab lab-${REGISTRY[g].arch}`}
+                          text-anchor={side === 'right' ? 'start' : side === 'left' ? 'end' : 'middle'}>{g}</text>
+                      )}
+                    </g>
+                  );
+                })}
+              </svg>
+              {lens.band && <div class="lp-foot">tightest on {BW_TIGHTEST_DAYS} of {BAND_DAYS} days, power on {KW_TIGHTEST_DAYS} — see §02</div>}
+            </div>
+          ))}
 
         </div>
         <div class="tip" id="hero-tip" role="status"></div>
@@ -171,7 +177,7 @@ const SNAP_DATE = '2026-07-06';
       </div>
 
       <p class="tfoot">
-        Neocloud (T2) guaranteed on-demand, US, generations on age (x, years) against each lens (y, from zero).
+        Neocloud (T2) guaranteed on-demand, all regions, generations on age (x, years) against each lens (y, from zero).
         Spread = (max − min) ÷ mean across the five generations. Example prints · {PRINT_DATE} · rates from the
         {SNAP_DATE} snapshot. Headline stat per published rule (mean where n ≥ 10, else median).
         The compute lens is denominated in petaFLOPs (PFLOP, 10^15 floating-point operations per
@@ -180,8 +186,10 @@ const SNAP_DATE = '2026-07-06';
 
       <p class="lede">
         One observed number underlies every panel: the Neocloud guaranteed on-demand rate, in dollars per
-        GPU-hour. Each panel divides that rate by one spec-sheet denominator. Where a denominator makes
-        the cross-section <strong>flat</strong>, that denominator is the dimension the market prices.
+        GPU-hour. Each panel divides that rate by one spec-sheet denominator. Two of the four compress the
+        cross-section by roughly two thirds and two do not, which is the whole content of the page:
+        <strong>power and memory bandwidth</strong> are the dimensions this market prices, capacity and
+        compute are not. The two constrained inputs of the build-out are also the two the price tracks.
       </p>
 
       <div class="twrap">
@@ -190,16 +198,20 @@ const SNAP_DATE = '2026-07-06';
             <tr><th>Generation</th><th>Age</th><th class="num">$/GPU-hr</th><th class="num">n</th><th class="num">$/GB-hr</th><th class="num">$/TB/s-hr</th><th class="num">$/PFLOP-hr</th><th class="num">$/kW-hr</th></tr>
           </thead>
           <tbody>
-            <tr><td class="gen">B300</td><td class="dim">~0.8y</td><td class="num strong">$7.85</td><td class="num dim">5</td><td class="num">0.0273</td><td class="num">0.98</td><td class="num">~3.5</td><td class="num">~6.0</td></tr>
-            <tr><td class="gen">B200</td><td class="dim">~1.4y</td><td class="num strong">$6.92</td><td class="num dim">8</td><td class="num">0.0384</td><td class="num">0.87</td><td class="num">3.1</td><td class="num">6.92</td></tr>
-            <tr><td class="gen">H200</td><td class="dim">~2.1y</td><td class="num strong">$4.18</td><td class="num dim">14</td><td class="num">0.0296</td><td class="num">0.87</td><td class="num">4.2</td><td class="num">5.97</td></tr>
-            <tr><td class="gen">H100</td><td class="dim">~3.7y</td><td class="num strong">$3.22</td><td class="num dim">20</td><td class="num">0.0403</td><td class="num">0.96</td><td class="num">3.3</td><td class="num">4.60</td></tr>
-            <tr><td class="gen">A100 80GB</td><td class="dim">~5.7y</td><td class="num strong">$1.80</td><td class="num dim">13</td><td class="num">0.0225</td><td class="num">0.90</td><td class="num">5.8</td><td class="num">4.50</td></tr>
+            {GEN_ORDER.map((g) => (
+              <tr>
+                <td class="gen">{REGISTRY[g].label}</td>
+                <td class="dim">{REGISTRY[g].ageLab}</td>
+                <td class="num strong">${RATE[g].toFixed(2)}</td>
+                <td class="num dim">{NSRC[g]}</td>
+                {LENSES.map((lens) => <td class="num">{fmt(lens, g)}</td>)}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
       <p class="sid">
-        <b>CRI-T2-&#123;chip&#125;-&#123;form&#125;-GTD-OD-US-&#123;GB|BW|PF|KW&#125;</b> · derived Compute Rate Index (CRI) series carry the underlying citable
+        <b>CRI-T2-&#123;chip&#125;-SXM-GTD-OD-ALL-&#123;GB|BW|PF|KW&#125;</b> · derived Compute Rate Index (CRI) series carry the underlying citable
         cell in the first seven segments; strip the lens suffix to reach the parent. $/GB-hr computed from
         registry high-bandwidth memory (HBM) capacity (80 / 80 / 141 / 180 / 288 GB).
       </p>
@@ -210,40 +222,41 @@ const SNAP_DATE = '2026-07-06';
       <h2><span class="n">02</span> The Bandwidth Band</h2>
       <p>
         Re-denominated per unit of memory bandwidth, datacenter silicon from eight months to 5.7 years of
-        age rents inside <strong>$0.87–0.98 per TB/s-hour</strong>, ±6% around a $0.92 mean. The band is
-        the test: a spread that holds tight means the age discount remains priced away. A widening spread
-        is the falsifiable marker firing. Members are disclosed on every exhibit.
+        age rents inside <strong>${BAND.min.toFixed(3)}–{BAND.max.toFixed(3)} per TB/s-hour</strong>, a
+        {pc('bw')}% spread around a ${BAND.mean.toFixed(3)} mean. Raw, the same five generations span
+        {(Math.max(...GEN_ORDER.map((g) => RATE[g])) / Math.min(...GEN_ORDER.map((g) => RATE[g]))).toFixed(1)}×.
+        The band is the test, and this page set it at first print: a widening spread is the falsifiable
+        marker firing. It has widened, from {bandSpread(FIRST).toFixed(0)}% on {FIRST[0]} to {pc('bw')}%
+        on {SNAP_DATE}. The record is plotted below. Members are disclosed on every exhibit.
       </p>
       <p>
-        The flatness is a like-for-like property. It holds across cells that share an operator segment,
+        The compression is a like-for-like property. It holds across cells that share an operator segment,
         interruptibility grade, term, and region: the series named under each exhibit. Pooled cuts,
         marketplace minimums, or mixed interruptibility grades will not reproduce it: grade and tenor are
         different markets per unit of bandwidth, as everywhere else on this site.
+      </p>
+      <p>
+        Bandwidth does not hold this position alone, and on the current record it does not hold it at all.
+        Power sits at {pc('kw')}%. Across the {BAND_DAYS} days recorded, power is the tightest of the four
+        lenses on {KW_TIGHTEST_DAYS} days and bandwidth on {BW_TIGHTEST_DAYS}; capacity and compute are
+        never within reach of either. The two that compress are the two inputs the build-out is short of.
       </p>
 
       <figure class="chart-fig">
         <div class="chart-box" id="bw-chart">
           <svg viewBox="0 0 680 300" role="img"
-               aria-label="Bandwidth band, zoomed axis from 0.80 to 1.02 dollars per TB/s-hour. A shaded band spans 0.87 to 0.98 with a mean line at 0.92. Five labeled generation dots sit inside the band.">
-            <line x1="46" x2="540" y1="250" y2="250" class="grid"/>
-            <line x1="46" x2="540" y1="196.8" y2="196.8" class="grid"/>
-            <line x1="46" x2="540" y1="143.6" y2="143.6" class="grid"/>
-            <line x1="46" x2="540" y1="90.5" y2="90.5" class="grid"/>
-            <line x1="46" x2="540" y1="37.3" y2="37.3" class="grid"/>
-            <text x="38" y="253" class="tick" text-anchor="end">0.80</text>
-            <text x="38" y="199.8" class="tick" text-anchor="end">0.85</text>
-            <text x="38" y="146.6" class="tick" text-anchor="end">0.90</text>
-            <text x="38" y="93.5" class="tick" text-anchor="end">0.95</text>
-            <text x="38" y="40.3" class="tick" text-anchor="end">1.00</text>
+               aria-label={`Bandwidth band, axis zoomed to ${ZMIN} to ${ZMAX} dollars per TB/s-hour. A shaded band spans ${BAND.min.toFixed(3)} to ${BAND.max.toFixed(3)} with a mean line at ${BAND.mean.toFixed(3)}. Five labelled generation dots sit inside the band.`}>
+            {ZTICKS.map((v) => <line x1="46" x2="540" y1={yb(v)} y2={yb(v)} class="grid"/>)}
+            {ZTICKS.map((v) => <text x="38" y={+(yb(v) + 3).toFixed(1)} class="tick" text-anchor="end">{v.toFixed(2)}</text>)}
 
-            <rect x="46" y="58.5" width="494" height="117" class="bw-band"/>
-            <line x1="46" x2="540" y1="58.5" y2="58.5" class="bw-edge"/>
-            <line x1="46" x2="540" y1="175.5" y2="175.5" class="bw-edge"/>
-            <line x1="46" x2="540" y1="122.4" y2="122.4" class="bandmean"/>
+            <rect x="46" y={yb(BAND.max)} width="494" height={+(yb(BAND.min) - yb(BAND.max)).toFixed(1)} class="bw-band"/>
+            <line x1="46" x2="540" y1={yb(BAND.max)} y2={yb(BAND.max)} class="bw-edge"/>
+            <line x1="46" x2="540" y1={yb(BAND.min)} y2={yb(BAND.min)} class="bw-edge"/>
+            <line x1="46" x2="540" y1={yb(BAND.mean)} y2={yb(BAND.mean)} class="bandmean"/>
 
-            <text x="548" y="61.5" class="annot">0.98 — max</text>
-            <text x="548" y="125.4" class="annot annot-acc">0.92 — mean ±6%</text>
-            <text x="548" y="178.5" class="annot">0.87 — min</text>
+            <text x="548" y={+(yb(BAND.max) + 3).toFixed(1)} class="annot">{BAND.max.toFixed(3)} — max</text>
+            <text x="548" y={+(yb(BAND.mean) + 3).toFixed(1)} class="annot annot-acc">{BAND.mean.toFixed(3)} — mean</text>
+            <text x="548" y={+(yb(BAND.min) + 3).toFixed(1)} class="annot">{BAND.min.toFixed(3)} — min</text>
 
             <text x="46" y="288" class="tick" text-anchor="middle">0y</text>
             <text x="205.4" y="288" class="tick" text-anchor="middle">2y</text>
@@ -251,44 +264,51 @@ const SNAP_DATE = '2026-07-06';
             <text x="524.1" y="288" class="tick" text-anchor="middle">6y</text>
             <text x="540" y="288" class="tick" text-anchor="start">  age</text>
             <text x="548" y="253" class="zoomnote">axis zoomed:</text>
-            <text x="548" y="264" class="zoomnote">$0.80–1.02, not to zero</text>
+            <text x="548" y="264" class="zoomnote">${ZMIN}–{ZMAX}, not to zero</text>
 
             <line id="bw-cross" class="crosshair" x1="0" x2="0" y1="16" y2="250" style="display:none"/>
 
-            <g><circle class="pt pt-blackwell" cx="109.7" cy="58.5" r="5.5"/><text x="109.7" y="47.5" class="ptlab lab-blackwell" text-anchor="middle">B300 0.98</text></g>
-            <g><circle class="pt pt-blackwell" cx="157.5" cy="175.5" r="5.5"/><text x="157.5" y="192.5" class="ptlab lab-blackwell" text-anchor="middle">B200 0.87</text></g>
-            <g><circle class="pt pt-hopper" cx="213.3" cy="175.5" r="5.5"/><text x="216.3" y="192.5" class="ptlab lab-hopper" text-anchor="start">H200 0.87</text></g>
-            <g><circle class="pt pt-hopper" cx="340.8" cy="79.8" r="5.5"/><text x="340.8" y="68.8" class="ptlab lab-hopper" text-anchor="middle">H100 SXM 0.96</text></g>
-            <g><circle class="pt pt-ampere" cx="500.2" cy="143.6" r="5.5"/><text x="500.2" y="132.6" class="ptlab lab-ampere" text-anchor="middle">A100 0.90</text></g>
+            {GEN_ORDER.map((g) => {
+              const cx = xb(REGISTRY[g].age), cy = yb(VAL.bw[g]);
+              const below = g === 'B200' || g === 'H200' || g === 'A100';
+              return (
+                <g>
+                  <circle class={`pt pt-${REGISTRY[g].arch}`} cx={cx} cy={cy} r="5.5"/>
+                  <text x={g === 'H200' ? cx + 3 : cx} y={below ? +(cy + 17).toFixed(1) : +(cy - 11).toFixed(1)}
+                        class={`ptlab lab-${REGISTRY[g].arch}`}
+                        text-anchor={g === 'H200' ? 'start' : 'middle'}>{REGISTRY[g].label} {VAL.bw[g].toFixed(2)}</text>
+                </g>
+              );
+            })}
           </svg>
           <div class="tip" id="bw-tip"></div>
         </div>
         <figcaption class="tfoot">
-          $/TB/s-hr against generation age; band = min–max across qualifying members, mean line at $0.92.
+          $/TB/s-hr against generation age; band = min–max across qualifying members, mean line at ${BAND.mean.toFixed(3)}.
           Denominator: vendor nameplate memory bandwidth. Example prints · {PRINT_DATE} · rates from the
           {SNAP_DATE} snapshot.
         </figcaption>
       </figure>
 
-      <!-- honest empty-history strip -->
-      <div class="hist-strip" aria-label="Band history: series begins 2026-07-07, no history exists yet">
-        <span class="hist-eye">Band history</span>
+      <div class="hist-strip" aria-label={`Band spread history, ${BAND_HISTORY[0][0]} to ${BAND_HISTORY[BAND_HISTORY.length - 1][0]}: the cross-generation spread per TB/s-hour, rising from ${bandSpread(BAND_HISTORY[0]).toFixed(0)} to ${bandSpread(BAND_HISTORY[BAND_HISTORY.length - 1]).toFixed(0)} percent.`}>
+        <span class="hist-eye">Band spread</span>
         <svg viewBox="0 0 680 92">
-          <line x1="24" x2="656" y1="66" y2="66" class="axisln"/>
-          <line x1="40" y1="60" x2="40" y2="72" class="axisln"/>
-          <circle cx="40" cy="40" r="5" class="hist-dot"/>
-          <text x="52" y="36" class="hist-lab-ink">2026-07-07 · first print · band mean $0.92 · spread 12%</text>
-          <text x="40" y="82" class="hist-lab" text-anchor="middle">series begins</text>
-          <line x1="194" y1="62" x2="194" y2="70" class="grid"/>
-          <line x1="348" y1="62" x2="348" y2="70" class="grid"/>
-          <line x1="502" y1="62" x2="502" y2="70" class="grid"/>
-          <text x="194" y="82" class="hist-lab" text-anchor="middle">+30d</text>
-          <text x="348" y="82" class="hist-lab" text-anchor="middle">+60d</text>
-          <text x="502" y="82" class="hist-lab" text-anchor="middle">+90d</text>
-          <text x="656" y="56" class="hist-lab" text-anchor="end">history accrues from launch — nothing is plotted here because nothing exists yet</text>
+          <line x1="40" x2="656" y1="74" y2="74" class="axisln"/>
+          {[10, 20, 30, 40].map((v) => <line x1="40" x2="656" y1={+(74 - v * 1.4).toFixed(1)} y2={+(74 - v * 1.4).toFixed(1)} class="grid"/>)}
+          {[20, 40].map((v) => <text x="34" y={+(74 - v * 1.4 + 3).toFixed(1)} class="hist-lab" text-anchor="end">{v}%</text>)}
+          {SEAM_DATES.map((sd) => {
+            const i = BAND_HISTORY.findIndex((r) => r[0] === sd);
+            const x = +(40 + i * (600 / (BAND_HISTORY.length - 1))).toFixed(1);
+            return <line x1={x} x2={x} y1="12" y2="74" class="grid"/>;
+          })}
+          <polyline class="hist-line" points={BAND_HISTORY.map((r, i) =>
+            `${(40 + i * (600 / (BAND_HISTORY.length - 1))).toFixed(1)},${(74 - bandSpread(r) * 1.4).toFixed(1)}`).join(' ')}/>
+          <text x="40" y="88" class="hist-lab">{BAND_HISTORY[0][0]}</text>
+          <text x="656" y="88" class="hist-lab" text-anchor="end">{BAND_HISTORY[BAND_HISTORY.length - 1][0]}</text>
+          <text x="348" y="88" class="hist-lab" text-anchor="middle">vertical rules mark panel additions</text>
         </svg>
       </div>
-      <p class="sid"><b>CRB-T2-BW-ALL-OD-US</b> · band row fields: band_min · band_max · band_mean · band_spread_pct · n_chips · member_chips. Emission gate n_chips ≥ 3, all members publication-qualified. Research-grade at launch (Shadow → Provisional).</p>
+      <p class="sid"><b>CRB-T2-BW-ALL-OD-ALL</b> · band row fields: band_min · band_max · band_mean · band_spread_pct · n_chips · member_chips. Emission gate n_chips ≥ 3, all members publication-qualified. Research-grade at launch (Shadow → Provisional).</p>
 
       <div id="parity">
         <p>
@@ -296,9 +316,12 @@ const SNAP_DATE = '2026-07-06';
           the band rules out is to price the oldest member both ways. If
           compute were the priced unit, every new generation would force the
           prior one down to its share of the throughput: against the H100
-          print of $3.22, a chip with 32% of the BF16 throughput reprices to
-          $1.02. If bandwidth is the priced unit, the same H100 print implies
-          $1.92: the A100 carries 60% of the bandwidth. Two rules, two
+          print of ${RATE.H100.toFixed(2)}, a chip with
+          {Math.round(100 * REGISTRY.A100.pf / REGISTRY.H100.pf)}% of the BF16 throughput reprices to
+          ${(RATE.H100 * REGISTRY.A100.pf / REGISTRY.H100.pf).toFixed(2)}. If bandwidth is the priced
+          unit, the same H100 print implies
+          ${(RATE.H100 * REGISTRY.A100.bw / REGISTRY.H100.bw).toFixed(2)}: the A100 carries
+          {Math.round(100 * REGISTRY.A100.bw / REGISTRY.H100.bw)}% of the bandwidth. Two rules, two
           implied rates:
         </p>
         <div class="twrap">
@@ -307,14 +330,17 @@ const SNAP_DATE = '2026-07-06';
               <tr><th>Pricing rule</th><th>Assumes the market pays for</th><th class="num">Implied A100 rate</th></tr>
             </thead>
             <tbody>
-              <tr><td>Compute parity</td><td>BF16 throughput — 312 vs 989.5 TFLOPS</td><td class="num">$1.02</td></tr>
-              <tr><td>Bandwidth parity</td><td>HBM bandwidth — 2.0 vs 3.35 TB/s</td><td class="num">$1.92</td></tr>
+              <tr><td>Compute parity</td><td>BF16 throughput — 312 vs 989.5 TFLOPS</td><td class="num">${(RATE.H100 * REGISTRY.A100.pf / REGISTRY.H100.pf).toFixed(2)}</td></tr>
+              <tr><td>Bandwidth parity</td><td>HBM bandwidth — 2.0 vs 3.35 TB/s</td><td class="num">${(RATE.H100 * REGISTRY.A100.bw / REGISTRY.H100.bw).toFixed(2)}</td></tr>
             </tbody>
           </table>
         </div>
         <p>
-          The observed A100 print is <strong>$1.80</strong>: 94% of
-          bandwidth parity, 77% above compute parity, at 5.7 years of age.
+          The observed A100 print is <strong>${RATE.A100.toFixed(2)}</strong>:
+          {Math.round(100 * RATE.A100 / (RATE.H100 * REGISTRY.A100.bw / REGISTRY.H100.bw))}% of
+          bandwidth parity,
+          {Math.round(100 * RATE.A100 / (RATE.H100 * REGISTRY.A100.pf / REGISTRY.H100.pf) - 100)}% above
+          compute parity, at 5.7 years of age.
           The market repriced the A100 to its bandwidth share, not its
           compute share. That is the band's claim restated as a spread you
           can falsify: the day prior-generation prints migrate from the
@@ -632,11 +658,11 @@ const SNAP_DATE = '2026-07-06';
 
       /* ---------- hero: cross-panel generation highlight + tooltip ---------- */
       var GENS = {
-        B300: { name: 'B300', age: '~0.8y', rate: '$7.85', n: 5,  gb: '$0.0273', bw: '$0.98', pf: '~$3.5', kw: '~$6.0' },
-        B200: { name: 'B200', age: '~1.4y', rate: '$6.92', n: 8,  gb: '$0.0384', bw: '$0.87', pf: '$3.1',  kw: '$6.92' },
-        H200: { name: 'H200', age: '~2.1y', rate: '$4.18', n: 14, gb: '$0.0296', bw: '$0.87', pf: '$4.2',  kw: '$5.97' },
-        H100: { name: 'H100', age: '~3.7y', rate: '$3.22', n: 20, gb: '$0.0403', bw: '$0.96', pf: '$3.3',  kw: '$4.60' },
-        A100: { name: 'A100 80GB', age: '~5.7y', rate: '$1.80', n: 13, gb: '$0.0225', bw: '$0.90', pf: '$5.8', kw: '$4.50' }
+        B300: { name: 'B300', age: '~0.8y', rate: '$7.85', n: 9,  gb: '$0.0273', bw: '$0.981', pf: '$3.49', kw: '$6.04' },
+        B200: { name: 'B200', age: '~1.4y', rate: '$6.40', n: 8,  gb: '$0.0356', bw: '$0.800', pf: '$2.84', kw: '$6.40' },
+        H200: { name: 'H200', age: '~2.1y', rate: '$4.50', n: 14, gb: '$0.0319', bw: '$0.938', pf: '$4.55', kw: '$6.43' },
+        H100: { name: 'H100 SXM', age: '~3.7y', rate: '$3.89', n: 21, gb: '$0.0486', bw: '$1.161', pf: '$3.93', kw: '$5.56' },
+        A100: { name: 'A100 80GB', age: '~5.7y', rate: '$2.08', n: 11, gb: '$0.0261', bw: '$1.042', pf: '$6.72', kw: '$5.21' }
       };
       var hero = document.getElementById('heromult');
       var heroTip = document.getElementById('hero-tip');
@@ -697,11 +723,11 @@ const SNAP_DATE = '2026-07-06';
 
       /* ---------- §02 crosshair + tooltip (od-vs-committed pattern) ---------- */
       var BW = [
-        { x: 109.7, gen: 'B300', v: '0.98', spec: '~8.0 TB/s', rate: '$7.85', n: 5 },
-        { x: 157.5, gen: 'B200', v: '0.87', spec: '8.0 TB/s',  rate: '$6.92', n: 8 },
-        { x: 213.3, gen: 'H200', v: '0.87', spec: '4.8 TB/s',  rate: '$4.18', n: 14 },
-        { x: 340.8, gen: 'H100 SXM', v: '0.96', spec: '3.35 TB/s', rate: '$3.22', n: 20 },
-        { x: 500.2, gen: 'A100 80GB', v: '0.90', spec: '2.0 TB/s', rate: '$1.80', n: 13 }
+        { x: 109.7, gen: 'B300', v: '0.981', spec: '~8.0 TB/s', rate: '$7.85', n: 9 },
+        { x: 157.6, gen: 'B200', v: '0.800', spec: '8.0 TB/s',  rate: '$6.40', n: 8 },
+        { x: 213.3, gen: 'H200', v: '0.938', spec: '4.8 TB/s',  rate: '$4.50', n: 14 },
+        { x: 340.8, gen: 'H100 SXM', v: '1.161', spec: '3.35 TB/s', rate: '$3.89', n: 21 },
+        { x: 500.2, gen: 'A100 80GB', v: '1.042', spec: '2.0 TB/s', rate: '$2.08', n: 11 }
       ];
       var W2 = 680;
       var box = document.getElementById('bw-chart');
@@ -969,7 +995,7 @@ const SNAP_DATE = '2026-07-06';
     .annot-neg { fill: var(--neg); font-weight: 600; }
     .zoomnote { font-family: var(--font-mono); font-size: 9px; fill: var(--ink-faint); }
 
-    /* history empty state */
+    /* band spread history */
     .hist-strip { border: 1px solid var(--rule); background: var(--surface); margin: 14px 0 4px; max-width: 900px; position: relative; }
     .hist-strip svg { display: block; width: 100%; height: auto; }
     .hist-eye {
@@ -980,6 +1006,7 @@ const SNAP_DATE = '2026-07-06';
       background: var(--surface);
     }
     .hist-dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+    .hist-line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
     .hist-lab { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
     .hist-lab-ink { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; fill: var(--ink-dim); }
 

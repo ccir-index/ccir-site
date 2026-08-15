@@ -280,6 +280,15 @@ a.chip-link:focus-visible {
 [data-register="editorial"] {
   --measure-prose: 66ch;
 }
+/* Owner preference, 2026-08-15: a note reads as a narrow CENTRED column (the
+   the-nearer-frontier layout), not prose hugging the left edge of a 1200px
+   wrap. .wrap already carries margin:0 auto, so capping .wrap.top centres the
+   whole note. Tables and figures wider than this still scroll in their own
+   containers. Only the editorial route gets it; data surfaces keep the wide
+   wrap they need. */
+[data-register="editorial"] .wrap.top {
+  max-width: 760px;
+}
 /* Prose at reading size. */
 [data-register="editorial"] :is(.sec, .gloss, .log) :is(p, li, dd),
 /* Some notes hang prose straight off the page wrapper with no .sec (2026-08-15:
