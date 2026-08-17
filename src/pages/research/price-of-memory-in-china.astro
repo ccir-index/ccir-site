@@ -1,0 +1,1003 @@
+---
+import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
+import ReadMore from '../../components/ReadMore.astro';
+
+/*
+  JOHN'S DRAFT, 2026-08-16. His text, verbatim, with two authorised changes
+  only: his seven inline questions resolved, and the A100 compute-parity
+  figure corrected. Nothing else has been rewritten. Section-by-section
+  review pending.
+
+  INTELLIGENCE LANE (John, 2026-08-15). Press and labelled inference are in
+  scope. Every basis is stated and recomputable. No benchmark claim here.
+
+  Rate figures: the V (variant-consistent, all-SXM) basis on the 2026-08-12
+  snapshot, from scratch/bandwidth_parity_backfill_V_20260815.csv. These
+  reconcile exactly with /chip-economics: bandwidth min 0.800, max 1.1613,
+  mean 0.9844, spread 36.7%. The first draft carried capacity 61% and
+  bandwidth 28%, computed before the sesterce restatement. Those are dead.
+
+  VERIFIED 2026-08-15:
+  - CXMT priced its STAR Market listing at 8.66 yuan, about $86bn. It closed
+    its first day, 27 July 2026, at 49 yuan, up 465.82%, above 3 trillion
+    yuan (about $443bn). The chart carries $546bn on 14 August.
+  - CXMT's IPO prospectus names three projects totalling 29.5bn yuan: 13bn
+    DRAM technology upgrade, 9bn next-generation DRAM research, 7.5bn wafer
+    line upgrade. It discloses NO HBM project and does not mention HBM.
+    Reuters reports CXMT aims at HBM3 mass production in 2026, sourced to
+    people familiar and NOT confirmed by the prospectus or roadshow.
+  - HBM4 uses the DRAM process for the core die only. The base die moves to
+    an advanced logic node, unlike every prior HBM generation, which used
+    one process for both. Interface width doubled, 1,024 to 2,048 bits.
+  - SK Hynix sources its HBM4 logic die from TSMC. Samsung builds its own on
+    its foundry's 4nm and is the only supplier holding the whole stack.
+    Micron KEEPS its base die on a DRAM process through HBM4 and moves to
+    TSMC at HBM4E. So "SK Hynix and Micron source from TSMC" is wrong for
+    HBM4 and becomes true at HBM4E.
+  - Taiwan-listed companies must report the prior month's revenue by the
+    10th. TSMC also files it with the SEC on Form 6-K.
+  - SK HYNIX 424B4 (Nasdaq listing, Jul-2026), READ DIRECTLY 2026-08-15 at
+    sec.gov/Archives/edgar/data/0002120882/000119312526299963/d32785d424b4.htm
+    Quarterly QoQ table, DRAM, USD basis, 1Q23 through 1Q26. Final column
+    1Q 2026: "DRAM Bit Sales Volume ... Flat" and "DRAM Average Selling
+    Price ... Mid-60% Increase". The same document: traditional DRAM price
+    recovery since 3Q25 driven by "structural undersupply arising from the
+    industry-wide reallocation of production capacity to HBM".
+    ⛔ These are QoQ CHANGES in verbal bands, never levels. ⛔ ASP is USD
+    basis against Won revenue. Direction is confident, levels are not.
+  - TSMC does not publish CoWoS capacity. Trade estimates disagree: roughly
+    115k-140k wafers/month by end-2026 and 170k-200k+ for 2027. TSMC's own
+    disclosed figure is a CAGR above 80%, 2022 to 2027 (May symposium).
+
+  ⛔ DO NOT WRITE "sold out". That phrase appears in no filing and is a
+     standing house prohibition. Trade press uses it freely; we do not.
+  ⛔ DO NOT divide CoWoS capacity into accelerators or attribute it to AI.
+     Packaging capacity is global and multi-market.
+  ⛔ Structure only on the TSMC hand-over. Never publish motive for why any
+     supplier chose its position.
+
+  RULED 2026-08-15 (John): "most valuable listed company in China" STANDS,
+  on the chart's own basis, which clears Tencent.
+
+  FIXED 2026-08-15: fig_m2_two_lenses carried a HARDCODED "1.3x" on the
+  bandwidth panel. Both panel spans are now COMPUTED in
+  build_memory_note_figures_20260815.py. Also swapped fig_wafer_tradeoff for
+  its _terminal variant: the original is a light card with BLUE data bars.
+
+  RULED 2026-08-16 (John): the five section headings are MEMORY PUNS, each
+  with the original descriptive title kept below it as a .dek subtitle. The
+  pun carries the register, the dek carries the signpost.
+  01 Total Recall · 02 Working Memory · 03 Memory Foam, which expands to
+  fill the space the incumbents leave · 04 Photographic Memory, the base die
+  leaving a memory process for a photolithographic one · 05 Refresh Rate.
+  ⛔ "In Memoriam" was applied to 01 and PULLED: fig_mem_consolidation
+  already carries that title, and the figure sits in the lede a few lines
+  above. One joke, one place.
+  ⛔ "Selective Memory" was offered for 05 and REFUSED: it implies TSMC
+  withholds the level deliberately, which is motive, and the house bars
+  publishing motive. ⛔ "Making Valuable Memories" stays the OG CARD title
+  and is not reused as a heading.
+
+  🔴 CORRECTED 2026-08-16 (John spotted it): §05 read "A generation ago that
+  supply sat ENTIRELY with the memory makers" — contradicted by the note's
+  own §04, which says TSMC already owned the packaging, that the packaging
+  WAS the binding constraint on the last generation, and that a foundry
+  "now sits at two points where a generation ago it sat at one". One, not
+  zero. Now "the memory makers built the whole STACK", which is the true
+  distinction: the stack (both dies) was theirs, the PATH to the accelerator
+  already ran through TSMC at packaging. ⛔ Never write that the memory
+  makers owned the bandwidth path end to end.
+
+  🔴 CORRECTED 2026-08-16 (external verification): §03 paired "about seven
+  percent of global DRAM this year" (a REVENUE share, TrendForce Q1-26
+  7.6%) with "one percent in 2021" (a BIT SHIPMENT share, Morningstar).
+  TWO BASES IN ONE COMPARISON — the same defect class as the ratio-beside-
+  percentage catch of 2026-08-15 — and it UNDERSTATED our own story, since
+  CXMT's bit share runs above its revenue share on a cheaper mix.
+  Now single-basis and single-source: bit shipments, 1% (2021) -> 9%
+  (2025), Morningstar, an analyst estimate. ⛔ Never pair the TrendForce
+  revenue share with the Morningstar bit share. ⭐ The prospectus gives
+  7.67% for 2025 on a REVENUE basis and is the stronger anchor if this ever
+  moves back to revenue, but NO 2021 revenue figure exists publicly.
+
+  RULED 2026-08-16 (John): §03 carries two amendments the verification
+  supports. "Its added volume clears largely inside China, to buyers who
+  contracted for it in advance" (ByteDance 5-yr >$7bn and Tencent ~$2.94bn,
+  both Reuters, both anonymous-sourced, neither disclosed by CXMT).
+  ⛔ "It relieves the bits rather than the price" was added and CUT the same
+  hour (John: "not sure I get" it). It defended against a misread the note
+  never invites — every CXMT claim here is a QUANTITY claim ("adding memory
+  volume", "fills the conventional hole"), so no price relief is implied and
+  none needs disclaiming. The underlying fact, kept here and out of the
+  body: CXMT will not discount because it is SOLD OUT, and is priced above
+  Samsung on at least one server SKU, while its blended ASP runs 5-10%
+  BELOW the incumbents. ⛔ If it ever goes back in, the plain form is "It
+  has not undercut the incumbents", never the bits/price construction.
+  ⛔ The "CXMT is pivoting to HBM" story was TESTED AND REJECTED: the 20%
+  -of-wafers figure traces to one unattributed trade line and matches a
+  projected 2028 ratio. Actual HBM share is ~1.9% of wafers in 2025 and
+  ~8.6% in 2026, and the IPO prospectus funds DRAM lines with NOTHING to
+  HBM. An exchange filing beats unsourced trade press.
+
+  RULED 2026-08-16: §02's ReadMore now cites /research/gpu-age-curve, which
+  already published the bandwidth normalization ("after bandwidth
+  normalization there is essentially no age discount left"). 🔒 Citing our
+  own prior work turns an overlap a reader could catch into a foundation.
+
+  RULED 2026-08-16 (John): §02 opens with THREE definitions, not two.
+  "Memory capacity decides whether a model fits. Bandwidth decides how fast
+  it runs. Power decides what it costs to keep running."
+  WHY: the old pair primed a two-way frame while the list delivers four and
+  the FINDING lands on bandwidth AND POWER — an attribute the reader had
+  never met. Compute needs no gloss (per-petaFLOP explains itself); power
+  does. ⛔ Do not trim this back to two to save a line.
+
+  ⛔ RULED 2026-08-16 (John): the lede does NOT say the CXMT move came on
+  debut. An external novelty audit flagged the sentence as implying an
+  18-day climb when the rise was almost all first-session. "and almost all
+  of that move came on debut" was added and REVERTED the same hour.
+  WHY: the sentence asserts no path. It gives two dated points, a listing
+  near $86bn and a close near $546bn, and the note never uses the shape
+  between them. Naming the debut spends words on a mechanism the note does
+  not need and nudges the reader toward reading the valuation as an IPO
+  artifact. The 18 days already answer that — the valuation HELD for 18
+  days, which is the fact that matters. ⛔ Do not re-add it.
+
+  RULED 2026-08-16 (John): §03's wafer choice now names what conventional
+  DRAM DOES — "conventional DRAM, which fills the rest of an AI server".
+  WHY: without it a reader takes conventional to mean phones and PCs, files
+  CXMT as a consumer-electronics sidebar, and misses that the buildout pulls
+  on BOTH sides of the wafer choice. An eight-GPU node carries on the order
+  of one to two terabytes of host DDR5 beside its HBM, and host memory is
+  also where KV-cache and weights spill when a model does not fit in HBM.
+  ⛔ Do not extend this into a claim about how much DRAM an AI server uses
+  relative to a standard one. The multiple is a trade figure and is not
+  verified. The clause names a USE, and claims no share.
+
+  🔴 CORRECTED 2026-08-16 (John spotted it): §03 read "HBM3 is two
+  generations behind the parts shipping beside current accelerators".
+  WRONG BY ONE. The stacks shipping beside current accelerators are HBM3E,
+  and HBM3 is ONE generation behind that. The ladder:
+      HBM2E  A100 80GB
+      HBM3   H100
+      HBM3E  H200, B200, B300
+      HBM4   Rubin
+  Now: "a generation behind the stacks shipping beside current accelerators,
+  and two behind the HBM4 step now in production." Two counts, each against
+  a named referent. ⛔ Nothing in this header verified the original count;
+  it went in unchecked.
+
+  RULED 2026-08-16 (John): §04 no longer drops HBM4 in cold. It now says
+  what came before: "Both carry HBM3E, the stack behind every part in our
+  panel since the H200." The §03 fix also hands the reader HBM4 one
+  paragraph earlier, so the term arrives twice before §04 explains it.
+  ⛔ "since the H200" is deliberate and correct — the H100 is HBM3 and the
+  A100 is HBM2E, so the claim covers three of the five, not all five.
+  ⛔ Do NOT write that the shared stack EXPLAINS the flat frontier. The H200
+  is also HBM3E at 4.8 TB/s, so HBM3E itself improved. The flat leg is
+  B200 -> B300 specifically.
+  Also "HBM4 widens the interface FROM 1,024 BITS to 2,048", which gives the
+  doubling a prior number rather than asking the reader to supply it.
+
+  SWEPT 2026-08-16: every other generation and spec claim in the body
+  re-checked against the header's VERIFIED block and the registry.
+  B300 +60% memory at the same 8.0 TB/s (180 -> 288) ✓ · $7.85 vs $6.40 ✓ ·
+  2020-vintage A100 ✓ · one process for both dies through HBM3E ✓ · SK Hynix
+  logic die at TSMC, Micron at HBM4E not HBM4 ✓ · packaging already TSMC's ✓
+  · "a generation ago that supply sat entirely with the memory makers" ✓.
+  The HBM3 count above was the only error found.
+
+  RULED 2026-08-16 (John): the lens is "MEMORY CAPACITY", never bare
+  "capacity", wherever the reader could reach for another sense. The word
+  carries three meanings near each other in this note: the defined LENS,
+  TSMC's packaging capacity, and DRAM production capacity. §05 had the
+  packaging sense and the lens sense in ADJACENT paragraphs.
+  Changed: §03 dek, §03's "lands on memory capacity", §05's "Memory
+  capacity is arriving now, and it is the loosest of the four lenses", and
+  §05's packaging sentence now reads "how fast that WORK is expanding",
+  which points back at "how much of that work it can do" two sentences up.
+  ⭐ LEFT alone: §03's "capacity availability increases with it" sits right
+  after "adding memory volume", so the sense is carried. Revisit if that
+  sentence ever moves.
+
+  RULED 2026-08-16 (John): the RUBIN RANGE closes the OPENING paragraph, and
+  availability is a separate paragraph at the end of the section.
+  - "Rubin's published targets have run from 13 to 22 TB/s against the 8.0
+    that tops our panel, and they have moved more than once, so treat the
+    level as unsettled." It first sat in its own late paragraph opening
+    "Rubin carries higher bandwidth than anything in our panel"; John moved
+    it up so the magnitude lands with the claim. The panel tie survives as
+    an appositive on 8.0, and the duplicate "carries" is gone.
+    🔒 Label the BASIS. Every other bandwidth figure in this note is a
+    vendor nameplate for a SHIPPING part, which is what the four lenses
+    divide by. Rubin's is a TARGET for a part nobody can rent. ⛔ Never let
+    the two stand unlabelled in one paragraph — that is the ratio-beside-
+    percentage defect caught 2026-08-15 in a different costume.
+    History: 13 (Mar-25) → 20.5 (Sep) → 22 (CES-26) → suppliers missing it,
+    initial shipments nearer 20. DIRECTION is confident, LEVEL is not.
+  - The availability sentence moved to its OWN paragraph opening "Rentable
+    supply is a separate question." Sitting directly after the target range
+    it read as though the moving targets explained the missing price. They
+    are unrelated.
+
+  RULED 2026-08-16 (John): §04 dates the flat frontier as "the B300 entered
+  at the B200's 8.0 TB/s about seven months later".
+  ⚠️ BASIS: the INTERVAL comes from our own published generation ages on
+  /chip-economics (B200 ~1.4y, B300 ~0.8y, difference 0.6y). ⛔ NO calendar
+  dates: that page does not record which event its age field measures, and
+  for Blackwell the announce, first-availability and first-rentable dates
+  differ by months. An interval is stable as the ages roll forward; a date
+  picked from the wrong event is wrong forever. ⭐ The on-basis upgrade is
+  to date each part by its FIRST APPEARANCE IN OUR RECORD, which needs a
+  lake query and is not done.
+
+  RULED 2026-08-16 (John): the two-companies line states what TSMC is used
+  FOR — "to build that base die". Without the object the sentence named a
+  foundry and no work. ⛔ Both tenses still stand per the earlier ruling.
+
+  RULED 2026-08-16 (John): §04 names RUBIN in its opening paragraph, so the
+  section states its subject before three paragraphs of process detail.
+  "HBM4 is the step change, and Rubin is the part that carries it."
+  ⛔ NOT "the first part built on it": AMD's next part is also expected on
+  HBM4 and we have not verified the ordering. "Carries it" needs no ranking.
+  ⛔ The second sentence now says "HBM4 doubles the interface", not "It
+  doubles", because inserting Rubin made the pronoun ambiguous.
+
+  RULED 2026-08-16 (John): "not yet rentable on demand ANYWHERE" is SOFTENED
+  to "we have not seen a public on-demand price for it". The old line was a
+  universal claim; the basis is three venues checked 2026-08-16 (Lambda
+  "Available H2 2026", Cudo "Contact us for pricing", Compute Exchange
+  reserved-only) plus its absence from our panel. ⚠️ That absence is WEAK
+  evidence on its own — the panel captures posted asks for registered parts,
+  so an unregistered part cannot appear whether or not it is quoted.
+  Stating what we have seen is exactly as strong as the evidence.
+  ⛔ Do not restore "anywhere". 🔒 The X and LinkedIn drafts must carry the
+  same softening.
+
+  RULED 2026-08-16 (John): §03's HBM3 paragraph is SPLIT, and the capacity
+  line now opens "Either way". The break makes the logic explicit: HBM3
+  target or no HBM3 target, the near-term supply is capacity.
+  ⛔ "We also would point out that" was proposed and NOT taken. Reuters and
+  the prospectus are both already attributed inline, so the phrase is an
+  editorial aside in front of a sourced fact.
+  ⛔ "the supply that is migrating to the on-demand market" was considered
+  and REFUSED. §03's subject is MEMORY supply — wafer allocation, CXMT
+  volume. On-demand-market supply is GPUs appearing on rental venues, a
+  different variable. Swapping it mid-paragraph would silently change what
+  "lands on capacity" is about.
+
+  RULED 2026-08-16 (John): the .dek subtitles are AMBER, var(--accent).
+  This is a KNOWN exception to base.css:17 ("amber = data emphasis only.
+  Never decorative"), taken with the cost stated: in §02 the amber subtitle
+  sits four lines above the amber bullet squares and the four spread
+  figures, so the subtitle carries data weight it does not earn. The
+  precedent-consistent alternative was OFFERED and DECLINED: putting accent
+  on the .sec .n number instead, which is what
+  alphabet-pays-for-data-center-speed and big-tech-hidden-debt both do.
+  ⛔ Do not "fix" this to match the other notes without asking.
+
+  RULED 2026-08-16 (John): §05's "that step" had NO ANTECEDENT. The sentence
+  before it says "a step in bandwidth", indefinite and inside a conditional,
+  so the pronoun pointed at a hypothetical while the foundry clause attaches
+  to a real scheduled part. "Step" beside "runs through" also reads as a
+  manufacturing STAGE. Now: "more exposed to a step CHANGE in bandwidth ...
+  HBM4 IS that step change, and it increasingly runs through one foundry."
+  §04's "HBM4 is the step" becomes "the step change" to match, so the note
+  uses one word for one meaning. ⛔ Do not revert either half alone.
+
+  RULED 2026-08-16 (John): blue data bars are permitted ON THIS CARD ONLY.
+  The house rule is UNCHANGED — blue is wayfinding, amber carries data — and
+  this is a recorded exception, not a precedent. ⛔ Do not cite it to justify
+  blue bars anywhere else, and do not revisit /chip-economics or /credit.
+  ⚠️ The note still renders fig_wafer_tradeoff_TERMINAL. The blue PNG is the
+  OLDER 14:14 render and swapping it in would roll back the 16:14 text fixes:
+  it reads "chips" for "dies", drops the DRAM and HBM labels, and carries a
+  footer sentence the terminal card does not. If the blue card is wanted,
+  REGENERATE the terminal figure with blue bars rather than swap in the
+  stale file.
+
+  ── THE TWO AUTHORISED CHANGES, 2026-08-16 ──────────────────────────────
+  1. A100 compute parity. The draft read "71 percent of its compute share".
+     /chip-economics §parity prints 71 percent ABOVE compute parity, i.e.
+     171 percent of it. Per PFLOP-hr the A100 is the MOST expensive of the
+     five ($6.72 vs H100 $3.93). "71 percent of" reads as a discount and
+     reverses the finding. Now "71 percent above".
+  2. Seven inline questions resolved in place. See ANSWERED markers below.
+
+  RULED 2026-08-16 (John), REVISED SAME DAY: the two-companies line now
+  carries BOTH tenses. "Two companies will be using Taiwan Semiconductor
+  Manufacturing Company (TSMC), and one already is." Pure future undersold
+  SK Hynix, which sources its HBM4 logic die from TSMC TODAY; pure present
+  oversold Micron, which arrives at HBM4E. The paragraph immediately after
+  names which company and which generation, so the summary and the detail
+  agree. Also the first body use of TSMC, so it is spelled out here.
+  ⛔ Do not collapse this back to one tense.
+
+  RULED 2026-08-16 (John): "roughly a 65%" STANDS for the filing's "Mid-60%
+  Increase". His read: mid-60s centres on 65 and "roughly" carries the
+  approximation. Rendering a verbal band as an explicitly-approximate number
+  is a faithful reading, not a fabricated level. The same figure repeats in
+  the following paragraph, deliberately, so one fact reads as one number.
+  ⛔ Still barred elsewhere: printing it bare ("65%") or as a LEVEL.
+
+  ALSO RULED (John, 2026-08-16): the body does NOT label the move quarter on
+  quarter. Raised twice and declined both times — the sequencing is not what
+  this note is about. The QoQ basis stays recorded in the VERIFIED block
+  above for anyone re-deriving it. Do not re-raise.
+
+  ── OPEN, FOR THE SECTION WALK ──────────────────────────────────────────
+
+  fig_mem_consolidation: it does NOT carry the price move. Three suppliers
+  has been true since 2012, so concentration cannot explain a change that
+  happened in 1Q26. The filing's own stated mechanism is reallocation to
+  HBM. ⛔ Do not let it imply concentration pricing power.
+  RESOLVED 2026-08-16: the figure was ORPHANED — it claimed four decades of
+  exits, three suppliers and a first new entrant, and the text used none of
+  it. John gave it a line: "That industry consolidated to three suppliers
+  and has not added a new one in over a decade", placed in the LEDE right
+  after the price move, so CXMT arrives as the fourth entrant. ⛔ The two
+  facts sit ADJACENT deliberately; no connective asserts that concentration
+  caused the 65%, and none may be added. Figure placement (two blocks below
+  its sentence) reviewed and LEFT as is.
+
+  §01 RULINGS (John, 2026-08-16):
+  - "financed ahead of their traffic" replaces "financed too aggressively".
+    The mechanism was DURATION: track laid ahead of settlement, so debt
+    service started years before the traffic arrived. Freight really did
+    keep growing, so the judgment version was both softer and less true.
+    Same frame as the Aug-14 scale-note ruling (debt tenor vs contract
+    tenor vs asset life).
+  - "cited", not "assigned". Nadella named the book; he did not set it.
+  - "rents comparably to new chips on 2 spec sheet attributes" is REPLACED.
+    Our own record contradicts it: per unit of bandwidth the A100 prints
+    $1.042 against the B200's $0.800, a ~30% PREMIUM. Per kilowatt it is
+    the cheapest of the five. The two lenses point opposite ways and the
+    text now says so, which also sets up §02 instead of duplicating it.
+  - "six years" STANDS on John's calendar basis (2026 − 2020). The registry
+    age of 5.7 is a different construction, not a contradiction.
+  - Three-year A100 availability STANDS on CoreWeave's disclosed 3-year
+    A100 contract, which is a stronger basis than our T1 cell and removes
+    the T1/T2 tier concern entirely.
+  - "us in the frame" is DELIBERATE for this piece (John). The first-person
+    framing in the lede stays. ⛔ Not a precedent for the benchmark lane.
+
+  §01 REFRAMED (John, 2026-08-16, late) — SUPERSEDES the §01 rulings below:
+  - 🔒 THE FRAME IS OVERINVESTMENT, NOT DURATION. Homework done on Ahamed's
+    "1873: The Rothschilds, the First Great Depression, and the Making of
+    the Modern World". Publisher's own description: an explosion in the
+    global bond market "built the railroads", and the same money "unleashed
+    a frenzy of speculation, massive overinvestment, and wasteful borrowing
+    by governments". OVERINVESTMENT is the BOOK'S OWN WORD, so §01 stands on
+    it. ⛔ The book does NOT address freight rates and does NOT argue
+    overcapacity -> rate wars -> levered holders squeezed. That chain is
+    OURS. The note only ever credits NADELLA with recommending the book,
+    never Ahamed with the argument. KEEP IT THAT WAY.
+  - The argument §01 now sets up (John): overinvestment happens, supply and
+    demand eventually equalise, competition turns to price, and the lean
+    operator survives. That is what "run an efficient railroad" means, and
+    it gives the whole note its stakes.
+  - JEVONS IS NOW EXPLAINED, not just named. John read it the natural way
+    first (less coal per engine -> less coal burned); the paradox is that
+    this is wrong. Three sentences: paradox, mechanism, arithmetic. An
+    earlier one-liner ("cheaper power found more uses than the efficiency
+    removed") compared USES against COAL SAVED and did not parse.
+  - Two texts now get a paragraph EACH, matching the section title. 1873
+    used to arrive in a subordinate clause after "eight years later the
+    railroad boom collapsed", which John flagged as too quick.
+  - ⛔ LENS DETAIL IS OUT OF §01 (John): "priced at a premium per unit of
+    bandwidth and at a discount per kilowatt" arrived from nowhere and is
+    §02's material. §01 says only that demand is enormous and six-year-old
+    chips still go out on three-year terms.
+  - ⛔ "Supply is what changes that" OVERCLAIMED. Demand can soften on its
+    own, so it is now "that could change from either side".
+  - ⛔ "Efficiency per delivered token" was TOO NARROW (John): it scoped the
+    Jevons parallel to inference serving. He means GPU efficiency generally,
+    training and inference alike. Now "more work per chip and per watt", so
+    the parallel is the steam engine exactly. "Per watt" also plants the
+    power lens before §02 makes it the tightest of the four at 1.2x.
+  - 🔒 JEVONS MECHANISM DELIBERATELY NOT SPELLED OUT (John, final call).
+    A version making the price link explicit (efficiency -> cost per unit of
+    work falls -> new uses -> total consumption up) was drafted and left
+    out: too far into the weeds for a note about supply. ⛔ Do not "fix"
+    this later. Two things it deliberately avoids saying: (a) our own record
+    has GPU-HOUR PRICES RISING (H100 +76.5%, A100 +84.8%) even as cost per
+    unit of WORK falls, so never write "AI got cheaper" flat; (b) much AI
+    demand is CAPABILITY-driven, not price-driven, which Jevons does not
+    describe at all. The parallel is real but partial.
+  - The A100 three-year-contract line STAYS. Its job is demand DEPTH, not
+    pricing: someone commits years ahead on six-year-old silicon.
+  - 🔒 §01'S POINT, stated so it stops drifting (John asked directly):
+    demand being enormous does not protect prices; when supply catches up
+    the competition turns to price and the low-cost operator survives; so
+    supply is worth watching even in a boom. Everything else in §01 is
+    scaffolding for that.
+  - ⛔ "Memory gets made long before the chips built on it can be rented"
+    CUT from §01. It is a §04 mechanism and the reader has no use for it
+    that early. The old close also handed off to §03/§04 and SKIPPED §02.
+    The section now ends on "which attributes of a new chip would move
+    prices most", which is the door into §02. ⛔ An earlier version said
+    "which part of a chip it would have to change" — backwards, it implies
+    incoming supply modifies a chip. Order of the argument: what the market pays
+    for (§02), then what supply is coming (§03/§04).
+  - ⛔ "Two Victorian texts" -> "Two Victorian lessons". 1873 is an EVENT,
+    and the text about it is Ahamed's 2026 book, so only Jevons was ever a
+    Victorian text. "Eight years later came the other text" went with it.
+
+  §02 RULINGS (John, 2026-08-16):
+  - Five generations, not four. Fixed.
+  - 🔥 JOHN WAS RIGHT AND I WAS WRONG. I replaced his "capacity and compute
+    compress it as well but are currently wider" with "stay wide", borrowing
+    the binary framing off /chip-economics. His reference point is the RAW
+    spread, and against that EVERY lens compresses. Verified both ways:
+      raw 3.77x / 117%  ->  compute 2.36x / 90%  ->  capacity 1.87x / 67%
+      ->  bandwidth 1.45x / 37%  ->  power 1.23x / 21%
+    Monotone on both measures. His sentence is restored.
+  - 🔴 THE REAL DEFECT was a BASIS MISMATCH, not the wording. The note
+    printed raw as "3.8x" (max/min) and the lenses as percentages
+    ((max-min)/mean). Two different statistics side by side, so 3.8 -> 90
+    read as an INCREASE and the compression was invisible on the page.
+    SPREAD.raw = 117 puts all five on one measure. ⛔ Never place a ratio
+    and a range-over-mean in the same ladder again.
+  - Bullets carry the ladder alone; the min/max asides were pulled so the
+    descent reads. The which-chip-at-which-end payoff moved to the A100
+    paragraph, where it belongs.
+  - 🔒 BASIS RULED (John): the note quotes RATIOS (dearest over cheapest),
+    not range-over-mean. Reason: John wrote this note, knows the data cold,
+    and 117% still stopped him. A reader will not get further than the
+    author did. 3.8x > 2.4x > 1.9x > 1.5x > 1.2x reads on sight, is
+    monotone, and matches fig_m2_two_lenses AS ALREADY RENDERED, so no
+    figure regen was needed. The Notes block states the /chip-economics
+    equivalence (117/90/67/37/21) so nobody reads the two as a conflict.
+    ⚠️ The "Rate figures" paragraph at the top of this header still quotes
+    36.7% because that is the /chip-economics statistic, and it is correct
+    there. The underlying rates are unchanged and still reconcile exactly.
+
+  §04 RULINGS (John, 2026-08-16):
+  - Split into three paragraphs. February softened to "early this year"
+    (not in the VERIFIED block; the timeline figure prints BANDS because
+    each of these dates has moved at least once).
+  - Samsung NOT named (John). The point is that two makers moved the
+    bandwidth-increasing die to TSMC, not that a third did not.
+  - 🔒 CLOSING RESTRAINED TO TWO SENTENCES (John). A longer Rubin block was
+    drafted and REJECTED as overweight for a part with no row in our record.
+
+  PACKAGING-AS-CONSTRAINT, VERIFIED 2026-08-16 (web, not our data):
+  CoWoS was the BINDING constraint on the last accelerator generation, and
+  explicitly not fabrication. Lead times ran past 50 weeks through 2024 and
+  2024-25 capacity was fully booked by two customers. Capacity path roughly
+  8k wafers/month (2022) -> 11k (end-2023) -> ~20k (end-2024).
+  🔒 PLACED IN §04, NOT §05, DELIBERATELY (John). In §05 a reader could
+  attach "was the binding constraint" to the NEW thing TSMC took on at HBM4
+  (the base die on a logic node). It was the half TSMC ALREADY had. The
+  clause now sits inside the sentence that says "was already TSMC's", so the
+  two cannot be conflated. ⛔ Do not move it.
+  ⛔ NOT USED: TSMC reportedly holds ~90% of advanced packaging at this
+  scale. It is a trade estimate AND it attributes packaging capacity to AI,
+  which the header bars outright.
+  CROSS-CHECK: 8k compounded at 80% for five years is ~151k/month by 2027,
+  against the trade estimates of 170k-200k in the VERIFIED block above.
+  Different sources, same neighbourhood, so the 80% CAGR holds up.
+
+  ── RUBIN, VERIFIED 2026-08-16 (web, not our data) ──────────────────────
+  Kept out of the body by John's call, recorded here because it is the
+  evidence behind the two sentences that DID go in.
+  - Capacity 288GB HBM4 per GPU. IDENTICAL to the B300's 288GB. Rubin adds
+    NO capacity.
+  - Bandwidth roughly 20-22 TB/s vs the B300's 8.0, so ~2.5-2.75x. Target
+    history: 13 TB/s (Mar-2025) -> 20.5 (Sep) -> 22 (CES 2026) -> suppliers
+    reportedly missing it, initial shipments nearer 20. ⚠️ The LEVEL is
+    contested; the DIRECTION is not. Even the lowest figure ever floated
+    (13) is a large step off 8.0, so the claim survives every published
+    version. Print a RANGE if it is ever printed at all.
+  - 🔥 RUBIN IS THE EXACT INVERSE OF THE B300. B300: capacity 180->288
+    (+60%), bandwidth 8.0->8.0 (flat). Rubin: capacity 288->288 (flat),
+    bandwidth 8.0->~22. Two consecutive steps, each moving ONE lens, in
+    OPPOSITE directions, and we already hold the price outcome for the
+    first. That makes the B300 paragraph in §02 a control case.
+  - ⛔ NEVER compare compute to Rubin. Lambda quotes 50 PFLOPS NVFP4; our
+    registry is dense BF16 (B300 = 2.25). Different number formats, so any
+    ratio between them is meaningless.
+  - NOT RENTABLE ON DEMAND anywhere that publishes a Rubin page, checked
+    2026-08-16: Lambda "Available H2 2026", sole CTA "Talk to our team", no
+    price. Cudo "Register now", "Contact us for pricing". Compute Exchange
+    reserved-only, twelve-month-and-longer commitments, first partner-
+    network supply 2027. NO public hourly price exists for a Rubin part.
+    So its absence from the panel is BY CONSTRUCTION, not a coverage gap:
+    the panel is built from posted asks and there is no posted ask.
+    ⚠️ Marketing pages = asks and intentions, never transactions.
+  - 🔴 John's B300-allocation hypothesis was TESTED AND NOT SUPPORTED: B300
+    prints from 10 neocloud sources on-demand vs the B200's 8. It is not
+    withheld from the public pool, and B300 supply cannot explain a flat
+    bandwidth frontier because the B300 is not a bandwidth part. The
+    allocation mechanism DOES hold for Rubin. Separate piece.
+
+  §05 RULINGS (John, 2026-08-16):
+  - REORDERED: why TSMC matters comes BEFORE how little it discloses. The
+    old order told the reader TSMC is opaque before telling them why it is
+    on the list at all, which read as a non sequitur.
+  - ORDER FLIPPED BACK (John): disclosure first, structural close LAST. The
+    reorder earlier in the day fixed the logic but ended the note on a CAGR.
+    §04 already establishes TSMC does the packaging, so "that packaging"
+    resolves at the top of §05 without a lead-in.
+  - 🔒 THE NOTE ENDS ON "It is now completed by the memory makers and TSMC
+    together. Watch both." John's call and the right one. "Watch both"
+    answers the section's own header and picks up the standfirst's "both
+    sides of the strait"; its antecedent is the two parties named in the
+    sentence before it. A closer reaching for the
+    title's idiom ("The memory news is in China. What it does to the price
+    of an older GPU runs through Taiwan.") was drafted and REJECTED: it
+    lands as a rhetorical reveal, which is the banned shape. The quiet
+    declarative is the house voice. ⛔ Do not add a flourish after it.
+  - "puts TSMC in the memory story as well as the logic one" CUT as a
+    near-duplicate of the closing sentence it would have preceded.
+  - ⛔ "a NEW name to watch" is DEAD. TSMC is nobody's new name, it already
+    builds the accelerators, and §04 says its packaging role predates HBM4
+    ("was already TSMC's"). Calling it new CONTRADICTED our own section.
+    What changed is that TSMC is now inside the MEMORY step too, so the
+    line is "in the memory story as well as the logic one".
+  - "advanced packaging capacity" CUT (John: "i have no clue what that is").
+    "Advanced" did no work for the reader and the term of art arrived cold.
+    §04 already defines the thing in plain words, so §05 reuses that: "the
+    step that joins finished memory stacks to the accelerator", defined
+    inline where the reader meets it.
+  - The by-the-tenth Taiwan reporting passage stays CUT (see the ANSWERED
+    marker in §05): it promised information the monthly filing cannot give,
+    because that filing carries no product breakdown.
+  - 🔒 §05 IS THE WRAP-UP AND OPENS WITH THE CALLBACKS (John, 2026-08-16).
+    §01 set up two Victorian lessons and nothing after it touched either;
+    every Jevons/1873 mention sat inside §01. The opener now closes both.
+    ⛔ NOT A FORECAST: "overinvestment is how supply catches up" was drafted
+    and REJECTED by John — overinvestment is not a mechanism, it is a risk
+    you manage against. The paragraph claims a CONDITION (Jevons holding),
+    an EXPOSURE (bandwidth over capacity or compute, labelled as our read),
+    and a BRIDGE. No glut is predicted.
+  - ⛔ "We read 1873 as a story about over-investment" was drafted and CUT
+    (John: "don't love saying we read it someway"). The note never claims to
+    summarise Ahamed, only that Nadella recommended the book, so it does not
+    need to flag an interpretation. 1873 is not named in §05 at all.
+  - ⛔ A closing railroad line ("the operators who came through were the ones
+    who could run a route cheaply") was drafted and DROPPED. The note ends on
+    "Watch both."
+  - "its capacity for that packaging, the step that joins finished memory
+    stacks" -> "how much of that packaging it can do". Removes the SECOND
+    sense of "capacity" (the note's defined lens) and the THIRD sense of
+    "step", both of which John flagged. §04 already defines the packaging.
+
+  §03 RULINGS (John, 2026-08-16):
+  - REORDERED: the allocation DECISION first, then its cost, then what the
+    incumbents chose, then where CXMT lands. The wafer trade-off used to
+    arrive before the reader knew a choice existed (John's read).
+  - A one-line gloss defines a wafer as the unit a fab ALLOCATES, which is
+    the economic fact, not the physics. It earns its place by making the
+    allocation decision self-explaining.
+  - The SK Hynix reallocation line was sitting unused in the lede. It is
+    the PRIMARY-SOURCE mechanism this section needed and now carries it,
+    replacing a trade-estimate derivation.
+  - CXMT HBM3 now attributed to Reuters WITH the prospectus gap stated.
+    ⛔ Never state it flat again: the prospectus names no HBM project.
+  - "its own" replaced by CXMT (John). The nearest nouns were incumbents
+    / global DRAM / conventional demand, so the possessive dangled.
+  - The closing hedge is gone. Capacity is the loosest lens at 1.9x, which
+    is derivable from the §02 ladder and needs no qualifier.
+*/
+const AS_OF = '2026-08-16';
+const SNAP = '2026-08-12';
+// 1,462 body words + five figures, at 238 wpm (average adult) plus 12s per
+// figure = 7.1. Set 2026-08-16. The BODY is the basis: the earlier 8 came
+// from a 1,563-word count that included the Notes block, which is collapsed
+// by default and which most readers never open. (Was 4, from the 704-word
+// draft.) Recount the body if the note grows.
+const READ_MIN = 7;
+
+// One basis for every figure below, so the prose cannot drift from
+// /chip-economics. ONE measure end to end: max divided by min, so the ladder
+// 3.8 > 2.4 > 1.9 > 1.5 > 1.2 is comparable and reads on sight.
+// /chip-economics publishes the SAME spreads on the SAME rates as
+// (max-min)/mean: 117 / 90 / 67 / 37 / 21. Different statistic, same
+// data, and the Notes block says so. Never mix the two in one ladder.
+const SPAN = { raw: '3.8', pf: '2.4', gb: '1.9', bw: '1.5', kw: '1.2' };
+---
+<Base
+  title="The Price of Memory in China · CCIR Research"
+  description="A memory maker is now the most valuable listed company in China. The supply arriving now lands on the attribute that moves GPU rental prices least. The one that would move them most is still scheduled, and it runs through a foundry in Taiwan."
+  ogImage="/og/price-of-memory-in-china.png"
+  article={{ published: '2026-08-16' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · {AS_OF} · {READ_MIN} min read</div>
+      <h1>The Price of Memory in China</h1>
+      <p class="standfirst">
+        A memory maker is now the most valuable listed company in China. For
+        what that has to do with the price of an older GPU, read the tea
+        leaves on both sides of the strait.
+      </p>
+    </header>
+
+    <section class="sec">
+      <p class="lede-para">
+        ChangXin Memory Technologies (CXMT) closed the end of last week
+        valued at near $546 billion, 18 days after its Shanghai listed IPO
+        near $86 billion. Today, it is the most valuable listed company in
+        China. Less than one month ago another memory maker headquartered in
+        South Korea, SK Hynix, listed on Nasdaq and its prospectus shows
+        first-quarter 2026 DRAM bit volume flat against roughly a 65% price
+        increase. That industry consolidated to three suppliers and has not
+        added a new one in over a decade.
+      </p>
+
+      <figure class="chart-fig">
+        <img src="/img/research/memory/fig_mem_crossover.png" width="1800" height="960"
+             alt="Bar chart of market value on August 14th, 2026: Samsung 1.23 trillion dollars, Micron 1.10 trillion, SK Hynix 847 billion, CXMT 546 billion, Tencent 503 billion." loading="lazy" />
+        <figcaption class="tfoot">
+          <details class="capnote"><summary>Basis</summary>
+            <span>Exchange closes on August 14th, 2026 converted at one FX fix. Each figure divided by that day&rsquo;s share price returns the issuer&rsquo;s share count, so every bar is recomputable. Tencent makes no memory; it is here because it is the company CXMT passed.</span>
+          </details>
+        </figcaption>
+      </figure>
+
+      <p>
+        We all continue to see the demand for global compute expanding at
+        breakneck pace. The market paid roughly 65% more for the same volume
+        of memory, then bid a company promising more of it past every other
+        listed company in China.
+      </p>
+
+      <figure class="chart-fig">
+        <img src="/img/research/memory/fig_mem_consolidation.png" width="1800" height="810"
+             alt="Timeline of the DRAM industry from 1981 to 2031: four decades of exits leave three suppliers, and 2026 brings the first new entrant in over a decade." loading="lazy" />
+        <figcaption class="tfoot">
+          <details class="capnote"><summary>Basis</summary>
+            <span>Exits are dated to the announcement of withdrawal from commodity DRAM, whether by closure, sale or merger. CXMT is marked at its 2026 listing rather than at first production.</span>
+          </details>
+        </figcaption>
+      </figure>
+
+      <p>
+        As we think about this incoming supply of memory to the markets we are
+        focused on which levers will have the most effect on the earning power
+        of prior generation GPUs, and on what schedule.
+      </p>
+
+
+      <h2><span class="n">01</span> Total Recall</h2>
+      <p class="dek">Two Victorian lessons</p>
+      <p>
+        In 1865 Jevons observed that more efficient steam engines raised coal
+        consumption rather than lowering it. Each engine burned less coal,
+        which made steam power cheap enough for uses that had never justified
+        it. The extra demand outweighed the saving.
+      </p>
+      <p>
+        Eight years later the bond market that built the railroads also
+        funded a great deal of overinvestment, and when the bubble broke the
+        operators who came through were the ones who ran most efficiently. Microsoft's CEO cited that period on his last
+        earnings call, telling investors 1873 is the book to read and that the
+        job is to run an efficient railroad.
+      </p>
+      <p>
+        The parallel to compute in 2026 is plain to see. Each generation does
+        more work per chip and per watt, across training and inference alike.
+        Demand has grown through every one of those gains. GPUs six years of
+        age are still being sold on three-year term contracts.
+      </p>
+      <p>
+        Demand is in line with Jevons for now. That could change from either
+        side, and when enough new supply arrives the competition turns to
+        price. Anyone still earning on prior generation chips then wants to be
+        the low cost operator. That makes the incoming supply worth watching,
+        and makes it worth knowing which attributes of a new chip would move
+        prices most.
+      </p>
+
+      <h2><span class="n">02</span> Working Memory</h2>
+      <p class="dek">The attributes with the most potential to move earning power</p>
+      <p>
+        Memory capacity decides whether a model fits. Bandwidth decides how
+        fast it runs. Power decides what it costs to keep running.
+        Take one daily reference rate for five generations of
+        GPUs and divide each by a figure from its spec sheet. Raw, the prices
+        of neocloud offerings across those five generations span
+        {SPAN.raw}&times;, dearest over cheapest. Re-denominated, every lens
+        compresses that:
+      </p>
+
+      <ul class="blist">
+        <li>Per petaFLOP, <strong>{SPAN.pf}&times;</strong></li>
+        <li>Per gigabyte of memory, <strong>{SPAN.gb}&times;</strong></li>
+        <li>Per unit of bandwidth, <strong>{SPAN.bw}&times;</strong></li>
+        <li>Per kilowatt, <strong>{SPAN.kw}&times;</strong></li>
+      </ul>
+
+      <p>
+        Power and bandwidth compress the cross-section hardest. Priced per
+        kilowatt the five sit within {SPAN.kw}&times; of one another. Memory
+        capacity and compute compress it as well, but currently far less. The
+        two constrained inputs of the build-out are the two that current
+        pricing tracks most closely.
+      </p>
+
+      <figure class="chart-fig">
+        <img src="/img/research/memory/fig_m2_two_lenses.png" width="1800" height="840"
+             alt="Two panels of the same five rental rates: raw dollars per GPU-hour spanning 3.8 times, then dollars per terabyte per second of bandwidth spanning 1.5 times." loading="lazy" />
+        <figcaption class="tfoot">
+          <details class="capnote"><summary>Basis</summary>
+            <span>Neocloud guaranteed on-demand, all regions, {SNAP}. Denominator is vendor nameplate memory bandwidth: 2.0, 3.35, 4.8, 8.0 and about 8.0 TB/s. Posted list asks, not transactions.</span>
+          </details>
+        </figcaption>
+      </figure>
+
+      <p>
+        Let's look at a controlled view versus current CCIR Neocloud rates:
+        B300 holds the same 8.0 TB/s as the B200 while possessing sixty
+        percent more memory, and is benchmarked at $7.85 against the B200's
+        $6.40.
+        Cheaper per gigabyte of memory, but 23 percent more expensive per unit
+        of bandwidth. An addition to the wide attribute earned no premium on
+        the compressed one.
+      </p>
+
+      {/* CORRECTED: was "71 percent of its compute share". The record says
+          71 percent ABOVE compute parity. See /chip-economics §parity. */}
+      <p>
+        Similarly the 2020 vintage A100 prices at 90 percent of what its
+        bandwidth share of the H100 rate implies, and 71 percent above what
+        its compute share implies. It is the cheapest of the five per gigabyte
+        and per kilowatt, and the dearest per petaFLOP. The market has
+        repriced its oldest silicon tighter to its bandwidth share.
+      </p>
+
+      <ReadMore title="The construction behind these numbers">
+        <a href="/chip-economics">Chip Economics</a>
+        <span>&mdash; the same rate through four denominators, updated daily</span>
+        <a href="/rates">Reference rates</a>
+        <span>&mdash; the panel these five cells come from</span>
+        <a href="/research/gpu-age-curve">The GPU age curve</a>
+        <span>&mdash; the same normalization run against age</span>
+      </ReadMore>
+
+      <h2><span class="n">03</span> Memory Foam</h2>
+      <p class="dek">Memory capacity supply is arriving now</p>
+      {/* ANSWERED "HOW DO WE KNOW THIS?": we do not, from a filing. It is a
+          trade estimate, attributed inline and graded in the Notes block.
+          REORDERED 2026-08-16 (John): the allocation DECISION now comes
+          first, then its cost, then what the incumbents chose, then where
+          CXMT lands. The wafer trade-off used to arrive before the reader
+          knew a choice existed. The SK Hynix reallocation line was sitting
+          unused in the lede and is the primary-source mechanism this
+          section needed. */}
+      <p>
+        Every memory maker faces the same decision on each wafer, the silicon
+        disc that chips are cut from and the unit a fab allocates. It can be
+        finished as conventional DRAM, which fills the rest of an AI server,
+        or it can be finished as high-bandwidth memory. It cannot be both, and
+        that choice shapes the supply story.
+      </p>
+      <p>
+        The choice is expensive. A wafer converted to HBM yields roughly half
+        as many usable dies, because the dies are bigger and the stacking
+        costs spare layers and losses. A maker moving a line to HBM is giving
+        up conventional volume to do it.
+      </p>
+      <p>
+        All three incumbents have been making that move. SK Hynix's own
+        prospectus attributes the shortage in conventional DRAM to the
+        industry-wide reallocation of production capacity to HBM.
+      </p>
+
+      <figure class="chart-fig">
+        <img src="/img/research/memory/fig_wafer_tradeoff_terminal.png" width="1800" height="840"
+             alt="Diagram of the wafer trade-off: one wafer yields roughly twice as many usable dies as ordinary DRAM than as high-bandwidth memory, because HBM dies are bigger and stacking costs spare layers and losses." loading="lazy" />
+        <figcaption class="tfoot">
+          <details class="capnote"><summary>Basis</summary>
+            <span>The die ratio is a trade estimate, not a filed figure. It is directionally consistent across sources and is used here as scale, never as precision. It is quoted per DIE. Trade sources more often quote the penalty per gigabyte, where high-bandwidth memory is reported at roughly three times the wafer area of conventional DRAM.</span>
+          </details>
+        </figcaption>
+      </figure>
+
+      <p>
+        Today CXMT is adding memory volume, and capacity availability
+        increases with it. It fills the conventional hole the incumbents
+        leave. Its share of global DRAM bit shipments went from one percent
+        in 2021 to nine percent in 2025, and its added volume clears largely
+        inside China, to buyers who contracted for it in advance. Absorbing
+        that conventional demand is
+        what will help the conversions continue.
+      </p>
+      <p>
+        Reuters reports CXMT is targeting domestic HBM3 by year-end, though
+        its prospectus names no HBM project. HBM3 is a generation behind the
+        stacks shipping beside current accelerators, and two behind the HBM4
+        step now in production.
+      </p>
+      <p>
+        Either way, the supply arriving now lands on memory capacity, which
+        is the loosest of the four lenses at {SPAN.gb}&times;.
+      </p>
+
+      <h2><span class="n">04</span> Photographic Memory</h2>
+      <p class="dek">Bandwidth supply is scheduled</p>
+      {/* ANSWERED "Is that right?": fig_m5_hbm4_timeline marks BOTH HBM4 mass
+          production and Rubin production as under way in Aug-2026, so "ship
+          next year" contradicted the note's own figure. Written to the figure.
+          ANSWERED "want a new word here": the vague "That generation also
+          changed hands" is CUT entirely (John). It announced the point
+          before making it. The hinge now sits BETWEEN the old world and the
+          new one and gives the REASON: a 2,048-bit interface asks more of
+          the base die than a memory process delivers. Para 2 tells the
+          story, para 3 names the parties.
+          ANSWERED "what stack": the HBM stack, and its two dies are named. */}
+      <p>
+        The bandwidth frontier has been flat: the B300 entered at the B200's
+        8.0 TB/s about seven months later. Both carry HBM3E, the stack behind
+        every part in our panel since the H200. HBM4 is the step change, and
+        Rubin is the part that carries it. HBM4 widens the interface from
+        1,024 bits to 2,048, and mass production began early this year.
+        Rubin's published
+        targets have run from 13 to 22 TB/s against the 8.0 that tops our
+        panel, and the most recent revision was downward, to about 20. Treat
+        the level as unsettled.
+      </p>
+      <p>
+        Through HBM3E one process built both dies in the HBM stack, the core
+        die that stores the bits and the base die that runs the interface, and
+        both were owned by the memory makers themselves. The wider HBM4
+        interface asked more of the base die than a memory process delivers,
+        so it moved to an advanced logic node. Two companies will be using
+        Taiwan Semiconductor Manufacturing Company (TSMC) to build that base
+        die, and one already is.
+      </p>
+      <p>
+        SK Hynix sources its logic die from TSMC. Micron keeps its base die on
+        a DRAM process through HBM4 and moves to TSMC at HBM4E. The packaging
+        that joins finished stacks to the accelerator was already TSMC's, and
+        it was the binding constraint on the last generation of accelerators.
+        A foundry now sits at two points on the bandwidth path where a
+        generation ago it sat at one.
+      </p>
+      <p>
+        Rentable supply is a separate question. We have not seen a public
+        on-demand price for Rubin. Production has started and the first cloud
+        partners are reported to take delivery this fall, with broader
+        availability later, so we will be watching prior generation pricing as
+        that widens.
+      </p>
+
+      <figure class="chart-fig">
+        <img src="/img/research/memory/fig_m5_hbm4_timeline.png" width="1800" height="930"
+             alt="Timeline of HBM4 and HBM4E availability bands from 2026 to 2028, with a marker at today in August 2026 showing HBM4 mass production and NVIDIA Rubin production both already underway." loading="lazy" />
+        <figcaption class="tfoot">
+          <details class="capnote"><summary>Basis</summary>
+            <span>Bands rather than dates: each of these has moved at least once.</span>
+          </details>
+        </figcaption>
+      </figure>
+
+      <h2><span class="n">05</span> Refresh Rate</h2>
+      <p class="dek">What is actually watchable</p>
+      {/* ANSWERED "WHAT GROWTH RATE?": advanced packaging capacity, i.e. CoWoS
+          wafers per month. Not bandwidth. Noun added.
+          ANSWERED "do they ever report on bandwidth upgrades?": NO. The
+          Taiwan monthly filing is a single revenue figure with no product
+          breakdown, so it cannot separate HBM from packaging from logic.
+          CUT 2026-08-16 (John): the whole by-the-tenth passage is gone. It
+          promised information it cannot deliver, and John's actual point is
+          structural, not about disclosure cadence. TSMC matters here because
+          it now COMPLETES the bandwidth step alongside the memory makers,
+          which is what the closing paragraph says.
+          RULED 2026-08-16 (John): "that step is increasingly being BUILT at
+          one foundry" is now "that step increasingly RUNS THROUGH one
+          foundry". TSMC does not build the step. It builds the base die and
+          does the packaging, which is the two points on the bandwidth path
+          named in §04, so "built" claimed more than the section supports.
+          "Runs through" picks up that path. ⛔ Do not restore "built". */}
+      <p>
+        None of this binds while demand keeps absorbing what arrives. That is
+        Jevons, and it has held through every efficiency gain so far. If it
+        stops holding, the exposure is to a step change in bandwidth. HBM4 is
+        that step change, and it increasingly runs through one foundry.
+      </p>
+
+      <p>
+        TSMC does not publish how much of that work it can do. Circulating
+        estimates disagree by about 20%. Its own disclosed figure is a growth
+        rate rather than a level, compounding above eighty percent from 2022
+        to 2027, so it tells you how fast that work is expanding and
+        nothing about whether it is enough.
+      </p>
+
+      <p>
+        Memory capacity is arriving now, and it is the loosest of the
+        four lenses. Bandwidth is where incoming supply meets a binding
+        constraint. A generation ago the memory makers built the whole stack.
+        It is now completed by the memory makers and TSMC together. Our read
+        is that prior generation chips are more exposed to that step than to
+        one in memory capacity or compute.
+      </p>
+
+      <details class="notes">
+        <summary>Notes on sources and construction</summary>
+        <p>
+          <strong>Rental rates.</strong> Neocloud guaranteed on-demand, all
+          regions, SXM parts throughout so each numerator matches its SXM
+          nameplate denominator. Forty-six complete days, July 1st to August
+          15th, 2026. Prices are posted list asks, not transactions. Spread is
+          the same-day range divided by the mean across the five generations.
+          Construction and the capacity, compute and power denominators are on
+          <a href="/chip-economics">/chip-economics</a>, which computes the
+          same figures from the same basis. Spread is quoted throughout this
+          note as dearest divided by cheapest, raw and re-denominated alike,
+          so the five figures are comparable end to end.
+          <a href="/chip-economics">/chip-economics</a> quotes the same
+          spreads on the same rates as the range divided by the mean, which
+          gives 117, 90, 67, 37 and 21 percent. Same data, different
+          statistic.
+        </p>
+        <p>
+          <strong>Market values.</strong> Exchange closes on August 14th,
+          2026, converted at one FX fix. Each figure divided by that day's
+          share price returns the issuer's share count, so every bar is
+          recomputable. Widely circulated aggregate figures for the three
+          incumbents do not reconcile against this arithmetic.
+        </p>
+        <p>
+          <strong>Grades.</strong> The prospectus project list and the HBM4
+          base die arrangements are primary. The
+          wafer reallocation share, the HBM wafer ratio and every packaging
+          capacity figure are trade estimates, used as scale rather than
+          precision. Where estimates disagree, the range is printed.
+        </p>
+        <p>
+          <strong>Live surfaces.</strong>
+          <a href="/chip-economics">/chip-economics</a> ·
+          <a href="/rates">/rates</a> · <a href="/hardware">/hardware</a>.
+        </p>
+      </details>
+    </section>
+
+    <NoteFooter title="The Price of Memory in China" published="2026-08-16" />
+  </section>
+</Base>
+
+<style>
+  .chart-fig { margin: 24px 0 28px; max-width: 660px; }
+  .chart-fig img {
+    display: block; width: 100%; height: auto;
+    border: 1px solid var(--rule); border-radius: 4px;
+  }
+  .standfirst { max-width: 60ch; }
+
+  /* Section subtitle. The heading carries the pun, this line says what the
+     section is, so the pun never costs the reader the signpost. */
+  .dek {
+    max-width: 60ch;
+    margin: 4px 0 16px;
+    color: var(--accent);
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .blist {
+    max-width: 74ch; margin: 4px 0 18px;
+    padding-left: 20px; list-style: none;
+  }
+  .blist li { position: relative; margin-bottom: 8px; line-height: 1.6; }
+  .blist li::before {
+    content: ''; position: absolute; left: -18px; top: 0.62em;
+    width: 6px; height: 6px; border-radius: 1px;
+    background: var(--accent); opacity: 0.8;
+  }
+
+  .notes {
+    margin: 40px 0 8px; max-width: 660px;
+    border-top: 1px solid var(--rule); padding-top: 14px;
+  }
+  .notes > summary {
+    cursor: pointer; color: var(--ink-dim);
+    font-family: var(--font-mono); font-size: 0.82rem;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .notes > summary:hover { color: var(--link); }
+  .notes p { color: var(--ink-dim); font-size: 0.92rem; margin-top: 14px; }
+</style>
