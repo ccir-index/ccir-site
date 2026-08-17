@@ -69,7 +69,7 @@
       "rate": {
         "kind": "sofr_spread",
         "value": null,
-        "value_low": 6.0,
+        "value_low": 6,
         "value_high": 6.5,
         "note": "Pre-Fifth-Amendment grid: SOFR + 6.00-6.50% (investment-grade contract loans) / SOFR + 13.00% (non-IG). Fifth Amendment (8-K 10/2/25): all new draws SOFR + 4.25% (or base rate + 3.25%), flat; 1.50% upfront on draws, 3.00% commitment fee on undrawn below $2.4B. Effective ~11% per 10-Q."
       },
@@ -137,7 +137,7 @@
       "size_note": "$2.6B facility; $1,700M outstanding 3/31/26",
       "rate": {
         "kind": "sofr_spread",
-        "value": 4.0,
+        "value": 4,
         "note": "Daily SOFR + 4.00%; 0.50% undrawn fee; effective ~9% per filings"
       },
       "maturity": "2030-08-21",
@@ -259,31 +259,35 @@
       "issuer": "CoreWeave, Inc.",
       "ticker": "CRWV",
       "issuer_type": "public",
-      "entity": null,
-      "name": "$2.6B DDTL (Jul 2026)",
+      "entity": "CoreWeave Financing DDTL V-V, LLC (borrower), an indirect subsidiary of CoreWeave, Inc.; equity held by CW Financing DDTL V-V Holdco, LLC",
+      "name": "DDTL 5.5 Facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 2600,
-      "size_note": "$2.6B first-lien delayed-draw; draws over 5 years, interest on drawn amounts only (FT)",
+      "size_note": "Committed $2.6B; drawn balance undisclosed. Draws available in one or more draws until the commitment termination date in December 2026 (8-K). Purpose per the filing: to finance capital expenditures required to perform certain customer contracts, including the acquisition of GPU servers and related infrastructure. Undrawn fee 0.50% per annum on the average daily undrawn portion, payable monthly in arrears.",
       "rate": {
         "kind": "sofr_spread",
         "value": 5.5,
-        "note": "S+550, 0% floor, 97 OID; ~10.44% yield to maturity at issue. Widened from S+425–450 / 99 OID talk. Completion + final terms press-reported (PitchBook LCD, reported Aug 1); 8-K not yet filed."
+        "note": "Term SOFR (0.00% floor) + 5.50%; base rate loans at base rate (0.00% floor) + 4.50%, base rate = highest of prime, fed funds effective + 0.50%, one-month Term SOFR + 1.00%. Undrawn fee 0.50% per annum on the average daily undrawn portion, payable monthly in arrears. Spread and floor confirmed by the 8-K. 97 OID and the ~10.44% yield-to-maturity remain press-sourced (PitchBook LCD) — not in the filing."
       },
       "maturity": "2031-09-01",
       "maturity_note": "Amortization scaled to fully repay the facility by maturity (PitchBook LCD)",
-      "seniority": "First-lien senior secured",
-      "security": "GPUs and ancillary components under take-or-pay contracts (Anthropic, Jane Street, Midjourney, Hudson River Trading, Anysphere — per PitchBook LCD/FT); DSCR ≥1.35x at borrower, aligned with parent revolver covenants until parent reaches IG; $112.5M minimum liquidity until 12 months pre-maturity; lockbox in place until half the debt is repaid, and also triggered if the lease rate drops below a threshold (FT term sheet)",
+      "seniority": "Senior secured; unconditionally guaranteed by CoreWeave, Inc. (parent) under a Parent Guarantee and Pledge Agreement dated 2026-08-07, and by the borrower's subsidiaries under a collateral agreement",
+      "security": "Substantially all assets of the borrower and its subsidiaries, plus a pledge of 100% of the equity interests in the borrower held by CW Financing DDTL V-V Holdco, LLC (8-K). Underlying: GPUs and ancillary components under take-or-pay contracts (Anthropic, Jane Street, Midjourney, Hudson River Trading, Anysphere — PitchBook LCD/FT). DSCR >=1.35x, tested from the first full calendar month after the earlier of (a) commitments reduced to zero and (b) 2026-12-31. $112.5M minimum liquidity until 12 months pre-maturity; lockbox in place until half the debt is repaid, and also triggered if the lease rate drops below a threshold (FT term sheet). Events of default include cross-defaults, change of control, bankruptcy, and adverse events with respect to certain material contracts.",
       "lenders": [
-        "JPMorgan (lead)"
+        "JPMorgan Chase Bank, N.A. (administrative agent; joint lead arranger, joint bookrunner, syndication agent)",
+        "MUFG Bank, Ltd. (joint lead arranger, joint bookrunner, syndication agent)",
+        "U.S. Bank Trust Company, N.A. (collateral agent)",
+        "U.S. Bank National Association (depositary bank)",
+        "Syndicate not named"
       ],
       "status": "confirmed",
-      "issued": "2026-08-01",
+      "issued": "2026-08-07",
       "source": {
-        "doc": "PitchBook LCD (completion, final terms); FT 7/30/26 (term sheet: lockbox, offtake mix)",
-        "date": "2026-08-01",
-        "url": "https://pitchbook.com/news/articles/coreweave-completes-2-6b-term-loan-after-raising-the-spread-and-yield"
+        "doc": "8-K, Items 1.01/2.03/7.01 (event 2026-08-07, filed 2026-08-10), acc. 0001769628-26-000357. Credit Agreement filed as EX-10.1; Parent Guarantee and Pledge Agreement as EX-10.2.",
+        "date": "2026-08-10",
+        "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000357/crwv-20260807.htm"
       },
-      "as_of": "2026-08-01",
+      "as_of": "2026-08-17",
       "facility_ratings": [
         {
           "agency": "Moody's",
@@ -347,7 +351,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 9.0,
+        "value": 9,
         "note": null
       },
       "maturity": "2031-02-01",
@@ -649,7 +653,7 @@
       "size_note": "$281M outstanding 3/31/26; reclassified customer deposit",
       "rate": {
         "kind": "fixed",
-        "value": 12.0,
+        "value": 12,
         "note": "Redemption multiplier = 12% annual return"
       },
       "maturity": "2029-01",
@@ -684,8 +688,8 @@
       "rate": {
         "kind": "fixed",
         "value": null,
-        "value_low": 13.0,
-        "value_high": 15.0,
+        "value_low": 13,
+        "value_high": 15,
         "note": "Imputed 15% / 13%"
       },
       "maturity": "~2038/39",
@@ -760,7 +764,7 @@
       "size_note": "$487.5M outstanding (of $500M); accretes to 120% ($587.5M payable)",
       "rate": {
         "kind": "fixed",
-        "value": 2.0,
+        "value": 2,
         "note": "Effective 7.06%; conversion ~$51.45 (40% premium); share-settled"
       },
       "maturity": "2029-06-05",
@@ -794,7 +798,7 @@
       "size_note": "$487.5M outstanding; accretes to 125% ($612.5M payable)",
       "rate": {
         "kind": "fixed",
-        "value": 3.0,
+        "value": 3,
         "note": "Effective 6.87%; conversion ~$51.45"
       },
       "maturity": "2031-06-05",
@@ -828,7 +832,7 @@
       "size_note": "Accretes to 115% ($1,818.4M payable)",
       "rate": {
         "kind": "fixed",
-        "value": 1.0,
+        "value": 1,
         "note": "Effective 4.15%; conversion ~$138.75"
       },
       "maturity": "2030-09-15",
@@ -1063,7 +1067,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 1.0,
+        "value": 1,
         "note": "Effective 10.9% after derivative discount; conversion ~$12.43; capped calls to $18.76"
       },
       "maturity": "2031-09-01",
@@ -1098,7 +1102,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 0.0,
+        "value": 0,
         "note": "Effective 0.4%; conversion ~$19.94"
       },
       "maturity": "2032-05-01",
@@ -1269,7 +1273,7 @@
       "size_note": "Issued at 100.0",
       "rate": {
         "kind": "fixed",
-        "value": 7.0,
+        "value": 7,
         "note": "Amortizes post-lease-commencement"
       },
       "maturity": "2031-06-15",
@@ -1573,7 +1577,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 0.0,
+        "value": 0,
         "note": "Effective 6.89%; conversion ~$16.03; capped calls to $23.32"
       },
       "maturity": "2031-10-01",
@@ -1671,7 +1675,7 @@
       "size_note": "Issued at 99.750",
       "rate": {
         "kind": "fixed",
-        "value": 6.0,
+        "value": 6,
         "note": "Amortizes to target DSCR"
       },
       "maturity": "2031-06-15",
@@ -1879,7 +1883,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 0.0,
+        "value": 0,
         "note": "Effective 0.37%; conversion $85.63; capped call to $120.18"
       },
       "maturity": "2031-07-01",
@@ -1947,7 +1951,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 1.0,
+        "value": 1,
         "note": "Effective 1.18%; conversion $51.40"
       },
       "maturity": "2033-06-01",
@@ -1981,7 +1985,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 1.0,
+        "value": 1,
         "note": "Conversion $73.07; capped calls to $110.30 ($201.3M — Santander, BMO, Citi, CACIB, Mizuho, Scotia, UBS)"
       },
       "maturity": "2033-12-01",
@@ -2141,7 +2145,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 3.0,
+        "value": 3,
         "note": "Effective 3.7%; conversion ~$11.00"
       },
       "maturity": "2029-09-01",
@@ -2175,7 +2179,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 0.0,
+        "value": 0,
         "note": "Effective 0.4%; conversion ~$22.49"
       },
       "maturity": "2031-06-15",
@@ -2371,7 +2375,7 @@
       "entity": "Digital Intrepid Holding B.V.",
       "name": "0.200% CHF notes due 2026",
       "instrument_type": "bond",
-      "size_usd_m": 344.0,
+      "size_usd_m": 344,
       "size_note": "CHF 275M",
       "rate": {
         "kind": "fixed",
@@ -2851,7 +2855,7 @@
       "size_note": "€750M",
       "rate": {
         "kind": "fixed",
-        "value": 1.0,
+        "value": 1,
         "note": null
       },
       "maturity": "2032-01-15",
@@ -2949,7 +2953,7 @@
       "entity": "Digital Dutch Finco B.V.",
       "name": "3.875% EUR notes due 2033",
       "instrument_type": "bond",
-      "size_usd_m": 982.0,
+      "size_usd_m": 982,
       "size_note": "€850M",
       "rate": {
         "kind": "fixed",
@@ -2983,7 +2987,7 @@
       "entity": "Digital Dutch Finco B.V.",
       "name": "3.875% EUR notes due 2034",
       "instrument_type": "bond",
-      "size_usd_m": 982.0,
+      "size_usd_m": 982,
       "size_note": "€850M",
       "rate": {
         "kind": "fixed",
@@ -3017,7 +3021,7 @@
       "entity": "Digital Dutch Finco B.V.",
       "name": "3.875% EUR notes due 2035",
       "instrument_type": "bond",
-      "size_usd_m": 982.0,
+      "size_usd_m": 982,
       "size_note": "€850M",
       "rate": {
         "kind": "fixed",
@@ -3257,7 +3261,7 @@
       "size_note": "$200M drawn",
       "rate": {
         "kind": "fixed",
-        "value": 7.0,
+        "value": 7,
         "note": null
       },
       "maturity": "2027-04-30",
@@ -3389,7 +3393,7 @@
       "size_note": "Effective 11.7%",
       "rate": {
         "kind": "fixed",
-        "value": 4.0,
+        "value": 4,
         "note": "Conversion $4.16; holder put Oct 1, 2028"
       },
       "maturity": "2030-10-01",
@@ -3452,7 +3456,7 @@
       "entity": "WhiteFiber Iceland",
       "name": "Landsbankinn term facility",
       "instrument_type": "credit_facility",
-      "size_usd_m": 18.0,
+      "size_usd_m": 18,
       "size_note": "Up to $20M; $18.0M drawn 4/24/26",
       "rate": {
         "kind": "sofr_spread",
@@ -3590,7 +3594,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 0.0,
+        "value": 0,
         "note": "Exchange ~$2.57 (17.5% premium); capped call to ~$4.92"
       },
       "maturity": "2031-04-15",
@@ -3624,7 +3628,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 0.0,
+        "value": 0,
         "note": "Exchange ~$4.83 (27.5% premium); capped call to $8.5275"
       },
       "maturity": "2031-07-01",
@@ -3658,7 +3662,7 @@
       "size_note": "C$20M",
       "rate": {
         "kind": "fixed",
-        "value": 6.0,
+        "value": 6,
         "note": "Quarterly interest, bullet"
       },
       "maturity": "~2028-01-30",
@@ -3720,11 +3724,11 @@
       "entity": null,
       "name": "Boden (Sweden) loan payable",
       "instrument_type": "credit_facility",
-      "size_usd_m": 11.0,
+      "size_usd_m": 11,
       "size_note": null,
       "rate": {
         "kind": "floating_other",
-        "value": 1.0,
+        "value": 1,
         "note": "Swedish government borrowing rate + 1% (~2%)"
       },
       "maturity": "2035-12-31",
@@ -3754,7 +3758,7 @@
       "entity": "New Brunswick subsidiary",
       "name": "Atlantic Term Loans 1 & 2 (New Brunswick)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 2.0,
+      "size_usd_m": 2,
       "size_note": null,
       "rate": {
         "kind": "fixed",
@@ -3826,7 +3830,7 @@
       "size_note": "$15.80M outstanding; commitments A-1 $5.5M / A-3 $11.5M / B $6.0M + $64.5M uncommitted accordion",
       "rate": {
         "kind": "sofr_spread",
-        "value": 10.0,
+        "value": 10,
         "note": "Term SOFR + 10.0% (3.50% floor; +2% default) — 14.24% at 3/31/26"
       },
       "maturity": "2030-09-12",
@@ -3858,7 +3862,7 @@
       "size_note": "$7.32M outstanding (originally $12.5M)",
       "rate": {
         "kind": "fixed",
-        "value": 9.0,
+        "value": 9,
         "note": "Convertible to 2.5M shares @ $5.00"
       },
       "maturity": "2027-06-20",
@@ -3890,7 +3894,7 @@
       "size_note": "$4.50M outstanding (originally $5.0M)",
       "rate": {
         "kind": "fixed",
-        "value": 15.0,
+        "value": 15,
         "note": "15% (20% default)"
       },
       "maturity": "2030-03-12",
@@ -3924,7 +3928,7 @@
       "size_note": null,
       "rate": {
         "kind": "fixed",
-        "value": 0.0,
+        "value": 0,
         "note": "0% (1.00x MOIC)"
       },
       "maturity": "2027-05-16",
@@ -3952,11 +3956,11 @@
       "entity": null,
       "name": "Equipment Loan Agreement (Spring Lane)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 4.0,
+      "size_usd_m": 4,
       "size_note": "Up to $4.0M; $0 drawn",
       "rate": {
         "kind": "fixed",
-        "value": 15.0,
+        "value": 15,
         "note": "15% + 3.0x MOIC provision"
       },
       "maturity": "2027-05-16",
@@ -3990,7 +3994,7 @@
       "size_note": "$12.5M commitment; draw at close UNVERIFIED until Q2 10-Q",
       "rate": {
         "kind": "sofr_spread",
-        "value": 8.0,
+        "value": 8,
         "note": "Term SOFR + 8.0% / ABR + 7.0%"
       },
       "maturity": "2030-09-12",
@@ -4020,11 +4024,11 @@
       "entity": "Soluna Wind Holding (guarantee)",
       "name": "Yorkville promissory note — post-Q1",
       "instrument_type": "credit_facility",
-      "size_usd_m": 12.0,
+      "size_usd_m": 12,
       "size_note": "Up to $12.0M; amortizing $1.2M/mo + 5% premium (July balance UNVERIFIED)",
       "rate": {
         "kind": "fixed",
-        "value": 5.0,
+        "value": 5,
         "note": "5% (18% default); +2.4M warrants @ $1.06"
       },
       "maturity": "2027-05-15",
@@ -4288,7 +4292,7 @@
       "size_note": "~$300M press-reported",
       "rate": {
         "kind": "fixed",
-        "value": 6.0,
+        "value": 6,
         "note": "~6% press-reported; tenor undisclosed. Close unconfirmed — no company/lender release"
       },
       "maturity": "Undisclosed",
@@ -5226,7 +5230,7 @@
       "size_note": "$350.0M aggregate principal. Securities Purchase Agreement with qualified institutional buyers 4/26/26; offering closed 5/20/26. Referred to in the S-1 as the \"May 2026 Convertible Notes\".",
       "rate": {
         "kind": "fixed",
-        "value": 6.0,
+        "value": 6,
         "note": null
       },
       "maturity": "2031",
@@ -5844,7 +5848,7 @@
       "rate": {
         "kind": "sofr_spread",
         "note": "SOFR + 3.00% at 99.5 OID; tightened 75bp during syndication; >=95% of principal required to be hedged through maturity (effectively fixed)",
-        "value": 3.0
+        "value": 3
       },
       "security": "First lien on GB300 GPU computing infrastructure at a single QScale data center site (Quebec, Canada) plus assignment of the take-or-pay Master Services Agreement with NVIDIA Corporation (Moody's Aa1, positive) as collateral; data center lease and purchase orders also assigned. No direct agreement among SPV, lenders and NVIDIA (noted as a rating constraint).",
       "seniority": "Senior secured (first lien)",
@@ -5905,6 +5909,76 @@
         }
       ],
       "offtaker_label": "Hyperscaler take-or-pay (rated at least Aa3, unnamed)"
+    },
+    {
+      "id": "riot-dc-logistics-ddtl-573",
+      "collateral_class": "operator_campus",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+      "issuer": "Riot Platforms, Inc.",
+      "ticker": "RIOT",
+      "issuer_type": "public",
+      "entity": "Riot DC Logistics, LLC (borrower), a wholly owned subsidiary of Riot Platforms, Inc.; guaranteed by each subsidiary of the borrower and by affiliate RPI AUS01-0H DC LLC (together, the Credit Parties)",
+      "name": "$573.0M senior secured delayed-draw term loan — Rockdale interim facility",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 573,
+      "size_note": "Up to $573.0M committed; drawn balance undisclosed (availability period commenced 2026-08-10). Proceeds fund long-lead equipment, related project equipment and certain other expenses for the 191 critical IT MW data center project at the Rockdale Facility. Company characterises it as an INTERIM facility \"to fund initial development costs while the investment-grade credit backstop is finalized\" (Q2 2026 release, 2026-08-11) — the backstop itself is not named, sized or documented in any filing and must not be carried as an instrument. First Riot row in the ledger; Riot had no prior entry. Underlying offtake is a 20-year, 191 IT MW build-to-suit Tier 3 Data Center Lease and Services Agreement with an unnamed \"leading frontier AI lab\" (~$9.1B over the initial term, up to ~$16.1B with extensions; 96 IT MW December 2027, full 191 IT MW June 2028). Bloomberg identified the tenant as Anthropic — press only, NOT in the filing.",
+      "rate": {
+        "kind": "sofr_spread",
+        "value": 2.75,
+        "note": "At the borrower's election: Adjusted Term SOFR + 2.75%, or Base Rate + 1.75% (Base Rate = highest of prime, fed funds effective + 0.50%, one-month Term SOFR + 1.00%). Customary agency fees and an undrawn fee payable; undrawn fee rate not stated in the 8-K."
+      },
+      "maturity": "2026-12-31",
+      "maturity_note": "Approximately 4.7 months from entry — a bridge tenor, consistent with the company's \"interim financing\" characterisation. Subject to the terms and conditions of the Credit Agreement.",
+      "seniority": "Senior secured; expressly non-recourse to Riot Platforms, Inc. and any other direct or indirect parent or affiliate other than the Credit Parties, subject to customary exceptions (fraud, willful misrepresentation, misappropriation of collateral proceeds)",
+      "security": "Lien on substantially all assets of the Credit Parties (Riot DC Logistics, LLC and RPI AUS01-0H DC LLC) under a Pledge and Security Agreement dated as of the closing date, plus a guaranty from each subsidiary of the borrower",
+      "lenders": [
+        "Morgan Stanley Senior Funding, Inc. (administrative agent)",
+        "Syndicate not named"
+      ],
+      "status": "confirmed",
+      "issued": "2026-08-10",
+      "source": {
+        "doc": "8-K, Items 1.01 and 2.03 (event 2026-08-10, filed 2026-08-14), acc. 0001104659-26-097330; facility characterisation and lease terms from the Q2 2026 results release, 8-K EX-99.1 acc. 0001104659-26-093406 (2026-08-11). Credit Agreement to be filed as an exhibit to the Q3 2026 10-Q.",
+        "date": "2026-08-14",
+        "url": "https://www.sec.gov/Archives/edgar/data/1167419/000110465926097330/riot-20260810x8k.htm"
+      },
+      "as_of": "2026-08-17"
+    },
+    {
+      "id": "nvda-sbenergy-ports-rvg",
+      "collateral_class": "dc_adjacent",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Contingent credit support, not an issuance. No principal advanced, no rate, no scheduled amortisation — the $105B figure is a CAP on a contingent payment obligation. Carried as market context in the same treatment class as the campus SPVs.",
+      "issuer": "NVIDIA Corporation",
+      "ticker": "NVDA",
+      "issuer_type": "public",
+      "entity": "NVIDIA Corporation as guarantor; SB Energy Corp. and affiliates as Lessor (SB Energy builds, owns and operates); an affiliate of OpenAI Group PBC as tenant. PORTS-Pike Technology Campus, Pike County, Ohio (the decommissioned Portsmouth Gaseous Diffusion Plant site).",
+      "name": "Residual value guaranties — PORTS-Pike leases (payment obligation capped at $105B)",
+      "instrument_type": "other",
+      "size_usd_m": 105000,
+      "size_note": "⚠️ NOT a principal amount. $105B is the CUMULATIVE CAP on NVIDIA's aggregate payment obligation for its INITIAL commitment under multiple residual value guaranties covering ~4.25 GW of IT load in the aggregate. NVIDIA may provide credit support for ~3.8 GW MORE at its sole discretion — that increment is an option, not an obligation, and is NOT included in the $105B. An Agreement generally becomes effective only on commencement of the applicable lease; payment obligations are further conditioned on the Lessor satisfying ready-for-service conditions, expected to begin in 2028. On a Trigger Event (OpenAI insolvency causing a lease default, or OpenAI payment failure) NVIDIA pays the shortfall between the guaranteed minimum lease value and amounts recovered through a replacement lease or sale, and may elect to assume the lease, require reletting, initiate a sale, allow termination, or defer remedies up to one year while paying specified project agreement costs. OpenAI has agreed to reimburse and indemnify NVIDIA for all amounts actually paid. 🔒 DISTINCT from the NVIDIA $500B financing platforms announced 2026-08-10 with Apollo, BlackRock, Blackstone, Brookfield, Goldman Sachs and KKR — those are memorandums of understanding, no 8-K was filed for them, and they are NOT an instrument. SB Energy is not one of the six. 🔒 Press in July 2026 reported a guarantee of \"over $250B\" for this site; the filed cap for the initial commitment is $105B. Do not blend the two. Separately and NOT debt: NVIDIA will invest $1.5B of equity in SB Energy. Form of the Agreements to be filed with the 10-Q for the quarter ended 2026-07-26.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "No rate. A contingent shortfall guaranty carries no coupon or spread. Any guaranty fee is not disclosed."
+      },
+      "maturity": "Earliest of: 20th anniversary of commencement of the applicable lease; termination of the applicable lease by OpenAI per its terms; OpenAI achieving a satisfactory credit rating; other customary termination events",
+      "maturity_note": "Per-lease, not a single date. The credit-rating release is the notable term: the guaranty extinguishes if the tenant becomes rated to a satisfactory standard.",
+      "seniority": "Unsecured contingent payment obligation of NVIDIA Corporation, reimbursable and indemnified by OpenAI",
+      "security": "None. NVIDIA's obligation is a shortfall guaranty on lease value, not a secured claim. The underlying leases cover land, power and shell capacity — no GPU or chip collateral is pledged under these Agreements.",
+      "lenders": [
+        "SB Energy Corp. (Lessor / beneficiary of the guaranties)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-08-17",
+      "source": {
+        "doc": "8-K, Items 1.01 and 2.03 (event and filing date 2026-08-17), acc. 0001045810-26-000069, plus EX-99.1 press release of the same date",
+        "date": "2026-08-17",
+        "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm"
+      },
+      "as_of": "2026-08-17",
+      "offtaker_label": "OpenAI lease (unrated tenant; guaranty releases on a satisfactory rating)"
     }
   ],
   "retired": [
