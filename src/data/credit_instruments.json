@@ -6013,6 +6013,110 @@
         "url": "https://www.sec.gov/Archives/edgar/data/2071778/000121390026078366/0001213900-26-078366-index.htm"
       },
       "as_of": "2026-08-18"
+    },
+    {
+      "id": "frmi-turbine-warehouse-500",
+      "collateral_class": "operator_campus",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+      "issuer": "Fermi Inc.",
+      "ticker": "FRMI",
+      "issuer_type": "public",
+      "entity": "Fermi Turbine Warehouse LLC (borrower), indirect wholly owned subsidiary of Fermi Inc.; Firebird Equipment Holdco, LLC as subsidiary guarantor",
+      "name": "Turbine Warehouse Equipment Financing (MUFG)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 500,
+      "size_note": "Up to $500.0M total commitment; $444.9M outstanding at 2026-06-30, 12.2% effective rate per the 10-Q debt table. Funded three Siemens SGT6-5000F gas turbines for Project Matador (Amarillo, TX) and repaid the Macquarie Term Loan in full on closing ($24.8M loss on extinguishment). Minimum quarterly principal of 10% of outstanding begins at the nine-month anniversary, reduced to 5% if a lease or offtake agreement for at least 400 MW of Project Matador's first phase has been signed by then.",
+      "rate": {
+        "kind": "sofr_spread",
+        "value": 4.0,
+        "note": "Term SOFR or Daily Simple SOFR + 4.00%; 12.2% effective per the 10-Q"
+      },
+      "maturity": "2027-08-10",
+      "maturity_note": null,
+      "seniority": "Senior secured equipment loan warehouse",
+      "security": "Financed turbine equipment; subsidiary guaranty from Firebird Equipment Holdco, LLC",
+      "lenders": [
+        "MUFG Bank, Ltd. (sole lender)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-02-10",
+      "source": {
+        "doc": "10-Q for the quarter ended 2026-06-30 (filed 2026-08-14), Note 5 Debt, acc. 0002071778-26-000051",
+        "date": "2026-08-14",
+        "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/0002071778-26-000051-index.htm"
+      },
+      "as_of": "2026-08-18"
+    },
+    {
+      "id": "frmi-hv-keystone-120",
+      "collateral_class": "operator_campus",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+      "issuer": "Fermi Inc.",
+      "ticker": "FRMI",
+      "issuer_type": "public",
+      "entity": "Fermi High Voltage Warehouse LLC (borrower), subsidiary of Fermi Inc.",
+      "name": "High Voltage Equipment Financing (Keystone Master Loan Agreement)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 120,
+      "size_note": "Equipment-backed advances of up to $120.0M aggregate principal, with a potential $100.0M increase subject to lender approval; $77.3M outstanding at 2026-06-30, 14.1% effective rate per the 10-Q debt table. Advances fund up to 80% of the purchase price of financed high-voltage equipment, the remaining 20% funded by the borrower or its affiliates; each advance is a separate promissory note with rate and term set at issuance. Covenants: minimum liquidity of $20.0M, mandatory prepayment if an approved customer agreement has not been received by 2026-12-31, and outstanding principal capped at 110% of the fair market value of the financed equipment.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Per-advance rates set at issuance in each promissory note; 14.1% effective per the 10-Q. Exit fee escalates from 0% (first 180 days) to 1% (days 181-365) and 1.33% thereafter."
+      },
+      "maturity": "2031",
+      "maturity_note": "Per-advance terms; the 10-Q debt table carries the facility to 2031.",
+      "seniority": "Senior secured; not a revolving credit facility",
+      "security": "Financed high-voltage equipment; outstanding principal capped at 110% of its fair market value",
+      "lenders": [
+        "Keystone National Group, LLC (agent)",
+        "Keystone Private Income Fund (initial lender)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-02-19",
+      "source": {
+        "doc": "10-Q for the quarter ended 2026-06-30 (filed 2026-08-14), Note 5 Debt, acc. 0002071778-26-000051",
+        "date": "2026-08-14",
+        "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/0002071778-26-000051-index.htm"
+      },
+      "as_of": "2026-08-18"
+    },
+    {
+      "id": "frmi-turbine-warehouse-ii-165",
+      "collateral_class": "operator_campus",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+      "issuer": "Fermi Inc.",
+      "ticker": "FRMI",
+      "issuer_type": "public",
+      "entity": "Fermi Turbine Warehouse II LLC (borrower), a Texas limited liability company and indirect wholly owned subsidiary of Fermi Inc.",
+      "name": "Turbine Warehouse II Equipment Financing (Beal Credit Agreement, CLMG as agent)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 165,
+      "size_note": "Senior secured term loan facility of up to $165.0M funding six Siemens Energy SGT-800 gas turbines and related equipment for Project Matador; $14.7M outstanding at 2026-06-30, 17.0% effective rate per the 10-Q debt table. Exit fee of $37.0M less cumulative interest and commitment fees paid through the exit date. Mandatory prepayment on an event of loss, a disposition of equipment or equity interests, or a change of control.",
+      "rate": {
+        "kind": "fixed",
+        "value": 12.0,
+        "note": "12.00% per annum, payable quarterly in arrears (14.00% on an event of default); 17.0% effective per the 10-Q"
+      },
+      "maturity": "2028-12",
+      "maturity_note": "33 months after the 2026-03-26 closing date; the 10-Q debt table carries the facility to 2028.",
+      "seniority": "Senior secured term loan",
+      "security": "The six financed SGT-800 turbines and related equipment",
+      "lenders": [
+        "CLMG Corp. (agent)",
+        "Lenders party thereto (not individually named)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-03-26",
+      "source": {
+        "doc": "10-Q for the quarter ended 2026-06-30 (filed 2026-08-14), Note 5 Debt, acc. 0002071778-26-000051",
+        "date": "2026-08-14",
+        "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/0002071778-26-000051-index.htm"
+      },
+      "as_of": "2026-08-18"
     }
   ],
   "retired": [
