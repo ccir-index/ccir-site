@@ -15,6 +15,29 @@ import { meta } from '../../data/snapshot';
 // not named; membership is disclosed at class/count grain.
 const entries = [
   {
+    id: '260818-1',
+    date: '2026-08-18',
+    effective: '2026-08-19',
+    type: 'Methodology change · aggregation',
+    restatement: 'None',
+    impact: 'Est. none at current fixings; damps single-listing marketplace steps (one T2 H100 OD fixing last week moved ≈ $0.05 on such a step, reverting the next day)',
+    title: 'v2.3.0 — single-point marketplace medians no longer vote in the operator-equal aggregate',
+    body: [
+      `The headline is the median of per-source medians, one vote per
+       source. At marketplace-class sources that vote can form over a
+       single surviving listing when catalog churn empties the rest of
+       the venue's cross-section — one host's asking price then moves
+       the aggregate by a full source vote, and reverts when the
+       listing rotates out. From the 2026-08-19 fixing, a
+       marketplace-class source votes only on days its median formed
+       over at least two distinct price points. The floor governs the
+       vote alone: the source's rows still stand in every distribution
+       field, count, and concentration measure, and a cell whose only
+       sources are floored keeps its median unchanged. Forward-only;
+       no series is restated.`,
+    ],
+  },
+  {
     id: '260723-1',
     date: '2026-07-23',
     effective: '2026-07-23',
