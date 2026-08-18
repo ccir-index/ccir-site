@@ -90,6 +90,20 @@ import ReadMore from '../../components/ReadMore.astro';
   why the B300 could add 60% capacity at flat bandwidth — inside HBM3E,
   height was the only lever available.
 
+  🔴 CORRECTED 2026-08-17 (John spotted it): the note said TWICE that memory
+  capacity "is the LOOSEST of the four lenses" — §03 and §05. FALSE by the
+  note's own constants: SPAN = raw 3.8 / pf 2.4 / gb 1.9 / bw 1.5 / kw 1.2, so
+  COMPUTE at 2.4x is the loosest lens and capacity at 1.9x is the second. The
+  §02 ladder prints 2.4x four lines above, so a reader could see the
+  contradiction on one screen.
+  🔒 HOW IT GOT IN: it was true when the note carried only the two MEMORY
+  lenses, and stopped being true when the ladder grew to four. Nobody
+  re-checked the superlative against the longer list.
+  Now stated as the comparison the argument actually rests on — capacity
+  against BANDWIDTH, 1.9x against 1.5x — which survives and is sharper.
+  ⛔ Never rank capacity against all four. Compute being loosest is irrelevant
+  to the argument and cannot be contradicted.
+
   🔴 CORRECTED 2026-08-16 (John spotted it): §05 read "A generation ago that
   supply sat ENTIRELY with the memory makers" — contradicted by the note's
   own §04, which says TSMC already owned the packaging, that the packaging
@@ -205,7 +219,7 @@ import ReadMore from '../../components/ReadMore.astro';
   TSMC's packaging capacity, and DRAM production capacity. §05 had the
   packaging sense and the lens sense in ADJACENT paragraphs.
   Changed: §03 dek, §03's "lands on memory capacity", §05's "Memory
-  capacity is arriving now, and it is the loosest of the four lenses", and
+  capacity is arriving now", and
   §05's packaging sentence now reads "how fast that WORK is expanding",
   which points back at "how much of that work it can do" two sentences up.
   ⭐ LEFT alone: §03's "capacity availability increases with it" sits right
@@ -589,8 +603,8 @@ import ReadMore from '../../components/ReadMore.astro';
     ⛔ Never state it flat again: the prospectus names no HBM project.
   - "its own" replaced by CXMT (John). The nearest nouns were incumbents
     / global DRAM / conventional demand, so the possessive dangled.
-  - The closing hedge is gone. Capacity is the loosest lens at 1.9x, which
-    is derivable from the §02 ladder and needs no qualifier.
+  - The closing hedge is gone. The capacity/bandwidth comparison is
+    derivable from the §02 ladder and needs no qualifier.
 */
 const AS_OF = '2026-08-16';
 const SNAP = '2026-08-12';
@@ -824,7 +838,8 @@ const SPAN = { raw: '3.8', pf: '2.4', gb: '1.9', bw: '1.5', kw: '1.2' };
       </p>
       <p>
         Either way, the supply arriving now lands on memory capacity, which
-        is the loosest of the four lenses at {SPAN.gb}&times;.
+        the market prices less closely than bandwidth: {SPAN.gb}&times; against
+        {SPAN.bw}&times;.
       </p>
 
       <h2><span class="n">04</span> Photographic Memory</h2>
@@ -919,8 +934,8 @@ const SPAN = { raw: '3.8', pf: '2.4', gb: '1.9', bw: '1.5', kw: '1.2' };
       </p>
 
       <p>
-        Memory capacity is arriving now, and it is the loosest of the
-        four lenses. Bandwidth is where the next supply step meets a binding
+        Memory capacity is arriving now, and the market prices it less
+        closely than bandwidth. Bandwidth is where the next supply step meets a binding
         constraint. A generation ago the memory makers built the whole stack.
         It is now completed by the memory makers and TSMC together. Our read
         is that prior generation chips are more exposed to that step than to
