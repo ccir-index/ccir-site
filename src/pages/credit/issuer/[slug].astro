@@ -1,0 +1,544 @@
+---
+/*
+  /credit/issuer/<slug> — per-issuer credit pages.
+
+  WHY THIS EXISTS. Every query landing on /credit is an ENTITY query —
+  "ref topco credit rating", "soluna holdings", "nscale s-1 filing",
+  '"ddtl 5.5" coreweave'. All of them funnel into one URL that answers each
+  of them badly, because a reader looking for one borrower arrives at a
+  177-row table. One page per issuer matches the question that was asked.
+
+  THE RULE, INHERITED FROM /chip/<slug>: INHERIT, NEVER MINT.
+  Every field on this page is a field the ledger already publishes, rendered
+  with credit.astro's own formatters and vocabulary.
+
+  ⛔ NO SUMMED TOTALS. Committed sizes are not additive across a capital
+  stack: bonds, revolvers, DDTLs and leases sit at different points, in
+  different states (committed vs drawn), and some rows are capped payment
+  obligations rather than principal. A headline "total debt" figure would be
+  a minted number the ledger does not publish and cannot defend. The COUNT of
+  tracked instruments is a fact about the ledger, not a market figure, so it
+  is safe to print.
+
+  ⛔ NOT EVERY LEDGER ISSUER GETS A PAGE. The `issuer` field carries three
+  kinds of thing: named companies, one-off SPVs, and project descriptions
+  ("Project Jupiter (Stargate NM)", "Meta / Blue Owl 'Hyperion' JV (Richland
+  Parish, LA)"). Only named companies are searched, so ISSUERS below is a
+  curated allowlist, not a derivation. Adding an issuer is a data edit.
+
+  ⛔ SLUGS ARE CURATED, NEVER SLUGIFIED. Naive slugification produces garbage
+  from this ledger: "Cipher Mining Inc. (renamed Cipher Digital Inc.)",
+  "Digital Realty Trust, Inc./L.P.", "Vultr (The Constant Company, LLC)".
+
+  SCOPE 2026-08-18 (John: "plan and complete… clean & professional"): the
+  CoreWeave-only draft became the full roster — every named-company issuer
+  with a page-worthy row count, plus Riot (one row, high entity-query
+  volume). Two chart panels and the borrower-silo table were added the same
+  day; review happened in-browser before push.
+
+  ── WHAT THIS PAGE MAY CARRY, RULED 2026-08-17 (John) ───────────────────────
+  ✅ The borrower's ARC. /credit is a cross-section; this page is longitudinal.
+     One borrower's spread at signing, in sequence, is a chart nobody else can
+     draw — CoreWeave alone runs DDTL 1.0 through 5.5 plus bonds and converts.
+  ✅ RATING TRAJECTORY across that borrower's facilities.
+  ✅ LENDER RECURRENCE — which banks keep showing up.
+  ✅ OFFTAKER / COUNTERPARTY concentration.
+  ✅ COLLATERAL OVERLAP — whether one pool secures more than one facility.
+  ✅ A one-line identity block (ticker, public/private) so an agent can confirm
+     it has the right entity. Nothing more; this is not a company directory.
+
+  ⛔ NO RENTAL PRICES FOR THE BORROWER, even where we hold them. Several of
+     these issuers are also venues in our rate panel (CoreWeave, Crusoe,
+     Lambda, Nebius, Fluidstack, Vultr). Publishing a named venue's own rate
+     would be publishing at a GRAIN WE DELIBERATELY DO NOT PUBLISH — the
+     surfaces pool sources into tiers — and setting a borrower's asking price
+     beside its debt terms implies a margin claim that is not ours to make.
+  ⛔ NOT EVEN "does this issuer feed our model". Saying so discloses panel
+     composition. Same objection, one step removed.
+  ⛔ NO EQUITY OR CDS VIEW. Not our data, not our lane, and it invites the one
+     question we never want asked. Link a ticker, stop there. Most of these
+     names have no liquid CDS in any case.
+  ⛔ NO HQ / EMPLOYEE / COMPANY-PROFILE FILLER. It does not differentiate and
+     it makes a reference surface look like a directory.
+
+  CHART BASES, never blended (house rule): floating spreads (S+%) and fixed
+  coupons (%) are different bases, so they are two PANELS. A facility whose
+  filed pricing is a grid rather than one number is listed under the panel,
+  never plotted as a point. Convertibles plot hollow — the coupon is not the
+  yield, the equity option is the rest of it, and the marker says so.
+*/
+import Base from '../../../layouts/Base.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import creditData from '../../../data/credit_instruments.json';
+import { ISSUERS } from './_issuers';
+
+export function getStaticPaths() {
+  return Object.keys(ISSUERS).map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const def = ISSUERS[slug as string];
+if (!def) throw new Error(`/credit/issuer: no ISSUERS entry for "${slug}"`);
+
+const all = creditData.instruments as any[];
+const rows = all.filter((i) => i.issuer === def.match);
+if (!rows.length) {
+  throw new Error(`/credit/issuer/${slug}: no ledger rows match issuer "${def.match}"`);
+}
+
+// --- formatters, lifted from credit.astro so the two pages agree -------------
+function fmtSize(v: number | null): string {
+  if (v == null) return '—';
+  if (v >= 1000) return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  if (v >= 10) return v.toLocaleString('en-US', { maximumFractionDigits: 1 });
+  return v.toLocaleString('en-US', { maximumFractionDigits: 2 });
+}
+const TYPE_LABEL: Record<string, string> = {
+  bond: 'Bond',
+  convertible: 'Convertible',
+  credit_facility: 'Credit facility',
+  lease: 'Lease',
+  abs: 'ABS',
+  other: 'Other',
+};
+function fmtPct(v: number): string {
+  // Integer stays integer ("10", never "1"); fractions drop only the
+  // trailing zeros after the point (9.625 -> 9.625, 4.50 -> 4.5).
+  if (Number.isInteger(v)) return String(v);
+  return String(+v.toFixed(3));
+}
+function rateLabel(rate: any): string {
+  if (!rate) return '—';
+  if (rate.kind === 'sofr_spread' && rate.value != null) return `S+${rate.value.toFixed(2)}%`;
+  if ((rate.kind === 'fixed' || rate.kind === 'coupon') && rate.value != null) return `${fmtPct(rate.value)}%`;
+  if (rate.value != null) return `${rate.value}%`;
+  return 'Undisclosed';
+}
+
+// --- ordering: newest filed first -------------------------------------------
+const ordered = [...rows].sort((a, b) => String(b.issued ?? '').localeCompare(String(a.issued ?? '')));
+
+// --- facts about the LEDGER, not about the market ---------------------------
+const asOf = ordered.map((r) => r.as_of).filter(Boolean).sort().slice(-1)[0];
+const ticker = ordered.map((r) => r.ticker).find(Boolean) ?? null;
+const typesPresent = [...new Set(ordered.map((r) => r.instrument_type))]
+  .map((t) => TYPE_LABEL[t] ?? t);
+const classesPresent = [...new Set(ordered.map((r) => r.collateral_class).filter(Boolean))];
+const ratings = ordered
+  .flatMap((r) => (r.facility_ratings ?? []).map((g: any) => ({ ...g, on: r.name })))
+  .sort((a, b) => String(b.public).localeCompare(String(a.public)));
+
+// --- borrower silos ----------------------------------------------------------
+// Grouping key = the entity string up to its first parenthetical; rows with
+// no entity are obligations of the listed parent itself. Presentation only:
+// the key is derived for GROUPING, the full filed entity string still renders
+// on every card.
+function siloKey(r: any): string {
+  if (!r.entity) return `${def.display} (parent level)`;
+  return String(r.entity).split('(')[0].trim().replace(/,$/, '');
+}
+const siloMap = new Map<string, any[]>();
+for (const r of ordered) {
+  const k = siloKey(r);
+  if (!siloMap.has(k)) siloMap.set(k, []);
+  siloMap.get(k)!.push(r);
+}
+const silos = [...siloMap.entries()];
+const showSilos = silos.length > 1;
+
+// --- chart data ---------------------------------------------------------------
+// Two bases, two panels. A row plots only when the ledger carries ONE filed
+// number and a parseable signing date; everything else is listed, not drawn.
+function parseIssued(s: any): number | null {
+  const m = String(s ?? '').match(/(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?/);
+  if (!m) return null;
+  return Date.UTC(+m[1], m[2] ? +m[2] - 1 : 6, m[3] ? +m[3] : 15);
+}
+function shortName(r: any): string {
+  let n = String(r.name).split(' (')[0].replace(/ Facility$/, '');
+  const bond = n.match(/^([\d.]+)%.*?due (?:\w+ )?(\d{4})/);
+  if (bond) n = `${fmtPct(+bond[1])}% '${bond[2].slice(2)}`;
+  if (r.instrument_type === 'convertible') {
+    const yy = String(r.maturity ?? '').slice(2, 4);
+    n = `conv ${fmtPct(r.rate.value)}%${yy ? ` '${yy}` : ''}`;
+  }
+  return n.length > 20 ? n.slice(0, 19) + '…' : n;
+}
+type Pt = { t: number; v: number; label: string; conv: boolean; id: string };
+function points(kind: string): { pts: Pt[]; skipped: any[] } {
+  const pts: Pt[] = [];
+  const skipped: any[] = [];
+  for (const r of ordered) {
+    if (r.rate?.kind !== kind) continue;
+    const t = parseIssued(r.issued);
+    if (r.rate.value == null || t == null) { skipped.push(r); continue; }
+    pts.push({ t, v: r.rate.value, label: shortName(r), conv: r.instrument_type === 'convertible', id: r.id });
+  }
+  pts.sort((a, b) => a.t - b.t);
+  return { pts, skipped };
+}
+const spread = points('sofr_spread');
+const fixed = points('fixed');
+
+// Geometry: everything computed from the data, nothing hardcoded.
+const W = 760, H = 250;
+const x0 = 52, x1 = W - 18, yTop = 16, yBot = H - 34;
+const DAY = 86400000;
+function scale(pts: Pt[]) {
+  let tMin = Math.min(...pts.map((p) => p.t)), tMax = Math.max(...pts.map((p) => p.t));
+  if (tMax - tMin < 120 * DAY) { tMin -= 90 * DAY; tMax += 90 * DAY; }
+  else { const pad = (tMax - tMin) * 0.06; tMin -= pad; tMax += pad; }
+  const vMaxRaw = Math.max(...pts.map((p) => p.v));
+  const vMin = 0;
+  // nice ceiling: 1/2/2.5/5 x 10^k step, 4-5 gridlines
+  const rough = (vMaxRaw - vMin) / 4 || 1;
+  const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+  const step = [1, 2, 2.5, 5, 10].map((s) => s * mag).find((s) => s >= rough)!;
+  const vMax = Math.max(step, Math.ceil((vMaxRaw * 1.08) / step) * step);
+  const ticksY: number[] = [];
+  for (let v = step; v <= vMax + 1e-9; v += step) ticksY.push(+v.toFixed(4));
+  const X = (t: number) => x0 + ((t - tMin) / (tMax - tMin)) * (x1 - x0);
+  const Y = (v: number) => yBot - ((v - vMin) / (vMax - vMin)) * (yBot - yTop);
+  // x ticks: Jan 1 of each year in domain; add Jul when few years
+  const years: { t: number; label: string }[] = [];
+  const y0 = new Date(tMin).getUTCFullYear(), y1_ = new Date(tMax).getUTCFullYear();
+  for (let y = y0; y <= y1_ + 1; y++) {
+    const jan = Date.UTC(y, 0, 1);
+    if (jan >= tMin && jan <= tMax) years.push({ t: jan, label: String(y) });
+    const jul = Date.UTC(y, 6, 1);
+    if (y1_ - y0 < 2 && jul >= tMin && jul <= tMax) years.push({ t: jul, label: `Jul '${String(y).slice(2)}` });
+  }
+  return { X, Y, ticksY, ticksX: years };
+}
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function windowLabel(pts: Pt[]): string {
+  const f = (t: number) => { const d = new Date(t); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
+  return `${f(Math.min(...pts.map((p) => p.t)))} – ${f(Math.max(...pts.map((p) => p.t)))}`;
+}
+// Marks with simple label de-collision: alternate above/below when the
+// previous label center is near in x. Rendered output is REVIEWED — computed
+// geometry has missed real collisions before.
+function marks(pts: Pt[], sc: ReturnType<typeof scale>) {
+  const out = pts.map((p) => ({ ...p, x: sc.X(p.t), y: sc.Y(p.v), above: true, lx: 0 }));
+  for (let i = 0; i < out.length; i++) {
+    const m = out[i];
+    m.lx = Math.max(x0 + 48, Math.min(x1 - 40, m.x));
+    if (i > 0 && m.x - out[i - 1].x < 78) m.above = !out[i - 1].above;
+    if (m.y < yTop + 26) m.above = false;
+    if (m.y > yBot - 26) m.above = true;
+  }
+  return out;
+}
+const sSc = spread.pts.length ? scale(spread.pts) : null;
+const fSc = fixed.pts.length ? scale(fixed.pts) : null;
+const sMarks = sSc ? marks(spread.pts, sSc) : [];
+const fMarks = fSc ? marks(fixed.pts, fSc) : [];
+const showSpread = spread.pts.length >= 2;
+const showFixed = fixed.pts.length >= 2;
+// Past this density per-point labels pile into an unreadable mass (Digital
+// Realty: 24 bonds over nine years) — the dots still carry the shape, and
+// the silo table below names every instrument.
+const LABEL_MAX = 12;
+const sLabels = spread.pts.length <= LABEL_MAX;
+const fLabels = fixed.pts.length <= LABEL_MAX;
+// Multi-currency paper: coupons stay in each bond's own filed currency and
+// the panel says so — the chart is one issuer's coupon record, never a
+// cross-currency comparison.
+const CCY_RE = /\b(EUR|CHF|GBP|JPY|USD)\b/;
+const fMultiCcy = fixed.pts.some((p) => CCY_RE.test(p.label))
+  || ordered.some((r) => r.rate?.kind === 'fixed' && CCY_RE.test(String(r.name)));
+
+const title = `${def.display} Debt & Credit Facilities, As Filed · CCIR`;
+const description =
+  `Every ${def.display} debt instrument CCIR tracks, as filed: ${ordered.length === 1 ? 'one instrument' : `${ordered.length} instruments`} — ` +
+  `sizes, coupons and spreads, collateral, lenders and covenants, ` +
+  `each traced to the filing it came from.`;
+
+const datasetLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: `${def.display} — tracked credit instruments`,
+  description,
+  url: new URL(`/credit/issuer/${slug}`, 'https://ccir.io').href,
+  isPartOf: { '@type': 'Dataset', name: 'CCIR Compute Credit Ledger', url: 'https://ccir.io/credit' },
+  creator: { '@id': 'https://ccir.io/#org' },
+  ...(asOf ? { dateModified: asOf } : {}),
+  variableMeasured: ['size', 'coupon or spread', 'maturity', 'seniority', 'collateral', 'lenders'],
+});
+---
+
+<Base title={title} description={description}>
+  <section class="wrap top">
+    <div class="col">
+      <PageHeader title={def.display} kicker="Credit · Tracked as filed" asOf={asOf} />
+
+      <p class="lede">
+        CCIR tracks <strong>{ordered.length}</strong>{' '}
+        {ordered.length === 1 ? 'instrument' : 'instruments'} issued by{' '}
+        {def.display}{ticker && <> (<span class="tkr">{ticker}</span>)</>}:{' '}
+        {typesPresent.join(', ').toLowerCase()}. Every row traces to a primary
+        document. Sizes are as filed and are not additive across the capital stack.
+      </p>
+
+      {showSpread && sSc && (
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Floating spreads at signing</div>
+            <div class="panel-sub">
+              Filed spread over SOFR, by signing date · window {windowLabel(spread.pts)}
+            </div>
+          </div>
+          <svg viewBox={`0 0 ${W} ${H}`} role="img"
+            aria-label={`${def.display} floating-rate facilities: filed spread over SOFR at signing, ${windowLabel(spread.pts)}.`}>
+            {sSc.ticksY.map((t) => (
+              <>
+                <line x1={x0} y1={sSc.Y(t)} x2={x1} y2={sSc.Y(t)} class="grid" />
+                <text x={x0 - 7} y={sSc.Y(t) + 3} class="tick tick-y">+{fmtPct(t)}</text>
+              </>
+            ))}
+            {sSc.ticksX.map((t) => (
+              <text x={sSc.X(t.t)} y={yBot + 22} class="tick tick-x">{t.label}</text>
+            ))}
+            <line x1={x0} y1={yBot} x2={x1} y2={yBot} class="axis" />
+            {sMarks.map((m) => (
+              <>
+                <circle cx={m.x} cy={m.y} r="4.5" class="pt" />
+                {sLabels && <text x={m.lx} y={m.above ? m.y - 10 : m.y + 17} class="ptl">{m.label}</text>}
+              </>
+            ))}
+          </svg>
+          {spread.skipped.length > 0 && (
+            <p class="chart-note">
+              Not plotted (no single filed spread):{' '}
+              {spread.skipped.map((r: any) => `${String(r.name).split(' (')[0]} (${r.rate?.note ? 'grid — see card' : 'undisclosed'})`).join(' · ')}.
+            </p>
+          )}
+        </div>
+      )}
+
+      {showFixed && fSc && (
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Fixed coupons at issue</div>
+            <div class="panel-sub">
+              Filed coupon, by issue date · hollow = convertible (the coupon is
+              not the whole return){fMultiCcy ? ' · each coupon in its instrument’s own filed currency' : ''} · window {windowLabel(fixed.pts)}
+            </div>
+          </div>
+          <svg viewBox={`0 0 ${W} ${H}`} role="img"
+            aria-label={`${def.display} fixed-rate instruments: filed coupon at issue, ${windowLabel(fixed.pts)}. Convertibles are drawn hollow.`}>
+            {fSc.ticksY.map((t) => (
+              <>
+                <line x1={x0} y1={fSc.Y(t)} x2={x1} y2={fSc.Y(t)} class="grid" />
+                <text x={x0 - 7} y={fSc.Y(t) + 3} class="tick tick-y">{fmtPct(t)}%</text>
+              </>
+            ))}
+            {fSc.ticksX.map((t) => (
+              <text x={fSc.X(t.t)} y={yBot + 22} class="tick tick-x">{t.label}</text>
+            ))}
+            <line x1={x0} y1={yBot} x2={x1} y2={yBot} class="axis" />
+            {fMarks.map((m) => (
+              <>
+                {m.conv
+                  ? <circle cx={m.x} cy={m.y} r="4.5" class="pt-conv" />
+                  : <circle cx={m.x} cy={m.y} r="4.5" class="pt" />}
+                {fLabels && <text x={m.lx} y={m.above ? m.y - 10 : m.y + 17} class="ptl">{m.label}</text>}
+              </>
+            ))}
+          </svg>
+          {!fLabels && (
+            <p class="chart-note">
+              Labels omitted at this density; the table below names every
+              instrument.
+            </p>
+          )}
+          {fixed.skipped.length > 0 && (
+            <p class="chart-note">
+              Not plotted (no single filed coupon or no dated issue):{' '}
+              {fixed.skipped.map((r: any) => String(r.name).split(' (')[0]).join(' · ')}.
+            </p>
+          )}
+        </div>
+      )}
+
+      {ratings.length > 0 && (
+        <div class="ratings">
+          <h2>Facility ratings</h2>
+          <ul>
+            {ratings.map((g: any) => (
+              <li>
+                <span class="grade">{g.grade}</span>
+                <span class="agency">{g.agency}</span>
+                <span class="when">{g.public}</span>
+                <span class="on">{g.on}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {showSilos && (
+        <div class="silos">
+          <h2>Capital stack by borrower</h2>
+          <p class="silo-sub">
+            Which entity owes what, as filed. Facilities raised in a
+            subsidiary sit on that subsidiary's assets; the parent's own
+            paper sits beside them, senior to nothing below it.
+          </p>
+          <table>
+            <thead>
+              <tr><th>Borrower</th><th>Instrument</th><th class="num">Size $m</th><th>Rate</th></tr>
+            </thead>
+            <tbody>
+              {silos.map(([name, rs]) => rs.map((r: any, i: number) => (
+                <tr class={i === 0 ? 'grp' : ''}>
+                  <td class="silo-name">{i === 0 ? name : ''}</td>
+                  <td><a href={`#${r.id}`}>{r.name}</a></td>
+                  <td class="num">{fmtSize(r.size_usd_m)}</td>
+                  <td class="mono">{rateLabel(r.rate)}</td>
+                </tr>
+              )))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <h2 class="sec-h">Instruments</h2>
+      <div class="stack">
+        {ordered.map((r: any) => (
+          <article class="inst" id={r.id}>
+            <header>
+              <h3>{r.name}</h3>
+              <div class="meta">
+                <span class="type">{TYPE_LABEL[r.instrument_type] ?? r.instrument_type}</span>
+                {r.size_usd_m != null && <span class="size">${fmtSize(r.size_usd_m)}m</span>}
+                <span class="rate">{rateLabel(r.rate)}</span>
+                {r.issued && <span class="date">{/^\d/.test(String(r.issued)) ? `Entered ${r.issued}` : r.issued}</span>}
+              </div>
+            </header>
+
+            <dl>
+              {r.entity && (<><dt>Borrower</dt><dd>{r.entity}</dd></>)}
+              {r.seniority && (<><dt>Seniority</dt><dd>{r.seniority}</dd></>)}
+              {r.maturity && (<><dt>Maturity</dt><dd>{r.maturity}{r.maturity_note ? ` — ${r.maturity_note}` : ''}</dd></>)}
+              {r.security && (<><dt>Collateral</dt><dd>{r.security}</dd></>)}
+              {r.lenders?.length ? (<><dt>Lenders</dt><dd>{r.lenders.join(' · ')}</dd></>) : null}
+              {r.rate?.note && (<><dt>Pricing</dt><dd>{r.rate.note}</dd></>)}
+              {r.size_note && (<><dt>Terms</dt><dd>{r.size_note}</dd></>)}
+            </dl>
+
+            {r.source && (
+              <p class="src">
+                Source: {r.source.doc}
+                {r.source.url && (<> · <a href={r.source.url} rel="nofollow noopener" target="_blank">document</a></>)}
+              </p>
+            )}
+          </article>
+        ))}
+      </div>
+
+      <p class="back">
+        Collateral classes on this page: {classesPresent.join(', ')}. The full
+        ledger, with every issuer and the derived credit series, is on{' '}
+        <a href="/credit">Compute Credit</a>.
+      </p>
+    </div>
+  </section>
+
+  <script is:inline type="application/ld+json" set:html={datasetLd} />
+</Base>
+
+<style>
+  .col { max-width: 880px; margin-inline: auto; }
+
+  .lede { color: var(--ink); line-height: 1.6; margin: 0 0 24px; }
+  .tkr { font-family: var(--font-mono); font-size: 0.9em; }
+
+  .panel {
+    border: 1px solid var(--rule); border-radius: 4px;
+    padding: 14px 16px 8px; background: var(--surface);
+    margin: 0 0 22px;
+  }
+  .panel-head { margin-bottom: 6px; }
+  .panel-title { font-weight: var(--weight-strong); font-size: 0.98rem; }
+  .panel-sub {
+    color: var(--ink-dim); font-size: 0.82rem; margin-top: 2px;
+    font-family: var(--font-mono);
+  }
+  svg { width: 100%; height: auto; display: block; }
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .axis { stroke: var(--ink-dim); stroke-width: 1; }
+  .tick {
+    font-family: var(--font-mono); font-size: 10px; fill: var(--ink-dim);
+  }
+  .tick-y { text-anchor: end; }
+  .tick-x { text-anchor: middle; }
+  .pt { fill: var(--accent); }
+  .pt-conv { fill: none; stroke: var(--accent); stroke-width: 2; }
+  .ptl {
+    font-family: var(--font-mono); font-size: 10.5px; fill: var(--ink);
+    text-anchor: middle;
+  }
+  .chart-note {
+    color: var(--ink-dim); font-size: 0.8rem; margin: 6px 0 8px;
+    line-height: 1.5;
+  }
+
+  .ratings, .silos { margin: 0 0 26px; }
+  .ratings h2, .silos h2, .sec-h { font-size: var(--fs-lg); margin: 0 0 10px; }
+  .ratings ul { list-style: none; padding: 0; margin: 0; }
+  .ratings li {
+    display: flex; gap: 12px; align-items: baseline;
+    padding: 6px 0; border-bottom: 1px solid var(--rule);
+    font-size: 0.92rem;
+  }
+  .grade { font-family: var(--font-mono); font-weight: var(--weight-strong); }
+  .agency, .when { color: var(--ink-dim); }
+  .on { color: var(--ink-dim); margin-left: auto; text-align: right; }
+
+  .silo-sub { color: var(--ink-dim); font-size: 0.88rem; margin: 0 0 10px; max-width: 74ch; }
+  .silos table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  .silos th {
+    text-align: left; font-family: var(--font-mono); font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-dim);
+    padding: 4px 10px 6px 0; border-bottom: 1px solid var(--rule);
+  }
+  .silos td { padding: 6px 10px 6px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .silos tr.grp td { border-top: 1px solid var(--rule); }
+  .silo-name { font-weight: var(--weight-strong); white-space: nowrap; max-width: 240px; overflow: hidden; text-overflow: ellipsis; }
+  .silos .num, .silos th.num { text-align: right; font-family: var(--font-mono); }
+  .silos .mono { font-family: var(--font-mono); white-space: nowrap; }
+  .silos a { color: inherit; }
+
+  .stack { display: flex; flex-direction: column; gap: 20px; }
+  .inst {
+    border: 1px solid var(--rule); border-radius: 4px;
+    padding: 16px 18px; background: var(--surface);
+  }
+  .inst h3 { font-size: var(--fs-md); margin: 0 0 6px; line-height: 1.35; }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    font-family: var(--font-mono); font-size: 0.8rem;
+    color: var(--ink-dim); margin-bottom: 12px;
+  }
+  .meta .size, .meta .rate { color: var(--ink); }
+
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
+  dt {
+    font-family: var(--font-mono); font-size: 0.74rem;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--ink-dim); padding-top: 2px;
+  }
+  dd { margin: 0; font-size: 0.92rem; line-height: 1.55; }
+
+  .src { margin: 12px 0 0; font-size: 0.82rem; color: var(--ink-dim); }
+  .back { margin: 28px 0 0; color: var(--ink-dim); font-size: 0.92rem; }
+
+  @media (max-width: 640px) {
+    dl { grid-template-columns: 1fr; gap: 2px 0; }
+    dt { padding-top: 8px; }
+    .ratings li { flex-wrap: wrap; }
+    .on { margin-left: 0; text-align: left; width: 100%; }
+    .silo-name { white-space: normal; }
+  }
+</style>
