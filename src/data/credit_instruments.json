@@ -27,33 +27,33 @@
       "issuer": "CoreWeave, Inc.",
       "ticker": "CRWV",
       "issuer_type": "public",
-      "entity": "CCAC II LLC (borrower)",
+      "entity": "CoreWeave Compute Acquisition Co. II, LLC (borrower); full CoreWeave, Inc. guarantee and equity pledge",
       "name": "DDTL 1.0",
       "instrument_type": "credit_facility",
       "size_usd_m": 1438,
-      "size_note": "$2.3B facility, fully drawn; $1,438M outstanding 3/31/26",
+      "size_note": "$2.3B facility, fully drawn; $1,438M outstanding 3/31/26. Availability ran to 2024-06-30; maturity the earlier of five years from closing and four years from commitment termination. Quarterly repayment is the greatest of a fixed schedule, the amount holding loans within projected contracted cash flows, and the amount holding loans within the maximum GPU amount (advance percentages redacted in the filed agreement; GPU useful lives 5.5 and 6.5 years, straight-line). Fees: one-time 1.00% commitment fee on the funding shortfall plus a 1.75% upfront fee on each draw. Call protection: make-whole plus 1.00% until the third anniversary of commitment termination, then 1.00% to the fourth. Minimum liquidity was cut by the First Amendment (2024-05-16) from the greater of $50M and 16% of outstanding (capped $325M) to the greater of $18.75M and 4% (capped $56.25M). The parent guarantee and pledge agreement carries its own parent covenants, including a $375M indebtedness basket before the contracted-revenue trigger and a 2.00x consolidated leverage gate.",
       "rate": {
         "kind": "sofr_spread",
         "value": 9.6196,
-        "note": "Originally 3M Term SOFR + 8.75%; amended 5/15/24 to SOFR + 9.6196%; effective ~15% per 10-Q"
+        "note": "Originally 3M Term SOFR + 8.75%; First Amendment (2024-05-16) reset to SOFR + 9.6196% (base rate + 8.6196%), 0.00% floor; effective ~15% per 10-Q"
       },
       "maturity": "2028-03-28",
       "maturity_note": "Quarterly amortization + balloon",
       "seniority": "Senior secured (SPV); parent guarantee",
-      "security": "1st-priority pledge of CCAC II equity + substantially all assets (GPU servers financed under customer contracts); amortization tied to depreciated GPU purchase price",
+      "security": "First-priority pledge of borrower equity plus substantially all assets (GPU servers financed under customer contracts, counterparties redacted in the filing); revenues route through a depositary cash waterfall at U.S. Bank",
       "lenders": [
-        "Blackstone Tactical Opportunities (lead)",
-        "Magnetar (lead)",
-        "U.S. Bank Trust Co. (admin/collateral)"
+        "Blackstone Tactical Opportunities + Imperial Capital (lead arrangers)",
+        "Blackstone and Magnetar Financial (lead lenders)",
+        "U.S. Bank Trust Co. (admin/collateral); U.S. Bank N.A. (depositary)"
       ],
       "status": "confirmed",
       "issued": "2023-07-30",
       "source": {
-        "doc": "424B4 3/31/25; Q1-26 10-Q debt note 5/8/26",
+        "doc": "424B4 3/31/25; credit agreement + First Amendment filed as S-1 EX-10.8/10.9, parent guarantee EX-10.10-10.12, acc 0001193125-25-044231; Q1-26 10-Q debt note",
         "date": "2026-05-08",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000222/crwv-20260331.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-ddtl-2",
@@ -61,22 +61,22 @@
       "issuer": "CoreWeave, Inc.",
       "ticker": "CRWV",
       "issuer_type": "public",
-      "entity": "CCAC IV LLC (borrower)",
+      "entity": "CoreWeave Compute Acquisition Co. IV, LLC (borrower); CoreWeave, Inc. parent guarantee and pledge",
       "name": "DDTL 2.0",
       "instrument_type": "credit_facility",
       "size_usd_m": 4425,
-      "size_note": "$7.6B facility; $4,425M outstanding 3/31/26",
+      "size_note": "$7.6B facility; $4,425M outstanding 3/31/26; legacy minimum funded amount $6.1B. Per-draw five-year maturities. Quarterly repayment holds each contract-coverage ratio at 1.40:1.00 and loans within the borrowing base; covenants also cap non-IG collateral and non-IG revenue at 0.35:1.00 each. Minimum liquidity 2.0% of outstanding (after the IPO, the greater of $25M and 1.0%). Fees: 2.50% per annum commitment fee on the funding shortfall plus a 1.50% upfront fee on draws. Call protection: make-whole until 30 months after commitment termination. Legacy availability ended at the Fifth Amendment date (2025-09-29). Revenues route through the depositary cash waterfall.",
       "rate": {
         "kind": "sofr_spread",
         "value": null,
         "value_low": 6,
         "value_high": 6.5,
-        "note": "Pre-Fifth-Amendment grid: SOFR + 6.00-6.50% (investment-grade contract loans) / SOFR + 13.00% (non-IG). Fifth Amendment (8-K 10/2/25): all new draws SOFR + 4.25% (or base rate + 3.25%), flat; 1.50% upfront on draws, 3.00% commitment fee on undrawn below $2.4B. Effective ~11% per 10-Q."
+        "note": "Filed three-tier grid on legacy loans: SOFR + 6.00% (specified investment-grade contracts), + 6.50% (other investment-grade), + 13.00% (non-IG); base rate legs 1% inside each; 0.00% floor. Fifth Amendment tranche draws at SOFR + 4.25% sit on the 2.1 row. Effective ~11% per 10-Q."
       },
       "maturity": "2030-08",
       "maturity_note": "Each draw 5-yr; quarterly amortization from Jan 2026",
       "seniority": "Senior secured (SPV); parent guarantee",
-      "security": "CCAC IV equity + all assets; borrowing base = % of depreciated GPU-server cost (credit-agreement schedule; treatment by customer rating not restated in the Fifth Amendment 8-K rate section)",
+      "security": "CCAC IV equity plus all assets; filed advance rates 90% of investment-grade and 60% of non-IG capital expenditures, net of six-year straight-line GPU depreciation",
       "lenders": [
         "Blackstone credit entities (lead)",
         "Magnetar (lead)",
@@ -85,11 +85,11 @@
       "status": "confirmed",
       "issued": "2024-05-16",
       "source": {
-        "doc": "8-K 10/2/25 (Fifth Amendment, spread detail); 10-Q",
+        "doc": "8-K 10/2/25 — the Fifth Amendment EX-10.1 attaches the full conformed credit agreement (through five amendments), acc 0001193125-25-227562; 10-Q",
         "date": "2025-10-02",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000119312525227562/d910811d8k.htm"
       },
-      "as_of": "2026-07-06"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-ddtl-2-1",
@@ -101,16 +101,16 @@
       "name": "DDTL 2.1 ($3.0B incremental tranche)",
       "instrument_type": "credit_facility",
       "size_usd_m": 3000,
-      "size_note": "$3.0B; $3,000M outstanding 3/31/26",
+      "size_note": "$3.0B Fifth Amendment tranche commitments; $3,000M outstanding 3/31/26; minimum funded amount $2.4B, and a shortfall is a fee event, never a default. Availability ran from the Fifth Amendment date to 2026-03-31 (extendable); each draw matures five years from funding. Repayment holds the tranche's contract-coverage ratio at 1.40:1.00. Minimum liquidity the greater of $10M and 1.0% of tranche outstanding. Call protection: make-whole until 30 months after the tranche's commitment termination.",
       "rate": {
         "kind": "sofr_spread",
         "value": 4.25,
-        "note": "SOFR + 4.25%; 1.50% upfront/draw; 3.00% commitment fee below $2.4B drawn; effective ~9% per filings"
+        "note": "SOFR + 4.25% (base rate + 3.25%), 0.00% floor; 1.50% upfront on draws; one-time 3.00% commitment fee on any shortfall below the $2.4B minimum funded amount; effective ~9% per filings"
       },
       "maturity": "2031-03",
       "maturity_note": "Quarterly amortization from Jul 2026",
       "seniority": "Senior secured (SPV); DDTL 2.0 collateral package",
-      "security": "Equipment for investment-grade and unrated strategic customers",
+      "security": "DDTL 2.0 collateral package; filed advance rates for this tranche: 90% of Albatross and 75% of OpenAI capital expenditures (both counterparties named in the conformed agreement), net of six-year straight-line depreciation",
       "lenders": [
         "U.S. Bank Trust Co. (admin/collateral)",
         "Lenders party thereto"
@@ -118,11 +118,11 @@
       "status": "confirmed",
       "issued": "2025-09-29",
       "source": {
-        "doc": "8-K 10/2/25; 10-K 3/2/26 debt note",
+        "doc": "8-K 10/2/25 (Fifth Amendment, conformed agreement as EX-10.1), acc 0001193125-25-227562; 10-K 3/2/26 debt note",
         "date": "2026-03-02",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-ddtl-3",
@@ -134,30 +134,31 @@
       "name": "DDTL 3.0",
       "instrument_type": "credit_facility",
       "size_usd_m": 1700,
-      "size_note": "$2.6B facility; $1,700M outstanding 3/31/26",
+      "size_note": "$2.6B facility; $1,700M outstanding 3/31/26. Availability to 2026-07-28; fixed maturity 2030-08-21. Monthly amortization from April 2026 on a filed percentage schedule (the schedule itself is not attached). Two financial covenants: debt service coverage at or above 1.40:1.00 from 2027-04-30, and a contract realization ratio at or above 0.85:1.00 (billed and received against projected contracted cash flows, trailing three months). Stepped minimum liquidity: $50M to 2025-09, $100M to 2026-03, $175M to 2026-04, $125M to 2026-05, then $100M to 2027-08, $75M to 2028-08, $50M thereafter (the filing misprints two steps as $100,00,000 and $75,00,000). Prepayment carries no premium or penalty, as filed. The parent guarantee covers the initial borrower's obligations only, excludes the co-borrower, and terminates if OpenAI OpCo, LLC achieves a public investment-grade rating from both S&P and Moody's and delivers specified financials.",
       "rate": {
         "kind": "sofr_spread",
         "value": 4,
-        "note": "Daily SOFR + 4.00%; 0.50% undrawn fee; effective ~9% per filings"
+        "note": "Daily SOFR + 4.00% (base rate + 3.00%), 0.00% floor; 0.50% per annum undrawn fee, monthly; effective ~9% per filings"
       },
       "maturity": "2030-08-21",
       "maturity_note": "Monthly amortization from Apr 2026",
       "seniority": "Senior secured (SPV); parent guarantee of CCAC VII",
-      "security": "Substantially all CCAC VII assets + 100% equity; GPU servers under a long-term OpenAI agreement (OpenAI is the offtaker/revenue source, unrated; contract not stated as pledged collateral); DSCR ≥1.40x from Apr 2027",
+      "security": "Substantially all assets plus 100% equity; filed advance rates 80% of capital expenditures at funding and an 85% net-of-depreciation maintenance test (six-year straight-line). GPU servers serve a long-term OpenAI agreement — OpenAI OpCo, LLC is named unredacted in the filed agreement and guarantee.",
       "lenders": [
         "MUFG (admin)",
-        "MS Asset Funding (JLA/bookrunner)",
-        "MUFG (JLA/bookrunner)",
-        "Goldman Sachs Bank (JLA)"
+        "MS Asset Funding + MUFG (JLA/bookrunners)",
+        "Goldman Sachs Bank (JLA)",
+        "Senior managing agents: JPMorgan, Wells Fargo, BBVA, Credit Agricole CIB; lenders include SMBC, PNC, Societe Generale",
+        "U.S. Bank Trust Co. (collateral)"
       ],
       "status": "confirmed",
       "issued": "2025-07-28",
       "source": {
-        "doc": "8-K 7/31/25 (DDTL 3.0); First Amendment 8-K 1/2/26; CoreWeave IR release 7/28/25 names OpenAI offtake",
+        "doc": "8-K 7/31/25, credit agreement filed unredacted as EX-10.1 and parent guarantee as EX-10.2, acc 0001769628-25-000033; First Amendment 8-K 1/2/26",
         "date": "2025-07-31",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000033/crwv-20250728.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-ddtl-4",
@@ -165,20 +166,20 @@
       "issuer": "CoreWeave, Inc.",
       "ticker": "CRWV",
       "issuer_type": "public",
-      "entity": "CCAC VIII LLC (borrower)",
+      "entity": "CoreWeave Compute Acquisition Co. VIII, LLC (borrower); CCAC VIII Holdco LLC pledgor under CoreWeave Debt Holdco I, LLC",
       "name": "DDTL 4.0",
       "instrument_type": "credit_facility",
       "size_usd_m": 8500,
-      "size_note": "$8.5B committed; $1,260M drawn 3/31/26 (draws through Jun 2027)",
+      "size_note": "$8.5B committed in two filed tranches: $4,040.8M fixed-rate and $4,459.2M floating-rate; $1,260M drawn 3/31/26; availability to 2027-06-30. Monthly amortization on a filed percentage schedule with site-based mechanics: delayed and stabilized data-center tranches, and top-up draws sized so projected debt service coverage holds at or above 1.20:1.00 through maturity. Maintenance covenant: debt service coverage at or above 1.15:1.00, trailing three months. Minimum liquidity is a formula (three months of scheduled interest, principal, swap settlements and operating expenses; the maximum three-month period after commitment termination) plus a power reserve account whose multiplier is redacted. Cash trap on a qualifying customer-agreement breach or a parent bankruptcy event. 0.50% undrawn fee. Customer and site identities are redacted in the filed agreement.",
       "rate": {
         "kind": "sofr_spread",
         "value": 2.25,
-        "note": "~$4.5B floating daily SOFR + 2.25%; ~$4.0B fixed 2.00% + blended UST (WAL 3.14y); 0.50% undrawn; effective ~7% per filings"
+        "note": "Floating tranche daily SOFR + 2.25% (base rate + 1.25%); fixed tranche 2.00% + a blended Treasury margin (WAL 3.14y per filings); 0.00% floor; 0.50% undrawn fee; effective ~7% per filings"
       },
       "maturity": "2032-03-31",
       "maturity_note": null,
-      "seniority": "Senior secured (SPV); non-recourse (bad-acts guarantee only)",
-      "security": "All CCAC VIII assets + equity; sized to depreciable equipment cost + projected DSCR ≥1.15x; ≥95% rate hedging + power hedging required. Anchored by an investment-grade Meta offtake contract (~$19B backlog) — first IG-rated GPU-backed financing (A3 Moody's / A-low DBRS), per CoreWeave release + Bloomberg 2026-03-31.",
+      "seniority": "Senior secured (SPV); non-recourse — the filed limited guarantee covers only five bad-acts categories (fraud, willful misconduct causing material damage, misappropriation of collateral, voluntary bankruptcy, consent to involuntary relief) and never requires the parent to fund equity",
+      "security": "All CCAC VIII assets + equity; filed advance rate 90% of funding-date capital expenditures, net of six-year straight-line depreciation; ≥95% rate hedging + power hedging required. Anchored by an investment-grade Meta offtake contract (~$19B backlog) — first IG-rated GPU-backed financing (A3 Moody's / A-low DBRS), per CoreWeave release + Bloomberg 2026-03-31; the filed agreement redacts the customer's name.",
       "lenders": [
         "MUFG (admin, coordinating lead arranger)",
         "MS Asset Funding (coordinating lead arranger)"
@@ -186,11 +187,11 @@
       "status": "confirmed",
       "issued": "2026-03-30",
       "source": {
-        "doc": "8-K 3/31/26 (DDTL 4.0); 10-Q",
+        "doc": "8-K 3/31/26, credit agreement filed as EX-10.1 (redacted) and limited guarantee as EX-10.2, acc 0001769628-26-000129; 10-Q",
         "date": "2026-03-31",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000129/crwv-20260330.htm"
       },
-      "as_of": "2026-03-31",
+      "as_of": "2026-08-18",
       "facility_ratings": [
         {
           "agency": "Moody's",
@@ -211,20 +212,20 @@
       "issuer": "CoreWeave, Inc.",
       "ticker": "CRWV",
       "issuer_type": "public",
-      "entity": "CoreWeave Financing DDTL V LLC (borrower)",
+      "entity": "CoreWeave Financing DDTL V, LLC (borrower); full CoreWeave, Inc. guarantee with CW Financing DDTL V Holdco, LLC pledge",
       "name": "DDTL 5.0",
       "instrument_type": "credit_facility",
       "size_usd_m": 3100,
-      "size_note": "$3.1B committed; drawn balance undisclosed (draws through Sep 2026)",
+      "size_note": "$3.1B committed; drawn balance undisclosed. Availability to 2026-09-30; fixed maturity 2031-11-15. Monthly amortization from commitment termination on a filed percentage schedule (not attached), bullet at maturity. Debt service coverage at or above 1.35:1.00, trailing three months, from the first monthly date after commitment termination. Minimum liquidity is a formula: three months of scheduled interest plus one month of scheduled principal. Call protection declines from the signing date: make-whole (Treasury + 50bps) in year one, 2.00% in year two, 1.00% in year three, none after. Cash trap on a material breach of either of two customer master services agreements (both names redacted) or a parent bankruptcy. 0.50% undrawn fee; upfront fees sit in unfiled fee letters.",
       "rate": {
         "kind": "sofr_spread",
         "value": 4.5,
-        "note": "Daily SOFR + 4.50%; 0.50% undrawn fee"
+        "note": "Daily SOFR + 4.50% (base rate + 3.50%), 0.00% floor; 0.50% per annum undrawn fee; fees otherwise in unfiled fee letters"
       },
       "maturity": "2031-11-15",
       "maturity_note": null,
       "seniority": "Senior secured (SPV); parent guarantee",
-      "security": "All borrower assets + 100% equity; GPU servers for 2 non-IG (unrated) customer contracts; DSCR ≥1.35x",
+      "security": "All borrower assets + 100% equity; filed advance rate 71.42% of funding-date capital expenditures, net of six-year straight-line depreciation; GPU servers serve two customer master services agreements, both counterparties redacted in the filing",
       "lenders": [
         "MS Senior Funding (admin)",
         "MUFG (lead)",
@@ -234,11 +235,11 @@
       "status": "confirmed",
       "issued": "2026-05-15",
       "source": {
-        "doc": "8-K 5/18/26 (DDTL 5.0)",
+        "doc": "8-K 5/18/26, credit agreement filed as EX-10.1 (redacted) and parent guarantee as EX-10.2, acc 0001769628-26-000236",
         "date": "2026-05-18",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000236/crwv-20260515.htm"
       },
-      "as_of": "2026-05-18",
+      "as_of": "2026-08-18",
       "facility_ratings": [
         {
           "agency": "Moody's",
@@ -314,15 +315,15 @@
       "name": "9.250% Senior Notes due 2030",
       "instrument_type": "bond",
       "size_usd_m": 2000,
-      "size_note": null,
+      "size_note": "Issued at par. Incurrence package: ratio debt permitted at pro forma consolidated total leverage no greater than 6.00:1.00; credit-facility basket of $1,500.0M plus the greater of $1,000.0M and 25.0% of LTM EBITDA; equal-and-ratable liens covenant; covenants suspend permanently on investment-grade status. ~10% effective rate per the Q2 2026 10-Q (rounded).",
       "rate": {
         "kind": "fixed",
         "value": 9.25,
-        "note": null
+        "note": "Make-whole (Treasury + 50bps, 1% floor) before 2027-06-01; then callable from June 1 at 104.625 (2027), 102.313 (2028), 100.000 (2029 on). 40% equity clawback at 109.250 before 2027-06-01; change-of-control put at 101."
       },
       "maturity": "2030-06-01",
       "maturity_note": null,
-      "seniority": "Senior unsecured; subsidiary-guaranteed",
+      "seniority": "Senior unsecured; guaranteed by CoreWeave Cash Management LLC and future domestic restricted subsidiaries that guarantee the Revolving Credit Facility",
       "security": null,
       "lenders": [
         "144A; Wilmington Trust (trustee)"
@@ -330,11 +331,11 @@
       "status": "confirmed",
       "issued": "2025-05-27",
       "source": {
-        "doc": "8-K 5/28/25 (closing)",
+        "doc": "8-K 5/28/25 (closing), indenture filed as EX-4.1, acc 0001769628-25-000025; 10-Q Note 10",
         "date": "2025-05-28",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000025/crwv-20250527.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-notes-9000-2031",
@@ -348,27 +349,27 @@
       "name": "9.000% Senior Notes due 2031",
       "instrument_type": "bond",
       "size_usd_m": 1750,
-      "size_note": null,
+      "size_note": "Issued at par. Same incurrence package as the 2030 notes: 6.00:1.00 total-leverage ratio test, $1,500.0M credit-facility basket plus the greater of $1,000.0M and 25.0% of LTM EBITDA, equal-and-ratable liens covenant, covenant suspension on investment-grade status. ~10% effective rate per the Q2 2026 10-Q (rounded).",
       "rate": {
         "kind": "fixed",
         "value": 9,
-        "note": null
+        "note": "Make-whole (Treasury + 50bps, 1% floor) before 2028-02-01; then callable from February 1 at 104.500 (2028), 102.250 (2029), 100.000 (2030 on). 40% equity clawback at 109.000; change-of-control put at 101."
       },
       "maturity": "2031-02-01",
       "maturity_note": null,
-      "seniority": "Senior unsecured; subsidiary-guaranteed",
+      "seniority": "Senior unsecured; guaranteed by CoreWeave Cash Management LLC, CoreWeave Debt HoldCo I, LLC and Weights and Biases, LLC (the Revolving Credit Facility guarantors)",
       "security": null,
       "lenders": [
-        "Trustee: Wilmington Trust per 8-K body (exhibit index says U.S. Bank — filing-internal discrepancy)"
+        "144A; U.S. Bank Trust Co. (trustee per the filed indenture; the 8-K narrative names Wilmington Trust)"
       ],
       "status": "confirmed",
       "issued": "2025-07-25",
       "source": {
-        "doc": "8-K 7/28/25 (closing)",
+        "doc": "8-K 7/28/25 (closing), indenture filed as EX-4.1, acc 0001193125-25-165924; 10-Q Note 10",
         "date": "2025-07-28",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000119312525165924/d73657d8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-notes-9750-2031",
@@ -382,15 +383,15 @@
       "name": "9.750% Senior Notes due Oct 2031",
       "instrument_type": "bond",
       "size_usd_m": 2750,
-      "size_note": "$1,750M + $1,000M add-on at 102.0",
+      "size_note": "$1,750M base (2026-04-14) plus a $1,000M add-on issued at 102.000 (2026-04-21, First Supplemental Indenture), one class. Credit-facility basket enlarged against the 2025 indentures: $2,500.0M plus the greater of $1,000.0M and 25.0% of LTM EBITDA; 6.00:1.00 total-leverage ratio test; covenants suspend on investment-grade status. No filed issue price for the base tranche. ~10% effective rate per the Q2 2026 10-Q (rounded).",
       "rate": {
         "kind": "fixed",
         "value": 9.75,
-        "note": null
+        "note": "Make-whole (Treasury + 50bps, 1% floor) before 2028-10-01; then callable from October 1 at 104.875 (2028), 102.438 (2029), 100.000 (2030 on). 40% equity clawback at 109.750; change-of-control put at 101."
       },
       "maturity": "2031-10-01",
       "maturity_note": null,
-      "seniority": "Senior unsecured; RCF-guarantor guaranteed",
+      "seniority": "Senior unsecured; guaranteed by CoreWeave Cash Management LLC, CoreWeave Debt HoldCo I, LLC and Weights and Biases, LLC (the Revolving Credit Facility guarantors)",
       "security": null,
       "lenders": [
         "144A; U.S. Bank Trust Co. (trustee)"
@@ -398,11 +399,11 @@
       "status": "confirmed",
       "issued": "2026-04-14",
       "source": {
-        "doc": "8-Ks 4/14/26 (notes + converts) and 4/21/26 (add-on)",
+        "doc": "8-Ks 4/14/26 (notes + converts, indenture EX-4.1) and 4/21/26 (add-on, First Supplemental Indenture EX-4.1, acc 0001769628-26-000183)",
         "date": "2026-04-21",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000164/crwv-20260409.htm"
       },
-      "as_of": "2026-04-21"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-notes-9625-2032",
@@ -416,15 +417,15 @@
       "name": "9.625% USD Senior Notes due 2032",
       "instrument_type": "bond",
       "size_usd_m": 1250,
-      "size_note": null,
+      "size_note": "No filed issue price (the launch release states only the intended $3.5B two-tranche total). 2026 incurrence package: $2,500.0M credit-facility basket plus the greater of $1,000.0M and 25.0% of LTM EBITDA; 6.00:1.00 total-leverage ratio test; covenant suspension on investment-grade status. ~10% effective rate per the Q2 2026 10-Q (rounded).",
       "rate": {
         "kind": "fixed",
         "value": 9.625,
-        "note": null
+        "note": "Make-whole (Treasury + 50bps, 1% floor) before 2029-07-15; then callable from July 15 at 104.813 (2029), 102.406 (2030), 100.000 (2031 on). 40% equity clawback at 109.625; change-of-control put at 101."
       },
       "maturity": "2032-07-15",
       "maturity_note": null,
-      "seniority": "Senior unsecured",
+      "seniority": "Senior unsecured; guaranteed by CoreWeave Cash Management LLC, CoreWeave Debt HoldCo I, LLC and Weights and Biases, LLC (the Revolving Credit Facility guarantors)",
       "security": null,
       "lenders": [
         "144A; U.S. Bank Trust Co. (trustee)"
@@ -432,11 +433,11 @@
       "status": "confirmed",
       "issued": "2026-06-18",
       "source": {
-        "doc": "8-K 6/18/26 (USD/EUR notes)",
+        "doc": "8-K 6/18/26 (USD/EUR notes), indenture filed as EX-4.1, acc 0001769628-26-000291; 10-Q Note 10",
         "date": "2026-06-18",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000291/crwv-20260618.htm"
       },
-      "as_of": "2026-06-18"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-notes-eur-8500-2032",
@@ -450,27 +451,28 @@
       "name": "8.500% EUR Senior Notes due 2032",
       "instrument_type": "bond",
       "size_usd_m": 2300,
-      "size_note": "€2,000M (~$2.3B)",
+      "size_note": "€2,000M (~$2.3B; $2,279M carrying value at 2026-06-30), €100,000 minimum denominations. Listing covenant on The International Stock Exchange; withholding gross-up via an additional-amounts provision. Same 2026 incurrence package as the USD notes: $2,500.0M credit-facility basket, 6.00:1.00 ratio test, investment-grade covenant suspension.",
       "rate": {
         "kind": "fixed",
         "value": 8.5,
-        "note": null
+        "note": "Make-whole (Bund Rate + 50bps, 1% floor) before 2029-07-15; then callable from July 15 at 104.250 (2029), 102.125 (2030), 100.000 (2031 on). 40% equity clawback at 108.500; change-of-control put at 101."
       },
       "maturity": "2032-07-15",
       "maturity_note": null,
-      "seniority": "Senior unsecured",
+      "seniority": "Senior unsecured; guaranteed by CoreWeave Cash Management LLC, CoreWeave Debt HoldCo I, LLC and Weights and Biases, LLC (the Revolving Credit Facility guarantors)",
       "security": null,
       "lenders": [
-        "U.S. Bank Trust Co.; U.S. Bank Europe DAC"
+        "U.S. Bank Trust Co. (trustee)",
+        "U.S. Bank Europe DAC (registrar and transfer agent; paying agent via the UK branch)"
       ],
       "status": "confirmed",
       "issued": "2026-06-18",
       "source": {
-        "doc": "8-K 6/18/26 (USD/EUR notes)",
+        "doc": "8-K 6/18/26 (USD/EUR notes), indenture filed as EX-4.3, acc 0001769628-26-000291; 10-Q Note 10",
         "date": "2026-06-18",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000291/crwv-20260618.htm"
       },
-      "as_of": "2026-06-18"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-conv-2031",
@@ -484,27 +486,28 @@
       "name": "1.75% Convertible Senior Notes due 2031",
       "instrument_type": "convertible",
       "size_usd_m": 2587.5,
-      "size_note": null,
+      "size_note": "Includes the $337.5M initial purchasers' option, exercised in full; net proceeds ~$2,542.2M. No redemption before 2028-12-05, then at par only if the stock trades at 130% of the conversion price for 20 of 30 trading days; fundamental-change put at par; settlement in cash, shares or a combination at the issuer's election. Cross-default threshold: the greater of $200M and 5% of LTM EBITDA.",
       "rate": {
         "kind": "fixed",
         "value": 1.75,
-        "note": "Conversion $107.80; capped calls to $215.60 ($340M cost)"
+        "note": "Conversion 9.2764 sh/$1,000 (~$107.80, ~25% premium); capped calls to $215.60 (~$340.0M cost)"
       },
       "maturity": "2031-12-01",
       "maturity_note": null,
-      "seniority": "Senior unsecured",
+      "seniority": "Senior unsecured; guaranteed by the subsidiaries that guarantee the 9.250% 2030 and 9.000% 2031 notes",
       "security": null,
       "lenders": [
-        "144A; U.S. Bank Trust Co. (trustee)"
+        "144A; U.S. Bank Trust Co. (trustee)",
+        "Capped-call banks: Wells Fargo, Citi, Barclays, Morgan Stanley, Societe Generale, TD, Goldman Sachs"
       ],
       "status": "confirmed",
       "issued": "2025-12-11",
       "source": {
-        "doc": "8-K 12/11/25 (converts); 10-K",
+        "doc": "8-K 12/11/25 (converts), indenture EX-4.1 and capped-call forms EX-10.1/10.2, acc 0001769628-25-000105; 10-K",
         "date": "2025-12-11",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000105/crwv-20251208.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-conv-2032",
@@ -518,15 +521,15 @@
       "name": "1.75% Convertible Senior Notes due 2032",
       "instrument_type": "convertible",
       "size_usd_m": 4000,
-      "size_note": null,
+      "size_note": "Includes the $500M initial purchasers' option, exercised in full; net proceeds $3,940.0M. No redemption before 2029-10-08, then at par only if the stock trades at 130% of the conversion price for 20 of 30 trading days; fundamental-change put at par; settlement in cash, shares or a combination at the issuer's election. Cross-default threshold: the greater of $200M and 5% of LTM EBITDA.",
       "rate": {
         "kind": "fixed",
         "value": 1.75,
-        "note": "Conversion ~$119.60 (30% premium); capped calls to $230.00 ($492M cost)"
+        "note": "Conversion 8.3612 sh/$1,000 (~$119.60, 30.0% premium over the 2026-04-09 close); capped calls to $230.00 ($492.0M cost)"
       },
       "maturity": "2032-10-01",
       "maturity_note": null,
-      "seniority": "Senior unsecured",
+      "seniority": "Senior unsecured; guaranteed by the subsidiaries that guarantee the 2030 notes, the 9.000% 2031 notes and the 2031 converts",
       "security": null,
       "lenders": [
         "U.S. Bank Trust Co. (trustee)",
@@ -535,11 +538,11 @@
       "status": "confirmed",
       "issued": "2026-04-14",
       "source": {
-        "doc": "8-K 4/14/26 (notes + converts)",
+        "doc": "8-K 4/14/26 (notes + converts), indenture EX-4.3 and capped-call forms EX-10.1/10.2, acc 0001769628-26-000164",
         "date": "2026-04-14",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000164/crwv-20260409.htm"
       },
-      "as_of": "2026-04-14"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-rcf",
@@ -551,14 +554,14 @@
       "name": "Revolving Credit Facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 2500,
-      "size_note": "$2.5B capacity (Nov 2025); $1,500M drawn + $314M LCs at 3/31/26",
+      "size_note": "Capacity grew $100M (June 2024 agreement) to $650M, then $1.5B with letter-of-credit capacity of $350M (Amendment No. 3, 2025-05-02), then $2.5B with maturity extended to November 2029 (November 2025 amendment; its text is not filed, so capacity and maturity rest on the 10-Q). At 2026-06-30: no borrowings, $533M letters of credit outstanding, $2.0B remaining capacity; $1.2B drawn in August 2026 per the Q2 10-Q subsequent events. Original covenants: total net leverage no greater than 6.00:1.00 (7.00:1.00 for four quarters after a material acquisition) and minimum contracted revenue of $1.0B, each with an equity cure; Amendment No. 3 added a springing 2026-12-30 maturity if former Series C investors' put rights remain in existence without an escrow deposit.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
-        "note": "At IPO SOFR + 1.75%, 0.25% undrawn; post-Nov-2025 pricing undisclosed; effective ~6% per 10-Q"
+        "note": "Original pricing flat at SOFR + 1.75% (base rate + 0.75%), 0.25% undrawn fee, unchanged through Amendment No. 3; the post-November-2025 grid is not filed. A June 2026 investor presentation (8-K EX-99.2) lists S+175; ~6% effective per the 10-Q."
       },
       "maturity": "2029-11",
-      "maturity_note": null,
+      "maturity_note": "November 2029 per the 10-Q; the November 2025 amendment text is not filed.",
       "seniority": "Senior secured",
       "security": "Pledges of certain assets; made fully secured Dec 2024",
       "lenders": [
@@ -568,11 +571,11 @@
       "status": "confirmed",
       "issued": "2024-06-21",
       "source": {
-        "doc": "424B4; 8-K 5/6/25 (Amendment No. 3); 10-K/10-Q",
+        "doc": "S-1 EX-10.17 (original agreement, unredacted); 8-K 5/6/25 EX-10.1 (Amendment No. 3); 424B4; 10-K/10-Q",
         "date": "2025-05-06",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000003/crwv-20250502.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-18"
     },
     {
       "id": "crwv-oem-financings",
@@ -1134,16 +1137,16 @@
       "name": "Senior Secured Revolving Credit Facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 250,
-      "size_note": "$250M commitments; draws undisclosed",
+      "size_note": "$250M commitments; draws undisclosed. Availability capped at $75M until lease cashflows commence at the first of the CB-4 and CB-5 projects. $150M letter-of-credit sublimit inside the facility; no accordion. Liquidity covenant $100M before that first commencement and $150M after, quarterly-tested, counting at most $50M of undrawn revolver; the equity cure is capped at five uses over the term with at least two clean quarters in any four. Designated project entities (the Google-backstopped CB-4/CB-5 and Abernathy structures among them) are carved out of the guarantees while their own debt documents bar them. Joint lead arrangers: Santander, BofA, Citi, Citizens, SMBC, TD, Wells Fargo.",
       "rate": {
         "kind": "sofr_spread",
         "value": 1.75,
         "value_low": 1.25,
         "value_high": 1.75,
-        "note": "SOFR + 1.75% pre-Fluidstack-lease commencement, then grid +1.25–1.75%"
+        "note": "SOFR + 1.75% until the first CB-4/CB-5 commencement, then a 1.25-1.75% grid on consolidated total debt to market capitalization (breakpoints 0.30x and 0.60x); 0.00% floor; 0.50% commitment fee; default rate +2%"
       },
       "maturity": "2030-05-07",
-      "maturity_note": "Springing maturity pre-2030 convert",
+      "maturity_note": "Initial maturity 2030-05-07 (fourth anniversary); springs to 91 days before the 2.75% 2030 converts' maturity if they remain outstanding then.",
       "seniority": "Senior secured (parent)",
       "security": "Substantially all Company assets; minimum-liquidity covenant. Context (8-K 2026-07-06): sub Raylan Data signed a 20-yr ~401 MW Hawesville lease with Anthropic (press ~$19B; payments ‘expected to be supported by an investment-grade credit’) — lessor-side offtake, tracked for the financing it will support, not as a ledger row; same 8-K: sold the 50.1% stake in Fluidstack JV FS CS I (Abernathy, TX — 168 MW; distinct campus and financing from the Meridian Arc/Indiana structure) to Fluidstack-led purchasers for ~$530M in three installments. Watch: Abernathy project debt ($1.3B of Fluidstack lease obligations Google-backstopped per Oct-2025 8-K) has not publicly priced — a future row when it does. Update (2026-07-20, per KBW): the investment-grade credit backstop for Anthropic's Hawesville payments is not yet finalized — Anthropic has not selected hardware (NVIDIA GPU vs AWS Trainium vs Google TPU) and the backstop provider is expected to follow that choice (decision expected within ~4 months). TeraWulf is reported (Bloomberg) to plan a ~$3.5B debt raise for the campus; if it prices before hardware is chosen, or if Anthropic selects TPUs/Trainium, the financing would fall outside strict GPU-collateral scope (same basis as the excluded Meta campus SPVs).",
       "lenders": [
@@ -1152,11 +1155,11 @@
       "status": "confirmed",
       "issued": "2026-05-07",
       "source": {
-        "doc": "Q1-26 10-Q Note 18",
+        "doc": "Q1-26 10-Q Note 18; credit agreement filed as EX-10.33 to the same 10-Q, acc 0001083301-26-000092",
         "date": "2026-05-08",
         "url": "https://www.sec.gov/Archives/edgar/data/1083301/000108330126000092/wulf-20260331.htm"
       },
-      "as_of": "2026-05-08"
+      "as_of": "2026-08-18"
     },
     {
       "id": "wulf-jv-7250-2030",
@@ -1467,15 +1470,15 @@
       "name": "Revolving Credit Facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 430,
-      "size_note": "$430M commitments (upsized from $350M 6/26/26; incremental to $550M); draws undisclosed",
+      "size_note": "$430M commitments: $350M at the 2026-05-29 closing plus an $80M Incremental Assumption No. 1 (2026-06-26, identical terms other than fees), with $200M of remaining incremental capacity to a $550M ceiling; draws undisclosed. Letter-of-credit sublimit equals the full facility. The filed agreement redacts the margin, the unused fee and the entire financial covenant; the covenant is monthly-tested with a cure right, and the S+2.25% on this row rests on the 8-K description alone. Collateral excludes the Texas Capital Bank loan collateral and real property at or under $15M fair market value.",
       "rate": {
         "kind": "sofr_spread",
         "value": 2.25,
-        "note": "Term SOFR + 2.25%"
+        "note": "Term SOFR + 2.25% per the 8-K description; the filed agreement redacts the margin and unused fee; 0.00% floor; default rate +2%"
       },
       "maturity": "2029-05-28",
-      "maturity_note": null,
-      "seniority": "Secured revolver; company + restricted-subsidiary guarantees",
+      "maturity_note": "The earlier of the third anniversary of closing and 91 days before the redemption date under the April 2025 Preferred Equity Purchase Agreement (as amended through the Fifth Amendment of 2026-05-29).",
+      "seniority": "Secured revolver; Holdings (Applied Digital Corporation) and restricted-subsidiary guarantees",
       "security": "Certain non-data-center project assets",
       "lenders": [
         "First National Bank of Omaha (admin/collateral)",
@@ -1488,11 +1491,11 @@
       "status": "confirmed",
       "issued": "2026-05-29",
       "source": {
-        "doc": "8-K 6/26/26 (upsize); PR 8-K 6/9/26",
+        "doc": "8-K 6/26/26, credit agreement filed as EX-10.1 (redacted) and Incremental Assumption No. 1 as EX-10.2, acc 0001493152-26-030333; PR 8-K 6/9/26",
         "date": "2026-06-26",
         "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315226030333/form8-k.htm"
       },
-      "as_of": "2026-06-26"
+      "as_of": "2026-08-18"
     },
     {
       "id": "apld-rcf-2025",
@@ -1707,16 +1710,16 @@
       "name": "Revolving Credit Facility (parent)",
       "instrument_type": "credit_facility",
       "size_usd_m": 200,
-      "size_note": "$200M + $50M accordion; $0 drawn 3/31/26",
+      "size_note": "$200M commitments plus a $50M accordion (with prepayment reload); $0 drawn 3/31/26; $50M letter-of-credit sublimit inside the facility. Liquidity covenant in three steps keyed to project commencement: $100M until the first of the Barber Lake and Black Pearl facilities commences, $150M after the first, $200M after the second; quarterly-tested with an equity cure, and undrawn revolver capacity counts toward liquidity. Borrower is Cipher Digital Inc.; guarantors are the borrower and its restricted-subsidiary loan parties. Pari passu with the Barber Lake notes (7.125% due 2030, capped at $1,733M) on shared collateral via the indenture-form intercreditor.",
       "rate": {
         "kind": "sofr_spread",
         "value": 1.75,
         "value_low": 1.25,
         "value_high": 1.75,
-        "note": "SOFR + 1.25–1.75% grid (initial 1.75%); 0.50% commitment fee"
+        "note": "SOFR + 1.25-1.75% grid on consolidated total debt to market capitalization (breakpoints 0.30x and 0.60x); initial 1.75% holds until the Q3 2026 compliance certificate; 0.00% floor; 0.50% commitment fee; default rate +2%"
       },
       "maturity": "2030-03-23",
-      "maturity_note": "Springing maturity",
+      "maturity_note": "Initial maturity 2030-03-23 (fourth anniversary); springs to 91 days before the 1.750% 2030 converts' maturity if they, or near-dated refinancing, remain outstanding then.",
       "seniority": "Senior secured 1st-priority (pari passu with Barber Lake notes on certain collateral)",
       "security": "Substantially all Company assets; minimum-liquidity $100M→$200M",
       "lenders": [
@@ -1730,11 +1733,11 @@
       "status": "confirmed",
       "issued": "2026-03-23",
       "source": {
-        "doc": "8-K 3/25/26",
+        "doc": "8-K 3/25/26, credit agreement filed as EX-10.1, acc 0000950103-26-004609",
         "date": "2026-03-25",
         "url": "https://www.sec.gov/Archives/edgar/data/1819989/000095010326004609/dp244113_8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-18"
     },
     {
       "id": "cifr-coinbase",
@@ -6026,11 +6029,11 @@
       "name": "Turbine Warehouse Equipment Financing (MUFG)",
       "instrument_type": "credit_facility",
       "size_usd_m": 500,
-      "size_note": "Up to $500.0M total commitment; $444.9M outstanding at 2026-06-30, 12.2% effective rate per the 10-Q debt table. Funded three Siemens SGT6-5000F gas turbines for Project Matador (Amarillo, TX) and repaid the Macquarie Term Loan in full on closing ($24.8M loss on extinguishment). Minimum quarterly principal of 10% of outstanding begins at the nine-month anniversary, reduced to 5% if a lease or offtake agreement for at least 400 MW of Project Matador's first phase has been signed by then.",
+      "size_note": "Up to $500.0M total commitment; $444.9M outstanding at 2026-06-30, 12.2% effective rate per the 10-Q debt table. Funded three Siemens SGT6-5000F gas turbines for Project Matador (Amarillo, TX) and repaid the Macquarie Term Loan in full on closing ($24.8M loss on extinguishment). Debt sizing: 65% (delivered) / 55% (undelivered) of the lower of equipment acquisition cost and orderly liquidation value, with matching 65%/55% target-LTV default triggers on a 2% revaluation move unremedied 30 days. Availability nine months from closing, maximum five borrowings. Reserves: three months' interest, a $5.0M liquidation reserve and a $3.9M O&M reserve; a reserve shortfall unremedied three days is a default. A distinct default arises if a committed Matador I project financing of at least 400 MW has not closed within one year. Minimum quarterly principal of 10% of outstanding begins at the nine-month anniversary, reduced to 5% if a Matador I lease or offtake of at least 400 MW is signed by that anniversary. Non-recourse to Fermi Inc. beyond the loan parties and pledgor; facility fees sit in an unfiled fee letter.",
       "rate": {
         "kind": "sofr_spread",
         "value": 4.0,
-        "note": "Term SOFR or Daily Simple SOFR + 4.00%; 12.2% effective per the 10-Q"
+        "note": "Term SOFR or Daily Simple SOFR + 4.00%, 0.00% floor; default rate +2%; 12.2% effective per the 10-Q"
       },
       "maturity": "2027-08-10",
       "maturity_note": null,
@@ -6042,7 +6045,7 @@
       "status": "confirmed",
       "issued": "2026-02-10",
       "source": {
-        "doc": "10-Q for the quarter ended 2026-06-30 (filed 2026-08-14), Note 5 Debt, acc. 0002071778-26-000051",
+        "doc": "8-K 2/10/26, agreement filed as EX-10.1, acc 0001213900-26-014270; 10-Q Note 5 (filed 2026-08-14)",
         "date": "2026-08-14",
         "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/0002071778-26-000051-index.htm"
       },
@@ -6060,11 +6063,11 @@
       "name": "High Voltage Equipment Financing (Keystone Master Loan Agreement)",
       "instrument_type": "credit_facility",
       "size_usd_m": 120,
-      "size_note": "Equipment-backed advances of up to $120.0M aggregate principal, with a potential $100.0M increase subject to lender approval; $77.3M outstanding at 2026-06-30, 14.1% effective rate per the 10-Q debt table. Advances fund up to 80% of the purchase price of financed high-voltage equipment, the remaining 20% funded by the borrower or its affiliates; each advance is a separate promissory note with rate and term set at issuance. Covenants: minimum liquidity of $20.0M, mandatory prepayment if an approved customer agreement has not been received by 2026-12-31, and outstanding principal capped at 110% of the fair market value of the financed equipment.",
+      "size_note": "Equipment-backed advances of up to $120.0M aggregate principal, with a potential $100.0M increase subject to arranger-secured commitments and agent and initial-lender approval; $77.3M outstanding at 2026-06-30, 14.1% effective rate per the 10-Q debt table. Advances fund up to 80% of the equipment purchase price, each evidenced by a separate promissory note whose rate, term, conversion date and amortization are set at issuance (the note controls on conflict); no reborrowing. Covenants: Fermi Inc. (guarantor) minimum liquidity of $20.0M, which sunsets on execution of an approved customer agreement; outstanding principal capped at 110% of the financed equipment's appraised fair market value with a 15-business-day cure; mandatory full prepayment at 1.05x principal if no approved customer agreement is received by 2026-12-31. Voluntary prepayment is locked out until after the sixth payment date and carries a 1.22x MOIC minimum; the form of note carries an optional 2.00% undrawn payment amount; the 10-Q describes an exit fee escalating from 0% (first 180 days) to 1% (days 181-365) and 1.33% thereafter. Default rate 1.5% per month. Cape Commercial Finance is sole arranger; closing fee in an unfiled fee letter.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
-        "note": "Per-advance rates set at issuance in each promissory note; 14.1% effective per the 10-Q. Exit fee escalates from 0% (first 180 days) to 1% (days 181-365) and 1.33% thereafter."
+        "note": "Per-advance rates set at issuance in each promissory note (360-day basis); 14.1% effective per the 10-Q"
       },
       "maturity": "2031",
       "maturity_note": "Per-advance terms; the 10-Q debt table carries the facility to 2031.",
@@ -6072,12 +6075,13 @@
       "security": "Financed high-voltage equipment; outstanding principal capped at 110% of its fair market value",
       "lenders": [
         "Keystone National Group, LLC (agent)",
-        "Keystone Private Income Fund (initial lender)"
+        "Keystone Private Income Fund (initial lender)",
+        "Cape Commercial Finance LLC (sole arranger)"
       ],
       "status": "confirmed",
       "issued": "2026-02-19",
       "source": {
-        "doc": "10-Q for the quarter ended 2026-06-30 (filed 2026-08-14), Note 5 Debt, acc. 0002071778-26-000051",
+        "doc": "8-K 2/25/26, master loan agreement filed as EX-10.1, acc 0001213900-26-020399; 10-Q Note 5 (filed 2026-08-14)",
         "date": "2026-08-14",
         "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/0002071778-26-000051-index.htm"
       },
@@ -6091,15 +6095,15 @@
       "issuer": "Fermi Inc.",
       "ticker": "FRMI",
       "issuer_type": "public",
-      "entity": "Fermi Turbine Warehouse II LLC (borrower), a Texas limited liability company and indirect wholly owned subsidiary of Fermi Inc.",
+      "entity": "Fermi Turbine Warehouse II LLC (borrower), with Fermi Turbine Holdco II LLC as guarantor and Fermi Turbine Pledgor II LLC as pledgor; indirect wholly owned subsidiaries of Fermi Inc. Payments route to Beal Bank; fees to CSG Investments, Inc.",
       "name": "Turbine Warehouse II Equipment Financing (Beal Credit Agreement, CLMG as agent)",
       "instrument_type": "credit_facility",
       "size_usd_m": 165,
-      "size_note": "Senior secured term loan facility of up to $165.0M funding six Siemens Energy SGT-800 gas turbines and related equipment for Project Matador; $14.7M outstanding at 2026-06-30, 17.0% effective rate per the 10-Q debt table. Exit fee of $37.0M less cumulative interest and commitment fees paid through the exit date. Mandatory prepayment on an event of loss, a disposition of equipment or equity interests, or a change of control.",
+      "size_note": "Senior secured term loan facility of up to $165.0M funding six Siemens Energy SGT-800 gas turbines and related equipment for Project Matador; $14.7M outstanding at 2026-06-30, 17.0% effective rate per the 10-Q debt table. Availability runs the full 33 months with at most 45 borrowings; a $22.9M sublimit lets interest and fees be drawn from the facility itself. No scheduled amortization: principal, interest, fees and the exit fee are due at maturity. Exit fee of $37.0M less cumulative interest and commitment fees paid, floored at zero. 1% per annum unused commitment fee. Draw conditions include a minimum equity contribution of $5.49M and assignment of the surety bond. Mandatory prepayment on asset dispositions, a change of control, liquidated damages received, or new debt proceeds; one disposition of three turbines is permitted with a 100% proceeds sweep, and the remaining three turbines cannot be sold before maturity. No financial covenants.",
       "rate": {
         "kind": "fixed",
         "value": 12.0,
-        "note": "12.00% per annum, payable quarterly in arrears (14.00% on an event of default); 17.0% effective per the 10-Q"
+        "note": "12.00% per annum fixed, payable quarterly in arrears from 2026-06-30 (14.00% on an event of default; 365-day basis); 17.0% effective per the 10-Q"
       },
       "maturity": "2028-12",
       "maturity_note": "33 months after the 2026-03-26 closing date; the 10-Q debt table carries the facility to 2028.",
@@ -6112,7 +6116,7 @@
       "status": "confirmed",
       "issued": "2026-03-26",
       "source": {
-        "doc": "10-Q for the quarter ended 2026-06-30 (filed 2026-08-14), Note 5 Debt, acc. 0002071778-26-000051",
+        "doc": "8-K 3/27/26, agreement filed as EX-10.1, acc 0001213900-26-035482; 10-Q Note 5 (filed 2026-08-14)",
         "date": "2026-08-14",
         "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/0002071778-26-000051-index.htm"
       },
@@ -6151,7 +6155,7 @@
         "SMBC $375M (closed 2/11/25; repaid Nov 2025 with 9.250% notes proceeds)",
         "GS ELN-04 bridge (Jun 2026)",
         "Excluded: Macquarie $900M 12.75% PIK preferred in HPC TopCo 2 = redeemable NCI, not debt",
-        "UNVERIFIED: status of Nov 2025 FNBO $65M revolver (SOFR+2.75%, $61.9M LCs at 2/28/26 — likely superseded, no terminating filing)",
+        "UNVERIFIED: status of Nov 2025 FNBO $65M revolver (SOFR+2.75%, $61.9M LCs at 2/28/26 — no terminating filing located; the 2026-05-29 FNBO credit agreement covers the same borrower group)",
         "DevCo Facility — MEC/Macquarie promissory note, $87.1M carrying ($45M + $40M draws) — \"On May 29, 2026, APLD DevCo repaid the DevCo Loan in full, including all outstanding and unpaid principal, accrued interest, and rate of return\" (FY26 10-K, period ended 2026-05-31, filed 2026-07-29)."
       ]
     },
@@ -6234,7 +6238,7 @@
     {
       "issuer": "Sharon AI Holdings, Inc.",
       "items": [
-        "USD.AI GPU-backed debt facility, up to US$500M (announced Jan 22, 2026) — NEVER EXECUTED. The Company's S-1 filed Aug 12, 2026 still states USD.AI \"had approved a debt facility of up to US$500 million ... subject to execution of definitive documentation\"; it appears in no debt footnote. Carried as a confirmed instrument until 2026-08-13; removed as an announced approval, not an instrument."
+        "USD.AI GPU-backed debt facility, up to US$500M (announced Jan 22, 2026) — never executed. The Company's S-1 filed Aug 12, 2026 still states USD.AI \"had approved a debt facility of up to US$500 million ... subject to execution of definitive documentation\"; it appears in no debt footnote. Carried as a confirmed instrument until 2026-08-13; removed as an announced approval, not an instrument."
       ]
     }
   ]
