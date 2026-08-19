@@ -260,7 +260,17 @@ const datasetLd = JSON.stringify({
   name: `${def.display} — tracked credit instruments`,
   description,
   url: new URL(`/credit/issuer/${slug}`, 'https://ccir.io').href,
-  isPartOf: { '@type': 'Dataset', name: 'CCIR Compute Credit Ledger', url: 'https://ccir.io/credit' },
+  // GSC 2026-08-19: a nested bare Dataset (no description) is a critical
+  // "Datasets" error on every issuer page. The ledger is a catalog of
+  // per-issuer datasets, so Google's documented shape is
+  // includedInDataCatalog + DataCatalog, which also ends the description
+  // requirement at the right entity.
+  includedInDataCatalog: {
+    '@type': 'DataCatalog',
+    name: 'CCIR Compute Credit Ledger',
+    url: 'https://ccir.io/credit',
+    description: 'GPU and AI-infrastructure debt instruments tracked as filed, by issuer.',
+  },
   creator: { '@id': 'https://ccir.io/#org' },
   ...(asOf ? { dateModified: asOf } : {}),
   variableMeasured: ['size', 'coupon or spread', 'maturity', 'seniority', 'collateral', 'lenders'],
