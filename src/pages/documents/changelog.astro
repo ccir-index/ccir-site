@@ -15,6 +15,29 @@ import { meta } from '../../data/snapshot';
 // not named; membership is disclosed at class/count grain.
 const entries = [
   {
+    id: '260819-1',
+    date: '2026-08-19',
+    effective: '2026-08-19',
+    type: 'Methodology change · aggregation',
+    restatement: 'None',
+    impact: 'Two marketplace-tier cells re-published same day; other tiers unchanged',
+    title: 'v2.3.1 — a quorum bound on the marketplace vote floor',
+    body: [
+      `The v2.3.0 vote floor applies source by source. In cells where
+       most members are marketplace-class, it can remove most of the
+       panel's votes at once and leave the headline to a small
+       minority. From the 2026-08-19 fixing the floor carries a
+       quorum bound. Where the floor would remove half or more of a
+       cell's voters, the floored votes stand for that day. The full
+       panel then prices the cell. Cells where floored sources are a
+       minority follow v2.3.0 unchanged. The bound applies from the
+       2026-08-19 fixing itself. Two marketplace-tier cells first
+       published that morning under v2.3.0 were re-published under
+       the bound the same day, before the daily record closed.
+       Forward-only; no prior series value is restated.`,
+    ],
+  },
+  {
     id: '260818-1',
     date: '2026-08-18',
     effective: '2026-08-19',
