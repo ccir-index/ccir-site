@@ -16999,4 +16999,5 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-08-19,upcloud,h100-sxm-80gb,H100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T2IF,T2,2.0721,False,,Available,v2.3.0,panel,EU-FI
 2026-08-19,upcloud,h100-sxm-80gb,H100,80GB,SXM,Unknown,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T2,2.0605,False,,Available,v2.3.0,panel,EU-FI
 2026-08-19,vast_ai,h100-sxm-80gb,H100,80GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,1.8667,True,local-nvme,Available,v2.3.0,marketplace,", RU"
+2026-08-19,vast_ai,h100-sxm-80gb,H100,80GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-Central,US,DIF,T3IF,T3,1.0533,True,local-nvme,Available,v2.3.0,marketplace,"IOWA, US"
 2026-08-19,voltage_park,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,US-East,US,SIF,T3IF,T2,1.9900,True,free-egress;support-tier,SoldOut,v2.3.0,panel,US
