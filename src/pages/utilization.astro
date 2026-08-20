@@ -4,7 +4,7 @@ import Base from '../layouts/Base.astro';
 // /utilization — the supply page: measured Vast utilization (the lead chart) +
 // the Availability Index (breadth of genuine-capacity venues showing launchable
 // stock). Reads the export_availability_index CSVs from /data/ client-side;
-// degrades to a "warming up" state if absent. /availability redirects here.
+// degrades to an empty state if absent. /availability redirects here.
 // Two independent chip selectors: measured utilization is limited to the
 // chips Vast discloses; the Availability Index has its own universe (it now
 // includes B300, which has no Vast leg). Selections do not couple.
@@ -76,7 +76,7 @@ const DEFAULT_CHIP = 'h100-sxm';
         </div>
         <div class="chart-wrap util-wrap"><canvas id="utilChart"></canvas></div>
       </div>
-      <div class="empty" id="util-empty" hidden>Vast utilization warming up.</div>
+      <div class="empty" id="util-empty" hidden>No data yet.</div>
     </div>
 
     <!-- chip selector — Availability Index (its own universe; incl. B300) -->
@@ -117,7 +117,7 @@ const DEFAULT_CHIP = 'h100-sxm';
         <div class="confbadge" id="confbadge"></div>
       </div>
       <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
-      <div class="empty" id="trend-empty" hidden>Series warming up — first publish lands on the next daily build.</div>
+      <div class="empty" id="trend-empty" hidden>Series publishes on the next daily build.</div>
     </div>
 
     <!-- source panel (collapsed by default) -->
@@ -268,8 +268,7 @@ const DEFAULT_CHIP = 'h100-sxm';
       $('s-clu').textContent = (h && has(h.n_available_8x)) ? `${h.n_available_8x} / ${h.n_sources_8x}` : '—';
       $('s-clu-sub').textContent = (h && has(h.breadth_8x)) ? `${pct(num(h.breadth_8x))} of venues · full node · 7d` : 'full 8-GPU node · 7d';
       $('s-srcs').textContent = h ? h.n_sources : '—';
-      $('s-srcs-sub').textContent = h && Number(h.n_sources_thin) > 0
-        ? `${h.n_sources_thin} warming up` : 'venues probed';
+      $('s-srcs-sub').textContent = 'venues probed';
       const badge = $('confbadge');
       if (h) { badge.textContent = h.confidence === 'thin' ? 'thin panel' : 'market read';
                badge.className = 'confbadge ' + (h.confidence === 'thin' ? 'thin' : 'ok'); }
@@ -281,7 +280,7 @@ const DEFAULT_CHIP = 'h100-sxm';
         .sort((a, b) => num(b.pct_available) - num(a.pct_available));
       const el = $('panel');
       const cnt = $('panel-count'); if (cnt) cnt.textContent = rows.length ? `${rows.length} sources` : '';
-      if (!rows.length) { el.innerHTML = '<div class="empty">Panel warming up.</div>'; return; }
+      if (!rows.length) { el.innerHTML = '<div class="empty">No data yet.</div>'; return; }
       el.innerHTML = rows.map((r) => {
         const p = num(r.pct_available) * 100;
         const name = r.source.startsWith('shadeform:') ? r.source.slice(10) + ' ·sf' : r.source.replace(/_caps|_stocks/, '');
