@@ -13,7 +13,7 @@ import { meta } from '../../data/snapshot';
     <PageHeader title="Methodology" crumbs={[{ href: '/documents', label: 'Documents' }]} kicker="Methodology" asOf={meta.as_of_date} asOfLabel="as published" display>
       <p class="standfirst">
         This document describes current practice for every published CCIR
-        series. It is deliberately short: what the numbers measure, where they
+        reference series (the CRI series). It is deliberately short: what the numbers measure, where they
         come from, and how they are computed. Changes to anything on this page
         are governed by the <a href="/documents/change-management">Change
         Management Policy</a>.
@@ -31,6 +31,26 @@ import { meta } from '../../data/snapshot';
         provider-operated pricing surface — not an executed transaction, not a
         solicited quote, not a broker-mediated or sponsored feed. If a price is
         only available through sales contact, it is not in the index.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">01a</span> Design Rationale</h2>
+      <p>
+        The series measure publicly posted list asks. They do not sample
+        executed transactions, and they do not estimate traded volume.
+        Posted asks are observable without solicitation and reproducible by
+        any third party on the day of observation. They carry no submission
+        channel, so there is nothing to misreport: no transaction sample to
+        select from, no broker mark, no expert judgment.
+      </p>
+      <p>
+        The series are designed as <strong>reference rates</strong>:
+        suitable for contractual citation, residual-value monitoring, and
+        credit covenants. They are not designed to replicate a
+        volume-weighted average of executed trades. Products that measure
+        executed levels sit outside this methodology and its governance
+        framework.
       </p>
     </section>
 
@@ -80,9 +100,18 @@ import { meta } from '../../data/snapshot';
       <p>
         <strong>There is no publication gate.</strong> Every populated cell
         publishes, whatever its depth; panel depth <em>n</em> is the trust
-        signal, and thin cells should be read as indicative. This is a
+        signal, and thin cells (especially below five sources) should be read
+        as indicative. This is a
         deliberate choice: suppressing thin cells hides the coverage boundary
         instead of disclosing it.
+      </p>
+      <p>
+        Under rapid dislocation (the sudden exit of major sources, widespread
+        collection failure, or extreme dispersion) the administrator may
+        widen the observation window or publish a notice of reduced coverage.
+        Both steps are pre-specified contingencies: each is logged, applies
+        forward only, and changes neither the series identifier nor the
+        definition of the rate.
       </p>
     </section>
 
@@ -122,7 +151,10 @@ Example:  CRI-T2-H100-ALL-GTD-OD-US
       <h2><span class="n">07</span> Publication, History, Restatement</h2>
       <p>
         Series publish daily by 07:30 Eastern Time (ET) at ccir.io. History is append-only
-        with a methodology version stamped on every row. When a defect or a
+        with a methodology version stamped on every row. A daily value
+        finalizes at the close of its publication day; recomputation before
+        finalization under a logged change is not a restatement. After
+        finalization, no value changes silently. When a defect or a
         material methodology change requires it, history is restated —
         republished in full under the current version — per the
         <a href="/documents/change-management">Change Management Policy</a>.

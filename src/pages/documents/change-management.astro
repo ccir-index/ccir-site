@@ -39,10 +39,15 @@ import { meta } from '../../data/snapshot';
       <p>
         <strong>Material changes</strong> — a material change is one that,
         applied to the trailing history, would move a headline series'
-        30-day average by more than <strong>10%</strong>. Material changes are
-        announced on the site before taking effect where practicable, and are
-        run as parallel (shadow) series alongside the incumbent before
-        promotion whenever the change permits it.
+        30-day average by more than <strong>10%</strong>. Material changes
+        are announced before they take effect: the effective date is no
+        earlier than <strong>five business days</strong> after the
+        announcement, and the change runs as a parallel (shadow) series
+        alongside the incumbent before promotion whenever the change permits
+        it. One exception applies: where a change corrects a defect that
+        would otherwise publish an erroneous value, the administrator may
+        act before the notice period ends. The action, its rationale, and
+        its realized effect are logged.
       </p>
       <p>
         Announcements are made in the
@@ -52,7 +57,10 @@ import { meta } from '../../data/snapshot';
         otherwise), and a comment window. At the effective fixing, the
         <strong>realized</strong> effect &mdash; the with/without decomposition &mdash;
         is appended alongside the anticipated figure, so the log carries the
-        record of what was estimated and what occurred. Changes below the
+        record of what was estimated and what occurred. Comments received in
+        the window are considered; the administrator is not required to
+        adopt them, and the final decision, with any modification of the
+        proposal, is recorded in the log. Changes below the
         material threshold that touch panel membership or series composition
         follow the same practice.
       </p>
@@ -84,6 +92,17 @@ import { meta } from '../../data/snapshot';
         last-good price for at most seven days and then exits its cells. A
         source's exit or entry is never applied retroactively except through a
         disclosed restatement.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">05</span> Contingency</h2>
+      <p>
+        If a material part of the input universe becomes unobservable for a
+        prolonged period, the administrator publishes a notice describing
+        the impact and the interim treatment. A series that can no longer be
+        produced on its existing definition is terminated with notice under
+        the series-break rule above; it is never redefined in place.
       </p>
     </section>
   </section>

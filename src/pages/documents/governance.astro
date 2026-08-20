@@ -41,16 +41,26 @@ import { meta } from '../../data/snapshot';
     </section>
 
     <section class="sec">
-      <h2><span class="n">03</span> Decision-Making</h2>
+      <h2><span class="n">03</span> Decision-Making and Interim Controls</h2>
       <p>
         Methodology and administration decisions are made by the
         administrator under the published
         <a href="/documents/methodology">Methodology</a> and
         <a href="/documents/change-management">Change Management Policy</a>.
         CCIR is a small administrator and says so: there is currently no
-        external oversight committee. An independent oversight function will
-        be added as adoption of the series warrants it. This page will be
-        updated when it is.
+        external oversight committee. Until an independent oversight
+        function is established, the following interim controls apply:
+      </p>
+      <ul>
+        <li>Material methodology changes require written internal sign-off
+        and advance public notice under the Change Management Policy.</li>
+        <li>Complaints and substantive challenges are logged and retained.</li>
+        <li>Determination is fully automated. Discretionary adjustment of a
+        published value is not permitted.</li>
+      </ul>
+      <p>
+        An independent oversight function will be added as adoption of the
+        series warrants it. This page will be updated when it is.
       </p>
     </section>
 
@@ -60,11 +70,13 @@ import { meta } from '../../data/snapshot';
         Anyone may challenge a published value or the treatment of a source by
         writing to <a href="mailto:research@ccir.io">research@ccir.io</a>.
         Substantive challenges are acknowledged within five business days and
-        answered against the underlying observation data. Where a challenge
+        answered against the underlying observation data and the published
+        methodology. Where a challenge
         identifies a defect, correction follows the
         <a href="/documents/change-management">Change Management Policy</a>
         and the outcome is noted in the change log. A record of complaints and
-        outcomes is retained.
+        outcomes is retained and is available to relevant authorities on
+        request.
       </p>
     </section>
 
@@ -79,6 +91,20 @@ import { meta } from '../../data/snapshot';
         against the 2013 Principles is published alongside this page. CCIR
         does not claim assured compliance. Independent external assurance of
         adherence will be sought when adoption warrants it.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">06</span> Scope of These Documents</h2>
+      <p>
+        The <a href="/documents/methodology">Methodology</a>, the
+        <a href="/documents/change-management">Change Management Policy</a>,
+        this Governance page, and the
+        <a href="/documents/iosco">IOSCO self-assessment</a> apply only to
+        the publicly published CCIR reference series (the CRI series). Any
+        proprietary or closed-methodology data product is outside this
+        framework: it is not a reference rate, is not designed for
+        contractual citation, and is published under separate terms.
       </p>
     </section>
   </section>
@@ -109,13 +135,15 @@ import { meta } from '../../data/snapshot';
       color: var(--accent);
       font-weight: var(--weight-strong);
     }
-    .sec p {
+    .sec p, .sec ul {
       font-family: var(--font-body);
       font-size: var(--fs-md);
       color: var(--ink);
       line-height: 1.65;
       margin: 0 0 12px;
     }
+    .sec ul { padding-left: 20px; }
+    .sec li { margin-bottom: 6px; }
     .sec strong { color: var(--accent); }
   </style>
 </Base>
