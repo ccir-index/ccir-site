@@ -112,7 +112,7 @@ const DEFAULT_CHIP = 'h100-sxm';
       <div class="card-head">
         <div>
           <h2>Availability over time</h2>
-          <p class="card-sub">Rolling 7-day count-weighted availability: the mean share of capacity-probes finding stock across genuine-capacity venues. Falling = capacity selling down. Dashed verticals flag a change in the venue panel. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
+          <p class="card-sub">Rolling 7-day count-weighted availability: the mean share of capacity-probes finding stock across genuine-capacity venues. Dashed verticals flag a change in the venue panel. <span id="trend-mode">Cluster (8×) vs Fractional.</span></p>
         </div>
         <div class="confbadge" id="confbadge"></div>
       </div>
@@ -140,8 +140,8 @@ const DEFAULT_CHIP = 'h100-sxm';
         disclosed a signal, the count X whose window rate is at least 10% of
         cycles (the floor keeps a venue with one available probe all week from
         reading as available until history rolls out of the window). The
-        <em>chart</em> plots the count-weighted mean venue rate, which shows
-        capacity selling down as it happens rather than in window-edge steps.
+        <em>chart</em> plots the count-weighted mean venue rate, which moves
+        as availability changes rather than in window-edge steps.
         Both shown as Fractional (any shape) and Cluster (full 8-GPU node).
         Each rolling point uses the venues present in that window, and dashed
         verticals flag where the panel set changed, so added venues don't read
