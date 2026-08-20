@@ -6,6 +6,13 @@ const SITE = 'https://ccir.io';
 export default defineConfig({
   site: SITE,
   trailingSlash: 'never',
+  // The editorial-register rules in base.css assume page-scoped styles carry
+  // zero scoping specificity (":where()-scoped", see the register comment).
+  // Astro 5's default strategy is 'attribute', which made every note's own
+  // scoped `.sec p { font-size: var(--fs-md) }` (13px) beat the register's
+  // 16px reading size — found 2026-08-19 on /research/the-rating-case-goes-
+  // investment-grade. 'where' restores the documented cascade.
+  scopedStyleStrategy: 'where',
   build: {
     format: 'file',
   },
