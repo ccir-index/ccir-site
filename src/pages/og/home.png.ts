@@ -92,7 +92,7 @@ export const GET: APIRoute = async () => {
 
   const titleRow = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexShrink: 0, marginTop: 24 }, [
     el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', alignItems: 'center', height: 46, fontFamily: 'IBM Plex Serif', fontSize: 36, fontWeight: 600, color: T.ink, letterSpacing: -0.5, lineHeight: 1.1 }, 'GPU rental reference rates, two grades'),
+      el('div', { display: 'flex', alignItems: 'center', height: 46, fontFamily: 'IBM Plex Serif', fontSize: 36, fontWeight: 600, color: T.ink, letterSpacing: -0.5, lineHeight: 1.1 }, 'GPU rental reference rates'),
       el('div', { display: 'flex', alignItems: 'center', height: 20, fontFamily: 'IBM Plex Mono', fontSize: 15, color: T.dim, marginTop: 3 }, 'USD per GPU-hour · on-demand · by operator segment · same panel construction, never blended'),
     ]),
     el('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }, [
