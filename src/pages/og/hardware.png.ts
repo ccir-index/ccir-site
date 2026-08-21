@@ -72,12 +72,21 @@ function ivCard(v: (typeof ivCards)[number]) {
 }
 
 export const GET: APIRoute = async () => {
-  if (ivCards.length !== 4) throw new Error(`og/hardware: expected 4 IV cards, got ${ivCards.length}`);
-  const [c1, c2, c3, c4] = ivCards;
-  const body = el('div', { display: 'flex', flexDirection: 'column', gap: 14 }, [
-    el('div', { display: 'flex', gap: 16 }, [ivCard(c1!), ivCard(c2!)]),
-    el('div', { display: 'flex', gap: 16 }, [ivCard(c3!), ivCard(c4!)]),
-  ]);
+  // A card drops out whenever its inputs do (2026-08-21: the A100 and B200
+  // NEOCLOUD 1Y pairs fell below the publish floor and the hard "exactly 4"
+  // assertion here failed the whole site build, leaving the live site on
+  // the previous day). The share card lays out whatever the model can
+  // price today, two per row, and never decides whether the site deploys.
+  const cards = ivCards.filter((c): c is NonNullable<typeof c> => c != null);
+  const rows: ReturnType<typeof el>[] = [];
+  for (let i = 0; i < cards.length; i += 2) {
+    rows.push(el('div', { display: 'flex', gap: 16 }, cards.slice(i, i + 2).map((c) => ivCard(c))));
+  }
+  if (rows.length === 0) {
+    rows.push(el('div', { display: 'flex', color: C.dim, fontSize: 16, padding: 24 },
+      'Model-implied values are not printable today: the committed curve inputs are below the publish floor.'));
+  }
+  const body = el('div', { display: 'flex', flexDirection: 'column', gap: 14 }, rows);
 
   const png = await toPng(frame(
     'Model-implied GPU value',

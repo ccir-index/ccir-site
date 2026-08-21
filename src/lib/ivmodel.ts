@@ -49,7 +49,13 @@ function ivValue(spot: number, d: Record<string, number>, r: number, life: numbe
   // Bootstrap yearly average rates off the committed curve; decay applies
   // beyond the LAST OBSERVED tenor (year 3 where the curve reaches 3Y,
   // year 1 where it stops at 1Y) — never a flat extension of missing tenors.
-  const y1 = d['1Y'] != null ? c('1Y') : spot;
+  // 2026-08-21 (John, option A): when no 1Y pair prints, year 1 is
+  // bootstrapped from the LONGEST observed shorter tenor (6M, then 3M,
+  // then 1M) and decay applies from year 1 — one more rung of the same
+  // disclosed-degradation rule that already handles a curve stopping at
+  // 1Y or 2Y. The card says "curve to 6M". Spot alone is never the anchor.
+  const shortT = (['6M', '3M', '1M'] as const).find((t) => d[t] != null);
+  const y1 = d['1Y'] != null ? c('1Y') : shortT ? c(shortT) : spot;
   const y2 = d['2Y'] != null ? 2 * c('2Y') - y1 : d['3Y'] != null ? (3 * c('3Y') - y1) / 2 : y1;
   const y3 = d['3Y'] != null && d['2Y'] != null ? 3 * c('3Y') - 2 * c('2Y') : y2;
   const lastYr = d['3Y'] != null ? 3 : d['2Y'] != null ? 2 : 1;
@@ -73,7 +79,9 @@ export const ivCards = IV_SPEC.map((s) => {
     if (r['band'] === 'NEOCLOUD' && r['silicon_id'] === s.silicon && r['metric'] === 'spread_to_spot')
       d[r['tenor']!] = -Number(r['value']);
   const hwm = hw.models.find((m: any) => m.key === s.key) as any;
-  if (!rrow || !Number.isFinite(spot) || d['1Y'] == null) return null;
+  // A committed leg of SOME tenor is required; the anchor is never spot alone.
+  const hasCurve = ['3Y', '2Y', '1Y', '6M', '3M', '1M'].some((t) => d[t] != null);
+  if (!rrow || !Number.isFinite(spot) || !hasCurve) return null;
   // Curve extent is DISCLOSED, not required (2026-08-05): the bootstrap
   // already decays beyond the last observed tenor by construction, and the
   // hard 3Y gate silently dropped A100/H200 when the neocloud panel's 3Y
@@ -114,7 +122,7 @@ export const ivCards = IV_SPEC.map((s) => {
     ask, askN: hwm?.ask?.n ?? null, askSources: hwm?.ask?.sources ?? null,
     t90, t90N: hwm?.t90?.n ?? null,
     basis: hwm?.basis?.usd ?? null, rateAsOf: rrow['as_of_date'],
-    curveTo: d['3Y'] != null ? '3Y' : d['2Y'] != null ? '2Y' : '1Y',
+    curveTo: (['3Y', '2Y', '1Y', '6M', '3M', '1M'] as const).find((t) => d[t] != null) ?? '1Y',
     rateN: Number(rrow['n_sources']) || null,
     rateStatus: rrow['promotion_status'] ?? '',
   };
