@@ -26,7 +26,7 @@ const AVAIL_CHIPS = [
 const DEFAULT_CHIP = 'h100-sxm';
 ---
 <Base
-  title="GPU Availability & Marketplace Utilization · CCIR"
+  title="GPU Availability & Utilization · CCIR"
   description="GPU availability and utilization, measured — the share of listed marketplace GPUs actually rented (supply-normalized), plus the Availability Index: how many genuine-capacity GPU venues show launchable stock. Utilization is an operating-cost exposure in take-or-pay GPU financings, and rating agencies now underwrite it explicitly."
   ogImage="/og-utilization.png"
 >
@@ -43,41 +43,14 @@ const DEFAULT_CHIP = 'h100-sxm';
   })} />
   <section class="wrap ai-page">
     <div class="kicker">Monitor · Supply &amp; utilization<span class="mi-tag">Market&nbsp;Intelligence</span></div>
-    <h1>Utilization &amp; Availability</h1>
+    <h1>Availability &amp; Utilization</h1>
     <p class="deck">
-      Two lenses on GPU supply. <strong>Utilization</strong>: of the capacity the
-      one marketplace we can measure lists, how much is rented, tracked
-      over time. <strong>Availability</strong>: of the genuine-capacity venues we
-      probe, how many show launchable stock (<strong>X of Y</strong>), so the slope
-      reads demand tightening or easing.
+      Two lenses on GPU supply. <strong>Availability</strong>: across a panel of
+      neoclouds and GPU marketplaces we probe, how many show launchable stock,
+      so the slope reads demand tightening or easing. <strong>Utilization</strong>:
+      of the capacity the one marketplace we can measure lists, how much is
+      rented, tracked over time. Counts publish as ranges.
     </p>
-
-    <!-- chip selector — measured utilization (Vast-disclosed chips only) -->
-    <div class="chips" id="chips-util" role="tablist" aria-label="GPU model — utilization">
-      {UTIL_CHIPS.map((c) => (
-        <button class="chip" role="tab" data-chip={c.slug} data-vast={c.vast}
-                aria-selected={c.slug === DEFAULT_CHIP ? 'true' : 'false'}>{c.label}</button>
-      ))}
-      <span class="chip-hint">select one or more to compare</span>
-    </div>
-
-    <!-- primary: measured utilization (Vast) -->
-    <div class="card util-card">
-      <div class="card-head">
-        <div>
-          <h2>Measured utilization <span class="tag">one marketplace source</span></h2>
-          <p class="card-sub">Vast.ai: the only marketplace that discloses rented / total. Rolling 7-day utilization, denominator fixed to each window's median listed capacity.</p>
-        </div>
-      </div>
-      <div class="util-grid">
-        <div class="util-now" id="util-now">
-          <span class="util-big" id="u-now">—</span>
-          <span class="util-now-lbl" id="u-now-lbl">trailing 7-day utilization</span>
-        </div>
-        <div class="chart-wrap util-wrap"><canvas id="utilChart"></canvas></div>
-      </div>
-      <div class="empty" id="util-empty" hidden>No data yet.</div>
-    </div>
 
     <!-- chip selector — Availability Index (its own universe; incl. B300) -->
     <div class="chips avail-chips" id="chips-avail" role="tablist" aria-label="GPU model — availability" data-anchor="availability">
@@ -120,24 +93,13 @@ const DEFAULT_CHIP = 'h100-sxm';
       <div class="empty" id="trend-empty" hidden>Series publishes on the next daily build.</div>
     </div>
 
-    <!-- source panel (collapsed by default) -->
-    <details class="card panel-card">
-      <summary>
-        <span class="sum-main"><h2>The panel</h2><span class="sum-count" id="panel-count"></span></span>
-        <span class="sum-sub">Each genuine-capacity source, one vote · 7-day availability</span>
-        <span class="sum-chev" aria-hidden="true">▾</span>
-      </summary>
-      <div class="panel" id="panel"></div>
-      <p class="foot">Excludes catalog-eligibility (Azure) and probabilistic-score (Amazon Web Services, AWS) sources from the headline. Resellers that duplicate a directly-probed operator are deduped. Sources below the minimum observed-cycle threshold are held out until they accumulate probes.</p>
-    </details>
-
     <details class="method-details">
       <summary>How this is measured</summary>
       <p class="method">
         Each source's window rate is its share of capacity-probes that found
         stock, count-weighted within source. Two layers, same panel. The
-        <em>tiles</em> report breadth: of the Y genuine-capacity venues that
-        disclosed a signal, the count X whose window rate is at least 10% of
+        <em>tiles</em> report breadth: of the venues that disclosed a signal,
+        how many had a window rate of at least 10% of
         cycles (the floor keeps a venue with one available probe all week from
         reading as available until history rolls out of the window). The
         <em>chart</em> plots the count-weighted mean venue rate, which moves
@@ -145,11 +107,41 @@ const DEFAULT_CHIP = 'h100-sxm';
         Both shown as Fractional (any shape) and Cluster (full 8-GPU node).
         Each rolling point uses the venues present in that window, and dashed
         verticals flag where the panel set changed, so added venues don't read
-        as a demand move. Method updated Jul 30, 2026 (floor + mean-rate chart;
-        raw per-venue rates in the panel below are unchanged). Utilization is a
+        as a demand move. Catalog-eligibility and probabilistic-score sources
+        are excluded from the headline; resellers that duplicate a directly
+        probed operator are deduped. Venue counts and rates publish as ranges.
+        Method updated Jul 30, 2026 (floor + mean-rate chart). Utilization is a
         separate measured metric, never blended into availability.
       </p>
     </details>
+
+    <!-- chip selector — measured utilization (Vast-disclosed chips only) -->
+    <div class="chips" id="chips-util" role="tablist" aria-label="GPU model — utilization">
+      {UTIL_CHIPS.map((c) => (
+        <button class="chip" role="tab" data-chip={c.slug} data-vast={c.vast}
+                aria-selected={c.slug === DEFAULT_CHIP ? 'true' : 'false'}>{c.label}</button>
+      ))}
+      <span class="chip-hint">select one or more to compare</span>
+    </div>
+
+    <!-- primary: measured utilization (Vast) -->
+    <div class="card util-card">
+      <div class="card-head">
+        <div>
+          <h2>Measured utilization <span class="tag">one marketplace source</span></h2>
+          <p class="card-sub">One GPU marketplace discloses rented against total listed. Rolling 7-day utilization, denominator fixed to each window's median listed capacity.</p>
+        </div>
+      </div>
+      <div class="util-grid">
+        <div class="util-now" id="util-now">
+          <span class="util-big" id="u-now">—</span>
+          <span class="util-now-lbl" id="u-now-lbl">trailing 7-day utilization</span>
+        </div>
+        <div class="chart-wrap util-wrap"><canvas id="utilChart"></canvas></div>
+      </div>
+      <div class="empty" id="util-empty" hidden>No data yet.</div>
+    </div>
+
   </section>
 
   <script>
@@ -175,6 +167,9 @@ const DEFAULT_CHIP = 'h100-sxm';
     });
     const $ = (id) => document.getElementById(id);
     const pct = (v) => (v == null || isNaN(v)) ? '—' : (v * 100).toFixed(0) + '%';
+    // Public surface publishes ranges, never exact venue counts or rates.
+    const band = (n, w) => { n = Number(n); if (isNaN(n)) return '—'; const lo = Math.floor(n / w) * w; return `${lo}–${lo + w - 1}`; };
+    const pctBand = (v) => { if (v == null || isNaN(v)) return '—'; const lo = Math.min(90, Math.floor(v * 10) * 10); return `${lo}–${lo + 10}%`; };
     const ACCENT = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff9100';
     const TEAL = '#4cc4b0';
     const css = (n, f) => (getComputedStyle(document.documentElement).getPropertyValue(n).trim() || f);
@@ -199,7 +194,7 @@ const DEFAULT_CHIP = 'h100-sxm';
 
     const num = (x) => (x === '' || x == null ? null : Number(x));
     let trendChart, utilChart;
-    const state = { headline: null, sources: null, util: null, trend: {}, vtrend: {} };
+    const state = { headline: null, util: null, trend: {}, vtrend: {} };
     // fixed per-chip colors for the multi-chip overlays (readable on both themes).
     const CHIP_COLORS = {
       'h100-sxm': '#ff9100', 'a100-sxm-80gb': '#14b8a6', 'b200-sxm': '#8b5cf6',
@@ -263,11 +258,11 @@ const DEFAULT_CHIP = 'h100-sxm';
     function renderBand(chip) {
       const h = (state.headline || []).find((r) => r.chip_slug === chip && r.scope === 'global');
       const has = (v) => v !== '' && v != null;
-      $('s-frac').textContent = (h && has(h.n_available)) ? `${h.n_available} / ${h.n_sources}` : '—';
-      $('s-frac-sub').textContent = (h && has(h.breadth)) ? `${pct(num(h.breadth))} of venues · any shape · 7d` : 'any launchable shape · 7d';
-      $('s-clu').textContent = (h && has(h.n_available_8x)) ? `${h.n_available_8x} / ${h.n_sources_8x}` : '—';
-      $('s-clu-sub').textContent = (h && has(h.breadth_8x)) ? `${pct(num(h.breadth_8x))} of venues · full node · 7d` : 'full 8-GPU node · 7d';
-      $('s-srcs').textContent = h ? h.n_sources : '—';
+      $('s-frac').textContent = (h && has(h.n_available)) ? band(h.n_available, 3) : '—';
+      $('s-frac-sub').textContent = (h && has(h.breadth)) ? `${pctBand(num(h.breadth))} of venues · any shape · 7d` : 'any launchable shape · 7d';
+      $('s-clu').textContent = (h && has(h.n_available_8x)) ? band(h.n_available_8x, 3) : '—';
+      $('s-clu-sub').textContent = (h && has(h.breadth_8x)) ? `${pctBand(num(h.breadth_8x))} of venues · full node · 7d` : 'full 8-GPU node · 7d';
+      $('s-srcs').textContent = h ? band(h.n_sources, 5) : '—';
       $('s-srcs-sub').textContent = 'venues probed';
       const badge = $('confbadge');
       if (h) { badge.textContent = h.confidence === 'thin' ? 'thin panel' : 'market read';
@@ -275,22 +270,6 @@ const DEFAULT_CHIP = 'h100-sxm';
       else badge.textContent = '';
     }
 
-    function renderPanel(chip) {
-      const rows = (state.sources || []).filter((r) => r.chip_slug === chip)
-        .sort((a, b) => num(b.pct_available) - num(a.pct_available));
-      const el = $('panel');
-      const cnt = $('panel-count'); if (cnt) cnt.textContent = rows.length ? `${rows.length} sources` : '';
-      if (!rows.length) { el.innerHTML = '<div class="empty">No data yet.</div>'; return; }
-      el.innerHTML = rows.map((r) => {
-        const p = num(r.pct_available) * 100;
-        const name = r.source.startsWith('shadeform:') ? r.source.slice(10) + ' ·sf' : r.source.replace(/_caps|_stocks/, '');
-        const c8 = r.pct_available_8x === '' || r.pct_available_8x == null ? '' : `<span class="bar-8x">8× ${(num(r.pct_available_8x)*100).toFixed(0)}%</span>`;
-        return `<div class="row">
-          <span class="row-name" title="${r.signal_type}">${name}</span>
-          <span class="row-bar"><span class="row-fill" style="width:${p.toFixed(0)}%"></span></span>
-          <span class="row-pct">${p.toFixed(0)}%</span>${c8}</div>`;
-      }).join('');
-    }
 
     function renderTrend(selected, dates, trends) {
       const empty = $('trend-empty');
@@ -387,7 +366,6 @@ const DEFAULT_CHIP = 'h100-sxm';
     async function renderAvailability(selected) {
       const primary = selected[0];
       renderBand(primary.slug);
-      renderPanel(primary.slug);
       const trends = {};
       await Promise.all(selected.map(async (ch) => {
         // Only plot days the panel is a market read (confidence=ok, ≥3 sources)
@@ -448,10 +426,9 @@ const DEFAULT_CHIP = 'h100-sxm';
     function init() {
       Promise.all([
         loadCsv('/data/availability_index_headline.csv'),
-        loadCsv('/data/availability_index_sources.csv'),
         loadCsv('/data/vast_utilization.csv'),
-      ]).then(([h, s, u]) => {
-        state.headline = h; state.sources = s; state.util = u;
+      ]).then(([h, u]) => {
+        state.headline = h; state.util = u;
         wireTabs('chips-util', renderUtilization);
         wireTabs('chips-avail', renderAvailability);
         if (location.hash === '#availability') {
@@ -522,25 +499,7 @@ const DEFAULT_CHIP = 'h100-sxm';
     .confbadge.ok { background: color-mix(in srgb, #4cc4b0 18%, transparent); color: #4cc4b0; }
     .confbadge.thin { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
 
-    .panel-card { padding: 0; }
-    .panel-card > summary { list-style: none; cursor: pointer; padding: 1.2rem 1.4rem; display: grid; grid-template-columns: 1fr auto; grid-template-areas: 'main chev' 'sub chev'; align-items: center; gap: .15rem .8rem; }
-    .panel-card > summary::-webkit-details-marker { display: none; }
-    .sum-main { grid-area: main; display: flex; align-items: baseline; gap: .6rem; }
-    .sum-main h2 { margin: 0; font-family: var(--font-display); font-size: 1.3rem; }
-    .sum-count { font-family: var(--font-mono); font-size: .78rem; color: var(--accent); }
-    .sum-sub { grid-area: sub; font-size: .82rem; color: var(--ink-dim); }
-    .sum-chev { grid-area: chev; color: var(--ink-faint); font-size: 1rem; transition: transform .2s; }
-    .panel-card[open] .sum-chev { transform: rotate(180deg); }
-    .panel-card[open] > summary { border-bottom: 1px solid var(--rule); }
-    .panel { display: flex; flex-direction: column; gap: .35rem; padding: 1.2rem 1.4rem; }
-    .row { display: grid; grid-template-columns: 9rem 1fr 2.6rem auto; align-items: center; gap: .7rem; font-family: var(--font-mono); font-size: .78rem; }
-    .row-name { color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .row-bar { height: .55rem; background: color-mix(in srgb, var(--ink) 8%, transparent); border-radius: 3px; overflow: hidden; }
-    .row-fill { display: block; height: 100%; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 55%, transparent), var(--accent)); border-radius: 3px; }
-    .row-pct { text-align: right; color: var(--ink); }
-    .bar-8x { font-size: .64rem; color: var(--ink-faint); }
     .foot { font-size: .72rem; color: var(--ink-faint); line-height: 1.5; margin: 1rem 0 0; }
-    .panel-card .foot { padding: 0 1.4rem 1.3rem; margin-top: .2rem; }
 
     .util-grid { display: grid; grid-template-columns: 200px 1fr; gap: 1.5rem; align-items: center; }
     .util-now { display: flex; flex-direction: column; gap: .2rem; }
@@ -566,7 +525,6 @@ const DEFAULT_CHIP = 'h100-sxm';
     @media (max-width: 720px) {
       .band { grid-template-columns: repeat(2, 1fr); }
       .util-grid { grid-template-columns: 1fr; }
-      .row { grid-template-columns: 7rem 1fr 2.4rem; }
       .bar-8x { display: none; }
     }
   </style>
