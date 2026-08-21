@@ -1126,9 +1126,9 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-08-20,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,3Y,NonInterruptible,Reserved,APAC,APAC,HIF,T1IF,T1,11.2954,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.1,panel,ap-northeast-2
 2026-08-20,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-East,US,HIF,T1IF,T1,7.6905,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.1,panel,us-east-1
 2026-08-20,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-West,US,HIF,T1IF,T1,7.6905,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.1,panel,us-west-2
-2026-08-20,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.5954,False,,Available,v2.3.1,panel,us-east-1d
-2026-08-20,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.4498,False,,Available,v2.3.1,panel,us-west-2a
-2026-08-20,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.3593,False,,Available,v2.3.1,panel,us-west-2b
+2026-08-20,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.5909,False,,Available,v2.3.1,panel,us-east-1d
+2026-08-20,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.4539,False,,Available,v2.3.1,panel,us-west-2a
+2026-08-20,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.3473,False,,Available,v2.3.1,panel,us-west-2b
 2026-08-20,aws_capacity_blocks,b300-sxm-288gb,B300,288GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,Other,Other,HIF,T2IF,T1,14.0400,False,,Available,v2.3.1,term-panel,non-us
 2026-08-20,aws_capacity_blocks,b300-sxm-288gb,B300,288GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,US-East,US,HIF,T2IF,T1,14.0400,False,,Available,v2.3.1,term-panel,us-east-1
 2026-08-20,coreweave,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T2,4.5875,False,,Available,v2.3.1,panel,EU

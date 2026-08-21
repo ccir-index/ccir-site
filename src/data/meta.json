@@ -1,8 +1,8 @@
 {
   "as_of_date": "2026-08-20",
-  "published_at_ct": "2026-08-20T19:07:05-05:00",
-  "published_at_utc": "2026-08-21T00:07:05+00:00",
-  "run_id": "export-20260821T000632Z-888af37a",
+  "published_at_ct": "2026-08-20T22:26:53-05:00",
+  "published_at_utc": "2026-08-21T03:26:53+00:00",
+  "run_id": "export-20260821T032559Z-20baa9b7",
   "methodology_version": "v2.3.1",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 70,
@@ -19,7 +19,7 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 62147,
+    "total_rows": 62151,
     "window_days": 90,
     "window_end": "2026-08-20",
     "window_start": "2026-05-23"
@@ -115,7 +115,7 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 354,
+    "occupancy_cycles": 355,
     "occupancy_series_start": "2026-05-13",
     "runpod_occupancy_chips": [],
     "runpod_occupancy_cycles": 0,
