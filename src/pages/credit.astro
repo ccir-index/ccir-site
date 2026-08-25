@@ -19,6 +19,11 @@ import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import creditData from '../data/credit_instruments.json';
 import CreditIssuanceChart from '../components/CreditIssuanceChart.astro';
+// The "By issuer" row is DERIVED from the same allowlist that generates the
+// pages. It used to be eighteen hand-written <a> tags, which silently went
+// stale the first time an issuer was added (2026-08-24, WhiteFiber and
+// ChronoScale). Order follows ledger row count, most-tracked first.
+import { ISSUERS } from './credit/issuer/_issuers';
 
 const instruments = creditData.instruments;
 const retired = creditData.retired;
@@ -33,6 +38,17 @@ const AS_OF =
     .at(-1) ?? creditData._meta.as_of;
 
 const byId = new Map(instruments.map((i: any) => [i.id, i]));
+
+// "By issuer" nav, derived from the page allowlist so adding an issuer to
+// ISSUERS is the only edit needed. Ordered by tracked row count, descending,
+// which puts the deepest capital stacks first.
+const issuerNav = Object.entries(ISSUERS)
+  .map(([slug, def]) => ({
+    slug,
+    display: def.display,
+    n: instruments.filter((i: any) => i.issuer === def.match).length,
+  }))
+  .sort((a, b) => b.n - a.n || a.display.localeCompare(b.display));
 function inst(id: string): any {
   const r = byId.get(id);
   if (!r) throw new Error(`credit_instruments.json: missing id ${id}`);
@@ -605,24 +621,11 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       </div>
       <p class="issuer-nav">
         By issuer:
-        <a href="/credit/issuer/coreweave">CoreWeave</a> ·
-        <a href="/credit/issuer/digital-realty">Digital Realty</a> ·
-        <a href="/credit/issuer/applied-digital">Applied Digital</a> ·
-        <a href="/credit/issuer/crusoe">Crusoe</a> ·
-        <a href="/credit/issuer/iren">IREN</a> ·
-        <a href="/credit/issuer/nebius">Nebius</a> ·
-        <a href="/credit/issuer/cipher-mining">Cipher Mining</a> ·
-        <a href="/credit/issuer/terawulf">TeraWulf</a> ·
-        <a href="/credit/issuer/hive-digital">HIVE Digital</a> ·
-        <a href="/credit/issuer/soluna">Soluna</a> ·
-        <a href="/credit/issuer/hut8">Hut 8</a> ·
-        <a href="/credit/issuer/bit-digital">Bit Digital</a> ·
-        <a href="/credit/issuer/core-scientific">Core Scientific</a> ·
-        <a href="/credit/issuer/lambda">Lambda</a> ·
-        <a href="/credit/issuer/nscale">Nscale</a> ·
-        <a href="/credit/issuer/xai">xAI</a> ·
-        <a href="/credit/issuer/fermi">Fermi</a> ·
-        <a href="/credit/issuer/riot">Riot Platforms</a>
+        {issuerNav.map((e, n) => (
+          <>
+            <a href={`/credit/issuer/${e.slug}`}>{e.display}</a>{n < issuerNav.length - 1 ? ' · ' : ''}
+          </>
+        ))}
       </p>
     </div>
 

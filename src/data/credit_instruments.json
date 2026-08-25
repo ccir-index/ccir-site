@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-08-13",
+    "as_of": "2026-08-24",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -764,7 +764,7 @@
       "name": "2.00% Convertible Senior Notes due 2029",
       "instrument_type": "convertible",
       "size_usd_m": 487.5,
-      "size_note": "$487.5M outstanding (of $500M); accretes to 120% ($587.5M payable)",
+      "size_note": "$487.5M outstanding (of $500M); accretes to 120% ($587.5M payable). Concurrently with the pricing of the August 2026 offering, Nebius agreed to exchange $400.0M ORIGINAL principal amount of this series, together with $400.0M original principal of the other June-2025 series, for approximately 15.8 million Class A ordinary shares in aggregate; the exchanges were expected to settle 2026-08-24, on terms negotiated individually with each holder. On the original-principal basis this row uses, that leaves about $87.5M. NOT YET CONFIRMED BY A FILED BALANCE SHEET — the press release states the amount exchanged rather than the residual, so size_usd_m is held at the last filed figure. All six series were still fully outstanding at 2026-06-30 (Q2 6-K, Note 12).",
       "rate": {
         "kind": "fixed",
         "value": 2,
@@ -784,7 +784,7 @@
         "date": "2026-04-30",
         "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465925055197/tm2516825d1_ex99-1.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-24"
     },
     {
       "id": "nbis-conv-2031-jun",
@@ -798,7 +798,7 @@
       "name": "3.00% Convertible Senior Notes due 2031",
       "instrument_type": "convertible",
       "size_usd_m": 487.5,
-      "size_note": "$487.5M outstanding; accretes to 125% ($612.5M payable)",
+      "size_note": "$487.5M outstanding; accretes to 125% ($612.5M payable). Concurrently with the pricing of the August 2026 offering, Nebius agreed to exchange $400.0M ORIGINAL principal amount of this series, together with $400.0M original principal of the other June-2025 series, for approximately 15.8 million Class A ordinary shares in aggregate; the exchanges were expected to settle 2026-08-24, on terms negotiated individually with each holder. On the original-principal basis this row uses, that leaves about $87.5M. NOT YET CONFIRMED BY A FILED BALANCE SHEET — the press release states the amount exchanged rather than the residual, so size_usd_m is held at the last filed figure. All six series were still fully outstanding at 2026-06-30 (Q2 6-K, Note 12).",
       "rate": {
         "kind": "fixed",
         "value": 3,
@@ -818,7 +818,7 @@
         "date": "2026-04-30",
         "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465925055197/tm2516825d1_ex99-1.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-24"
     },
     {
       "id": "nbis-conv-2030",
@@ -853,6 +853,74 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1513845/000141057825002147/tm2525503-7_424b5.htm"
       },
       "as_of": "2026-03-31"
+    },
+    {
+      "id": "nbis-conv-2030-aug",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "Nebius Group N.V.",
+      "ticker": "NBIS",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "0.50% Convertible Senior Notes due Feb 2030 (August series)",
+      "instrument_type": "convertible",
+      "size_usd_m": 3000,
+      "size_note": "$3.0B original principal, one of two series in a $5.0B offering upsized from the $4.5B announced. Accretes on an indenture schedule to 110% of original principal ($3.30B) at maturity; the coupon accrues on the ORIGINAL amount, while redemption, fundamental-change repurchase and the conversion trigger are all measured against the ACCRETED amount. Initial purchasers hold a 13-day option for up to a further $450M, open at the time of this entry and expiring about 2026-09-06. Aggregate net proceeds across both series were estimated at ~$4.94B, or ~$5.68B if both options are exercised in full.",
+      "rate": {
+        "kind": "fixed",
+        "value": 0.5,
+        "note": "Semi-annual Feb 15 / Aug 15 from 2027-02-15. Initial conversion rate 3.1902 Class A shares per $1,000 original principal (~$313.46), a 40.0% premium to the $223.90 close on 2026-08-19. Taking the accreted amount payable at maturity, the effective conversion price is ~$344.81, a ~54.0% effective premium."
+      },
+      "maturity": "2030-02-15",
+      "maturity_note": "Not redeemable before 2028-02-21 except on certain tax-law changes; thereafter callable in whole or in part only if the notes are freely tradable and the share price is at least 130% of the conversion price times the then-applicable accretion ratio. No make-whole adjustment on optional or tax redemption. Redemption and fundamental-change repurchase prices are the Accreted Principal Amount plus accrued interest on the original amount.",
+      "seniority": "Senior unsecured",
+      "security": null,
+      "lenders": [
+        "144A QIBs; U.S. Bank Trust Co. (trustee)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-08-24",
+      "source": {
+        "doc": "6-K 8/20/26 EX-99.1 (pricing), acc 0001104659-26-098924; 6-K 8/24/26 (closing; indentures at Ex-4.1 and Ex-4.3), acc 0001104659-26-100347",
+        "date": "2026-08-24",
+        "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926098924/tm2623617d1_ex99-1.htm"
+      },
+      "as_of": "2026-08-24"
+    },
+    {
+      "id": "nbis-conv-2034",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "Nebius Group N.V.",
+      "ticker": "NBIS",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "4.50% Convertible Senior Notes due 2034",
+      "instrument_type": "convertible",
+      "size_usd_m": 2000,
+      "size_note": "$2.0B original principal, the second of two series in the $5.0B offering. Accretes on an indenture schedule to 125% of original principal ($2.50B) at maturity, on the same original-versus-accreted mechanics as the 2030 series. Initial purchasers hold a 13-day option for up to a further $300M, open at the time of this entry and expiring about 2026-09-06. Stated use of proceeds covers data-center construction and build-out, the full-stack AI cloud, footprint expansion and the procurement of key components including GPUs.",
+      "rate": {
+        "kind": "fixed",
+        "value": 4.5,
+        "note": "Semi-annual Feb 15 / Aug 15 from 2027-02-15. Initial conversion rate 3.0802 Class A shares per $1,000 original principal (~$324.65), a 45.0% premium to the $223.90 close on 2026-08-19. Taking the accreted amount payable at maturity, the effective conversion price is ~$405.82, a ~81.3% effective premium."
+      },
+      "maturity": "2034-02-15",
+      "maturity_note": "Not redeemable before 2028-08-21 except on certain tax-law changes. The share-price condition is 150% of the conversion price times the accretion ratio for redemptions between 2028-08-21 and 2029-08-21, and 130% thereafter. No make-whole adjustment on optional or tax redemption.",
+      "seniority": "Senior unsecured",
+      "security": null,
+      "lenders": [
+        "144A QIBs; U.S. Bank Trust Co. (trustee)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-08-24",
+      "source": {
+        "doc": "6-K 8/20/26 EX-99.1 (pricing), acc 0001104659-26-098924; 6-K 8/24/26 (closing; indentures at Ex-4.1 and Ex-4.3), acc 0001104659-26-100347",
+        "date": "2026-08-24",
+        "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926098924/tm2623617d1_ex99-1.htm"
+      },
+      "as_of": "2026-08-24"
     },
     {
       "id": "nbis-conv-2032",
@@ -1532,6 +1600,142 @@
       "as_of": "2026-08-03"
     },
     {
+      "id": "chrn-apld-grid-note",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Unsecured related-party demand note priced at a tax-minimum reference rate, not GPU-collateral and not a market-priced credit (strict scope, 2026-07-06).",
+      "issuer": "ChronoScale Holdings Corporation",
+      "ticker": "CHRN",
+      "issuer_type": "public",
+      "entity": "ChronoScale Holdings Corporation (borrower); Applied Digital Corporation, the former parent, as lender",
+      "name": "Demand Grid Promissory Note (Applied Digital)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 100,
+      "size_note": "Aggregate principal available of up to $100.0M, reduced by the value of any ChronoScale liabilities the lender guarantees and by a reserve amount the lender determines, so the lender may reduce availability unilaterally. $7.0M drawn 2026-07-01. Parent-support financing for the carved-out GPU cloud rather than third-party credit.",
+      "rate": {
+        "kind": "floating_other",
+        "value": null,
+        "note": "Short-term Applicable Federal Rate, compounded semi-annually. The AFR is the tax-minimum reference rate under IRC s.1274(d), so it is not a market spread and must not be read as one."
+      },
+      "maturity": "Payable on demand",
+      "maturity_note": "Applied Digital has agreed not to exercise its demand right before 2027-08-20.",
+      "seniority": "Unsecured",
+      "security": null,
+      "lenders": [
+        "Applied Digital Corporation"
+      ],
+      "status": "confirmed",
+      "issued": "2026-06-26",
+      "source": {
+        "doc": "CHRN 10-K for the fiscal year ended 2026-05-31, Note 8 Debt, filed 2026-08-19, acc 0001628280-26-058018",
+        "date": "2026-08-19",
+        "url": "https://www.sec.gov/Archives/edgar/data/1549084/000162828026058018/chrn-20260531.htm"
+      },
+      "as_of": "2026-08-24"
+    },
+    {
+      "id": "chrn-gpu-leases",
+      "collateral_class": "gpu",
+      "exclude_from_issuance": null,
+      "exclude_reason": null,
+      "issuer": "ChronoScale Holdings Corporation",
+      "ticker": "CHRN",
+      "issuer_type": "public",
+      "entity": "ChronoScale Corporation (the GPU cloud; formerly Applied Digital Cloud Corporation)",
+      "name": "Computing-equipment finance leases",
+      "instrument_type": "lease",
+      "size_usd_m": 58.3,
+      "size_note": "$47.6M current plus $10.7M long-term at 2026-05-31, against $133.4M current a year earlier. Finances the deployed GPU fleet: 6,144 NVIDIA H100s across colocation sites in Colorado, Minnesota and Utah. The leases were renegotiated in FY2025 to extend amortisation to five years and again after FY2025 to extend payments through fiscal 2028. The cloud business was acquired by Ekso Bionics Holdings in the 2026-05-05 business combination and reorganised under a holding company on 2026-07-01.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Implicit rate not disclosed in the 10-K."
+      },
+      "maturity": "2028",
+      "maturity_note": "Payments extended through fiscal year 2028 after two renegotiations.",
+      "seniority": "Finance lease",
+      "security": "Leased GPU computing equipment",
+      "lenders": [
+        "Not named"
+      ],
+      "status": "confirmed",
+      "issued": "2026-05-31",
+      "source": {
+        "doc": "CHRN 10-K for the fiscal year ended 2026-05-31, Note 8 Debt, filed 2026-08-19, acc 0001628280-26-058018",
+        "date": "2026-08-19",
+        "url": "https://www.sec.gov/Archives/edgar/data/1549084/000162828026058018/chrn-20260531.htm"
+      },
+      "as_of": "2026-08-24"
+    },
+    {
+      "id": "chrn-briley-note",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Small legacy secured note assumed in the business combination, not GPU-collateral (strict scope, 2026-07-06).",
+      "issuer": "ChronoScale Holdings Corporation",
+      "ticker": "CHRN",
+      "issuer_type": "public",
+      "entity": "ChronoScale Holdings Corporation (assumed from Ekso Bionics Holdings)",
+      "name": "B. Riley Secured Promissory Note",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 2.0,
+      "size_note": "Secured term loan of up to $2.0M; $2.0M principal outstanding at the date of the 10-K. Recorded at an acquisition-date fair value of $2.239M under ASC 805. B. Riley may elect to convert principal, interest and the exit fee into equity in a qualified financing at the lead investor's price per share. Assumed in the 2026-05-05 business combination; originally entered by Legacy Ekso in September 2025.",
+      "rate": {
+        "kind": "fixed",
+        "value": 10.0,
+        "note": "10% per annum, payable in full at maturity, plus an exit fee of 10% of the original principal ($0.2M) due at maturity. Prepayment requires payment of all interest that would have accrued through maturity plus the proportionate exit fee."
+      },
+      "maturity": "2026-09-14",
+      "maturity_note": "The earlier of receipt of at least $2.4M of net proceeds from new equity investors (a Qualified Financing) and 2026-09-14.",
+      "seniority": "Senior secured; ranks ahead of the Parker Hannifin note",
+      "security": "Security agreement over company and subsidiary assets; covenants limit debt, liens, asset disposals and restricted payments",
+      "lenders": [
+        "B. Riley Commercial Capital, LLC"
+      ],
+      "status": "confirmed",
+      "issued": "2025-09",
+      "source": {
+        "doc": "CHRN 10-K for the fiscal year ended 2026-05-31, Note 8 Debt, filed 2026-08-19, acc 0001628280-26-058018",
+        "date": "2026-08-19",
+        "url": "https://www.sec.gov/Archives/edgar/data/1549084/000162828026058018/chrn-20260531.htm"
+      },
+      "as_of": "2026-08-24"
+    },
+    {
+      "id": "chrn-parker-note",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Legacy unsecured vendor note assumed in the business combination, not GPU-collateral (strict scope, 2026-07-06).",
+      "issuer": "ChronoScale Holdings Corporation",
+      "ticker": "CHRN",
+      "issuer_type": "public",
+      "entity": "ChronoScale Holdings Corporation (assumed from Ekso Bionics Holdings)",
+      "name": "Parker Hannifin Promissory Note",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 1.875,
+      "size_note": "$1.875M principal outstanding at 2026-05-31 ($1.25M due in fiscal 2027, $0.625M in fiscal 2028); $1.574M net of a $0.301M debt discount. Recorded at an acquisition-date fair value of $1.571M under ASC 805. Assumed in the 2026-05-05 business combination; originally issued by Legacy Ekso.",
+      "rate": {
+        "kind": "fixed",
+        "value": 0,
+        "note": "Non-interest-bearing; the 22.7% effective rate for 2026-05-05 to 2026-05-31 is accretion of the acquisition-date debt discount, not a contractual coupon. On default, interest at the lesser of 5% per annum and the maximum permitted by law."
+      },
+      "maturity": "2027-09-30",
+      "maturity_note": "Principal payable in equal instalments on the last day of each calendar quarter.",
+      "seniority": "Unsecured; subordinated to the B. Riley Secured Promissory Note",
+      "security": null,
+      "lenders": [
+        "Parker Hannifin Corporation"
+      ],
+      "status": "confirmed",
+      "issued": "2023-12-31",
+      "source": {
+        "doc": "CHRN 10-K for the fiscal year ended 2026-05-31, Note 8 Debt, filed 2026-08-19, acc 0001628280-26-058018",
+        "date": "2026-08-19",
+        "url": "https://www.sec.gov/Archives/edgar/data/1549084/000162828026058018/chrn-20260531.htm"
+      },
+      "as_of": "2026-08-24"
+    },
+    {
       "id": "cifr-conv-2030",
       "collateral_class": "out",
       "exclude_from_issuance": true,
@@ -1781,7 +1985,7 @@
       "name": "Two Prime facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 100,
-      "size_note": "$100M; never drawn",
+      "size_note": "$100.0M secured credit facility with Two Prime Lending Limited, never drawn and nothing outstanding at 2026-03-31. VERIFIED against the Q1-26 10-Q, which carries a dedicated \"Two Prime Lending Facility\" note; an earlier suspicion that this row was unsupported or a Hut 8 misattribution was wrong, and Hut 8's separate $200M Two Prime revolver is a different facility. DISCLOSURE GAP: the Q2-26 10-Q (quarter ended 2026-06-30, filed 2026-08-04) does not mention Two Prime anywhere. No terminating statement has been located, so the facility's status after 2026-03-31 is unknown and is not asserted here.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -1797,11 +2001,11 @@
       "status": "confirmed",
       "issued": "2025",
       "source": {
-        "doc": "10-K; Q1-26 10-Q",
-        "date": "2026-05-05",
+        "doc": "10-K; Q1-26 10-Q, \"Two Prime Lending Facility\" note (acc. 0001819989-26-000028). Absent from the Q2-26 10-Q, acc. 0001819989-26-000041.",
+        "date": "2026-08-04",
         "url": "https://www.sec.gov/Archives/edgar/data/1819989/000181998926000028/cifr-20260331.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-24"
     },
     {
       "id": "iren-conv-2030",
@@ -3421,54 +3625,88 @@
       "collateral_class": "out",
       "exclude_from_issuance": true,
       "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
-      "issuer": "Bit Digital, Inc.",
-      "ticker": "BTBT",
+      "issuer": "WhiteFiber, Inc.",
+      "ticker": "WYFI",
       "issuer_type": "public",
-      "entity": "WhiteFiber (WYFI, ~70.1%-owned; non-recourse to BTBT)",
-      "name": "WhiteFiber 4.50% Convertible Senior Notes due 2031",
+      "entity": "WhiteFiber, Inc. (Cayman Islands issuer); Bit Digital owns ~69.6% (BTBT 10-Q, 2026-08-13)",
+      "name": "4.500% Convertible Senior Notes due 2031",
       "instrument_type": "convertible",
-      "size_usd_m": 230,
-      "size_note": null,
+      "size_usd_m": 31.85,
+      "size_note": "$230.0M issued 2026-01-26, including full exercise of a $20.0M initial-purchaser option. On 2026-08-21, concurrently with the pricing of the 5.00% 2032 notes, WhiteFiber exchanged $198.15M of this series in privately negotiated transactions for approximately $118.5M in cash (including accrued interest) plus approximately 6.3 million ordinary shares; the company states the outstanding amount is \"expected to be reduced to approximately $31.85 million.\" That is a company-stated expected residual at the time of filing, not a post-settlement balance-sheet figure. Separately, $120.0M of the original $222.1M of net proceeds was spent on a zero-strike call option for 5,905,511 shares, so cash retained from the issue was ~$102.1M.",
       "rate": {
         "kind": "fixed",
         "value": 4.5,
-        "note": "Coupon from Aug 1, 2026"
+        "note": "Semi-annual Feb 1 / Aug 1 from 2026-08-01; effective 5.37% at 2026-06-30. Initial conversion rate 38.5981 shares per $1,000 (~$25.91), a 27.5% premium to the $20.32 close on 2026-01-21."
       },
       "maturity": "2031-02-01",
-      "maturity_note": null,
-      "seniority": "Senior unsecured at WhiteFiber; non-recourse to BTBT",
+      "maturity_note": "Holder put and first call date both 2029-02-06; partial optional redemption requires at least $75.0M to remain outstanding and uncalled.",
+      "seniority": "Senior unsecured",
       "security": null,
       "lenders": [
-        "U.S. Bank (trustee)"
+        "144A QIBs; U.S. Bank Trust Co. (trustee)"
       ],
       "status": "confirmed",
       "issued": "2026-01-26",
       "source": {
-        "doc": "Q1-26 10-Q Note 12",
-        "date": "2026-05-15",
-        "url": "https://www.sec.gov/Archives/edgar/data/1710350/000121390026057116/ea0288833-10q_bitdigital.htm"
+        "doc": "WYFI 10-Q for the quarter ended 2026-06-30, Note 10 Debt, filed 2026-08-12, acc 0001213900-26-088026",
+        "date": "2026-08-12",
+        "url": "https://www.sec.gov/Archives/edgar/data/2042022/000121390026088026/ea0300877-10q_whitefiber.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-08-24"
+    },
+    {
+      "id": "wyfi-conv-2032",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "WhiteFiber, Inc.",
+      "ticker": "WYFI",
+      "issuer_type": "public",
+      "entity": "WhiteFiber, Inc. (Cayman Islands issuer)",
+      "name": "5.00% Convertible Senior Notes due 2032",
+      "instrument_type": "convertible",
+      "size_usd_m": 310,
+      "size_note": "$310.0M, including full exercise of the initial purchasers' $40.0M option. Issued concurrently with an exchange of $198.15M of the 4.500% 2031 notes. A maximum of 11,451,803 ordinary shares may be issued on conversion at the 36.9413 maximum conversion rate. No capped call.",
+      "rate": {
+        "kind": "fixed",
+        "value": 5.0,
+        "note": "Semi-annual Mar 1 / Sep 1 from 2027-03-01. Initial conversion rate 29.5530 ordinary shares per $1,000 (~$33.84), a 25% premium to the close on 2026-08-18."
+      },
+      "maturity": "2032-09-01",
+      "maturity_note": "Callable on or after 2030-09-06 on a 130% share-price trigger, but not in part unless at least $75.0M remains outstanding and uncalled. Holder put on 2030-09-06 and on a fundamental change, both at par plus accrued interest. No sinking fund.",
+      "seniority": "Senior unsecured",
+      "security": null,
+      "lenders": [
+        "144A QIBs; U.S. Bank Trust Co. (trustee)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-08-21",
+      "source": {
+        "doc": "8-K Items 1.01/2.03/3.02/8.01 (event 2026-08-18, filed 2026-08-21), acc 0001213900-26-092599; Indenture dated 2026-08-21",
+        "date": "2026-08-21",
+        "url": "https://www.sec.gov/Archives/edgar/data/2042022/000121390026092599/ea0302925-8k_white.htm"
+      },
+      "as_of": "2026-08-24"
     },
     {
       "id": "wyfi-landsbankinn",
       "collateral_class": "gpu",
-      "issuer": "Bit Digital, Inc.",
-      "ticker": "BTBT",
+      "issuer": "WhiteFiber, Inc.",
+      "ticker": "WYFI",
       "issuer_type": "public",
-      "entity": "WhiteFiber Iceland",
+      "entity": "WhiteFiber Iceland ehf. (borrower); guaranteed by WhiteFiber, Inc. and WhiteFiber AI, Inc.",
       "name": "Landsbankinn term facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 18,
-      "size_note": "Up to $20M; $18.0M drawn 4/24/26",
+      "size_note": "Up to $20M; $18.0M drawn 2026-04-24. Arrangement fee $0.2M, 1.111% of the amount drawn.",
       "rate": {
         "kind": "sofr_spread",
         "value": 4.25,
-        "note": "3-mo SOFR + 4.25% (0% floor)"
+        "note": "3-mo CME Term SOFR + 4.25%, 0% floor; stated rate 7.92% and effective rate 10.64% at 2026-06-30."
       },
       "maturity": "2028-03-25",
-      "maturity_note": "Extendable to 2030; quarterly amortization",
-      "seniority": "Secured 1st-ranking; WhiteFiber guarantees",
+      "maturity_note": "Initial two-year term from 2026-03-25 with options to extend up to two further years, four years maximum. Quarterly principal instalments begin three months after the initial drawdown, balance due at maturity.",
+      "seniority": "Senior secured; financial maintenance covenants on leverage, equity and loan-to-value, all in compliance at 2026-06-30",
       "security": "Pledge of WhiteFiber Iceland shares + GPU/CPU servers, InfiniBand switches",
       "lenders": [
         "Landsbankinn hf."
@@ -3476,45 +3714,11 @@
       "status": "confirmed",
       "issued": "2026-03-25",
       "source": {
-        "doc": "Q1-26 10-Q Notes 12/22",
-        "date": "2026-05-15",
-        "url": "https://www.sec.gov/Archives/edgar/data/1710350/000121390026057116/ea0288833-10q_bitdigital.htm"
+        "doc": "WYFI 10-Q for the quarter ended 2026-06-30, Note 10 Debt, filed 2026-08-12, acc 0001213900-26-088026",
+        "date": "2026-08-12",
+        "url": "https://www.sec.gov/Archives/edgar/data/2042022/000121390026088026/ea0300877-10q_whitefiber.htm"
       },
-      "as_of": "2026-04-24"
-    },
-    {
-      "id": "wyfi-rbc-mtl3",
-      "collateral_class": "operator_campus",
-      "exclude_from_issuance": true,
-      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
-      "issuer": "Bit Digital, Inc.",
-      "ticker": "BTBT",
-      "issuer_type": "public",
-      "entity": "WhiteFiber",
-      "name": "RBC amended facility (MTL-3 bridge)",
-      "instrument_type": "credit_facility",
-      "size_usd_m": 17.4,
-      "size_note": "CAD 28M (~US$20M) facility; CAD 24.2M (~$17.4M) funded 5/8/26 + CAD 8M LC line",
-      "rate": {
-        "kind": "floating_other",
-        "value": 2.75,
-        "note": "CORRA + 2.75% or Prime + 1.00%; interest-only"
-      },
-      "maturity": "~2026-11",
-      "maturity_note": "~6-month bullet",
-      "seniority": "Secured bank facility; DSCR + leverage covenants",
-      "security": "MTL-3 datacenter (Montreal) acquisition bridge",
-      "lenders": [
-        "Royal Bank of Canada"
-      ],
-      "status": "confirmed",
-      "issued": "2026-04-27",
-      "source": {
-        "doc": "Q1-26 10-Q Notes 21/22",
-        "date": "2026-05-15",
-        "url": "https://www.sec.gov/Archives/edgar/data/1710350/000121390026057116/ea0288833-10q_bitdigital.htm"
-      },
-      "as_of": "2026-05-08"
+      "as_of": "2026-08-24"
     },
     {
       "id": "btbt-galaxy-mla",
@@ -3526,16 +3730,16 @@
       "name": "Galaxy Master Loan Agreement — initial draw",
       "instrument_type": "credit_facility",
       "size_usd_m": 50,
-      "size_note": "$50.0M drawn 5/20/26; facility uncapped, per-loan term sheets",
+      "size_note": "$50.0M drawn 2026-05-20 to fund the WhiteFiber NC-1 delayed-draw term loan; the Galaxy agreement had not been drawn before that. Facility uncapped, sized loan by loan under individual Loan Term Sheets. Evergreen: recallable by Galaxy on seven days' notice, and classified as a current liability because the company has no unconditional right to defer settlement for twelve months.",
       "rate": {
         "kind": "fixed",
         "value": 5.45,
-        "note": "5.45% on initial draw (+5% late fee)"
+        "note": "5.45% per annum on the initial draw, per the 8-K. The Q2-26 10-Q rounds this to 5.5%. A late fee of 5% annualised applies for each business day a borrowed asset is not returned when due."
       },
       "maturity": "Master 1-yr auto-renew (from 3/27/26)",
       "maturity_note": null,
       "seniority": "Collateralized; margin-call/NAV triggers",
-      "security": "USD or digital-currency collateral per term sheet (specifics undisclosed)",
+      "security": "LsETH pledged to the lender for the initial draw (BTBT 10-Q, 2026-08-13). The master agreement permits Dollars or Digital Currency as collateral per term sheet. Additional collateral is required if value falls below the Margin Call Rate; the agreement terminates on, among other things, a 25% month-end decline in the company's net asset value.",
       "lenders": [
         "Galaxy Digital LLC"
       ],
@@ -3546,21 +3750,21 @@
         "date": "2026-05-27",
         "url": "https://www.sec.gov/Archives/edgar/data/1710350/000121390026061574/ea0292031-8k_bitdigital.htm"
       },
-      "as_of": "2026-05-27"
+      "as_of": "2026-08-24"
     },
     {
       "id": "wyfi-briley-nc1",
       "collateral_class": "operator_campus",
       "exclude_from_issuance": true,
       "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
-      "issuer": "Bit Digital, Inc.",
-      "ticker": "BTBT",
+      "issuer": "WhiteFiber, Inc.",
+      "ticker": "WYFI",
       "issuer_type": "public",
-      "entity": "WhiteFiber Operating Partnership (guarantor)",
+      "entity": "Enovum NC-1 Venture, LLC (borrower); WhiteFiber Operating Partnership, LP (guarantor); B. Riley Securities, Inc. as assignee lender of record",
       "name": "B. Riley-assigned advance — NC-1 bridge",
       "instrument_type": "credit_facility",
       "size_usd_m": 20,
-      "size_note": "$20.0M (3% OID)",
+      "size_note": "$20.0M at a 3% original issue discount, assigned by Bit Digital Capital to B. Riley on 2026-05-26 out of an advance under the Delayed Draw Term Loan Facility, on the same economic terms as the lender including interest rate, MOIC Amount and security interest. 90-day term. Net carrying value $19.4M at 2026-06-30; effective interest rate 50.6%.",
       "rate": {
         "kind": "fixed",
         "value": 9.5,
@@ -3576,11 +3780,81 @@
       "status": "confirmed",
       "issued": "2026-05-20",
       "source": {
-        "doc": "8-K 5/27/26",
-        "date": "2026-05-27",
+        "doc": "WYFI 10-Q for the quarter ended 2026-06-30, Note 10 Debt, filed 2026-08-12, acc 0001213900-26-088026",
+        "date": "2026-08-12",
+        "url": "https://www.sec.gov/Archives/edgar/data/2042022/000121390026088026/ea0300877-10q_whitefiber.htm"
+      },
+      "as_of": "2026-08-24"
+    },
+    {
+      "id": "wyfi-ddtl-nc1",
+      "collateral_class": "operator_campus",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by the equity of an HPC data-center holding company, not by GPUs (strict scope, 2026-07-06).",
+      "issuer": "WhiteFiber, Inc.",
+      "ticker": "WYFI",
+      "issuer_type": "public",
+      "entity": "Enovum NC-1 Venture, LLC (borrower); Bit Digital Capital, Inc. (lender, a Bit Digital subsidiary and therefore a related party); WhiteFiber Operating Partnership, LP (guarantor)",
+      "name": "Delayed Draw Term Loan Facility — NC-1 (Bit Digital Capital)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 60,
+      "size_note": "Facility of up to $100M, increasable to $150M by mutual agreement. $60.0M outstanding under the facility as last reported: $30.0M remaining from the $50.0M drawn 2026-05-26 in two tranches after the $20.0M tranche was assigned to B. Riley the same day and is carried separately, plus $20.0M drawn 2026-07-27 and $10.0M drawn 2026-07-31. Each advance is funded net of a 3% original issue discount with the borrower liable for the full stated principal. Availability period nine months, extendable by three. Commitment fee 0.50% of the undrawn facility size, payable at expiry of the availability period. Related-party governance: fairness opinions were obtained for both Bit Digital and WhiteFiber, and independent committees of both boards approved the transaction.",
+      "rate": {
+        "kind": "fixed",
+        "value": 9.5,
+        "note": "9.5% before the Rate Step Down Event and 8.0% after, the step-down conditioned on substantial completion of a 40 MW Phase I buildout at NC-1 and at least 80% of Phase I capacity leased to tenants at market rates. Payments at each advance's maturity are no less than 1.1x the principal advanced excluding OID, less cumulative payments received (the MOIC Amount); prepayment carries no penalty and does not reduce the MOIC. PIK election at the borrower's discretion. Default rate is the lesser of the interest rate plus 3.0% and the maximum permitted by law. The MOIC and the short tenor produced an effective interest rate of 50.6% at 2026-06-30."
+      },
+      "maturity": "2026-08-24",
+      "maturity_note": "Tranche-by-tranche rather than facility-level: the 2026-05-26 advances ran 90 days, extendable 30 days by mutual agreement, and the 2026-07-27 and 2026-07-31 advances run 180 days, extendable by mutual agreement. The date shown is the nearest tranche maturity. Mandatory prepayment of 100% of net cash proceeds from any disposition of collateral outside the ordinary course, within five business days.",
+      "seniority": "Senior secured at the NC-1 holding-company level",
+      "security": "First-ranking security over 100% of the shareholding in Enovum NC-1 Topco, Inc. Subject to a collateral step-down: the lender releases all liens and security interests once Enovum NC-1 Bidco, LLC or another affiliate of the borrower obtains loan financing from institutional investors or another form of permanent financing for NC-1.",
+      "lenders": [
+        "Bit Digital Capital, Inc.",
+        "B. Riley Securities, Inc. (assignee of a $20.0M advance)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-05-20",
+      "source": {
+        "doc": "BTBT 8-K Items 1.01/2.03 filed 2026-05-27, acc 0001213900-26-061574; balances and subsequent draws from the WYFI 10-Q for the quarter ended 2026-06-30, Note 10 Debt",
+        "date": "2026-08-12",
         "url": "https://www.sec.gov/Archives/edgar/data/1710350/000121390026061574/ea0292031-8k_bitdigital.htm"
       },
-      "as_of": "2026-05-27"
+      "as_of": "2026-08-24"
+    },
+    {
+      "id": "wyfi-rbc-syndicated",
+      "collateral_class": "operator_campus",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Data-center business financing, not GPU-collateral (strict scope, 2026-07-06).",
+      "issuer": "WhiteFiber, Inc.",
+      "ticker": "WYFI",
+      "issuer_type": "public",
+      "entity": "Enovum Data Center Corp. (borrower), a wholly owned subsidiary",
+      "name": "Syndicated RBC Credit Facility",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 80.8,
+      "size_note": "Up to approximately CAD $115M (~$80.8M), plus an accordion permitting an increase of up to a further CAD $25M (~$17.7M) subject to specified conditions. Non-revolving: amounts repaid or prepaid may not be reborrowed. Proceeds refinanced the Amended RBC Credit Agreement in full on 2026-07-15 and finance the data-centers business. Drawn balance undisclosed. USD equivalents are the filing's own.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed in the 10-Q."
+      },
+      "maturity": "Undisclosed",
+      "maturity_note": null,
+      "seniority": "Syndicated credit facility",
+      "security": "Not disclosed in the 10-Q",
+      "lenders": [
+        "Royal Bank of Canada",
+        "Syndicate not named"
+      ],
+      "status": "confirmed",
+      "issued": "2026-07-06",
+      "source": {
+        "doc": "WYFI 10-Q for the quarter ended 2026-06-30, Note 10 Debt, filed 2026-08-12, acc 0001213900-26-088026",
+        "date": "2026-08-12",
+        "url": "https://www.sec.gov/Archives/edgar/data/2042022/000121390026088026/ea0300877-10q_whitefiber.htm"
+      },
+      "as_of": "2026-08-24"
     },
     {
       "id": "hive-exch-t1",
@@ -3661,15 +3935,15 @@
       "entity": null,
       "name": "Vendor takeback mortgage #1 (Toronto–Waterloo land)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 14.5,
-      "size_note": "C$20M",
+      "size_usd_m": 14.7,
+      "size_note": "C$20M; $14.7M at the 2026-06-30 translation rate. The row carries the USD equivalent of a fixed C$ face, so period-to-period movement in this figure is FX translation and not a change in the obligation.",
       "rate": {
         "kind": "fixed",
-        "value": 6,
-        "note": "Quarterly interest, bullet"
+        "value": 6.0,
+        "note": "6.00% annually, interest payable quarterly; full principal due at maturity."
       },
       "maturity": "~2028-01-30",
-      "maturity_note": null,
+      "maturity_note": "Two-year term from 2026-01-30, bullet repayment.",
       "seniority": "Mortgage",
       "security": "Ontario land",
       "lenders": [
@@ -3678,11 +3952,11 @@
       "status": "confirmed",
       "issued": "2026-01-30",
       "source": {
-        "doc": "10-K (FY ended 3/31/26) Notes 4/15",
-        "date": "2026-06-02",
-        "url": "https://www.sec.gov/Archives/edgar/data/1720424/000106299326002973/form10k.htm"
+        "doc": "HIVE 10-Q for the quarter ended 2026-06-30, Notes 13/14, filed 2026-08-14, acc 0001062993-26-004434",
+        "date": "2026-08-14",
+        "url": "https://www.sec.gov/Archives/edgar/data/1720424/000106299326004434/form10q.htm"
       },
-      "as_of": "2026-06-02"
+      "as_of": "2026-08-24"
     },
     {
       "id": "hive-mortgage-2",
@@ -3695,15 +3969,15 @@
       "entity": null,
       "name": "Vendor mortgage #2 (second property)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 4.4,
-      "size_note": null,
+      "size_usd_m": 4.3,
+      "size_note": "C$6M; $4.3M at the 2026-06-30 translation rate. Same C$-face convention as the first vendor mortgage.",
       "rate": {
-        "kind": "undisclosed",
-        "value": null,
-        "note": "Rate/term UNVERIFIED in filings"
+        "kind": "fixed",
+        "value": 6.0,
+        "note": "6.00% annually, interest payable quarterly; full principal due at maturity."
       },
-      "maturity": "Undisclosed",
-      "maturity_note": null,
+      "maturity": "~2029-05-15",
+      "maturity_note": "Three-year term from 2026-05-15, bullet repayment. Rate and term were undisclosed until the Q1 FY27 10-Q.",
       "seniority": "Mortgage to seller",
       "security": "Ontario real property",
       "lenders": [
@@ -3712,11 +3986,11 @@
       "status": "confirmed",
       "issued": "2026-05-15",
       "source": {
-        "doc": "10-K Note 31",
-        "date": "2026-06-02",
-        "url": "https://www.sec.gov/Archives/edgar/data/1720424/000106299326002973/form10k.htm"
+        "doc": "HIVE 10-Q for the quarter ended 2026-06-30, Notes 13/14, filed 2026-08-14, acc 0001062993-26-004434",
+        "date": "2026-08-14",
+        "url": "https://www.sec.gov/Archives/edgar/data/1720424/000106299326004434/form10q.htm"
       },
-      "as_of": "2026-06-02"
+      "as_of": "2026-08-24"
     },
     {
       "id": "hive-boden",
@@ -3761,8 +4035,8 @@
       "entity": "New Brunswick subsidiary",
       "name": "Atlantic Term Loans 1 & 2 (New Brunswick)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 2,
-      "size_note": null,
+      "size_usd_m": 1.6,
+      "size_note": "$1.6M outstanding at 2026-06-30, from $2.0M at 2026-03-31. Still carried on the balance sheet after the stated 2026-06-30 maturity, so the facility was renewed or extended; the renewal terms are not disclosed.",
       "rate": {
         "kind": "fixed",
         "value": null,
@@ -3771,7 +4045,7 @@
         "note": "4.39% / 5.15%"
       },
       "maturity": "2026-06-30",
-      "maturity_note": "Renewal UNVERIFIED",
+      "maturity_note": "Stated maturity 2026-06-30; still outstanding at that date per the Q1 FY27 balance sheet. Renewal terms undisclosed.",
       "seniority": "Subsidiary; unlimited parent guarantee; DSCR ≥1.50",
       "security": "NB datacenter business",
       "lenders": [
@@ -3780,11 +4054,11 @@
       "status": "confirmed",
       "issued": "Assumed 2021",
       "source": {
-        "doc": "10-K Note 14",
-        "date": "2026-06-02",
-        "url": "https://www.sec.gov/Archives/edgar/data/1720424/000106299326002973/form10k.htm"
+        "doc": "HIVE 10-Q for the quarter ended 2026-06-30, Notes 13/14, filed 2026-08-14, acc 0001062993-26-004434",
+        "date": "2026-08-14",
+        "url": "https://www.sec.gov/Archives/edgar/data/1720424/000106299326004434/form10q.htm"
       },
-      "as_of": "2026-06-02"
+      "as_of": "2026-08-24"
     },
     {
       "id": "hive-dell-lease",
@@ -6239,6 +6513,13 @@
       "issuer": "Sharon AI Holdings, Inc.",
       "items": [
         "USD.AI GPU-backed debt facility, up to US$500M (announced Jan 22, 2026) — never executed. The Company's S-1 filed Aug 12, 2026 still states USD.AI \"had approved a debt facility of up to US$500 million ... subject to execution of definitive documentation\"; it appears in no debt footnote. Carried as a confirmed instrument until 2026-08-13; removed as an announced approval, not an instrument."
+      ]
+    },
+    {
+      "issuer": "WhiteFiber, Inc.",
+      "items": [
+        "RBC Amended Credit Agreement (MTL-3 bridge), CAD $28M authorised (~$20M), CAD $24.7M (~$17.3M) drawn 2026-05-08 to fund the MTL-3 acquisition — \"On July 15, 2026, the Amended Credit agreement was repaid in full and refinanced through the Syndicated RBC Credit Facility agreement\" (WYFI 10-Q for the quarter ended 2026-06-30, Note 10 Debt). The CAD $8M revolving letter-of-credit and letter-of-guarantee line under that agreement REMAINS IN PLACE and is not tracked as a separate row.",
+        "Original RBC credit agreement of 2025-06-18 (as amended 2025-07-04), up to ~CAD 60M (~$43.8M) across three facilities — conditions precedent were never satisfied, nothing was ever drawn and no borrowings were available; replaced by the Amended Credit Agreement on 2026-04-27."
       ]
     }
   ]

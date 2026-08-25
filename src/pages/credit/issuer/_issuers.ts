@@ -10,6 +10,7 @@ export const ISSUERS: Record<string, { match: string; display: string }> = {
   'coreweave': { match: 'CoreWeave, Inc.', display: 'CoreWeave' },
   'digital-realty': { match: 'Digital Realty Trust, Inc./L.P.', display: 'Digital Realty' },
   'applied-digital': { match: 'Applied Digital Corporation', display: 'Applied Digital' },
+  'chronoscale': { match: 'ChronoScale Holdings Corporation', display: 'ChronoScale' },
   'crusoe': { match: 'Crusoe Energy Systems', display: 'Crusoe' },
   'iren': { match: 'IREN Limited', display: 'IREN' },
   'nebius': { match: 'Nebius Group N.V.', display: 'Nebius' },
@@ -19,6 +20,11 @@ export const ISSUERS: Record<string, { match: string; display: string }> = {
   'soluna': { match: 'Soluna Holdings, Inc.', display: 'Soluna' },
   'hut8': { match: 'Hut 8 Corp.', display: 'Hut 8' },
   'bit-digital': { match: 'Bit Digital, Inc.', display: 'Bit Digital' },
+  // WhiteFiber is its own SEC registrant (Cayman, NASDAQ: WYFI) with its own
+  // 10-Q, 8-Ks and indentures. Five rows were filed under Bit Digital until
+  // 2026-08-24; the issuer strings were corrected and this entry keeps them
+  // on a page. Bit Digital retains its own two rows.
+  'whitefiber': { match: 'WhiteFiber, Inc.', display: 'WhiteFiber' },
   'core-scientific': { match: 'Core Scientific, Inc.', display: 'Core Scientific' },
   'lambda': { match: 'Lambda', display: 'Lambda' },
   'nscale': { match: 'Nscale', display: 'Nscale' },
