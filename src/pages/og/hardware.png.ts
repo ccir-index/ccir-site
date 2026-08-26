@@ -35,12 +35,6 @@ function ivCard(v: (typeof ivCards)[number]) {
     el('div', { display: 'flex', fontFamily: 'IBM Plex Serif', fontSize: 34, fontWeight: 600, color: C.ink }, usd(v.base)),
     el('div', { display: 'flex', fontSize: 12.5, color: C.dim }, `sensitivity ${k(v.lo)} – ${k(v.hi)}`),
   ]);
-  // Service life prints on its own line — appended to the sensitivity text
-  // it wraps under the value figure at card size (Satori has no nowrap).
-  const lifeLine = v.lifePts.length
-    ? [el('div', { display: 'flex', fontSize: 12.5, color: C.dim, marginTop: 3 },
-        v.lifePts.map((q) => `${k(q.v)} at ${q.life}y life assumed`).join(' · '))]
-    : [];
 
   // Strip carries only the sensitivity band and the model dot (2026-08-04
   // ruling): the corroborating numbers live in the text rows below — mark
@@ -74,7 +68,7 @@ function ivCard(v: (typeof ivCards)[number]) {
   return el('div', {
     display: 'flex', flexDirection: 'column', width: CARD_W, height: CARD_H,
     backgroundColor: C.surface, border: `1px solid ${C.rule}`, padding: '14px 22px',
-  }, [head, value, ...lifeLine, strip, ...rows, meta]);
+  }, [head, value, strip, ...rows, meta]);
 }
 
 export const GET: APIRoute = async () => {

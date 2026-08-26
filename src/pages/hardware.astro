@@ -275,9 +275,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
               <div class="ivband" style={`left:${p(v.lo)}%;width:${p(v.hi) - p(v.lo)}%`}></div>
               <div class="ivdot" style={`left:${p(v.base)}%`} title={`model ${fmtUsd(v.base)}`}></div>
               {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`no-contract floor ${fmtUsd(v.intStress)} — earning the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) at the same 75% utilization and 65% net margin as the base case; the rate is the only changed input`}></div>}
-              {v.lifePts.map((q) => (
-                <div class="ivlife" style={`left:${p(q.v)}%`} title={`${fmtUsd(q.v)} if a ${q.life}-year service life were assumed · every other assumption at base`}></div>
-              ))}
               {v.ask != null && <div class="ivtick" style={`left:${p(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
               {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)} (n=${v.t90N})`}></div>}
               {/* right endpoint intentionally unlabeled: it is the padded
@@ -298,9 +295,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
             )}
             {v.intStress != null && (
               <div class="ivrow"><span class="g g-int"></span>no-contract floor {fmtUsd(v.intStress)}<span class="dim"> · interruptible rate, base-case assumptions</span></div>
-            )}
-            {v.lifePts.length > 0 && (
-              <div class="ivrow"><span class="g g-life"></span>{v.lifePts.map((q) => `${fmtUsd(q.v)} at ${q.life}y life assumed`).join(' · ')}<span class="dim"> · base 6y</span></div>
             )}
             <div class="ivmeta">rate leg ${v.spot.toFixed(2)}/hr · curve to {v.curveTo} · {v.remaining.toFixed(1)}yr remaining at 6yr service life</div>
           </div>
@@ -325,13 +319,10 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         around base: discount rate 10–20%, decay 10–30%/yr (the 30% bound
         is the worst case on record: V100 from its scarcity peak). The
         band shows the min–max of those legs. Jointly optimistic or
-        pessimistic corners are not stacked. Utilization and margin are
-        held at base. Service life is shown separately: the 5- and 7-year
-        cases print as named marks beside the band, because life is a
-        discrete scenario rather than parameter noise, and on an aged
-        chip a one-year life change moves the value more than every rate
-        assumption combined. A life case at or below a chip's current age
-        is omitted rather than shown as a zero. The discount-rate band is
+        pessimistic corners are not stacked. Utilization, margin, and the
+        6-year service life are held at base; the band prices rate
+        uncertainty around the stated life, and each card states the
+        remaining years that life implies. The discount-rate band is
         anchored to observed GPU-asset-backed financing yields in CCIR's
         <a href="/credit">credit ledger</a> (see Method below).
         The no-contract floor is the same model with one input changed:
@@ -781,8 +772,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       color: var(--ink-dim); margin-bottom: 2px;
     }
     /* Triangulation strip: zero-anchored dollar scale — band = rate
-       sensitivity, dot = model base, hollow square = service-life
-       scenario, tick = posted ask, diamond = executed 90d. */
+       sensitivity, dot = model base, tick = posted ask, diamond =
+       executed 90d. */
     .iv .ivstrip { position: relative; height: 30px; margin: 4px 0 10px; }
     .iv .ivstrip::before {
       content: ''; position: absolute; left: 0; right: 0; top: 9px;
@@ -809,13 +800,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .iv .ivtick {
       position: absolute; top: 3px; width: 2px; height: 13px;
       background: var(--ink); transform: translateX(-50%);
-    }
-    /* Service-life scenario — hollow square: a named alternative case,
-       deliberately outside the sensitivity band. */
-    .iv .ivlife {
-      position: absolute; top: 9.5px; width: 8px; height: 8px;
-      background: var(--surface); border: 2px solid var(--accent);
-      transform: translate(-50%, -50%);
     }
     .iv .ivdia {
       position: absolute; top: 9.5px; width: 7px; height: 7px;
@@ -844,11 +828,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       transform: rotate(45deg); vertical-align: 0;
     }
     /* matches the strip's hollow-ring mark (.ivint) */
-    .iv .g-life {
-      width: 7px; height: 7px;
-      background: var(--surface); border: 2px solid var(--accent);
-      vertical-align: -1px;
-    }
     .iv .g-int {
       width: 7px; height: 7px; border-radius: 50%;
       background: var(--surface); border: 2px solid var(--ink-dim);
