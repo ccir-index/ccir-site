@@ -5436,27 +5436,27 @@
       "name": "USD.AI non-recourse GPU financing facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 500,
-      "size_note": "$500M guidance facility; finances up to 70% LTV on approved GPU deployments, drawn as hardware deploys. Borrower QumulusAI completed a Nasdaq direct listing 2026-07-16 (ticker QMLS); S-1/424B4 disclosures indicate ~12% APR on the facility",
+      "size_note": "$500.0M facility entered 2025-09-19; the company is under no obligation to draw. The facility allows QumulusAI to borrow stablecoins against up to 70% of its approved GPU deployments. Draws: ~$4.282M on 2026-02-13 (matures February 2029), ~$16.4M on 2026-04-17 (matures April 2029), and $15.3M on 2026-08-07 (Q2 10-Q subsequent event). $18,913,377 outstanding at 2026-06-30. Interest rate not disclosed. QumulusAI completed a Nasdaq direct listing 2026-07-16 (ticker QMLS).",
       "rate": {
         "kind": "undisclosed",
         "value": null,
-        "note": null
+        "note": "Not disclosed in the Q2 2026 10-Q"
       },
       "maturity": "Undisclosed",
-      "maturity_note": null,
+      "maturity_note": "No facility-level maturity disclosed; each draw carries its own maturity (the first two mature February 2029 and April 2029)",
       "seniority": "Non-recourse, asset-level",
-      "security": "Approved GPU deployments tokenized as GPU Warehouse Receipt Tokens (GWRTs); credit secured against verified GPU assets, not the corporate balance sheet",
+      "security": "Approved GPU deployments tokenized as GPU Warehouse Receipt Tokens (GWRTs); credit secured at the asset level against verified GPU deployments",
       "lenders": [
         "USD.AI Protocol (structured by Permian Labs)"
       ],
       "status": "confirmed",
-      "issued": "2025-10-09",
+      "issued": "2025-09-19",
       "source": {
-        "doc": "QumulusAI release 10/9/25; USD.AI story",
-        "date": "2025-10-09",
-        "url": "https://www.qumulusai.com/articles/qumulusai-secures-500m-non-recourse-financing-facility-through-usdai-to-accelerate-ai-infrastructure-growth"
+        "doc": "10-Q for the quarter ended 2026-06-30, Note 14 (acc. 0001437749-26-028924); QumulusAI release 10/9/25",
+        "date": "2026-08-25",
+        "url": "https://www.sec.gov/Archives/edgar/data/2084026/000143774926028924/quma20260630_10q.htm"
       },
-      "as_of": "2026-07-04"
+      "as_of": "2026-08-26"
     },
     {
       "id": "sharonai-conv-2032",
@@ -5504,14 +5504,14 @@
       "name": "6.00% Convertible Senior Notes due 2031",
       "instrument_type": "convertible",
       "size_usd_m": 350,
-      "size_note": "$350.0M aggregate principal. Securities Purchase Agreement with qualified institutional buyers 4/26/26; offering closed 5/20/26. Referred to in the S-1 as the \"May 2026 Convertible Notes\".",
+      "size_note": "$350.0M aggregate principal. Securities Purchase Agreement with qualified institutional buyers 4/26/26; offering closed 5/20/26. Referred to in the S-1 as the \"May 2026 Convertible Notes\". First Supplemental Indenture (2026-08-21; 8-K 8/26/26, EX-4.1) removed the GPU-value covenant package: the \"GPU Value\", \"Secured GPU Debt\", \"Holdco Coverage Amount\" and related definitions, the debt-maintenance covenant, and the prohibition on secured debt above $25M. Dividend and buyback restrictions and affiliate-transaction protections remain. SAI US No. 1 LLC released as guarantor. No consent fee disclosed.",
       "rate": {
         "kind": "fixed",
         "value": 6,
         "note": null
       },
-      "maturity": "2031",
-      "maturity_note": "Day not stated in the S-1; \"due 2031\" as filed",
+      "maturity": "2031-05-01",
+      "maturity_note": "May 1, 2031 per the First Supplemental Indenture title; the S-1 stated the year only",
       "seniority": "Senior (as titled); ranking not separately stated for this series in the S-1",
       "security": null,
       "lenders": [
@@ -5520,11 +5520,11 @@
       "status": "confirmed",
       "issued": "2026-05-20",
       "source": {
-        "doc": "S-1 (acc. 0001493152-26-035629), Recent Developments + Description of Securities",
+        "doc": "S-1 (acc. 0001493152-26-035629), Recent Developments + Description of Securities; First Supplemental Indenture 8-K 8/26/26 EX-4.1 (acc. 0001493152-26-040152)",
         "date": "2026-07-31",
         "url": "https://www.sec.gov/Archives/edgar/data/2068385/000149315226035629/forms-1.htm"
       },
-      "as_of": "2026-08-03"
+      "as_of": "2026-08-26"
     },
     {
       "id": "usdai-quantum",
