@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-08-24",
+    "as_of": "2026-08-26",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -764,7 +764,7 @@
       "name": "2.00% Convertible Senior Notes due 2029",
       "instrument_type": "convertible",
       "size_usd_m": 487.5,
-      "size_note": "$487.5M outstanding (of $500M); accretes to 120% ($587.5M payable). Concurrently with the pricing of the August 2026 offering, Nebius agreed to exchange $400.0M ORIGINAL principal amount of this series, together with $400.0M original principal of the other June-2025 series, for approximately 15.8 million Class A ordinary shares in aggregate; the exchanges were expected to settle 2026-08-24, on terms negotiated individually with each holder. On the original-principal basis this row uses, that leaves about $87.5M. NOT YET CONFIRMED BY A FILED BALANCE SHEET — the press release states the amount exchanged rather than the residual, so size_usd_m is held at the last filed figure. All six series were still fully outstanding at 2026-06-30 (Q2 6-K, Note 12).",
+      "size_note": "$487.5M outstanding (of $500M); accretes to 120% ($587.5M payable). Concurrently with the pricing of the August 2026 offering, Nebius agreed to exchange $400.0M ORIGINAL principal amount of this series, together with $400.0M original principal of the other June-2025 series, for approximately 15.8 million Class A ordinary shares in aggregate; the exchange agreement, on terms negotiated individually with each holder, is filed with the 2026-08-24 closing 6-K (acc 0001104659-26-100347), which states the exchanges were expected to settle on that date. On the original-principal basis this row uses, that leaves about $87.5M. NOT YET CONFIRMED BY A FILED BALANCE SHEET — the filings state the amount exchanged rather than the residual, so size_usd_m is held at the last filed figure. All six series were still fully outstanding at 2026-06-30 (Q2 6-K, Note 12).",
       "rate": {
         "kind": "fixed",
         "value": 2,
@@ -784,7 +784,7 @@
         "date": "2026-04-30",
         "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465925055197/tm2516825d1_ex99-1.htm"
       },
-      "as_of": "2026-08-24"
+      "as_of": "2026-08-26"
     },
     {
       "id": "nbis-conv-2031-jun",
@@ -798,7 +798,7 @@
       "name": "3.00% Convertible Senior Notes due 2031",
       "instrument_type": "convertible",
       "size_usd_m": 487.5,
-      "size_note": "$487.5M outstanding; accretes to 125% ($612.5M payable). Concurrently with the pricing of the August 2026 offering, Nebius agreed to exchange $400.0M ORIGINAL principal amount of this series, together with $400.0M original principal of the other June-2025 series, for approximately 15.8 million Class A ordinary shares in aggregate; the exchanges were expected to settle 2026-08-24, on terms negotiated individually with each holder. On the original-principal basis this row uses, that leaves about $87.5M. NOT YET CONFIRMED BY A FILED BALANCE SHEET — the press release states the amount exchanged rather than the residual, so size_usd_m is held at the last filed figure. All six series were still fully outstanding at 2026-06-30 (Q2 6-K, Note 12).",
+      "size_note": "$487.5M outstanding; accretes to 125% ($612.5M payable). Concurrently with the pricing of the August 2026 offering, Nebius agreed to exchange $400.0M ORIGINAL principal amount of this series, together with $400.0M original principal of the other June-2025 series, for approximately 15.8 million Class A ordinary shares in aggregate; the exchange agreement, on terms negotiated individually with each holder, is filed with the 2026-08-24 closing 6-K (acc 0001104659-26-100347), which states the exchanges were expected to settle on that date. On the original-principal basis this row uses, that leaves about $87.5M. NOT YET CONFIRMED BY A FILED BALANCE SHEET — the filings state the amount exchanged rather than the residual, so size_usd_m is held at the last filed figure. All six series were still fully outstanding at 2026-06-30 (Q2 6-K, Note 12).",
       "rate": {
         "kind": "fixed",
         "value": 3,
@@ -818,7 +818,7 @@
         "date": "2026-04-30",
         "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465925055197/tm2516825d1_ex99-1.htm"
       },
-      "as_of": "2026-08-24"
+      "as_of": "2026-08-26"
     },
     {
       "id": "nbis-conv-2030",
@@ -865,8 +865,8 @@
       "entity": null,
       "name": "0.50% Convertible Senior Notes due Feb 2030 (August series)",
       "instrument_type": "convertible",
-      "size_usd_m": 3000,
-      "size_note": "$3.0B original principal, one of two series in a $5.0B offering upsized from the $4.5B announced. Accretes on an indenture schedule to 110% of original principal ($3.30B) at maturity; the coupon accrues on the ORIGINAL amount, while redemption, fundamental-change repurchase and the conversion trigger are all measured against the ACCRETED amount. Initial purchasers hold a 13-day option for up to a further $450M, open at the time of this entry and expiring about 2026-09-06. Aggregate net proceeds across both series were estimated at ~$4.94B, or ~$5.68B if both options are exercised in full.",
+      "size_usd_m": 3450,
+      "size_note": "$3.45B original principal at closing, one of two series in the offering priced 2026-08-19 at $5.0B, upsized from the $4.5B announced. The initial purchasers exercised their $450M option in full at the 2026-08-24 closing (closing 6-K, acc 0001104659-26-100347), bringing the two series to $5.75B combined original principal. Accretes on an indenture schedule to 110% of original principal ($3.795B) at maturity; the coupon accrues on the ORIGINAL amount, while redemption, fundamental-change repurchase and the conversion trigger are all measured against the ACCRETED amount.",
       "rate": {
         "kind": "fixed",
         "value": 0.5,
@@ -886,7 +886,7 @@
         "date": "2026-08-24",
         "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926098924/tm2623617d1_ex99-1.htm"
       },
-      "as_of": "2026-08-24"
+      "as_of": "2026-08-26"
     },
     {
       "id": "nbis-conv-2034",
@@ -899,8 +899,8 @@
       "entity": null,
       "name": "4.50% Convertible Senior Notes due 2034",
       "instrument_type": "convertible",
-      "size_usd_m": 2000,
-      "size_note": "$2.0B original principal, the second of two series in the $5.0B offering. Accretes on an indenture schedule to 125% of original principal ($2.50B) at maturity, on the same original-versus-accreted mechanics as the 2030 series. Initial purchasers hold a 13-day option for up to a further $300M, open at the time of this entry and expiring about 2026-09-06. Stated use of proceeds covers data-center construction and build-out, the full-stack AI cloud, footprint expansion and the procurement of key components including GPUs.",
+      "size_usd_m": 2300,
+      "size_note": "$2.30B original principal at closing, the second of two series in the $5.0B-priced offering. The initial purchasers exercised their $300M option in full at the 2026-08-24 closing (closing 6-K, acc 0001104659-26-100347). Accretes on an indenture schedule to 125% of original principal ($2.875B) at maturity, on the same original-versus-accreted mechanics as the 2030 series. Stated use of proceeds covers data-center construction and build-out, the full-stack AI cloud, footprint expansion and the procurement of key components including GPUs.",
       "rate": {
         "kind": "fixed",
         "value": 4.5,
@@ -920,7 +920,7 @@
         "date": "2026-08-24",
         "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926098924/tm2623617d1_ex99-1.htm"
       },
-      "as_of": "2026-08-24"
+      "as_of": "2026-08-26"
     },
     {
       "id": "nbis-conv-2032",
