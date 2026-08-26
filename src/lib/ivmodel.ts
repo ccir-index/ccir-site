@@ -94,12 +94,23 @@ export const ivCards = IV_SPEC.map((s) => {
   // One-at-a-time sensitivity: each assumption varied around base with the
   // others held at base — no stacking of jointly optimistic/pessimistic
   // corners (a full cross doubles the band with scenarios nobody holds).
-  // Life bounds at or below the chip's current age are omitted: a zero-year
-  // PV is the salvage question, not a rate-model output.
+  // The band carries RATE assumptions only (discount rate, decay). Service
+  // life is a discrete structural scenario, not parameter noise — the 5y/7y
+  // values are returned as named points (lifePts) and rendered as labeled
+  // marks beside the band (John, 2026-08-25: folding a ±1y life leg into
+  // the min–max made A100's band read 90% of base while hiding that the
+  // whole question is one-vs-two remaining earning years). Life bounds at
+  // or below the chip's current age are omitted: a zero-year PV is the
+  // salvage question, not a rate-model output.
   const combos: number[] = [ivValue(spot, d, IV_BASE.r, IV_BASE.life, age)];
-  for (const rr of [0.10, 0.25]) combos.push(ivValue(spot, d, rr, IV_BASE.life, age));
-  for (const lf of [5, 7]) if (lf > age) combos.push(ivValue(spot, d, IV_BASE.r, lf, age));
+  // r band re-anchored 2026-08-25 (John): top bound 25% -> 20%. The 25% leg
+  // carried 2023-era debt (~15% all-in) + equity premium; the 2026 ledger
+  // prints GPU-backed debt at 5.45%-9.875%, so the top bound is now the
+  // costliest current debt (~10%) + the same equity spread.
+  for (const rr of [0.10, 0.20]) combos.push(ivValue(spot, d, rr, IV_BASE.life, age));
   for (const gg of IV_G) combos.push(ivValue(spot, d, IV_BASE.r, IV_BASE.life, age, gg));
+  const lifePts = [5, 7].filter((lf) => lf > age)
+    .map((lf) => ({ life: lf, v: ivValue(spot, d, IV_BASE.r, lf, age) }));
   const ask = hwm?.ask?.med ?? null;
   const t90 = hwm?.t90?.med ?? null;
   // No-contract floor: the same income model with the published Neocloud
@@ -113,9 +124,10 @@ export const ivCards = IV_SPEC.map((s) => {
   const intStress = Number.isFinite(intRate)
     ? ivValue(intRate, {}, IV_BASE.r, IV_BASE.life, age) : null;
   // Strip scale: zero-anchored so mark positions read as magnitudes.
-  const smax = Math.max(...combos, base, ask ?? 0, t90 ?? 0, intStress ?? 0) * 1.06;
+  const smax = Math.max(...combos, ...lifePts.map((q) => q.v), base,
+                        ask ?? 0, t90 ?? 0, intStress ?? 0) * 1.06;
   return {
-    ...s, spot, base, lo: Math.min(...combos), hi: Math.max(...combos), smax,
+    ...s, spot, base, lo: Math.min(...combos), hi: Math.max(...combos), smax, lifePts,
     intStress, intRate: Number.isFinite(intRate) ? intRate : null,
     intN: intRow ? Number(intRow['n_sources']) || null : null,
     remaining: Math.max(0, IV_BASE.life - age),
