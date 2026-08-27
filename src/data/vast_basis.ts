@@ -1,11 +1,11 @@
 /*
-  Loads the Vast clearing-vs-list basis overlay (vast_basis.csv).
+  Loads the Vast marketplace-vs-list basis overlay (vast_basis.csv).
 
-  The CCIR rate index is a list-ask benchmark; Vast is the one live/executable
-  venue and is pulled from the rate panel. This overlay re-surfaces Vast as a
-  separate signal: how the live marketplace price sits vs the ex-Vast T3
-  (Marketplace) list-ask floor at matched segment. NOT part of the benchmark.
-  Single-venue.
+  The CCIR rate index is a list-ask benchmark; Vast is the one live
+  marketplace venue and is excluded from the premium-tier rate panel. This
+  overlay re-surfaces Vast as a separate signal: how the live marketplace
+  ask sits vs the ex-Vast T3 (Marketplace) list-ask panel at matched
+  segment. NOT part of the benchmark. Single-venue.
 */
 import csvText from './vast_basis.csv?raw';
 
@@ -14,7 +14,8 @@ export interface VastBasis {
   silicon_id: string;
   gpu_model: string;
   window_days: number;
-  vast_input: string; // 'min_bid' (clearing floor) | 'dph_base' (live ask)
+  vast_input: string; // 'min_bid' (interruptible reserve bid) | 'dph_base' (on-demand posted ask)
+  vast_input_1d: string; // same coding; the 1d pool's input (may differ from 7d)
   listask_floor_7d: number | null;
   vast_price_7d: number | null;
   basis_pct_7d: number | null;
@@ -49,6 +50,7 @@ function parse(text: string): VastBasis[] {
         gpu_model: g('gpu_model') ?? '',
         window_days: num(g('window_days')) ?? 7,
         vast_input: g('vast_input') ?? '',
+        vast_input_1d: g('vast_input_1d') ?? '',
         listask_floor_7d: num(g('listask_floor_7d')),
         vast_price_7d: num(g('vast_price_7d')),
         basis_pct_7d: num(g('basis_pct_7d')),

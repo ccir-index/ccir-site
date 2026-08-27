@@ -410,9 +410,10 @@ export function neocloudCommittedTenors(): Term[] {
 
 // Native-product rule for the T-tier headline cells: all three tiers
 // (T1IF/T2IF/T3IF) are GTD-only — apples-to-apples guaranteed-grade marks.
-// (T3IF used to pool GTD+INT for marketplace spot, but the one live/executable
-// venue, Vast, is now pulled from the rate panel and shown on /basis as the
-// clearing-vs-list overlay; the residual T3IF list-ask pool is GTD anyway.)
+// (T3IF used to pool GTD+INT for marketplace spot, but the one live
+// marketplace venue, Vast, is now pulled from the rate panel and shown on
+// /basis as the marketplace basis overlay; the residual T3IF list-ask pool
+// is GTD anyway.)
 // Falls back to the fully-pooled ('ALL') series if a GTD-only series is absent
 // (e.g. a transitional snapshot before the gold change lands).
 function preferredInterruptibility(_tier: Tier): Interruptibility {

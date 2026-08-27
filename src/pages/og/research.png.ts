@@ -18,7 +18,7 @@ const SPEC = {
     ],
     [
       "Term & Price Structure",
-      "Tenor · commitment discount · clearing basis",
+      "Tenor · commitment discount · marketplace basis",
       ""
     ],
     [

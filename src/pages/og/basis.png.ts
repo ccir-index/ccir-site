@@ -7,9 +7,9 @@ export const prerender = true;
 const SPEC = {
   "kicker": "Monitor · updated daily",
   "titleLines": [
-    "On-Demand vs Clearing Basis"
+    "Marketplace Basis"
   ],
-  "sub": "Posted list asks against marketplace clearing at matched tier.",
+  "sub": "The live marketplace ask against posted list-asks at matched tier.",
   "rows": [
     [
       "List",
@@ -17,13 +17,13 @@ const SPEC = {
       ""
     ],
     [
-      "Clearing",
-      "The executable marketplace price",
+      "Vast",
+      "The live marketplace ask",
       ""
     ],
     [
       "Basis",
-      "Where list sits above what transacts",
+      "Where the live ask sits against list",
       ""
     ]
   ],
