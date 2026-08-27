@@ -26,6 +26,7 @@ export const ISSUERS: Record<string, { match: string; display: string }> = {
   // on a page. Bit Digital retains its own two rows.
   'whitefiber': { match: 'WhiteFiber, Inc.', display: 'WhiteFiber' },
   'core-scientific': { match: 'Core Scientific, Inc.', display: 'Core Scientific' },
+  'bitdeer': { match: 'Bitdeer Technologies Group', display: 'Bitdeer' },
   'lambda': { match: 'Lambda', display: 'Lambda' },
   'nscale': { match: 'Nscale', display: 'Nscale' },
   'xai': { match: 'xAI', display: 'xAI' },

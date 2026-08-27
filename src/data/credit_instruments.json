@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-08-26",
+    "as_of": "2026-08-27",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -1407,8 +1407,8 @@
       "entity": null,
       "name": "Starion Ellendale Loan (ELN-01)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 9.2,
-      "size_note": null,
+      "size_usd_m": 8.1,
+      "size_note": "$8.108M at 5/31/26 (was $12.283M at 5/31/25)",
       "rate": {
         "kind": "fixed",
         "value": 7.48,
@@ -1424,11 +1424,11 @@
       "status": "confirmed",
       "issued": "2023-02-16",
       "source": {
-        "doc": "Fiscal Q3 FY26 10-Q; FY25 10-K",
-        "date": "2026-04-08",
-        "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000030/apld-20260228.htm"
+        "doc": "FY26 10-K debt note + subsequent events (acc 0001144879-26-000048)",
+        "date": "2026-07-29",
+        "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000048/"
       },
-      "as_of": "2026-02-28"
+      "as_of": "2026-05-31"
     },
     {
       "id": "apld-cornerstone-gpu01",
@@ -1439,8 +1439,8 @@
       "entity": null,
       "name": "Cornerstone Bank Loan (GPU-01)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 10.7,
-      "size_note": null,
+      "size_usd_m": 9.9,
+      "size_note": "$9.910M at 5/31/26 (was $12.866M at 5/31/25)",
       "rate": {
         "kind": "fixed",
         "value": 8.59,
@@ -1456,11 +1456,11 @@
       "status": "confirmed",
       "issued": "2024-02-28",
       "source": {
-        "doc": "Fiscal Q3 FY26 10-Q; FY25 10-K",
-        "date": "2026-04-08",
-        "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000030/apld-20260228.htm"
+        "doc": "FY26 10-K debt note + subsequent events (acc 0001144879-26-000048)",
+        "date": "2026-07-29",
+        "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000048/"
       },
-      "as_of": "2026-02-28"
+      "as_of": "2026-05-31"
     },
     {
       "id": "apld-starion-hosting",
@@ -1471,8 +1471,8 @@
       "entity": null,
       "name": "Starion Term Loan (Hosting)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 4.7,
-      "size_note": "Originally $15M",
+      "size_usd_m": 3.9,
+      "size_note": "Originally $15M; $3.900M at 5/31/26 (was $7.061M at 5/31/25)",
       "rate": {
         "kind": "fixed",
         "value": 6.5,
@@ -1488,11 +1488,11 @@
       "status": "confirmed",
       "issued": "2022-07-25",
       "source": {
-        "doc": "Fiscal Q3 FY26 10-Q; FY25 10-K",
-        "date": "2026-04-08",
-        "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000030/apld-20260228.htm"
+        "doc": "FY26 10-K debt note + subsequent events (acc 0001144879-26-000048)",
+        "date": "2026-07-29",
+        "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000048/"
       },
-      "as_of": "2026-02-28"
+      "as_of": "2026-05-31"
     },
     {
       "id": "apld-other-safes-notes",
@@ -1503,8 +1503,8 @@
       "entity": null,
       "name": "Other long-term debt: 2 SAFEs + 2 promissory notes",
       "instrument_type": "other",
-      "size_usd_m": 31.4,
-      "size_note": "$12.0M SAFEs + ~$19.0M notes",
+      "size_usd_m": 18.5,
+      "size_note": "Two promissory notes (~$18.5M total, entered Q2 FY2026), within the $34.762M 'Other debt' line at 5/31/26. The $12.0M of SAFE proceeds formerly in this line was paid off 6/2/26 for $13.3M (FY26 10-K subsequent events).",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -1520,11 +1520,11 @@
       "status": "confirmed",
       "issued": "FY2025–FY2026",
       "source": {
-        "doc": "Fiscal Q3 FY26 10-Q; Q2 FY26 10-Q 1/8/26",
-        "date": "2026-04-08",
-        "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000030/apld-20260228.htm"
+        "doc": "FY26 10-K debt note + subsequent events (acc 0001144879-26-000048)",
+        "date": "2026-07-29",
+        "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000048/"
       },
-      "as_of": "2026-02-28"
+      "as_of": "2026-05-31"
     },
     {
       "id": "apld-rcf",
@@ -1813,7 +1813,7 @@
       "name": "7.125% Senior Secured Notes due 2030 — Barber Lake",
       "instrument_type": "bond",
       "size_usd_m": 1733,
-      "size_note": "$1,400M + $333M add-on",
+      "size_note": "$1,400M + $333M add-on; outstanding in full per the Q2-26 10-Q debt table (6/30/26)",
       "rate": {
         "kind": "fixed",
         "value": 7.125,
@@ -1830,11 +1830,11 @@
       "status": "confirmed",
       "issued": "2025-11-13",
       "source": {
-        "doc": "8-K 11/13/25; add-on 8-K 11/24/25",
+        "doc": "8-K 11/13/25; add-on 8-K 11/24/25; Q2-26 10-Q (acc 0001819989-26-000041)",
         "date": "2025-11-24",
         "url": "https://www.sec.gov/Archives/edgar/data/1819989/000095010325014692/dp237330_8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "cifr-6125-2031",
@@ -5508,7 +5508,7 @@
       "rate": {
         "kind": "fixed",
         "value": 6,
-        "note": null
+        "note": "Semi-annual per the S-1 debt footnote (business section says quarterly; footnote governs)"
       },
       "maturity": "2031-05-01",
       "maturity_note": "May 1, 2031 per the First Supplemental Indenture title; the S-1 stated the year only",
@@ -6395,6 +6395,208 @@
         "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/0002071778-26-000051-index.htm"
       },
       "as_of": "2026-08-18"
+    },
+    {
+      "id": "btdr-conv-2029",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "Bitdeer Technologies Group",
+      "ticker": "BTDR",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "5.25% Convertible Senior Notes due 2029",
+      "instrument_type": "convertible",
+      "size_usd_m": 400,
+      "size_note": "Issued November 2024, $400.0M original. $200.0M repurchased during 2025 (US$119.3M cash + 10,661,140 Class A shares); further $135.0M repurchased Feb-2026 (~$138.2M cash). Remaining principal ~$65.0M is implied (400−200−135; the filings state the repurchases, not the remainder). Principal outstanding on the 12/31/25 balance sheet: $200.0M.",
+      "rate": {
+        "kind": "fixed",
+        "value": 5.25,
+        "note": "Payable Jun-1/Dec-1; initial conversion rate 62.7126 Class A per $1,000 (~$15.95); holder put 12/6/27 at par"
+      },
+      "maturity": "2029-12-01",
+      "maturity_note": null,
+      "seniority": "Senior unsecured; no subsidiary guarantees (structurally subordinated)",
+      "security": null,
+      "lenders": [
+        "144A QIBs"
+      ],
+      "status": "confirmed",
+      "issued": null,
+      "source": {
+        "doc": "FY2025 20-F Note 16 + liquidity (acc 0001213900-26-049770)",
+        "date": "2026-04-30",
+        "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026049770/ea0282628-20f_bitdeer.htm"
+      },
+      "as_of": "2026-04-30"
+    },
+    {
+      "id": "btdr-conv-jul2031",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "Bitdeer Technologies Group",
+      "ticker": "BTDR",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "4.875% Convertible Senior Notes due 2031 (July series)",
+      "instrument_type": "convertible",
+      "size_usd_m": 375,
+      "size_note": "Issued June 2025, $375.0M; outstanding in full at 12/31/25.",
+      "rate": {
+        "kind": "fixed",
+        "value": 4.875,
+        "note": "Payable Jan-1/Jul-1; initial conversion rate 62.9921 per $1,000 (~$15.87); holder put 7/6/29"
+      },
+      "maturity": "2031-07-01",
+      "maturity_note": null,
+      "seniority": "Senior unsecured; no subsidiary guarantees (structurally subordinated)",
+      "security": null,
+      "lenders": [
+        "144A QIBs"
+      ],
+      "status": "confirmed",
+      "issued": null,
+      "source": {
+        "doc": "FY2025 20-F Note 16 + liquidity (acc 0001213900-26-049770)",
+        "date": "2026-04-30",
+        "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026049770/ea0282628-20f_bitdeer.htm"
+      },
+      "as_of": "2026-04-30"
+    },
+    {
+      "id": "btdr-conv-nov2031",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "Bitdeer Technologies Group",
+      "ticker": "BTDR",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "4.00% Convertible Senior Notes due 2031 (November series)",
+      "instrument_type": "convertible",
+      "size_usd_m": 400,
+      "size_note": "Issued November 2025, $400.0M; outstanding in full at 12/31/25. Capped calls: strike $17.77, cap $27.88 ($35.4M premium).",
+      "rate": {
+        "kind": "fixed",
+        "value": 4.0,
+        "note": "Payable May-15/Nov-15; initial conversion rate 56.2635 per $1,000 (~$17.77)"
+      },
+      "maturity": "2031-11-15",
+      "maturity_note": null,
+      "seniority": "Senior unsecured; no subsidiary guarantees (structurally subordinated)",
+      "security": null,
+      "lenders": [
+        "144A QIBs"
+      ],
+      "status": "confirmed",
+      "issued": null,
+      "source": {
+        "doc": "FY2025 20-F Note 16 + liquidity (acc 0001213900-26-049770)",
+        "date": "2026-04-30",
+        "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026049770/ea0282628-20f_bitdeer.htm"
+      },
+      "as_of": "2026-04-30"
+    },
+    {
+      "id": "btdr-conv-2032",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "Bitdeer Technologies Group",
+      "ticker": "BTDR",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "5.00% Convertible Senior Notes due 2032",
+      "instrument_type": "convertible",
+      "size_usd_m": 375,
+      "size_note": "Closed February 2026: $325.0M priced 2/20/26 + $50.0M initial-purchaser option exercised in full. Capped calls (initial cap $15.88). Concurrent registered direct at $7.94.",
+      "rate": {
+        "kind": "fixed",
+        "value": 5.0,
+        "note": "Payable Mar-1/Sep-1 from 9/1/26; initial conversion rate 100.7557 per $1,000 (~$9.93, +25% over the concurrent offering price)"
+      },
+      "maturity": "2032-03-01",
+      "maturity_note": null,
+      "seniority": "Senior unsecured; no subsidiary guarantees (structurally subordinated)",
+      "security": null,
+      "lenders": [
+        "144A QIBs"
+      ],
+      "status": "confirmed",
+      "issued": null,
+      "source": {
+        "doc": "Pricing 6-K 2/20/26 Ex-99.2 (acc 0001213900-26-018592); FY2025 20-F subsequent events",
+        "date": "2026-02-20",
+        "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026018592/ea027781201ex99-2_bitdeer.htm"
+      },
+      "as_of": "2026-04-30"
+    },
+    {
+      "id": "apld-texas-capital",
+      "collateral_class": "secured_undisclosed",
+      "issuer": "Applied Digital Corporation",
+      "ticker": "APLD",
+      "issuer_type": "public",
+      "entity": "Applied Digital Corporation (borrower)",
+      "name": "Texas Capital Bank term loan",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 58.5,
+      "size_note": "Promissory note, stated principal $58.5M; Loan and Security Agreement 6/30/26 (collateral not itemized in the 10-K)",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Adjusted term SOFR + applicable margin; margin not disclosed"
+      },
+      "maturity": "2031-06-30",
+      "maturity_note": null,
+      "seniority": "Secured (Loan and Security Agreement)",
+      "security": "Not itemized in the FY26 10-K",
+      "lenders": [
+        "Texas Capital Bank"
+      ],
+      "status": "confirmed",
+      "issued": "2026-06-30",
+      "source": {
+        "doc": "FY26 10-K subsequent events (acc 0001144879-26-000048)",
+        "date": "2026-07-29",
+        "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000048/"
+      },
+      "as_of": "2026-07-29"
+    },
+    {
+      "id": "dlr-carver-construction",
+      "collateral_class": "operator_campus",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "issuer": "Digital Realty Trust, Inc./L.P.",
+      "ticker": "DLR",
+      "issuer_type": "public",
+      "entity": "Digital Carver Dulles 9 JV, LLC / Digital Carver Brickyard JV, LLC (assumed)",
+      "name": "Assumed construction loan — Carver JVs",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 725.6,
+      "size_note": "$725.638M fair value assumed in the 6/30/26 step-acquisition of 64% blended interests ($726M as rounded in both 10-Q notes)",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Loan-level rate not disclosed; the secured-and-other-debt category carries a 7.49% weighted average at 6/30/26"
+      },
+      "maturity": "2027-12-24",
+      "maturity_note": "Two 12-month extension options",
+      "seniority": "Secured construction loan",
+      "security": "JV data-center assets (loan-level collateral not itemized)",
+      "lenders": [
+        "Not named"
+      ],
+      "status": "confirmed",
+      "issued": "2026-06-30",
+      "source": {
+        "doc": "Q2-26 10-Q, OP debt note fn (2) + Investments in Properties note (acc 0001104659-26-089296)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/0001104659-26-089296-index.htm"
+      },
+      "as_of": "2026-06-30"
     }
   ],
   "retired": [
