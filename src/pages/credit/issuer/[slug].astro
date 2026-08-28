@@ -264,7 +264,9 @@ function marks(pts: Pt[], sc: ReturnType<typeof scale>) {
       }
       if (pick) break;
     }
-    if (!pick) pick = { off: offs[0] ?? -10, lx: clampX(m.x) };
+    // No collision-free spot: drop the label rather than overlap — the dot
+    // still links to its card and the silo table names every instrument.
+    if (!pick) { m.loff = null as any; continue; }
     m.loff = pick.off;
     m.lx = pick.lx;
     placed.push(box(pick.off, pick.lx));
@@ -366,7 +368,7 @@ const hasOgCard = fs.existsSync(`public${ogCredit}`);
                 {m.conv
                   ? <circle cx={m.x} cy={m.y} r="4.5" class="pt-conv" />
                   : <circle cx={m.x} cy={m.y} r="4.5" class="pt" />}
-                {fLabels && <text x={m.lx} y={m.y + m.loff} class="ptl">{m.label}</text>}
+                {fLabels && m.loff != null && <text x={m.lx} y={m.y + m.loff} class="ptl">{m.label}</text>}
               </a>
             ))}
           </svg>
@@ -408,7 +410,7 @@ const hasOgCard = fs.existsSync(`public${ogCredit}`);
             {sMarks.map((m) => (
               <a href={`#${m.id}`} class="pt-link" aria-label={`Jump to ${m.label} details`}>
                 <circle cx={m.x} cy={m.y} r="4.5" class="pt" />
-                {sLabels && <text x={m.lx} y={m.y + m.loff} class="ptl">{m.label}</text>}
+                {sLabels && m.loff != null && <text x={m.lx} y={m.y + m.loff} class="ptl">{m.label}</text>}
               </a>
             ))}
           </svg>
@@ -474,6 +476,7 @@ const hasOgCard = fs.existsSync(`public${ogCredit}`);
                 {r.size_usd_m != null && <span class="size">${fmtSize(r.size_usd_m)}m</span>}
                 <span class="rate">{rateLabel(r.rate)}</span>
                 {r.issued && <span class="date">{/^\d/.test(String(r.issued)) ? `Entered ${r.issued}` : r.issued}</span>}
+                {r.resolved && <span class="resolved">Resolved {r.resolved}</span>}
               </div>
             </header>
 
@@ -587,6 +590,11 @@ const hasOgCard = fs.existsSync(`public${ogCredit}`);
     color: var(--ink-dim); margin-bottom: 12px;
   }
   .meta .size, .meta .rate { color: var(--ink); }
+  .meta .resolved {
+    color: var(--ink-dim); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 0 6px;
+    text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.72rem;
+  }
 
   dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 0; }
   dt {

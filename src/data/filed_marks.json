@@ -4,7 +4,7 @@
     "created": "2026-07-12",
     "description": "Lender-filed fair-value marks on compute-credit facilities, reproduced from SEC schedules of investments. CCIR reproduces marks as filed and computes only mark_pct = fair_value_k / principal_k * 100 (two filed numbers). Nothing here is a CCIR valuation.",
     "units": "USD_thousands",
-    "period": "2026-03-31",
+    "period": "2026-06-30",
     "conventions": {
       "mark_pct": "fair_value_k / principal_k * 100, rounded to 2dp; null when funded principal is 0",
       "maturity_as_filed": "reproduced verbatim per holder; conflicting filed maturities across holders are NOT reconciled",
@@ -13,7 +13,8 @@
       "level3": "row's fair value flagged as measured with significant unobservable inputs",
       "ccir_instrument_id": "see facility_map.json; null = unmapped"
     },
-    "provenance": "Rows verified against primary documents 2026-07-11/12; full-SOI extracts with 0.00% FV reconciliation in CCIR/scratch/filed_marks_seed/"
+    "provenance": "Rows verified against primary documents 2026-07-11/12; full-SOI extracts with 0.00% FV reconciliation in CCIR/scratch/filed_marks_seed/",
+    "refreshed": "2026-08-28 (Q2-2026 SOI sweep, all 13 holders; exits recorded in `exited`)"
   },
   "marks": [
     {
@@ -23,9 +24,9 @@
       "filer_kind": "bdc",
       "filing": {
         "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001702510-26-000049",
-        "url": "https://www.sec.gov/Archives/edgar/data/1702510/000170251026000049/cars-20260331.htm"
+        "period_end": "2026-06-30",
+        "accession": "0001702510-26-000084",
+        "url": "https://www.sec.gov/Archives/edgar/data/1702510/000170251026000084/cars-20260630.htm"
       },
       "borrower_entity": "CoreWeave Compute Acquisition Co. II, LLC",
       "ccir_instrument_id": "crwv-ddtl-1",
@@ -33,19 +34,19 @@
         "rate_kind": "float",
         "reference": "SOFR",
         "spread_pct": 9.62,
-        "all_in_pct": 13.31,
+        "all_in_pct": 13.35,
         "maturity_as_filed": "2028-07-30"
       },
-      "principal_k": 1267,
-      "cost_k": 1255,
-      "fair_value_k": 1280,
-      "mark_pct": 101.03,
+      "principal_k": 1145,
+      "cost_k": 1136,
+      "fair_value_k": 1157,
+      "mark_pct": 101.05,
       "level3": true,
       "transacted_qtr": false,
       "unfunded_k": null,
       "funded": true,
       "notes": "First lien; rate floor 0.50-1.00% (fn 3)",
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "holder": "Carlyle Credit Solutions, Inc.",
@@ -54,29 +55,29 @@
       "filer_kind": "bdc",
       "filing": {
         "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001702510-26-000049",
-        "url": "https://www.sec.gov/Archives/edgar/data/1702510/000170251026000049/cars-20260331.htm"
+        "period_end": "2026-06-30",
+        "accession": "0001702510-26-000084",
+        "url": "https://www.sec.gov/Archives/edgar/data/1702510/000170251026000084/cars-20260630.htm"
       },
       "borrower_entity": "CoreWeave Compute Acquisition Co. IV, LLC",
       "ccir_instrument_id": "crwv-ddtl-2",
       "tranche": {
         "rate_kind": "float",
         "reference": "SOFR",
-        "spread_pct": 6.0,
-        "all_in_pct": 9.67,
+        "spread_pct": 6,
+        "all_in_pct": 9.73,
         "maturity_as_filed": "2029-05-22"
       },
-      "principal_k": 17468,
-      "cost_k": 17280,
-      "fair_value_k": 17294,
-      "mark_pct": 99.0,
+      "principal_k": 12559,
+      "cost_k": 12429,
+      "fair_value_k": 12432,
+      "mark_pct": 98.99,
       "level3": true,
       "transacted_qtr": false,
       "unfunded_k": null,
       "funded": true,
       "notes": "First lien; par amortized from 19,885 at 12/31/2025",
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "holder": "Carlyle Secured Lending, Inc.",
@@ -85,9 +86,9 @@
       "filer_kind": "bdc",
       "filing": {
         "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001544206-26-000033",
-        "url": "https://www.sec.gov/Archives/edgar/data/1544206/000154420626000033/csl-20260331.htm"
+        "period_end": "2026-06-30",
+        "accession": "0001544206-26-000055",
+        "url": "https://www.sec.gov/Archives/edgar/data/1544206/000154420626000055/csl-20260630.htm"
       },
       "borrower_entity": "CoreWeave Compute Acquisition Co. II, LLC",
       "ccir_instrument_id": "crwv-ddtl-1",
@@ -95,19 +96,19 @@
         "rate_kind": "float",
         "reference": "SOFR",
         "spread_pct": 9.62,
-        "all_in_pct": 13.31,
+        "all_in_pct": 13.35,
         "maturity_as_filed": "2028-07-30"
       },
-      "principal_k": 2027,
-      "cost_k": 2023,
-      "fair_value_k": 2047,
-      "mark_pct": 100.99,
+      "principal_k": 1832,
+      "cost_k": 1829,
+      "fair_value_k": 1851,
+      "mark_pct": 101.04,
       "level3": true,
       "transacted_qtr": false,
       "unfunded_k": null,
       "funded": true,
       "notes": "First lien",
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "holder": "Carlyle Secured Lending, Inc.",
@@ -116,29 +117,29 @@
       "filer_kind": "bdc",
       "filing": {
         "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001544206-26-000033",
-        "url": "https://www.sec.gov/Archives/edgar/data/1544206/000154420626000033/csl-20260331.htm"
+        "period_end": "2026-06-30",
+        "accession": "0001544206-26-000055",
+        "url": "https://www.sec.gov/Archives/edgar/data/1544206/000154420626000055/csl-20260630.htm"
       },
       "borrower_entity": "CoreWeave Compute Acquisition Co. IV, LLC",
       "ccir_instrument_id": "crwv-ddtl-2",
       "tranche": {
         "rate_kind": "float",
         "reference": "SOFR",
-        "spread_pct": 6.0,
-        "all_in_pct": 9.67,
+        "spread_pct": 6,
+        "all_in_pct": 9.73,
         "maturity_as_filed": "2029-05-22"
       },
-      "principal_k": 23289,
-      "cost_k": 23048,
-      "fair_value_k": 23058,
-      "mark_pct": 99.01,
+      "principal_k": 16742,
+      "cost_k": 16576,
+      "fair_value_k": 16575,
+      "mark_pct": 99,
       "level3": true,
       "transacted_qtr": false,
       "unfunded_k": null,
       "funded": true,
       "notes": "First lien; par amortized from 26,511 at 12/31/2025",
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "holder": "Great Elm Capital Corp.",
@@ -147,9 +148,9 @@
       "filer_kind": "bdc",
       "filing": {
         "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001193125-26-204228",
-        "url": "https://www.sec.gov/Archives/edgar/data/1675033/000119312526204228/gecc-20260331.htm"
+        "period_end": "2026-06-30",
+        "accession": "0001193125-26-335023",
+        "url": "https://www.sec.gov/Archives/edgar/data/1675033/000119312526335023/gecc-20260630.htm"
       },
       "borrower_entity": "Coreweave Compute Acquisition Co. II, LLC",
       "ccir_instrument_id": "crwv-ddtl-1",
@@ -157,19 +158,19 @@
         "rate_kind": "float",
         "reference": "3M SOFR",
         "spread_pct": 9.62,
-        "all_in_pct": 13.3,
+        "all_in_pct": 13.29,
         "maturity_as_filed": "2028-07-31"
       },
-      "principal_k": 10938,
-      "cost_k": 10912,
-      "fair_value_k": 11157,
-      "mark_pct": 102.0,
+      "principal_k": 9888,
+      "cost_k": 9866,
+      "fair_value_k": 10234,
+      "mark_pct": 103.5,
       "level3": true,
       "transacted_qtr": false,
       "unfunded_k": null,
       "funded": true,
       "notes": "Filed maturity 7/31/2028 vs Carlyle's 7/30/2028 (as filed, not reconciled)",
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "holder": "Great Elm Capital Corp.",
@@ -178,29 +179,29 @@
       "filer_kind": "bdc",
       "filing": {
         "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001193125-26-204228",
-        "url": "https://www.sec.gov/Archives/edgar/data/1675033/000119312526204228/gecc-20260331.htm"
+        "period_end": "2026-06-30",
+        "accession": "0001193125-26-335023",
+        "url": "https://www.sec.gov/Archives/edgar/data/1675033/000119312526335023/gecc-20260630.htm"
       },
       "borrower_entity": "Coreweave Compute Acquisition Co. IV, LLC",
       "ccir_instrument_id": "crwv-ddtl-2",
       "tranche": {
         "rate_kind": "float",
         "reference": "3M SOFR",
-        "spread_pct": 6.0,
-        "all_in_pct": 9.67,
+        "spread_pct": 6,
+        "all_in_pct": 9.68,
         "maturity_as_filed": "2030-05-16"
       },
-      "principal_k": 2911,
-      "cost_k": 2878,
-      "fair_value_k": 2969,
-      "mark_pct": 102.0,
+      "principal_k": 2093,
+      "cost_k": 2070,
+      "fair_value_k": 2145,
+      "mark_pct": 102.48,
       "level3": true,
       "transacted_qtr": false,
       "unfunded_k": null,
       "funded": true,
       "notes": "FILED-MATURITY CONFLICT: GECC files 5/16/2030; PIMCO files 5/16/2029; Carlyle files 5/22/2029 — same facility per entity+spread. Reproduced as filed.",
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "holder": "PIMCO Capital Solutions BDC Corp.",
@@ -209,30 +210,30 @@
       "filer_kind": "bdc",
       "filing": {
         "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001193125-26-224212",
-        "url": "https://www.sec.gov/Archives/edgar/data/1905824/000119312526224212/d847475d10q.htm"
+        "period_end": "2026-06-30",
+        "accession": "0001193125-26-344935",
+        "url": "https://www.sec.gov/Archives/edgar/data/1905824/000119312526344935/d131047d10q.htm"
       },
       "borrower_entity": "CoreWeave Compute Acquisition Co. IV, LLC",
       "ccir_instrument_id": "crwv-ddtl-2",
       "tranche": {
         "rate_kind": "float",
         "reference": "SOFR",
-        "spread_pct": 6.0,
+        "spread_pct": 6,
         "all_in_pct": 9.7,
         "maturity_as_filed": "2029-05-16",
         "instrument": "Initial Term Loan"
       },
-      "principal_k": 2911,
-      "cost_k": 2911,
-      "fair_value_k": 3000,
-      "mark_pct": 103.06,
+      "principal_k": 2093,
+      "cost_k": 2093,
+      "fair_value_k": 2158,
+      "mark_pct": 103.11,
       "level3": true,
       "transacted_qtr": false,
       "unfunded_k": null,
       "funded": true,
       "notes": "Same par as GECC's Co. IV row (2,911) — likely identical participation, marked 103.06 vs GECC 102.00",
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "holder": "MSD Investment Corp.",
@@ -241,31 +242,413 @@
       "filer_kind": "bdc",
       "filing": {
         "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001193125-26-222241",
-        "url": "https://www.sec.gov/Archives/edgar/data/1849894/000119312526222241/ck0001849894-20260331.htm"
+        "period_end": "2026-06-30",
+        "accession": "0001193125-26-352436",
+        "url": "https://www.sec.gov/Archives/edgar/data/1849894/000119312526352436/ck0001849894-20260630.htm"
       },
       "borrower_entity": "CoreWeave (SOI label; commitment table: CoreWeave Compute Acquisition Co., IV, LLC)",
       "ccir_instrument_id": "crwv-ddtl-2",
       "tranche": {
         "rate_kind": "float",
         "reference": "SOFR",
-        "spread_pct": 6.0,
+        "spread_pct": 6,
         "all_in_pct": 9.66,
         "maturity_as_filed": "2030-08-26",
         "instrument": "Delayed Draw Term Loan"
       },
-      "principal_k": 30742,
-      "cost_k": 30403,
-      "fair_value_k": 30742,
-      "mark_pct": 100.0,
+      "principal_k": 26950,
+      "cost_k": 26669,
+      "fair_value_k": 26950,
+      "mark_pct": 100,
       "level3": true,
       "transacted_qtr": false,
       "unfunded_k": null,
       "funded": true,
-      "notes": "Blended rate across multiple contracts (fn 6). Mapped to DDTL 2.0 on documentary basis: entity (CCAC IV LLC per commitment table), spread (grid low S+6.00), and maturity 2030-08-26 matching the ledger facility final (2030-08); Carlyle/GECC/PIMCO file per-draw maturities on the same facility.",
-      "as_of": "2026-03-31"
+      "notes": "Blended rate across multiple contracts (fn 6). Mapped to DDTL 2.0 on documentary basis: entity (CCAC IV LLC per commitment table), spread (grid low S+6.00), and maturity 2030-08-26 matching the ledger facility final (2030-08); Carlyle/GECC/PIMCO file per-draw maturities on the same facility. Q2-26: industry label reclassified High Tech Industries -> Software & Services; FV = principal held at 100.00. Maturity as filed 8/26/2030.",
+      "as_of": "2026-06-30"
     },
+    {
+      "holder": "Monroe Capital Income Plus Corporation",
+      "holder_cik": "0001742313",
+      "adviser": "Monroe",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001742313-26-000046",
+        "url": "https://www.sec.gov/Archives/edgar/data/1742313/000174231326000046/mcip-20260630.htm"
+      },
+      "borrower_entity": "Crusoe Energy Systems LLC",
+      "ccir_instrument_id": null,
+      "tranche": {
+        "rate_kind": "fixed",
+        "reference": "fixed",
+        "spread_pct": null,
+        "all_in_pct": 16.25,
+        "maturity_as_filed": "2029-11-13",
+        "instrument": "Senior secured loan (Tranche II per LAGO's labeling)"
+      },
+      "principal_k": 2289,
+      "cost_k": 2319,
+      "fair_value_k": 2317,
+      "mark_pct": 101.22,
+      "level3": true,
+      "transacted_qtr": true,
+      "unfunded_k": null,
+      "funded": true,
+      "notes": "Position reduced ~83% during Q1-2026 (27.0M -> 4.6M principal across both tranches); acquisition date 11/13/2025. No matching ledger row — candidate NEW instrument Q2-26 filed coupon 16.25% (was 15.00% at 3/31 and 12/31, no footnote); LAGO files 15% on the identical tranche same date — as-filed conflict, reproduced not reconciled.",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "Monroe Capital Income Plus Corporation",
+      "holder_cik": "0001742313",
+      "adviser": "Monroe",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001742313-26-000046",
+        "url": "https://www.sec.gov/Archives/edgar/data/1742313/000174231326000046/mcip-20260630.htm"
+      },
+      "borrower_entity": "Crusoe Energy Systems LLC",
+      "ccir_instrument_id": null,
+      "tranche": {
+        "rate_kind": "fixed",
+        "reference": "fixed",
+        "spread_pct": null,
+        "all_in_pct": 14.25,
+        "maturity_as_filed": "2029-11-13",
+        "instrument": "Senior secured loan (Tranche III per LAGO's labeling)"
+      },
+      "principal_k": 1885,
+      "cost_k": 1912,
+      "fair_value_k": 1857,
+      "mark_pct": 98.51,
+      "level3": true,
+      "transacted_qtr": true,
+      "unfunded_k": null,
+      "funded": true,
+      "notes": "Marked below par and below cost after Q1 sale; was 102.0 at 12/31/2025. Seller-vs-holder gap vs LAGO: 4.15 pts Q2-26 filed coupon 14.25% (was 13.00%); LAGO files 13% same date — as-filed conflict. Below par and below cost.",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "LAGO Evergreen Credit",
+      "holder_cik": "0002043759",
+      "adviser": "LAGO",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001193125-26-342657",
+        "url": "https://www.sec.gov/Archives/edgar/data/2043759/000119312526342657/ck0002043759-20260630.htm"
+      },
+      "borrower_entity": "Crusoe Energy Systems",
+      "ccir_instrument_id": null,
+      "tranche": {
+        "rate_kind": "fixed",
+        "reference": "fixed",
+        "spread_pct": null,
+        "all_in_pct": 15,
+        "maturity_as_filed": "2029-11-13",
+        "instrument": "First lien senior secured term loan - Tranche II"
+      },
+      "principal_k": 3802.7,
+      "cost_k": 3866,
+      "fair_value_k": 3831.1,
+      "mark_pct": 100.75,
+      "level3": true,
+      "transacted_qtr": false,
+      "unfunded_k": null,
+      "funded": true,
+      "notes": "FV = amortized cost exactly, both quarters (cost-anchored) Q2-26: first quarter FV != amortized cost (marked below cost) after two quarters of FV = cost exactly.",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "LAGO Evergreen Credit",
+      "holder_cik": "0002043759",
+      "adviser": "LAGO",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001193125-26-342657",
+        "url": "https://www.sec.gov/Archives/edgar/data/2043759/000119312526342657/ck0002043759-20260630.htm"
+      },
+      "borrower_entity": "Crusoe Energy Systems",
+      "ccir_instrument_id": null,
+      "tranche": {
+        "rate_kind": "fixed",
+        "reference": "fixed",
+        "spread_pct": null,
+        "all_in_pct": 13,
+        "maturity_as_filed": "2029-11-13",
+        "instrument": "First lien senior secured term loan - Tranche III"
+      },
+      "principal_k": 3132.8,
+      "cost_k": 3215.7,
+      "fair_value_k": 3180.3,
+      "mark_pct": 101.52,
+      "level3": true,
+      "transacted_qtr": false,
+      "unfunded_k": null,
+      "funded": true,
+      "notes": "FV = amortized cost exactly, both quarters (cost-anchored) Q2-26: FV below cost for the first time (cost-anchor broke).",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "Blackstone Secured Lending Fund",
+      "holder_cik": "0001736035",
+      "adviser": "Blackstone",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001736035-26-000016",
+        "url": "https://www.sec.gov/Archives/edgar/data/1736035/000173603526000016/bxsl-20260630.htm"
+      },
+      "borrower_entity": "Firmus Supercloud Pty Ltd",
+      "ccir_instrument_id": null,
+      "tranche": {
+        "rate_kind": "float",
+        "reference": "SOFR",
+        "spread_pct": 5.13,
+        "all_in_pct": 8.77,
+        "maturity_as_filed": "2032-03-15",
+        "instrument": "Delayed Draw Term Loan commitment; draw window expires 2027-03-15"
+      },
+      "principal_k": 19125,
+      "cost_k": 18736,
+      "fair_value_k": 17763,
+      "mark_pct": 92.88,
+      "level3": true,
+      "transacted_qtr": false,
+      "unfunded_k": 58732,
+      "funded": true,
+      "notes": "Wholly unfunded at 3/31/2026; FV of commitment $0; new in Q1-2026 (absent from FY2025 10-K). Candidate mapping: firmus-southgate-blackstone slice — unverified. First funded mark would print in Q2-2026 10-Q First funded print: $19,125K drawn 4/21/26 of the prior wholly-unfunded $77,858K commitment; marked 92.9 on principal / 94.8 on cost — a genuine below-cost mark. Rate floor 0.50%.",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "Blue Owl Capital Corp",
+      "holder_cik": "0001655888",
+      "adviser": "Blue Owl",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001655888-26-000056",
+        "url": "https://www.sec.gov/Archives/edgar/data/1655888/000165588826000056/obdc-20260630.htm"
+      },
+      "borrower_entity": "NSCALE SERVICES UK LTD",
+      "ccir_instrument_id": "nscale-ddtl",
+      "tranche": {
+        "rate_kind": "float",
+        "reference": "3M SOFR",
+        "spread_pct": 5,
+        "all_in_pct": 8.68,
+        "maturity_as_filed": "2031-02",
+        "instrument": "First lien senior secured DDTL; commitment $40.0M; draw window to 8/2027"
+      },
+      "principal_k": 1397,
+      "cost_k": 831,
+      "fair_value_k": 900,
+      "mark_pct": 64.42,
+      "level3": true,
+      "transacted_qtr": false,
+      "unfunded_k": 38344,
+      "funded": true,
+      "notes": "mark_pct is NOT a credit markdown: FV = 100% of cost; commitment-level OID/fees netted against small funded balance. Mapping to nscale-ddtl ($1.4B Feb-2026 facility) pending verification. New in Q1-2026 Q2-26: net paydown (~15-16% of funded principal); FV above amortized cost for the first time (was FV = cost at 3/31). Sub-par mark_pct remains commitment-OID/fee netting on a small funded balance, not a credit markdown.",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "Blue Owl Credit Income Corp.",
+      "holder_cik": "0001812554",
+      "adviser": "Blue Owl",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001812554-26-000047",
+        "url": "https://www.sec.gov/Archives/edgar/data/1812554/000181255426000047/orcic-20260630.htm"
+      },
+      "borrower_entity": "NSCALE SERVICES UK LTD",
+      "ccir_instrument_id": "nscale-ddtl",
+      "tranche": {
+        "rate_kind": "float",
+        "reference": "3M SOFR",
+        "spread_pct": 5,
+        "all_in_pct": 8.68,
+        "maturity_as_filed": "2031-02",
+        "instrument": "First lien senior secured DDTL; commitment $160.0M; draw window to 8/2027"
+      },
+      "principal_k": 5587,
+      "cost_k": 3325,
+      "fair_value_k": 3600,
+      "mark_pct": 64.44,
+      "level3": true,
+      "transacted_qtr": false,
+      "unfunded_k": 153377,
+      "funded": true,
+      "notes": "Same OID/fee-netting caveat as OBDC row; FV = 100% of cost Q2-26: net paydown (~15-16% of funded principal); FV above amortized cost for the first time (was FV = cost at 3/31). Sub-par mark_pct remains commitment-OID/fee netting on a small funded balance, not a credit markdown.",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "Blue Owl Technology Finance Corp.",
+      "holder_cik": "0001747777",
+      "adviser": "Blue Owl",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001747777-26-000028",
+        "url": "https://www.sec.gov/Archives/edgar/data/1747777/000174777726000028/ortf-20260630.htm"
+      },
+      "borrower_entity": "NSCALE SERVICES UK LTD",
+      "ccir_instrument_id": "nscale-ddtl",
+      "tranche": {
+        "rate_kind": "float",
+        "reference": "3M SOFR",
+        "spread_pct": 5,
+        "all_in_pct": 8.68,
+        "maturity_as_filed": "2031-02",
+        "instrument": "First lien senior secured DDTL; commitment $200.0M; draw window to 8/2027"
+      },
+      "principal_k": 6984,
+      "cost_k": 4003,
+      "fair_value_k": 4500,
+      "mark_pct": 64.43,
+      "level3": true,
+      "transacted_qtr": false,
+      "unfunded_k": 191722,
+      "funded": true,
+      "notes": "Largest Blue Owl BDC piece; same OID/fee-netting caveat; FV = 100% of cost Q2-26: net paydown (~15-16% of funded principal); FV above amortized cost for the first time (was FV = cost at 3/31). Sub-par mark_pct remains commitment-OID/fee netting on a small funded balance, not a credit markdown.",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "Trinity Capital Inc.",
+      "holder_cik": "0001786108",
+      "adviser": "Trinity",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001193125-26-333907",
+        "url": "https://www.sec.gov/Archives/edgar/data/1786108/000119312526333907/trin-20260630.htm"
+      },
+      "borrower_entity": "Together Computer, Inc.",
+      "ccir_instrument_id": null,
+      "tranche": {
+        "rate_kind": "fixed",
+        "reference": null,
+        "spread_pct": null,
+        "all_in_pct": 11,
+        "maturity_as_filed": "2029-07-01"
+      },
+      "principal_k": 49397,
+      "cost_k": 49158,
+      "fair_value_k": 49158,
+      "mark_pct": 99.52,
+      "level3": true,
+      "transacted_qtr": true,
+      "unfunded_k": 0,
+      "funded": true,
+      "notes": "NEW Q2-26: equipment financing, fixed 11.0% + EOT 4.5%, invested 6/29/26 (one day before quarter end, so FV = cost). Trinity’s largest compute equipment financing; replaces the rolled-off Applied Digital vintages.",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "Eagle Point Trinity Senior Secured Lending Co",
+      "holder_cik": "0002027033",
+      "adviser": "Eagle Point / Trinity",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0002027033-26-000011",
+        "url": "https://www.sec.gov/Archives/edgar/data/2027033/000202703326000011/ept-20260630.htm"
+      },
+      "borrower_entity": "Together Computer, Inc.",
+      "ccir_instrument_id": null,
+      "tranche": {
+        "rate_kind": "fixed",
+        "reference": null,
+        "spread_pct": null,
+        "all_in_pct": 11,
+        "maturity_as_filed": "2029-07-01"
+      },
+      "principal_k": 1528,
+      "cost_k": 1520,
+      "fair_value_k": 1520,
+      "mark_pct": 99.48,
+      "level3": true,
+      "transacted_qtr": true,
+      "unfunded_k": 0,
+      "funded": true,
+      "notes": "NEW Q2-26: participation alongside Trinity’s $49.4M piece; same terms (11.0% fixed, EOT 4.5%, 7/1/29).",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "Great Elm Capital Corp.",
+      "holder_cik": "0001675033",
+      "adviser": "Great Elm",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001193125-26-335023",
+        "url": "https://www.sec.gov/Archives/edgar/data/1675033/000119312526335023/gecc-20260630.htm"
+      },
+      "borrower_entity": "Coreweave Financing DDTL V, LLC",
+      "ccir_instrument_id": "crwv-ddtl-5",
+      "tranche": {
+        "rate_kind": "float",
+        "reference": "1M SOFR",
+        "spread_pct": 4.5,
+        "all_in_pct": 8.12,
+        "maturity_as_filed": "2031-11-14"
+      },
+      "principal_k": 2664,
+      "cost_k": 2590,
+      "fair_value_k": 2812,
+      "mark_pct": 105.56,
+      "level3": true,
+      "transacted_qtr": true,
+      "unfunded_k": 4836,
+      "funded": true,
+      "notes": "NEW Q2-26: first BDC mark on DDTL 5.0 — acquired 5/6/26, marked 105.56 with $4.8M still unfunded.",
+      "as_of": "2026-06-30"
+    },
+    {
+      "holder": "Great Elm Capital Corp.",
+      "holder_cik": "0001675033",
+      "adviser": "Great Elm",
+      "filer_kind": "bdc",
+      "filing": {
+        "form": "10-Q",
+        "period_end": "2026-06-30",
+        "accession": "0001193125-26-335023",
+        "url": "https://www.sec.gov/Archives/edgar/data/1675033/000119312526335023/gecc-20260630.htm"
+      },
+      "borrower_entity": "Coreweave, Inc.",
+      "ccir_instrument_id": "crwv-notes-9625-2032",
+      "tranche": {
+        "rate_kind": "fixed",
+        "reference": null,
+        "spread_pct": null,
+        "all_in_pct": 9.63,
+        "maturity_as_filed": "2032-07-15"
+      },
+      "principal_k": 2000,
+      "cost_k": 2000,
+      "fair_value_k": 1973,
+      "mark_pct": 98.65,
+      "level3": false,
+      "transacted_qtr": true,
+      "unfunded_k": 0,
+      "funded": true,
+      "notes": "NEW Q2-26: first unsecured CoreWeave corporate bond mark in the holder set — 9.63% unsecured bond due 7/15/2032, acquired 6/11/26, marked 98.65.",
+      "as_of": "2026-06-30"
+    }
+  ],
+  "exited": [
     {
       "holder": "MSD Investment Corp.",
       "holder_cik": "0001849894",
@@ -296,135 +679,9 @@
       "unfunded_k": null,
       "funded": true,
       "notes": "FV = cost. Spread 4.25 + maturity 2030-09-29 (= ledger issue date 2025-09-29 + 5y) matches DDTL 2.1. ~$10.2M drawn during Q1 (12/31 unfunded commitment 10,168 expired 3/31/2026)",
-      "as_of": "2026-03-31"
-    },
-    {
-      "holder": "Monroe Capital Income Plus Corporation",
-      "holder_cik": "0001742313",
-      "adviser": "Monroe",
-      "filer_kind": "bdc",
-      "filing": {
-        "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001742313-26-000026",
-        "url": "https://www.sec.gov/Archives/edgar/data/1742313/000174231326000026/mcip-20260331.htm"
-      },
-      "borrower_entity": "Crusoe Energy Systems LLC",
-      "ccir_instrument_id": null,
-      "tranche": {
-        "rate_kind": "fixed",
-        "reference": "fixed",
-        "spread_pct": null,
-        "all_in_pct": 15.0,
-        "maturity_as_filed": "2029-11-13",
-        "instrument": "Senior secured loan (Tranche II per LAGO's labeling)"
-      },
-      "principal_k": 2535,
-      "cost_k": 2582,
-      "fair_value_k": 2569,
-      "mark_pct": 101.34,
-      "level3": true,
-      "transacted_qtr": true,
-      "unfunded_k": null,
-      "funded": true,
-      "notes": "Position reduced ~83% during Q1-2026 (27.0M -> 4.6M principal across both tranches); acquisition date 11/13/2025. No matching ledger row — candidate NEW instrument",
-      "as_of": "2026-03-31"
-    },
-    {
-      "holder": "Monroe Capital Income Plus Corporation",
-      "holder_cik": "0001742313",
-      "adviser": "Monroe",
-      "filer_kind": "bdc",
-      "filing": {
-        "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001742313-26-000026",
-        "url": "https://www.sec.gov/Archives/edgar/data/1742313/000174231326000026/mcip-20260331.htm"
-      },
-      "borrower_entity": "Crusoe Energy Systems LLC",
-      "ccir_instrument_id": null,
-      "tranche": {
-        "rate_kind": "fixed",
-        "reference": "fixed",
-        "spread_pct": null,
-        "all_in_pct": 13.0,
-        "maturity_as_filed": "2029-11-13",
-        "instrument": "Senior secured loan (Tranche III per LAGO's labeling)"
-      },
-      "principal_k": 2088,
-      "cost_k": 2123,
-      "fair_value_k": 2054,
-      "mark_pct": 98.37,
-      "level3": true,
-      "transacted_qtr": true,
-      "unfunded_k": null,
-      "funded": true,
-      "notes": "Marked below par and below cost after Q1 sale; was 102.0 at 12/31/2025. Seller-vs-holder gap vs LAGO: 4.15 pts",
-      "as_of": "2026-03-31"
-    },
-    {
-      "holder": "LAGO Evergreen Credit",
-      "holder_cik": "0002043759",
-      "adviser": "LAGO",
-      "filer_kind": "bdc",
-      "filing": {
-        "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001193125-26-212445",
-        "url": "https://www.sec.gov/Archives/edgar/data/2043759/000119312526212445/ck0002043759-20260331.htm"
-      },
-      "borrower_entity": "Crusoe Energy Systems",
-      "ccir_instrument_id": null,
-      "tranche": {
-        "rate_kind": "fixed",
-        "reference": "fixed",
-        "spread_pct": null,
-        "all_in_pct": 15.0,
-        "maturity_as_filed": "2029-11-13",
-        "instrument": "First lien senior secured term loan - Tranche II"
-      },
-      "principal_k": 4227.2,
-      "cost_k": 4296.5,
-      "fair_value_k": 4296.5,
-      "mark_pct": 101.64,
-      "level3": true,
-      "transacted_qtr": false,
-      "unfunded_k": null,
-      "funded": true,
-      "notes": "FV = amortized cost exactly, both quarters (cost-anchored)",
-      "as_of": "2026-03-31"
-    },
-    {
-      "holder": "LAGO Evergreen Credit",
-      "holder_cik": "0002043759",
-      "adviser": "LAGO",
-      "filer_kind": "bdc",
-      "filing": {
-        "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001193125-26-212445",
-        "url": "https://www.sec.gov/Archives/edgar/data/2043759/000119312526212445/ck0002043759-20260331.htm"
-      },
-      "borrower_entity": "Crusoe Energy Systems",
-      "ccir_instrument_id": null,
-      "tranche": {
-        "rate_kind": "fixed",
-        "reference": "fixed",
-        "spread_pct": null,
-        "all_in_pct": 13.0,
-        "maturity_as_filed": "2029-11-13",
-        "instrument": "First lien senior secured term loan - Tranche III"
-      },
-      "principal_k": 3482.5,
-      "cost_k": 3570.2,
-      "fair_value_k": 3570.2,
-      "mark_pct": 102.52,
-      "level3": true,
-      "transacted_qtr": false,
-      "unfunded_k": null,
-      "funded": true,
-      "notes": "FV = amortized cost exactly, both quarters (cost-anchored)",
-      "as_of": "2026-03-31"
+      "as_of": "2026-03-31",
+      "exited": "2026-Q2",
+      "exit_note": "Absent from the 6/30/26 SOI; present at 3/31/26 at $117.8M principal. No narrative disclosure of the disposition anywhere in the Q2 10-Q — a silent exit of MSD’s largest CoreWeave exposure. Repayment vs sale undetermined."
     },
     {
       "holder": "Trinity Capital Inc.",
@@ -443,7 +700,7 @@
         "rate_kind": "fixed",
         "reference": "fixed",
         "spread_pct": null,
-        "all_in_pct": 19.0,
+        "all_in_pct": 19,
         "maturity_as_filed": "2026-04-01",
         "instrument": "Equipment Financing (Apr 2024 vintage)"
       },
@@ -456,7 +713,9 @@
       "unfunded_k": null,
       "funded": true,
       "notes": "EPT owns an additional portion (fn 19); amortizing out Apr/May-2026",
-      "as_of": "2026-03-31"
+      "as_of": "2026-03-31",
+      "exited": "2026-Q2",
+      "exit_note": "Equipment-financing vintages matured/amortized to zero on schedule (maturities 3/1/26-5/1/26); absent from the 6/30/26 SOI."
     },
     {
       "holder": "Trinity Capital Inc.",
@@ -475,7 +734,7 @@
         "rate_kind": "fixed",
         "reference": "fixed",
         "spread_pct": null,
-        "all_in_pct": 16.0,
+        "all_in_pct": 16,
         "maturity_as_filed": "2026-05-01",
         "instrument": "Equipment Financing (May 2024 vintage)"
       },
@@ -488,7 +747,9 @@
       "unfunded_k": null,
       "funded": true,
       "notes": null,
-      "as_of": "2026-03-31"
+      "as_of": "2026-03-31",
+      "exited": "2026-Q2",
+      "exit_note": "Equipment-financing vintages matured/amortized to zero on schedule (maturities 3/1/26-5/1/26); absent from the 6/30/26 SOI."
     },
     {
       "holder": "Trinity Capital Inc.",
@@ -507,7 +768,7 @@
         "rate_kind": "fixed",
         "reference": "fixed",
         "spread_pct": null,
-        "all_in_pct": 19.0,
+        "all_in_pct": 19,
         "maturity_as_filed": "2026-04-01",
         "instrument": "Equipment Financing (Jun 2024 vintage)"
       },
@@ -520,7 +781,9 @@
       "unfunded_k": null,
       "funded": true,
       "notes": null,
-      "as_of": "2026-03-31"
+      "as_of": "2026-03-31",
+      "exited": "2026-Q2",
+      "exit_note": "Equipment-financing vintages matured/amortized to zero on schedule (maturities 3/1/26-5/1/26); absent from the 6/30/26 SOI."
     },
     {
       "holder": "Eagle Point Trinity Senior Secured Lending Co",
@@ -539,7 +802,7 @@
         "rate_kind": "fixed",
         "reference": "fixed",
         "spread_pct": null,
-        "all_in_pct": 19.0,
+        "all_in_pct": 19,
         "maturity_as_filed": "2026-04-01",
         "instrument": "Equipment Financing (Jun 2024 vintage, EPT purchase 6/28/2024)"
       },
@@ -552,7 +815,9 @@
       "unfunded_k": null,
       "funded": true,
       "notes": "Participation in TRIN-originated financing",
-      "as_of": "2026-03-31"
+      "as_of": "2026-03-31",
+      "exited": "2026-Q2",
+      "exit_note": "Equipment-financing vintages matured/amortized to zero on schedule (maturities 3/1/26-5/1/26); absent from the 6/30/26 SOI."
     },
     {
       "holder": "Eagle Point Trinity Senior Secured Lending Co",
@@ -571,7 +836,7 @@
         "rate_kind": "fixed",
         "reference": "fixed",
         "spread_pct": null,
-        "all_in_pct": 19.0,
+        "all_in_pct": 19,
         "maturity_as_filed": "2026-04-01",
         "instrument": "Equipment Financing (EPT purchase 11/19/2024)"
       },
@@ -584,135 +849,9 @@
       "unfunded_k": null,
       "funded": true,
       "notes": null,
-      "as_of": "2026-03-31"
-    },
-    {
-      "holder": "Blackstone Secured Lending Fund",
-      "holder_cik": "0001736035",
-      "adviser": "Blackstone",
-      "filer_kind": "bdc",
-      "filing": {
-        "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001736035-26-000010",
-        "url": "https://www.sec.gov/Archives/edgar/data/1736035/000173603526000010/bxsl-20260331.htm"
-      },
-      "borrower_entity": "Firmus Supercloud Pty Ltd",
-      "ccir_instrument_id": null,
-      "tranche": {
-        "rate_kind": null,
-        "reference": null,
-        "spread_pct": null,
-        "all_in_pct": null,
-        "maturity_as_filed": null,
-        "instrument": "Delayed Draw Term Loan commitment; draw window expires 2027-03-15"
-      },
-      "principal_k": 0,
-      "cost_k": null,
-      "fair_value_k": 0,
-      "mark_pct": null,
-      "level3": true,
-      "transacted_qtr": false,
-      "unfunded_k": 77858,
-      "funded": false,
-      "notes": "Wholly unfunded at 3/31/2026; FV of commitment $0; new in Q1-2026 (absent from FY2025 10-K). Candidate mapping: firmus-southgate-blackstone slice — unverified. First funded mark would print in Q2-2026 10-Q",
-      "as_of": "2026-03-31"
-    },
-    {
-      "holder": "Blue Owl Capital Corp",
-      "holder_cik": "0001655888",
-      "adviser": "Blue Owl",
-      "filer_kind": "bdc",
-      "filing": {
-        "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001655888-26-000033",
-        "url": "https://www.sec.gov/Archives/edgar/data/1655888/000165588826000033/obdc-20260331.htm"
-      },
-      "borrower_entity": "NSCALE SERVICES UK LTD",
-      "ccir_instrument_id": "nscale-ddtl",
-      "tranche": {
-        "rate_kind": "float",
-        "reference": "3M SOFR",
-        "spread_pct": 5.0,
-        "all_in_pct": 8.68,
-        "maturity_as_filed": "2031-02",
-        "instrument": "First lien senior secured DDTL; commitment $40.0M; draw window to 8/2027"
-      },
-      "principal_k": 1656,
-      "cost_k": 1056,
-      "fair_value_k": 1056,
-      "mark_pct": 63.77,
-      "level3": true,
-      "transacted_qtr": false,
-      "unfunded_k": 38344,
-      "funded": true,
-      "notes": "mark_pct is NOT a credit markdown: FV = 100% of cost; commitment-level OID/fees netted against small funded balance. Mapping to nscale-ddtl ($1.4B Feb-2026 facility) pending verification. New in Q1-2026",
-      "as_of": "2026-03-31"
-    },
-    {
-      "holder": "Blue Owl Credit Income Corp.",
-      "holder_cik": "0001812554",
-      "adviser": "Blue Owl",
-      "filer_kind": "bdc",
-      "filing": {
-        "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001812554-26-000027",
-        "url": "https://www.sec.gov/Archives/edgar/data/1812554/000181255426000027/orcic-20260331.htm"
-      },
-      "borrower_entity": "NSCALE SERVICES UK LTD",
-      "ccir_instrument_id": "nscale-ddtl",
-      "tranche": {
-        "rate_kind": "float",
-        "reference": "3M SOFR",
-        "spread_pct": 5.0,
-        "all_in_pct": 8.68,
-        "maturity_as_filed": "2031-02",
-        "instrument": "First lien senior secured DDTL; commitment $160.0M; draw window to 8/2027"
-      },
-      "principal_k": 6623,
-      "cost_k": 4223,
-      "fair_value_k": 4223,
-      "mark_pct": 63.76,
-      "level3": true,
-      "transacted_qtr": false,
-      "unfunded_k": 153377,
-      "funded": true,
-      "notes": "Same OID/fee-netting caveat as OBDC row; FV = 100% of cost",
-      "as_of": "2026-03-31"
-    },
-    {
-      "holder": "Blue Owl Technology Finance Corp.",
-      "holder_cik": "0001747777",
-      "adviser": "Blue Owl",
-      "filer_kind": "bdc",
-      "filing": {
-        "form": "10-Q",
-        "period_end": "2026-03-31",
-        "accession": "0001747777-26-000019",
-        "url": "https://www.sec.gov/Archives/edgar/data/1747777/000174777726000019/ortf-20260331.htm"
-      },
-      "borrower_entity": "NSCALE SERVICES UK LTD",
-      "ccir_instrument_id": "nscale-ddtl",
-      "tranche": {
-        "rate_kind": "float",
-        "reference": "3M SOFR",
-        "spread_pct": 5.0,
-        "all_in_pct": 8.68,
-        "maturity_as_filed": "2031-02",
-        "instrument": "First lien senior secured DDTL; commitment $200.0M; draw window to 8/2027"
-      },
-      "principal_k": 8278,
-      "cost_k": 5278,
-      "fair_value_k": 5278,
-      "mark_pct": 63.76,
-      "level3": true,
-      "transacted_qtr": false,
-      "unfunded_k": 191722,
-      "funded": true,
-      "notes": "Largest Blue Owl BDC piece; same OID/fee-netting caveat; FV = 100% of cost",
-      "as_of": "2026-03-31"
+      "as_of": "2026-03-31",
+      "exited": "2026-Q2",
+      "exit_note": "Equipment-financing vintages matured/amortized to zero on schedule (maturities 3/1/26-5/1/26); absent from the 6/30/26 SOI."
     }
   ]
 }
