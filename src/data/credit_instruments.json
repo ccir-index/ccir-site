@@ -1678,11 +1678,11 @@
       "entity": "ChronoScale Holdings Corporation (assumed from Ekso Bionics Holdings)",
       "name": "B. Riley Secured Promissory Note",
       "instrument_type": "credit_facility",
-      "size_usd_m": 2.0,
+      "size_usd_m": 2,
       "size_note": "Secured term loan of up to $2.0M; $2.0M principal outstanding at the date of the 10-K. Recorded at an acquisition-date fair value of $2.239M under ASC 805. B. Riley may elect to convert principal, interest and the exit fee into equity in a qualified financing at the lead investor's price per share. Assumed in the 2026-05-05 business combination; originally entered by Legacy Ekso in September 2025.",
       "rate": {
         "kind": "fixed",
-        "value": 10.0,
+        "value": 10,
         "note": "10% per annum, payable in full at maturity, plus an exit fee of 10% of the original principal ($0.2M) due at maturity. Prepayment requires payment of all interest that would have accrued through maturity plus the proportionate exit fee."
       },
       "maturity": "2026-09-14",
@@ -2343,30 +2343,30 @@
       "issuer": "IREN Limited",
       "ticker": "IREN",
       "issuer_type": "public",
-      "entity": null,
+      "entity": "IE Mackenzie Compute Ltd. (borrower; BC subsidiary)",
       "name": "Mackenzie Term Loan (Blue Owl-led $2.4B GPU package, senior secured)",
       "instrument_type": "credit_facility",
       "size_usd_m": 1200,
-      "size_note": "$2.4B package = $1.2B senior secured term loan + $1.2B senior secured notes (Blue Owl release 8/28/26). Funds purchase of air-cooled NVIDIA compute incl. Blackwell Ultra GPUs for the Mackenzie campus (British Columbia); drawn in tranches over a defined draw period against equipment delivery and commissioning. IREN FY26 results (8-K Ex-99.1, 8/27/26): 9.0% fixed rate on the package; funds 90% of associated GPU capex; part of $2.8B of GPU financings supporting non-investment-grade customer deployments.",
+      "size_note": "$2.4B package signed 2026-08-25 = ~$1.2B MFSA (master financing and security agreement) + ~$1.2B senior secured notes. Pro-rata draws on equipment acceptance; funds air-cooled NVIDIA compute incl. Blackwell Ultra for Mackenzie (BC). IREN FY26 results: 9.0% fixed on the package; funds 90% of associated GPU capex; part of $2.8B GPU financings supporting non-IG customer deployments.",
       "rate": {
         "kind": "fixed",
         "value": 9,
         "note": "9.0% fixed per IREN FY26 results release (package-level rate)"
       },
       "maturity": null,
-      "maturity_note": "Undisclosed",
-      "seniority": "Senior secured",
-      "security": "Compute equipment financing (financed GPUs); collateral detail not yet disclosed",
+      "maturity_note": "Each draw matures 30 months after its funding date; amortizing per schedule. Draws available through 2026-12-31.",
+      "seniority": "Senior secured, subsidiary-level; unconditional IREN Limited payment guaranty (payment only; no financial maintenance covenants; no parent security granted)",
+      "security": "First-priority security interest in the financed equipment (Mackenzie GPUs and ancillary equipment) and associated rights, BC law",
       "lenders": [
-        "Blue Owl-managed funds (lead)",
-        "Pacific Investment Management Company LLC (adviser to certain investors)"
+        "Blue Owl Capital Corporation (OBDC) — admin/collateral/intercreditor agent, lender",
+        "Blue Owl-managed funds"
       ],
       "status": "confirmed",
-      "issued": "2026-08-28",
+      "issued": "2026-08-25",
       "source": {
-        "doc": "IREN FY26 results 8-K Ex-99.1 (8/27/26); Blue Owl release 8/28/26",
-        "date": "2026-08-28",
-        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000051/irenreportsfy26results.htm"
+        "doc": "FY26 10-K subsequent events (filed 8/27/26); Blue Owl + IREN releases 8/27-28",
+        "date": "2026-08-27",
+        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm"
       },
       "as_of": "2026-08-28"
     },
@@ -2376,30 +2376,30 @@
       "issuer": "IREN Limited",
       "ticker": "IREN",
       "issuer_type": "public",
-      "entity": null,
+      "entity": "IE Mackenzie Compute Ltd. (borrower; BC subsidiary)",
       "name": "Mackenzie Notes (Blue Owl-led $2.4B GPU package, senior secured)",
       "instrument_type": "bond",
       "size_usd_m": 1200,
-      "size_note": "$2.4B package = $1.2B senior secured term loan + $1.2B senior secured notes (Blue Owl release 8/28/26). Same purpose and draw mechanics as the term loan leg.",
+      "size_note": "$2.4B package signed 2026-08-25 = ~$1.2B MFSA + ~$1.2B senior secured notes under a Note Purchase Agreement; intercreditor agreement across both legs. Same draw mechanics and rate as the MFSA leg.",
       "rate": {
         "kind": "fixed",
         "value": 9,
         "note": "9.0% fixed per IREN FY26 results release (package-level rate)"
       },
       "maturity": null,
-      "maturity_note": "Undisclosed",
-      "seniority": "Senior secured",
-      "security": "Compute equipment financing (financed GPUs); collateral detail not yet disclosed",
+      "maturity_note": "Each draw matures 30 months after its funding date; amortizing per schedule. Draws available through 2026-12-31.",
+      "seniority": "Senior secured, subsidiary-level; unconditional IREN Limited payment guaranty (payment only; no financial maintenance covenants; no parent security granted)",
+      "security": "First-priority security interest in the financed equipment (Mackenzie GPUs and ancillary equipment) and associated rights, BC law",
       "lenders": [
-        "Blue Owl-managed funds (lead)",
-        "Pacific Investment Management Company LLC (adviser to certain investors)"
+        "Institutional purchasers (PIMCO as adviser to certain purchasers)",
+        "Blue Owl Capital Corporation (OBDC) — note agent"
       ],
       "status": "confirmed",
-      "issued": "2026-08-28",
+      "issued": "2026-08-25",
       "source": {
-        "doc": "IREN FY26 results 8-K Ex-99.1 (8/27/26); Blue Owl release 8/28/26",
-        "date": "2026-08-28",
-        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000051/irenreportsfy26results.htm"
+        "doc": "FY26 10-K subsequent events (filed 8/27/26); Blue Owl + IREN releases 8/27-28",
+        "date": "2026-08-27",
+        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm"
       },
       "as_of": "2026-08-28"
     },
@@ -3735,7 +3735,7 @@
       "size_note": "$310.0M, including full exercise of the initial purchasers' $40.0M option. Issued concurrently with an exchange of $198.15M of the 4.500% 2031 notes. A maximum of 11,451,803 ordinary shares may be issued on conversion at the 36.9413 maximum conversion rate. No capped call.",
       "rate": {
         "kind": "fixed",
-        "value": 5.0,
+        "value": 5,
         "note": "Semi-annual Mar 1 / Sep 1 from 2027-03-01. Initial conversion rate 29.5530 ordinary shares per $1,000 (~$33.84), a 25% premium to the close on 2026-08-18."
       },
       "maturity": "2032-09-01",
@@ -4005,7 +4005,7 @@
       "size_note": "C$20M; $14.7M at the 2026-06-30 translation rate. The row carries the USD equivalent of a fixed C$ face, so period-to-period movement in this figure is FX translation and not a change in the obligation.",
       "rate": {
         "kind": "fixed",
-        "value": 6.0,
+        "value": 6,
         "note": "6.00% annually, interest payable quarterly; full principal due at maturity."
       },
       "maturity": "~2028-01-30",
@@ -4039,7 +4039,7 @@
       "size_note": "C$6M; $4.3M at the 2026-06-30 translation rate. Same C$-face convention as the first vendor mortgage.",
       "rate": {
         "kind": "fixed",
-        "value": 6.0,
+        "value": 6,
         "note": "6.00% annually, interest payable quarterly; full principal due at maturity."
       },
       "maturity": "~2029-05-15",
@@ -6338,7 +6338,7 @@
       "size_note": "Includes $56.25M issued on the initial purchasers' full exercise of their option. Rule 144A private placement to qualified institutional buyers; net proceeds ~$416.8M, of which ~$34.5M funded capped call transactions. Proceeds otherwise for general corporate purposes, including a portion of capital expenditures for Project Matador (Amarillo, TX); the issuer is the power and campus landlord side of that project, and no GPU or compute asset secures the notes.",
       "rate": {
         "kind": "fixed",
-        "value": 5.0,
+        "value": 5,
         "note": "Conversion 105.0862 sh/$1,000 (~$9.52); capped calls to $14.64 (~$34.5M cost)"
       },
       "maturity": "2031-07-15",
@@ -6372,7 +6372,7 @@
       "size_note": "Up to $500.0M total commitment; $444.9M outstanding at 2026-06-30, 12.2% effective rate per the 10-Q debt table. Funded three Siemens SGT6-5000F gas turbines for Project Matador (Amarillo, TX) and repaid the Macquarie Term Loan in full on closing ($24.8M loss on extinguishment). Debt sizing: 65% (delivered) / 55% (undelivered) of the lower of equipment acquisition cost and orderly liquidation value, with matching 65%/55% target-LTV default triggers on a 2% revaluation move unremedied 30 days. Availability nine months from closing, maximum five borrowings. Reserves: three months' interest, a $5.0M liquidation reserve and a $3.9M O&M reserve; a reserve shortfall unremedied three days is a default. A distinct default arises if a committed Matador I project financing of at least 400 MW has not closed within one year. Minimum quarterly principal of 10% of outstanding begins at the nine-month anniversary, reduced to 5% if a Matador I lease or offtake of at least 400 MW is signed by that anniversary. Non-recourse to Fermi Inc. beyond the loan parties and pledgor; facility fees sit in an unfiled fee letter.",
       "rate": {
         "kind": "sofr_spread",
-        "value": 4.0,
+        "value": 4,
         "note": "Term SOFR or Daily Simple SOFR + 4.00%, 0.00% floor; default rate +2%; 12.2% effective per the 10-Q"
       },
       "maturity": "2027-08-10",
@@ -6442,7 +6442,7 @@
       "size_note": "Senior secured term loan facility of up to $165.0M funding six Siemens Energy SGT-800 gas turbines and related equipment for Project Matador; $14.7M outstanding at 2026-06-30, 17.0% effective rate per the 10-Q debt table. Availability runs the full 33 months with at most 45 borrowings; a $22.9M sublimit lets interest and fees be drawn from the facility itself. No scheduled amortization: principal, interest, fees and the exit fee are due at maturity. Exit fee of $37.0M less cumulative interest and commitment fees paid, floored at zero. 1% per annum unused commitment fee. Draw conditions include a minimum equity contribution of $5.49M and assignment of the surety bond. Mandatory prepayment on asset dispositions, a change of control, liquidated damages received, or new debt proceeds; one disposition of three turbines is permitted with a 100% proceeds sweep, and the remaining three turbines cannot be sold before maturity. No financial covenants.",
       "rate": {
         "kind": "fixed",
-        "value": 12.0,
+        "value": 12,
         "note": "12.00% per annum fixed, payable quarterly in arrears from 2026-06-30 (14.00% on an event of default; 365-day basis); 17.0% effective per the 10-Q"
       },
       "maturity": "2028-12",
@@ -6545,7 +6545,7 @@
       "size_note": "Issued November 2025, $400.0M; outstanding in full at 12/31/25. Capped calls: strike $17.77, cap $27.88 ($35.4M premium).",
       "rate": {
         "kind": "fixed",
-        "value": 4.0,
+        "value": 4,
         "note": "Payable May-15/Nov-15; initial conversion rate 56.2635 per $1,000 (~$17.77)"
       },
       "maturity": "2031-11-15",
@@ -6579,7 +6579,7 @@
       "size_note": "Closed February 2026: $325.0M priced 2/20/26 + $50.0M initial-purchaser option exercised in full. Capped calls (initial cap $15.88). Concurrent registered direct at $7.94.",
       "rate": {
         "kind": "fixed",
-        "value": 5.0,
+        "value": 5,
         "note": "Payable Mar-1/Sep-1 from 9/1/26; initial conversion rate 100.7557 per $1,000 (~$9.93, +25% over the concurrent offering price)"
       },
       "maturity": "2032-03-01",
