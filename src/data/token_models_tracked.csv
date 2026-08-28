@@ -1,175 +1,174 @@
 as_of_date,canonical_model_id,model_display,in_panel,in_frontier,providers
-2026-08-27,claudefable5,Claude Fable 5,False,True,anthropic
-2026-08-27,claudehaiku3.5,"Claude Haiku 3.5 (retired, except on Bedrock and Google Cloud)",False,True,anthropic
-2026-08-27,claudehaiku4.5,Claude Haiku 4.5,False,True,anthropic
-2026-08-27,claudemythos5,Claude Mythos 5 (limited availability),False,True,anthropic
-2026-08-27,claudeopus4,"Claude Opus 4 (retired, except on Google Cloud)",False,True,anthropic
-2026-08-27,claudeopus4.1,"Claude Opus 4.1 (retired, except on Bedrock and Google Cloud)",False,True,anthropic
-2026-08-27,claudeopus4.5,Claude Opus 4.5,False,True,anthropic
-2026-08-27,claudeopus4.6,Claude Opus 4.6,False,True,anthropic
-2026-08-27,claudeopus4.7,Claude Opus 4.7,False,True,anthropic
-2026-08-27,claudeopus4.8,Claude Opus 4.8,False,True,anthropic
-2026-08-27,claudeopus5,Claude Opus 5,False,True,anthropic
-2026-08-27,claudesonnet4,"Claude Sonnet 4 (retired, except on Bedrock and Google Cloud)",False,True,anthropic
-2026-08-27,claudesonnet4.5,Claude Sonnet 4.5,False,True,anthropic
-2026-08-27,claudesonnet4.6,Claude Sonnet 4.6,False,True,anthropic
-2026-08-27,claudesonnet5,Claude Sonnet 5,False,True,anthropic
-2026-08-27,deepseekr1,DeepSeek R1,True,False,
-2026-08-27,deepseekr10528,DeepSeek R1 0528,True,False,
-2026-08-27,deepseekr1distillllama70b,DeepSeek R1 Distill LLama 70B,True,False,
-2026-08-27,deepseekr1distillqwen32b,DeepSeek R1 Distill Qwen 32B,True,False,
-2026-08-27,deepseekv3,DeepSeek V3,True,False,
-2026-08-27,deepseekv3.1,DeepSeek V3.1,True,False,
-2026-08-27,deepseekv3.2,DeepSeek-V3.2,True,False,
-2026-08-27,deepseekv30324,DeepSeek V3 0324,True,False,
-2026-08-27,deepseekv4flash,DeepSeek V4-Flash,True,True,deepseek
-2026-08-27,deepseekv4flash0731,DeepSeek V4-Flash-0731,True,False,
-2026-08-27,deepseekv4flashvisionexp,deepseek-v4-flash-vision-exp,False,True,deepseek
-2026-08-27,deepseekv4pro,DeepSeek V4-Pro,True,True,deepseek
-2026-08-27,deepseekv4pro0813,DeepSeek V4 Pro 0813,True,False,
-2026-08-27,gemini2.5computerusepreview102025,Gemini 2.5 Computer Use Preview,False,True,google
-2026-08-27,gemini2.5flash,Gemini 2.5 Flash,False,True,google
-2026-08-27,gemini2.5flashlite,Gemini 2.5 Flash-Lite,False,True,google
-2026-08-27,gemini2.5pro,Gemini 2.5 Pro,False,True,google
-2026-08-27,gemini3.1flashlite,Gemini 3.1 Flash-Lite,False,True,google
-2026-08-27,gemini3.1propreview,Gemini 3.1 Pro Preview,False,True,google
-2026-08-27,gemini3.5flash,Gemini 3.5 Flash,False,True,google
-2026-08-27,gemini3.5flashlite,Gemini 3.5 Flash-Lite,False,True,google
-2026-08-27,gemini3.5transcribe,Gemini 3.5 Transcribe,False,True,google
-2026-08-27,gemini3.5transcribelive,Gemini 3.5 Transcribe Live,False,True,google
-2026-08-27,gemini3.6flash,Gemini 3.6 Flash,False,True,google
-2026-08-27,gemini3.7flash,Gemini 3.7 Flash,False,True,google
-2026-08-27,gemini3flashpreview,Gemini 3 Flash Preview,False,True,google
-2026-08-27,geminiroboticser,Gemini Robotics ER 1.6 Preview,False,True,google
-2026-08-27,geminiroboticser2,Gemini Robotics ER 2 Preview,False,True,google
-2026-08-27,geminiroboticser2streaming,Gemini Robotics ER 2 Streaming Preview,False,True,google
-2026-08-27,gemma312bit,Gemma3 12B,True,False,
-2026-08-27,gemma327bit,Gemma 3 27B,True,False,
-2026-08-27,gemma426ba4bit,Gemma 4 26B A4B,True,False,
-2026-08-27,gemma431bit,gemma-4-31B-it,True,False,
-2026-08-27,glm4.5,GLM-4.5,True,True,zai
-2026-08-27,glm4.5air,GLM-4.5-Air,True,True,zai
-2026-08-27,glm4.5airx,GLM-4.5-AirX,False,True,zai
-2026-08-27,glm4.5v,GLM-4.5V,False,True,zai
-2026-08-27,glm4.5x,GLM-4.5-X,False,True,zai
-2026-08-27,glm4.6,GLM-4.6,True,True,zai
-2026-08-27,glm4.6v,GLM-4.6V,True,True,zai
-2026-08-27,glm4.6vflashx,GLM-4.6V-FlashX,False,True,zai
-2026-08-27,glm4.7,GLM-4.7,True,True,zai
-2026-08-27,glm4.7flashx,GLM-4.7-FlashX,False,True,zai
-2026-08-27,glm432b0414128k,GLM-4-32B-0414-128K,False,True,zai
-2026-08-27,glm5,GLM-5,True,True,zai
-2026-08-27,glm5.1,GLM-5.1,True,True,zai
-2026-08-27,glm5.2,GLM-5.2,True,True,zai
-2026-08-27,glm5.3,GLM-5.3,False,True,zai
-2026-08-27,glm5.3flash,GLM-5.3-Flash,True,True,zai
-2026-08-27,glm5turbo,GLM-5-Turbo,False,True,zai
-2026-08-27,glm5vturbo,GLM-5V-Turbo,False,True,zai
-2026-08-27,glmocr,GLM-OCR,False,True,zai
-2026-08-27,gpt3.5turbo0125,gpt-3.5-turbo-0125,False,True,openai
-2026-08-27,gpt3.5turbo1106,gpt-3.5-turbo-1106,False,True,openai
-2026-08-27,gpt3.5turboinstruct,gpt-3.5-turbo-instruct,False,True,openai
-2026-08-27,gpt4.1,gpt-4.1,False,True,openai
-2026-08-27,gpt4.1mini,gpt-4.1-mini,False,True,openai
-2026-08-27,gpt4.1nano,gpt-4.1-nano,False,True,openai
-2026-08-27,gpt40613,gpt-4-0613,False,True,openai
-2026-08-27,gpt4o,gpt-4o,False,True,openai
-2026-08-27,gpt4o20240513,gpt-4o-2024-05-13,False,True,openai
-2026-08-27,gpt4omini,gpt-4o-mini,False,True,openai
-2026-08-27,gpt4turbo20240409,gpt-4-turbo-2024-04-09,False,True,openai
-2026-08-27,gpt5,gpt-5,False,True,openai
-2026-08-27,gpt5.1,gpt-5.1,False,True,openai
-2026-08-27,gpt5.2,gpt-5.2,False,True,openai
-2026-08-27,gpt5.2pro,gpt-5.2-pro,False,True,openai
-2026-08-27,gpt5.4,gpt-5.4 (<272K context length),False,True,openai
-2026-08-27,gpt5.4mini,gpt-5.4-mini,False,True,openai
-2026-08-27,gpt5.4nano,gpt-5.4-nano,False,True,openai
-2026-08-27,gpt5.4pro,gpt-5.4-pro (<272K context length),False,True,openai
-2026-08-27,gpt5.5,gpt-5.5 (<272K context length),False,True,openai
-2026-08-27,gpt5.5pro,gpt-5.5-pro (<272K context length),False,True,openai
-2026-08-27,gpt5.6luna,gpt-5.6-luna,False,True,openai
-2026-08-27,gpt5.6sol,gpt-5.6-sol,False,True,openai
-2026-08-27,gpt5.6terra,gpt-5.6-terra,False,True,openai
-2026-08-27,gpt5mini,gpt-5-mini,False,True,openai
-2026-08-27,gpt5nano,gpt-5-nano,False,True,openai
-2026-08-27,gpt5pro,gpt-5-pro,False,True,openai
-2026-08-27,gptoss120b,gpt-oss-120b,True,False,
-2026-08-27,gptoss20b,OpenAI: GPT OSS 20B,True,False,
-2026-08-27,grok4.200309nonreasoning,grok-4.20-0309-non-reasoning,False,True,xai
-2026-08-27,grok4.200309reasoning,grok-4.20-0309-reasoning,False,True,xai
-2026-08-27,grok4.20multiagent0309,grok-4.20-multi-agent-0309,False,True,xai
-2026-08-27,grok4.3,grok-4.3,False,True,xai
-2026-08-27,grok4.5,grok-4.5,False,True,xai
-2026-08-27,grok4.6,Grok 4.6,False,True,xai
-2026-08-27,grokbuild0.1,grok-build-0.1,False,True,xai
-2026-08-27,inkling,Inkling,True,True,thinkingmachines
-2026-08-27,inklingsmall,Inkling-Small,True,True,thinkingmachines
-2026-08-27,kimik2.6,kimi-k2.6,True,True,moonshot
-2026-08-27,kimik2.7code,kimi-k2.7-code,True,True,moonshot
-2026-08-27,kimik2.7codehighspeed,kimi-k2.7-code-highspeed,False,True,moonshot
-2026-08-27,kimik2instruct,Kimi K2 Instruct,True,False,
-2026-08-27,kimik2thinking,Kimi K2 Thinking,True,False,
-2026-08-27,kimik3,kimi-k3,True,True,moonshot
-2026-08-27,mimov2.5,mimo-v2.5,True,True,xiaomi
-2026-08-27,mimov2.5pro,mimo-v2.5-pro,True,True,xiaomi
-2026-08-27,minimaxm2,MiniMax-M2,True,True,minimax
-2026-08-27,minimaxm2.1,MiniMax-M2.1,True,True,minimax
-2026-08-27,minimaxm2.1highspeed,MiniMax-M2.1-highspeed,False,True,minimax
-2026-08-27,minimaxm2.5,MiniMax M2.5,True,True,minimax
-2026-08-27,minimaxm2.5highspeed,MiniMax-M2.5-highspeed,False,True,minimax
-2026-08-27,minimaxm2.7,MiniMax-M2.7,True,True,minimax
-2026-08-27,minimaxm2.7highspeed,MiniMax-M2.7-highspeed,False,True,minimax
-2026-08-27,minimaxm3,MiniMax M3,True,True,minimax
-2026-08-27,moonshotv1128k,moonshot-v1-128k,False,True,moonshot
-2026-08-27,moonshotv1128kvisionpreview,moonshot-v1-128k-vision-preview,False,True,moonshot
-2026-08-27,moonshotv132k,moonshot-v1-32k,False,True,moonshot
-2026-08-27,moonshotv132kvisionpreview,moonshot-v1-32k-vision-preview,False,True,moonshot
-2026-08-27,moonshotv18k,moonshot-v1-8k,False,True,moonshot
-2026-08-27,moonshotv18kvisionpreview,moonshot-v1-8k-vision-preview,False,True,moonshot
-2026-08-27,musespark1.1,muse-spark-1.1,False,True,meta
-2026-08-27,musespark1.2,muse-spark-1.2,False,True,meta
-2026-08-27,mythomaxl213b,Mythomax L2 13B,True,False,
-2026-08-27,o1,o1,False,True,openai
-2026-08-27,o1pro,o1-pro,False,True,openai
-2026-08-27,o3,o3,False,True,openai
-2026-08-27,o3mini,o3-mini,False,True,openai
-2026-08-27,o3pro,o3-pro,False,True,openai
-2026-08-27,o4mini,o4-mini,False,True,openai
-2026-08-27,qwen27binstruct,Qwen 2 7B Instruct,True,False,
-2026-08-27,qwen3.535ba3b,Qwen3.5 35B A3B,True,False,
-2026-08-27,qwen3.5plus20260215,qwen3.5-plus Currently equivalent to qwen3.5-plus-2026-02-15,False,True,alibaba
-2026-08-27,qwen3.5plus20260420,qwen3.5-plus-2026-04-20,False,True,alibaba
-2026-08-27,qwen3.627b,Qwen3.6 27B,True,False,
-2026-08-27,qwen3.635ba3b,Qwen3.6 35B A3B,True,False,
-2026-08-27,qwen3.6maxpreview,qwen3.6-max-preview context caching discount,False,True,alibaba
-2026-08-27,qwen3.6plus20260402,qwen3.6-plus Currently equivalent to qwen3.6-plus-2026-04-02,False,True,alibaba
-2026-08-27,qwen3.7max,qwen3.7-max Currently equivalent to qwen3.7-max-2026-05-20 context caching discount,True,False,
-2026-08-27,qwen3.7max20260517,qwen3.7-max-2026-05-17,False,True,alibaba
-2026-08-27,qwen3.7max20260520,qwen3.7-max Currently equivalent to qwen3.7-max-2026-05-20 context caching discount,False,True,alibaba
-2026-08-27,qwen3.7max20260608,qwen3.7-max-2026-06-08 context caching discount,False,True,alibaba
-2026-08-27,qwen3.7plus20260526,qwen3.7-plus Currently equivalent to qwen3.7-plus-2026-05-26 context caching discount,False,True,alibaba
-2026-08-27,qwen3.8max,qwen3.8-max context caching discount,True,True,alibaba
-2026-08-27,qwen3235ba22binstruct2507,Qwen3 235B A22B Instruct 2507,True,False,
-2026-08-27,qwen3235ba22bthinking2507,Qwen3 235B A22b Thinking 2507,True,False,
-2026-08-27,qwen330ba3b,Qwen3 30B A3B,True,False,
-2026-08-27,qwen3coder30ba3binstruct,Qwen3 Coder 30b A3B Instruct,True,False,
-2026-08-27,qwen3coder480ba35binstruct,Qwen3 Coder 480B A35B Instruct,True,False,
-2026-08-27,qwen3max,qwen3-max Currently equivalent to qwen3-max-2026-01-23 context caching discount,True,False,
-2026-08-27,qwen3max20250923,qwen3-max-2025-09-23,False,True,alibaba
-2026-08-27,qwen3max20260123,qwen3-max Currently equivalent to qwen3-max-2026-01-23 context caching discount,False,True,alibaba
-2026-08-27,qwen3maxpreview,qwen3-max-preview context caching discount,False,True,alibaba
-2026-08-27,qwen3next80ba3binstruct,Qwen3 Next 80B A3B Instruct,True,False,
-2026-08-27,qwen3vl235ba22binstruct,Qwen3 VL 235B A22B Instruct,True,False,
-2026-08-27,qwen3vl235ba22bthinking,Qwen3 VL 235B A22B Thinking,True,False,
-2026-08-27,qwen3vl30ba3binstruct,qwen/qwen3-vl-30b-a3b-instruct,True,False,
-2026-08-27,qwen3vl30ba3bthinking,qwen/qwen3-vl-30b-a3b-thinking,True,False,
-2026-08-27,qwen3vl8binstruct,qwen/qwen3-vl-8b-instruct,True,False,
-2026-08-27,qwenmax,qwen-max 50% batch inference discount,False,True,alibaba
-2026-08-27,qwenplus20250125,qwen-plus-2025-01-25,False,True,alibaba
-2026-08-27,qwenplus20250428,qwen-plus-2025-04-28,False,True,alibaba
-2026-08-27,qwenplus20250714,qwen-plus-2025-07-14,False,True,alibaba
-2026-08-27,qwenplus20250728,qwen-plus-2025-07-28,False,True,alibaba
-2026-08-27,qwenplus20250911,qwen-plus-2025-09-11,False,True,alibaba
-2026-08-27,qwenplus20251201,qwen-plus Currently equivalent to qwen-plus-2025-12-01,False,True,alibaba
-2026-08-27,qwenpluslatest,qwen-plus-latest,False,True,alibaba
-2026-08-27,qwenturbo,qwen-turbo 50% batch inference discount,False,True,alibaba
+2026-08-28,claudefable5,Claude Fable 5,False,True,anthropic
+2026-08-28,claudehaiku3.5,"Claude Haiku 3.5 (retired, except on Bedrock and Google Cloud)",False,True,anthropic
+2026-08-28,claudehaiku4.5,Claude Haiku 4.5,False,True,anthropic
+2026-08-28,claudemythos5,Claude Mythos 5 (limited availability),False,True,anthropic
+2026-08-28,claudeopus4,"Claude Opus 4 (retired, except on Google Cloud)",False,True,anthropic
+2026-08-28,claudeopus4.1,"Claude Opus 4.1 (retired, except on Bedrock and Google Cloud)",False,True,anthropic
+2026-08-28,claudeopus4.5,Claude Opus 4.5,False,True,anthropic
+2026-08-28,claudeopus4.6,Claude Opus 4.6,False,True,anthropic
+2026-08-28,claudeopus4.7,Claude Opus 4.7,False,True,anthropic
+2026-08-28,claudeopus4.8,Claude Opus 4.8,False,True,anthropic
+2026-08-28,claudeopus5,Claude Opus 5,False,True,anthropic
+2026-08-28,claudesonnet4,"Claude Sonnet 4 (retired, except on Bedrock and Google Cloud)",False,True,anthropic
+2026-08-28,claudesonnet4.5,Claude Sonnet 4.5,False,True,anthropic
+2026-08-28,claudesonnet4.6,Claude Sonnet 4.6,False,True,anthropic
+2026-08-28,claudesonnet5,Claude Sonnet 5,False,True,anthropic
+2026-08-28,deepseekr1,DeepSeek R1,True,False,
+2026-08-28,deepseekr10528,DeepSeek R1 0528,True,False,
+2026-08-28,deepseekr1distillllama70b,DeepSeek R1 Distill LLama 70B,True,False,
+2026-08-28,deepseekr1distillqwen32b,DeepSeek R1 Distill Qwen 32B,True,False,
+2026-08-28,deepseekv3,DeepSeek V3,True,False,
+2026-08-28,deepseekv3.1,DeepSeek V3.1,True,False,
+2026-08-28,deepseekv3.2,DeepSeek-V3.2,True,False,
+2026-08-28,deepseekv30324,DeepSeek V3 0324,True,False,
+2026-08-28,deepseekv4flash,DeepSeek V4-Flash,True,True,deepseek
+2026-08-28,deepseekv4flash0731,DeepSeek V4-Flash-0731,True,False,
+2026-08-28,deepseekv4flashvisionexp,deepseek-v4-flash-vision-exp,False,True,deepseek
+2026-08-28,deepseekv4pro,DeepSeek V4-Pro,True,True,deepseek
+2026-08-28,deepseekv4pro0813,DeepSeek V4 Pro 0813,True,False,
+2026-08-28,gemini2.5computerusepreview102025,Gemini 2.5 Computer Use Preview,False,True,google
+2026-08-28,gemini2.5flash,Gemini 2.5 Flash,False,True,google
+2026-08-28,gemini2.5flashlite,Gemini 2.5 Flash-Lite,False,True,google
+2026-08-28,gemini2.5pro,Gemini 2.5 Pro,False,True,google
+2026-08-28,gemini3.1flashlite,Gemini 3.1 Flash-Lite,False,True,google
+2026-08-28,gemini3.1propreview,Gemini 3.1 Pro Preview,False,True,google
+2026-08-28,gemini3.5flash,Gemini 3.5 Flash,False,True,google
+2026-08-28,gemini3.5flashlite,Gemini 3.5 Flash-Lite,False,True,google
+2026-08-28,gemini3.5transcribe,Gemini 3.5 Transcribe,False,True,google
+2026-08-28,gemini3.5transcribelive,Gemini 3.5 Transcribe Live,False,True,google
+2026-08-28,gemini3.6flash,Gemini 3.6 Flash,False,True,google
+2026-08-28,gemini3.7flash,Gemini 3.7 Flash,False,True,google
+2026-08-28,gemini3flashpreview,Gemini 3 Flash Preview,False,True,google
+2026-08-28,geminiroboticser,Gemini Robotics ER 1.6 Preview,False,True,google
+2026-08-28,geminiroboticser2,Gemini Robotics ER 2 Preview,False,True,google
+2026-08-28,geminiroboticser2streaming,Gemini Robotics ER 2 Streaming Preview,False,True,google
+2026-08-28,gemma312bit,Gemma3 12B,True,False,
+2026-08-28,gemma327bit,Gemma 3 27B,True,False,
+2026-08-28,gemma426ba4bit,Gemma 4 26B A4B,True,False,
+2026-08-28,gemma431bit,gemma-4-31B-it,True,False,
+2026-08-28,glm4.5,GLM-4.5,True,True,zai
+2026-08-28,glm4.5air,GLM-4.5-Air,True,True,zai
+2026-08-28,glm4.5airx,GLM-4.5-AirX,False,True,zai
+2026-08-28,glm4.5v,GLM-4.5V,False,True,zai
+2026-08-28,glm4.5x,GLM-4.5-X,False,True,zai
+2026-08-28,glm4.6,GLM-4.6,True,True,zai
+2026-08-28,glm4.6v,GLM-4.6V,True,True,zai
+2026-08-28,glm4.6vflashx,GLM-4.6V-FlashX,False,True,zai
+2026-08-28,glm4.7,GLM-4.7,True,True,zai
+2026-08-28,glm4.7flashx,GLM-4.7-FlashX,False,True,zai
+2026-08-28,glm432b0414128k,GLM-4-32B-0414-128K,False,True,zai
+2026-08-28,glm5,GLM-5,True,True,zai
+2026-08-28,glm5.1,GLM-5.1,True,True,zai
+2026-08-28,glm5.2,GLM-5.2,True,True,zai
+2026-08-28,glm5.3,GLM-5.3,False,True,zai
+2026-08-28,glm5.3flash,GLM-5.3-Flash,True,True,zai
+2026-08-28,glmocr,GLM-OCR,False,True,zai
+2026-08-28,gpt3.5turbo0125,gpt-3.5-turbo-0125,False,True,openai
+2026-08-28,gpt3.5turbo1106,gpt-3.5-turbo-1106,False,True,openai
+2026-08-28,gpt3.5turboinstruct,gpt-3.5-turbo-instruct,False,True,openai
+2026-08-28,gpt4.1,gpt-4.1,False,True,openai
+2026-08-28,gpt4.1mini,gpt-4.1-mini,False,True,openai
+2026-08-28,gpt4.1nano,gpt-4.1-nano,False,True,openai
+2026-08-28,gpt40613,gpt-4-0613,False,True,openai
+2026-08-28,gpt4o,gpt-4o,False,True,openai
+2026-08-28,gpt4o20240513,gpt-4o-2024-05-13,False,True,openai
+2026-08-28,gpt4omini,gpt-4o-mini,False,True,openai
+2026-08-28,gpt4turbo20240409,gpt-4-turbo-2024-04-09,False,True,openai
+2026-08-28,gpt5,gpt-5,False,True,openai
+2026-08-28,gpt5.1,gpt-5.1,False,True,openai
+2026-08-28,gpt5.2,gpt-5.2,False,True,openai
+2026-08-28,gpt5.2pro,gpt-5.2-pro,False,True,openai
+2026-08-28,gpt5.4,gpt-5.4 (<272K context length),False,True,openai
+2026-08-28,gpt5.4mini,gpt-5.4-mini,False,True,openai
+2026-08-28,gpt5.4nano,gpt-5.4-nano,False,True,openai
+2026-08-28,gpt5.4pro,gpt-5.4-pro (<272K context length),False,True,openai
+2026-08-28,gpt5.5,gpt-5.5 (<272K context length),False,True,openai
+2026-08-28,gpt5.5pro,gpt-5.5-pro (<272K context length),False,True,openai
+2026-08-28,gpt5.6luna,gpt-5.6-luna,False,True,openai
+2026-08-28,gpt5.6sol,gpt-5.6-sol,False,True,openai
+2026-08-28,gpt5.6terra,gpt-5.6-terra,False,True,openai
+2026-08-28,gpt5mini,gpt-5-mini,False,True,openai
+2026-08-28,gpt5nano,gpt-5-nano,False,True,openai
+2026-08-28,gpt5pro,gpt-5-pro,False,True,openai
+2026-08-28,gptoss120b,gpt-oss-120b,True,False,
+2026-08-28,gptoss20b,OpenAI: GPT OSS 20B,True,False,
+2026-08-28,grok4.200309nonreasoning,grok-4.20-0309-non-reasoning,False,True,xai
+2026-08-28,grok4.200309reasoning,grok-4.20-0309-reasoning,False,True,xai
+2026-08-28,grok4.20multiagent0309,grok-4.20-multi-agent-0309,False,True,xai
+2026-08-28,grok4.3,grok-4.3,False,True,xai
+2026-08-28,grok4.5,grok-4.5,False,True,xai
+2026-08-28,grok4.6,Grok 4.6,False,True,xai
+2026-08-28,grokbuild0.1,grok-build-0.1,False,True,xai
+2026-08-28,inkling,Inkling,True,True,thinkingmachines
+2026-08-28,inklingsmall,Inkling-Small,True,True,thinkingmachines
+2026-08-28,kimik2.6,kimi-k2.6,True,True,moonshot
+2026-08-28,kimik2.7code,kimi-k2.7-code,True,True,moonshot
+2026-08-28,kimik2.7codehighspeed,kimi-k2.7-code-highspeed,False,True,moonshot
+2026-08-28,kimik2instruct,Kimi K2 Instruct,True,False,
+2026-08-28,kimik2thinking,Kimi K2 Thinking,True,False,
+2026-08-28,kimik3,kimi-k3,True,True,moonshot
+2026-08-28,mimov2.5,mimo-v2.5,True,True,xiaomi
+2026-08-28,mimov2.5pro,mimo-v2.5-pro,True,True,xiaomi
+2026-08-28,minimaxm2,MiniMax-M2,True,True,minimax
+2026-08-28,minimaxm2.1,MiniMax-M2.1,True,True,minimax
+2026-08-28,minimaxm2.1highspeed,MiniMax-M2.1-highspeed,False,True,minimax
+2026-08-28,minimaxm2.5,MiniMax M2.5,True,True,minimax
+2026-08-28,minimaxm2.5highspeed,MiniMax-M2.5-highspeed,False,True,minimax
+2026-08-28,minimaxm2.7,MiniMax-M2.7,True,True,minimax
+2026-08-28,minimaxm2.7highspeed,MiniMax-M2.7-highspeed,False,True,minimax
+2026-08-28,minimaxm3,MiniMax M3,True,True,minimax
+2026-08-28,moonshotv1128k,moonshot-v1-128k,False,True,moonshot
+2026-08-28,moonshotv1128kvisionpreview,moonshot-v1-128k-vision-preview,False,True,moonshot
+2026-08-28,moonshotv132k,moonshot-v1-32k,False,True,moonshot
+2026-08-28,moonshotv132kvisionpreview,moonshot-v1-32k-vision-preview,False,True,moonshot
+2026-08-28,moonshotv18k,moonshot-v1-8k,False,True,moonshot
+2026-08-28,moonshotv18kvisionpreview,moonshot-v1-8k-vision-preview,False,True,moonshot
+2026-08-28,musespark1.1,muse-spark-1.1,False,True,meta
+2026-08-28,musespark1.2,muse-spark-1.2,False,True,meta
+2026-08-28,mythomaxl213b,Mythomax L2 13B,True,False,
+2026-08-28,o1,o1,False,True,openai
+2026-08-28,o1pro,o1-pro,False,True,openai
+2026-08-28,o3,o3,False,True,openai
+2026-08-28,o3mini,o3-mini,False,True,openai
+2026-08-28,o3pro,o3-pro,False,True,openai
+2026-08-28,o4mini,o4-mini,False,True,openai
+2026-08-28,qwen27binstruct,Qwen 2 7B Instruct,True,False,
+2026-08-28,qwen3.535ba3b,Qwen3.5 35B A3B,True,False,
+2026-08-28,qwen3.5plus20260215,qwen3.5-plus Currently equivalent to qwen3.5-plus-2026-02-15,False,True,alibaba
+2026-08-28,qwen3.5plus20260420,qwen3.5-plus-2026-04-20,False,True,alibaba
+2026-08-28,qwen3.627b,Qwen3.6 27B,True,False,
+2026-08-28,qwen3.635ba3b,Qwen3.6 35B A3B,True,False,
+2026-08-28,qwen3.6maxpreview,qwen3.6-max-preview context caching discount,False,True,alibaba
+2026-08-28,qwen3.6plus20260402,qwen3.6-plus Currently equivalent to qwen3.6-plus-2026-04-02,False,True,alibaba
+2026-08-28,qwen3.7max,qwen3.7-max Currently equivalent to qwen3.7-max-2026-05-20 context caching discount,True,False,
+2026-08-28,qwen3.7max20260517,qwen3.7-max-2026-05-17,False,True,alibaba
+2026-08-28,qwen3.7max20260520,qwen3.7-max Currently equivalent to qwen3.7-max-2026-05-20 context caching discount,False,True,alibaba
+2026-08-28,qwen3.7max20260608,qwen3.7-max-2026-06-08 context caching discount,False,True,alibaba
+2026-08-28,qwen3.7plus20260526,qwen3.7-plus Currently equivalent to qwen3.7-plus-2026-05-26 context caching discount,False,True,alibaba
+2026-08-28,qwen3.827b,Qwen3.8 27B,True,False,
+2026-08-28,qwen3.8max,qwen3.8-max context caching discount,True,True,alibaba
+2026-08-28,qwen3235ba22binstruct2507,Qwen3 235B A22B Instruct 2507,True,False,
+2026-08-28,qwen3235ba22bthinking2507,Qwen3 235B A22b Thinking 2507,True,False,
+2026-08-28,qwen330ba3b,Qwen3 30B A3B,True,False,
+2026-08-28,qwen3coder30ba3binstruct,Qwen3 Coder 30b A3B Instruct,True,False,
+2026-08-28,qwen3coder480ba35binstruct,Qwen3 Coder 480B A35B Instruct,True,False,
+2026-08-28,qwen3max,qwen3-max Currently equivalent to qwen3-max-2026-01-23 context caching discount,True,False,
+2026-08-28,qwen3max20250923,qwen3-max-2025-09-23,False,True,alibaba
+2026-08-28,qwen3max20260123,qwen3-max Currently equivalent to qwen3-max-2026-01-23 context caching discount,False,True,alibaba
+2026-08-28,qwen3maxpreview,qwen3-max-preview context caching discount,False,True,alibaba
+2026-08-28,qwen3next80ba3binstruct,Qwen3 Next 80B A3B Instruct,True,False,
+2026-08-28,qwen3vl235ba22binstruct,Qwen3 VL 235B A22B Instruct,True,False,
+2026-08-28,qwen3vl235ba22bthinking,Qwen3 VL 235B A22B Thinking,True,False,
+2026-08-28,qwen3vl30ba3binstruct,qwen/qwen3-vl-30b-a3b-instruct,True,False,
+2026-08-28,qwen3vl30ba3bthinking,qwen/qwen3-vl-30b-a3b-thinking,True,False,
+2026-08-28,qwen3vl8binstruct,qwen/qwen3-vl-8b-instruct,True,False,
+2026-08-28,qwenmax,qwen-max 50% batch inference discount,False,True,alibaba
+2026-08-28,qwenplus20250125,qwen-plus-2025-01-25,False,True,alibaba
+2026-08-28,qwenplus20250428,qwen-plus-2025-04-28,False,True,alibaba
+2026-08-28,qwenplus20250714,qwen-plus-2025-07-14,False,True,alibaba
+2026-08-28,qwenplus20250728,qwen-plus-2025-07-28,False,True,alibaba
+2026-08-28,qwenplus20250911,qwen-plus-2025-09-11,False,True,alibaba
+2026-08-28,qwenplus20251201,qwen-plus Currently equivalent to qwen-plus-2025-12-01,False,True,alibaba
+2026-08-28,qwenpluslatest,qwen-plus-latest,False,True,alibaba
+2026-08-28,qwenturbo,qwen-turbo 50% batch inference discount,False,True,alibaba
