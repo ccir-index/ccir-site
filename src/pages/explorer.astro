@@ -102,15 +102,11 @@ const rows = source.map((r) => ({
     <PageHeader title="The Whole Market, Unfiltered" kicker="Series Explorer" asOf={meta.as_of_date} />
     <p class="standfirst lede">
       Every grain we track: {rows.length} series across {chips.length} chips
-      and three operator segments (Hyperscaler / Neocloud / Marketplace), broken
-      out by form, interruptibility, and region. No curation: single-source
-      cells sit alongside deep ones, each shown with its source count
-      <em>n</em>. A dash means the axis is not broken out for that series.
-      Mean and median are both shown. The one set in ink is the stat the
-      published headline uses for that series (mean at n≥10, median below),
-      so every number here ties to the rates ladder. On-demand rates.
-      Grid tokens: GTD = guaranteed · INT = interruptible · IQR =
-      interquartile range.
+      and three operator segments, broken out by form, interruptibility, and
+      region. Single-source cells sit beside deep ones; <em>n</em> is the
+      source count. The stat set in ink is the one the published headline
+      uses (mean at n≥10, median below). GTD = guaranteed · INT =
+      interruptible · IQR = interquartile range.
     </p>
 
     <div class="filter-bank">

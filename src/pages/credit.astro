@@ -599,19 +599,15 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       <PageHeader title="Compute Credit Tracker" kicker="Market Intelligence · Compute Credit" asOf={AS_OF} />
       <p class="standfirst lede">
         The debt stack behind AI compute: GPU-backed loans and the credit
-        around them, tracked as filed. {instruments.length}
-        instruments across {issuers.length} issuers. Public companies come
-        from their U.S. Securities and Exchange Commission (SEC) filings,
-        private issuers from company, lender, or arranger
-        statements. Of these, ${inScopeUsdB}B across {inScopeC.length} are
-        secured directly by the GPUs. That subset is the issuance measure
-        charted below. Convertibles, unsecured notes, and data-center credit
-        are tracked for context.
+        around them, tracked as filed. {instruments.length} instruments
+        across {issuers.length} issuers. ${inScopeUsdB}B across
+        {inScopeC.length} is secured directly by the GPUs: the issuance
+        measure charted below. Convertibles, unsecured notes, and
+        data-center credit are tracked for context.
       </p>
       <div class="disclosure">
         <strong>Sourced as filed</strong>
-        Compiled from filings in the SEC's EDGAR filing system and
-        issuer/lender releases as filed.
+        Compiled from SEC EDGAR filings and issuer/lender releases.
         Every row links its source document. Confirmation flags:
         <span class="chip chip-confirmed">confirmed</span> company/lender/arranger
         statement · <span class="chip chip-press">press</span> journalist-sourced,

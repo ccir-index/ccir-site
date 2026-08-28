@@ -52,13 +52,15 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
       <p class="standfirst">
         Meta, Alphabet, Microsoft, Oracle and Amazon have signed
         <strong>{fmtB(sumL + sumP, 0)}</strong> of AI infrastructure
-        commitments that have not yet been delivered: leases signed on
-        buildings not yet handed over, plus contracts to buy chips, power
-        and capacity at stated minimums. That figure is those two
-        disclosed quantities added together, as of {mon.as_of}. It is not
-        debt. It is not the same as the all-in total below, which adds
-        borrowings and leases already on the balance sheet.
+        commitments not yet delivered: leases on buildings not yet handed
+        over, plus contracts to buy chips, power and capacity at stated
+        minimums, as of {mon.as_of}. It is not debt.
       </p>
+      <ul class="lede-index">
+        <li><span class="arw">→</span> <a href="#monitor">The monitor</a></li>
+        <li><span class="arw">→</span> <a href="#quantities">What these quantities are</a></li>
+        <li><span class="arw">→</span> <a href="#implied-rates">Implied committed rates</a></li>
+      </ul>
       <p class="standfirst">
         The demand-side commitments that back compute credit, tracked from
         the SEC filings of the five largest AI buyers. Two footnote
@@ -80,7 +82,7 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
       <div class="tile"><div class="tlab">Revenue backlog (RPO), four sellers</div><div class="tval">{fmtB(sumR, 0)}</div></div>
     </div>
 
-    <section class="sec monwide">
+    <section class="sec monwide" id="monitor">
       <h2><span class="n">§</span> The monitor</h2>
       <div class="tblwrap">
         <table class="mon">
@@ -148,7 +150,7 @@ const sumAll = mon.companies.reduce((s, c) => s + allIn(c), 0);
       </p>
     </section>
 
-    <section class="sec">
+    <section class="sec" id="quantities">
       <h2><span class="n">§</span> What these quantities are</h2>
       <p>
         <strong>Leases signed but not yet commenced</strong> are rental

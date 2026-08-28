@@ -240,21 +240,20 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     <PageHeader title="The Secondary Market" kicker="Market Intelligence · Hardware Residual" asOf={hw.as_of}>
       <p class="subhead">What a deployed GPU is worth as an earning asset, and what machines list and sell for.</p>
       <p class="standfirst">
-        This page publishes one value per chip: what a machine is worth
-        deployed and earning. It triangulates that value against the
-        market. The value is <strong>model-implied</strong>, computed
-        from CCIR's own benchmark. It is an income approach over the CRI
-        rental rate and committed term curve. Every assumption is
-        disclosed, and the discount rate is anchored to the same
-        collateral's financing yields in the
-        <a href="/credit">credit ledger</a>. The market checks are
-        observational: executed sales and posted asks, in separate
-        lanes. They are inputs to recovery analysis, not a recovery
-        estimate.
+        One value per chip: what a machine is worth deployed and earning,
+        triangulated against the market. The value is
+        <strong>model-implied</strong>, an income approach over CCIR's own
+        benchmark, every assumption disclosed. The market checks are
+        observational, in separate lanes.
       </p>
+      <ul class="lede-index">
+        <li><span class="arw">→</span> <a href="#income-value">Income-derived value</a></li>
+        <li><span class="arw">→</span> <a href="#record">The record — executed sales &amp; posted asks</a></li>
+        <li><span class="arw">→</span> <a href="#method">Method</a></li>
+      </ul>
     </PageHeader>
 
-    <section class="sec iv">
+    <section class="sec iv" id="income-value">
       <h2><span class="n">§</span> Income-derived value</h2>
       <p class="secintro">
         Model-implied value of a deployed unit, derived from the CRI T2
@@ -365,7 +364,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       </div>
     </section>
 
-    <section class="sec">
+    <section class="sec" id="record">
       <h2><span class="n">§</span> The record — executed sales &amp; posted asks</h2>
       <p class="secintro">
         Three years of executed sales (July 2023 – August 2026; 3,009
@@ -628,7 +627,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       </p>
     </details>
 
-    <section class="sec">
+    <section class="sec" id="method">
       <h2><span class="n">§</span> Method</h2>
       <p>
         <strong>Income approach (model-implied).</strong> The headline value

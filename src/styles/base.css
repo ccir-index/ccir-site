@@ -61,6 +61,15 @@ main { min-height: calc(100vh - 200px); }
 }
 .standfirst em { font-style: italic; color: var(--accent); }
 
+/* "lede-index" — the arrow list under a standfirst naming the 2-3 things
+   a page holds, each linked (house pattern, 2026-08-28). */
+.lede-index {
+  list-style: none; padding: 0; margin: 10px 0 0;
+  font-family: var(--font-mono); font-size: var(--fs-sm);
+}
+.lede-index li { margin: 4px 0; }
+.lede-index .arw { color: var(--accent); margin-right: 6px; }
+
 .mono { font-family: var(--font-mono); }
 .serif { font-family: var(--font-display); }
 .dim { color: var(--ink-dim); }
