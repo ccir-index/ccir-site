@@ -339,42 +339,8 @@ const hasOgCard = fs.existsSync(`public${ogCredit}`);
         document.
       </p>
 
-      {showSpread && sSc && (
-        <div class="panel">
-          <div class="panel-head">
-            <div class="panel-title">Floating spreads at signing</div>
-            <div class="panel-sub">
-              Filed spread over SOFR, by signing date · window {windowLabel(spread.pts)}
-            </div>
-          </div>
-          <svg viewBox={`0 0 ${W} ${H}`} role="img"
-            aria-label={`${def.display} floating-rate facilities: filed spread over SOFR at signing, ${windowLabel(spread.pts)}.`}>
-            {sSc.ticksY.map((t) => (
-              <>
-                <line x1={x0} y1={sSc.Y(t)} x2={x1} y2={sSc.Y(t)} class="grid" />
-                <text x={x0 - 7} y={sSc.Y(t) + 3} class="tick tick-y">+{fmtPct(t)}</text>
-              </>
-            ))}
-            {sSc.ticksX.map((t) => (
-              <text x={sSc.X(t.t)} y={yBot + 22} class="tick tick-x">{t.label}</text>
-            ))}
-            <line x1={x0} y1={yBot} x2={x1} y2={yBot} class="axis" />
-            {sMarks.map((m) => (
-              <a href={`#${m.id}`} class="pt-link" aria-label={`Jump to ${m.label} details`}>
-                <circle cx={m.x} cy={m.y} r="4.5" class="pt" />
-                {sLabels && <text x={m.lx} y={m.y + m.loff} class="ptl">{m.label}</text>}
-              </a>
-            ))}
-          </svg>
-          {spread.skipped.length > 0 && (
-            <p class="chart-note">
-              Not plotted (no single filed spread):{' '}
-              {spread.skipped.map((r: any) => `${String(r.name).split(' (')[0]} (${r.rate?.note ? 'grid — see card' : 'undisclosed'})`).join(' · ')}.
-            </p>
-          )}
-        </div>
-      )}
-
+      {/* Fixed panel leads: more instruments carry a filed coupon than a
+          filed spread, so it is the denser, more informative chart. */}
       {showFixed && fSc && (
         <div class="panel">
           <div class="panel-head">
@@ -414,6 +380,42 @@ const hasOgCard = fs.existsSync(`public${ogCredit}`);
             <p class="chart-note">
               Not plotted (no single filed coupon or no dated issue):{' '}
               {fixed.skipped.map((r: any) => String(r.name).split(' (')[0]).join(' · ')}.
+            </p>
+          )}
+        </div>
+      )}
+
+      {showSpread && sSc && (
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Floating spreads at signing</div>
+            <div class="panel-sub">
+              Filed spread over SOFR, by signing date · window {windowLabel(spread.pts)}
+            </div>
+          </div>
+          <svg viewBox={`0 0 ${W} ${H}`} role="img"
+            aria-label={`${def.display} floating-rate facilities: filed spread over SOFR at signing, ${windowLabel(spread.pts)}.`}>
+            {sSc.ticksY.map((t) => (
+              <>
+                <line x1={x0} y1={sSc.Y(t)} x2={x1} y2={sSc.Y(t)} class="grid" />
+                <text x={x0 - 7} y={sSc.Y(t) + 3} class="tick tick-y">+{fmtPct(t)}</text>
+              </>
+            ))}
+            {sSc.ticksX.map((t) => (
+              <text x={sSc.X(t.t)} y={yBot + 22} class="tick tick-x">{t.label}</text>
+            ))}
+            <line x1={x0} y1={yBot} x2={x1} y2={yBot} class="axis" />
+            {sMarks.map((m) => (
+              <a href={`#${m.id}`} class="pt-link" aria-label={`Jump to ${m.label} details`}>
+                <circle cx={m.x} cy={m.y} r="4.5" class="pt" />
+                {sLabels && <text x={m.lx} y={m.y + m.loff} class="ptl">{m.label}</text>}
+              </a>
+            ))}
+          </svg>
+          {spread.skipped.length > 0 && (
+            <p class="chart-note">
+              Not plotted (no single filed spread):{' '}
+              {spread.skipped.map((r: any) => `${String(r.name).split(' (')[0]} (${r.rate?.note ? 'grid — see card' : 'undisclosed'})`).join(' · ')}.
             </p>
           )}
         </div>
