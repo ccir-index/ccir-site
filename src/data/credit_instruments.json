@@ -2536,6 +2536,41 @@
       "as_of": "2026-06-30"
     },
     {
+      "id": "corz-jpm-rcf",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Corporate parent revolving credit + LC facility secured by substantially all Company and Guarantor assets (undrawn at closing), not a GPU-asset-backed facility — out of the GPU-collateralized issuance scope; tracked for the capital-stack picture.",
+      "issuer": "Core Scientific, Inc.",
+      "ticker": "CORZ",
+      "issuer_type": "public",
+      "entity": "Core Scientific, Inc. (borrower)",
+      "name": "JPMorgan Revolving Credit + Letter of Credit Facility",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 600,
+      "size_note": "$100.0M senior secured revolving credit facility + $500.0M letter of credit facility; $0 outstanding under either at the 8/25/26 closing. Minimum liquidity covenant $150.0M (unrestricted cash + undrawn revolver commitments); each revolver borrowing conditioned on market capitalization of at least $3,000.0M at the prior market close.",
+      "rate": {
+        "kind": "sofr_spread",
+        "value": 1.75,
+        "note": "Term SOFR (0.00% floor) + 1.75%"
+      },
+      "maturity": "2029-08-25",
+      "maturity_note": "Third anniversary of closing; extendable to the fourth anniversary (2030-08-25) at the Company's sole election",
+      "seniority": "Senior secured, parent level",
+      "security": "First-priority lien on substantially all assets of the Company and the Guarantors",
+      "lenders": [
+        "JPMorgan Chase Bank, N.A. (admin + collateral agent)",
+        "Issuing banks and lenders party thereto"
+      ],
+      "status": "confirmed",
+      "issued": "2026-08-25",
+      "source": {
+        "doc": "8-K 8/27/26 (Credit Agreement filed as EX-10.1)",
+        "date": "2026-08-27",
+        "url": "https://www.sec.gov/Archives/edgar/data/1839341/000183934126000021/core-20260825.htm"
+      },
+      "as_of": "2026-08-25"
+    },
+    {
       "id": "dlr-global-rcf",
       "collateral_class": "out",
       "exclude_from_issuance": true,
@@ -6474,7 +6509,7 @@
       "name": "5.25% Convertible Senior Notes due 2029",
       "instrument_type": "convertible",
       "size_usd_m": 400,
-      "size_note": "Issued November 2024, $400.0M original. $200.0M repurchased during 2025 (US$119.3M cash + 10,661,140 Class A shares); further $135.0M repurchased Feb-2026 (~$138.2M cash). Remaining principal ~$65.0M is implied (400−200−135; the filings state the repurchases, not the remainder). Principal outstanding on the 12/31/25 balance sheet: $200.0M.",
+      "size_note": "Issued November 2024, $400.0M original. $200.0M repurchased during 2025 (US$119.3M cash + 10,661,140 Class A shares); further $135.0M repurchased Feb-2026 (~$138.2M cash). Remaining principal ~$65.0M is implied (400−200−135; the filings state the repurchases, not the remainder). Principal outstanding on the 12/31/25 balance sheet: $200.0M. Unreconciled filed figures: our ~$138.2M cash for the Feb-2026 repurchase vs the Q1-26 6-K cash-flow line 'US$93.0 million of repayments made in connection with the extinguishment of convertible senior notes' — both reproduced, not reconciled; revisit at the FY26 20-F.",
       "rate": {
         "kind": "fixed",
         "value": 5.25,
