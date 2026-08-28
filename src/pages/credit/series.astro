@@ -77,7 +77,9 @@ const spreadRangeShort = spreadRows.length ? `${fmtShort(spreadRows[0].issued)} 
 const SW = 960, SH = 330, SL = 46, SRp = 14, STp = 16, SBp = 34;
 const monthIdx = (d: string) => +d.slice(0, 4) * 12 + (+d.slice(5, 7) || 1);
 const mMin = monthIdx('2023-05');
-const mMax = monthIdx('2026-09');
+// x-domain follows the data — a hardcoded end month silently clipped
+// future signings.
+const mMax = Math.max(monthIdx('2026-09'), ...spreadRows.map((r: any) => monthIdx(r.issued) + 1));
 const sx = (d: string) => SL + ((monthIdx(d) - mMin) / (mMax - mMin)) * (SW - SL - SRp);
 const sy = (v: number) => STp + (1 - v / 10) * (SH - STp - SBp);
 const yTicks = [0, 2, 4, 6, 8, 10];
@@ -287,17 +289,15 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
         asOf={AS_OF}
       />
       <p class="standfirst lede">
-        The derived layer of the credit record. The
-        <a href="/credit">instrument tracker</a> reproduces each facility as
-        filed. This page computes from it, and from the schedules of
-        investments of SEC-reporting funds that hold the same paper. Three
-        series: the spread each GPU-collateralized facility signed at, how
-        long facilities stay outstanding, and the fair-value marks
-        different lenders file on identical instruments. Every number here is
-        either reproduced from a primary document or is arithmetic on two
-        filed figures: a ratio, a month count, a max−min.
+        Arithmetic on filed numbers, computed from the
+        <a href="/credit">instrument tracker</a> and lender filings.
         <em>Nothing on this page is a CCIR valuation.</em>
       </p>
+      <ul class="lede-index">
+        <li><span class="arw">→</span> <a href="#spreads">Spread at signing</a></li>
+        <li><span class="arw">→</span> <a href="#refi-velocity">Refi velocity</a></li>
+        <li><span class="arw">→</span> <a href="#filed-marks">Filed marks</a></li>
+      </ul>
     </div>
   </section>
 
@@ -712,6 +712,12 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
   h2 .n { color: var(--accent); margin-right: 10px; font-family: var(--font-mono); font-size: 0.8em; }
   .lede { font-size: var(--fs-lg); }
   .lede em { font-style: italic; color: var(--accent); }
+  .lede-index {
+    list-style: none; padding: 0; margin: 12px 0 0;
+    font-family: var(--font-mono); font-size: var(--fs-sm);
+  }
+  .lede-index li { margin: 4px 0; }
+  .lede-index .arw { color: var(--accent); margin-right: 6px; }
   .hero-solo { margin-bottom: 26px; max-width: 84ch; }
 
   section.wrap { margin-bottom: 44px; }
