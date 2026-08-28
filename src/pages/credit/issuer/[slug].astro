@@ -67,6 +67,7 @@
   never plotted as a point. Convertibles plot hollow — the coupon is not the
   yield, the equity option is the rest of it, and the marker says so.
 */
+import fs from 'node:fs';
 import Base from '../../../layouts/Base.astro';
 import PageHeader from '../../../components/PageHeader.astro';
 import creditData from '../../../data/credit_instruments.json';
@@ -156,11 +157,19 @@ function parseIssued(s: any): number | null {
 }
 function shortName(r: any): string {
   let n = String(r.name).split(' (')[0].replace(/ Facility$/, '');
-  const bond = n.match(/^([\d.]+)%.*?due (?:\w+ )?(\d{4})/);
-  if (bond) n = `${fmtPct(+bond[1])}% '${bond[2].slice(2)}`;
+  // The rate lives on the y-axis — labels carry identity (series, maturity
+  // year), never the coupon.
+  const due = n.match(/due (?:\w+ )?(\d{4})/);
   if (r.instrument_type === 'convertible') {
     const yy = String(r.maturity ?? '').slice(2, 4);
-    n = `conv ${fmtPct(r.rate.value)}%${yy ? ` '${yy}` : ''}`;
+    n = `conv${yy ? ` '${yy}` : ''}`;
+  } else if (due) {
+    const yy = `'${due[1].slice(2)}`;
+    const dash = n.split(' — ');
+    const suffix = dash.length > 1 ? dash[dash.length - 1].trim() : '';
+    const coupon = n.search(/[\d.]+%/);
+    const prefix = coupon > 0 ? n.slice(0, coupon).trim() : '';
+    n = suffix ? `${suffix} ${yy}` : prefix ? `${prefix} ${yy}` : `notes ${yy}`;
   }
   return n.length > 20 ? n.slice(0, 19) + '…' : n;
 }
@@ -215,17 +224,50 @@ function windowLabel(pts: Pt[]): string {
   const f = (t: number) => { const d = new Date(t); return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
   return `${f(Math.min(...pts.map((p) => p.t)))} – ${f(Math.max(...pts.map((p) => p.t)))}`;
 }
-// Marks with simple label de-collision: alternate above/below when the
-// previous label center is near in x. Rendered output is REVIEWED — computed
-// geometry has missed real collisions before.
+// Marks with label de-collision: each label's box (estimated from its
+// character count — the font is monospace) is tested against every box
+// already placed, trying above/below and small horizontal nudges before
+// accepting an overlap. Clamping is width-aware so edge labels stay inside
+// the plot. Rendered output is REVIEWED — computed geometry has missed
+// real collisions before.
+type LBox = { x0: number; x1: number; y0: number; y1: number };
 function marks(pts: Pt[], sc: ReturnType<typeof scale>) {
-  const out = pts.map((p) => ({ ...p, x: sc.X(p.t), y: sc.Y(p.v), above: true, lx: 0 }));
-  for (let i = 0; i < out.length; i++) {
-    const m = out[i];
-    m.lx = Math.max(x0 + 48, Math.min(x1 - 40, m.x));
-    if (i > 0 && m.x - out[i - 1].x < 78) m.above = !out[i - 1].above;
-    if (m.y < yTop + 26) m.above = false;
-    if (m.y > yBot - 26) m.above = true;
+  const CW = 6.5; // ~10.5px mono advance width
+  const out = pts.map((p) => ({ ...p, x: sc.X(p.t), y: sc.Y(p.v), lx: 0, loff: -10 }));
+  // Other points' dots are obstacles too, so a nudged label never sits on a
+  // point; a label may still sit directly above/below its own dot.
+  const dotBoxes = out.map((p) => ({ x0: p.x - 6, x1: p.x + 6, y0: p.y - 6, y1: p.y + 6 }));
+  const placed: LBox[] = [];
+  for (let mi = 0; mi < out.length; mi++) {
+    const m = out[mi];
+    const hw = (m.label.length * CW) / 2 + 2;
+    const clampX = (v: number) => Math.max(x0 + hw, Math.min(x1 - hw, v));
+    const box = (off: number, lx: number): LBox => {
+      const ly = m.y + off; // text baseline
+      return { x0: lx - hw, x1: lx + hw, y0: ly - 11, y1: ly + 3 };
+    };
+    const overlap = (b: LBox, q: LBox) =>
+      b.x0 < q.x1 && q.x0 < b.x1 && b.y0 < q.y1 && q.y0 < b.y1;
+    const collides = (b: LBox) =>
+      placed.some((q) => overlap(b, q)) || dotBoxes.some((q, qi) => qi !== mi && overlap(b, q));
+    // Baseline tiers: one row above (-10), one below (+17), then a second
+    // row out on each side for dense clusters. Edge points lose the tiers
+    // that would leave the plot.
+    const offs = [-10, 17, -24, 31].filter(
+      (off) => m.y + off - 11 >= yTop - 2 && m.y + off + 3 <= yBot + 12,
+    );
+    let pick: { off: number; lx: number } | null = null;
+    for (const dx of [0, 14, -14, 28, -28, 44, -44, 64, -64, 90, -90]) {
+      for (const off of offs) {
+        const lx = clampX(m.x + dx);
+        if (!collides(box(off, lx))) { pick = { off, lx }; break; }
+      }
+      if (pick) break;
+    }
+    if (!pick) pick = { off: offs[0] ?? -10, lx: clampX(m.x) };
+    m.loff = pick.off;
+    m.lx = pick.lx;
+    placed.push(box(pick.off, pick.lx));
   }
   return out;
 }
@@ -275,9 +317,14 @@ const datasetLd = JSON.stringify({
   ...(asOf ? { dateModified: asOf } : {}),
   variableMeasured: ['size', 'coupon or spread', 'maturity', 'seniority', 'collateral', 'lenders'],
 });
+
+// Per-issuer OG card (built by scripts/build_og_credit_<slug>.py into
+// public/og/credit-<slug>.png); falls back to the Base default when absent.
+const ogCredit = `/og/credit-${slug}.png`;
+const hasOgCard = fs.existsSync(`public${ogCredit}`);
 ---
 
-<Base title={title} description={description}>
+<Base title={title} description={description} {...(hasOgCard ? { ogImage: ogCredit } : {})}>
   <section class="wrap top">
     <div class="col">
       <PageHeader title={def.display} kicker="Credit · Tracked as filed" asOf={asOf} />
@@ -287,7 +334,7 @@ const datasetLd = JSON.stringify({
         {ordered.length === 1 ? 'instrument' : 'instruments'} issued by{' '}
         {def.display}{ticker && <> (<span class="tkr">{ticker}</span>)</>}:{' '}
         {typesPresent.join(', ').toLowerCase()}. Every row traces to a primary
-        document. Sizes are as filed and are not additive across the capital stack.
+        document.
       </p>
 
       {showSpread && sSc && (
@@ -311,10 +358,10 @@ const datasetLd = JSON.stringify({
             ))}
             <line x1={x0} y1={yBot} x2={x1} y2={yBot} class="axis" />
             {sMarks.map((m) => (
-              <>
+              <a href={`#${m.id}`} class="pt-link" aria-label={`Jump to ${m.label} details`}>
                 <circle cx={m.x} cy={m.y} r="4.5" class="pt" />
-                {sLabels && <text x={m.lx} y={m.above ? m.y - 10 : m.y + 17} class="ptl">{m.label}</text>}
-              </>
+                {sLabels && <text x={m.lx} y={m.y + m.loff} class="ptl">{m.label}</text>}
+              </a>
             ))}
           </svg>
           {spread.skipped.length > 0 && (
@@ -331,8 +378,7 @@ const datasetLd = JSON.stringify({
           <div class="panel-head">
             <div class="panel-title">Fixed coupons at issue</div>
             <div class="panel-sub">
-              Filed coupon, by issue date · hollow = convertible (the coupon is
-              not the whole return){fMultiCcy ? ' · each coupon in its instrument’s own filed currency' : ''} · window {windowLabel(fixed.pts)}
+              Filed coupon, by issue date · hollow = convertible{fMultiCcy ? ' · each coupon in its instrument’s own filed currency' : ''} · window {windowLabel(fixed.pts)}
             </div>
           </div>
           <svg viewBox={`0 0 ${W} ${H}`} role="img"
@@ -348,12 +394,12 @@ const datasetLd = JSON.stringify({
             ))}
             <line x1={x0} y1={yBot} x2={x1} y2={yBot} class="axis" />
             {fMarks.map((m) => (
-              <>
+              <a href={`#${m.id}`} class="pt-link" aria-label={`Jump to ${m.label} details`}>
                 {m.conv
                   ? <circle cx={m.x} cy={m.y} r="4.5" class="pt-conv" />
                   : <circle cx={m.x} cy={m.y} r="4.5" class="pt" />}
-                {fLabels && <text x={m.lx} y={m.above ? m.y - 10 : m.y + 17} class="ptl">{m.label}</text>}
-              </>
+                {fLabels && <text x={m.lx} y={m.y + m.loff} class="ptl">{m.label}</text>}
+              </a>
             ))}
           </svg>
           {!fLabels && (
@@ -485,6 +531,10 @@ const datasetLd = JSON.stringify({
   .tick-x { text-anchor: middle; }
   .pt { fill: var(--accent); }
   .pt-conv { fill: none; stroke: var(--accent); stroke-width: 2; }
+  .pt-link { cursor: pointer; }
+  .pt-link:hover .pt, .pt-link:focus .pt { fill: var(--ink); }
+  .pt-link:hover .pt-conv, .pt-link:focus .pt-conv { stroke: var(--ink); }
+  .pt-link:hover .ptl, .pt-link:focus .ptl { fill: var(--accent); }
   .ptl {
     font-family: var(--font-mono); font-size: 10.5px; fill: var(--ink);
     text-anchor: middle;
@@ -524,6 +574,7 @@ const datasetLd = JSON.stringify({
   .inst {
     border: 1px solid var(--rule); border-radius: 4px;
     padding: 16px 18px; background: var(--surface);
+    scroll-margin-top: 24px;
   }
   .inst h3 { font-size: var(--fs-md); margin: 0 0 6px; line-height: 1.35; }
   .meta {
