@@ -262,6 +262,41 @@ jobs:
               print(f'ok {fname} ({spec["byte_size"]} bytes)')
           PY
 
+      - name: Guard — no internal series on this public surface
+        if: steps.fetch.outputs.have_snapshot == 'true'
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import csv, glob, sys
+          # ccir-site is a PUBLIC repo: everything staged here is
+          # world-readable even when no page renders it. The hub composite
+          # (HUB-*) and the marketplace-composite series family (MC-*) are
+          # internal products; a snapshot must never carry them onto this
+          # surface. Guard added 2026-08-28 (ruled) so "hub stays dark" is
+          # structural, not habitual — an upstream export change that leaks
+          # an internal series id fails the sync loudly instead of
+          # publishing it.
+          BANNED = ("HUB-", "MC-")
+          bad = []
+          for path in sorted(glob.glob('.sync/*.csv')):
+              with open(path, newline='', encoding='utf-8',
+                        errors='replace') as f:
+                  for i, row in enumerate(csv.reader(f)):
+                      if not row:
+                          continue
+                      cell = (row[0] or '').strip()
+                      if cell.startswith(BANNED):
+                          bad.append(f'{path}:{i + 1}: {cell}')
+                          if len(bad) >= 20:
+                              break
+              if len(bad) >= 20:
+                  break
+          if bad:
+              sys.exit('INTERNAL SERIES ON PUBLIC SURFACE — sync refused:\n'
+                       + '\n'.join(bad))
+          print('guard ok: no HUB-/MC- series in synced files')
+          PY
+
       - name: Stage CSVs and rewrite meta.json
         if: steps.fetch.outputs.have_snapshot == 'true'
         run: |

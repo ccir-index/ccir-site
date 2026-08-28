@@ -46,3 +46,9 @@
 # drafts/scale_note_draft_2026_08_02.md; its images stay in
 # public/img/research/scale/ for when the note ships properly.
 /research/scale-draft               /research                 301
+
+# /realized retired 2026-08-28 (pre-redesign hand-built realized-price tool;
+# unlinked since redesign/v1, superseded by /hardware). 301 preserves any
+# crawled or shared links.
+/realized                           /hardware                 301
+/realized/*                         /hardware                 301
