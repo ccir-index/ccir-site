@@ -275,7 +275,9 @@ const sSc = spread.pts.length ? scale(spread.pts) : null;
 const fSc = fixed.pts.length ? scale(fixed.pts) : null;
 const sMarks = sSc ? marks(spread.pts, sSc) : [];
 const fMarks = fSc ? marks(fixed.pts, fSc) : [];
-const showSpread = spread.pts.length >= 2;
+// One point is enough to draw: hiding a single-row panel made an issuer's
+// only floating-rate facility invisible on the page (Nebius $775M secured).
+const showSpread = spread.pts.length >= 1;
 const showFixed = fixed.pts.length >= 2;
 // Past this density per-point labels pile into an unreadable mass (Digital
 // Realty: 24 bonds over nine years) — the dots still carry the shape, and
