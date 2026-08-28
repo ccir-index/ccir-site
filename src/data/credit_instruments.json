@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-08-27",
+    "as_of": "2026-08-28",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -2336,6 +2336,72 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000026/iren-20260331.htm"
       },
       "as_of": "2026-03-31"
+    },
+    {
+      "id": "iren-mackenzie-tl",
+      "collateral_class": "gpu",
+      "issuer": "IREN Limited",
+      "ticker": "IREN",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "Mackenzie GPU financing — Senior Secured Term Loan (Blue Owl-led)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 1200,
+      "size_note": "$2.4B package = $1.2B senior secured term loan + $1.2B senior secured notes (Blue Owl release 8/28/26). Funds purchase of air-cooled NVIDIA compute incl. Blackwell Ultra GPUs for the Mackenzie campus (British Columbia); drawn in tranches over a defined draw period against equipment delivery and commissioning. IREN FY26 results (8-K Ex-99.1, 8/27/26): 9.0% fixed rate on the package; funds 90% of associated GPU capex; part of $2.8B of GPU financings supporting non-investment-grade customer deployments.",
+      "rate": {
+        "kind": "fixed",
+        "value": 9,
+        "note": "9.0% fixed per IREN FY26 results release (package-level rate)"
+      },
+      "maturity": null,
+      "maturity_note": "Undisclosed",
+      "seniority": "Senior secured",
+      "security": "Compute equipment financing (financed GPUs); collateral detail not yet disclosed",
+      "lenders": [
+        "Blue Owl-managed funds (lead)",
+        "Pacific Investment Management Company LLC (adviser to certain investors)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-08-28",
+      "source": {
+        "doc": "IREN FY26 results 8-K Ex-99.1 (8/27/26); Blue Owl release 8/28/26",
+        "date": "2026-08-28",
+        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000051/irenreportsfy26results.htm"
+      },
+      "as_of": "2026-08-28"
+    },
+    {
+      "id": "iren-mackenzie-notes",
+      "collateral_class": "gpu",
+      "issuer": "IREN Limited",
+      "ticker": "IREN",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "Mackenzie GPU financing — Senior Secured Notes (Blue Owl-led)",
+      "instrument_type": "bond",
+      "size_usd_m": 1200,
+      "size_note": "$2.4B package = $1.2B senior secured term loan + $1.2B senior secured notes (Blue Owl release 8/28/26). Same purpose and draw mechanics as the term loan leg.",
+      "rate": {
+        "kind": "fixed",
+        "value": 9,
+        "note": "9.0% fixed per IREN FY26 results release (package-level rate)"
+      },
+      "maturity": null,
+      "maturity_note": "Undisclosed",
+      "seniority": "Senior secured",
+      "security": "Compute equipment financing (financed GPUs); collateral detail not yet disclosed",
+      "lenders": [
+        "Blue Owl-managed funds (lead)",
+        "Pacific Investment Management Company LLC (adviser to certain investors)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-08-28",
+      "source": {
+        "doc": "IREN FY26 results 8-K Ex-99.1 (8/27/26); Blue Owl release 8/28/26",
+        "date": "2026-08-28",
+        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000051/irenreportsfy26results.htm"
+      },
+      "as_of": "2026-08-28"
     },
     {
       "id": "corz-conv-2029",
