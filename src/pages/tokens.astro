@@ -304,7 +304,7 @@ const fmtV = (v: number) => (v >= 10 ? `$${Math.round(v)}` : `$${v.toFixed(2)}`)
 const windowStart = frontierDays[0] ?? '2026-07-03';
 
 /*
-  Section 00: CCIR Vercel Volume Token Index (VVTI), pilot. Weights are
+  Section 00: CCIR Vercel Volume Token Index (VVTI). Weights are
   Vercel AI Gateway daily token shares (CC BY 4.0 export); prices are this
   page's posted first-party record. Renormalized daily over the priced set;
   coverage disclosed. Series built by scratch prototype pending the
@@ -335,7 +335,7 @@ const vvPts = vv.map((p) => [p.date, p.vvti]);
   <section class="wrap">
     <div class="chart-block lead-chart">
       <div class="vvti-head">
-        <h2 class="vvti-name">CCIR Vercel Volume Token Index <span class="dim">(VVTI, pilot)</span></h2>
+        <h2 class="vvti-name">CCIR Vercel Volume Token Index <span class="dim">(VVTI)</span></h2>
         <div class="vvti-print mono">
           <span id="vvti-price">${vvLast.vvti.toFixed(2)}</span>
           <span class="vvti-chg" id="vvti-chg">{vvChg}%</span>
@@ -401,8 +401,8 @@ const vvPts = vv.map((p) => [p.date, p.vvti]);
             priced set. {vvCovLo}&ndash;{vvCovHi}% of gateway volume is priced across
             the window; the remainder sits in the leaderboard&rsquo;s own
             &ldquo;Other&rdquo; bucket. CCIR calculation; Vercel publishes shares
-            only. Pilot series: weights re-fix daily while the banded-weight
-            construction is finalized.
+            only. Weights re-fix daily with the gateway's published shares:
+            composition change is part of what the index measures.
           </p>
         </div>
       </details>
