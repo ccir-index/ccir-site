@@ -15,6 +15,19 @@ import '@fontsource/jetbrains-mono/600.css';
 import '@fontsource/ibm-plex-sans/400.css';
 import '@fontsource/ibm-plex-sans/400-italic.css';
 import '@fontsource/ibm-plex-sans/600.css';
+// CLS 2026-08-29: @fontsource ships every face `font-display: swap` and Astro
+// emits no preload, so first paint used the fallback metrics and every block
+// re-wrapped when the real face arrived. Cloudflare put site CLS at 18% poor
+// over the week, worst element the `lambda-tlb-926` definition list — the
+// longest prose block in the ledger, so the largest re-wrap. Preloading the
+// four latin subsets that carry first paint closes the swap window. Only
+// latin: the other subsets stay lazy, and preloading them would compete for
+// the same bandwidth this is trying to free.
+import plexLatin400 from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2?url';
+import plexLatin600 from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-600-normal.woff2?url';
+import monoLatin400 from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
+import groteskLatin600 from '@fontsource/space-grotesk/files/space-grotesk-latin-600-normal.woff2?url';
+const PRELOAD_FONTS = [plexLatin400, plexLatin600, monoLatin400, groteskLatin600];
 import Masthead from '../components/Masthead.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import Tape from '../components/Tape.astro';
@@ -115,6 +128,13 @@ const articleLd = article
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  {/* Ahead of the title so the preload scanner starts the fonts before the
+      stylesheet resolves. `crossorigin` is required even same-origin: without
+      it the preload lands in a different cache partition than the CSS fetch
+      and the file is downloaded twice. */}
+  {PRELOAD_FONTS.map((href) => (
+    <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />
+  ))}
   <title>{title}</title>
   <meta name="description" content={description} />
   {noindex && <meta name="robots" content="noindex,follow" />}
