@@ -36,7 +36,8 @@ export const GET: APIRoute = async () => {
       el('div', { display: 'flex', color: D.ink, fontSize: 19, fontWeight: 600 },
         'Vercel Volume Token Index (VVTI) · output, USD per 1M'),
     ]),
-    el('div', { display: 'flex', color: D.dim, fontSize: 15 }, '1M · daily candles'),
+    el('div', { display: 'flex', color: D.dim, fontSize: 15 },
+      `$${last.vvti.toFixed(2)} · ${chg}% · 1M · daily candles`),
   ]);
 
   const img = {
@@ -49,18 +50,7 @@ export const GET: APIRoute = async () => {
     },
   };
 
-  // headline print overlaid on the chart's empty upper right
-  const bigPrint = el('div', {
-    position: 'absolute', top: 26, right: 58,
-    display: 'flex', alignItems: 'baseline', gap: 22,
-  }, [
-    el('div', { display: 'flex', color: D.ink, fontSize: 84, fontWeight: 700 },
-      `$${last.vvti.toFixed(2)}`),
-    el('div', { display: 'flex', color: '#e8554e', fontSize: 84, fontWeight: 700 },
-      `${chg}%`),
-  ]);
-
-  const body = el('div', { display: 'flex', justifyContent: 'center', position: 'relative' }, [img, bigPrint]);
+  const body = el('div', { display: 'flex', justifyContent: 'center' }, [img]);
 
   const root = el('div', { display: 'flex', flexDirection: 'column', width: 1200, height: 630, backgroundColor: D.bg, fontFamily: 'IBM Plex Mono' }, [
     bar, body,
