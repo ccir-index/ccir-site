@@ -350,8 +350,7 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
         </div>
       </div>
       <div class="chart-title mono">
-        volume-weighted posted price of an output token · USD per 1M ·
-        gateway token shares × first-party posted prices · {vvFirst.date} → {vvLast.date}
+        volume-weighted posted price of an output token · USD per 1M · {vvFirst.date} → {vvLast.date}
       </div>
       <svg viewBox={`0 0 ${VVW} ${VVH}`} role="img"
         aria-label="Line chart of the CCIR Vercel Volume Token Index, the volume-weighted posted price of an output token, with the open-weight average for reference.">
@@ -380,14 +379,23 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
           open-weight average ${vvLast.open_avg.toFixed(2)}
         </text>
       </svg>
-      <p class="chart-note">
-        Weights are Vercel AI Gateway daily token shares
-        (<a href="https://vercel.com/docs/ai-gateway/leaderboards" rel="noopener">
-        &ldquo;AI Gateway Leaderboard Data&rdquo;</a>, CC BY 4.0); prices are the posted
-        first-party record on this page. {vvCovLo}&ndash;{vvCovHi}% of gateway volume
-        priced, weights renormalized daily over the priced set. CCIR calculation;
-        Vercel publishes shares only.
-      </p>
+      <details class="method-disclosure">
+        <summary>Construction &amp; source</summary>
+        <div class="disclosure-body">
+          <p>
+            VVTI is the volume-weighted average of posted output-token prices:
+            Vercel AI Gateway daily token shares
+            (<a href="https://vercel.com/docs/ai-gateway/leaderboards" rel="noopener">&ldquo;AI
+            Gateway Leaderboard Data&rdquo;</a>, CC BY 4.0) multiplied by the posted
+            first-party prices recorded on this page, renormalized daily over the
+            priced set. {vvCovLo}&ndash;{vvCovHi}% of gateway volume is priced across
+            the window; the remainder sits in the leaderboard&rsquo;s own
+            &ldquo;Other&rdquo; bucket. CCIR calculation; Vercel publishes shares
+            only. Pilot series: weights re-fix daily while the banded-weight
+            construction is finalized.
+          </p>
+        </div>
+      </details>
     </div>
   </section>
 
@@ -540,13 +548,18 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
       ))}
     </div>
 
-    <p class="foot-note scope-note">
-      Scope: these are standard self-serve rates, the price a buyer pays
-      without a contract. Batch, provisioned-throughput and committed-spend
-      tiers are separate prices and are not pooled into these figures, so a
-      large buyer's realized rate sits below them. Cached input is shown
-      wherever the owner posts it.
-    </p>
+    <details class="method-disclosure">
+      <summary>Scope</summary>
+      <div class="disclosure-body">
+        <p>
+          Standard self-serve rates, the price a buyer pays without a contract.
+          Batch, provisioned-throughput and committed-spend tiers are separate
+          prices and are not pooled into these figures, so a large buyer's
+          realized rate sits below them. Cached input is shown wherever the
+          owner posts it.
+        </p>
+      </div>
+    </details>
 
     <div class="chart-block">
       <div class="chart-title mono">
@@ -672,6 +685,9 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
           open-weight model, published at n ≥ 3.</li>
         <li>The two are never pooled. A posted price and a cross-provider
           median answer different questions.</li>
+        <li>The VVTI weights each posted output price by its model&rsquo;s daily
+          share of Vercel AI Gateway token volume (CC BY 4.0, attributed above),
+          renormalized over the priced set with coverage disclosed.</li>
         <li>Token prices are not evidence about GPU rental rates. The link
           between them is serving efficiency, a vendor variable rather than a
           market price. CCIR publishes the GPU-hour record separately.</li>
@@ -736,6 +752,19 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
   .vvti-name { font-size: var(--fs-md, 1.05rem); font-weight: 600; margin: 0; }
   .vvti-print { font-size: var(--fs-lg, 1.15rem); font-weight: 600; }
   .vvti-chg { color: var(--tok-c3-ink, #c96f06); margin-left: 4px; }
+  .method-disclosure { margin: 6px 0 0; }
+  .method-disclosure > summary {
+    list-style: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: var(--tracking-eye, 0.04em); text-transform: uppercase;
+    color: var(--ink-dim, #888); font-weight: 500; padding: 4px 0 6px;
+  }
+  .method-disclosure > summary::before { content: 'B8 '; }
+  .method-disclosure[open] > summary::before { content: 'BE '; }
+  .method-disclosure .disclosure-body p {
+    font-size: var(--fs-xs); color: var(--ink-dim, #888);
+    max-width: 72ch; margin: 2px 0 8px;
+  }
   .chart-title { font-size: var(--fs-xs); color: var(--ink-dim, #888); margin-bottom: 6px; }
   svg { width: 100%; height: auto; --tok-c1: #3b82f6; --tok-c2: #0d9488; --tok-c3: #c96f06; }
   .grid { stroke: var(--rule-soft, #8883); stroke-width: 1; }
