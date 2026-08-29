@@ -22,8 +22,11 @@ const chartUri = `data:image/png;base64,${chart.toString('base64')}`;
 const D = { bg: '#0d1117', ink: '#e6e6e6', dim: '#9aa2ad', gold: '#e5a50a' };
 
 const series = vvti.series as { date: string; vvti: number }[];
-const first = series[0];
 const last = series[series.length - 1];
+// 1M window to match the card's daily-candle chart
+const lastMs = Date.parse(last.date + 'T00:00:00Z');
+const win = series.filter((p) => lastMs - Date.parse(p.date + 'T00:00:00Z') <= 30 * 86400000);
+const first = win[0];
 const chg = Math.round(100 * (last.vvti / first.vvti - 1));
 
 export const GET: APIRoute = async () => {
@@ -34,7 +37,7 @@ export const GET: APIRoute = async () => {
         'Vercel Volume Token Index (VVTI) · output, USD per 1M'),
     ]),
     el('div', { display: 'flex', color: D.dim, fontSize: 15 },
-      `$${last.vvti.toFixed(2)} · ${chg}% · Jul 27 - Aug 29`),
+      `$${last.vvti.toFixed(2)} · ${chg}% · 1M · daily candles`),
   ]);
 
   const img = {
