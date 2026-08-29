@@ -302,6 +302,29 @@ const BAR_W = 26, BAR_GAP = 2;
 const fmtV = (v: number) => (v >= 10 ? `$${Math.round(v)}` : `$${v.toFixed(2)}`);
 
 const windowStart = frontierDays[0] ?? '2026-07-03';
+
+/*
+  Section 00: CCIR Vercel Volume Token Index (VVTI), pilot. Weights are
+  Vercel AI Gateway daily token shares (CC BY 4.0 export); prices are this
+  page's posted first-party record. Renormalized daily over the priced set;
+  coverage disclosed. Series built by scratch prototype pending the
+  production build (bronze-sourced weights on a disclosed re-fix schedule).
+*/
+import vvtiData from '../data/vvti_daily.json';
+const vv = vvtiData.series as { date: string; vvti: number; open_avg: number; coverage: number }[];
+const VVW = 960, VVH = 250, VVPL = 40, VVPR = 12, VVPT = 14, VVPB = 26;
+const vvMax = Math.ceil(Math.max(...vv.map((p) => p.vvti)) * 1.12);
+const vvx = (i: number) => VVPL + (i / Math.max(1, vv.length - 1)) * (VVW - VVPL - VVPR);
+const vvy = (v: number) => VVPT + (1 - v / vvMax) * (VVH - VVPT - VVPB);
+const vvPath = (key: 'vvti' | 'open_avg') =>
+  vv.map((p, i) => `${i ? 'L' : 'M'}${vvx(i).toFixed(1)},${vvy(p[key]).toFixed(1)}`).join(' ');
+const vvLast = vv[vv.length - 1];
+const vvFirst = vv[0];
+const vvChg = Math.round(100 * (vvLast.vvti / vvFirst.vvti - 1));
+const vvCovLo = Math.round(Math.min(...vv.map((p) => p.coverage)));
+const vvCovHi = Math.round(Math.max(...vv.map((p) => p.coverage)));
+const vvTickIdx = vv.map((_, i) => i).filter((i) => i % 7 === 0);
+const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
 ---
 <Base
   title="Token Prices — GPT-5.6, Claude & Open-Weight Models · CCIR"
@@ -314,6 +337,58 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
       kicker={`Benchmark · USD per 1M tokens${modelsTracked > 0 ? ` · ${modelsTracked} models` : ''}`}
       asOf={servedAsOf}
     />
+  </section>
+
+  <section class="wrap">
+    <div class="chart-block lead-chart">
+      <div class="vvti-head">
+        <h2 class="vvti-name">CCIR Vercel Volume Token Index <span class="dim">(VVTI, pilot)</span></h2>
+        <div class="vvti-print mono">
+          ${vvLast.vvti.toFixed(2)}
+          <span class="vvti-chg">{vvChg}%</span>
+          <span class="dim">since {vvFirst.date}</span>
+        </div>
+      </div>
+      <div class="chart-title mono">
+        volume-weighted posted price of an output token · USD per 1M ·
+        gateway token shares × first-party posted prices · {vvFirst.date} → {vvLast.date}
+      </div>
+      <svg viewBox={`0 0 ${VVW} ${VVH}`} role="img"
+        aria-label="Line chart of the CCIR Vercel Volume Token Index, the volume-weighted posted price of an output token, with the open-weight average for reference.">
+        {vvYTicks.map((t) => (
+          <>
+            <line x1={VVPL} x2={VVW - VVPR} y1={vvy(t)} y2={vvy(t)} class="grid" />
+            <text x={VVPL - 6} y={vvy(t) + 3} class="tick" text-anchor="end">${t}</text>
+          </>
+        ))}
+        {vvTickIdx.map((i) => (
+          <text x={vvx(i)} y={VVH - 6} class="tick" text-anchor="middle">{vv[i].date.slice(5)}</text>
+        ))}
+        <path d={vvPath("open_avg")} fill="none" stroke="var(--tok-c1)"
+          stroke-width="1.6" stroke-dasharray="5 4" />
+        <path d={vvPath("vvti")} fill="none" stroke="var(--tok-c3)" stroke-width="2.6" />
+        <circle cx={vvx(vv.length - 1)} cy={vvy(vvLast.vvti)} r="3.5" fill="var(--tok-c3)" />
+        <text x={vvx(vv.length - 1) - 8} y={vvy(vvLast.vvti) + 22}
+          class="series-label" fill="var(--ink, #ddd)" text-anchor="end">
+          ${vvLast.vvti.toFixed(2)}
+        </text>
+        <text x={vvx(2)} y={vvy(vvFirst.vvti) - 10} class="series-label" fill="var(--ink, #ddd)">
+          ${vvFirst.vvti.toFixed(2)}
+        </text>
+        <text x={vvx(vv.length - 1)} y={vvy(vvLast.open_avg) - 8}
+          class="series-label" fill="var(--tok-c1)" text-anchor="end">
+          open-weight average ${vvLast.open_avg.toFixed(2)}
+        </text>
+      </svg>
+      <p class="chart-note">
+        Weights are Vercel AI Gateway daily token shares
+        (<a href="https://vercel.com/docs/ai-gateway/leaderboards" rel="noopener">
+        &ldquo;AI Gateway Leaderboard Data&rdquo;</a>, CC BY 4.0); prices are the posted
+        first-party record on this page. {vvCovLo}&ndash;{vvCovHi}% of gateway volume
+        priced, weights renormalized daily over the priced set. CCIR calculation;
+        Vercel publishes shares only.
+      </p>
+    </div>
   </section>
 
   <section class="wrap">
@@ -656,6 +731,11 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   /* Lead chart sits directly under the hero — tighter top, a little more air
      before the first section rule. */
   .lead-chart { margin-top: 18px; margin-bottom: 8px; }
+  .vvti-head { display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: 6px 16px; margin-bottom: 2px; }
+  .vvti-name { font-size: var(--fs-md, 1.05rem); font-weight: 600; margin: 0; }
+  .vvti-print { font-size: var(--fs-lg, 1.15rem); font-weight: 600; }
+  .vvti-chg { color: var(--tok-c3-ink, #c96f06); margin-left: 4px; }
   .chart-title { font-size: var(--fs-xs); color: var(--ink-dim, #888); margin-bottom: 6px; }
   svg { width: 100%; height: auto; --tok-c1: #3b82f6; --tok-c2: #0d9488; --tok-c3: #c96f06; }
   .grid { stroke: var(--rule-soft, #8883); stroke-width: 1; }
