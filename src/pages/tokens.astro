@@ -312,29 +312,22 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
 */
 import vvtiData from '../data/vvti_daily.json';
 const vv = vvtiData.series as { date: string; vvti: number; open_avg: number; coverage: number }[];
-const VVW = 960, VVH = 250, VVPL = 40, VVPR = 12, VVPT = 14, VVPB = 26;
-const vvMax = Math.ceil(Math.max(...vv.map((p) => p.vvti)) * 1.12);
-const vvx = (i: number) => VVPL + (i / Math.max(1, vv.length - 1)) * (VVW - VVPL - VVPR);
-const vvy = (v: number) => VVPT + (1 - v / vvMax) * (VVH - VVPT - VVPB);
-const vvPath = (key: 'vvti' | 'open_avg') =>
-  vv.map((p, i) => `${i ? 'L' : 'M'}${vvx(i).toFixed(1)},${vvy(p[key]).toFixed(1)}`).join(' ');
 const vvLast = vv[vv.length - 1];
 const vvFirst = vv[0];
 const vvChg = Math.round(100 * (vvLast.vvti / vvFirst.vvti - 1));
 const vvCovLo = Math.round(Math.min(...vv.map((p) => p.coverage)));
 const vvCovHi = Math.round(Math.max(...vv.map((p) => p.coverage)));
-const vvTickIdx = vv.map((_, i) => i).filter((i) => i % 7 === 0);
-const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
+const vvPts = vv.map((p) => [p.date, p.vvti]);
 ---
 <Base
-  title="Token Prices — GPT-5.6, Claude & Open-Weight Models · CCIR"
-  description="Daily record of posted token prices from model owners' own price lists — OpenAI, Anthropic, Google, DeepSeek, Moonshot, xAI, Meta, Alibaba, Z.AI, MiniMax, Mistral and more — plus cross-provider medians for open-weight models served by three or more independent providers. USD per 1M tokens."
+  title="Token Index (VVTI) & Token Prices — GPT-5.6, Claude & Open-Weight Models · CCIR"
+  description="The CCIR Vercel Volume Token Index (VVTI), the volume-weighted posted price of an output token on Vercel AI Gateway traffic shares, plus the daily record of posted token prices from model owners' own price lists — OpenAI, Anthropic, Google, DeepSeek, Moonshot, xAI, Meta, Alibaba, Z.AI, MiniMax, Mistral and more — plus cross-provider medians for open-weight models served by three or more independent providers. USD per 1M tokens."
   ogImage="/og/tokenindex.png"
 >
   <section class="wrap page-top">
     <PageHeader
-      title="Token Prices"
-      kicker={`Benchmark · USD per 1M tokens${modelsTracked > 0 ? ` · ${modelsTracked} models` : ''}`}
+      title="Token Index & Prices"
+      kicker={`VVTI pilot · Benchmark record · USD per 1M tokens${modelsTracked > 0 ? ` · ${modelsTracked} models` : ''}`}
       asOf={servedAsOf}
     />
   </section>
@@ -344,32 +337,60 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
       <div class="vvti-head">
         <h2 class="vvti-name">CCIR Vercel Volume Token Index <span class="dim">(VVTI, pilot)</span></h2>
         <div class="vvti-print mono">
-          ${vvLast.vvti.toFixed(2)}
-          <span class="vvti-chg">{vvChg}%</span>
-          <span class="dim">since {vvFirst.date}</span>
+          <span id="vvti-price">${vvLast.vvti.toFixed(2)}</span>
+          <span class="vvti-chg" id="vvti-chg">{vvChg}%</span>
+          <span class="dim" id="vvti-since">since {vvFirst.date}</span>
         </div>
       </div>
       <div class="chart-title mono">
-        volume-weighted posted price of an output token · USD per 1M · {vvFirst.date} → {vvLast.date}
+        volume-weighted posted price of an output token · USD per 1M ·
+        <span id="vvti-winlbl">MAX</span>
       </div>
-      <div class="vvti-chart-box" id="vvti-chart">
-        <svg viewBox={`0 0 ${VVW} ${VVH}`} role="img"
-          aria-label="Line chart of the CCIR Vercel Volume Token Index, the volume-weighted posted price of an output token.">
-          {vvYTicks.map((t) => (
-            <>
-              <line x1={VVPL} x2={VVW - VVPR} y1={vvy(t)} y2={vvy(t)} class="grid" />
-              <text x={VVPL - 6} y={vvy(t) + 3} class="tick" text-anchor="end">${t}</text>
-            </>
-          ))}
-          {vvTickIdx.map((i) => (
-            <text x={vvx(i)} y={VVH - 6} class="tick" text-anchor="middle">{vv[i].date.slice(5)}</text>
-          ))}
-          <path d={vvPath("vvti")} fill="none" stroke="var(--tok-c3)" stroke-width="2.6" />
-          <circle cx={vvx(vv.length - 1)} cy={vvy(vvLast.vvti)} r="3.5" fill="var(--tok-c3)" />
-          <line id="vvti-cross" x1="0" x2="0" y1={VVPT} y2={VVH - VVPB} class="crosshair" style="display:none" />
+      <div class="vvti-chart-box">
+        <svg class="vvti-chart" id="vvtichart" viewBox="0 0 920 340">
+          <defs>
+            <linearGradient id="vv-greenfade" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#2fbd6f" stop-opacity="0.20" />
+              <stop offset="100%" stop-color="#2fbd6f" stop-opacity="0" />
+            </linearGradient>
+            <linearGradient id="vv-redfade" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#e8554e" stop-opacity="0.20" />
+              <stop offset="100%" stop-color="#e8554e" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <g class="vv-gridlines" id="vv-gridlines"></g>
+          <path id="vv-area" />
+          <path id="vv-line" fill="none" stroke="var(--tok-c3)" stroke-width="1.8" />
+          <g id="vv-candles"></g>
+          <g class="vv-axis" id="vv-xaxis"></g>
+          <g class="vv-axis" id="vv-yaxis"></g>
+          <rect id="vv-selrect" class="vv-selrect" style="display:none" y="0" height="316" />
+          <g id="vv-xhair" style="display:none" pointer-events="none">
+            <line id="vvxh-v" y1="10" y2="316" />
+            <line id="vvxh-h" x1="46" x2="874" />
+            <circle id="vvxh-dot" r="3.5" />
+            <rect id="vvxh-box" width="140" height="30" rx="2" />
+            <text id="vvxh-val" font-weight="600" />
+            <text id="vvxh-date" class="dim" />
+            <rect id="vvxh-ychip" width="44" height="14" rx="2" />
+            <text id="vvxh-yval" />
+            <rect id="vvxh-xchip" width="58" height="14" rx="2" />
+            <text id="vvxh-xval" />
+          </g>
         </svg>
-        <div id="vvti-tip" class="vvti-tip" style="display:none"></div>
       </div>
+      <div class="vv-rangerow">
+        <span class="vv-tabs" id="vvti-type-tabs">
+          <button data-type="line" class="on">LINE</button>
+          <button data-type="candle">CANDLE</button>
+        </span>
+        <span class="vv-tabs" id="vvti-range-tabs">
+          <button data-range="7">1W</button>
+          <button data-range="30">1M</button>
+          <button data-range="max" class="on">MAX</button>
+        </span>
+      </div>
+      <div class="vv-chrome mono">drag to zoom · double-click to reset</div>
       <details class="method-disclosure">
         <summary>Construction &amp; source</summary>
         <div class="disclosure-body">
@@ -464,8 +485,10 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: 'CCIR Token Posted Price Record',
-    description: 'Daily record of posted prices per 1 million tokens: '
+    name: 'CCIR Vercel Volume Token Index (VVTI) & Token Posted Price Record',
+    description: 'The CCIR Vercel Volume Token Index (VVTI): the volume-weighted '
+      + 'posted price of an output token, weighted by Vercel AI Gateway daily '
+      + 'token shares (CC BY 4.0). Plus the daily record of posted prices per 1 million tokens: '
       + 'first-party price lists published by the model owners themselves '
       + '(frontier posted construction) and cross-provider medians for '
       + 'open-weight models served by three or more independent providers '
@@ -476,13 +499,16 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
     isAccessibleForFree: true,
     temporalCoverage: `${windowStart}/..`,
     keywords: [
-      'token prices', 'GPT-5.6 API pricing', 'Claude API pricing',
+      'token index', 'AI token price index', 'CCIR Vercel Volume Token Index',
+      'VVTI', 'volume-weighted token price', 'LLM cost index',
+      'AI inference cost index', 'token prices', 'GPT-5.6 API pricing', 'Claude API pricing',
       'Gemini API pricing', 'Grok API pricing', 'Muse Spark pricing',
       'Kimi K3 price', 'DeepSeek price', 'GLM pricing', 'Qwen pricing',
       'Mistral API pricing', 'price per million tokens',
       'LLM inference pricing', 'open-weight model pricing',
     ],
     variableMeasured: [
+      { '@type': 'PropertyValue', name: 'VVTI index level (output leg)', unitText: 'USD per 1M tokens' },
       { '@type': 'PropertyValue', name: 'input price', unitText: 'USD per 1M tokens' },
       { '@type': 'PropertyValue', name: 'cached input price', unitText: 'USD per 1M tokens' },
       { '@type': 'PropertyValue', name: 'output price', unitText: 'USD per 1M tokens' },
@@ -631,39 +657,234 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
 
   </section>
 
-  <script is:inline define:vars={{
-    vvD: vv.map((p) => ({ d: p.date, v: p.vvti, c: p.coverage })),
-    VVW, VVPL, VVPR, VVPT, VVH,
-  }}>
-    // Crosshair + tooltip for the VVTI chart (od-vs-committed pattern).
+  <script is:inline define:vars={{ vvPts }}>
+    // VVTI chart: direct port of the hub terminal chart (hub/terminal-v1)
+    // so the two surfaces read identically at hub launch. Two-tone area
+    // (green/red by window direction), 1W/1M/MAX ranges, LINE/CANDLE
+    // (daily candles to 32d, weekly beyond), drag-zoom, full crosshair.
     (function () {
-      var box = document.getElementById('vvti-chart');
-      if (!box) return;
-      var tip = document.getElementById('vvti-tip');
-      var cross = document.getElementById('vvti-cross');
-      var svg = box.querySelector('svg');
-      if (!tip || !cross || !svg) return;
-      var innerW = VVW - VVPL - VVPR;
-      function show(ev) {
-        var r = svg.getBoundingClientRect();
-        var relX = ((ev.clientX - r.left) / r.width) * VVW;
-        var i = Math.round(((relX - VVPL) / innerW) * (vvD.length - 1));
-        if (i < 0 || i > vvD.length - 1) { hide(); return; }
-        var d = vvD[i];
-        var xPix = VVPL + (i * innerW) / (vvD.length - 1);
-        cross.setAttribute('x1', xPix); cross.setAttribute('x2', xPix);
-        cross.style.display = '';
-        tip.innerHTML = '<strong>' + d.d + '</strong><br>$' + d.v.toFixed(2) +
-          ' per 1M<br><span class="tn">' + d.c.toFixed(0) + '% of volume priced</span>';
-        tip.style.display = '';
-        var left = (xPix / VVW) * r.width + 12;
-        if (left > r.width - 160) left -= 185;
-        tip.style.left = left + 'px';
-        tip.style.top = '14px';
+      const H = 340, PADL = 46, PADR = 46, PADT = 10, PADB = 24;
+      const DAY = 86400000;
+      const GREEN = "#2fbd6f", RED = "#e8554e";
+      let W = 920, rangeDays = "max", zoom = null, ctype = "line", scaleState = null;
+      const $ = (id) => document.getElementById(id);
+      const svg = $("vvtichart");
+      if (!svg) return;
+      const sel = $("vv-selrect");
+      const t = (d) => Date.parse(d + "T00:00:00Z");
+      const pts0 = vvPts.map(([d, v]) => [t(d), v]);
+      const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+      const dlabel = (ms) => {
+        const d = new Date(ms);
+        return `${MONTHS[d.getUTCMonth()]} ${String(d.getUTCDate()).padStart(2, "0")}`;
+      };
+      const sgnp = (p, dp = 1) =>
+        p == null ? "\u2014" : `${p >= 0 ? "+" : "\u2212"}${Math.abs(p).toFixed(dp)}%`;
+      function windowBounds() {
+        const tEnd = pts0[pts0.length - 1][0];
+        if (zoom) return zoom;
+        if (rangeDays === "max") return [pts0[0][0], tEnd];
+        return [tEnd - rangeDays * DAY, tEnd];
       }
-      function hide() { tip.style.display = 'none'; cross.style.display = 'none'; }
-      box.addEventListener('mousemove', show);
-      box.addEventListener('mouseleave', hide);
+      function pathOf(pts, X, Y) {
+        let d = "", prev = 0, first = null, lastX = null;
+        pts.forEach(([x, v], i) => {
+          const gap = i > 0 && (x - prev) > DAY * 1.5;
+          const px = X(x), py = Y(v);
+          d += `${i === 0 || gap ? "M" : "L"}${px.toFixed(1)},${py.toFixed(1)} `;
+          if (first == null) first = px;
+          lastX = px; prev = x;
+        });
+        return { d, first, lastX };
+      }
+      function render() {
+        W = svg.clientWidth || W;
+        svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+        const [t0, t1] = windowBounds();
+        const pts = pts0.filter(([x]) => x >= t0 && x <= t1);
+        const spanDays = (t1 - t0) / DAY;
+        const xg = $("vv-xaxis"), yg = $("vv-yaxis"), gg = $("vv-gridlines");
+        xg.innerHTML = ""; yg.innerHTML = ""; gg.innerHTML = "";
+        $("vv-area").setAttribute("d", "");
+        $("vv-candles").innerHTML = "";
+        scaleState = null;
+        if (pts.length >= 2) {
+          let lo = Infinity, hi = -Infinity;
+          pts.forEach(([, v]) => { if (v < lo) lo = v; if (v > hi) hi = v; });
+          const steps = [0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 3, 5];
+          const rawSpan = (hi - lo) || 1;
+          const step = steps.find((st) => rawSpan / st <= 6) || steps[steps.length - 1];
+          lo = Math.floor(lo / step) * step;
+          hi = Math.ceil(hi / step) * step;
+          const yspan = (hi - lo) || 1;
+          const X = (x) => PADL + ((x - t0) / ((t1 - t0) || 1)) * (W - PADL - PADR);
+          const Y = (v) => H - PADB - ((v - lo) / yspan) * (H - PADT - PADB);
+          const up = pts[pts.length - 1][1] >= pts[0][1];
+          const lineCol = up ? GREEN : RED;
+          $("vv-line").setAttribute("stroke", lineCol);
+          $("vv-area").setAttribute("fill", up ? "url(#vv-greenfade)" : "url(#vv-redfade)");
+          $("vvxh-dot").style.fill = lineCol;
+          const candleMode = ctype === "candle";
+          if (candleMode && spanDays <= 32) {
+            $("vv-line").setAttribute("d", "");
+            const wPix = Math.max(2.5, (DAY / ((t1 - t0) || 1)) * (W - PADL - PADR) * 0.55);
+            let html = "";
+            for (let i = 1; i < pts.length; i++) {
+              const x = pts[i][0], v = pts[i][1]; const pv = pts[i - 1][1];
+              const col = v >= pv ? GREEN : RED;
+              const cx = X(x);
+              const top = Y(Math.max(v, pv)), bot = Y(Math.min(v, pv));
+              html += `<rect x="${(cx - wPix / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${wPix.toFixed(1)}" height="${Math.max(1, bot - top).toFixed(1)}" fill="${col}"/>`;
+            }
+            $("vv-candles").innerHTML = html;
+          } else if (candleMode) {
+            $("vv-line").setAttribute("d", "");
+            const weeks = new Map();
+            pts.forEach(([x, v]) => {
+              const wk = Math.floor((x + 3 * DAY) / (7 * DAY));
+              if (!weeks.has(wk)) weeks.set(wk, { xs: [], vs: [] });
+              const w = weeks.get(wk); w.xs.push(x); w.vs.push(v);
+            });
+            const wPix = Math.max(3, ((7 * DAY) / ((t1 - t0) || 1)) * (W - PADL - PADR) * 0.5);
+            let html = "";
+            for (const w of weeks.values()) {
+              const o = w.vs[0], c = w.vs[w.vs.length - 1];
+              const hh = Math.max(...w.vs), ll = Math.min(...w.vs);
+              const cx = X(w.xs[Math.floor(w.xs.length / 2)]);
+              const col = c >= o ? GREEN : RED;
+              const top = Y(Math.max(o, c)), bot = Y(Math.min(o, c));
+              html += `<line x1="${cx.toFixed(1)}" x2="${cx.toFixed(1)}" y1="${Y(hh).toFixed(1)}" y2="${Y(ll).toFixed(1)}" stroke="${col}" stroke-width="1"/>` +
+                `<rect x="${(cx - wPix / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${wPix.toFixed(1)}" height="${Math.max(1, bot - top).toFixed(1)}" fill="${col}"/>`;
+            }
+            $("vv-candles").innerHTML = html;
+          } else {
+            const main = pathOf(pts, X, Y);
+            $("vv-line").setAttribute("d", main.d);
+            if (main.d) {
+              $("vv-area").setAttribute("d",
+                `${main.d}L${main.lastX.toFixed(1)},${H - PADB} L${main.first.toFixed(1)},${H - PADB} Z`);
+            }
+          }
+          scaleState = { pts, X, Y, base: pts[0][1] };
+          for (let v = lo; v <= hi + step / 2; v += step) {
+            const y = Y(v);
+            const lbl = "$" + v.toFixed(2);
+            yg.insertAdjacentHTML("beforeend",
+              `<text x="2" y="${(y + 3).toFixed(1)}">${lbl}</text>` +
+              `<text x="${W - 2}" y="${(y + 3).toFixed(1)}" text-anchor="end">${lbl}</text>`);
+            gg.insertAdjacentHTML("beforeend",
+              `<line x1="${PADL}" x2="${W - PADR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`);
+          }
+          const span = t1 - t0;
+          const ticks = [];
+          if (spanDays <= 35) {
+            for (let x = t0; x <= t1 + DAY / 2; x += 7 * DAY) ticks.push(Math.min(x, t1));
+          } else {
+            for (let i = 0; i <= 6; i++) ticks.push(t0 + (span * i) / 6);
+          }
+          ticks.forEach((x, i) => {
+            const px = X(x);
+            const anchor = i === 0 ? "start" : i === ticks.length - 1 ? "end" : "middle";
+            xg.insertAdjacentHTML("beforeend",
+              `<text x="${px.toFixed(1)}" y="${H - 8}" text-anchor="${anchor}">${dlabel(x)}</text>`);
+            if (i > 0 && i < ticks.length - 1) {
+              gg.insertAdjacentHTML("beforeend",
+                `<line x1="${px.toFixed(1)}" x2="${px.toFixed(1)}" y1="${PADT}" y2="${H - PADB}"/>`);
+            }
+          });
+          const winLbl = zoom ? `${dlabel(t0)}\u2013${dlabel(t1)}`
+            : (rangeDays === "max" ? "MAX" : { 7: "1W", 30: "1M" }[rangeDays]);
+          const vs2 = pts.map((p) => p[1]);
+          const wchg = 100 * (vs2[vs2.length - 1] / vs2[0] - 1);
+          $("vvti-winlbl").textContent = winLbl +
+            (ctype === "candle" ? (spanDays <= 32 ? " \u00b7 DAILY CANDLES" : " \u00b7 WEEKLY CANDLES") : "");
+          $("vvti-price").textContent = `$${vs2[vs2.length - 1].toFixed(2)}`;
+          const ch = $("vvti-chg");
+          ch.textContent = sgnp(wchg, Math.abs(wchg) >= 100 ? 0 : 1);
+          ch.style.color = wchg >= 0 ? GREEN : RED;
+          $("vvti-since").textContent = zoom
+            ? `${dlabel(t0)} \u2192 ${dlabel(t1)}`
+            : (rangeDays === "max" ? "since " + new Date(pts[0][0]).toISOString().slice(0, 10)
+               : `${winLbl} window`);
+        } else {
+          $("vv-line").setAttribute("d", "");
+        }
+        $("vv-xhair").style.display = "none";
+        document.querySelectorAll("#vvti-range-tabs [data-range]").forEach((b) =>
+          b.classList.toggle("on", !zoom && String(rangeDays) === b.dataset.range));
+        document.querySelectorAll("#vvti-type-tabs button").forEach((b) =>
+          b.classList.toggle("on", b.dataset.type === ctype));
+      }
+      let dragX = null;
+      function moveCrosshair(px) {
+        if (!scaleState) { $("vv-xhair").style.display = "none"; return; }
+        const pts = scaleState.pts, X = scaleState.X, Y = scaleState.Y;
+        let best = pts[0], bd = Infinity;
+        for (const pt of pts) {
+          const d = Math.abs(X(pt[0]) - px);
+          if (d < bd) { bd = d; best = pt; }
+        }
+        const sx = X(best[0]), sy = Y(best[1]);
+        $("vvxh-v").setAttribute("x1", sx); $("vvxh-v").setAttribute("x2", sx);
+        $("vvxh-h").setAttribute("x1", PADL); $("vvxh-h").setAttribute("x2", W - PADR);
+        $("vvxh-h").setAttribute("y1", sy); $("vvxh-h").setAttribute("y2", sy);
+        $("vvxh-dot").setAttribute("cx", sx); $("vvxh-dot").setAttribute("cy", sy);
+        const bx = sx + 12 + 140 > W - PADR ? sx - 152 : sx + 12;
+        const by = Math.max(PADT, Math.min(sy - 15, H - PADB - 32));
+        $("vvxh-box").setAttribute("x", bx); $("vvxh-box").setAttribute("y", by);
+        $("vvxh-val").setAttribute("x", bx + 8); $("vvxh-val").setAttribute("y", by + 13);
+        const chg = scaleState.base > 0 ? 100 * (best[1] / scaleState.base - 1) : null;
+        $("vvxh-val").textContent = `$${best[1].toFixed(2)}  ${sgnp(chg, 1)}`;
+        $("vvxh-date").setAttribute("x", bx + 8); $("vvxh-date").setAttribute("y", by + 25);
+        $("vvxh-date").textContent = dlabel(best[0]);
+        $("vvxh-ychip").setAttribute("x", W - 44); $("vvxh-ychip").setAttribute("y", sy - 7);
+        $("vvxh-yval").setAttribute("x", W - 40); $("vvxh-yval").setAttribute("y", sy + 4);
+        $("vvxh-yval").textContent = best[1].toFixed(2);
+        const xcx = Math.max(PADL, Math.min(sx - 29, W - PADR - 58));
+        $("vvxh-xchip").setAttribute("x", xcx); $("vvxh-xchip").setAttribute("y", H - PADB + 4);
+        $("vvxh-xval").setAttribute("x", xcx + 6); $("vvxh-xval").setAttribute("y", H - PADB + 15);
+        $("vvxh-xval").textContent = dlabel(best[0]);
+        $("vv-xhair").style.display = "";
+      }
+      const frac = (evt) => {
+        const r = svg.getBoundingClientRect();
+        return Math.max(0, Math.min(W, ((evt.clientX - r.left) / r.width) * W));
+      };
+      svg.addEventListener("pointerdown", (e) => { dragX = frac(e); svg.setPointerCapture(e.pointerId); });
+      svg.addEventListener("pointermove", (e) => {
+        const x = frac(e);
+        if (dragX == null) { moveCrosshair(x); return; }
+        $("vv-xhair").style.display = "none";
+        sel.style.display = "";
+        sel.setAttribute("x", Math.min(dragX, x));
+        sel.setAttribute("width", Math.abs(x - dragX));
+      });
+      svg.addEventListener("pointerleave", () => { $("vv-xhair").style.display = "none"; });
+      svg.addEventListener("pointerup", (e) => {
+        if (dragX == null) return;
+        const x = frac(e);
+        sel.style.display = "none";
+        if (Math.abs(x - dragX) > 12) {
+          const bounds = windowBounds();
+          const span = bounds[1] - bounds[0];
+          const f = (px) => bounds[0] + span * Math.max(0, Math.min(1, (px - PADL) / (W - PADL - PADR)));
+          const a = f(Math.min(dragX, x)), b = f(Math.max(dragX, x));
+          if (b - a >= 3 * DAY) zoom = [a, b];
+        }
+        dragX = null;
+        render();
+      });
+      svg.addEventListener("dblclick", () => { zoom = null; render(); });
+      document.querySelectorAll("#vvti-range-tabs [data-range]").forEach((b) =>
+        b.addEventListener("click", () => {
+          rangeDays = b.dataset.range === "max" ? "max" : parseInt(b.dataset.range);
+          zoom = null; render();
+        }));
+      document.getElementById("vvti-type-tabs").addEventListener("click", (e) => {
+        if (e.target.dataset.type) { ctype = e.target.dataset.type; render(); }
+      });
+      window.addEventListener("resize", render);
+      render();
     })();
   </script>
 
@@ -780,15 +1001,26 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
   .vvti-print { font-size: var(--fs-lg, 1.15rem); font-weight: 600; }
   .vvti-chg { color: var(--tok-c3-ink, #c96f06); margin-left: 4px; }
   .vvti-chart-box { position: relative; }
-  .crosshair { stroke: var(--ink-faint, #777); stroke-width: 1; stroke-dasharray: 3 3; }
-  .vvti-tip {
-    position: absolute; pointer-events: none;
-    font-family: var(--font-mono); font-size: var(--fs-xs);
-    color: var(--ink); background: var(--surface-2, #1a1d21);
-    border: 1px solid var(--rule-2, #444); padding: 7px 10px; line-height: 1.55;
-    min-width: 120px;
-  }
-  .vvti-tip :global(.tn) { color: var(--ink-faint, #777); }
+  svg.vvti-chart { width: 100%; height: 340px; display: block; cursor: crosshair;
+    user-select: none; touch-action: none; }
+  .vv-gridlines line { stroke: var(--rule, #8883); stroke-dasharray: 2 3; }
+  .vv-axis text { fill: var(--ink-faint, #96a0ac); font-size: 10.5px;
+    font-family: var(--font-mono); }
+  .vv-selrect { fill: rgba(77,196,217,.10); stroke: rgba(77,196,217,.5); stroke-width: 1; }
+  #vv-xhair line { stroke: var(--ink-dim, #888); stroke-dasharray: 3 3; stroke-width: 1; }
+  #vv-xhair circle { stroke: var(--surface, #fff); stroke-width: 1.5; }
+  #vv-xhair rect { fill: var(--surface-2, #f2f2f2); stroke: var(--rule-2, #8886); }
+  #vv-xhair text { fill: var(--ink); font-size: 10.5px; font-family: var(--font-mono); }
+  #vv-xhair text.dim { fill: var(--ink-dim, #888); }
+  .vv-rangerow { display: flex; justify-content: space-between; margin-top: 8px; }
+  .vv-tabs { display: flex; gap: 2px; }
+  .vv-tabs button { background: var(--surface-2, #f2f2f2); border: 1px solid var(--rule, #8884);
+    color: var(--ink-dim, #888); font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.06em; padding: 3px 12px; cursor: pointer; text-transform: uppercase; }
+  .vv-tabs button.on { color: var(--accent); border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent); }
+  .vv-chrome { color: var(--ink-faint, #999); font-size: 10px; margin-top: 6px;
+    letter-spacing: 0.04em; text-align: center; }
   .method-disclosure { margin: 6px 0 0; }
   .method-disclosure > summary {
     list-style: none; cursor: pointer;
