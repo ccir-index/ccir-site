@@ -29,7 +29,7 @@ const spectrum = [
     tenor: 'Per second / per hour',
     obligation: 'Pay for hours consumed; stop anytime',
     capacity: 'Not guaranteed; interruptible tiers exist',
-    paper: 'Published terms of service — accepted, not negotiated',
+    paper: 'Published terms of service, accepted rather than negotiated',
   },
   {
     mode: 'Reserved / committed',
@@ -55,7 +55,7 @@ const msas = [
   { cp: 'Microsoft', signed: 'Feb 22, 2023', filed: 'Ex. 10.23, Form S-1 (Mar 2025)', url: 'msft',
     notable: 'Take-or-pay termination mechanics with remarketing offset; 2-day hardware-failure payment relief' },
   { cp: 'NVIDIA', signed: 'Apr 10, 2023', filed: 'Ex. 10.31, Form S-4/A (Sep 2025)', url: 'nvidia',
-    notable: 'Capacity cap on NVIDIA’s own usage — the “[*] Rule,” size redacted' },
+    notable: 'Capacity cap on NVIDIA’s own usage: the “[*] Rule,” size redacted' },
   { cp: 'OpenAI', signed: 'Mar 7, 2025', filed: 'Ex. 10.24, Form S-1/A (Mar 2025)', url: 'openai',
     notable: 'Substitute-operator assignment right; “Reportable Event” payment-distress covenant; $350M initial public offering (IPO) share issuance' },
   { cp: 'OpenAI (second)', signed: 'May 8, 2025', filed: 'Ex. 10.32, Form S-4/A (Sep 2025)', url: 'openai2',
@@ -493,15 +493,15 @@ const msas = [
     <section class="sec" id="sources">
       <h2><span class="n">07</span> Sources</h2>
       <ul class="src-list">
-        <li>CoreWeave–Microsoft Master Services Agreement (Feb 22, 2023) — <a href={EDGAR.msft} rel="noopener" target="_blank">Ex. 10.23</a> to Form S-1, accession 0001193125-25-044231</li>
-        <li>CoreWeave–OpenAI Master Services Agreement, Bare Metal Environment (Mar 7, 2025) — <a href={EDGAR.openai} rel="noopener" target="_blank">Ex. 10.24</a> to Form S-1/A, accession 0001193125-25-052207</li>
-        <li>CoreWeave–NVIDIA Master Services Agreement (Apr 10, 2023) — <a href={EDGAR.nvidia} rel="noopener" target="_blank">Ex. 10.31</a> to Form S-4/A, accession 0001140361-25-036118</li>
-        <li>CoreWeave–OpenAI Master Services Agreement, second (May 8, 2025) — <a href={EDGAR.openai2} rel="noopener" target="_blank">Ex. 10.32</a> to Form S-4/A, accession 0001140361-25-036118</li>
-        <li>Soluna–HPE GreenLake Statement of Work, HPC &amp; AI Cloud Services Agreement, and SLA (June 2024) — <a href={EDGAR.soluna} rel="noopener" target="_blank">Ex. 10.105</a> to Soluna Holdings' Form 10-Q, accession 0001493152-24-032123; deal terms per the June 24, 2024 8-K (accession 0001493152-24-024845); termination per the March 28, 2025 8-K (accession 0001641172-25-001318)</li>
-        <li>Voltage Park Compute Services Agreement (last revised May 28, 2026) — <a href="https://www.voltagepark.com/computer-services-agreement" rel="noopener" target="_blank">voltagepark.com</a></li>
-        <li>Nebius Services Agreement — <a href="https://docs.nebius.com/legal/agreement" rel="noopener" target="_blank">docs.nebius.com</a>; AWS Capacity Blocks for ML — <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-capacity-blocks.html" rel="noopener" target="_blank">AWS documentation</a></li>
+        <li>CoreWeave–Microsoft Master Services Agreement (Feb 22, 2023): <a href={EDGAR.msft} rel="noopener" target="_blank">Ex. 10.23</a> to Form S-1, accession 0001193125-25-044231</li>
+        <li>CoreWeave–OpenAI Master Services Agreement, Bare Metal Environment (Mar 7, 2025): <a href={EDGAR.openai} rel="noopener" target="_blank">Ex. 10.24</a> to Form S-1/A, accession 0001193125-25-052207</li>
+        <li>CoreWeave–NVIDIA Master Services Agreement (Apr 10, 2023): <a href={EDGAR.nvidia} rel="noopener" target="_blank">Ex. 10.31</a> to Form S-4/A, accession 0001140361-25-036118</li>
+        <li>CoreWeave–OpenAI Master Services Agreement, second (May 8, 2025): <a href={EDGAR.openai2} rel="noopener" target="_blank">Ex. 10.32</a> to Form S-4/A, accession 0001140361-25-036118</li>
+        <li>Soluna–HPE GreenLake Statement of Work, HPC &amp; AI Cloud Services Agreement, and SLA (June 2024): <a href={EDGAR.soluna} rel="noopener" target="_blank">Ex. 10.105</a> to Soluna Holdings' Form 10-Q, accession 0001493152-24-032123; deal terms per the June 24, 2024 8-K (accession 0001493152-24-024845); termination per the March 28, 2025 8-K (accession 0001641172-25-001318)</li>
+        <li>Voltage Park Compute Services Agreement (last revised May 28, 2026): <a href="https://www.voltagepark.com/computer-services-agreement" rel="noopener" target="_blank">voltagepark.com</a></li>
+        <li>Nebius Services Agreement: <a href="https://docs.nebius.com/legal/agreement" rel="noopener" target="_blank">docs.nebius.com</a>; AWS Capacity Blocks for ML: <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-capacity-blocks.html" rel="noopener" target="_blank">AWS documentation</a></li>
         <li>Applied Digital Form 8-K (June 2, 2025) with Building 2 and Building 3 Datacenter Leases — <a href={EDGAR.apld8k} rel="noopener" target="_blank">8-K body</a>, <a href={EDGAR.apldLease2} rel="noopener" target="_blank">Ex. 10.1</a>, <a href={EDGAR.apldLease3} rel="noopener" target="_blank">Ex. 10.2</a>, accession 0001641172-25-013199</li>
-        <li>CoreWeave Terms of Service (last modified June 30, 2022) — <a href={EDGAR.tos} rel="noopener" target="_blank">docs.coreweave.com</a></li>
+        <li>CoreWeave Terms of Service (last modified June 30, 2022): <a href={EDGAR.tos} rel="noopener" target="_blank">docs.coreweave.com</a></li>
       </ul>
       <p class="tfoot">
         All excerpts verified against the filed text on {DATED}. [*] marks
