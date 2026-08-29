@@ -352,33 +352,24 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
       <div class="chart-title mono">
         volume-weighted posted price of an output token · USD per 1M · {vvFirst.date} → {vvLast.date}
       </div>
-      <svg viewBox={`0 0 ${VVW} ${VVH}`} role="img"
-        aria-label="Line chart of the CCIR Vercel Volume Token Index, the volume-weighted posted price of an output token, with the open-weight average for reference.">
-        {vvYTicks.map((t) => (
-          <>
-            <line x1={VVPL} x2={VVW - VVPR} y1={vvy(t)} y2={vvy(t)} class="grid" />
-            <text x={VVPL - 6} y={vvy(t) + 3} class="tick" text-anchor="end">${t}</text>
-          </>
-        ))}
-        {vvTickIdx.map((i) => (
-          <text x={vvx(i)} y={VVH - 6} class="tick" text-anchor="middle">{vv[i].date.slice(5)}</text>
-        ))}
-        <path d={vvPath("open_avg")} fill="none" stroke="var(--tok-c1)"
-          stroke-width="1.6" stroke-dasharray="5 4" />
-        <path d={vvPath("vvti")} fill="none" stroke="var(--tok-c3)" stroke-width="2.6" />
-        <circle cx={vvx(vv.length - 1)} cy={vvy(vvLast.vvti)} r="3.5" fill="var(--tok-c3)" />
-        <text x={vvx(vv.length - 1) - 8} y={vvy(vvLast.vvti) + 22}
-          class="series-label" fill="var(--ink, #ddd)" text-anchor="end">
-          ${vvLast.vvti.toFixed(2)}
-        </text>
-        <text x={vvx(2)} y={vvy(vvFirst.vvti) - 10} class="series-label" fill="var(--ink, #ddd)">
-          ${vvFirst.vvti.toFixed(2)}
-        </text>
-        <text x={vvx(vv.length - 1)} y={vvy(vvLast.open_avg) - 8}
-          class="series-label" fill="var(--tok-c1)" text-anchor="end">
-          open-weight average ${vvLast.open_avg.toFixed(2)}
-        </text>
-      </svg>
+      <div class="vvti-chart-box" id="vvti-chart">
+        <svg viewBox={`0 0 ${VVW} ${VVH}`} role="img"
+          aria-label="Line chart of the CCIR Vercel Volume Token Index, the volume-weighted posted price of an output token.">
+          {vvYTicks.map((t) => (
+            <>
+              <line x1={VVPL} x2={VVW - VVPR} y1={vvy(t)} y2={vvy(t)} class="grid" />
+              <text x={VVPL - 6} y={vvy(t) + 3} class="tick" text-anchor="end">${t}</text>
+            </>
+          ))}
+          {vvTickIdx.map((i) => (
+            <text x={vvx(i)} y={VVH - 6} class="tick" text-anchor="middle">{vv[i].date.slice(5)}</text>
+          ))}
+          <path d={vvPath("vvti")} fill="none" stroke="var(--tok-c3)" stroke-width="2.6" />
+          <circle cx={vvx(vv.length - 1)} cy={vvy(vvLast.vvti)} r="3.5" fill="var(--tok-c3)" />
+          <line id="vvti-cross" x1="0" x2="0" y1={VVPT} y2={VVH - VVPB} class="crosshair" style="display:none" />
+        </svg>
+        <div id="vvti-tip" class="vvti-tip" style="display:none"></div>
+      </div>
       <details class="method-disclosure">
         <summary>Construction &amp; source</summary>
         <div class="disclosure-body">
@@ -640,6 +631,42 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
 
   </section>
 
+  <script is:inline define:vars={{
+    vvD: vv.map((p) => ({ d: p.date, v: p.vvti, c: p.coverage })),
+    VVW, VVPL, VVPR, VVPT, VVH,
+  }}>
+    // Crosshair + tooltip for the VVTI chart (od-vs-committed pattern).
+    (function () {
+      var box = document.getElementById('vvti-chart');
+      if (!box) return;
+      var tip = document.getElementById('vvti-tip');
+      var cross = document.getElementById('vvti-cross');
+      var svg = box.querySelector('svg');
+      if (!tip || !cross || !svg) return;
+      var innerW = VVW - VVPL - VVPR;
+      function show(ev) {
+        var r = svg.getBoundingClientRect();
+        var relX = ((ev.clientX - r.left) / r.width) * VVW;
+        var i = Math.round(((relX - VVPL) / innerW) * (vvD.length - 1));
+        if (i < 0 || i > vvD.length - 1) { hide(); return; }
+        var d = vvD[i];
+        var xPix = VVPL + (i * innerW) / (vvD.length - 1);
+        cross.setAttribute('x1', xPix); cross.setAttribute('x2', xPix);
+        cross.style.display = '';
+        tip.innerHTML = '<strong>' + d.d + '</strong><br>$' + d.v.toFixed(2) +
+          ' per 1M<br><span class="tn">' + d.c.toFixed(0) + '% of volume priced</span>';
+        tip.style.display = '';
+        var left = (xPix / VVW) * r.width + 12;
+        if (left > r.width - 160) left -= 185;
+        tip.style.left = left + 'px';
+        tip.style.top = '14px';
+      }
+      function hide() { tip.style.display = 'none'; cross.style.display = 'none'; }
+      box.addEventListener('mousemove', show);
+      box.addEventListener('mouseleave', hide);
+    })();
+  </script>
+
   <script is:inline>
     // Click-to-sort for the open-weight table. Numeric columns parse the
     // first number in the cell ("$0.55", "12", "$0.19 – $0.99" → its min);
@@ -752,6 +779,16 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
   .vvti-name { font-size: var(--fs-md, 1.05rem); font-weight: 600; margin: 0; }
   .vvti-print { font-size: var(--fs-lg, 1.15rem); font-weight: 600; }
   .vvti-chg { color: var(--tok-c3-ink, #c96f06); margin-left: 4px; }
+  .vvti-chart-box { position: relative; }
+  .crosshair { stroke: var(--ink-faint, #777); stroke-width: 1; stroke-dasharray: 3 3; }
+  .vvti-tip {
+    position: absolute; pointer-events: none;
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--ink); background: var(--surface-2, #1a1d21);
+    border: 1px solid var(--rule-2, #444); padding: 7px 10px; line-height: 1.55;
+    min-width: 120px;
+  }
+  .vvti-tip :global(.tn) { color: var(--ink-faint, #777); }
   .method-disclosure { margin: 6px 0 0; }
   .method-disclosure > summary {
     list-style: none; cursor: pointer;
@@ -759,8 +796,8 @@ const vvYTicks = [0, 3, 6, 9, 12].filter((t) => t <= vvMax);
     letter-spacing: var(--tracking-eye, 0.04em); text-transform: uppercase;
     color: var(--ink-dim, #888); font-weight: 500; padding: 4px 0 6px;
   }
-  .method-disclosure > summary::before { content: 'B8 '; }
-  .method-disclosure[open] > summary::before { content: 'BE '; }
+  .method-disclosure > summary::before { content: '▸ '; }
+  .method-disclosure[open] > summary::before { content: '▾ '; }
   .method-disclosure .disclosure-body p {
     font-size: var(--fs-xs); color: var(--ink-dim, #888);
     max-width: 72ch; margin: 2px 0 8px;
