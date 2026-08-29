@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-08-28",
+    "as_of": "2026-08-29",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -7584,6 +7584,38 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/0001104659-26-089296-index.htm"
       },
       "as_of": "2026-06-30"
+    },
+    {
+      "id": "alp-b300-nonrecourse",
+      "collateral_class": "gpu",
+      "issuer": "Alpha Compute Corp.",
+      "ticker": "ALP",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "$31.9M non-recourse GPU loan facility (B300 collateral; binding term sheet)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 31.9,
+      "size_note": "Binding term sheet executed April 22, 2026 for a $31.9M non-recourse senior secured loan facility; collateral strictly limited to the Nvidia B300 GPUs (release highlights say 'Dell B300 Nvidia GPUs'). Undisclosed institutional lender; definitive documentation in process at announcement, no later filing confirms closing (May 424B3 only incorporates the same release). Proceeds for AI infrastructure purchase and installation supporting an Equinex/AtNorth data center build in Sweden. Issuer formerly AlphaTON Capital Corp. (ATON); BVI foreign private issuer. Note: the 6-K cover text misdates the release as April 22, 2025; the release itself is dated April 22, 2026.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed (term-sheet stage)"
+      },
+      "maturity": null,
+      "maturity_note": "Undisclosed (term-sheet stage)",
+      "seniority": "Senior secured (per release)",
+      "security": "Nvidia B300 GPUs (non-recourse; collateral limited to the GPUs per release)",
+      "lenders": [
+        "Undisclosed institutional lender"
+      ],
+      "status": "press",
+      "issued": "2026-04-22",
+      "source": {
+        "doc": "6-K Exhibit 99.1, acc 0001171843-26-002823 (filed 2026-04-29)",
+        "date": "2026-04-29",
+        "url": "https://www.sec.gov/Archives/edgar/data/1095435/000117184326002823/exh_991.htm"
+      },
+      "as_of": "2026-08-29"
     }
   ],
   "retired": [
