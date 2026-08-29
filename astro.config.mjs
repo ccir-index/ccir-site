@@ -29,6 +29,10 @@ export default defineConfig({
       // referring sitemaps detected" in GSC URL Inspection). Normalize the
       // root entry to the slashed canonical form; all other URLs already
       // match (slashless on both sides).
+      // /tokenindex (2026-08-29) is a share-link shim: it serves the candle
+      // OG card and bounces to /tokens. It carries noindex, so listing it
+      // here would point Google at a page that asks not to be indexed.
+      filter: (page) => !/\/tokenindex\/?$/.test(page),
       serialize(item) {
         if (item.url === SITE || item.url === `${SITE}/`) {
           item.url = `${SITE}/`;

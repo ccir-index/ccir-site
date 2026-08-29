@@ -1,0 +1,36 @@
+---
+// Share link for the token index (2026-08-29).
+//
+// Paste ccir.io/tokenindex into X or LinkedIn and the card renders from the
+// og:image below — the 1M daily-candle VVTI card. Humans land here and are
+// sent straight to /tokens.
+//
+// Why this is a page and not a _redirects 301: a redirect makes the social
+// crawler follow to /tokens and build the card from THAT page's tags, which
+// is the generic /tokens card. Serving 200 here keeps the candle card on the
+// share link while /tokens keeps its own.
+//
+// The bounce is JS-only on purpose. A meta-refresh can be followed by a
+// crawler; script never runs in one. Readers without JS get the link.
+//
+// noindex keeps this out of search so it does not compete with /tokens.
+// Keep ?v= in step with the ogImage bust on tokens.astro.
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="CCIR Vercel Volume Token Index"
+  description="The volume-weighted posted price of an output token, weighted by each model's daily share of token volume on Vercel's AI Gateway. Updated daily, with the posted-price record behind every print."
+  ogImage="/og/tokenindex.png?v=2"
+  noindex={true}
+>
+  <section class="wrap page-top">
+    <p>
+      Redirecting to the token index. <a href="/tokens">Continue to /tokens</a>.
+    </p>
+  </section>
+</Base>
+
+<script is:inline>
+  window.location.replace('/tokens');
+</script>
