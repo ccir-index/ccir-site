@@ -485,6 +485,13 @@ const hasOgCard = fs.existsSync(`public${ogCredit}`);
               {r.seniority && (<><dt>Seniority</dt><dd>{r.seniority}</dd></>)}
               {r.maturity && (<><dt>Maturity</dt><dd>{r.maturity}{r.maturity_note ? ` — ${r.maturity_note}` : ''}</dd></>)}
               {r.security && (<><dt>Collateral</dt><dd>{r.security}</dd></>)}
+              {/* Offtaker, ruled onto this page 2026-08-17 and built 2026-08-29.
+                  Inherited from the ledger's own `offtaker_label`, which until
+                  now only fed the rated ladder on /credit. Absent on a row means
+                  the filed text names no counterparty, which is not the same as
+                  there being none — where a filing states there is no offtake,
+                  the row says so in words. */}
+              {r.offtaker_label && (<><dt>Offtaker</dt><dd>{r.offtaker_label}</dd></>)}
               {r.lenders?.length ? (<><dt>Lenders</dt><dd>{r.lenders.join(' · ')}</dd></>) : null}
               {r.rate?.note && (<><dt>Pricing</dt><dd>{r.rate.note}</dd></>)}
               {r.size_note && (<><dt>Terms</dt><dd>{r.size_note}</dd></>)}

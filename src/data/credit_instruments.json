@@ -53,7 +53,8 @@
         "date": "2026-05-08",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000222/crwv-20260331.htm"
       },
-      "as_of": "2026-08-18"
+      "as_of": "2026-08-18",
+      "offtaker_label": "Customer contracts (counterparties redacted in the filing)"
     },
     {
       "id": "crwv-ddtl-2",
@@ -89,7 +90,8 @@
         "date": "2025-10-02",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000119312525227562/d910811d8k.htm"
       },
-      "as_of": "2026-08-18"
+      "as_of": "2026-08-18",
+      "offtaker_label": "Investment-grade and non-IG customers (unnamed; advance rates split by grade)"
     },
     {
       "id": "crwv-ddtl-2-1",
@@ -122,7 +124,8 @@
         "date": "2026-03-02",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm"
       },
-      "as_of": "2026-08-18"
+      "as_of": "2026-08-18",
+      "offtaker_label": "Albatross and OpenAI (both named in the conformed agreement)"
     },
     {
       "id": "crwv-ddtl-3",
@@ -158,7 +161,8 @@
         "date": "2025-07-31",
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000033/crwv-20250728.htm"
       },
-      "as_of": "2026-08-18"
+      "as_of": "2026-08-18",
+      "offtaker_label": "OpenAI OpCo, LLC (named unredacted in the filing)"
     },
     {
       "id": "crwv-ddtl-4",
@@ -890,7 +894,8 @@
         "date": "2026-07-17",
         "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926084452/tm2620683d1_6k.htm"
       },
-      "as_of": "2026-08-12"
+      "as_of": "2026-08-12",
+      "offtaker_label": "Investment-grade customer (unnamed)"
     },
     {
       "id": "nbis-conv-2029",
@@ -1600,7 +1605,8 @@
         "date": "2026-07-29",
         "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000048/"
       },
-      "as_of": "2026-05-31"
+      "as_of": "2026-05-31",
+      "offtaker_label": "AI-cloud customer service agreements (Jamestown; counterparties unnamed)"
     },
     {
       "id": "apld-starion-hosting",
@@ -2541,7 +2547,8 @@
         "date": "2026-08-27",
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm"
       },
-      "as_of": "2026-08-28"
+      "as_of": "2026-08-28",
+      "offtaker_label": "Non-IG customer deployments (issuer statement, program level; counterparty unnamed)"
     },
     {
       "id": "iren-mackenzie-notes",
@@ -2574,7 +2581,8 @@
         "date": "2026-08-27",
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm"
       },
-      "as_of": "2026-08-28"
+      "as_of": "2026-08-28",
+      "offtaker_label": "Non-IG customer deployments (issuer statement, program level; counterparty unnamed)"
     },
     {
       "issuer_type": "public",
@@ -5495,7 +5503,8 @@
         "date": "2024-04-02",
         "url": "https://www.businesswire.com/news/home/20240402148086/en/Lambda-Announces-$500M-GPU-Backed-Facility-to-Expand-Cloud-for-AI"
       },
-      "as_of": "2026-07-02"
+      "as_of": "2026-07-02",
+      "offtaker_label": "None — on-demand fleet, no long-term customer contracts"
     },
     {
       "id": "lambda-jpm-275",
@@ -5634,7 +5643,8 @@
         "date": "2026-02-12",
         "url": "https://www.nscale.com/press-releases/nscale-signs-1-4bn-delayed-draw-term-loan"
       },
-      "as_of": "2026-07-12"
+      "as_of": "2026-07-12",
+      "offtaker_label": "Signed customer contracts (counterparties unnamed)"
     },
     {
       "id": "nscale-narvik",
@@ -5891,7 +5901,8 @@
         "date": "2026-01-07",
         "url": "https://www.apollo.com/insights-news/pressreleases/2026/01/apollo-backs-5-4-billion-valor-and-xai-data-center-compute-infrastructure-transaction-with-3-5-billion-capital-solution-3214463"
       },
-      "as_of": "2026-07-02"
+      "as_of": "2026-07-02",
+      "offtaker_label": "xAI subsidiary (triple-net lease)"
     },
     {
       "id": "xai-apollo-t2",
@@ -6924,7 +6935,8 @@
         "date": "2026-08-28",
         "url": "https://www.bloomberg.com/news/articles/2026-08-28/nvidia-backed-lambda-inks-1-billion-private-debt-for-chip-deal"
       },
-      "as_of": "2026-08-28"
+      "as_of": "2026-08-28",
+      "offtaker_label": "Microsoft lease (per press)"
     },
     {
       "as_of": "2026-08-13",
