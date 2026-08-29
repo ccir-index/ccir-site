@@ -6852,7 +6852,7 @@
       "as_of": "2026-08-09"
     },
     {
-      "as_of": "2026-08-13",
+      "as_of": "2026-08-27",
       "collateral_class": "gpu",
       "entity": "Lambda Compute II LLC (Delaware bankruptcy-remote SPV; obligations guaranteed by operating subsidiary Lambda Cloud Canada Inc.)",
       "id": "lambda-tlb-926",
@@ -6866,21 +6866,21 @@
         "Syndicate not named"
       ],
       "maturity": "2030-12-31",
-      "maturity_note": "Fully amortizing; company states the profile is aligned with contracted cash flows and the useful life of the underlying GPU infrastructure",
+      "maturity_note": "Fully amortizing schedule aligned with contracted cash flows",
       "name": "$926M senior secured Term Loan B (Moody's Baa2 — first IG-rated TLB by a private neocloud, per company)",
       "rate": {
         "kind": "sofr_spread",
-        "note": "SOFR + 3.00% at 99.5 OID; tightened 75bp during syndication; >=95% of principal required to be hedged through maturity (effectively fixed)",
+        "note": "SOFR + 3.00% at 99.5 OID; tightened 75bp during syndication; >=95% of principal required to be hedged through maturity (effectively fixed); SOFR + 3.00%, OID 99.5 (close release)",
         "value": 3
       },
-      "security": "First lien on GB300 GPU computing infrastructure at a single QScale data center site (Quebec, Canada) plus assignment of the take-or-pay Master Services Agreement with NVIDIA Corporation (Moody's Aa1, positive) as collateral; data center lease and purchase orders also assigned. No direct agreement among SPV, lenders and NVIDIA (noted as a rating constraint).",
+      "security": "GPU servers and related infrastructure funded through the transaction, plus the cash flows those assets generate (close release)",
       "seniority": "Senior secured (first lien)",
-      "size_note": "Moody's assigned first-time Baa2 (stable) 2026-08-11 to the proposed ~$917M facility; priced 2026-08-12 at $926M (upsized) — expected close August 2026. Offtaker = NVIDIA under take-or-pay MSA (availability-based fixed-price payments, no volume/price exposure; SLA credits up to 30%, regime noted by Moody's as more onerous than other non-recourse GPU financings). Moody's base case: DSCR ~1.20x, GPU utilization 70%, PUE 1.20; 3-month DSRA + 3-month opex reserve (vs 6-month typical); single draw; power unhedged (Hydro-Quebec regulated). NVIDIA context per Moody's: material equity interest in Lambda + guarantee of >$2B of Lambda data center lease payments. Company framing 'first IG-rated TLB by a private neocloud' carried as claim only.",
+      "size_note": "Moody's assigned first-time Baa2 (stable) 2026-08-11 to the proposed ~$917M facility; priced 2026-08-12 at $926M (upsized) — expected close August 2026. Offtaker = NVIDIA under take-or-pay MSA (availability-based fixed-price payments, no volume/price exposure; SLA credits up to 30%, regime noted by Moody's as more onerous than other non-recourse GPU financings). Moody's base case: DSCR ~1.20x, GPU utilization 70%, PUE 1.20; 3-month DSRA + 3-month opex reserve (vs 6-month typical); single draw; power unhedged (Hydro-Quebec regulated). NVIDIA context per Moody's: material equity interest in Lambda + guarantee of >$2B of Lambda data center lease payments. Company framing 'first IG-rated TLB by a private neocloud' carried as claim only. CLOSED per Lambda release 8/27/26: priced 8/12 at SOFR + 3.00%, issued at 99.5; fully amortizing, matures 2030-12-31, aligned with the contracted cash flows and useful life of the funded GPUs. Company frames it as its first large-scale private-cloud GPU asset-backed SPV financing and the first broadly syndicated, investment-grade-rated term loan B by a private neocloud.",
       "size_usd_m": 926,
       "source": {
-        "date": "2026-08-12",
-        "doc": "Lambda company release (priced 2026-08-12) + Moody's Ratings rating action 'Moody's Ratings assigns first-time Baa2 rating to Lambda Compute II LLC' (2026-08-11, New York; access-restricted, on file)",
-        "url": "https://lambda.ai/blog/lambda-prices-926-million-senior-secured-term-loan-b-facility"
+        "doc": "Lambda close release 8/27/26; Moody's Baa2 8/11/26",
+        "date": "2026-08-27",
+        "url": "https://lambda.ai/blog/lambda-closes-926-million-senior-secured-term-loan-b-facility"
       },
       "status": "confirmed",
       "ticker": null,
@@ -6892,6 +6892,39 @@
         }
       ],
       "offtaker_label": "NVIDIA take-or-pay"
+    },
+    {
+      "id": "lambda-jpm-shortdated-2026",
+      "collateral_class": "gpu",
+      "issuer": "Lambda",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": null,
+      "name": "~$1B private short-dated debt (JPMorgan-arranged; chips leased to Microsoft)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 1000,
+      "size_note": "~$1B of private short-dated debt raised to buy NVIDIA AI chips Lambda will lease to Microsoft; arranged by JPMorgan Chase (Bloomberg 8/28/26; TechCrunch pickup). Press reads the short tenor as pricing rapid deployment and repayment from contracted lease cash flows. Terms, tenor, and lenders otherwise undisclosed; distinct from the May 2026 $1B facility and the $926M TLB.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed"
+      },
+      "maturity": null,
+      "maturity_note": "Short-dated per Bloomberg; tenor undisclosed",
+      "seniority": "Not disclosed",
+      "security": "NVIDIA chips to be leased to Microsoft (per press)",
+      "lenders": [
+        "Private credit investors (undisclosed)",
+        "JPMorgan Chase (arranger, per Bloomberg)"
+      ],
+      "status": "press",
+      "issued": "2026-08-28",
+      "source": {
+        "doc": "Bloomberg 8/28/26; TechCrunch 8/28/26",
+        "date": "2026-08-28",
+        "url": "https://www.bloomberg.com/news/articles/2026-08-28/nvidia-backed-lambda-inks-1-billion-private-debt-for-chip-deal"
+      },
+      "as_of": "2026-08-28"
     },
     {
       "as_of": "2026-08-13",
