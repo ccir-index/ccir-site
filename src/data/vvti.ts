@@ -10,17 +10,16 @@
   once. The old JSON had been rounded twice (4dp, then 2dp), which left four
   days off by one in the last digit.
 
-  THE PUBLISHED SERIES IS FIXINGS ONLY. A leaderboard day freezes at the first
-  capture taken after it closed and is never revised; the day still in progress
-  is computed too, but it is indicative and restated on every run, so it stays
-  out of `series`. The page therefore publishes on 30 Aug the fixing for
-  29 Aug, which is how a daily benchmark works.
+  EVERY ROW IS A COMPLETE DAY. Each leaderboard day is pulled on its own and
+  priced from that same day's posted record, so the series runs to yesterday
+  and a print does not move once made. The page therefore publishes on 30 Aug
+  the fixing for 29 Aug, which is how a daily benchmark works.
 
-  Two dates, and they mean different things. `built` is the last FIXING, and it
-  labels the series range. `updated` is the last row in the file of any kind,
-  which is the pipeline's own heartbeat: it advances the morning a new
-  in-flight day appears and freezes the moment the pipeline stops. Neither is
-  a build stamp, so neither can claim the page is fresher than its data.
+  Two dates, and they mean different things. `built` is the last fixing, and it
+  labels the series range. `updated` is the newest `computed_on` in the file,
+  the date the pipeline last built a row. Neither is a build stamp: both come
+  out of the data, so if the pipeline stops, both stop, and the page cannot
+  claim to be fresher than what it is showing.
 */
 import vvtiCsv from './vvti_daily.csv?raw';
 
@@ -59,9 +58,9 @@ const rows = parse(vvtiCsv)
     vvti: num(r.vvti_output_usd_per_mtok) ?? NaN,
     open_avg: num(r.open_weight_output_usd_per_mtok),
     coverage: num(r.coverage_pct) ?? NaN,
-    // Only an explicit "false" is in-flight. A blank predates the column and
-    // is history, which is a fixing.
+    // Only an explicit "false" is unsettled. A blank predates the column.
     settled: String(r.settled ?? '').toLowerCase() !== 'false',
+    computed_on: r.computed_on ?? '',
   }))
   .filter((p) => p.date && Number.isFinite(p.vvti))
   .sort((a, b) => a.date.localeCompare(b.date));
@@ -74,7 +73,8 @@ export const series: VvtiPoint[] = rows
 /** Last FIXING. Labels the series range. */
 export const built: string = series.length ? series[series.length - 1].date : '';
 
-/** Last row of any kind — the pipeline's heartbeat. Drives the Dataset
-    dateModified, so it advances when a run lands and freezes when one does
-    not. */
-export const updated: string = rows.length ? rows[rows.length - 1].date : built;
+/** The date the pipeline last built a row. Drives the Dataset dateModified and
+    the "updated" label, so both advance when a run lands and freeze when one
+    does not. Falls back to the last fixing on a file without the column. */
+export const updated: string =
+  rows.reduce((a, p) => (p.computed_on > a ? p.computed_on : a), '') || built;
