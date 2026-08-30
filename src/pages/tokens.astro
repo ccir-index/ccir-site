@@ -410,16 +410,17 @@ const vvPts = vv.map((p) => [p.date, p.vvti]);
             composition change is part of what the index measures.
           </p>
           <p>
-            Each day is fixed from the first capture taken after that day
-            closed, and a fixed day is never revised. The index publishes one
-            day in arrears.
+            Each day is requested from the leaderboard on its own and priced
+            against the posted record for that same day. No print is derived
+            from a later reading, so a print does not move once it is made.
+            Only complete days are requested, so the series runs to the
+            previous day.
           </p>
           <p>
-            The leaderboard names a set of models and buckets the rest as
-            &ldquo;Other&rdquo;. A named model enters the priced set as soon as
-            its first-party price is on the record, and leaves it when the
-            leaderboard stops naming it. Coverage states the priced share on
-            every day.
+            The leaderboard names the models carrying the largest share of that
+            day&rsquo;s traffic and buckets the rest as &ldquo;Other&rdquo;. A
+            named model joins the priced set on any day its first-party price
+            is on the record. Coverage states the priced share on every day.
           </p>
         </div>
       </details>
@@ -1010,9 +1011,9 @@ const vvPts = vv.map((p) => [p.date, p.vvti]);
   .vvti-name { font-size: var(--fs-md, 1.05rem); font-weight: 600; margin: 0; }
   .vvti-print { font-size: var(--fs-lg, 1.15rem); font-weight: 600; }
   .vvti-chg { color: var(--tok-c3-ink, #c96f06); margin-left: 4px; }
-  /* The index publishes a day in arrears: a day fixes on the first capture
-     taken after it closed. So the run date and the last fixing are different
-     dates and both are stated. Sized down because the print is the headline. */
+  /* Only complete days are priced, so the last print is the previous day
+     while the run happens today. Both dates are stated because they differ.
+     Sized down because the print is the headline. */
   .vvti-upd { font-size: var(--fs-sm, 0.85rem); font-weight: 400; margin-left: 2px; }
   .vvti-chart-box { position: relative; }
   svg.vvti-chart { width: 100%; height: 340px; display: block; cursor: crosshair;
