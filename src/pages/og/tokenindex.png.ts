@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { el, toPng } from '../../lib/og';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import vvti from '../../data/vvti_daily.json';
+import { series } from '../../data/vvti';
 
 export const prerender = true;
 
@@ -11,9 +11,9 @@ export const prerender = true;
   build as the rental-rates card: the page's own chart, rendered from the
   terminal theme at 2x (src/assets/og-vvti-chart.png, 2148x1110 -> 1074x555),
   under a one-line masthead. Headline numbers are DATA-LOCKED to
-  src/data/vvti_daily.json - the same file the page renders from - so the
-  card cannot disagree with the page. New filename (was og/tokens.png)
-  doubles as the cache bust.
+  src/data/vvti.ts - the same series the page renders from - so the card
+  cannot disagree with the page. New filename (was og/tokens.png) doubles
+  as the cache bust.
 */
 
 const chart = readFileSync(join(process.cwd(), 'src/assets/og-vvti-chart.png'));
@@ -21,7 +21,6 @@ const chartUri = `data:image/png;base64,${chart.toString('base64')}`;
 
 const D = { bg: '#0d1117', ink: '#e6e6e6', dim: '#9aa2ad', gold: '#e5a50a' };
 
-const series = vvti.series as { date: string; vvti: number }[];
 const last = series[series.length - 1];
 // 1M window to match the card's daily-candle chart
 const lastMs = Date.parse(last.date + 'T00:00:00Z');

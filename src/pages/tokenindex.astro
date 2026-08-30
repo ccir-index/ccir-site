@@ -32,5 +32,11 @@ import Base from '../layouts/Base.astro';
 </Base>
 
 <script is:inline>
-  window.location.replace('/tokens');
+  // Wait for load before bouncing. The Cloudflare Web Analytics beacon is
+  // injected as type="module", so it is deferred and does not execute until
+  // parsing finishes. An immediate replace() raced it, and this page's
+  // pageview was counted only sometimes. Bouncing after load lets the beacon
+  // run first. Cost is a few hundred ms on an interstitial that already
+  // carries a visible link out.
+  addEventListener('load', () => setTimeout(() => location.replace('/tokens'), 0));
 </script>

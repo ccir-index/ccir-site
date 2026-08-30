@@ -307,23 +307,24 @@ const windowStart = frontierDays[0] ?? '2026-07-03';
   Section 00: CCIR Vercel Volume Token Index (VVTI). Weights are
   Vercel AI Gateway daily token shares (CC BY 4.0 export); prices are this
   page's posted first-party record. Renormalized daily over the priced set;
-  coverage disclosed. Series built by scratch prototype pending the
-  production build (bronze-sourced weights on a disclosed re-fix schedule).
+  coverage disclosed.
+
+  Pipeline-fed since 2026-08-29 (gold_token_vvti -> export_tokens ->
+  sync-from-data). Daily re-weighting IS the construction, not a stopgap
+  pending banded weights — composition change is the measured signal.
 */
-import vvtiData from '../data/vvti_daily.json';
-const vv = vvtiData.series as { date: string; vvti: number; open_avg: number; coverage: number }[];
+import { series as vv, updated as vvtiUpdated } from '../data/vvti';
 const vvLast = vv[vv.length - 1];
 const vvFirst = vv[0];
 const vvChg = Math.round(100 * (vvLast.vvti / vvFirst.vvti - 1));
 const vvCovLo = Math.round(Math.min(...vv.map((p) => p.coverage)));
 const vvCovHi = Math.round(Math.max(...vv.map((p) => p.coverage)));
 const vvPts = vv.map((p) => [p.date, p.vvti]);
-const vvtiBuilt = vvtiData.built;
 ---
 <Base
   title="Token Index (VVTI) & Token Prices — GPT-5.6, Claude & Open-Weight Models · CCIR"
   description="The CCIR Vercel Volume Token Index (VVTI), the volume-weighted posted price of an output token on Vercel AI Gateway traffic shares, plus the daily record of posted token prices from model owners' own price lists — OpenAI, Anthropic, Google, DeepSeek, Moonshot, xAI, Meta, Alibaba, Z.AI, MiniMax, Mistral and more — plus cross-provider medians for open-weight models served by three or more independent providers. USD per 1M tokens."
-  ogImage="/og/tokenindex.png?v=2"
+  ogImage="/og/tokenindex.png?v=3"
 >
   <section class="wrap page-top">
     <PageHeader
@@ -341,6 +342,9 @@ const vvtiBuilt = vvtiData.built;
           <span id="vvti-price">${vvLast.vvti.toFixed(2)}</span>
           <span class="vvti-chg" id="vvti-chg">{vvChg}%</span>
           <span class="dim" id="vvti-since">{vvFirst.date} &#8594; {vvLast.date}</span>
+          {vvtiUpdated > vvLast.date && (
+            <span class="dim vvti-upd">updated {vvtiUpdated}</span>
+          )}
         </div>
       </div>
       <div class="chart-title mono">
@@ -404,6 +408,19 @@ const vvtiBuilt = vvtiData.built;
             &ldquo;Other&rdquo; bucket. CCIR calculation; Vercel publishes shares
             only. Weights re-fix daily with the gateway's published shares:
             composition change is part of what the index measures.
+          </p>
+          <p>
+            Each day is fixed from the first capture taken after that day
+            closed, and a fixed day is never revised. The index publishes one
+            day in arrears.
+          </p>
+          <p>
+            The leaderboard names the models in its current top set and applies
+            that set to its whole window. A model that leaves the set has its
+            volume folded into &ldquo;Other&rdquo;, so it drops out of the
+            priced set and coverage discloses the loss. GPT 5.6 Sol left the
+            set on 30 August. That removed one model from the 29 August fixing
+            and lowered the print by 9.2%.
           </p>
         </div>
       </details>
@@ -510,7 +527,7 @@ const vvtiBuilt = vvtiData.built;
     // until the production build lands, so stamping today's snapshot here
     // would claim a freshness the downloadable series does not have. This
     // reads stale the day it goes stale, which is the point.
-    dateModified: vvtiBuilt,
+    dateModified: vvtiUpdated,
     temporalCoverage: `${windowStart}/..`,
     keywords: [
       'token index', 'AI token price index', 'CCIR Vercel Volume Token Index',
@@ -994,6 +1011,10 @@ const vvtiBuilt = vvtiData.built;
   .vvti-name { font-size: var(--fs-md, 1.05rem); font-weight: 600; margin: 0; }
   .vvti-print { font-size: var(--fs-lg, 1.15rem); font-weight: 600; }
   .vvti-chg { color: var(--tok-c3-ink, #c96f06); margin-left: 4px; }
+  /* The index publishes a day in arrears: a day fixes on the first capture
+     taken after it closed. So the run date and the last fixing are different
+     dates and both are stated. Sized down because the print is the headline. */
+  .vvti-upd { font-size: var(--fs-sm, 0.85rem); font-weight: 400; margin-left: 2px; }
   .vvti-chart-box { position: relative; }
   svg.vvti-chart { width: 100%; height: 340px; display: block; cursor: crosshair;
     user-select: none; touch-action: none; }

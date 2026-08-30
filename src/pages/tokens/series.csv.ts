@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import vvti from '../../data/vvti_daily.json';
+import { series } from '../../data/vvti';
 
 export const prerender = true;
 
@@ -24,8 +24,14 @@ const esc = (v: unknown) => {
 export const GET: APIRoute = () => {
   const header =
     'date,vvti_output_usd_per_mtok,open_weight_avg_usd_per_mtok,coverage_pct';
-  const body = vvti.series.map((p) =>
-    [p.date, p.vvti, p.open_avg, p.coverage].map(esc).join(','),
+  // The lake carries full precision; this file is the citable artifact, so
+  // it publishes at a stated precision instead. 4dp on the price legs keeps
+  // every displayed 2dp value recoverable without printing eight digits of
+  // false precision on a $/Mtok figure.
+  const px = (v: number | null) => (v === null ? '' : v.toFixed(4));
+  const body = series.map((p) =>
+    [p.date, px(p.vvti), px(p.open_avg), p.coverage.toFixed(2)]
+      .map(esc).join(','),
   );
   return new Response([header, ...body].join('\n') + '\n', {
     headers: { 'Content-Type': 'text/csv; charset=utf-8' },

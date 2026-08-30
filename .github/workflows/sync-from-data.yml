@@ -125,7 +125,7 @@ jobs:
           # roster behind the published "N models tracked" figure — the two
           # lanes use different id conventions, so the count must come from
           # there and never from summing the other two files' row counts.
-          for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv; do
+          for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv vvti_daily.csv; do
             if curl -fsSL -H "Authorization: token $GH_PAT" -o ".sync/$tf" "$BASE/$tf"; then
               echo "fetched $tf"
             else
@@ -302,7 +302,7 @@ jobs:
         run: |
           set -euo pipefail
           cp .sync/rates_daily.csv      src/data/rates_daily.csv
-          for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv; do
+          for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv vvti_daily.csv; do
             if [ -s ".sync/$tf" ]; then cp ".sync/$tf" "src/data/$tf"; fi
           done
           cp .sync/rates_shadow.csv     src/data/rates_shadow.csv
@@ -517,7 +517,7 @@ jobs:
           # token_models_tracked.csv has no committed copy yet — a bare
           # `git add` on a missing path is fatal under `set -e` and would
           # take the whole snapshot refresh down with it.
-          for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv; do
+          for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv vvti_daily.csv; do
             if [ -f "src/data/$tf" ]; then git add "src/data/$tf"; fi
           done
           # public/data/listings_history_*.csv only exists once the upstream
