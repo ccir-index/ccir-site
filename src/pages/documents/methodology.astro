@@ -18,6 +18,12 @@ import { meta } from '../../data/snapshot';
         are governed by the <a href="/documents/change-management">Change
         Management Policy</a>.
       </p>
+      <p class="revnote">
+        Document revision 2026-08-31. This revision states existing practice
+        more precisely in sections 03 to 06. It changes no source, no
+        aggregation rule and no published value. The methodology version
+        stamped on every published row is unchanged at <code>v2.3.2</code>.
+      </p>
     </PageHeader>
 
     <section class="sec">
@@ -47,7 +53,8 @@ import { meta } from '../../data/snapshot';
       <p>
         The series are designed as <strong>reference rates</strong>:
         suitable for contractual citation, residual-value monitoring, and
-        credit covenants. They are not designed to replicate a
+        credit covenants. Not every published row carries that status, and
+        section 04a sets out the test. They are not designed to replicate a
         volume-weighted average of executed trades. Products that measure
         executed levels sit outside this methodology and its governance
         framework.
@@ -74,11 +81,20 @@ import { meta } from '../../data/snapshot';
     <section class="sec">
       <h2><span class="n">03</span> Collection</h2>
       <p>
-        Prices are collected by automated daily collection from each provider's
-        public pricing pages or application programming interfaces (APIs), early morning U.S. time. Each observation
+        Prices are collected automatically from each provider's public pricing
+        pages or application programming interfaces (APIs). Each observation
         records the provider, chip, posted price, and its axes (form factor,
         interruptibility, commitment term, region). Raw observations are
         archived; published series are aggregates.
+      </p>
+      <p>
+        Capture runs on a per-source schedule, from once a day to hourly, set
+        by how often a surface can be read without burdening it.
+        <strong>Every series is a daily series</strong>: each cell publishes
+        one value per day, and a source's readings within that day reduce to a
+        single per-source value before the headline is computed. Capture
+        frequency is an operational parameter rather than part of a series
+        definition, so a change to it is not a series break.
       </p>
     </section>
 
@@ -98,12 +114,22 @@ import { meta } from '../../data/snapshot';
         the headline value.
       </p>
       <p>
-        <strong>There is no publication gate.</strong> Every populated cell
-        publishes, whatever its depth; panel depth <em>n</em> is the trust
-        signal, and thin cells (especially below five sources) should be read
-        as indicative. This is a
-        deliberate choice: suppressing thin cells hides the coverage boundary
-        instead of disclosing it.
+        <strong>Publication threshold.</strong> A cell publishes when at least
+        three independent sources contribute to it and it holds at least five
+        observations. Cells below that threshold are computed and retained,
+        and they do not publish. Two breakout classes publish at two sources
+        rather than being withheld: regional cuts and committed-term cuts,
+        where a thin panel is the true state of an emerging market. Those
+        cells carry <code>promotion_status</code> of
+        <code>Provisional</code>; cells clearing the full threshold carry
+        <code>Published</code>.
+      </p>
+      <p>
+        Panel depth <em>n</em> is the trust signal. It publishes beside every
+        headline value with the observation count and the interquartile range,
+        and thin cells should be read as indicative. Because the threshold is
+        a floor on depth rather than a view on price, it never selects among
+        cells that clear it.
       </p>
       <p>
         Under rapid dislocation (the sudden exit of major sources, widespread
@@ -116,10 +142,45 @@ import { meta } from '../../data/snapshot';
     </section>
 
     <section class="sec">
+      <h2><span class="n">04a</span> What Publishes, and What May Be Cited</h2>
+      <p>
+        Publication and citability are separate questions, and every row
+        answers both on its face. <code>promotion_status</code> reports
+        whether a cell cleared the full threshold in section 04.
+        <code>product_class</code> reports what it may be used for.
+      </p>
+      <p>
+        <code>citable</code> marks the on-demand reference series.
+        <code>market_intelligence</code> marks the committed-term series,
+        together with the on-demand companion published beside them for
+        like-for-like comparison. Those cells are published for context.
+        They rest on a different and generally thinner panel than the
+        on-demand series beside them, so they are not offered for contractual
+        citation. <strong>A citable reference rate is a row reading
+        <code>product_class = citable</code> and
+        <code>promotion_status = Published</code></strong>. A substantial
+        share of published rows does not meet both conditions, so the two
+        columns are the test rather than the series identifier.
+      </p>
+      <p>
+        The published file carries the operator-segment series set out in
+        section 06. An earlier factory-class taxonomy is still computed and
+        surfaces in the <a href="/explorer">/explorer</a> long tail. Those
+        series are not part of the reference set and are not included in the
+        download.
+      </p>
+    </section>
+
+    <section class="sec">
       <h2><span class="n">05</span> Windows and Composition Stability</h2>
       <p>
-        Each cell is computed on the shortest observation window with data:
-        one day, else three days, else seven. Panel membership is versioned;
+        Each cell is computed on the shortest observation window that meets
+        the publication threshold in section 04: one day, else three days,
+        else seven. A cell whose single day of data falls short of the
+        threshold widens its window rather than publish thin. The window
+        actually used is stamped on every row
+        (<code>headline_window_days</code>), with the source and observation
+        counts at each horizon. Panel membership is versioned;
         when a panel member transiently fails collection, its last-good price
         carries forward for at most seven days so one missed scrape does not
         change a series' composition. Members absent beyond that exit the cell.
@@ -132,16 +193,19 @@ import { meta } from '../../data/snapshot';
       <pre class="grammar">CRI-&#123;SEGMENT&#125;-&#123;CHIP&#125;-&#123;FORM&#125;-&#123;INT&#125;-&#123;TERM&#125;-&#123;REGION&#125;
 
 SEGMENT   T1 Hyperscaler · T2 Neocloud · T3 Marketplace
-FORM      SXM · PCIe · NVL · ALL (pooled)
+FORM      SXM · PCIe · NVL · OAM · ALL (pooled)
 INT       GTD guaranteed · INT interruptible · ALL (pooled)
 TERM      OD on-demand · 1mo 3mo 6mo 1yr 2yr 3yr committed
-REGION    US · EU · APAC · ALL (pooled)
+REGION    US · EU · APAC · Other · ALL (pooled)
 
 Example:  CRI-T2-H100-ALL-GTD-OD-US
           Neocloud · H100 · guaranteed on-demand · United States</pre>
       <p>
         <code>ALL</code> on any axis means that axis is pooled for that
-        series. The reference ladder on <a href="/rates">/rates</a> shows the
+        series. <code>Other</code> on the region axis collects posted
+        locations outside the three named regions; it is a residual, and it is
+        never a substitute for a named region. <code>OAM</code> is the Open
+        Accelerator Module form factor. The reference ladder on <a href="/rates">/rates</a> shows the
         guaranteed on-demand US cut per chip and segment, with each cell's
         series identifier printed beneath the rate.
       </p>
@@ -172,6 +236,18 @@ Example:  CRI-T2-H100-ALL-GTD-OD-US
       font-weight: var(--weight-display);
       margin: 6px 0 14px;
       letter-spacing: -0.01em;
+    }
+    .revnote {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.6;
+      max-width: 76ch;
+      margin: 10px 0 0;
+    }
+    .revnote code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
     }
     .sec { margin: 26px 0; max-width: 76ch; }
     .sec h2 {
