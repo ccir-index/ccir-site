@@ -18,7 +18,7 @@
       "floating_other": "Floating over a non-SOFR benchmark (TIBOR, EURIBOR, CORRA, prime, fed funds, sovereign reference); benchmark in note. Extends the brief's enum — these rates are disclosed but not SOFR-linked.",
       "undisclosed": "Not stated in any filing or release"
     },
-    "size_convention": "size_usd_m = latest-reported principal outstanding where filed; committed/face where drawn balances are undisclosed (see size_note). Non-USD sizes use the USD equivalents reported in the filings themselves."
+    "size_convention": "size_usd_m = the instrument's COMMITTED or face amount. This is the field the issuance chart aggregates, so it stays on a commitment basis: a delayed-draw facility's issuance quarter must not shrink as the facility draws. Where a filing discloses a drawn balance below the commitment, the funded and unfunded split is stated in size_note rather than replacing the field. Non-USD sizes use the USD equivalents reported in the filings themselves."
   },
   "instruments": [
     {
