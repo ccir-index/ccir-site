@@ -34,7 +34,15 @@ const IV_G = [0.10, 0.18, 0.30];
 const IV_NOW = 2026 + (7 - 0.5) / 12;
 const IV_SPEC = [
   { key: 'H100-80-SXM5', label: 'H100 SXM', model: 'H100', silicon: 'h100-sxm-80gb', vintage: 2023 + 2 / 12, modeledOnly: false },
-  { key: 'H200-141', label: 'H200', model: 'H200', silicon: 'h200-sxm-141gb', vintage: 2024 + 5 / 12, modeledOnly: false },
+  // H200 became modeled-only on 2026-08-31, when the sold record split by
+  // form factor. This value is derived from the SXM rental rate
+  // (h200-sxm-141gb) and the SXM secondary record is too thin to publish:
+  // 7 lifetime sales, 2 in the trailing 90 days, no posted asks. The part
+  // that DOES publish is H200 NVL, a different good trading about 35% away.
+  // Triangulating an SXM-derived value against NVL marks would repeat, one
+  // level up, exactly the pooling the split removed. The card states
+  // "modeled only" until the SXM record carries a panel.
+  { key: 'H200-141-SXM5', label: 'H200 SXM', model: 'H200', silicon: 'h200-sxm-141gb', vintage: 2024 + 5 / 12, modeledOnly: true },
   { key: 'A100-80-SXM4', label: 'A100 80GB', model: 'A100', silicon: 'a100-sxm-80gb', vintage: 2021 + 5 / 12, modeledOnly: false },
   // Modeled-only: no secondary-market record exists for this chip yet, so
   // the value is published without ask/executed triangulation (disclosed on
