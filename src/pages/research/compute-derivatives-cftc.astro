@@ -1,0 +1,525 @@
+---
+/*
+  Compute Derivatives at the CFTC — a standing MONITOR, updated in place as
+  letters land on CFTC-2026-1850. Mirror voice: every filer is described in
+  its own words, quoted and linked. No characterisation of any filer, no
+  comparison of anyone's coverage to ours, no CCIR position on any question.
+  The RFC text is Federal Register text (public domain). Filers' quotes are
+  short excerpts from public comment letters, linked to the docket copy.
+  Research folder: research/cftc_comment_letter/ (internal reads per letter).
+*/
+import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
+
+const AS_OF = '2026-09-02';
+const PUBLISHED = '2026-09-02';
+
+const LINKS = {
+  release: 'https://www.cftc.gov/PressRoom/PressReleases/9286-26',
+  fr: 'https://www.federalregister.gov/documents/2026/08/21/2026-17163/request-for-comment-on-the-listing-of-compute-derivatives-contracts',
+  frPdf: 'https://www.govinfo.gov/content/pkg/FR-2026-08-21/pdf/2026-17163.pdf',
+  docket: 'https://www.regulations.gov/docket/CFTC-2026-1850',
+  c0002: 'https://www.regulations.gov/comment/CFTC-2026-1850-0002',
+  c0003: 'https://www.regulations.gov/comment/CFTC-2026-1850-0003',
+  c0004: 'https://www.regulations.gov/comment/CFTC-2026-1850-0004',
+  setara: 'https://www.setarafinancial.com/',
+};
+
+// The docket in one block. Every line is from the Federal Register notice
+// or the regulations.gov docket record.
+const FACTS = [
+  ['Release', '9286-26, issued August 19, 2026'],
+  ['Federal Register', '91 FR 54259, August 21, 2026 (FR Doc. 2026-17163)'],
+  ['Docket', 'CFTC-2026-1850 · RIN 3038-AF77'],
+  ['Comments due', 'October 20, 2026'],
+  ['Questions', '23, in four topics'],
+  ['Vote', 'Chairman Selig in the affirmative; no Commissioner in the negative'],
+];
+
+// Who has written. Date is the letter's own date (docket rows: received
+// date, with posted date in the note). "Asks" are the filer's words.
+interface Letter {
+  date: string;
+  filer: string;
+  form: string;
+  where: string;
+  href?: string;
+  onDocket: string;
+  topics: string;
+  asks: string[];
+  note?: string;
+}
+const LETTERS: Letter[] = [
+  {
+    date: '2026-08-20',
+    filer: 'Setara Financial Corp (H. Jack Bouroudjian, CEO)',
+    form: 'Open letter, "An Open Letter to the CFTC: Compute Derivatives Are Essential Market Infrastructure"',
+    where: 'LinkedIn',
+    href: LINKS.setara,
+    onDocket: 'No (pre-docket)',
+    topics: 'Cash markets · oversight',
+    asks: [
+      'Treat compute derivatives as "the natural evolution of commodity derivatives markets".',
+      'Judge the market on whether its infrastructure is "sufficiently neutral, transparent, standardized, and robust to support institutional participation".',
+      'Establish "an independent reference layer that can sit beneath competing venues".',
+    ],
+  },
+  {
+    date: '2026-08-21',
+    filer: 'Michael Ravnitzky, Silver Spring, Maryland',
+    form: 'Comment letter, 7 pages',
+    where: 'regulations.gov',
+    href: LINKS.c0002,
+    onDocket: 'Yes, CFTC-2026-1850-0002 (posted Aug 24)',
+    topics: 'All four',
+    asks: [
+      'The Commission "should refrain from the listing of compute derivatives until a standardized, independently governed benchmark is in place and mandatory, verifiable reporting from power-dependent compute providers is established".',
+      'An index "must adjust for the operational factors that determine compute’s economic value; simple posted-rate averaging is structurally inadequate": hardware age and efficiency, data egress costs, regional power constraints.',
+      '"Until these risks are better understood, perpetual compute futures should not be listed."',
+    ],
+    note: 'Notes that "compute", "compute capacity" and "compute services" are used interchangeably in the RFC and asks the Commission to say which it means.',
+  },
+  {
+    date: '2026-08-24',
+    filer: 'Anonymous',
+    form: 'Comment with attachment, "feedback-observability"',
+    where: 'regulations.gov',
+    href: LINKS.c0003,
+    onDocket: 'Yes, CFTC-2026-1850-0003',
+    topics: 'Cash markets · oversight · customer protection (Q1(f), 2(d), 2(e), 3(c))',
+    asks: [
+      'Surveillance should distinguish "when a derivatives price is primarily measuring scarcity from when that financial signal is also materially participating in the production, allocation, or reduction of scarcity".',
+      'Observe concentration across "physical capacity + benchmark observations + reservation behavior" together rather than within each layer alone.',
+      '"Successful financial hedging should therefore not necessarily be treated as equivalent to successful physical procurement."',
+    ],
+    note: 'States that it takes no position for or against listing, and that "large-language-model assistance was used to organize and draft this comment".',
+  },
+  {
+    date: '2026-08-24',
+    filer: 'Anonymous',
+    form: 'Short comment, no attachment',
+    where: 'regulations.gov',
+    href: LINKS.c0004,
+    onDocket: 'Yes, CFTC-2026-1850-0004',
+    topics: 'Oversight',
+    asks: [
+      '"Clear provisioning on the index calculation methodology, transparency with respect to the underlying market data collection process and source."',
+      '"Clear separation of index providers business functions and the interests of its investors, of whom many are trading firms."',
+      '"A clear designation of what and how a unit in this commodity class is measured and standardized across hardware architectures."',
+    ],
+  },
+  {
+    date: '2026-09-01',
+    filer: 'Setara Financial Corp (H. Jack Bouroudjian, CEO)',
+    form: 'Formal comment letter, 3 pages, "Via Electronic Submission"',
+    where: 'LinkedIn (page images)',
+    href: LINKS.setara,
+    onDocket: 'Not yet visible on the docket as of the date above',
+    topics: 'All four',
+    asks: [
+      'Permit and facilitate compute derivatives on regulated U.S. venues; "encourage competition among venues and methodologies".',
+      'Do not delay "until a perfect benchmark exists".',
+      'Basis "should be measurable, transparent and economically manageable at the outset of a trade"; a hedger’s exposure is to "H100, H200 or B200 capacity in a particular geography".',
+      'Support perpetual compute futures where the structure fits, with convergence, margining, funding and settlement safeguards.',
+    ],
+    note: 'Their second letter. The single reference-layer ask of August 20 is replaced by competition among methodologies.',
+  },
+];
+
+// Statements on the record: positions spoken or given to the press, not
+// filed. Same discipline as the letters: date, who, where, the words, link.
+interface Statement { date: string; who: string; venue: string; quote: string; href: string; source: string; note?: string }
+const STATEMENTS: Statement[] = [
+  { date: '2026-08-20', who: 'Don Wilson, founder and CEO, DRW',
+    venue: 'CFTC Innovation Advisory Committee, inaugural meeting, Washington',
+    quote: 'It is a mistake to delay the launch of these futures by subjecting them to a lengthy comment period.',
+    href: 'https://www.garp.org/risk-intelligence/technology/cant-get-enough-compute-260828', source: 'GARP, Aug 28',
+    note: 'Also: "Risk management instruments in the compute space are essential to reducing the cost of capital."' },
+  { date: '2026-08-20', who: 'Raghu Yarlagadda, CEO, FalconX',
+    venue: 'CFTC Innovation Advisory Committee',
+    quote: 'The CFTC has a remarkable opportunity to define compute as an asset class.',
+    href: 'https://johnlothiannews.com/cftcs-new-ai-playbook-industry-titans-push-for-compute-derivatives-seek-clarity-warn-against-over-regulation/', source: 'John Lothian News, Aug 28' },
+  { date: '2026-08-20', who: 'Tushar Jain, co-founder, Multicoin Capital',
+    venue: 'CFTC Innovation Advisory Committee',
+    quote: 'We are seeing a lot of new entrepreneurial ideas on how to structure compute derivatives. They don’t look a lot like traditional commodities.',
+    href: 'https://www.garp.org/risk-intelligence/technology/cant-get-enough-compute-260828', source: 'GARP, Aug 28',
+    note: 'Asked for room to test designs at small scale before committing capital.' },
+  { date: '2026-08-20', who: 'Terry Duffy, CEO, CME Group',
+    venue: 'CFTC Innovation Advisory Committee',
+    quote: 'Let’s call that a coincidence.',
+    href: 'https://finance.yahoo.com/markets/options/articles/cme-group-ceo-terry-duffy-204331653.html', source: 'BeInCrypto via Yahoo Finance, Aug 20',
+    note: 'On the sequence of the 60-day window, CME’s planned October 5 listing, and a Cantor Fitzgerald announcement on Kalshi contracts the same day.' },
+  { date: '2026-08-12', who: 'Kelly Littlepage, founder, OneChronos',
+    venue: 'To Axios, before the request issued',
+    quote: 'Compute fails every measure of being a commodity.',
+    href: 'https://www.financemagnates.com/institutional-forex/cftc-plans-ai-compute-derivatives-consultation-as-cme-targets-october-5/', source: 'Finance Magnates, Aug 20' },
+];
+
+// The 23 questions, Federal Register text, unchanged.
+interface Topic { n: string; title: string; cite: string; qs: Array<{ id: string; text: string }> }
+const TOPICS: Topic[] = [
+  { n: '1', title: 'Compute cash markets: size, liquidity, and other considerations', cite: '91 FR 54263', qs: [
+    { id: '1(a)', text: 'How does observed price behavior in compute markets compare to price behavior in cash markets underlying derivatives that the Commission has customarily regulated? In responding, please distinguish between on-demand, spot, reserved, committed purchase modes, and state for each the volume transacted, the number of distinct counterparties transacting, and whether any transaction price is published. Are there particular commodity markets that the Commission should consider as being especially relevant or similar to the compute cash market?' },
+    { id: '1(b)', text: 'What data sources, analyses, calculations, variables, or other factors should be used to determine the market size, liquidity, transaction volume, types of participants, and supplier concentration of compute markets? Please distinguish between publicly available data sources and the data derived from non-public, bilateral agreements. How should the Commission consider the fact that, in the Commission’s preliminary understanding, non-public, bilateral agreements carry the majority of economic value but tend to be undisclosed and negotiated privately?' },
+    { id: '1(c)', text: 'What proportion of compute transactions occur at publicly disclosed prices, and what proportion does not? What data applicable to this question is available by voluntary disclosure, as opposed to obligations under statutory, regulatory, or contractual obligations? Would it be appropriate to permit trading in a derivative contract settling to a price computed from data that the Commission may not be able to observe, verify, or surveil, in whole or in part?' },
+    { id: '1(d)', text: 'Have any audits, studies, or independent verifications of the transaction data referenced in question 1(c) above been conducted, and if so, what did they conclude?' },
+    { id: '1(e)', text: 'How do the characteristics of the compute cash markets differ from those of the cash markets underlying derivatives customarily regulated by the Commission? Please address the following characteristics: (i) whether the underlying commodity is storable; (ii) whether a publicly observable transaction record exists, and what proportion of the total transaction volume it captures; (iii) the number of producers of the commodity and the share of commodity production attributable to the largest producers; (iv) the extent to which units of the commodity are fungible across producers without adjustment, and if not, what quality or grade adjustments are necessary to foster fungibility; and (v) whether any price reporting agency or enforced standardized methodology exists.' },
+    { id: '1(f)', text: 'Please describe any potential effects on the cash market for compute that may arise in connection with the listing or trading of compute derivatives. In particular, would the existence of a listed futures contract settling to a published compute index change provider incentives with respect to the publication of posted rates, the pricing or structuring of bilateral reservations, the disclosure of utilization and committed capacity data, or the allocation of capacity amongst purchasers? How should the Commission consider whether the parties best positioned to influence the reference price are the same parties that supply capacity or contribute transactions or posted rates from which price is computed? Is this different from other derivative contracts and their commodity underliers?' },
+    { id: '1(g)', text: 'Regarding DCM Core Principle 5, what would be an appropriate deliverable supply estimate methodology to evaluate the necessity and appropriateness of position limits or position accountability levels?' },
+  ] },
+  { n: '2', title: 'Market oversight and susceptibility to manipulation', cite: '91 FR 54263–54264', qs: [
+    { id: '2(a)', text: 'Core Principle 3 requires a DCM to list only contracts not readily susceptible to manipulation. What features would a compute derivatives contract that cash settles to an index calculated over predominantly bilateral and privately priced cash market transactions be required to demonstrate to satisfy that standard, consistent with the Appendix C Guidance?' },
+    { id: '2(b)', text: 'Certain published compute price series are constructed in whole or in part from posted or listed rates that the compute capacity providers themselves administer, with the remainder of transactions executed on venues that a small number of participants operate or dominate. Are there protections or requirements that would prevent a compute capacity provider from manipulating a cash settlement index by adjusting a posted rate, directing capacity onto or away from a venue whose transactions the index calculation methodology treats as input data, or by executing or declining to execute transactions during the observation window? Please describe any such protections or requirements which the Commission should consider.' },
+    { id: '2(c)', text: 'What volume, transaction-frequency, and contributor concentration data typically characterize the population from which a compute reference price may be calculated? What thresholds would be appropriate for a compute settlement reference price given the idiosyncrasies of the cash markets for compute?' },
+    { id: '2(d)', text: 'Core Principle 4 requires a DCM to have the capacity and responsibility to prevent manipulation, price distortion, and disruption of the delivery or cash-settlement process. What surveillance capabilities would be necessary to satisfy Core Principle 4 for compute derivatives, and are those capabilities presently feasible from a technological, operational, and legal perspective? Should a DCM be expected or required to maintain an information-sharing arrangement with each compute venue and each compute capacity provider whose transactions or posted rates enter a settlement reference price against which a compute derivative settles on the DCM?' },
+    { id: '2(e)', text: 'What, if any, recalibration of market safeguards, risk controls, and liquidity protections should a DCM implement for compute derivatives to ensure price formation remains representative of genuine supply and demand, and to prevent thin liquidity conditions from resulting in disproportionate or runaway price movements that could influence benchmark markets?' },
+    { id: '2(f)', text: 'Are there any types or patterns of trader or intermediary conduct that has occurred in the compute cash markets that raise market risks or challenges and should be monitored closely by trading venues or regulators? How do these risks and challenges compare to cash markets underlying more mature futures products?' },
+    { id: '2(g)', text: 'Appendix C to part 38 provides that a cash-settled derivative contract is readily susceptible to manipulation if the settlement price is not reliable, acceptable, publicly available, and timely, and is computed from a cash market that is sufficiently liquid and not itself readily susceptible to manipulation. Is there a cash price series for compute cash markets that could serve as a reference price that satisfies those criteria? Please describe the series, its computation methodology and governance, and the venues and transaction volumes from which it is derived. What steps should the Commission take, if any, if no such cash price series is available?' },
+    { id: '2(h)', text: 'The Appendix C Guidance addresses the adequacy of deliverable supply and susceptibility to squeezes and corners. What is the estimated deliverable supply for compute at the relevant pricing point or points and how are they measured? Please provide associated data.' },
+    { id: '2(i)', text: 'Are there any other considerations the Commission should take into account with respect to evaluating a DCM’s compliance with the Core Principles in connection with the listing and trading of compute derivatives?' },
+  ] },
+  { n: '3', title: 'Customer protection of market participants', cite: '91 FR 54264', qs: [
+    { id: '3(a)', text: 'What heightened anti-money laundering and know your customers concerns, if any, are present in the compute markets, as compared to more mature commodities markets? What challenges may introducing brokers, FCMs, and other intermediaries face in implementing a BSA/AML program for compute futures?' },
+    { id: '3(b)', text: 'What customer-protection considerations, such as disclosure requirements arise from offering a compute derivatives contract settling against a geopolitically sensitive commodity, including to retail participants? How do these considerations differ, if at all, from derivatives that settle against other commodities, such as oil?' },
+    { id: '3(c)', text: 'Should the terms and conditions of a compute futures contract be required to include any specific information related to idiosyncratic risks? If so, what are those idiosyncratic risks?' },
+    { id: '3(d)', text: 'What, if any, unique protections and prophylactic measures are appropriate or necessary for the protection of retail users of compute derivatives and markets, including as compared to other derivatives markets?' },
+    { id: '3(e)', text: 'Are there any types of trader or intermediary conduct that are particular to compute cash markets and contemplated compute derivative markets, including any such conduct that may require additional action by the Commission?' },
+  ] },
+  { n: '4', title: 'Perpetual compute futures', cite: '91 FR 54264', qs: [
+    { id: '4(a)', text: 'Would perpetual compute futures have advantages for market participants over "traditional" or "fixed date" futures contracts? Would perpetual compute derivatives provide commercial risk management features that cannot be met with existing products?' },
+    { id: '4(b)', text: 'Would perpetual compute derivatives pose any unique risks for market participants or the broader markets? Are there additional protections or safeguards that the Commission or exchanges should adopt to mitigate risks associated with these products?' },
+  ] },
+];
+---
+<Base
+  title="Compute Derivatives at the CFTC: Letters and Statements · CCIR"
+  description="The CFTC consultation on compute derivatives: what the Commission asked, every comment letter filed, statements on the record, and the October 20 deadline."
+  ogImage="/og/compute-derivatives-cftc.jpg"
+  article={{ published: PUBLISHED, modified: AS_OF }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · monitor · updated {AS_OF} · docket CFTC-2026-1850</div>
+      <h1>Compute Derivatives at the CFTC</h1>
+      <p class="standfirst">
+        On August 19, 2026 the Commodity Futures Trading Commission (CFTC)
+        asked what a market in compute derivatives and compute futures should
+        look like. It also asked what could be trusted to settle one. Comments
+        close October 20. This page gathers the letters on the docket and the
+        ones posted publicly outside it, and summarises what each one asks.
+      </p>
+      <ul class="lede-index">
+        <li><span class="arw">→</span> <a href="#asked">What the CFTC asked</a></li>
+        <li><span class="arw">→</span> <a href="#letters">Comment letters filed, with summaries</a></li>
+        <li><span class="arw">→</span> <a href="#statements">Statements on the record</a></li>
+        <li><span class="arw">→</span> <a href="#questions">The 23 questions</a></li>
+        <li><span class="arw">→</span> <a href="#file">How to file a comment</a></li>
+      </ul>
+    </header>
+
+    <figure class="photo">
+      <img src="/img/research/cftc-entrance.webp" width="1600" height="1018"
+           alt="The entrance to the Commodity Futures Trading Commission at Three Lafayette Centre, Washington, DC, with the Commission's seal and CFTC sign on the brick wall." loading="eager" />
+      <figcaption>
+        The Commission's entrance at Three Lafayette Centre, Washington, DC,
+        where paper comments are delivered. Photo: G. Edward Johnson,
+        <a href="https://commons.wikimedia.org/wiki/File:Commodity_Futures_Trading_Commission_entrance_Washington_DC_2026-03-15_08-47-48.jpg" rel="noopener" target="_blank">via Wikimedia Commons</a>
+        (<a href="https://creativecommons.org/licenses/by/4.0/" rel="noopener" target="_blank">CC BY 4.0</a>).
+      </figcaption>
+    </figure>
+
+    <div class="twrap facts">
+      <table>
+        <tbody>
+          {FACTS.map(([k, v]) => (
+            <tr><th>{k}</th><td>{v}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <section class="sec" id="asked">
+      <h2><span class="n">01</span> What the CFTC asked about compute derivatives</h2>
+      <p class="lede-para">
+        The request is a set of questions. The Commission states a preliminary
+        understanding and asks the market to correct it with data. The
+        contract class references "the price of access to computing power".
+        Compute, in the notice's words, "has become a multi-hundred-billion-dollar
+        enterprise and is a scarce, capital-intensive commodity".
+      </p>
+      <p>
+        The underlier it has in mind is rented capacity. In the notice's
+        words:
+      </p>
+      <blockquote>
+        The commodity underlying a compute futures contract would typically be
+        access to rented compute capacity from hardware the purchaser of such
+        capacity does not own (e.g., the hourly rental price of compute from a
+        B200), though the underlier may be a different type of compute-related
+        commodity, such as access to a stated volume of LLM inference tokens.
+      </blockquote>
+      <p>
+        The price of that capacity "would likely be derived from a bundle of
+        factors (e.g., provider, region, contract structures)". A market in it
+        would need those variables standardized. That applies "both with
+        respect to the price index used as a settlement reference, and with
+        respect to the standards of compute that is required to be physically
+        delivered".
+      </p>
+      <p>
+        The Commission expects most contracts to settle in cash. It also
+        describes the cash market it would be settling against. Compute markets
+        "are fragmented and price formation primarily occurs in opaque
+        bilateral transactions, hindering the availability of current and
+        historical price data". Dominant participants "may wield significant
+        pricing power that may lead to manipulability, preferential pricing
+        arrangements, and, in turn, unfair market dynamics". Pricing "can vary
+        dramatically across providers, regions, and contract structures". The
+        Commission's preliminary view is that compute "may not yet exhibit"
+        fungibility, standardization, and sufficient liquidity.
+      </p>
+      <p>
+        The legal test sits in one paragraph of the notice. A cash-settled
+        contract passes Core Principle 3 only if its settlement price is
+        "reliable, acceptable, publicly available, and timely". The cash
+        market beneath it must be "sufficiently liquid and not itself readily
+        susceptible to manipulation". Question 2(g) asks whether any compute
+        price series meets that standard today. It also asks what the
+        Commission should do if none does.
+      </p>
+      <p>
+        The Chairman set the sequence the next day, at the first meeting of
+        the Commission's Innovation Advisory Committee: "Our first step was to
+        issue a request for comment on compute markets, which was released
+        earlier this week. From there, we'll take stakeholder feedback into
+        consideration and develop a gold standard regulatory framework for
+        these new commodity markets."
+      </p>
+      <p>
+        The four topics, and what each one asks:
+      </p>
+      <ul class="topics">
+        <li><strong>Cash markets</strong> (seven questions). How compute trades, in what modes, at what disclosed prices, and whether a listed contract would change how providers post and reserve.</li>
+        <li><strong>Oversight and manipulation</strong> (nine questions). What stops a provider moving an index by moving a posted rate or a venue. What surveillance a market would need. Whether a qualifying price series exists.</li>
+        <li><strong>Customer protection</strong> (five questions). Anti-money-laundering, retail disclosure, and the risks a contract's terms should name.</li>
+        <li><strong>Perpetual futures</strong> (two questions). Whether a perpetual compute contract adds anything a dated contract cannot, and what it risks.</li>
+      </ul>
+      <p class="fine">
+        The request primarily addresses exchange listings. Footnote 6 extends
+        it to swap-execution-facility contracts settling to the price of
+        compute, and to physically settled compute swaps. The Commission
+        "particularly encourages commenters to provide empirical and
+        data-driven input".
+      </p>
+    </section>
+
+    <section class="sec" id="letters">
+      <h2><span class="n">02</span> Comment letters filed, with summaries</h2>
+      <p class="lede-para">
+        Five letters so far: three on the docket, two posted publicly by one
+        filer before and beside it. Each row gives the filer's own asks in the
+        filer's own words, with a link to the source. The docket copy is the
+        record; a letter posted elsewhere is listed as such until it appears
+        there.
+      </p>
+      <div class="letters">
+        {LETTERS.map((l) => (
+          <article class="letter">
+            <div class="lhead">
+              <span class="ldate">{l.date}</span>
+              <span class="lfiler">{l.filer}</span>
+            </div>
+            <div class="lmeta">
+              <span>{l.form}</span>
+              <span>· {l.href ? <a href={l.href} rel="noopener" target="_blank">{l.where}</a> : l.where}</span>
+              <span>· on the docket: {l.onDocket}</span>
+              <span>· topics: {l.topics}</span>
+            </div>
+            <ul class="asks">
+              {l.asks.map((a) => <li>{a}</li>)}
+            </ul>
+            {l.note && <p class="lnote">{l.note}</p>}
+          </article>
+        ))}
+      </div>
+      <p>
+        Read together, the letters ask for the same object from opposite
+        directions. Every filer wants a benchmark with a published method, a
+        governance body independent of the firms it measures, and a unit that
+        standardizes across hardware. They part on sequence. One asks the
+        Commission to withhold listings until that benchmark exists. Another
+        asks it not to wait for a perfect one. Two anonymous filers ask only
+        that whoever calculates the index be separated from the firms that
+        trade on it.
+      </p>
+      <p class="fine">
+        CCIR publishes posted-rate compute benchmarks. Docket rows are
+        checked against regulations.gov on the date in the
+        kicker. Letters posted outside the docket are included when the full
+        text is public. Comments are published by the Commission without
+        review and without removal of personal or business information.
+      </p>
+    </section>
+
+    <section class="sec" id="statements">
+      <h2><span class="n">03</span> Statements on the record</h2>
+      <p class="lede-para">
+        Positions spoken at Commission meetings or given to the press, by
+        people who have not filed. They are not part of the docket. Each row
+        carries the statement as reported and a link to the report.
+      </p>
+      <div class="twrap">
+        <table class="stmts">
+          <thead><tr><th>Date</th><th>Who</th><th>Where</th><th>Statement</th><th>Source</th></tr></thead>
+          <tbody>
+            {STATEMENTS.map((st) => (
+              <tr>
+                <td class="sdate">{st.date}</td>
+                <td class="swho">{st.who}</td>
+                <td class="svenue">{st.venue}</td>
+                <td class="squote">“{st.quote}”{st.note && <span class="snote"> {st.note}</span>}</td>
+                <td class="ssrc"><a href={st.href} rel="noopener" target="_blank">{st.source}</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="fine">
+        The Commission's own account of the meeting is in the Chairman's
+        <a href="https://www.cftc.gov/PressRoom/SpeechesTestimony/opaselig10" rel="noopener" target="_blank">remarks of August 20</a>.
+        Legal explainers that summarise the request without taking a
+        position are not listed.
+      </p>
+    </section>
+
+    <section class="sec" id="questions">
+      <h2><span class="n">04</span> The 23 questions in the request for comment</h2>
+      <p class="lede-para">
+        The Commission's text, unchanged, from 91 FR 54263 to 54264. Open a
+        topic to read its questions.
+      </p>
+      {TOPICS.map((t) => (
+        <details class="topic">
+          <summary><span class="tn">Topic {t.n}</span> {t.title} <span class="tcite">{t.cite} · {t.qs.length} questions</span></summary>
+          <ol class="qs">
+            {t.qs.map((q) => (
+              <li id={'q' + q.id.replace(/[()]/g, '')}>
+                <span class="qid">{q.id}</span>
+                <span class="qtext">{q.text}</span>
+              </li>
+            ))}
+          </ol>
+        </details>
+      ))}
+    </section>
+
+    <section class="sec" id="file">
+      <h2><span class="n">05</span> How to file a comment on the compute derivatives RFC</h2>
+      <ul class="file">
+        <li>Comments must be received on or before <strong>October 20, 2026</strong>.</li>
+        <li>Every submission carries the reference line "Request for Comment on the Listing of Compute Derivatives Contracts" and RIN 3038-AF77.</li>
+        <li>File once, by one method. The Commission encourages <a href={LINKS.docket} rel="noopener" target="_blank">regulations.gov</a>. Mail or hand delivery goes to Christopher Kirkpatrick, Secretary of the Commission, Three Lafayette Centre, 1155 21st Street NW, Washington, DC 20581.</li>
+        <li>Comments are public on receipt. Confidential material needs prior contact with the Office of General Counsel and a request under 17 CFR 145.9.</li>
+        <li>Comment is invited "on all aspects of the compute markets (including those not mentioned herein)".</li>
+      </ul>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">06</span> Sources</h2>
+      <ul class="src-list">
+        <li>CFTC, August 19, 2026 — <a href={LINKS.release} rel="noopener" target="_blank">Release 9286-26, CFTC Requests Comment on the Listing of Compute Derivatives Contracts</a></li>
+        <li>Federal Register, August 21, 2026 — <a href={LINKS.fr} rel="noopener" target="_blank">91 FR 54259, Request for Comment on the Listing of Compute Derivatives Contracts</a> (<a href={LINKS.frPdf} rel="noopener" target="_blank">PDF</a>)</li>
+        <li>regulations.gov — <a href={LINKS.docket} rel="noopener" target="_blank">Docket CFTC-2026-1850</a>: comments <a href={LINKS.c0002} rel="noopener" target="_blank">0002</a>, <a href={LINKS.c0003} rel="noopener" target="_blank">0003</a>, <a href={LINKS.c0004} rel="noopener" target="_blank">0004</a></li>
+        <li>Setara Financial Corp — open letter (August 20, 2026) and comment letter (September 1, 2026), both posted on the company's LinkedIn page; <a href={LINKS.setara} rel="noopener" target="_blank">company site</a></li>
+      </ul>
+    </section>
+
+    <NoteFooter title="Compute Derivatives at the CFTC" published={PUBLISHED} updated={AS_OF} />
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 18px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p, .sec ul, .sec ol {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 13px;
+    }
+    .sec strong { color: var(--accent); }
+    .sec blockquote {
+      margin: 0 0 13px; padding: 10px 16px;
+      border-left: 2px solid var(--accent);
+      font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink);
+      line-height: 1.65;
+    }
+    .sec .fine { font-size: var(--fs-sm); color: var(--ink-dim); }
+    .topics { padding-left: 1.2em; }
+    .topics li { margin-bottom: 6px; }
+
+    .photo { margin: 0 0 22px; max-width: 880px; }
+    .photo img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); filter: grayscale(0.15); }
+    .photo figcaption { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
+    .photo figcaption a { color: var(--ink-dim); }
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 8px; max-width: 880px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+    .facts th { color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); white-space: nowrap; width: 1%; }
+    .facts td { color: var(--ink); }
+
+    .letters { display: flex; flex-direction: column; gap: 14px; margin: 0 0 16px; }
+    .letter { border: 1px solid var(--rule); background: var(--surface); padding: 12px 14px; }
+    .lhead { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; margin-bottom: 4px; }
+    .ldate { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--accent); font-weight: var(--weight-strong); }
+    .lfiler { font-family: var(--font-display); font-size: var(--fs-lg); color: var(--ink); }
+    .lmeta { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-dim); line-height: 1.6; margin-bottom: 8px; }
+    .lmeta span { margin-right: 4px; }
+    .asks { padding-left: 1.2em; margin: 0 0 6px; }
+    .asks li { margin-bottom: 5px; font-size: var(--fs-sm); line-height: 1.55; }
+    .lnote { font-size: var(--fs-sm); color: var(--ink-dim); margin: 0; }
+
+    .topic { border: 1px solid var(--rule); background: var(--surface); margin: 0 0 8px; }
+    .topic summary { cursor: pointer; padding: 10px 14px; font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); list-style: none; }
+    .topic summary::-webkit-details-marker { display: none; }
+    .topic summary::before { content: '+'; font-family: var(--font-mono); color: var(--accent); margin-right: 10px; }
+    .topic[open] summary::before { content: '–'; }
+    .tn { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--accent); margin-right: 6px; }
+    .tcite { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-left: 8px; }
+    .qs { list-style: none; padding: 0 14px 6px; margin: 0; }
+    .qs li { display: grid; grid-template-columns: 3.2em 1fr; gap: 8px; padding: 8px 0; border-top: 1px solid var(--rule); font-size: var(--fs-sm); line-height: 1.55; }
+    .qid { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--accent); }
+    .qtext { color: var(--ink); }
+
+    .stmts th { color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); background: var(--surface-2); }
+    .stmts td { font-family: var(--font-body); font-size: var(--fs-sm); line-height: 1.5; }
+    .stmts .sdate { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--accent); white-space: nowrap; }
+    .stmts .swho { color: var(--ink); min-width: 12ch; }
+    .stmts .svenue { color: var(--ink-dim); min-width: 14ch; }
+    .stmts .squote { color: var(--ink); min-width: 26ch; }
+    .stmts .snote { color: var(--ink-dim); }
+    .stmts .ssrc { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); white-space: nowrap; }
+    .file { padding-left: 1.2em; }
+    .file li { margin-bottom: 6px; }
+    .src-list { list-style: none; padding: 0; }
+    .src-list li { margin-bottom: 8px; font-size: var(--fs-sm); }
+  </style>
+</Base>
