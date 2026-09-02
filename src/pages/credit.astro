@@ -293,7 +293,7 @@ function layoutLabels(items: LabIn[], marks: { x: number; y: number }[]): LabOut
     a.ly < b.ly + b.h + 3 && b.ly < a.ly + a.h + 3;
   // Within a local x-window, a lower-value mark's label must not sit above a
   // higher-value one's — else near-tied points (e.g. 5.96 vs 6.00, ~2px apart)
-  // read inverted. Penalise value-order violations so the solver picks a
+  // read inverted. Penalize value-order violations so the solver picks a
   // slightly-less-ideal but order-consistent slot over the nearest one.
   const INV_PEN = 1000;
   const X_WIN = 120;
@@ -1498,7 +1498,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     .range { stroke-width: 2; }
     .ring { fill: none; stroke-width: 1.4; opacity: 0.85; }
     /* Credit-enhancement ramp — strong → weak support. Dedicated per-theme
-       colours (not the semantic tokens): teal / gold / rose ≈ cyan/yellow/
+       colors (not the semantic tokens): teal / gold / rose ≈ cyan/yellow/
        magenta, a near-maximal three-hue spread so the tiers read distinctly.
        teal/blue collapses in the dark theme and teal/amber/red left two
        adjacent warm hues too close; this set separates cleanly in both.

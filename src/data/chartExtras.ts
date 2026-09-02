@@ -8,7 +8,7 @@
     (default 6) line datasets are visible, so dense multi-provider charts
     don't clutter. When 3 or fewer lines are visible it also draws the
     dataset label in small dim text under the value — direct end-of-line
-    labelling, which replaces the legend on those charts.
+    labeling, which replaces the legend on those charts.
 
     Wire per chart (inline plugin — never registered globally):
 
