@@ -227,7 +227,7 @@ export function colorForSource(name: string): string {
     case 'runpod_secure':     return '#2c8055';   // green
     case 'runpod_spot':       return '#a84040';   // red
     case 'runpod_community':  return '#2d6a94';   // teal
-    case 'runpod_cluster':    return '#6b7176';   // grey
+    case 'runpod_cluster':    return '#6b7176';   // gray
     default:                  return '#5b5852';
   }
 }

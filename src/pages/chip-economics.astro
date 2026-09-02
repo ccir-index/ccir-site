@@ -251,7 +251,7 @@ const ZTICKS = [0.80, 0.90, 1.00, 1.10];
       <figure class="chart-fig">
         <div class="chart-box" id="bw-chart">
           <svg viewBox="0 0 680 300" role="img"
-               aria-label={`Bandwidth band, axis zoomed to ${ZMIN} to ${ZMAX} dollars per TB/s-hour. A shaded band spans ${BAND.min.toFixed(3)} to ${BAND.max.toFixed(3)} with a mean line at ${BAND.mean.toFixed(3)}. Five labelled generation dots sit inside the band.`}>
+               aria-label={`Bandwidth band, axis zoomed to ${ZMIN} to ${ZMAX} dollars per TB/s-hour. A shaded band spans ${BAND.min.toFixed(3)} to ${BAND.max.toFixed(3)} with a mean line at ${BAND.mean.toFixed(3)}. Five labeled generation dots sit inside the band.`}>
             {ZTICKS.map((v) => <line x1="46" x2="540" y1={yb(v)} y2={yb(v)} class="grid"/>)}
             {ZTICKS.map((v) => <text x="38" y={+(yb(v) + 3).toFixed(1)} class="tick" text-anchor="end">{v.toFixed(2)}</text>)}
 

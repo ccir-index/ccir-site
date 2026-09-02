@@ -39,7 +39,7 @@ const PROVIDER_META: Record<string, { label: string; note?: string }> = {
   google: { label: 'Google', note: 'standard tier' },
   deepseek: { label: 'DeepSeek', note: 'standard price' },
   moonshot: { label: 'Moonshot', note: 'per-model pages' },
-  xai: { label: 'xAI', note: 'model catalogue' },
+  xai: { label: 'xAI', note: 'model catalog' },
   meta: { label: 'Meta', note: 'standard tier' },
   alibaba: { label: 'Alibaba', note: 'international storefront' },
   zai: { label: 'Z.AI', note: 'model table' },
@@ -91,7 +91,7 @@ const providerBlocks = (() => {
   return ordered.map((provider) => {
     const cfg = PROVIDER_META[provider] ?? { label: provider };
     const pool = byProvider.get(provider)!
-      // Vendor-labelled legacy first: what a lab calls legacy stays in the
+      // Vendor-labeled legacy first: what a lab calls legacy stays in the
       // record and off the page. RETIRED_RE still catches labs that annotate
       // in the display name rather than in axes.
       .filter((r) => r.lifecycle !== 'legacy')

@@ -369,7 +369,7 @@ const ay = (v: number) => y0 + (y1 - y0) * ((A_YMAX - v) / A_YMAX);
 
 // Credit-enhancement tier is the primary encoding, not the date: the low
 // spreads are the IG-contract-wrapped facilities, the high ones the
-// unwrapped GPU-only / non-IG legs. Colour carries that; the eye should
+// unwrapped GPU-only / non-IG legs. Color carries that; the eye should
 // read "cheap = wrapped," not "cheap = later." Tiers, strong → weak:
 //   strong = IG-offtake-contract-wrapped (Microsoft)
 //   mid    = customer offtake contracts, no single-IG wrap (2.0/2.1 IG+unrated mix; 3.0 = OpenAI, single/unrated; 5.0 = 2 non-IG customers)
@@ -498,7 +498,7 @@ const B_TICKS_X = [
 const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed(1)}`).join(' ');
 
 // ---- Chart C: leaseback / securitization landlord paper ---------------------
-// Mirrors Chart B's construction (coupon vs pricing date, tier colour,
+// Mirrors Chart B's construction (coupon vs pricing date, tier color,
 // hollow = press-sourced pricing, ◎ = long amortizer) now that the panel
 // TITLES carry the operator/landlord seat distinction. One addition: mark
 // AREA ∝ deal size — this panel exists to show where the financing volume
@@ -631,10 +631,8 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         <div>
           <div class="panel-title">Compute-infrastructure debt issuance — observed, by quarter</div>
           <div class="panel-sub">
-            Amount issued, bucketed by issuance quarter and collateral seat —
-            GPU-collateralized · operator campus-secured · landlord SPV &amp;
-            securitization · the line is cumulative GPU-collateralized
-            tracked debt
+            Amount issued by quarter and collateral seat · line = cumulative
+            GPU-collateralized debt tracked
           </div>
         </div>
         <span class="badge">AS FILED</span>
@@ -648,10 +646,8 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         <div>
           <div class="panel-title">GPU-collateral floating spreads — CoreWeave &amp; IREN</div>
           <div class="panel-sub">
-            Filed spread over the Secured Overnight Financing Rate (SOFR) at
-            signing, coloured by what backs the loan ·
-            window Jul 2023 – Jul 2026 · CoreWeave delayed-draw term loan
-            (DDTL) vintages + IREN Hardware 3
+            Spread over SOFR at signing, colored by what backs the loan ·
+            Jul 2023 – Jul 2026
           </div>
         </div>
         <span class="badge">FILED TERMS</span>
@@ -709,7 +705,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         <summary>How to read this</summary>
         <div class="panel-foot">
           <p>
-            Colour, not the date, carries the story. The two lowest spreads
+            Color, not the date, carries the story. The two lowest spreads
             (+2.25%, 2026) are the facilities wrapped by an investment-grade
             offtake contract: CoreWeave DDTL 4.0 (Meta-backed) and IREN
             Hardware 3 (Microsoft-backed). The widest (+9.62% in 2023, and
@@ -748,9 +744,8 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         <div>
           <div class="panel-title">Operator bond coupons — corporate issuers, by offtake credit support</div>
           <div class="panel-sub">
-            Coupon at pricing/close, fixed-rate senior secured Rule 144A issued
-            by the data-center <em>operator</em> — recourse to a corporate
-            balance sheet — coloured by who backs the lease · window
+            Coupon at pricing, fixed-rate senior secured 144A notes issued by the
+            data-center operator, colored by who backs the lease ·
             Oct 2025 – Jul 2026
           </div>
         </div>
@@ -844,10 +839,8 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         <div>
           <div class="panel-title">Landlord SPV &amp; securitization coupons — non-recourse, by tenant credit</div>
           <div class="panel-sub">
-            Coupon at pricing — bankruptcy-remote landlord vehicles with no
-            operating company behind them; the compute tenant's lease or its
-            guarantee is the entire credit · mark area ∝ deal size ·
-            window Oct 2025 – Jul 2026
+            Coupon at pricing, non-recourse landlord vehicles where the tenant's
+            lease is the credit · mark area ∝ deal size · Oct 2025 – Jul 2026
           </div>
         </div>
         <span class="badge">AT PRICING</span>
@@ -1509,7 +1502,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
        magenta, a near-maximal three-hue spread so the tiers read distinctly.
        teal/blue collapses in the dark theme and teal/amber/red left two
        adjacent warm hues too close; this set separates cleanly in both.
-       Reinforced by y-position + legend, so colour is redundant. */
+       Reinforced by y-position + legend, so color is redundant. */
     .panel {
       --ct-strong: #0d9488;
       --ct-mid: #b9770a;

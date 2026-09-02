@@ -15,7 +15,7 @@ export const prerender = true;
   a link card, never both, so the card has to carry everything: the donuts
   give the scale of the turn, the footer carries the finding.
 
-  Same segment order and colour in both rings so the AI wedge reads across.
+  Same segment order and color in both rings so the AI wedge reads across.
   Figures: 10-Q segment revenue disaggregation and Note 18 segment capex.
   ASCII only — the mono subset has no arrows or em-dashes.
 */
