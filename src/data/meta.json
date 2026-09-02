@@ -43,13 +43,64 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 902,
+    "total_rows": 942,
     "window_days": 7,
     "window_end": "2026-09-02",
     "window_start": "2026-08-27"
   },
-  "vast": null,
-  "availability": null,
+  "vast": {
+    "chips_observed": [
+      "A100 PCIE",
+      "A100 SXM4",
+      "B200",
+      "B300",
+      "H100 NVL",
+      "H100 PCIE",
+      "H100 SXM",
+      "H200",
+      "H200 NVL",
+      "L40",
+      "L40S",
+      "RTX 3090",
+      "RTX 4090",
+      "RTX 5090",
+      "RTX 6000Ada",
+      "RTX A6000",
+      "RTX PRO 6000 Max-Q",
+      "RTX PRO 6000 S",
+      "RTX PRO 6000 WS"
+    ],
+    "latest_collected_at_utc": "2026-09-02 13:07:40.857663+00:00",
+    "n_chips": 19,
+    "n_offers_latest_cycle": 2405,
+    "status": "ok",
+    "summary_file": "vast_summary.csv",
+    "window_days": 30,
+    "window_end": "2026-09-02",
+    "window_start": "2026-08-04"
+  },
+  "availability": {
+    "chips_observed": [
+      "a100-pcie-80gb",
+      "a100-sxm-80gb",
+      "b300",
+      "gh200",
+      "h100-pcie",
+      "h100-sxm",
+      "h200-sxm",
+      "l40s",
+      "rtx-pro-6000"
+    ],
+    "latest_collected_at_utc": "2026-09-02 13:15:31.746324+00:00",
+    "n_available_latest_cycle": 32,
+    "n_chips": 9,
+    "n_sku_regions_latest_cycle": 304,
+    "status": "ok",
+    "summary_file": "shadeform_summary.csv",
+    "window_days": 30,
+    "window_end": "2026-09-02",
+    "window_start": "2026-08-04"
+  },
   "utilization": {
     "chips": [
       "h100-sxm",
