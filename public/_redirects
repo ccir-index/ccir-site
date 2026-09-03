@@ -52,3 +52,9 @@
 # crawled or shared links.
 /realized                           /hardware                 301
 /realized/*                         /hardware                 301
+
+# 2026-09-02: a mangled share link. Some client base64-encoded the slug of the
+# rating-case piece (dGhlLXJhdGluZy1jYXNl... = "the-rating-case...") and the
+# analytics show visitors landing on /research/dGhlXJhdG (the L dropped, then
+# truncated). Splat catches every variant and sends them to the piece.
+/research/dGhl* /research/the-rating-case-goes-investment-grade 301
