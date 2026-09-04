@@ -804,11 +804,23 @@ const vvPts = vv.map((p) => [p.date, p.vvti]);
               `<line x1="${PADL}" x2="${W - PADR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`);
           }
           const span = t1 - t0;
-          const ticks = [];
+          // Tick count follows the plot width: an 11px "AUG 23" label needs
+          // ~72px of room, so a 360px phone gets 4 labels where a desktop
+          // gets 7. Fixed counts overlapped on mobile (2026-09-04).
+          const maxTicks = Math.max(2, Math.min(7, Math.floor((W - PADL - PADR) / 72)));
+          let ticks = [];
           if (spanDays <= 35) {
-            for (let x = t0; x <= t1 + DAY / 2; x += 7 * DAY) ticks.push(Math.min(x, t1));
+            const weekly = [];
+            for (let x = t0; x <= t1 + DAY / 2; x += 7 * DAY) weekly.push(Math.min(x, t1));
+            const step = Math.max(1, Math.ceil(weekly.length / maxTicks));
+            ticks = weekly.filter((_, i) => i % step === 0);
+            if (ticks[ticks.length - 1] !== weekly[weekly.length - 1]) {
+              if (weekly[weekly.length - 1] - ticks[ticks.length - 1] < 4 * DAY) ticks.pop();
+              ticks.push(weekly[weekly.length - 1]);
+            }
           } else {
-            for (let i = 0; i <= 6; i++) ticks.push(t0 + (span * i) / 6);
+            const n = maxTicks - 1;
+            for (let i = 0; i <= n; i++) ticks.push(t0 + (span * i) / n);
           }
           ticks.forEach((x, i) => {
             const px = X(x);
