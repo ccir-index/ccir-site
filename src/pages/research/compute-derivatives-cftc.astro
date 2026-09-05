@@ -11,7 +11,7 @@
 import Base from '../../layouts/Base.astro';
 import NoteFooter from '../../components/NoteFooter.astro';
 
-const AS_OF = '2026-09-02';
+const AS_OF = '2026-09-05';
 const PUBLISHED = '2026-09-02';
 
 const LINKS = {
@@ -22,6 +22,8 @@ const LINKS = {
   c0002: 'https://www.regulations.gov/comment/CFTC-2026-1850-0002',
   c0003: 'https://www.regulations.gov/comment/CFTC-2026-1850-0003',
   c0004: 'https://www.regulations.gov/comment/CFTC-2026-1850-0004',
+  c0005: 'https://www.regulations.gov/comment/CFTC-2026-1850-0005',
+  c0006: 'https://www.regulations.gov/comment/CFTC-2026-1850-0006',
   setara: 'https://www.setarafinancial.com/',
 };
 
@@ -112,9 +114,9 @@ const LETTERS: Letter[] = [
     date: '2026-09-01',
     filer: 'Setara Financial Corp (H. Jack Bouroudjian, CEO)',
     form: 'Formal comment letter, 3 pages, "Via Electronic Submission"',
-    where: 'LinkedIn (page images)',
-    href: LINKS.setara,
-    onDocket: 'Not yet visible on the docket as of the date above',
+    where: 'regulations.gov (first posted on LinkedIn as page images)',
+    href: LINKS.c0005,
+    onDocket: 'Yes, CFTC-2026-1850-0005 (received Sep 1, posted Sep 4)',
     topics: 'All four',
     asks: [
       'Permit and facilitate compute derivatives on regulated U.S. venues; "encourage competition among venues and methodologies".',
@@ -123,6 +125,21 @@ const LETTERS: Letter[] = [
       'Support perpetual compute futures where the structure fits, with convergence, margining, funding and settlement safeguards.',
     ],
     note: 'Their second letter. The single reference-layer ask of August 20 is replaced by competition among methodologies.',
+  },
+  {
+    date: '2026-09-04',
+    filer: 'Animica Labs (Alienbeing LLC, DBA Animica; Alexander Lehman, Founder)',
+    form: 'Comment letter, 5 pages, with three attachments: a posted-rate census (13,030 rows), a computed summary and a reproduction script',
+    where: 'regulations.gov',
+    href: LINKS.c0006,
+    onDocket: 'Yes, CFTC-2026-1850-0006 (posted Sep 4)',
+    topics: 'Cash markets (Q1(b), 1(c), 1(e)) · oversight (Q2(b), 2(d), 2(g))',
+    asks: [
+      'Do not treat cash-market opacity "as an inherent property of compute. It is a property of a settlement architecture."',
+      '"A contract should not settle to a price the Commission cannot observe or verify"; this "counsels a sourcing requirement, not abstention from listing".',
+      '"Make observability a listing condition rather than a hoped-for disclosure": independently verifiable settlement, a published methodology fixed in advance, "counterparty-diversity floors, not volume floors", and a stated delivered unit with attestation of delivery independent of the payment record.',
+    ],
+    note: 'Data is a 17-day census of machine-priced inference endpoints paid over the x402 protocol. The filer states the census covers the API layer, "not evidence about hourly accelerator pricing", and gives its own scale as 226 settlements for $3.12.',
   },
 ];
 
@@ -316,8 +333,8 @@ const TOPICS: Topic[] = [
     <section class="sec" id="letters">
       <h2><span class="n">02</span> Comment letters filed, with summaries</h2>
       <p class="lede-para">
-        Five letters so far: three on the docket, two posted publicly by one
-        filer before and beside it. Each row gives the filer's own asks in the
+        Six letters so far: five on the docket, one posted publicly by a
+        filer before the docket opened. Each row gives the filer's own asks in the
         filer's own words, with a link to the source. The docket copy is the
         record; a letter posted elsewhere is listed as such until it appears
         there.
@@ -429,8 +446,8 @@ const TOPICS: Topic[] = [
       <ul class="src-list">
         <li>CFTC, August 19, 2026 — <a href={LINKS.release} rel="noopener" target="_blank">Release 9286-26, CFTC Requests Comment on the Listing of Compute Derivatives Contracts</a></li>
         <li>Federal Register, August 21, 2026 — <a href={LINKS.fr} rel="noopener" target="_blank">91 FR 54259, Request for Comment on the Listing of Compute Derivatives Contracts</a> (<a href={LINKS.frPdf} rel="noopener" target="_blank">PDF</a>)</li>
-        <li>regulations.gov — <a href={LINKS.docket} rel="noopener" target="_blank">Docket CFTC-2026-1850</a>: comments <a href={LINKS.c0002} rel="noopener" target="_blank">0002</a>, <a href={LINKS.c0003} rel="noopener" target="_blank">0003</a>, <a href={LINKS.c0004} rel="noopener" target="_blank">0004</a></li>
-        <li>Setara Financial Corp — open letter (August 20, 2026) and comment letter (September 1, 2026), both posted on the company's LinkedIn page; <a href={LINKS.setara} rel="noopener" target="_blank">company site</a></li>
+        <li>regulations.gov — <a href={LINKS.docket} rel="noopener" target="_blank">Docket CFTC-2026-1850</a>: comments <a href={LINKS.c0002} rel="noopener" target="_blank">0002</a>, <a href={LINKS.c0003} rel="noopener" target="_blank">0003</a>, <a href={LINKS.c0004} rel="noopener" target="_blank">0004</a>, <a href={LINKS.c0005} rel="noopener" target="_blank">0005</a>, <a href={LINKS.c0006} rel="noopener" target="_blank">0006</a></li>
+        <li>Setara Financial Corp — open letter (August 20, 2026) posted on the company's LinkedIn page; the September 1 comment letter is now on the docket as 0005; <a href={LINKS.setara} rel="noopener" target="_blank">company site</a></li>
       </ul>
     </section>
 
