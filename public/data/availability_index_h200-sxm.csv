@@ -1,7 +1,7 @@
 chip_slug,scope,window_days,as_of_date,n_sources,n_sources_8x,n_sources_thin,n_cycles,confidence,n_available,breadth,n_available_8x,breadth_8x,panel_signature,pct_available_median,pct_available_mean,pct_available_min,pct_available_max,pct_available_8x_median,pct_available_8x_mean,methodology_version
 h200-sxm,geo:EU,7,2026-09-06,6,4,0,233,ok,5,0.8333,2,0.5,89453f6c,0.724,0.5906,0.0,1.0,0.0843,0.2039,v2.3.2
 h200-sxm,geo:US,7,2026-09-06,5,3,0,225,ok,4,0.8,2,0.6667,dfb35062,0.5833,0.6142,0.0,1.0,0.125,0.2312,v2.3.2
-h200-sxm,global,7,2026-09-06,16,12,0,588,ok,10,0.625,5,0.4167,dd48ae72,0.6454,0.5179,0.0,1.0,0.0646,0.2165,v2.3.2
+h200-sxm,global,7,2026-09-06,16,12,0,593,ok,10,0.625,5,0.4167,dd48ae72,0.6354,0.5167,0.0,1.0,0.0646,0.2148,v2.3.2
 h200-sxm,tier:T1,7,2026-09-06,1,1,0,51,thin,0,0.0,0,0.0,1d78613e,0.0,0.0,0.0,0.0,0.0,0.0,v2.3.2
 h200-sxm,tier:T2,7,2026-09-06,4,4,0,185,ok,3,0.75,2,0.5,fd802ba6,0.4593,0.5041,0.098,1.0,0.1176,0.2382,v2.3.2
 h200-sxm,tier:T3,7,2026-09-06,2,1,0,99,thin,2,1.0,1,1.0,47a5944f,0.9896,0.9896,0.9792,1.0,0.125,0.125,v2.3.2
