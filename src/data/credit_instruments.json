@@ -7671,6 +7671,116 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1095435/000117184326002823/exh_991.htm"
       },
       "as_of": "2026-08-29"
+    },
+    {
+      "id": "polardc-nordic-bond-2030",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "issuer": "PolarDC Group Limited (H.I.G. Capital portfolio company)",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "PolarDC Finance NO1 AS (wholly owned issuing subsidiary)",
+      "name": "€800M senior secured Nordic bond due 2030 (Norway AI data centers; record Nordic high-yield print)",
+      "instrument_type": "bond",
+      "size_usd_m": 930,
+      "size_note": "€800M; $930M at the rate Bloomberg reported at pricing. Largest high-yield bond ever sold in the Nordic market, priced 2026-05-28, about €2.9B of bids (~3.6x). Four-year tenor against tenant leases of up to 15 years (refinancing assumed at maturity). Proceeds refinance the debt on the first Drangedal, Norway site and fund two further Norwegian sites targeted for 2026 and 2027; PitchBook reports the refinanced facility was from Tikehau Capital. One of the two new-site leases was reported unsigned at issue (Bloomberg). Entered 2026-09-06 as the first of three Nordic prints in the tracker; landlord-of-neocloud paper priced wider than the tenants' own GPU-backed debt at the time.",
+      "rate": {
+        "kind": "floating_other",
+        "value": 6.0,
+        "note": "3M Euribor + 600 bp at issue (~8.2% yield at pricing, Bloomberg 2026-05-27)"
+      },
+      "maturity": "2030-05",
+      "maturity_note": "Four-year bond from 2026-05-28 pricing; exact maturity date per the bond terms not on file",
+      "seniority": "Senior secured",
+      "security": "Norway data-center sites: Drangedal (operating, leased to Crusoe), a second site under construction, and a refit at the Heroya industrial park near Porsgrunn for CoreWeave on a 15-year contract with a 10-year extension option (PitchBook/Bloomberg)",
+      "lenders": [
+        "Nordic bond investors (bookrunners not verified)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-05-28",
+      "source": {
+        "doc": "H.I.G. Capital / Polar release 'Polar Completes Record-breaking EUR 800 million Nordic Bond Issue' (PRNewswire 302786449, 2026-06-01); Bloomberg 'Data Center Operator PolarDC Sells Largest Nordic High-Yield Bond' (2026-05-27)",
+        "date": "2026-06-01",
+        "url": "https://www.prnewswire.com/news-releases/polar-an-hig-capital-portfolio-company-completes-record-breaking-eur-800-million-nordic-bond-issue-302786449.html"
+      },
+      "as_of": "2026-09-06",
+      "offtaker_label": "Neocloud tenants (Crusoe; CoreWeave 15-year)"
+    },
+    {
+      "id": "prime-dc-nordic-bond-2026",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Not issued: sale postponed 2026-07-13 (press); no relaunch found as of 2026-09-06.",
+      "issuer": "Prime Data Centers LLC",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": null,
+      "name": "$500M Norwegian-law bond (launched at $600M, cut to $500M, sale postponed)",
+      "instrument_type": "bond",
+      "size_usd_m": 500,
+      "size_note": "Bloomberg 2026-07-13: Prime Data Centers floated a $600M bond under Norwegian law, cut the expected size to $500M, then put the sale on hold after some investors said they would not participate on the proposed terms; the company may relaunch if enough investors sign on. Second Nordic data-center deal after PolarDC's record print; Bloomberg framed it as indigestion in the Nordic bond market after a few deals. Recorded as press, not issued. No terms disclosed.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed (sale postponed)"
+      },
+      "maturity": null,
+      "maturity_note": "Undisclosed (sale postponed)",
+      "seniority": "Undisclosed (press reports a bond under Norwegian law)",
+      "security": "Undisclosed",
+      "lenders": [
+        "Undisclosed"
+      ],
+      "status": "press",
+      "issued": "Launched July 2026; postponed 2026-07-13",
+      "resolved": "Postponed 2026-07-13; no relaunch found as of 2026-09-06",
+      "source": {
+        "doc": "Bloomberg 'Prime Data Centers Delays Sale of $500 Million Nordic Bond' (2026-07-13)",
+        "date": "2026-07-13",
+        "url": "https://www.bloomberg.com/news/articles/2026-07-13/prime-data-centers-delays-planned-500-million-nordic-bond-sale"
+      },
+      "as_of": "2026-09-06",
+      "offtaker_label": "Not stated"
+    },
+    {
+      "id": "puredc-sjk01-senior-debt",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "issuer": "Pure DC (Oaktree-backed; UK data-center developer)",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "SJK01 Seinajoki AI campus, Phase I (project financing)",
+      "name": "€1.3B committed senior project debt, Seinajoki (Finland) AI campus Phase I (bank financing after an abandoned ~€1B Nordic bond)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 1508,
+      "size_note": "€1.3B of committed senior debt for Phase I of the SJK01 campus (issuer release 2026-07-21); $1,508M at 1.16 USD/EUR (tracker conversion, not a reported figure). Bloomberg reported the company had abandoned plans for a Nordic bond sale of about €1B, which would have been a record, in favor of bank financing ('AI Borrowers Are Pushing a Niche Credit Market to Its Limits'). Phase I reported fully leased to Microsoft (Bloomberg 2026-07-14). Third of the three summer-2026 Nordic data-center financings in the tracker.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed in the release"
+      },
+      "maturity": null,
+      "maturity_note": "Undisclosed",
+      "seniority": "Senior secured project financing (per release)",
+      "security": "SJK01 Seinajoki, Finland AI campus Phase I (project-level)",
+      "lenders": [
+        "SMBC",
+        "ABN AMRO",
+        "Citi",
+        "Societe Generale",
+        "Natixis CIB"
+      ],
+      "status": "confirmed",
+      "issued": "2026-07-21",
+      "source": {
+        "doc": "Pure DC release 'Pure DC Secures Additional EUR 1.3 Billion to Accelerate Growth of One of Europe's Largest AI Campuses' (GlobeNewswire, 2026-07-21); Bloomberg 'AI Borrowers Are Pushing a Niche Credit Market to Its Limits' (July 2026)",
+        "date": "2026-07-21",
+        "url": "https://www.globenewswire.com/news-release/2026/07/21/3330594/0/en/pure-dc-secures-additional-1-3-billion-to-accelerate-growth-of-one-of-europe-s-largest-ai-campuses.html"
+      },
+      "as_of": "2026-09-06",
+      "offtaker_label": "Hyperscaler lease (Microsoft, per Bloomberg)"
     }
   ],
   "retired": [
