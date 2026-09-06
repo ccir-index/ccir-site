@@ -25,7 +25,11 @@ export function quarterOf(iso: string): string | null {
   return `${m[1]}-Q${q}`;
 }
 
-export const byClass = (cls: string) => instruments.filter((i) => i.collateral_class === cls);
+// Issuance means issued: a deal recorded as rumored, postponed or not yet
+// launched carries `exclude_from_totals` and stays out of the bars and the
+// class totals (it is still a ledger row). 2026-09-06.
+export const byClass = (cls: string) =>
+  instruments.filter((i) => i.collateral_class === cls && !i.exclude_from_totals);
 export const gpuRows = byClass('gpu');
 export const ocRows = byClass('operator_campus');
 export const lsRows = byClass('landlord_spv');

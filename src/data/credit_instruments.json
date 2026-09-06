@@ -7741,7 +7741,8 @@
         "url": "https://www.bloomberg.com/news/articles/2026-07-13/prime-data-centers-delays-planned-500-million-nordic-bond-sale"
       },
       "as_of": "2026-09-06",
-      "offtaker_label": "Not stated"
+      "offtaker_label": "Not stated",
+      "exclude_from_totals": true
     },
     {
       "id": "puredc-sjk01-senior-debt",
@@ -7781,6 +7782,330 @@
       },
       "as_of": "2026-09-06",
       "offtaker_label": "Hyperscaler lease (Microsoft, per Bloomberg)"
+    },
+    {
+      "ticker": null,
+      "issuer_type": "private",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "as_of": "2026-09-06",
+      "maturity_note": null,
+      "facility_ratings": [],
+      "id": "related-digital-saline-2045",
+      "issuer": "Related Digital / Blackstone JV",
+      "entity": "RD Michigan Property Owner I LLC",
+      "name": "~$14B senior secured project bonds (Saline Township, MI campus; Oracle tenant for the OpenAI build)",
+      "instrument_type": "bond",
+      "size_usd_m": 14000,
+      "size_note": "Issuer release 2026-04-24: $16.3B total financing package for the >1 GW, three-building Saline Township campus, ~$14B of senior secured project bonds plus ~$2B of equity from Related Digital and Blackstone funds. Press (TheNextWeb 2026-04-25): 7.5% coupon, priced at 98.75, PIMCO took about $10B; tenant Oracle (BBB negative / Baa2 negative), built for the Oracle-OpenAI relationship. Bank of America structuring agent and financial advisor; Goldman Sachs and Wells Fargo advised Related Digital. Maturity: Paul Hastings release says 2045; TheNextWeb describes a 19.5-year maturity, six years interest-only then 13 years amortization; both shown as reported.",
+      "rate": {
+        "kind": "fixed",
+        "value": 7.5,
+        "note": "7.5% coupon, priced 98.75 (press)"
+      },
+      "maturity": "2045",
+      "seniority": "Senior secured, project level",
+      "security": "Saline Township, Michigan data-center campus (>1 GW, three buildings); Oracle lease",
+      "lenders": [
+        "Bank of America (structuring agent, financial advisor)",
+        "Goldman Sachs and Wells Fargo (advisors to Related Digital)",
+        "PIMCO (~$10B of the notes, press)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-04-24",
+      "source": {
+        "doc": "Related Digital release 'Related Digital Announces Financing of $16 Billion Oracle Data Center Project' (2026-04-24); Paul Hastings release on the $14B project bond issuance; TheNextWeb 2026-04-25",
+        "date": "2026-04-24",
+        "url": "https://www.related.com/press-releases/2026-04-24/related-digital-announces-financing-16-billion-oracle-data-center-project"
+      },
+      "offtaker_label": "Oracle (for the OpenAI build; BBB negative / Baa2 negative per press)"
+    },
+    {
+      "ticker": null,
+      "issuer_type": "private",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "as_of": "2026-09-06",
+      "maturity_note": null,
+      "facility_ratings": [
+        {
+          "agency": "Moody's",
+          "grade": "Baa2",
+          "public": "2026-04"
+        }
+      ],
+      "id": "qts-fayetteville-5700-2036",
+      "issuer": "QTS Data Centers (Blackstone)",
+      "entity": "QTS subsidiaries (Fayetteville, GA campus)",
+      "name": "$4.6B 5.7% senior secured green notes due 2036 (Fayetteville, GA; Microsoft 20-year lease)",
+      "instrument_type": "bond",
+      "size_usd_m": 4600,
+      "size_note": "Bloomberg 2026-04-06 / DCD April 2026: $4.6B senior secured green notes, 5.7% coupon, 10-year, Moody's Baa2, about $12.5B of peak demand (~2.7x). Secured by a cash waterfall, a debt-service reserve and the cash flows of Microsoft's 20-year absolute triple-net lease with a 15-year renewal option. Proceeds refinance credit facilities tied to the campus plus payouts. Bookrunners not named in accessible sources. Private placement; no filing.",
+      "rate": {
+        "kind": "fixed",
+        "value": 5.7,
+        "note": "5.7% coupon (press)"
+      },
+      "maturity": "2036-04",
+      "seniority": "Senior secured, project level",
+      "security": "Fayetteville, Georgia campus cash flows under Microsoft's 20-year triple-net lease",
+      "lenders": [
+        "Bookrunners not named in accessible sources"
+      ],
+      "status": "press",
+      "issued": "2026-04-06",
+      "source": {
+        "doc": "Bloomberg 'Blackstone-Backed Data Center Firm QTS Kicks Off Bond Sale' (2026-04-06); DCD 'Blackstone-owned QTS Data Centers looks to raise $4.6bn...' (April 2026)",
+        "date": "2026-04-06",
+        "url": "https://www.datacenterdynamics.com/en/news/blackstone-owned-qts-data-centers-looks-to-raise-46bn-starting-with-10-year-investment-grade-green-bond-sale/"
+      },
+      "offtaker_label": "Microsoft (20-year triple-net lease)"
+    },
+    {
+      "ticker": null,
+      "issuer_type": "private",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "as_of": "2026-09-06",
+      "maturity_note": null,
+      "facility_ratings": [
+        {
+          "agency": "Moody's",
+          "grade": "Baa3 (expected)",
+          "public": "2026-08"
+        },
+        {
+          "agency": "Fitch",
+          "grade": "BBB- (expected)",
+          "public": "2026-08"
+        }
+      ],
+      "id": "qts-odyssey-2031",
+      "issuer": "QTS Data Centers (Blackstone)",
+      "entity": "Two special-purpose subsidiaries of QualityTech LP ('Project Odyssey', Georgia)",
+      "name": "$3.9B senior notes, 5-year (Georgia venture; Microsoft tenant)",
+      "instrument_type": "bond",
+      "size_usd_m": 3900,
+      "size_note": "Bloomberg 2026-08-17/18 (via investing.com, BigGo): $3.9B of high-grade senior notes, about $1B larger than first discussed; 5-year; marketed 'around high-6%', final yield 7.228%; expected Baa3 (Moody's) / BBB- (Fitch); orders above $8B on day one and as much as $23B at peak. Proceeds: construction, development and operation, general corporate expenses and distributions to QualityTech. Bloomberg's headline framed the pricing as a hefty cost. Private placement; no filing.",
+      "rate": {
+        "kind": "fixed",
+        "value": 7.228,
+        "note": "7.228% yield at pricing (press); coupon not stated"
+      },
+      "maturity": "2031",
+      "seniority": "Senior notes, venture level",
+      "security": "Georgia data-center venture assets; Microsoft tenant",
+      "lenders": [
+        "Citigroup",
+        "Goldman Sachs",
+        "JPMorgan",
+        "Morgan Stanley"
+      ],
+      "status": "press",
+      "issued": "2026-08-18",
+      "source": {
+        "doc": "Bloomberg 'Blackstone-Backed QTS Kicks Off Data Center Bond at Hefty Cost' (2026-08-18); investing.com relay 'Microsoft-linked QTS bond sale draws $8 billion in demand' (2026-08-17)",
+        "date": "2026-08-18",
+        "url": "https://www.investing.com/news/stock-market-news/microsoftlinked-qts-bond-sale-draws-8-billion-in-demand--bloomberg-93CH-4863795"
+      },
+      "offtaker_label": "Microsoft"
+    },
+    {
+      "ticker": null,
+      "issuer_type": "private",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "as_of": "2026-09-06",
+      "maturity_note": null,
+      "facility_ratings": [
+        {
+          "agency": "Moody's",
+          "grade": "Ba2",
+          "public": "2026-08"
+        }
+      ],
+      "id": "zenith-arc-2031",
+      "issuer": "Zenith Arc LLC (Prairieland Rivers LLC)",
+      "entity": "Zenith Arc LLC",
+      "name": "$2.25B senior secured green notes due 2031 (149 MW Oklahoma facility; Jane Street 15-year lease)",
+      "instrument_type": "bond",
+      "size_usd_m": 2250,
+      "size_note": "Priced 2026-08-13 (briefs.co, Bloomberg, IFR): talk 'high-8% area', priced at 99.5 to yield almost 9% at the wide end of discussions; IFR: 'Zenith faces buyside pushback in latest data centre bond'. Moody's Ba2 corporate family and notes, stable, citing construction risk and a high loan-to-cost ratio. Funds development and construction of a 149 MW data center and substation in Central Oklahoma. Tenant JS Data Center LLC, a Jane Street Group subsidiary, under a 15-year absolute triple-net lease with a Jane Street lease guaranty. Sources call it a compute facility; AI use is not stated. Bookrunners not named in accessible sources.",
+      "rate": {
+        "kind": "fixed",
+        "value": 9.0,
+        "note": "About 9% yield at 99.5 (press); coupon not stated"
+      },
+      "maturity": "2031",
+      "seniority": "Senior secured",
+      "security": "149 MW Central Oklahoma data center and substation under construction; Jane Street lease guaranty",
+      "lenders": [
+        "Bookrunners not named in accessible sources"
+      ],
+      "status": "press",
+      "issued": "2026-08-13",
+      "source": {
+        "doc": "briefs.co 'Market-making giant's lease guaranty anchors $2.25B data center bond' (2026-08-13); IFR 'Zenith preps junk bond to fund Jane Street-backed data center'; Bloomberg 2026-08-13; Moody's Ba2 rating release (referenced, not on file)",
+        "date": "2026-08-13",
+        "url": "https://www.briefs.co/news/market-making-giant-s-lease-guaranty-anchors-2-25b-data-cent/"
+      },
+      "offtaker_label": "Jane Street (trading firm; compute facility, AI use not stated)"
+    },
+    {
+      "ticker": null,
+      "issuer_type": "private",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "as_of": "2026-09-06",
+      "maturity_note": null,
+      "facility_ratings": [
+        {
+          "agency": "S&P",
+          "grade": "Rated (grade not on file)",
+          "public": "2026-06"
+        }
+      ],
+      "id": "prime-elkgrove-7500-2031",
+      "issuer": "Prime Data Centers LLC",
+      "entity": "Elk Grove Village Property LLC (indirect wholly owned subsidiary)",
+      "name": "$900M 7.5% senior secured notes due 2031 (Elk Grove Village, IL; CoreWeave 15-year lease)",
+      "instrument_type": "bond",
+      "size_usd_m": 900,
+      "size_note": "Priced 2026-06-02 (Bloomberg via investing.com; Crain's Chicago): $900M senior secured notes, upsized from $850M, 5-year, priced at par to yield 7.5% at the low end of talk. Build-to-suit hyperscale data center fully leased to CoreWeave for 15 years (~$2.2B of revenue) with two 7-year renewal options on the entire premises. Proceeds refinance $500M of existing debt plus accrued interest and fund remaining construction. Banco Santander sole manager. S&P rated the notes (rating page on file by reference). Distinct from Prime's postponed Nordic bond (prime-dc-nordic-bond-2026).",
+      "rate": {
+        "kind": "fixed",
+        "value": 7.5,
+        "note": "7.5% at par (press)"
+      },
+      "maturity": "2031",
+      "seniority": "Senior secured",
+      "security": "Elk Grove Village, Illinois build-to-suit data center; CoreWeave 15-year lease",
+      "lenders": [
+        "Banco Santander (sole manager)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-06-02",
+      "source": {
+        "doc": "S&P Global Ratings report on Elk Grove Village Property LLC notes (2026-06); Bloomberg 'CoreWeave Data Center Raises $900 Million in Junk-Bond Sale' (2026-06-02, via investing.com); Crain's Chicago Business 2026-06-02",
+        "date": "2026-06-02",
+        "url": "https://www.spglobal.com/ratings/en/regulatory/article/-/view/type/HTML/id/3584909"
+      },
+      "offtaker_label": "CoreWeave (15-year lease, ~$2.2B revenue)"
+    },
+    {
+      "ticker": null,
+      "issuer_type": "private",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "as_of": "2026-09-06",
+      "maturity_note": "Undisclosed",
+      "facility_ratings": [],
+      "id": "nexus-hubbard-mezz-2026",
+      "issuer": "Nexus Data Centers",
+      "entity": "Hubbard, Texas project (2,900-acre site with on-site 1.6 GW gas generation)",
+      "name": "~$1.3B private-credit mezzanine loan (Eagle Point Credit Management; Anthropic-leased campus, Google guarantee on the senior debt)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 1300,
+      "size_note": "Bloomberg 2026-08-19 (via Financial Advisor): about $1.3B private-credit mezzanine loan from Eagle Point Credit Management, 'recently closed', part of a roughly $16B project-finance package for the Hubbard, Texas campus leased to Anthropic under four data-center leases with associated power purchase agreements; Google agreed to guarantee the senior debt and is to receive about 20% of the equity. The ~$15B senior bank package (a $14B bridge loan paired with a revolving credit facility, Morgan Stanley leading) was in advanced talks per WSJ/CNBC 2026-07-30; no source confirms its close as of 2026-09-06 (separate rumored row). Pricing and tenor not stated.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed"
+      },
+      "maturity": null,
+      "seniority": "Mezzanine",
+      "security": "Hubbard, Texas campus (project level); four Anthropic leases; Google guarantee sits on the senior debt, not stated for the mezzanine",
+      "lenders": [
+        "Eagle Point Credit Management"
+      ],
+      "status": "press",
+      "issued": "2026-08-19",
+      "source": {
+        "doc": "Bloomberg 'Anthropic-Tied Data Center Inks $1.3 Billion Private Credit Loan' (2026-08-19, via Financial Advisor magazine); CNBC 2026-07-30 on the ~$15B bank package",
+        "date": "2026-08-19",
+        "url": "https://www.fa-mag.com/news/anthropic-tied-data-center-inks--1-3-billion-private-credit-loan-88158.html"
+      },
+      "offtaker_label": "Anthropic (four leases); Google guarantee on senior debt"
+    },
+    {
+      "ticker": null,
+      "issuer_type": "private",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Not closed: advanced talks per WSJ/CNBC 2026-07-30; no close found as of 2026-09-06.",
+      "as_of": "2026-09-06",
+      "maturity_note": "Undisclosed",
+      "facility_ratings": [],
+      "id": "nexus-hubbard-bank-2026",
+      "issuer": "Nexus Data Centers",
+      "entity": "Hubbard, Texas project",
+      "name": "~$15B senior bank package: ~$14B bridge loan plus revolving credit facility (in advanced talks; Morgan Stanley leading)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 15000,
+      "size_note": "CNBC / WSJ 2026-07-30: Nexus Data Centers in advanced talks to secure about $15B of bank financing, described as a $14B bridge loan paired with a revolving credit facility, for the Google-backed Anthropic campus at Hubbard, Texas; a high-yield bond to refinance the bank piece later in 2026 was mentioned as possible. Recorded as rumored, not closed.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed (not closed)"
+      },
+      "maturity": null,
+      "seniority": "Senior (bank)",
+      "security": "Hubbard, Texas campus; Anthropic leases; Google guarantee (press)",
+      "lenders": [
+        "Morgan Stanley (leading the bank group)"
+      ],
+      "status": "rumored",
+      "issued": "In talks (2026-07-30)",
+      "source": {
+        "doc": "CNBC 'Nexus Data Centers in advanced talks to secure $15B for Google-backed Anthropic data center' (2026-07-30)",
+        "date": "2026-07-30",
+        "url": "https://www.cnbc.com/2026/07/30/nexus-data-centers-in-advanced-talks-to-secure-15b-for-google-backed-anthropic-data-center.html"
+      },
+      "offtaker_label": "Anthropic; Google guarantee (press)",
+      "exclude_from_totals": true
+    },
+    {
+      "ticker": null,
+      "issuer_type": "private",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Not launched: Goldman Sachs sounding out investors 2026-08-19; expected in market September 2026.",
+      "as_of": "2026-09-06",
+      "maturity_note": "Undisclosed",
+      "facility_ratings": [],
+      "id": "digital-drive-coreweave-bond-2026",
+      "issuer": "Digital Drive project (PowerHouse Data Centers / Chirisa Technology Parks; Blue Owl equity)",
+      "entity": "Digital Drive, Chesterfield County, Virginia",
+      "name": "~$1.15B speculative-grade bond (pre-marketing; CoreWeave leases)",
+      "instrument_type": "bond",
+      "size_usd_m": 1150,
+      "size_note": "Bloomberg 2026-08-19 (via briefs.co): Goldman Sachs sounding out investors for a roughly $1.15B speculative-grade bond backed by long-term CoreWeave leases at the Digital Drive site (104 acres, five facilities, initial 300 MW, first building Q3 2027); 'nothing is final', expected to hit the market in September. Developers PowerHouse Data Centers (American Real Estate Partners) and Chirisa; Blue Owl Capital funds provide the $5B JV equity. Recorded as rumored.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed (not launched)"
+      },
+      "maturity": null,
+      "seniority": "Undisclosed",
+      "security": "Digital Drive campus; long-term CoreWeave leases (press)",
+      "lenders": [
+        "Goldman Sachs (sounding out investors)"
+      ],
+      "status": "rumored",
+      "issued": "Pre-marketing (2026-08-19)",
+      "source": {
+        "doc": "Bloomberg 'Goldman Sounds Out Investors for CoreWeave-Tied Data Center Bond' (2026-08-19, via briefs.co)",
+        "date": "2026-08-19",
+        "url": "https://www.briefs.co/news/goldman-sachs-explores-1-15b-bond-sale-for-coreweave-data-ce/"
+      },
+      "offtaker_label": "CoreWeave (long-term leases)",
+      "exclude_from_totals": true
     }
   ],
   "retired": [
