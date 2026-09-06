@@ -952,14 +952,14 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           {ratedLadder.map((l: any) => (
             <tr>
               <td class="grade">{l.grades}</td>
-              <td class="mono-dim">{l.public}</td>
-              <td>{l.issuer}</td>
-              <td>
+              <td class="mono-dim r-date">{l.public}</td>
+              <td class="r-issuer" data-label="Issuer">{l.issuer}</td>
+              <td class="r-name">
                 <a class="hot rated-link" href={`#${l.rid}`}
                    data-row={l.rid} title={l.rowNames}>{l.name}</a>
               </td>
-              <td class="num">{l.size}</td>
-              <td>{l.offtaker}</td>
+              <td class="num r-size" data-label="Size">{l.size}</td>
+              <td class="r-offtaker" data-label="Offtaker">{l.offtaker}</td>
             </tr>
           ))}
         </tbody>
@@ -1864,6 +1864,63 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       }
       #credit-table tbody tr:hover td.c-issuer { background: var(--surface-3); }
       .c-issuer { max-width: 96px; }
+
+      /* Rated ladder: six columns cannot fit a phone either, and this one
+         is short enough to stack. Each row becomes a card: grade and
+         record date on the first line, financing name on the second,
+         issuer / size / offtaker labeled beneath. Header row hidden; the
+         labels come from data-label on the cells. */
+      .rated-wrap { overflow: hidden; }
+      .rated-grid, .rated-grid tbody { display: block; width: 100%; }
+      .rated-grid td.grade,
+      .rated-grid td.mono-dim,
+      .rated-grid td.num { white-space: normal; }
+      /* Outranks table.data td + td (the desktop hairline column rule). */
+      .rated-grid tbody tr td + td { border-left: 0; }
+      .rated-grid thead { display: none; }
+      .rated-grid tbody tr {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+          "grade date"
+          "name name"
+          "issuer size"
+          "offtaker offtaker";
+        column-gap: 12px;
+        row-gap: 4px;
+        padding: 10px 12px 11px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .rated-grid tbody tr:last-child { border-bottom: 0; }
+      .rated-grid tbody tr:hover td { background: transparent; }
+      .rated-grid tbody td {
+        display: block;
+        height: auto;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        text-align: left;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      .rated-grid td.grade { grid-area: grade; font-size: var(--fs-sm); }
+      .rated-grid td.r-date { grid-area: date; text-align: right; font-size: var(--fs-xs); }
+      .rated-grid td.r-name { grid-area: name; font-size: var(--fs-sm); }
+      .rated-grid td.r-issuer { grid-area: issuer; }
+      .rated-grid td.r-size { grid-area: size; text-align: right; }
+      .rated-grid td.r-offtaker { grid-area: offtaker; }
+      .rated-grid td.r-issuer,
+      .rated-grid td.r-size,
+      .rated-grid td.r-offtaker { font-size: var(--fs-xs); color: var(--ink-dim); }
+      .rated-grid td[data-label]::before {
+        content: attr(data-label);
+        display: inline-block;
+        margin-right: 6px;
+        color: var(--ink-faint);
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-eye);
+        font-size: 9px;
+      }
     }
   
     /* --- tap-to-expand charts (2026-09-06) ------------------------------- */
