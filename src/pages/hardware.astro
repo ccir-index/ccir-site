@@ -5,6 +5,17 @@ import hw from '../data/hardware_panels.json';
 import ChipLink from '../components/ChipLink.astro';
 import { ivCards } from '../lib/ivmodel';
 
+// Record totals (full capture vs the tracked-model subset) come from the
+// generator so the standfirst and the Method foot can never disagree.
+const rec = (hw as any).record;
+if (!rec) throw new Error('hardware_panels.json has no record block; regenerate with gen_hardware_data.py');
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+  'August', 'September', 'October', 'November', 'December'];
+const monthLabel = (ym: string) => `${MONTHS[Number(ym.slice(5, 7)) - 1]} ${ym.slice(0, 4)}`;
+const recWindow = `${monthLabel(rec.window.start)} – ${monthLabel(rec.window.end)}`;
+const fmtN = (n: number) => n.toLocaleString('en-US');
+const fmtM = (usd: number) => `$${(usd / 1e6).toFixed(1)}M`;
+
 // Secondary-market hardware price tape — observed executed prices (eBay
 // sold record, human-captured via Seller Hub research; see Method) paired
 // with current multi-source posted asks, and — per the 2026-07-22 ruling —
@@ -367,10 +378,12 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     <section class="sec" id="record">
       <h2><span class="n">§</span> The record — executed sales &amp; posted asks</h2>
       <p class="secintro">
-        Three years of executed sales (July 2023 – August 2026; 3,009
-        sold listings, 10,911 units, $26.3M documented) beside the asks
-        posted today across an official marketplace API and a named dealer
-        cohort. The rental market prices an hour of compute. This page
+        Three years of executed sales beside the asks posted today across
+        an official marketplace API and a named dealer cohort. The record:
+        {recWindow}, {fmtN(rec.tracked.listings)} sold listings,
+        {fmtN(rec.tracked.units)} units, {fmtM(rec.tracked.usd)} of the
+        models tracked here, from a {fmtN(rec.full.listings)}-listing
+        capture. The rental market prices an hour of compute. This page
         prices the machine itself.
       </p>
     </section>
@@ -655,14 +668,16 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <p>
         <strong>Executed record.</strong> Dated, human-captured snapshots of
         the eBay sold-listing research record (Seller Hub product research),
-        July 2023 – August 2026: 3,774 sold listings, 16,819 units, $31.3M.
+        {recWindow}: {fmtN(rec.full.listings)} sold listings,
+        {fmtN(rec.full.units)} units, {fmtM(rec.full.usd)}.
         Every row carries listing title, average sale price, sale count,
         dollar volume, format, and date last sold; every capture is archived.
         Rows are classified by title into single cards, multi-unit lots,
         servers, bare baseboards, converted cards (e.g. SXM-to-PCIe
         conversions; tracked, never banded), accessories, and mislabeled
         SKUs (V100S, L40, H100i and kin; excluded and tallied). Of the full
-        record, 11,388 units and $26.0M are hardware of the models tracked
+        record, {fmtN(rec.tracked.listings)} listings, {fmtN(rec.tracked.units)} units
+        and {fmtM(rec.tracked.usd)} are hardware of the models tracked
         here. Those are the figures this page reports. The remainder is the
         excluded tally. Multi-sale listings count once at their average
         price. Their sale history carries a date-last-sold only, so month

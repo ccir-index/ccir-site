@@ -6,6 +6,22 @@
   "date": "2026-08-31",
   "source": "ECB reference"
  },
+ "record": {
+  "window": {
+   "start": "2023-07",
+   "end": "2026-08"
+  },
+  "full": {
+   "listings": 3947,
+   "units": 16992,
+   "usd": 32387519
+  },
+  "tracked": {
+   "listings": 3162,
+   "units": 12398,
+   "usd": 28278116
+  }
+ },
  "models": [
   {
    "key": "V100-16",
