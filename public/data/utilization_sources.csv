@@ -18,7 +18,7 @@ massed_compute,a100-sxm-80gb,T3,US,count,False,2026-06-09,90,0.2536,,v2.3.2
 runpod,a100-sxm-80gb,T3,Other,categorical,False,2026-06-09,90,0.0,,v2.3.2
 tensordock,a100-sxm-80gb,T3,Other,count,False,2026-06-09,69,0.0021,,v2.3.2
 prime_intellect,b200-sxm,,EU|Other|US,categorical,False,2026-06-10,18,0.2302,,v2.3.2
-aws_caps,b200-sxm,T1,Other|US,score,True,2026-06-09,90,0.2379,0.2379,v2.3.2
+aws_caps,b200-sxm,T1,Other|US,score,True,2026-06-09,90,0.2305,0.2305,v2.3.2
 oci_caps,b200-sxm,T1,US,count,True,2026-06-09,90,1.0,1.0,v2.3.2
 datacrunch,b200-sxm,T2,EU,binary,True,2026-08-27,1,0.8,1.0,v2.3.2
 lambda_caps,b200-sxm,T2,Other,binary,True,2026-06-09,90,0.9885,0.9984,v2.3.2
@@ -28,14 +28,14 @@ runpod,b200-sxm,T3,Other,categorical,False,2026-06-09,90,0.0538,,v2.3.2
 oci_caps,gb200,T1,US,count,True,2026-06-09,90,1.0,1.0,v2.3.2
 akash_console,h100-sxm,,EU|Other|US,count,False,2026-06-09,90,0.0063,,v2.3.2
 prime_intellect,h100-sxm,,EU|US,categorical,False,2026-06-09,88,0.1162,,v2.3.2
-aws_caps,h100-sxm,T1,EU|Other|US,score,True,2026-06-09,90,0.4453,0.4453,v2.3.2
+aws_caps,h100-sxm,T1,EU|Other|US,score,True,2026-06-09,90,0.449,0.449,v2.3.2
 azure_skus,h100-sxm,T1,EU|Other|US,categorical,True,2026-06-09,90,0.0,0.0,v2.3.2
 oci_caps,h100-sxm,T1,US,count,True,2026-06-09,90,1.0,1.0,v2.3.2
 crusoe_caps,h100-sxm,T2,EU|US,binary,True,2026-06-15,84,0.9632,0.9632,v2.3.2
-datacrunch,h100-sxm,T2,EU,binary,True,2026-08-21,17,0.1433,0.9254,v2.3.2
+datacrunch,h100-sxm,T2,EU,binary,True,2026-08-21,16,0.1522,0.9208,v2.3.2
 gcore_caps,h100-sxm,T2,EU|Other,count,True,2026-08-21,17,0.0,0.2924,v2.3.2
 hyperstack_stocks,h100-sxm,T2,Other|US,count,True,2026-06-09,90,0.5994,0.5994,v2.3.2
-lambda_caps,h100-sxm,T2,Other|US,binary,True,2026-06-09,90,0.2256,0.9342,v2.3.2
+lambda_caps,h100-sxm,T2,Other|US,binary,True,2026-06-09,90,0.2256,0.9379,v2.3.2
 latitude_caps,h100-sxm,T2,Other,categorical,False,2026-06-09,90,1.0,,v2.3.2
 nebius_caps,h100-sxm,T2,EU,count,True,2026-08-21,17,0.0,0.1618,v2.3.2
 scaleway,h100-sxm,T2,EU,categorical,True,2026-06-09,84,0.0,0.4711,v2.3.2
@@ -51,6 +51,6 @@ oci_caps,h200-sxm,T1,US,count,True,2026-06-09,90,1.0,1.0,v2.3.2
 datacrunch,h200-sxm,T2,EU,binary,True,2026-08-21,11,0.2711,0.9302,v2.3.2
 gcore_caps,h200-sxm,T2,EU,count,True,2026-08-21,17,0.9485,0.9485,v2.3.2
 hyperstack_stocks,h200-sxm,T2,Other,count,True,2026-06-27,72,0.6732,0.6732,v2.3.2
-nebius_caps,h200-sxm,T2,EU|US,count,True,2026-08-21,17,0.0,0.1029,v2.3.2
-hyperbolic,h200-sxm,T3,EU|US,count,True,2026-08-20,18,0.0149,0.4329,v2.3.2
+nebius_caps,h200-sxm,T2,EU|US,count,True,2026-08-21,17,0.0,0.1422,v2.3.2
+hyperbolic,h200-sxm,T3,EU|US,count,True,2026-08-20,17,0.0158,0.3996,v2.3.2
 runpod,h200-sxm,T3,Other,categorical,False,2026-06-09,90,0.0,,v2.3.2
