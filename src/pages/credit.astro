@@ -544,7 +544,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
 <Base
   title="GPU-Backed Loans & AI Data Center Debt, As Filed · CCIR"
   description="GPU-backed loans and compute financing tracked as filed — coupons, spreads, collateral treatment, lenders and agency ratings, source linked on every row. Credit-risk reference for AI infrastructure lending: how GPU collateral is treated, what rated GPU financings carry, and which counterparties sit behind them. CoreWeave, Crusoe, Nscale, Applied Digital, Core Scientific, IREN, Soluna, Hut 8, TeraWulf, Lambda and 30+ more issuers, from SEC filings and lender releases."
-  ogImage="/og/credit.png"
+  ogImage="/og/credit-issuance-20260906.png"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
     '@context': 'https://schema.org',
@@ -1158,6 +1158,18 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     </div>
   </section>
 
+  <!-- Tap-to-expand for charts (2026-09-06): every chart svg opens full-width
+       in a dialog; on a phone that is the difference between reading the
+       chart and not. Marks keep their ledger-row click. -->
+  <dialog id="chart-zoom" class="chart-zoom" aria-label="Expanded chart">
+    <div class="cz-bar">
+      <span class="cz-title"></span>
+      <button type="button" class="cz-close" aria-label="Close">Close ×</button>
+    </div>
+    <div class="cz-body"></div>
+    <div class="cz-hint">Pinch to zoom · rotate the phone for the full width</div>
+  </dialog>
+
   <script is:inline>
     (function () {
       var selIssuer = document.getElementById('f-issuer');
@@ -1279,6 +1291,36 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           row.classList.add('flash');
         });
       });
+
+      // --- tap-to-expand charts (2026-09-06) ---------------------------------
+      (function () {
+        var dlg = document.getElementById('chart-zoom');
+        if (!dlg || typeof dlg.showModal !== 'function') return;
+        var body = dlg.querySelector('.cz-body');
+        var title = dlg.querySelector('.cz-title');
+        var svgs = document.querySelectorAll('.panel svg[role="img"]');
+        svgs.forEach(function (svg) {
+          svg.classList.add('zoomable');
+          var panel = svg.closest('.panel');
+          var hint = document.createElement('div');
+          hint.className = 'zoom-hint';
+          hint.textContent = 'Tap the chart to expand';
+          if (panel) panel.insertBefore(hint, svg.closest('figure') || svg);
+          svg.addEventListener('click', function (ev) {
+            if (ev.target.closest && ev.target.closest('.hot')) return; // mark -> ledger row
+            var clone = svg.cloneNode(true);
+            clone.removeAttribute('class');
+            clone.querySelectorAll('.hot').forEach(function (h) { h.classList.remove('hot'); });
+            body.innerHTML = '';
+            body.appendChild(clone);
+            var head = panel ? panel.querySelector('.panel-title') : null;
+            title.textContent = head ? head.textContent : '';
+            dlg.showModal();
+          });
+        });
+        dlg.querySelector('.cz-close').addEventListener('click', function () { dlg.close(); });
+        dlg.addEventListener('click', function (ev) { if (ev.target === dlg) dlg.close(); });
+      })();
 
       // --- resizable columns -------------------------------------------------
       // Fixed layout with measured initial widths; a grip on each header edge
@@ -1823,5 +1865,34 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       #credit-table tbody tr:hover td.c-issuer { background: var(--surface-3); }
       .c-issuer { max-width: 96px; }
     }
-  </style>
+  
+    /* --- tap-to-expand charts (2026-09-06) ------------------------------- */
+    .panel svg.zoomable { cursor: zoom-in; }
+    .zoom-hint {
+      display: none; font-family: var(--font-mono); font-size: var(--fs-xs);
+      color: var(--ink-faint); margin: 0 0 4px;
+    }
+    @media (hover: none) and (pointer: coarse) { .zoom-hint { display: block; } }
+    .chart-zoom {
+      width: 100vw; height: 100vh; max-width: 100vw; max-height: 100vh;
+      margin: 0; padding: 0; border: 0; background: var(--bg, #050607);
+      color: var(--ink);
+    }
+    .chart-zoom::backdrop { background: rgba(0, 0, 0, 0.85); }
+    .cz-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-bottom: 1px solid var(--rule);
+      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
+    }
+    .cz-close {
+      font: inherit; color: var(--ink); background: transparent;
+      border: 1px solid var(--rule); padding: 6px 12px; cursor: pointer;
+    }
+    .cz-body { padding: 8px; overflow: auto; touch-action: pinch-zoom; }
+    .cz-body svg { display: block; width: 100%; height: auto; min-width: 640px; }
+    .cz-hint {
+      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint);
+      padding: 6px 14px;
+    }
+</style>
 </Base>

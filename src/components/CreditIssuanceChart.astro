@@ -13,85 +13,13 @@
   chart what filings don't state). Line = cumulative GPU-collateralized.
   Observed only — no modeling of drawdowns or amortization.
 */
-import creditData from '../data/credit_instruments.json';
-
-const instruments = (creditData as any).instruments as any[];
-
-function quarterOf(iso: string): string | null {
-  // Match a YYYY-MM anywhere in the string — issuance dates are often prose
-  // ("Priced ~2026-04-16", "Reported 2026-02-19", "Closed; PR 2026-01-07").
-  const m = /(\d{4})-(\d{2})/.exec(iso || '');
-  if (!m) return null;
-  const q = +m[2] <= 3 ? 1 : +m[2] <= 6 ? 2 : +m[2] <= 9 ? 3 : 4;
-  return `${m[1]}-Q${q}`;
-}
-
-const byClass = (cls: string) => instruments.filter((i) => i.collateral_class === cls);
-const gpuRows = byClass('gpu');
-const ocRows = byClass('operator_campus');
-const lsRows = byClass('landlord_spv');
-const clRows = byClass('chip_lease');
-const suRows = byClass('secured_undisclosed');
-const sumB = (rows: any[]) => rows.reduce((a, i) => a + i.size_usd_m, 0) / 1000;
-
-function bucket(rows: any[]) {
-  const byQ = new Map<string, number>();
-  let undated = 0, undatedUsd = 0;
-  for (const i of rows) {
-    const q = quarterOf(i.issued);
-    if (q === null) { undated++; undatedUsd += i.size_usd_m; continue; }
-    byQ.set(q, (byQ.get(q) ?? 0) + i.size_usd_m);
-  }
-  return { byQ, undated, undatedUsd };
-}
-const g = bucket(gpuRows);
-const o = bucket(ocRows);
-const l = bucket(lsRows);
-
-const WINDOW_START = '2024-Q1';
-const allQ = [...new Set([...g.byQ.keys(), ...o.byQ.keys(), ...l.byQ.keys()])].sort();
-const preBaseUsd = [...g.byQ.keys()].filter((q) => q < WINDOW_START).reduce((a, q) => a + g.byQ.get(q)!, 0);
-const preOtherUsd =
-  [...o.byQ.keys()].filter((q) => q < WINDOW_START).reduce((a, q) => a + o.byQ.get(q)!, 0) +
-  [...l.byQ.keys()].filter((q) => q < WINDOW_START).reduce((a, q) => a + l.byQ.get(q)!, 0);
-// Contiguous quarter axis: empty quarters render as empty, never vanish.
-const lastQ = allQ[allQ.length - 1];
-const windowQ: string[] = [];
-{
-  let [y, qn] = [2024, 1];
-  while (true) {
-    const s = `${y}-Q${qn}`;
-    if (s > lastQ) break;
-    windowQ.push(s);
-    qn === 4 ? (y++, qn = 1) : qn++;
-  }
-}
-
-const asOf = (creditData as any)._meta?.as_of ?? '';
-// The quarter containing the ledger's as-of date is in progress: mark it QTD
-// so a part-quarter bar is never read as a full-quarter collapse.
-const currentQ = quarterOf(asOf);
-
-let cum = preBaseUsd;
-const bars = windowQ.map((q) => {
-  const gpu = g.byQ.get(q) ?? 0;
-  const oc = o.byQ.get(q) ?? 0;
-  const ls = l.byQ.get(q) ?? 0;
-  cum += gpu;
-  return { q, gpu_b: gpu / 1000, oc_b: oc / 1000, ls_b: ls / 1000, cum_b: cum / 1000, qtd: q === currentQ };
-});
-
-// Y scales get headroom above the data max, rounded up to a clean tick
-// step so bars and line never touch the chart ceiling.
-const Y_TICKS = 4;
-function axisMax(raw: number): number {
-  const target = raw * 1.05;
-  const pow = Math.pow(10, Math.floor(Math.log10(target / Y_TICKS)));
-  const step = [1, 2, 2.5, 5, 10].map((m) => m * pow).find((s) => s * Y_TICKS >= target)!;
-  return step * Y_TICKS;
-}
-const maxBar = axisMax(Math.max(...bars.map((b) => Math.max(b.gpu_b, b.oc_b, b.ls_b)), 1));
-const maxCum = axisMax(Math.max(...bars.map((b) => b.cum_b), 1));
+import {
+  bars, barTicks, cumTicks, maxBar, maxCum, Y_TICKS,
+  gpuRows, ocRows, lsRows, clRows, suRows, sumB, qLabel, preBaseUsd, preOtherUsd, g, o, l, byClass,
+  asOf, currentQ, windowQ, instruments,
+} from '../lib/creditIssuance';
+// Derivation lives in lib/creditIssuance.ts (shared with the OG card since
+// 2026-09-06). Only the SVG geometry is local to this component.
 
 // --- svg geometry ----------------------------------------------------------
 const W = 920, H = 300;
@@ -103,12 +31,8 @@ const barW = Math.min(band * 0.24, 17);
 const bx = (i: number) => x0 + band * (i + 0.5);
 const byBar = (v: number) => y1 - (v / maxBar) * (y1 - y0);
 const byCum = (v: number) => y1 - (v / maxCum) * (y1 - y0);
-
 const yTicks = Y_TICKS;
-const barTicks = Array.from({ length: yTicks + 1 }, (_, k) => Math.round((maxBar / yTicks) * k));
-const cumTicks = Array.from({ length: yTicks + 1 }, (_, k) => Math.round((maxCum / yTicks) * k));
 const cumPath = bars.map((b, i) => `${i === 0 ? 'M' : 'L'} ${bx(i).toFixed(1)} ${byCum(b.cum_b).toFixed(1)}`).join(' ');
-const qLabel = (q: string) => q.replace('-', ' ');
 ---
 <figure class="ci">
   <svg viewBox={`0 0 ${W} ${H}`} role="img"

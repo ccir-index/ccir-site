@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-08-31",
+    "as_of": "2026-09-06",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -6939,7 +6939,7 @@
       "offtaker_label": "Microsoft lease (per press)"
     },
     {
-      "as_of": "2026-08-13",
+      "as_of": "2026-09-06",
       "collateral_class": "gpu",
       "entity": "Nscale Ward County Borrower SPV, LLC (bankruptcy-remote; Nscale Ward County LLC = data center tenant and affiliate guarantor; land owned by third-party DC operator)",
       "id": "nscale-ward-ddtl-baa1",
@@ -6948,11 +6948,13 @@
       "issuer": "Nscale",
       "issuer_type": "private",
       "lenders": [
+        "J.P. Morgan (lead; joint lead arranger, joint bookrunner, co-structuring agent)",
+        "Goldman Sachs (joint lead arranger, joint bookrunner, co-structuring agent)",
         "Fixed + floating commitments; lenders not named (fixed-rate investors described by Moody's as high credit quality)"
       ],
       "maturity": "Undisclosed",
       "maturity_note": "Fully amortizing within the 6-year take-or-pay contract term; floating tranche >=85% hedged through maturity; last forecast funding date February 2027",
-      "name": "Up to $1.831B senior secured DDTL (Moody's first-time Baa1, stable — Ward County, TX GPU-as-a-service SPV)",
+      "name": "Up to $1.85B senior secured DDTL (Moody's first-time Baa1, stable — Ward County, TX GPU-as-a-service SPV; closed per issuer release 2026-08-31)",
       "rate": {
         "kind": "undisclosed",
         "note": "Fixed + floating mix; pricing not disclosed in the rating action",
@@ -6960,12 +6962,12 @@
       },
       "security": "GPU infrastructure (NVIDIA GB300 and VR200/Vera Rubin systems, ~275 MW IT load) and related networking/storage/cooling at a Ward County, Texas data center campus; 6-year availability-based fixed-price take-or-pay GPU-as-a-service contract with an unnamed hyperscaler rated at least Aa3; direct agreements with the customer and the data center operator; strict funding conditions (Level 3 commissioning + power + hedges as draw conditions)",
       "seniority": "Senior secured",
-      "size_note": "Moody's assigned first-time Baa1 (stable) 2026-08-12 — one day after Lambda's Baa2; second IG GPU project rating in 24 hours, third overall (after CRWV DDTL 4.0 A3). Customer = unnamed hyperscaler rated at least Aa3; large per-tranche prepayments substitute for cash equity (no cash equity in the GPU financing; Moody's notes equity distributions exceed the separate DC-financing equity needs by commissioning). Moody's DSCR avg ~1.33x (range 1.15-1.40x); DSRA sized at 67% of next payment/2 months + 3-month opex reserve; BTM generation procurement pending for tranche 3; Dell service agreement covers 3 of 6 years; VR200 has no operating track record (stabilization period negotiated). Separate instrument from the Feb-2026 $1.4B Nscale GPU DDTL (Blue Owl BDC-disclosed, S+500, Europe clusters).",
-      "size_usd_m": 1831,
+      "size_note": "Issuer release 2026-08-31: 'up to $1.85 billion', part of 'approximately $3 billion in aggregate commitments across two senior secured delayed draw term loan facilities' (the other: Madison County, NC, separate row). J.P. Morgan and Goldman Sachs joint lead arrangers, joint bookrunners and co-structuring agents for both facilities; J.P. Morgan led this one. Release states ~200 MW of IT load (Moody's rating action of 2026-08-12 described ~275 MW and sized the facility at $1.831B; the release figure is the committed amount). Moody's assigned first-time Baa1 (stable) 2026-08-12 — one day after Lambda's Baa2; second IG GPU project rating in 24 hours, third overall (after CRWV DDTL 4.0 A3). Customer = unnamed hyperscaler rated at least Aa3; large per-tranche prepayments substitute for cash equity (no cash equity in the GPU financing; Moody's notes equity distributions exceed the separate DC-financing equity needs by commissioning). Moody's DSCR avg ~1.33x (range 1.15-1.40x); DSRA sized at 67% of next payment/2 months + 3-month opex reserve; BTM generation procurement pending for tranche 3; Dell service agreement covers 3 of 6 years; VR200 has no operating track record (stabilization period negotiated). Separate instrument from the Feb-2026 $1.4B Nscale GPU DDTL (Blue Owl BDC-disclosed, S+500, Europe clusters).",
+      "size_usd_m": 1850,
       "source": {
-        "date": "2026-08-12",
-        "doc": "Moody's Ratings rating action 'Moody's Ratings assigns first-time Baa1 rating to Nscale Ward County Borrower SPV, LLC; outlook stable' (New York, 2026-08-12; on file)",
-        "url": "https://ratings.moodys.com"
+        "doc": "Nscale release 'Nscale Closes Approximately $3 Billion in Financing for Both Ward County, Texas and Madison County, North Carolina AI Deployments' (London, 2026-08-31); Moody's rating action 2026-08-12 (on file)",
+        "date": "2026-08-31",
+        "url": "https://www.nscale.com/press-releases/nscale-3-billion-delayed-draw-term-loans"
       },
       "status": "confirmed",
       "ticker": null,
@@ -6977,6 +6979,47 @@
         }
       ],
       "offtaker_label": "Hyperscaler take-or-pay (rated at least Aa3, unnamed)"
+    },
+    {
+      "id": "nscale-madison-ddtl",
+      "collateral_class": "secured_undisclosed",
+      "issuer": "Nscale",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "Nscale borrower for the Madison County, NC site (SPV name not stated in the release)",
+      "name": "Up to $1.2B senior secured DDTL (investment-grade rated per issuer — Madison County, NC colocation site)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 1200,
+      "size_note": "Issuer release 2026-08-31: 'up to $1.2 billion' senior secured delayed draw term loan facility for a 96-acre colocation site in Madison County, North Carolina with up to 40 MW of IT load capacity; funds 'site retrofit capital expenditures, GPU infrastructure and associated networking'. The release says both facilities 'each received investment-grade ratings with stable outlooks' without naming the agency or grade; no rating action located as of 2026-09-06. Second of the two facilities announced together (~$3B aggregate); the Ward County, TX facility is a separate row.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed in the release"
+      },
+      "maturity": null,
+      "maturity_note": "Undisclosed",
+      "seniority": "Senior secured (per release)",
+      "security": "Secured per release; collateral not stated (the facility funds site retrofit, GPU infrastructure and networking). Classed secured_undisclosed until a filing or rating action names the collateral.",
+      "lenders": [
+        "Goldman Sachs (lead; joint lead arranger, joint bookrunner, co-structuring agent)",
+        "J.P. Morgan (joint lead arranger, joint bookrunner, co-structuring agent)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-08-31",
+      "source": {
+        "doc": "Nscale release 'Nscale Closes Approximately $3 Billion in Financing for Both Ward County, Texas and Madison County, North Carolina AI Deployments' (London, 2026-08-31)",
+        "date": "2026-08-31",
+        "url": "https://www.nscale.com/press-releases/nscale-3-billion-delayed-draw-term-loans"
+      },
+      "as_of": "2026-09-06",
+      "facility_ratings": [
+        {
+          "agency": "Undisclosed",
+          "grade": "Investment grade (per issuer release; agency and grade not named)",
+          "public": "2026-08-31"
+        }
+      ],
+      "offtaker_label": "Not stated in release"
     },
     {
       "id": "riot-dc-logistics-ddtl-573",
