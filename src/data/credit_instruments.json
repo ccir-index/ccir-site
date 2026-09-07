@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-09-06",
+    "as_of": "2026-09-07",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -7782,6 +7782,43 @@
       },
       "as_of": "2026-09-06",
       "offtaker_label": "Hyperscaler lease (Microsoft, per Bloomberg)"
+    },
+    {
+      "id": "puredc-dublin-amsterdam-2150",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "issuer": "Pure DC (Oaktree-backed; UK data-center developer)",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "Dublin (Ballycoolin) and Amsterdam campuses (asset-level facility)",
+      "name": "$2.15B facility secured against the Dublin and Amsterdam campuses (syndicated within three months)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 2150,
+      "size_note": "$2.15B facility secured against Pure DC's Dublin and Amsterdam campuses, part of $2.7B of financing announced 2026-05-28 alongside an increase in corporate-level financing to $550M (the corporate facility is not entered: collateral undisclosed). Release: the facility was syndicated within three months; the Amsterdam facility is fully leased with construction under way; the Dublin campus is designed to deliver up to 150MW of IT capacity, with 54MW currently permitted. Entered 2026-09-07 from the weekly sweep (pre-window gap; the Finland Phase I debt of 2026-07-21 was already on file).",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed in the release"
+      },
+      "maturity": null,
+      "maturity_note": "Undisclosed",
+      "seniority": "Secured, asset-level (per release)",
+      "security": "Dublin (Ballycoolin; up to 150MW designed, 54MW permitted; Europe's first data-center microgrid per release) and Amsterdam (fully leased, under construction) campuses",
+      "lenders": [
+        "SMBC",
+        "ABN AMRO",
+        "Allianz Global Investors"
+      ],
+      "status": "confirmed",
+      "issued": "2026-05-28",
+      "source": {
+        "doc": "Pure DC release 'Pure DC Secures $2.7 Billion to Accelerate AI Infrastructure Growth Across Europe and the Middle East' (GlobeNewswire, London, 2026-05-28)",
+        "date": "2026-05-28",
+        "url": "https://www.globenewswire.com/news-release/2026/05/28/3303028/0/en/pure-dc-secures-2-7-billion-to-accelerate-ai-infrastructure-growth-across-europe-and-the-middle-east.html"
+      },
+      "as_of": "2026-09-07",
+      "offtaker_label": "Leased campuses (tenants not named in the release)"
     },
     {
       "ticker": null,
