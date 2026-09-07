@@ -11,7 +11,7 @@
 import Base from '../../layouts/Base.astro';
 import NoteFooter from '../../components/NoteFooter.astro';
 
-const AS_OF = '2026-09-05';
+const AS_OF = '2026-09-07';
 const PUBLISHED = '2026-09-02';
 
 const LINKS = {
@@ -27,8 +27,8 @@ const LINKS = {
   setara: 'https://www.setarafinancial.com/',
 };
 
-// The docket in one block. Every line is from the Federal Register notice
-// or the regulations.gov docket record.
+// The docket in one block. Every line is from the Federal Register notice,
+// the regulations.gov docket record, or the CFTC product-filings record.
 const FACTS = [
   ['Release', '9286-26, issued August 19, 2026'],
   ['Federal Register', '91 FR 54259, August 21, 2026 (FR Doc. 2026-17163)'],
@@ -36,6 +36,7 @@ const FACTS = [
   ['Comments due', 'October 20, 2026'],
   ['Questions', '23, in four topics'],
   ['Vote', 'Chairman Selig in the affirmative; no Commissioner in the negative'],
+  ['Product filing', 'CME: two compute futures (H100 and B200 rental-index contracts), CFTC product submission 62544, status Approval Pending, 45-day review ends September 25, 2026. CME’s announced first trade date is October 5, 2026.'],
 ];
 
 // Who has written. Date is the letter's own date (docket rows: received
