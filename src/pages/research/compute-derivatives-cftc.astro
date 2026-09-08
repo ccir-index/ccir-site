@@ -11,7 +11,7 @@
 import Base from '../../layouts/Base.astro';
 import NoteFooter from '../../components/NoteFooter.astro';
 
-const AS_OF = '2026-09-07';
+const AS_OF = '2026-09-08';
 const PUBLISHED = '2026-09-02';
 
 const LINKS = {
@@ -24,6 +24,7 @@ const LINKS = {
   c0004: 'https://www.regulations.gov/comment/CFTC-2026-1850-0004',
   c0005: 'https://www.regulations.gov/comment/CFTC-2026-1850-0005',
   c0006: 'https://www.regulations.gov/comment/CFTC-2026-1850-0006',
+  c0007: 'https://www.regulations.gov/comment/CFTC-2026-1850-0007',
   setara: 'https://www.setarafinancial.com/',
 };
 
@@ -141,6 +142,22 @@ const LETTERS: Letter[] = [
       '"Make observability a listing condition rather than a hoped-for disclosure": independently verifiable settlement, a published methodology fixed in advance, "counterparty-diversity floors, not volume floors", and a stated delivered unit with attestation of delivery independent of the payment record.',
     ],
     note: 'Data is a 17-day census of machine-priced inference endpoints paid over the x402 protocol. The filer states the census covers the API layer, "not evidence about hourly accelerator pricing", and gives its own scale as 226 settlements for $3.12.',
+  },
+  {
+    date: '2026-09-07',
+    filer: 'Li Li (independent researcher, personal capacity)',
+    form: 'Comment letter, 7 pages, "From Price Hedge to Credit Signal: Risk Considerations When Compute Derivatives Enter AI Infrastructure Finance"',
+    where: 'regulations.gov',
+    href: LINKS.c0007,
+    onDocket: 'Yes, CFTC-2026-1850-0007 (received Sep 7, posted Sep 8)',
+    topics: 'Cash markets (Q1(e), 1(f)) · oversight (Q2(e)) · customer protection (Q3(c))',
+    asks: [
+      'Contract specifications and risk disclosures should distinguish the reference-price exposure covered, the differences between the index and common commercial compute contracts, that "cash settlement does not ensure access to physical capacity", and that "an effective price hedge does not ensure adequate project cash flow or debt-service capacity".',
+      'Risk materials for commercial hedgers should explain "the potential timing mismatch between derivative margin obligations and cash flows from the underlying compute business".',
+      'Product materials should state that listing "does not constitute a Commission determination that the relevant index is suitable for loan pricing, collateral valuation, or credit assessment".',
+      'Exchanges should publish "the historical relationship between the futures reference price and major categories of commercial compute contracts"; the Commission should monitor whether futures prices enter financing and valuation frameworks and produce procyclical effects.',
+    ],
+    note: 'Supports listing. The argument is that a hedge transfers price risk only: "the hedgeability of compute should not be equated with the bankability of the underlying project." No data, no index named. Carries an AI-assistance disclosure.',
   },
 ];
 
@@ -334,7 +351,7 @@ const TOPICS: Topic[] = [
     <section class="sec" id="letters">
       <h2><span class="n">02</span> Comment letters filed, with summaries</h2>
       <p class="lede-para">
-        Six letters so far: five on the docket, one posted publicly by a
+        Seven letters so far: six on the docket, one posted publicly by a
         filer before the docket opened. Each row gives the filer's own asks in the
         filer's own words, with a link to the source. The docket copy is the
         record; a letter posted elsewhere is listed as such until it appears
@@ -368,7 +385,9 @@ const TOPICS: Topic[] = [
         Commission to withhold listings until that benchmark exists. Another
         asks it not to wait for a perfect one. Two anonymous filers ask only
         that whoever calculates the index be separated from the firms that
-        trade on it.
+        trade on it. The newest letter turns to what happens after listing.
+        A futures price that lenders adopt becomes a credit signal. The filer
+        asks the Commission to say that listing does not validate that use.
       </p>
       <p class="fine">
         CCIR publishes posted-rate compute benchmarks. Docket rows are
@@ -447,7 +466,7 @@ const TOPICS: Topic[] = [
       <ul class="src-list">
         <li>CFTC, August 19, 2026 — <a href={LINKS.release} rel="noopener" target="_blank">Release 9286-26, CFTC Requests Comment on the Listing of Compute Derivatives Contracts</a></li>
         <li>Federal Register, August 21, 2026 — <a href={LINKS.fr} rel="noopener" target="_blank">91 FR 54259, Request for Comment on the Listing of Compute Derivatives Contracts</a> (<a href={LINKS.frPdf} rel="noopener" target="_blank">PDF</a>)</li>
-        <li>regulations.gov — <a href={LINKS.docket} rel="noopener" target="_blank">Docket CFTC-2026-1850</a>: comments <a href={LINKS.c0002} rel="noopener" target="_blank">0002</a>, <a href={LINKS.c0003} rel="noopener" target="_blank">0003</a>, <a href={LINKS.c0004} rel="noopener" target="_blank">0004</a>, <a href={LINKS.c0005} rel="noopener" target="_blank">0005</a>, <a href={LINKS.c0006} rel="noopener" target="_blank">0006</a></li>
+        <li>regulations.gov — <a href={LINKS.docket} rel="noopener" target="_blank">Docket CFTC-2026-1850</a>: comments <a href={LINKS.c0002} rel="noopener" target="_blank">0002</a>, <a href={LINKS.c0003} rel="noopener" target="_blank">0003</a>, <a href={LINKS.c0004} rel="noopener" target="_blank">0004</a>, <a href={LINKS.c0005} rel="noopener" target="_blank">0005</a>, <a href={LINKS.c0006} rel="noopener" target="_blank">0006</a>, <a href={LINKS.c0007} rel="noopener" target="_blank">0007</a></li>
         <li>Setara Financial Corp — open letter (August 20, 2026) posted on the company's LinkedIn page; the September 1 comment letter is now on the docket as 0005; <a href={LINKS.setara} rel="noopener" target="_blank">company site</a></li>
       </ul>
     </section>
