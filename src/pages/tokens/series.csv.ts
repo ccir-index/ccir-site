@@ -3,6 +3,11 @@ import { series } from '../../data/vvti';
 
 export const prerender = true;
 
+// Public download window (data terms §03, 2026-09-08): the current print and
+// the trailing thirty days. Longer history is licensed.
+const PUBLIC_DAYS = 30;
+const dayNum = (d: string) => Date.parse(d.slice(0, 10) + 'T00:00:00Z');
+
 /*
   CCIR Vercel Volume Token Index (VVTI), daily. The volume-weighted posted
   price of an output token: each model's posted first-party price weighted
@@ -29,7 +34,9 @@ export const GET: APIRoute = () => {
   // every displayed 2dp value recoverable without printing eight digits of
   // false precision on a $/Mtok figure.
   const px = (v: number | null) => (v === null ? '' : v.toFixed(4));
-  const body = series.map((p) =>
+  const last = series.length ? dayNum(series[series.length - 1].date) : 0;
+  const cutoff = last - (PUBLIC_DAYS - 1) * 86400000;
+  const body = series.filter((p) => dayNum(p.date) >= cutoff).map((p) =>
     [p.date, px(p.vvti), px(p.open_avg), p.coverage.toFixed(2)]
       .map(esc).join(','),
   );

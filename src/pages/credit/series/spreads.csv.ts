@@ -3,6 +3,11 @@ import creditData from '../../../data/credit_instruments.json';
 
 export const prerender = true;
 
+// Public download window (data terms §03, 2026-09-08): the current print and
+// the trailing thirty days. Longer history is licensed.
+const PUBLIC_DAYS = 30;
+const dayNum = (d: string) => Date.parse(d.slice(0, 10) + 'T00:00:00Z');
+
 /*
   Spread-at-signing series, CSV. Same selection as /credit/series#spreads:
   issuance-scope instruments (GPU-collateralized, disclosed size) with a
@@ -24,7 +29,8 @@ const rows = (creditData.instruments as any[])
     status: i.status,
     source_url: i.source?.url ?? '',
   }))
-  .sort((a, b) => a.signed.localeCompare(b.signed));
+  .sort((a, b) => a.signed.localeCompare(b.signed))
+  .filter((r, _i, all) => all.length === 0 || dayNum(r.signed) >= dayNum(all[all.length - 1].signed) - (PUBLIC_DAYS - 1) * 86400000);
 
 const esc = (v: unknown) => {
   const s = String(v ?? '');
