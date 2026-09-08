@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "current": "v2.3.2",
+  "versions": [
+    {
+      "version": "v2.3.3",
+      "effective": "2026-09-11",
+      "announced": "2026-09-03",
+      "changelog_id": "260903-1",
+      "document_revision": null,
+      "changed": "Four operators join the on-demand rate panel: two European, two Asia-Pacific.",
+      "pdf": null,
+      "markdown": null,
+      "source_sha256": null,
+      "source_commit": null,
+      "rendered": null
+    },
+    {
+      "version": "v2.3.2",
+      "effective": "2026-08-21",
+      "announced": null,
+      "changelog_id": null,
+      "document_revision": "2026-08-31",
+      "changed": "Availability is informational. A posted price is eligible whatever the venue says about stock.",
+      "pdf": "CCIR_Methodology_v2.3.2_effective_2026-08-21.pdf",
+      "markdown": "CCIR_Methodology_v2.3.2_effective_2026-08-21.md",
+      "source_sha256": "05505fdab278db8bef6c6eb4ee59aa736584ce426332bb46cca68b11cd2de526",
+      "source_commit": "255323a9d6fdfff41a70e6e6e04417425e4b202d",
+      "rendered": "2026-09-08"
+    },
+    {
+      "version": "v2.3.1",
+      "effective": "2026-08-19",
+      "announced": "2026-08-19",
+      "changelog_id": "260819-1",
+      "document_revision": null,
+      "changed": "A quorum bound on the marketplace vote floor. Where the floor would remove half or more of a cell's voters, the floored votes stand.",
+      "pdf": null,
+      "markdown": null,
+      "source_sha256": null,
+      "source_commit": null,
+      "rendered": null
+    },
+    {
+      "version": "v2.3.0",
+      "effective": "2026-08-19",
+      "announced": "2026-08-18",
+      "changelog_id": "260818-1",
+      "document_revision": null,
+      "changed": "Single-point marketplace medians no longer vote in the operator-equal aggregate.",
+      "pdf": null,
+      "markdown": null,
+      "source_sha256": null,
+      "source_commit": null,
+      "rendered": null
+    },
+    {
+      "version": "v2.2.1",
+      "effective": "2026-07-23",
+      "announced": "2026-07-15",
+      "changelog_id": "260715-4",
+      "document_revision": null,
+      "changed": "Two sources join the on-demand rate panel and one member retires.",
+      "pdf": null,
+      "markdown": null,
+      "source_sha256": null,
+      "source_commit": null,
+      "rendered": null
+    },
+    {
+      "version": "v2.2.0",
+      "effective": "2026-07-16",
+      "announced": "2026-07-15",
+      "changelog_id": "260715-3",
+      "document_revision": null,
+      "changed": "Two sources join the committed-term cells. A hard panel gate applies to every cell.",
+      "pdf": null,
+      "markdown": null,
+      "source_sha256": null,
+      "source_commit": null,
+      "rendered": null
+    },
+    {
+      "version": "v2.1.0",
+      "effective": "2026-07-15",
+      "announced": "2026-07-10",
+      "changelog_id": "260710-2",
+      "document_revision": null,
+      "changed": "One source joins the on-demand rate panel.",
+      "pdf": null,
+      "markdown": null,
+      "source_sha256": null,
+      "source_commit": null,
+      "rendered": null
+    },
+    {
+      "version": "v2.0.0",
+      "effective": "2026-04-26",
+      "announced": "2026-04-26",
+      "changelog_id": "260426-1",
+      "document_revision": null,
+      "changed": "First public methodology.",
+      "pdf": null,
+      "markdown": null,
+      "source_sha256": null,
+      "source_commit": null,
+      "rendered": null
+    }
+  ]
+}

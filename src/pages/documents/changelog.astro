@@ -266,7 +266,7 @@ const entries = [
 
     <div class="log">
       {entries.map((e) => (
-        <section class="entry">
+        <section class="entry" id={e.id}>
           <div class="entry-head">
             <span class="entry-date">{e.id}</span>
             <span class="entry-tag">{e.type}</span>

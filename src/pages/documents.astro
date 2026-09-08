@@ -2,6 +2,19 @@
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import { meta } from '../data/snapshot';
+import versions from '../../public/documents/methodology/versions.json';
+
+// Methodology versions. public/documents/methodology/versions.json is copied
+// from the public methodology repository (ccir-index/ccir-methodology,
+// versions/), where one dated PDF is rendered per methodology version and
+// never changes once published. The current version leads; prior versions
+// follow in the order they were superseded.
+const currentVersion = versions.versions.find((v) => v.version === versions.current);
+const priorVersions = versions.versions.filter(
+  (v) => v.version !== versions.current && v.effective <= (currentVersion?.effective ?? ''),
+);
+const versionRows = currentVersion ? [currentVersion, ...priorVersions] : priorVersions;
+const pdfHref = (v) => (v.pdf ? `/documents/methodology/${v.pdf}` : null);
 
 const docs = [
   {
@@ -77,6 +90,46 @@ const docs = [
       ))}
     </div>
 
+    <section class="versions" id="methodology-versions">
+      <h2 class="versions-title">Methodology versions</h2>
+      <p class="versions-note">
+        Each methodology version is a dated PDF. A version's PDF does not
+        change after publication. The change log entry records what changed
+        and when it took effect.
+      </p>
+      <table class="versions-table">
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Effective</th>
+            <th>Document</th>
+            <th>Change log</th>
+          </tr>
+        </thead>
+        <tbody>
+          {versionRows.map((v) => (
+            <tr class={v.version === versions.current ? 'is-current' : undefined}>
+              <td class="v">
+                {v.version}
+                {v.version === versions.current && <span class="tag">current</span>}
+              </td>
+              <td>{v.effective}</td>
+              <td>
+                {pdfHref(v) ? <a href={pdfHref(v)}>PDF</a> : <span class="none">no PDF</span>}
+              </td>
+              <td>
+                {v.changelog_id ? (
+                  <a href={`/documents/changelog#${v.changelog_id}`}>{v.changelog_id}</a>
+                ) : (
+                  <span class="none">—</span>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+
     <p class="iosco-note">
       CCIR's methodology and governance are designed with reference to the
       International Organization of Securities Commissions (IOSCO)
@@ -139,6 +192,56 @@ const docs = [
       text-transform: uppercase;
       letter-spacing: var(--tracking-eye);
     }
+    .versions {
+      max-width: 760px;
+      margin: 30px 0 0;
+      padding-top: 18px;
+      border-top: 1px solid var(--rule-2);
+    }
+    .versions-title {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 8px;
+    }
+    .versions-note {
+      font-family: var(--font-body);
+      font-size: var(--fs-sm);
+      color: var(--ink-dim);
+      line-height: 1.6;
+      max-width: 76ch;
+      margin: 0 0 14px;
+    }
+    .versions-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink);
+    }
+    .versions-table th {
+      text-align: left;
+      font-weight: var(--weight-strong);
+      color: var(--ink-dim);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+      padding: 6px 10px 6px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+    .versions-table td {
+      padding: 8px 10px 8px 0;
+      border-bottom: 1px solid var(--rule-2);
+      vertical-align: baseline;
+    }
+    .versions-table .v { white-space: nowrap; }
+    .versions-table .is-current td { color: var(--ink); }
+    .versions-table .tag {
+      margin-left: 8px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-eye);
+    }
+    .versions-table a { color: var(--accent); }
+    .versions-table .none { color: var(--ink-dim); }
     .iosco-note {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);

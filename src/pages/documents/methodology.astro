@@ -2,6 +2,13 @@
 import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { meta } from '../../data/snapshot';
+import versions from '../../../public/documents/methodology/versions.json';
+
+// Version bar. public/documents/methodology/versions.json is copied from the
+// public methodology repository (ccir-index/ccir-methodology, versions/),
+// where the mirror workflow renders one dated PDF per methodology version.
+const current = versions.versions.find((v) => v.version === versions.current);
+const pdfHref = current?.pdf ? `/documents/methodology/${current.pdf}` : null;
 ---
 <Base
   title="GPU Compute Price Index Methodology — Sources, Aggregation, Series Grammar · CCIR"
@@ -19,7 +26,15 @@ import { meta } from '../../data/snapshot';
         Management Policy</a>.
       </p>
       <p class="revnote">
-        Revision 2026-08-31 · describes methodology <code>v2.3.2</code>
+        Methodology <code>{current?.version}</code>
+        <span class="sep">·</span> effective {current?.effective}
+        {current?.document_revision && (
+          <><span class="sep">·</span> document revised {current.document_revision}</>
+        )}
+        {pdfHref && (
+          <><span class="sep">·</span> <a href={pdfHref}>PDF</a></>
+        )}
+        <span class="sep">·</span> <a href="/documents#methodology-versions">All versions</a>
       </p>
     </PageHeader>
 
@@ -246,6 +261,8 @@ Example:  CRI-T2-H100-ALL-GTD-OD-US
       font-family: var(--font-mono);
       font-size: 0.9em;
     }
+    .revnote .sep { color: var(--rule); padding: 0 2px; }
+    .revnote a { color: var(--accent); }
     .sec { margin: 26px 0; max-width: 76ch; }
     .sec h2 {
       font-family: var(--font-display);
