@@ -55,20 +55,6 @@ interface Letter {
 }
 const LETTERS: Letter[] = [
   {
-    date: '2026-08-20',
-    filer: 'Setara Financial Corp (H. Jack Bouroudjian, CEO)',
-    form: 'Open letter, "An Open Letter to the CFTC: Compute Derivatives Are Essential Market Infrastructure"',
-    where: 'LinkedIn',
-    href: LINKS.setara,
-    onDocket: 'No (pre-docket)',
-    topics: 'Cash markets · oversight',
-    asks: [
-      'Treat compute derivatives as "the natural evolution of commodity derivatives markets".',
-      'Judge the market on whether its infrastructure is "sufficiently neutral, transparent, standardized, and robust to support institutional participation".',
-      'Establish "an independent reference layer that can sit beneath competing venues".',
-    ],
-  },
-  {
     date: '2026-08-21',
     filer: 'Michael Ravnitzky, Silver Spring, Maryland',
     form: 'Comment letter, 7 pages',
@@ -126,7 +112,7 @@ const LETTERS: Letter[] = [
       'Basis "should be measurable, transparent and economically manageable at the outset of a trade"; a hedger’s exposure is to "H100, H200 or B200 capacity in a particular geography".',
       'Support perpetual compute futures where the structure fits, with convergence, margining, funding and settlement safeguards.',
     ],
-    note: 'Their second letter. The single reference-layer ask of August 20 is replaced by competition among methodologies.',
+    note: 'Their second letter. An open letter posted on LinkedIn on August 20, before the docket opened, asked for "an independent reference layer that can sit beneath competing venues". The filed letter replaces that with competition among methodologies.',
   },
   {
     date: '2026-09-04',
@@ -258,7 +244,7 @@ const TOPICS: Topic[] = [
       </p>
       <ul class="lede-index">
         <li><span class="arw">→</span> <a href="#asked">What the CFTC asked</a></li>
-        <li><span class="arw">→</span> <a href="#letters">Comment letters: filed, and posted publicly</a></li>
+        <li><span class="arw">→</span> <a href="#letters">Comment letters on the docket</a></li>
         <li><span class="arw">→</span> <a href="#statements">Statements to the press and at meetings</a></li>
         <li><span class="arw">→</span> <a href="#questions">The 23 questions</a></li>
         <li><span class="arw">→</span> <a href="#file">How to file a comment</a></li>
@@ -364,13 +350,13 @@ const TOPICS: Topic[] = [
     <section class="sec" id="letters">
       <h2><span class="n">02</span> Comment letters</h2>
       <p class="lede-para">
-        Six comment letters are on the docket. One open letter was posted
-        publicly before the docket opened and has not been filed. The docket
-        copy is the record. Each card gives the filer's own asks, in the
-        filer's own words, with a link to the source. Remarks to the press and
-        at Commission meetings are in section 03.
+        Six comment letters are on the docket. The docket copy is the record.
+        Each card gives the filer's own asks, in the filer's own words, with a
+        link to the docket. A letter posted elsewhere is listed apart until it
+        is filed. Remarks to the press and at Commission meetings are in
+        section 03.
       </p>
-      {LETTER_GROUPS.map((g) => (
+      {LETTER_GROUPS.filter((g) => g.items.length > 0).map((g) => (
         <>
           <h3 class="lgroup">{g.title} <span class="lcount">{g.items.length}</span></h3>
           <div class="letters">
