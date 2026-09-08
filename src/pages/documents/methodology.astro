@@ -3,10 +3,19 @@ import Base from '../../layouts/Base.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { meta } from '../../data/snapshot';
 import versions from '../../../public/documents/methodology/versions.json';
+import raw from '../../content/methodology/methodology.md?raw';
+import { renderMethodology } from '../../lib/methodology-md.mjs';
 
-// Version bar. public/documents/methodology/versions.json is copied from the
-// public methodology repository (ccir-index/ccir-methodology, versions/),
-// where the mirror workflow renders one dated PDF per methodology version.
+// The page text is src/content/methodology/methodology.md, the public
+// methodology (METHODOLOGY_PUBLIC.md in ccir-v2-notebooks). The versioned
+// PDF renders from the same file, so the two cannot drift. Both the text and
+// public/documents/methodology/ (PDFs + versions.json) arrive through
+// scripts/sync-methodology.mjs from a checkout of ccir-index/ccir-methodology;
+// see src/lib/methodology-md.mjs for the rendering pipeline.
+const { title, standfirst, body } = await renderMethodology(raw);
+
+// Version bar. versions.json is the public index the mirror workflow writes:
+// one dated PDF per methodology version.
 const current = versions.versions.find((v) => v.version === versions.current);
 const pdfHref = current?.pdf ? `/documents/methodology/${current.pdf}` : null;
 ---
@@ -16,15 +25,9 @@ const pdfHref = current?.pdf ? `/documents/methodology/${current.pdf}` : null;
   description="CCIR methodology — what the series measure, where prices come from, how they are aggregated, and the series grammar."
   showTape={false}
 >
-  <section class="wrap page-top">
-    <PageHeader title="Methodology" crumbs={[{ href: '/documents', label: 'Documents' }]} kicker="Methodology" asOf={meta.as_of_date} asOfLabel="as published" display>
-      <p class="standfirst">
-        This document describes current practice for every published CCIR
-        reference series, the Compute Rental Index (CRI): what the numbers measure, where they
-        come from, and how they are computed. Changes to anything on this page
-        are governed by the <a href="/documents/change-management">Change
-        Management Policy</a>.
-      </p>
+  <section class="wrap page-top methodology-doc">
+    <PageHeader title={title} crumbs={[{ href: '/documents', label: 'Documents' }]} kicker="Methodology" asOf={meta.as_of_date} asOfLabel="as published" display>
+      <Fragment set:html={standfirst} />
       <p class="revnote">
         Methodology <code>{current?.version}</code>
         <span class="sep">·</span> effective {current?.effective}
@@ -38,204 +41,7 @@ const pdfHref = current?.pdf ? `/documents/methodology/${current.pdf}` : null;
       </p>
     </PageHeader>
 
-    <section class="sec">
-      <h2><span class="n">01</span> What the Series Are</h2>
-      <p>
-        CCIR publishes daily reference series for GPU rental prices, in U.S.
-        dollars per GPU per hour, on the grain
-        <strong>chip × operator segment × form factor × interruptibility ×
-        commitment term × region</strong>. Every price is a
-        <strong>posted, publicly observable list ask</strong> collected from a
-        provider-operated pricing surface — not an executed transaction, not a
-        solicited quote, not a broker-mediated or sponsored feed. If a price is
-        only available through sales contact, it is not in the index.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">01a</span> Design Rationale</h2>
-      <p>
-        The series measure publicly posted list asks. They do not sample
-        executed transactions, and they do not estimate traded volume.
-        Posted asks are observable without solicitation and reproducible by
-        any third party on the day of observation. They carry no submission
-        channel, so there is nothing to misreport: no transaction sample to
-        select from, no broker mark, no expert judgment.
-      </p>
-      <p>
-        The series are designed as <strong>reference rates</strong>:
-        suitable for contractual citation, residual-value monitoring, and
-        credit covenants. Not every published row carries that status, and
-        section 04a sets out the test. They are not designed to replicate a
-        volume-weighted average of executed trades. Products that measure
-        executed levels sit outside this methodology and its governance
-        framework.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">02</span> Operator Segments</h2>
-      <p>
-        Series are segmented by the class of operator posting the price, not by
-        hardware grade:
-      </p>
-      <ul>
-        <li><strong>Hyperscaler</strong> — integrated cloud majors (list rate cards).</li>
-        <li><strong>Neocloud</strong> — GPU-specialist clouds selling dedicated capacity.</li>
-        <li><strong>Marketplace</strong> — multi-seller venues and aggregated marketplaces.</li>
-      </ul>
-      <p>
-        In series identifiers these carry the tokens <code>T1</code> /
-        <code>T2</code> / <code>T3</code> respectively.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">03</span> Collection</h2>
-      <p>
-        Prices are collected automatically from each provider's public pricing
-        pages or application programming interfaces (APIs). Each observation
-        records the provider, chip, posted price, and its axes (form factor,
-        interruptibility, commitment term, region). Raw observations are
-        archived; published series are aggregates.
-      </p>
-      <p>
-        Capture runs on a per-source schedule, from once a day to hourly, set
-        by how often a surface can be read without burdening it.
-        <strong>Every series is a daily series</strong>: each cell publishes
-        one value per day, and a source's readings within that day reduce to a
-        single per-source value before the headline is computed. Capture
-        frequency is an operational parameter rather than part of a series
-        definition, so a change to it is not a series break.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">04</span> Aggregation and the Headline Statistic</h2>
-      <p>
-        Aggregation is <strong>operator-equal</strong>: one source, one vote. A
-        provider's multiple qualifying listings in a cell are reduced to a
-        per-source value first, so no provider's listing count moves a series.
-      </p>
-      <p>
-        The headline statistic per cell follows a disclosed rule:
-        <strong>mean when the panel has ten or more sources (n ≥ 10), median
-        below that</strong>. The statistic actually used is stamped on every
-        row (<code>headline_stat</code>), and every cell publishes its source
-        count <em>n</em>, observation count, and interquartile range alongside
-        the headline value.
-      </p>
-      <p>
-        <strong>Publication threshold.</strong> A cell publishes when at least
-        three independent sources contribute to it and it holds at least five
-        observations. Cells below that threshold are computed and retained,
-        and they do not publish. Two breakout classes publish at two sources
-        rather than being withheld: regional cuts and committed-term cuts,
-        where a thin panel is the true state of an emerging market. Those
-        cells carry <code>promotion_status</code> of
-        <code>Provisional</code>; cells clearing the full threshold carry
-        <code>Published</code>.
-      </p>
-      <p>
-        Panel depth <em>n</em> is the trust signal. It publishes beside every
-        headline value with the observation count and the interquartile range,
-        and thin cells should be read as indicative. Because the threshold is
-        a floor on depth rather than a view on price, it never selects among
-        cells that clear it.
-      </p>
-      <p>
-        Under rapid dislocation (the sudden exit of major sources, widespread
-        collection failure, or extreme dispersion) the administrator may
-        widen the observation window or publish a notice of reduced coverage.
-        Both steps are pre-specified contingencies: each is logged, applies
-        forward only, and changes neither the series identifier nor the
-        definition of the rate.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">04a</span> What Publishes, and What May Be Cited</h2>
-      <p>
-        Publication and citability are separate questions, and every row
-        answers both on its face. <code>promotion_status</code> reports
-        whether a cell cleared the full threshold in section 04.
-        <code>product_class</code> reports what it may be used for.
-      </p>
-      <p>
-        <code>citable</code> marks the on-demand reference series.
-        <code>market_intelligence</code> marks the committed-term series,
-        together with the on-demand companion published beside them for
-        like-for-like comparison. Those cells are published for context.
-        They rest on a different and generally thinner panel than the
-        on-demand series beside them, so they are not offered for contractual
-        citation. <strong>A citable reference rate is a row reading
-        <code>product_class = citable</code> and
-        <code>promotion_status = Published</code></strong>. A substantial
-        share of published rows does not meet both conditions, so the two
-        columns are the test rather than the series identifier.
-      </p>
-      <p>
-        The published file carries the operator-segment series set out in
-        section 06. An earlier factory-class taxonomy is still computed and
-        surfaces in the <a href="/explorer">/explorer</a> long tail. Those
-        series are not part of the reference set and are not included in the
-        download.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">05</span> Windows and Composition Stability</h2>
-      <p>
-        Each cell is computed on the shortest observation window that meets
-        the publication threshold in section 04: one day, else three days,
-        else seven. A cell whose single day of data falls short of the
-        threshold widens its window rather than publish thin. The window
-        actually used is stamped on every row
-        (<code>headline_window_days</code>), with the source and observation
-        counts at each horizon. Panel membership is versioned;
-        when a panel member transiently fails collection, its last-good price
-        carries forward for at most seven days so one missed scrape does not
-        change a series' composition. Members absent beyond that exit the cell.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">06</span> Series Grammar</h2>
-      <p>Every Compute Rental Index (CRI) series identifier is fully self-describing:</p>
-      <pre class="grammar">CRI-&#123;SEGMENT&#125;-&#123;CHIP&#125;-&#123;FORM&#125;-&#123;INT&#125;-&#123;TERM&#125;-&#123;REGION&#125;
-
-SEGMENT   T1 Hyperscaler · T2 Neocloud · T3 Marketplace
-FORM      SXM · PCIe · NVL · OAM · ALL (pooled)
-INT       GTD guaranteed · INT interruptible · ALL (pooled)
-TERM      OD on-demand · 1mo 3mo 6mo 1yr 2yr 3yr committed
-REGION    US · EU · APAC · Other · ALL (pooled)
-
-Example:  CRI-T2-H100-ALL-GTD-OD-US
-          Neocloud · H100 · guaranteed on-demand · United States</pre>
-      <p>
-        <code>ALL</code> on any axis means that axis is pooled for that
-        series. <code>Other</code> on the region axis collects posted
-        locations outside the three named regions; it is a residual, and it is
-        never a substitute for a named region. <code>OAM</code> is the Open
-        Accelerator Module form factor. The reference ladder on <a href="/rates">/rates</a> shows the
-        guaranteed on-demand US cut per chip and segment, with each cell's
-        series identifier printed beneath the rate.
-      </p>
-    </section>
-
-    <section class="sec">
-      <h2><span class="n">07</span> Publication, History, Restatement</h2>
-      <p>
-        Series publish daily by 07:30 Eastern Time (ET) at ccir.io. History is append-only
-        with a methodology version stamped on every row. A daily value
-        finalizes at the close of its publication day; recomputation before
-        finalization under a logged change is not a restatement. After
-        finalization, no value changes silently. When a defect or a
-        material methodology change requires it, history is restated —
-        republished in full under the current version — per the
-        <a href="/documents/change-management">Change Management Policy</a>.
-      </p>
-    </section>
+    <Fragment set:html={body} />
   </section>
 
   <style>
@@ -263,8 +69,13 @@ Example:  CRI-T2-H100-ALL-GTD-OD-US
     }
     .revnote .sep { color: var(--rule); padding: 0 2px; }
     .revnote a { color: var(--accent); }
-    .sec { margin: 26px 0; max-width: 76ch; }
-    .sec h2 {
+  </style>
+
+  <!-- The sections come from markdown (set:html), outside Astro's style
+       scoping, so their rules are global under .methodology-doc. -->
+  <style is:global>
+    .methodology-doc .sec { margin: 26px 0; max-width: 76ch; }
+    .methodology-doc .sec h2 {
       font-family: var(--font-display);
       font-size: var(--fs-xl);
       margin: 0 0 10px;
@@ -272,30 +83,30 @@ Example:  CRI-T2-H100-ALL-GTD-OD-US
       align-items: baseline;
       gap: 12px;
     }
-    .sec .n {
+    .methodology-doc .sec .n {
       font-family: var(--font-mono);
       font-size: var(--fs-sm);
       color: var(--accent);
       font-weight: var(--weight-strong);
     }
-    .sec p, .sec ul {
+    .methodology-doc .sec p, .methodology-doc .sec ul {
       font-family: var(--font-body);
       font-size: var(--fs-md);
       color: var(--ink);
       line-height: 1.65;
       margin: 0 0 12px;
     }
-    .sec ul { padding-left: 20px; }
-    .sec li { margin-bottom: 6px; }
-    .sec strong { color: var(--accent); }
-    .sec code {
+    .methodology-doc .sec ul { padding-left: 20px; }
+    .methodology-doc .sec li { margin-bottom: 6px; }
+    .methodology-doc .sec strong { color: var(--accent); }
+    .methodology-doc .sec code {
       font-family: var(--font-mono);
       font-size: 0.9em;
       background: var(--surface-2);
       padding: 1px 5px;
       border: 1px solid var(--rule);
     }
-    .grammar {
+    .methodology-doc .grammar {
       font-family: var(--font-mono);
       font-size: var(--fs-xs);
       color: var(--ink);
@@ -306,6 +117,13 @@ Example:  CRI-T2-H100-ALL-GTD-OD-US
       padding: 14px 16px;
       overflow-x: auto;
       margin: 0 0 12px;
+    }
+    .methodology-doc .grammar code {
+      font-family: inherit;
+      font-size: inherit;
+      background: none;
+      border: 0;
+      padding: 0;
     }
   </style>
 </Base>
