@@ -161,6 +161,19 @@ const LETTERS: Letter[] = [
   },
 ];
 
+// A filed letter carries a docket number; a letter posted elsewhere does not.
+// The two are shown apart so a reader never mistakes one for the other.
+const docketOf = (l: Letter): string | null =>
+  l.onDocket.startsWith('Yes') ? l.onDocket.replace('Yes, ', '').split(' ')[0] : null;
+const docketDetail = (l: Letter): string => {
+  const i = l.onDocket.indexOf('(');
+  return i >= 0 ? l.onDocket.slice(i + 1, l.onDocket.length - 1) : 'filed';
+};
+const LETTER_GROUPS = [
+  { title: 'Filed on the docket', items: LETTERS.filter((l) => docketOf(l)) },
+  { title: 'Posted publicly, not filed', items: LETTERS.filter((l) => !docketOf(l)) },
+];
+
 // Statements on the record: positions spoken or given to the press, not
 // filed. Same discipline as the letters: date, who, where, the words, link.
 interface Statement { date: string; who: string; venue: string; quote: string; href: string; source: string; note?: string }
@@ -245,8 +258,8 @@ const TOPICS: Topic[] = [
       </p>
       <ul class="lede-index">
         <li><span class="arw">→</span> <a href="#asked">What the CFTC asked</a></li>
-        <li><span class="arw">→</span> <a href="#letters">Comment letters filed, with summaries</a></li>
-        <li><span class="arw">→</span> <a href="#statements">Statements on the record</a></li>
+        <li><span class="arw">→</span> <a href="#letters">Comment letters: filed, and posted publicly</a></li>
+        <li><span class="arw">→</span> <a href="#statements">Statements to the press and at meetings</a></li>
         <li><span class="arw">→</span> <a href="#questions">The 23 questions</a></li>
         <li><span class="arw">→</span> <a href="#file">How to file a comment</a></li>
       </ul>
@@ -349,34 +362,42 @@ const TOPICS: Topic[] = [
     </section>
 
     <section class="sec" id="letters">
-      <h2><span class="n">02</span> Comment letters filed, with summaries</h2>
+      <h2><span class="n">02</span> Comment letters</h2>
       <p class="lede-para">
-        Seven letters so far: six on the docket, one posted publicly by a
-        filer before the docket opened. Each row gives the filer's own asks in the
-        filer's own words, with a link to the source. The docket copy is the
-        record; a letter posted elsewhere is listed as such until it appears
-        there.
+        Six comment letters are on the docket. One open letter was posted
+        publicly before the docket opened and has not been filed. The docket
+        copy is the record. Each card gives the filer's own asks, in the
+        filer's own words, with a link to the source. Remarks to the press and
+        at Commission meetings are in section 03.
       </p>
-      <div class="letters">
-        {LETTERS.map((l) => (
-          <article class="letter">
-            <div class="lhead">
-              <span class="ldate">{l.date}</span>
-              <span class="lfiler">{l.filer}</span>
-            </div>
-            <div class="lmeta">
-              <span>{l.form}</span>
-              <span>· {l.href ? <a href={l.href} rel="noopener" target="_blank">{l.where}</a> : l.where}</span>
-              <span>· on the docket: {l.onDocket}</span>
-              <span>· topics: {l.topics}</span>
-            </div>
-            <ul class="asks">
-              {l.asks.map((a) => <li>{a}</li>)}
-            </ul>
-            {l.note && <p class="lnote">{l.note}</p>}
-          </article>
-        ))}
-      </div>
+      {LETTER_GROUPS.map((g) => (
+        <>
+          <h3 class="lgroup">{g.title} <span class="lcount">{g.items.length}</span></h3>
+          <div class="letters">
+            {g.items.map((l) => (
+              <article class="letter">
+                <div class="lhead">
+                  {docketOf(l)
+                    ? <span class="lkind filed">Docket {docketOf(l)}</span>
+                    : <span class="lkind">Not filed</span>}
+                  <span class="ldate">{l.date}</span>
+                  <span class="lfiler">{l.filer}</span>
+                </div>
+                <div class="lmeta">
+                  <span>{l.form}</span>
+                  <span>· {l.href ? <a href={l.href} rel="noopener" target="_blank">{l.where}</a> : l.where}</span>
+                  <span>· {docketOf(l) ? docketDetail(l) : 'not on the docket'}</span>
+                  <span>· topics: {l.topics}</span>
+                </div>
+                <ul class="asks">
+                  {l.asks.map((a) => <li>{a}</li>)}
+                </ul>
+                {l.note && <p class="lnote">{l.note}</p>}
+              </article>
+            ))}
+          </div>
+        </>
+      ))}
       <p>
         Read together, the letters ask for the same object from opposite
         directions. Every filer wants a benchmark with a published method, a
@@ -399,11 +420,11 @@ const TOPICS: Topic[] = [
     </section>
 
     <section class="sec" id="statements">
-      <h2><span class="n">03</span> Statements on the record</h2>
+      <h2><span class="n">03</span> Statements to the press and at meetings</h2>
       <p class="lede-para">
-        Positions spoken at Commission meetings or given to the press, by
-        people who have not filed. They are not part of the docket. Each row
-        carries the statement as reported and a link to the report.
+        Remarks spoken at Commission meetings or given to the press, by people
+        who have not filed a letter. They are outside the docket. Each row
+        carries the remark as reported and a link to the report.
       </p>
       <div class="twrap">
         <table class="stmts">
@@ -523,6 +544,10 @@ const TOPICS: Topic[] = [
     .facts th { color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); white-space: nowrap; width: 1%; }
     .facts td { color: var(--ink); }
 
+    .lgroup { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-dim); margin: 18px 0 8px; font-weight: var(--weight-strong); }
+    .lcount { color: var(--ink); margin-left: 4px; }
+    .lkind { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); border: 1px solid var(--rule); padding: 1px 6px; color: var(--ink-dim); letter-spacing: 0.02em; }
+    .lkind.filed { border-color: var(--accent); color: var(--accent); }
     .letters { display: flex; flex-direction: column; gap: 14px; margin: 0 0 16px; }
     .letter { border: 1px solid var(--rule); background: var(--surface); padding: 12px 14px; }
     .lhead { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; margin-bottom: 4px; }
