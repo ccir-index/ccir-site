@@ -31,6 +31,11 @@ export interface FrontierRow {
   /* The vendor's own lifecycle wording, never our inference. 'legacy' means
      the lab itself marks the model legacy/deprecated/retired. */
   lifecycle: string | null;
+  /* The posted price in the vendor's own currency, for rows the pipeline
+     converted to USD (axes.fx_converted). A reprice is a change in THIS
+     number; the USD figure moves every day with the exchange rate. Null
+     for rows posted in USD. */
+  native: { input: string | null; output: string | null } | null;
 }
 
 export interface ServedRow {
@@ -96,6 +101,20 @@ function readLifecycle(axes: string | undefined): string | null {
   }
 }
 
+/* Native-currency prices ride in axes for FX-converted rows. Read as strings:
+   they are compared for equality, never used in arithmetic. */
+function readNative(axes: string | undefined): FrontierRow['native'] {
+  if (!axes) return null;
+  try {
+    const o = JSON.parse(axes);
+    if (!o?.fx_converted) return null;
+    const pick = (k: string) => (o[k] === undefined || o[k] === null ? null : String(o[k]));
+    return { input: pick('native_input_per_mtok'), output: pick('native_output_per_mtok') };
+  } catch {
+    return null;
+  }
+}
+
 export const frontier: FrontierRow[] = parse(frontierCsv).map((r) => ({
   as_of_date: r.as_of_date,
   provider: r.provider as FrontierRow['provider'],
@@ -106,6 +125,7 @@ export const frontier: FrontierRow[] = parse(frontierCsv).map((r) => ({
   output: num(r.output_usd_per_mtok),
   source_rank: num(r.source_rank),
   lifecycle: readLifecycle(r.axes),
+  native: readNative(r.axes),
 }));
 
 export const served: ServedRow[] = parse(servedCsv).map((r) => ({
@@ -225,12 +245,23 @@ export function frontierSeries(modelId: string): FrontierRow[] {
     .sort((a, b) => a.as_of_date.localeCompare(b.as_of_date));
 }
 
+/* Did the posted price change between two consecutive rows? For rows the
+   pipeline converted from another currency, compare the native figures: the
+   USD value drifts with the exchange rate on days the vendor changed nothing
+   (StepFun, 2026-09-08 QC packet). USD rows compare as before. */
+function priceChanged(prev: FrontierRow, cur: FrontierRow): boolean {
+  if (prev.native && cur.native) {
+    return prev.native.input !== cur.native.input || prev.native.output !== cur.native.output;
+  }
+  return cur.output !== prev.output || cur.input !== prev.input;
+}
+
 /** Most recent posted-price change: {date, prevOutput, output} or null. */
 export function lastReprice(modelId: string):
   { date: string; prevInput: number | null; prevOutput: number | null } | null {
   const s = frontierSeries(modelId);
   for (let i = s.length - 1; i > 0; i--) {
-    if (s[i].output !== s[i - 1].output || s[i].input !== s[i - 1].input) {
+    if (priceChanged(s[i - 1], s[i])) {
       return { date: s[i].as_of_date, prevInput: s[i - 1].input, prevOutput: s[i - 1].output };
     }
   }
