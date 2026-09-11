@@ -1,9 +1,9 @@
 {
   "as_of_date": "2026-09-11",
-  "published_at_ct": "2026-09-11T03:02:34-05:00",
-  "published_at_utc": "2026-09-11T08:02:34+00:00",
-  "run_id": "export-20260911T080139Z-9b0776e4",
-  "methodology_version": "v2.3.2",
+  "published_at_ct": "2026-09-11T07:14:30-05:00",
+  "published_at_utc": "2026-09-11T12:14:30+00:00",
+  "run_id": "export-20260911T121300Z-59e87170",
+  "methodology_version": "v2.3.3",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 70,
   "listings_history": {
@@ -19,7 +19,7 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 105268,
+    "total_rows": 105284,
     "window_days": 90,
     "window_end": "2026-09-11",
     "window_start": "2026-06-14"
@@ -43,7 +43,7 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 1309,
+    "total_rows": 1367,
     "window_days": 7,
     "window_end": "2026-09-11",
     "window_start": "2026-09-05"
@@ -71,7 +71,7 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 438,
+    "occupancy_cycles": 439,
     "occupancy_series_start": "2026-05-13",
     "runpod_occupancy_chips": [],
     "runpod_occupancy_cycles": 0,
