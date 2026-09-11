@@ -1,6 +1,6 @@
 {
- "as_of": "2026-07-31",
- "next_expected": "Oracle 10-Q FY27 Q1 (quarter ending August 31, 2026), expected mid-September 2026",
+ "as_of": "2026-09-11",
+ "next_expected": "Oracle 10-Q FY27 Q2 (quarter ending November 30, 2026), expected mid-December 2026",
  "companies": [
   {
    "key": "meta",
@@ -123,41 +123,42 @@
   {
    "key": "oracle",
    "name": "Oracle",
-   "latest_filing": "10-K FY2026 (period 2026-05-31), acc 0001193125-26-277521",
-   "prior_filing": "10-K FY2022 (period 2022-05-31), acc 0001564590-22-023675 — earliest comparable for leases",
+   "latest_filing": "10-Q FY27 Q1 (period 2026-08-31), acc 0001193125-26-389274",
+   "prior_filing": "10-K FY2026 (period 2026-05-31), acc 0001193125-26-277521",
    "leases_nyc": {
     "v": 260.0,
     "w": "May-26",
     "pv": 4.1,
     "pw": "May-22",
-    "note": "terms 15–19 yrs, commencing FY27–FY29; includes a lease with $3.3B guarantee of the lessor's borrowing (matures Sep-26)"
+    "note": "terms 15–19 yrs, commencing FY27–FY29; includes a lease with $3.3B guarantee of the lessor's borrowing (matures Sep-26); the 10-Q restates no pipeline figure and refers to the 10-K, so May-26 stands"
    },
    "purchase": {
-    "v": 13.31,
-    "w": "May-26",
-    "pv": null,
-    "pw": "",
-    "note": "unconditional, primarily data-center power; +$19B cloud-infrastructure purchase commitments signed after year-end (subsequent event)"
+    "v": 34.15,
+    "w": "Aug-26",
+    "pv": 13.31,
+    "pw": "May-26",
+    "note": "unconditional purchase and other obligations with terms of one year or more: cloud-infrastructure component supply and data-center power; the $19B signed after the May year-end now sits inside the figure"
    },
    "rpo": {
-    "v": 638.0,
-    "w": "May-26",
-    "pv": 138.0,
-    "pw": "May-25",
-    "note": "~12% expected to convert to revenue within 12 months; increase attributed to 'certain significant cloud contracts,' unnamed"
+    "v": 664.0,
+    "w": "Aug-26",
+    "pv": 638.0,
+    "pw": "May-26",
+    "note": "~13% expected to convert to revenue within 12 months, 37% in months 13-36, 34% in months 37-60; more than $30B of AI cloud contracts booked in the quarter; the issuer states the new contracts carry no incremental impact on its plans to raise capital"
    },
    "support": {
     "v": 3.3,
     "w": "May-26",
     "label": "guarantee of a lessor's borrowing within the lease pipeline"
    },
-   "ocf_ttm": 32.0,
+   "ocf_ttm": 46.96,
    "visible": {
-    "debt": 130.11,
-    "leases": 37.89,
-    "w": "May-26",
-    "note": "debt = $130.11B total senior notes and other borrowings (pre-adjustment; incl term loan $5.14B + CP $1.47B); op leases $30.19B + fin leases $7.70B"
-   }
+    "debt": 125.34,
+    "leases": 43.81,
+    "w": "Aug-26",
+    "note": "debt = balance-sheet notes payable and other borrowings, current $7.63B + non-current $117.71B (carrying; the 10-Q carries no debt-note face table); op leases $34.62B + fin leases $9.19B; $3.1B repaid in the quarter"
+   },
+   "quarter_note": "Q1 FY27: capex $28.5B GAAP ($18.0B net cash outlay after $11.4B of customer prepayments with a significant financing component and $0.8B supplier financing); $19.9B net common stock sold through the ATM program; free cash flow negative $5B (issuer non-GAAP); 850 MW of data-center capacity delivered; cloud infrastructure revenue $7.39B, +121%; RPO +$26B in the quarter"
   },
   {
    "key": "amazon",
