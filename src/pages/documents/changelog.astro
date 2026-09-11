@@ -15,10 +15,43 @@ import { meta } from '../../data/snapshot';
 // not named; membership is disclosed at class/count grain.
 const entries = [
   {
+    id: '260911-1',
+    date: '2026-09-11',
+    effective: '2026-09-11',
+    type: 'Provider change · realized',
+    restatement: 'None',
+    impact: 'Realized: blended H100 −0.7% (est. −0.8%) · blended H200 −2.1% · EU H200 −6.7% (est. −6.7%) · APAC H100 −1.1% (est. −1.0%) · EU H100 +1.0% on a statistic crossover, like for like −2.3% (est. −2.3%)',
+    title: 'v2.3.3 effective — realized decomposition',
+    body: [
+      `The four additions announced 2026-09-03 took effect at the
+       2026-09-11 fixing. Realized with/without on that fixing's own
+       rows, blended H100 on-demand rate: $3.58 with (n = 24) vs $3.61
+       without (n = 23), −0.7% composition. Day-over-day −0.8% is −0.7%
+       composition and −0.04% market on the incumbent panel; use $3.61
+       for the market leg across the boundary. Blended H200: $4.31 with
+       (n = 14) vs $4.40 without (n = 13), −2.1% composition, market
+       −0.03%.`,
+      `EU H200: $3.49 with (n = 7) vs $3.74 without (n = 6), −6.7%
+       composition, as estimated. APAC H100: $3.73 with (n = 7) vs $3.77
+       without (n = 5), −1.1%, as estimated. The market leg on both
+       cells was zero on the day. Two APAC one-month cells reached a
+       first provisional print on two sources each.`,
+      `The EU H100 cell crossed the ten-source line. A cell of ten or
+       more sources publishes the listing mean; below ten it publishes
+       the operator-equal median. With the addition the cell prints
+       $3.02 as a mean of ten. Without it the cell prints $2.99 as a
+       median of nine, so the published rule shows +1.0%. Like for like
+       the added card sits below the cell: mean against mean −1.1%,
+       median against median −2.3%, the estimated figure. No published
+       series crossed the material threshold. No comments were received
+       by the close.`,
+    ],
+  },
+  {
     id: '260903-1',
     date: '2026-09-03',
     effective: '2026-09-11',
-    type: 'Provider change · adopted',
+    type: 'Provider change · realized 2026-09-11',
     restatement: 'None',
     impact: 'T2 H100 OD blended: n 23 → 24, est. −0.8% · EU H100 −2.3%, EU H200 −6.7% · APAC H100 n 5 → 7, −1.0% · two APAC one-month cells first print',
     title: 'v2.3.3 — four sources proposed for the on-demand rate panel',
@@ -40,9 +73,9 @@ const entries = [
        material threshold. Realized with/without publishes at the
        effective fixing. Comments through 2026-09-10: research@ccir.io.`,
       `The comment window closed on 2026-09-10 with no comments received.
-       The four sources enter the panel at the 2026-09-11 fixing as
-       announced. The realized with/without is appended here after that
-       fixing.`,
+       The four sources entered the panel at the 2026-09-11 fixing as
+       announced. The realized with/without is the entry dated
+       2026-09-11.`,
     ],
   },
   {
