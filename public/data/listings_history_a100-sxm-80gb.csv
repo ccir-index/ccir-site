@@ -22861,8 +22861,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,3Y,NonInterruptible,Reserved,Other,Other,HIF,T2IF,T1,1.8984,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.3,panel,il-central-1
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-East,US,HIF,T2IF,T1,1.4647,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.3,panel,us-east-1
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,1.4647,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.3,panel,us-west-2
-2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.3691,False,,Available,v2.3.3,panel,ap-northeast-1a
-2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.0070,False,,Available,v2.3.3,panel,ap-northeast-1c
+2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.4495,False,,Available,v2.3.3,panel,ap-northeast-1a
+2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.0520,False,,Available,v2.3.3,panel,ap-northeast-1c
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.1171,False,,Available,v2.3.3,panel,ap-southeast-1a
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.1171,False,,Available,v2.3.3,panel,ap-southeast-1c
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T1,4.2864,False,,Available,v2.3.3,panel,eu-central-1a
@@ -22870,7 +22870,7 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,Other,Other,DIF,T2IF,T1,4.4467,False,,Available,v2.3.3,panel,il-central-1b
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.8811,False,,Available,v2.3.3,panel,us-east-1c
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.8933,False,,Available,v2.3.3,panel,us-east-1d
-2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.7436,False,,Available,v2.3.3,panel,us-west-2a
+2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.7483,False,,Available,v2.3.3,panel,us-west-2a
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.7455,False,,Available,v2.3.3,panel,us-west-2b
 2026-09-12,aws,a100-sxm-80gb,A100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.6119,False,,Available,v2.3.3,panel,us-west-2c
 2026-09-12,aws_capacity_blocks,a100-sxm-80gb,A100,80GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,US-East,US,HIF,T2IF,T1,2.2140,False,,Available,v2.3.3,term-panel,us-east-1
@@ -23321,6 +23321,7 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-12,koyeb,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,2.1500,False,,Available,v2.3.3,candidate,Multi
 2026-09-12,lambda,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-East,US,IIF,T3IF,T2,2.7900,True,local-nvme,Available,v2.3.3,panel,US
 2026-09-12,massed_compute,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-East,US,DIF,T3IF,T3,1.3800,False,,Available,v2.3.3,panel,US
+2026-09-12,oci,a100-sxm-80gb,A100,80GB,SXM,RoCE-v2,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T2IF,T1,4.0000,True,local-nvme;egress-capped;managed-ops-plane;support-tier;observability,Available,v2.3.3,panel,us-ashburn-1
 2026-09-12,paperspace,a100-sxm-80gb,A100,80GB,SXM,,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,3.1800,False,,Available,v2.3.3,panel,undisclosed
 2026-09-12,paperspace,a100-sxm-80gb,A100,80GB,SXM,,3Y,NonInterruptible,Reserved,Other,Other,SIF,T2IF,T2,1.1500,False,,Available,v2.3.3,panel,undisclosed
 2026-09-12,qubrid,a100-sxm-80gb,A100,80GB,SXM,Unknown,1Y,NonInterruptible,Reserved,Other,Other,SIF,T2IF,T2,1.2771,False,,Available,v2.3.3,panel,
@@ -23343,5 +23344,6 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-12,sesterce,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-West,US,IIF,T2IF,T2,3.0690,False,,SoldOut,v2.3.3,panel,phoenix-usa-2
 2026-09-12,sesterce,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-West,US,IIF,T2IF,T2,3.6080,False,,SoldOut,v2.3.3,panel,santaclara-usa-1
 2026-09-12,spheron,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-East,US,DIF,T3IF,T3,1.6905,False,,Available,v2.3.3,panel,us-1
+2026-09-12,vast_ai,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,0.9333,True,local-nvme,Available,v2.3.3,marketplace,"UNITED ARAB EMIRATES, AE"
 2026-09-12,vultr,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-East,US,SIF,T2IF,T2,2.8000,False,,Available,v2.3.3,panel,"New Jersey, US"
 2026-09-12,vultr,a100-sxm-80gb,A100,80GB,SXM,Unknown,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T2,1.4900,False,,Available,v2.3.3,panel,"New Jersey, US"
