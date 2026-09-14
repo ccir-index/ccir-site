@@ -11,7 +11,7 @@
 import Base from '../../layouts/Base.astro';
 import NoteFooter from '../../components/NoteFooter.astro';
 
-const AS_OF = '2026-09-08';
+const AS_OF = '2026-09-14';
 const PUBLISHED = '2026-09-02';
 
 const LINKS = {
@@ -25,6 +25,7 @@ const LINKS = {
   c0005: 'https://www.regulations.gov/comment/CFTC-2026-1850-0005',
   c0006: 'https://www.regulations.gov/comment/CFTC-2026-1850-0006',
   c0007: 'https://www.regulations.gov/comment/CFTC-2026-1850-0007',
+  c0008: 'https://www.regulations.gov/comment/CFTC-2026-1850-0008',
   setara: 'https://www.setarafinancial.com/',
 };
 
@@ -144,6 +145,22 @@ const LETTERS: Letter[] = [
       'Exchanges should publish "the historical relationship between the futures reference price and major categories of commercial compute contracts"; the Commission should monitor whether futures prices enter financing and valuation frameworks and produce procyclical effects.',
     ],
     note: 'Supports listing. The argument is that a hedge transfers price risk only: "the hedgeability of compute should not be equated with the bankability of the underlying project." No data, no index named. Carries an AI-assistance disclosure.',
+  },
+  {
+    date: '2026-09-11',
+    filer: 'Steven Singleton',
+    form: 'Comment, no attachment',
+    where: 'regulations.gov',
+    href: LINKS.c0008,
+    onDocket: 'Yes, CFTC-2026-1850-0008 (received Sep 11, posted Sep 14)',
+    topics: 'Oversight (Q2(b), 2(e), 2(g)) · customer protection (Q3(b)) · perpetual futures (Q4(b))',
+    asks: [
+      'The Commission should commit, "in a follow-up notice, to heightened review of self-certified compute filings until the open questions in Section II.2 are answered".',
+      '"Condition self-certification eligibility on public disclosure of the number and market share of rate-contributing providers feeding any settlement index."',
+      'Tie "any retail-facing compute contract to a specific, dated disclosure requirement".',
+      'Ask whether the payment mechanism for a perpetual contract "would rely on the same data inputs Question 2(b) already flags as provider-administered".',
+    ],
+    note: 'States: "None of this is a case for leaving compute derivatives unlisted indefinitely." The concern it names is sequencing.',
   },
 ];
 
@@ -350,7 +367,7 @@ const TOPICS: Topic[] = [
     <section class="sec" id="letters">
       <h2><span class="n">02</span> Comment letters</h2>
       <p class="lede-para">
-        Six comment letters are on the docket. The docket copy is the record.
+        Seven comment letters are on the docket. The docket copy is the record.
         Each card gives the filer's own asks, in the filer's own words, with a
         link to the docket. A letter posted elsewhere is listed apart until it
         is filed. Remarks to the press and at Commission meetings are in
