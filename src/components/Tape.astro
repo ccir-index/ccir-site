@@ -36,10 +36,9 @@ const short = (r: typeof ticks[number]) => {
 };
 
 // 30-day change: today's published HEADLINE vs the bundled history point
-// closest to 30 calendar days ago. Headline, not median — the headline stat is
-// the n>=10 mean on some series and the median on the rest, so a median-based
-// change contradicts the number /rates publishes on exactly the flagship cells
-// (2026-08-03: T2 H100 GTD OD US reads +7.2% on medians, +5.2% on headline).
+// closest to 30 calendar days ago. Headline, so the tape ties to what /rates
+// publishes: since v2.4.0 (2026-09-16) that is the operator-equal median at
+// every depth; the bundled history carries each day's headline as printed.
 // Returns null (→ flat glyph, no %) when there is no reference point at least
 // ~2 weeks back — bootstrap days or new series don't have a meaningful 30-day
 // window yet.
