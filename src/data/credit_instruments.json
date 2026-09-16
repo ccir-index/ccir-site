@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-09-07",
+    "as_of": "2026-09-16",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -6451,7 +6451,7 @@
       "id": "wulf-kentucky-plan",
       "collateral_class": "out",
       "exclude_from_issuance": true,
-      "exclude_reason": "Out of scope on two counts: data-center-campus financing (Kentucky 'Justified Data' campus, not GPUs) and status is rumored/planned — no launch or pricing as of 2026-07-26, so it isn't issued debt.",
+      "exclude_reason": "Out of scope on two counts: data-center-campus financing (Kentucky 'Justified Data' campus, not GPUs) and status is rumored/planned. No launch or pricing found as of 2026-09-16, so it is not issued debt.",
       "issuer": "TeraWulf Inc.",
       "ticker": "WULF",
       "issuer_type": "public",
@@ -6479,7 +6479,7 @@
         "date": "2026-07-09",
         "url": "https://www.bloomberg.com/news/articles/2026-07-09/terawulf-eyes-3-5-billion-for-anthropic-leased-data-center"
       },
-      "as_of": "2026-07-26"
+      "as_of": "2026-09-16"
     },
     {
       "issuer_type": "public",
@@ -6914,7 +6914,7 @@
       "name": "~$1B private short-dated debt (JPMorgan-arranged; chips leased to Microsoft)",
       "instrument_type": "credit_facility",
       "size_usd_m": 1000,
-      "size_note": "~$1B of private short-dated debt raised to buy NVIDIA AI chips Lambda will lease to Microsoft; arranged by JPMorgan Chase (Bloomberg 8/28/26; TechCrunch pickup). Press reads the short tenor as pricing rapid deployment and repayment from contracted lease cash flows. Terms, tenor, and lenders otherwise undisclosed; distinct from the May 2026 $1B facility and the $926M TLB.",
+      "size_note": "~$1B of private short-dated debt raised to buy NVIDIA AI chips Lambda will lease to Microsoft; arranged by JPMorgan Chase (Bloomberg 8/28/26; TechCrunch pickup). Press reads the short tenor as pricing rapid deployment and repayment from contracted lease cash flows. Terms, tenor, and lenders otherwise undisclosed; distinct from the May 2026 $1B facility and the $926M TLB. Re-checked 2026-09-16: no Lambda release or lender statement found; stays press.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -6935,7 +6935,7 @@
         "date": "2026-08-28",
         "url": "https://www.bloomberg.com/news/articles/2026-08-28/nvidia-backed-lambda-inks-1-billion-private-debt-for-chip-deal"
       },
-      "as_of": "2026-08-28",
+      "as_of": "2026-09-16",
       "offtaker_label": "Microsoft lease (per press)"
     },
     {
@@ -7711,7 +7711,7 @@
       "id": "prime-dc-nordic-bond-2026",
       "collateral_class": "landlord_spv",
       "exclude_from_issuance": true,
-      "exclude_reason": "Not issued: sale postponed 2026-07-13 (press); no relaunch found as of 2026-09-06.",
+      "exclude_reason": "Not issued: sale postponed 2026-07-13 (press); no relaunch found as of 2026-09-16.",
       "issuer": "Prime Data Centers LLC",
       "ticker": null,
       "issuer_type": "private",
@@ -7734,13 +7734,13 @@
       ],
       "status": "press",
       "issued": "Launched July 2026; postponed 2026-07-13",
-      "resolved": "Postponed 2026-07-13; no relaunch found as of 2026-09-06",
+      "resolved": "Postponed 2026-07-13; no relaunch found as of 2026-09-16",
       "source": {
         "doc": "Bloomberg 'Prime Data Centers Delays Sale of $500 Million Nordic Bond' (2026-07-13)",
         "date": "2026-07-13",
         "url": "https://www.bloomberg.com/news/articles/2026-07-13/prime-data-centers-delays-planned-500-million-nordic-bond-sale"
       },
-      "as_of": "2026-09-06",
+      "as_of": "2026-09-16",
       "offtaker_label": "Not stated",
       "exclude_from_totals": true
     },
@@ -8075,8 +8075,8 @@
       "issuer_type": "private",
       "collateral_class": "landlord_spv",
       "exclude_from_issuance": true,
-      "exclude_reason": "Not closed: advanced talks per WSJ/CNBC 2026-07-30; no close found as of 2026-09-06.",
-      "as_of": "2026-09-06",
+      "exclude_reason": "Not closed: advanced talks per WSJ/CNBC 2026-07-30; no close found as of 2026-09-16.",
+      "as_of": "2026-09-16",
       "maturity_note": "Undisclosed",
       "facility_ratings": [],
       "id": "nexus-hubbard-bank-2026",
@@ -8112,8 +8112,8 @@
       "issuer_type": "private",
       "collateral_class": "landlord_spv",
       "exclude_from_issuance": true,
-      "exclude_reason": "Not launched: Goldman Sachs sounding out investors 2026-08-19; expected in market September 2026.",
-      "as_of": "2026-09-06",
+      "exclude_reason": "Not launched: Goldman Sachs sounding out investors 2026-08-19; expected in market September 2026. Re-checked 2026-09-16: no launch or pricing found.",
+      "as_of": "2026-09-16",
       "maturity_note": "Undisclosed",
       "facility_ratings": [],
       "id": "digital-drive-coreweave-bond-2026",
