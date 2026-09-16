@@ -52,7 +52,7 @@ The published file carries the operator-segment series set out in section 06. An
 
 ## 05 Windows and Composition Stability
 
-Each cell is computed on the shortest observation window that meets the publication threshold in section 04: one day, else three days, else seven. A cell whose single day of data falls short of the threshold widens its window rather than publish thin. The window actually used is stamped on every row (`headline_window_days`), with the source and observation counts at each horizon. Panel membership is versioned; when a panel member transiently fails collection, its last-good price carries forward for at most seven days so one missed scrape does not change a series' composition. Members absent beyond that exit the cell.
+Each cell is computed on the shortest observation window that meets the publication threshold in section 04: one day, else three days, else seven. A cell whose single day of data falls short of the threshold widens its window rather than publish thin. The window actually used is stamped on every row (`headline_window_days`), with the source and observation counts at each horizon. Panel membership is versioned; when a hyperscaler or neocloud panel member transiently fails collection, its last-good price carries forward for at most three days so one missed scrape does not change a series' composition; marketplace absences take effect the same day. Members absent beyond that exit the cell.
 
 ## 06 Series Grammar
 
