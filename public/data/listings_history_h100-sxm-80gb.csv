@@ -31122,36 +31122,36 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-East,US,HIF,T1IF,T1,2.9722,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.3,panel,us-east-2
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-West,US,HIF,T1IF,T1,3.7152,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.3,panel,us-west-1
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-West,US,HIF,T1IF,T1,2.9722,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.3,panel,us-west-2
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,2.7995,False,,Available,v2.3.3,panel,ap-northeast-1a
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,2.8264,False,,Available,v2.3.3,panel,ap-northeast-1c
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,2.8010,False,,Available,v2.3.3,panel,ap-northeast-1a
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,2.8286,False,,Available,v2.3.3,panel,ap-northeast-1c
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,1.5164,False,,Available,v2.3.3,panel,ap-northeast-2a
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,2.3500,False,,Available,v2.3.3,panel,ap-south-1a
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,2.3646,False,,Available,v2.3.3,panel,ap-south-1b
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,2.3515,False,,Available,v2.3.3,panel,ap-south-1a
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,2.3658,False,,Available,v2.3.3,panel,ap-south-1b
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,2.4776,False,,Available,v2.3.3,panel,ap-south-1c
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,8.9440,False,,Available,v2.3.3,panel,ap-southeast-2a
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,3.2437,False,,Available,v2.3.3,panel,ap-southeast-2b
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,6.7687,False,,Available,v2.3.3,panel,ap-southeast-2c
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,7.4989,False,,Available,v2.3.3,panel,ap-southeast-3a
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,3.2549,False,,Available,v2.3.3,panel,ap-southeast-2b
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,6.6684,False,,Available,v2.3.3,panel,ap-southeast-2c
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,7.4971,False,,Available,v2.3.3,panel,ap-southeast-3a
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,Other,Other,DIF,T2IF,T1,2.1941,False,,Available,v2.3.3,panel,ca-central-1d
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T1,1.5017,False,,Available,v2.3.3,panel,eu-north-1c
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T1,1.4701,False,,Available,v2.3.3,panel,eu-north-1c
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T1,8.9440,False,,Available,v2.3.3,panel,eu-west-2a
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T1,2.3319,False,,Available,v2.3.3,panel,eu-west-2b
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T1,2.3813,False,,Available,v2.3.3,panel,eu-west-2c
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,Other,Other,DIF,T2IF,T1,9.6911,False,,Available,v2.3.3,panel,sa-east-1c
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T1,2.3285,False,,Available,v2.3.3,panel,eu-west-2b
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T1,2.3922,False,,Available,v2.3.3,panel,eu-west-2c
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,Other,Other,DIF,T2IF,T1,9.6951,False,,Available,v2.3.3,panel,sa-east-1c
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.6295,False,,Available,v2.3.3,panel,us-east-1a
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5930,False,,Available,v2.3.3,panel,us-east-1b
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5937,False,,Available,v2.3.3,panel,us-east-1b
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.6295,False,,Available,v2.3.3,panel,us-east-1c
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5875,False,,Available,v2.3.3,panel,us-east-1d
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5942,False,,Available,v2.3.3,panel,us-east-1e
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5898,False,,Available,v2.3.3,panel,us-east-1d
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5944,False,,Available,v2.3.3,panel,us-east-1e
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5559,False,,Available,v2.3.3,panel,us-east-1f
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5287,False,,Available,v2.3.3,panel,us-east-2a
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5578,False,,Available,v2.3.3,panel,us-east-2b
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5337,False,,Available,v2.3.3,panel,us-east-2c
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.8729,False,,Available,v2.3.3,panel,us-west-1c
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.6014,False,,Available,v2.3.3,panel,us-west-2a
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.5501,False,,Available,v2.3.3,panel,us-west-2b
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5307,False,,Available,v2.3.3,panel,us-east-2a
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5592,False,,Available,v2.3.3,panel,us-east-2b
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,2.5329,False,,Available,v2.3.3,panel,us-east-2c
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.8794,False,,Available,v2.3.3,panel,us-west-1c
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.6025,False,,Available,v2.3.3,panel,us-west-2a
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.5510,False,,Available,v2.3.3,panel,us-west-2b
 2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.5850,False,,Available,v2.3.3,panel,us-west-2c
-2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.6073,False,,Available,v2.3.3,panel,us-west-2d
+2026-09-16,aws,h100-sxm-80gb,H100,80GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,2.6075,False,,Available,v2.3.3,panel,us-west-2d
 2026-09-16,aws_capacity_blocks,h100-sxm-80gb,H100,80GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,Other,Other,HIF,T2IF,T1,4.7200,False,,Available,v2.3.3,term-panel,non-us
 2026-09-16,aws_capacity_blocks,h100-sxm-80gb,H100,80GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,US-East,US,HIF,T2IF,T1,5.1910,False,,Available,v2.3.3,term-panel,us-east-1
 2026-09-16,azure,h100-sxm-80gb,H100,80GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,APAC,APAC,HIF,T1IF,T1,17.8250,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.3.3,panel,australiaeast
@@ -31662,9 +31662,11 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-16,seeweb,h100-sxm-80gb,H100,80GB,SXM,Unknown,1Y,NonInterruptible,Reserved,EU,EU,SIF,T2IF,T2,1.8578,False,,Available,v2.3.3,panel,EU-IT
 2026-09-16,seeweb,h100-sxm-80gb,H100,80GB,SXM,Unknown,3M,NonInterruptible,Reserved,EU,EU,SIF,T2IF,T2,2.0770,False,,Available,v2.3.3,panel,EU-IT
 2026-09-16,seeweb,h100-sxm-80gb,H100,80GB,SXM,Unknown,6M,NonInterruptible,Reserved,EU,EU,SIF,T2IF,T2,1.9616,False,,Available,v2.3.3,panel,EU-IT
+2026-09-16,sesterce,h100-sxm-80gb,H100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-South,US,IIF,T2IF,T2,4.6090,False,,Available,v2.3.3,panel,austin-usa-1
 2026-09-16,shakti_cloud,h100-sxm-80gb,H100,80GB,SXM,,OnDemand,NonInterruptible,OnDemand,APAC,APAC,SIF,T2IF,T2,3.7073,False,,Available,v2.3.3,panel,IN
 2026-09-16,shakti_cloud,h100-sxm-80gb,H100,80GB,SXM,IB-Unspecified,1M,NonInterruptible,Reserved,APAC,APAC,SIF,T2IF,T2,3.6578,False,,Available,v2.3.3,panel,IN
 2026-09-16,spheron,h100-sxm-80gb,H100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,EU,EU,DIF,T3IF,T3,5.0700,False,,Available,v2.3.3,panel,eu-north-1
+2026-09-16,spheron,h100-sxm-80gb,H100,80GB,SXM,Unknown,OnDemand,Interruptible,Spot,EU,EU,DIF,T3IF,T3,2.9430,False,,Available,v2.3.3,panel,eu-north-1
 2026-09-16,stackit,h100-sxm-80gb,H100,80GB,SXM,,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T2IF,T2,9.2790,False,,Available,v2.3.3,candidate,EU01 (DE)
 2026-09-16,taiga_cloud,h100-sxm-80gb,H100,80GB,SXM,,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T2IF,T2,2.6000,False,,Available,v2.3.3,panel,EU
 2026-09-16,tensordock,h100-sxm-80gb,H100,80GB,SXM,Unknown,1M,NonInterruptible,Reserved,Other,Other,DIF,T3IF,T3,2.0000,False,,Available,v2.3.3,panel,
@@ -31677,6 +31679,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-16,upcloud,h100-sxm-80gb,H100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T2IF,T2,2.0655,False,,Available,v2.3.3,panel,EU-FI
 2026-09-16,upcloud,h100-sxm-80gb,H100,80GB,SXM,Unknown,OnDemand,Interruptible,Spot,EU,EU,DIF,T2IF,T2,2.0539,False,,Available,v2.3.3,panel,EU-FI
 2026-09-16,vast_ai,h100-sxm-80gb,H100,80GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,APAC,APAC,DIF,T3IF,T3,2.1533,True,local-nvme,Available,v2.3.3,marketplace,"AUSTRALIA, AU"
+2026-09-16,vast_ai,h100-sxm-80gb,H100,80GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,EU,EU,DIF,T3IF,T3,1.8000,True,local-nvme,Available,v2.3.3,marketplace,"GERMANY, DE"
+2026-09-16,vast_ai,h100-sxm-80gb,H100,80GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-West,US,DIF,T3IF,T3,1.7867,True,local-nvme,Available,v2.3.3,marketplace,"IDAHO, US"
 2026-09-16,vast_ai,h100-sxm-80gb,H100,80GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,APAC,APAC,DIF,T3IF,T3,2.4000,True,local-nvme,Available,v2.3.3,marketplace,"TAIWAN, TW"
 2026-09-16,vast_ai,h100-sxm-80gb,H100,80GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-West,US,DIF,T3IF,T3,1.7333,True,local-nvme,Available,v2.3.3,marketplace,"WASHINGTON, US"
 2026-09-16,voltage_park,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,US-East,US,SIF,T3IF,T2,1.9900,True,free-egress;support-tier,SoldOut,v2.3.3,panel,US
