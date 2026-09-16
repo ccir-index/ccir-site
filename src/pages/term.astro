@@ -15,12 +15,12 @@ import TermCurveChart from '../components/TermCurveChart.astro';
 import HyperscalerTermChart from '../components/HyperscalerTermChart.astro';
 import { meta } from '../data/snapshot';
 import { CHIPS } from '../data/chips';
-// Implied-forwards section CUT (John 2026-07-02): with the par curve's OD
-// anchor moving to the pooled NEOCLOUD band OD (apples-to-apples), the
-// derived step chart adds confusion without adding signal for most readers.
-// The within-provider forwards DATA still ships in committed_mi.csv and
-// ForwardStepChart.astro (already rewired to it) stays in src/components —
-// reinstating is one import + one tag.
+// Implied-forwards section CUT (John 2026-07-02) and the metric itself
+// RETIRED (John 2026-09-16, v2.4.0): subtracting one contract's total from
+// the next only yields a marginal-period price when both carry the same
+// discount per hour, and posted ladders do not. committed_mi.csv now ships
+// spread_to_spot only; ForwardStepChart.astro stays in src/components as a
+// record and must not be reinstated without a new ruling.
 ---
 <Base
   title="GPU Reserved & Committed Pricing — 1M to 3Y Term Structure · CCIR"

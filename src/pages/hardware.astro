@@ -314,8 +314,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <details class="ivnote-d">
       <summary>Model assumptions & sensitivity</summary>
       <p class="ivnote">
-        Base case: year 1 at the 1Y committed rate; years 2–3 bootstrapped
-        from the 2Y/3Y committed curve; 18%/yr decay beyond the last
+        Base case: the posted committed rate of the longest observed tenor,
+        flat over the years that contract covers (a 3Y contract pays the 3Y
+        rate for three years); 18%/yr decay beyond the last
         observed tenor of each chip's curve, a measured base calibrated
         to the realized decline of prior-generation rates (Method); 75%
         utilization; 65% net margin after power, colocation, and operations;
@@ -647,8 +648,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         is a discounted-cash-flow over the income a deployed unit can
         contract for, with every leg either observable or disclosed. The
         observable legs: the CRI T2 US guaranteed on-demand headline as the
-        spot rate, and the neocloud committed term curve (1Y/2Y/3Y
-        per-operator median discounts) pricing years one through three.
+        spot rate, and the neocloud committed term curve (per-operator
+        median discounts by tenor), whose longest observed tenor prices the
+        years that contract covers at its posted rate.
         The curve is the market's own price for locked duration, not a
         forecast. The
         assumed legs are printed with the figure: decay beyond the curve,

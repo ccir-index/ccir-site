@@ -54,20 +54,21 @@ const IV_SPEC = [
 function ivValue(spot: number, d: Record<string, number>, r: number, life: number, age: number,
                  g = IV_BASE.g, u = IV_BASE.u, m = IV_BASE.m): number {
   const c = (T: string) => spot * (1 - d[T]!);
-  // Bootstrap yearly average rates off the committed curve; decay applies
-  // beyond the LAST OBSERVED tenor (year 3 where the curve reaches 3Y,
-  // year 1 where it stops at 1Y) — never a flat extension of missing tenors.
-  // 2026-08-21 (John, option A): when no 1Y pair prints, year 1 is
-  // bootstrapped from the LONGEST observed shorter tenor (6M, then 3M,
-  // then 1M) and decay applies from year 1 — one more rung of the same
-  // disclosed-degradation rule that already handles a curve stopping at
-  // 1Y or 2Y. The card says "curve to 6M". Spot alone is never the anchor.
-  const shortT = (['6M', '3M', '1M'] as const).find((t) => d[t] != null);
-  const y1 = d['1Y'] != null ? c('1Y') : shortT ? c(shortT) : spot;
-  const y2 = d['2Y'] != null ? 2 * c('2Y') - y1 : d['3Y'] != null ? (3 * c('3Y') - y1) / 2 : y1;
-  const y3 = d['3Y'] != null && d['2Y'] != null ? 3 * c('3Y') - 2 * c('2Y') : y2;
+  // 2026-09-16 (John, v2.4.0): the rate leg is the posted committed ask of
+  // the LONGEST observed tenor, flat over the years that contract covers
+  // (a 3Y contract pays the 3Y rate for three years). No marginal-year
+  // arithmetic: subtracting one contract's total from the next only yields
+  // a marginal-period rate when both carry the same discount per hour, and
+  // posted ladders load more prepay, credit and volume value into the
+  // longer commit, so the bootstrapped years 2-3 read far below any price
+  // anyone sells. Decay applies beyond the last observed tenor (year 3
+  // where the curve reaches 3Y, year 1 where it stops at 1Y); a curve that
+  // stops short of 1Y uses its longest posted tenor (6M, 3M, 1M) for year 1
+  // (2026-08-21 rule). Spot alone is never the anchor.
+  const longT = (['3Y', '2Y', '1Y', '6M', '3M', '1M'] as const).find((t) => d[t] != null);
+  const flat = longT ? c(longT) : spot;
   const lastYr = d['3Y'] != null ? 3 : d['2Y'] != null ? 2 : 1;
-  const yObs = [y1, y2, y3];
+  const yObs = [flat, flat, flat];
   const rem = Math.max(0, life - age);
   const full = Math.floor(rem), frac = rem - full;
   let pv = 0;
