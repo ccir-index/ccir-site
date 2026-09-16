@@ -34,7 +34,7 @@ Capture runs on a per-source schedule, from once a day to hourly, set by how oft
 
 Aggregation is **operator-equal**: one source, one vote. A provider's multiple qualifying listings in a cell are reduced to a per-source value first, the median across the locations it posts within that cell, so neither a provider's listing count nor the number of locations it serves moves a series.
 
-The headline statistic per cell follows a disclosed rule: **mean when the panel has ten or more sources (n ≥ 10), median below that**. The statistic actually used is stamped on every row (`headline_stat`), and every cell publishes its source count *n*, observation count, and interquartile range alongside the headline value.
+The headline statistic per cell is the **operator-equal median at every panel depth**. The statistic is stamped on every row (`headline_stat`), the listing mean publishes beside it for readers who want it, and every cell publishes its source count *n*, observation count, and interquartile range alongside the headline value.
 
 **Publication threshold.** A cell publishes when at least three independent sources contribute to it and it holds at least five observations. Cells below that threshold are computed and retained, and they do not publish. Two breakout classes publish at two sources rather than being withheld: regional cuts and committed-term cuts, where a thin panel is the true state of an emerging market. Those cells carry `promotion_status` of `Provisional`; cells clearing the full threshold carry `Published`.
 
