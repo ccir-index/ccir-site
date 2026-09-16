@@ -10,10 +10,33 @@ import { meta } from '../../data/snapshot';
 // repository's log; this page carries what a reader of the series needs.
 
 // Announcement fields: id (YYMMDD-N), announced, effective, type,
-// restatement (CCIR series are forward-only — always "None"), impact
+// restatement ("None" for a forward-only change; the version and range for a restatement), impact
 // (estimated at announcement; realized appended), summary. Providers are
 // not named; membership is disclosed at class/count grain.
 const entries = [
+  {
+    id: '260918-1',
+    date: '2026-09-18',
+    effective: '2026-09-18',
+    type: 'Methodology version · restatement',
+    restatement: 'Full record from 2026-04-24 republished under v2.4.0',
+    impact: 'Headline on-demand medians unchanged in the recent record · regional cells re-cut by posted location · hyperscaler EU cells publish for the first time',
+    title: 'v2.4.0 — one construction across the record',
+    body: [
+      `Each daily print now reports the prior complete day in Central
+       time and is dated that day. Distinct products a provider posts on
+       one chip are distinct listings; the sizes of one product are one
+       listing, priced at the eight-GPU node where posted. A listing
+       prices the region of its posted location, whichever provider posts
+       it, so hyperscaler capacity in Europe prices the European cells.
+       Every marketplace enters on the same terms.`,
+      `The published record from 2026-04-24 was recomputed under these
+       rules and republished in full. Series identifiers are unchanged and
+       every row carries the version. The implied-forward metric of the
+       committed-term intelligence file is retired; the ladder and each
+       operator's discount to its own on-demand rate remain.`,
+    ],
+  },
   {
     id: '260911-1',
     date: '2026-09-11',
@@ -294,9 +317,9 @@ const entries = [
         The record of changes to what the published series measure.
         Pending changes are announced with an estimated impact and a
         comment window; the realized impact is appended at the effective
-        fixing. CCIR series are forward-only — no restatements. The
-        <a href="/documents/change-management">Change Management Policy</a>
-        governs classification. Comments:
+        fixing. Changes apply forward. A restatement is rare, is recorded
+        here with the version every republished row carries, and follows the
+        <a href="/documents/change-management">Change Management Policy</a>. Comments:
         <a href="mailto:research@ccir.io">research@ccir.io</a>.
       </p>
     </PageHeader>

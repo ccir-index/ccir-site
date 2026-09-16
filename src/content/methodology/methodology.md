@@ -18,7 +18,7 @@ Series are segmented by the class of operator posting the price, not by hardware
 
 - **Hyperscaler** — integrated cloud majors (list rate cards).
 - **Neocloud** — GPU-specialist clouds selling dedicated capacity.
-- **Marketplace** — multi-seller venues and aggregated marketplaces.
+- **Marketplace** — multi-seller venues and aggregated marketplaces. Every marketplace enters on the same terms; capacity a venue resells from another panel member is excluded.
 
 In series identifiers these carry the tokens `T1` / `T2` / `T3` respectively.
 
@@ -26,11 +26,13 @@ In series identifiers these carry the tokens `T1` / `T2` / `T3` respectively.
 
 Prices are collected automatically from each provider's public pricing pages or application programming interfaces (APIs). Each observation records the provider, chip, posted price, and its axes (form factor, interruptibility, commitment term, region). Raw observations are archived; published series are aggregates.
 
-Capture runs on a per-source schedule, from once a day to hourly, set by how often a surface can be read without burdening it. **Every series is a daily series**: each cell publishes one value per day, and a source's readings within that day reduce to a single per-source value before the headline is computed. Capture frequency is an operational parameter rather than part of a series definition, so a change to it is not a series break.
+Capture runs on a per-source schedule, from once a day to hourly, set by how often a surface can be read without burdening it. **Every series is a daily series**: each cell publishes one value per day from every reading collected on that day, midnight to midnight Central time, and a source's readings within the day reduce to a single per-source value before the headline is computed. Capture frequency is an operational parameter rather than part of a series definition, so a change to it is not a series break.
+
+**What counts as one listing.** Distinct products a provider posts on one chip and term are distinct listings: a different fabric, machine family, or deployment model is a different product. The sizes of one product are one listing, priced per GPU at the eight-GPU node where the provider posts one, else at its largest posted node. Marketplace offers are recorded one per offer.
 
 ## 04 Aggregation and the Headline Statistic
 
-Aggregation is **operator-equal**: one source, one vote. A provider's multiple qualifying listings in a cell are reduced to a per-source value first, so no provider's listing count moves a series.
+Aggregation is **operator-equal**: one source, one vote. A provider's multiple qualifying listings in a cell are reduced to a per-source value first, the median across the locations it posts within that cell, so neither a provider's listing count nor the number of locations it serves moves a series.
 
 The headline statistic per cell follows a disclosed rule: **mean when the panel has ten or more sources (n ≥ 10), median below that**. The statistic actually used is stamped on every row (`headline_stat`), and every cell publishes its source count *n*, observation count, and interquartile range alongside the headline value.
 
@@ -69,8 +71,8 @@ Example:  CRI-T2-H100-ALL-GTD-OD-US
           Neocloud · H100 · guaranteed on-demand · United States
 ```
 
-`ALL` on any axis means that axis is pooled for that series. `Other` on the region axis collects posted locations outside the three named regions; it is a residual, and it is never a substitute for a named region. `OAM` is the Open Accelerator Module form factor. The reference ladder on [/rates](/rates) shows the guaranteed on-demand US cut per chip and segment, with each cell's series identifier printed beneath the rate.
+`ALL` on any axis means that axis is pooled for that series. A listing prices the region of its posted location, whichever provider posts it; a hyperscaler's European capacity prices Europe. `Other` on the region axis collects posted locations outside the three named regions; it is a residual, and it is never a substitute for a named region. A listing with no posted location falls back to its provider's home region. `OAM` is the Open Accelerator Module form factor. The reference ladder on [/rates](/rates) shows the guaranteed on-demand US cut per chip and segment, with each cell's series identifier printed beneath the rate.
 
 ## 07 Publication, History, Restatement
 
-Series publish daily by 07:30 Eastern Time (ET) at ccir.io. History is append-only with a methodology version stamped on every row. A daily value finalizes at the close of its publication day; recomputation before finalization under a logged change is not a restatement. After finalization, no value changes silently. When a defect or a material methodology change requires it, history is restated — republished in full under the current version — per the [Change Management Policy](/documents/change-management).
+Series publish daily by 07:30 Eastern Time (ET) at ccir.io. Each print reports the prior complete day in Central time and is dated that day. History is append-only with a methodology version stamped on every row. A value is final when it publishes. After that, no value changes silently. When a defect or a material methodology change requires it, history is restated and republished in full under the current version, per the [Change Management Policy](/documents/change-management). The record from 2026-04-24 was republished in full under v2.4.0; see the [change log](/documents/changelog).
