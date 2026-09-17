@@ -37,7 +37,13 @@ jobs:
           GH_PAT: ${{ secrets.CCIR_V2_DATA_READ_PAT }}
         run: |
           set -euo pipefail
-          DATE=$(TZ=America/Chicago date +%F)
+          # 2026-09-17: complete-day fixing (methodology v2.4.0). The 07:30 CT
+          # run prices the Central day that ended at midnight and files the
+          # snapshot under THAT date, so the print to fetch today is dated
+          # yesterday (FIXING_LAG_DAYS = 1 in the pipeline). Before this the
+          # sync looked for today's date, found nothing, and served the prior run.
+          TODAY=$(TZ=America/Chicago date +%F)
+          DATE=$(TZ=America/Chicago date -d "$TODAY -1 day" +%F)
           PREV=$(TZ=America/Chicago date -d "$DATE -1 day" +%F)
           echo "date=$DATE" >> "$GITHUB_OUTPUT"
           echo "prev=$PREV" >> "$GITHUB_OUTPUT"

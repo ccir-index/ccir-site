@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { printLine } from '../lib/printline';
 import PageHeader from '../components/PageHeader.astro';
 import CiteBlock from '../components/CiteBlock.astro';
 import TermCurveChart from '../components/TermCurveChart.astro';
@@ -44,7 +45,7 @@ import { CHIPS } from '../data/chips';
     isAccessibleForFree: true,
   })} />
   <section class="wrap page-top">
-    <PageHeader title="Committed Term Structure" kicker="Market Intelligence · Committed Term" asOf={meta.as_of_date}>
+    <PageHeader title="Committed Term Structure" kicker="Market Intelligence · Committed Term" asOfLabel="fixing day" asOf={printLine(meta)}>
       <p class="standfirst">
         The price of guaranteed capacity, by tenor. Posted committed asks from
         one month to three years, and the discount each tenor carries to

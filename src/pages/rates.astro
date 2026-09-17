@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { printLine } from '../lib/printline';
 import PageHeader from '../components/PageHeader.astro';
 import CiteBlock from '../components/CiteBlock.astro';
 import ChipLink from '../components/ChipLink.astro';
@@ -84,7 +85,7 @@ function cellTitle(c: Rate): string {
     isAccessibleForFree: true,
   })} />
   <section class="wrap page-top">
-    <PageHeader title="Reference Rates" kicker="Benchmark · US &amp; EU" asOf={meta.as_of_date}>
+    <PageHeader title="Reference Rates" kicker="Benchmark · US &amp; EU" asOfLabel="fixing day" asOf={printLine(meta)}>
       <p class="standfirst">
         Guaranteed and interruptible on-demand reference rates per chip,
         across the three operator segments. Every cell is a published,
@@ -99,7 +100,7 @@ function cellTitle(c: Rate): string {
     <div class="table-wrap">
       <div class="table-head">
         <span class="th-scope">On-demand, guaranteed · US &amp; EU</span>
-        <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
+        <span class="th-meta">USD/GPU-hr · daily · fixing day {meta.as_of_date}</span>
       </div>
       <table class="data ladder-table">
         <thead>
@@ -144,7 +145,7 @@ function cellTitle(c: Rate): string {
       <div class="table-wrap int-wrap">
         <div class="table-head">
           <span class="th-scope">On-demand, interruptible · US &amp; EU</span>
-          <span class="th-meta">USD/GPU-hr · daily · as of {meta.as_of_date}</span>
+          <span class="th-meta">USD/GPU-hr · daily · fixing day {meta.as_of_date}</span>
         </div>
         <table class="data ladder-table">
           <thead>

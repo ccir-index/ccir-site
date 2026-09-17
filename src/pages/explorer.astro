@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { printLine } from '../lib/printline';
 import PageHeader from '../components/PageHeader.astro';
 import { headlineRates, meta, headlineStatOf, seriesHistory } from '../data/snapshot';
 import { TIERS, TIER_LABELS, REGION_LABELS } from '../data/types';
@@ -99,7 +100,7 @@ const rows = source.map((r) => ({
   ogImage="/og/explorer.png"
 >
   <section class="wrap page-top">
-    <PageHeader title="The Whole Market, Unfiltered" kicker="Series Explorer" asOf={meta.as_of_date} />
+    <PageHeader title="The Whole Market, Unfiltered" kicker="Series Explorer" asOfLabel="fixing day" asOf={printLine(meta)} />
     <p class="standfirst lede">
       Every grain we track: {rows.length} series across {chips.length} chips
       and three operator segments, broken out by form, interruptibility, and
