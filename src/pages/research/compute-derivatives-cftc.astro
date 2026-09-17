@@ -11,7 +11,7 @@
 import Base from '../../layouts/Base.astro';
 import NoteFooter from '../../components/NoteFooter.astro';
 
-const AS_OF = '2026-09-14';
+const AS_OF = '2026-09-17';
 const PUBLISHED = '2026-09-02';
 
 const LINKS = {
@@ -26,6 +26,7 @@ const LINKS = {
   c0006: 'https://www.regulations.gov/comment/CFTC-2026-1850-0006',
   c0007: 'https://www.regulations.gov/comment/CFTC-2026-1850-0007',
   c0008: 'https://www.regulations.gov/comment/CFTC-2026-1850-0008',
+  c0010: 'https://www.regulations.gov/comment/CFTC-2026-1850-0010',
   setara: 'https://www.setarafinancial.com/',
 };
 
@@ -161,6 +162,22 @@ const LETTERS: Letter[] = [
       'Ask whether the payment mechanism for a perpetual contract "would rely on the same data inputs Question 2(b) already flags as provider-administered".',
     ],
     note: 'States: "None of this is a case for leaving compute derivatives unlisted indefinitely." The concern it names is sequencing.',
+  },
+  {
+    date: '2026-09-15',
+    filer: 'Capital Markets & Technology Partners (John J. Rapa)',
+    form: 'Comment letter, 20-page attachment',
+    where: 'regulations.gov',
+    href: LINKS.c0010,
+    onDocket: 'Yes, CFTC-2026-1850-0010 (received Sep 15, posted Sep 16)',
+    topics: 'Cash markets (Q1) · index methodology and oversight (Q2) · perpetual futures (Q4)',
+    asks: [
+      'A central reporting authority for bilateral cash-market transactions, with "current and historical price data, publicly available"; "the independence of the reporting authority from the entities that it measures will be key, going forward".',
+      '"Transparency and oversight of Compute Futures index providers, their index calculation methodologies and transparency of settlement pricing."',
+      'DCMs should have "robust systems, processes and procedures to identify, detect and capture Compute Futures index transactions posted by index providers and surveil them for irregularities".',
+      'Perpetual contracts "will function more like swaps products and their structures should be more closely evaluated by the Commission".',
+    ],
+    note: 'Concludes that "the present underlying market is not ready to support listed derivatives", on concentration grounds: ten operators holding two thirds of one GPU generation, cited to a third-party report. Describes the announced exchange products and their index administrator. Carries a no-AI disclosure.',
   },
 ];
 
