@@ -1202,38 +1202,6 @@
       "as_of": "2026-06-30"
     },
     {
-      "id": "nbis-legacy-2025",
-      "collateral_class": "out",
-      "exclude_from_issuance": true,
-      "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
-      "issuer": "Nebius Group N.V.",
-      "ticker": "NBIS",
-      "issuer_type": "public",
-      "entity": null,
-      "name": "Legacy 0.75% converts due Mar 2025 (Yandex-era residual)",
-      "instrument_type": "convertible",
-      "size_usd_m": 5.3,
-      "size_note": "$5.3M residual payable; matured",
-      "rate": {
-        "kind": "fixed",
-        "value": 0.75,
-        "note": null
-      },
-      "maturity": "2025-03-03 (matured)",
-      "maturity_note": null,
-      "seniority": "Senior unsecured",
-      "security": null,
-      "lenders": [],
-      "status": "confirmed",
-      "issued": "2020-03-03",
-      "source": {
-        "doc": "FY2025 20-F Note 12",
-        "date": "2026-04-30",
-        "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926052948/nbis-20251231x20f.htm"
-      },
-      "as_of": "2026-03-31"
-    },
-    {
       "id": "wulf-notes-7750-2030",
       "collateral_class": "operator_campus",
       "issuer": "TeraWulf Inc.",
@@ -1853,31 +1821,31 @@
       "issuer": "ChronoScale Holdings Corporation",
       "ticker": "CHRN",
       "issuer_type": "public",
-      "entity": "ChronoScale Holdings Corporation (assumed from Ekso Bionics Holdings)",
+      "entity": "Borrower: ChronoScale Intermediate, LLC (f/k/a Ekso Bionics Holdings, Inc. and ChronoScale Corporation), Nevada LLC; Guarantor: Ekso Bionics, Inc. (Delaware). Both wholly owned subsidiaries of ChronoScale Holdings Corporation.",
       "name": "B. Riley Secured Promissory Note",
       "instrument_type": "credit_facility",
       "size_usd_m": 2,
-      "size_note": "Secured term loan of up to $2.0M; $2.0M principal outstanding at the date of the 10-K. Recorded at an acquisition-date fair value of $2.239M under ASC 805. B. Riley may elect to convert principal, interest and the exit fee into equity in a qualified financing at the lead investor's price per share. Assumed in the 2026-05-05 business combination; originally entered by Legacy Ekso in September 2025.",
+      "size_note": "Secured term loan of up to $2.0M; $2.0M principal outstanding at the date of the 10-K. Recorded at an acquisition-date fair value of $2.239M under ASC 805. B. Riley may elect to convert principal, interest and the exit fee into equity in a qualified financing at the lead investor's price per share. Assumed in the 2026-05-05 business combination; originally entered by Legacy Ekso in September 2025. First Amendment §2(a) (2026-09-12): \"the principal amount outstanding under the Note on the date hereof is $2,000,000.00\".",
       "rate": {
         "kind": "fixed",
         "value": 10,
         "note": "10% per annum, payable in full at maturity, plus an exit fee of 10% of the original principal ($0.2M) due at maturity. Prepayment requires payment of all interest that would have accrued through maturity plus the proportionate exit fee."
       },
-      "maturity": "2026-09-14",
-      "maturity_note": "The earlier of receipt of at least $2.4M of net proceeds from new equity investors (a Qualified Financing) and 2026-09-14.",
+      "maturity": "2026-11-12",
+      "maturity_note": "The earlier of a Qualified Financing (receipt of $2.4M net proceeds from the sale of equity interests of the Borrower to new equity investors) and 2026-11-12. First Amendment effective 2026-09-12 \"extends the Maturity Date described in clause (i) above to November 12, 2026\"; the Proposed Financing under the 2026-04-23 Waiver \"shall not constitute a Qualified Financing for purposes of accelerating the Maturity Date\" but is one for the Section 10 conversion right.",
       "seniority": "Senior secured; ranks ahead of the Parker Hannifin note",
-      "security": "Security agreement over company and subsidiary assets; covenants limit debt, liens, asset disposals and restricted payments",
+      "security": "Security agreement over company and subsidiary assets; covenants limit debt, liens, asset disposals and restricted payments. First Amendment adds a Permitted Disposition: the sale of the Guarantor (Ekso Bionics, Inc.) by asset sale, stock sale, merger or otherwise; on consummation the Lender's liens on the Released Collateral are released \"without any payment to the Lender as a condition thereto\" (new §11(l)); carved out of the §6(a) disposition restriction and of Change of Control. All other Collateral continues to secure the Note.",
       "lenders": [
         "B. Riley Commercial Capital, LLC"
       ],
       "status": "confirmed",
-      "issued": "2025-09",
+      "issued": "2025-09-12",
       "source": {
-        "doc": "CHRN 10-K for the fiscal year ended 2026-05-31, Note 8 Debt, filed 2026-08-19, acc 0001628280-26-058018",
-        "date": "2026-08-19",
-        "url": "https://www.sec.gov/Archives/edgar/data/1549084/000162828026058018/chrn-20260531.htm"
+        "doc": "CHRN 8-K Item 1.01 (event 2026-09-12, filed 2026-09-16), acc 0001493152-26-042947, with EX-10.1 First Amendment to Secured Promissory Note and Security Agreement; 10-K FYE 2026-05-31 Note 8 for original terms",
+        "date": "2026-09-16",
+        "url": "https://www.sec.gov/Archives/edgar/data/1549084/000149315226042947/form8-k.htm"
       },
-      "as_of": "2026-08-24"
+      "as_of": "2026-09-16"
     },
     {
       "id": "chrn-parker-note",
@@ -2761,7 +2729,7 @@
       "name": "Finance leases",
       "instrument_type": "lease",
       "size_usd_m": 0.876,
-      "size_note": "$876K finance leases 6/30/26; weighted-average remaining term 4.4y, discount rate 7.4% (Q2-26 10-Q)",
+      "size_note": "$876K finance leases 6/30/26; weighted-average remaining term 4.4y, discount rate 7.4% (Q2-26 10-Q). Commenced Q4 2025 (ROU assets of $1,916K obtained in exchange for lease obligations in 2025; none at 9/30/25); exact commencement date not disclosed.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -2775,9 +2743,9 @@
       "status": "confirmed",
       "issued": null,
       "source": {
-        "doc": "Q1-26 10-Q Note 5",
-        "date": "2026-05-06",
-        "url": "https://www.sec.gov/Archives/edgar/data/1839341/000162828026031396/core-20260331.htm"
+        "doc": "Q2-26 10-Q Note 6 Leases, filed 2026-07-28, acc 0001839341-26-000014; FY2025 10-K Note 7",
+        "date": "2026-07-28",
+        "url": "https://www.sec.gov/Archives/edgar/data/1839341/000183934126000014/core-20260630.htm"
       },
       "as_of": "2026-06-30"
     },
@@ -2866,7 +2834,7 @@
       "rate": {
         "kind": "floating_other",
         "value": null,
-        "note": "Benchmark + 85 bps grid + 20 bps facility fee (±4 bps ESG adjustment); drawn weighted average 1.39%"
+        "note": "drawn weighted average 1.70% at 2026-06-30 (Q2 10-Q); $726.2M drawn, $82.0M LCs"
       },
       "maturity": "2029-01-24",
       "maturity_note": "+2×6-month extensions",
@@ -2878,9 +2846,9 @@
       "status": "confirmed",
       "issued": "2024-09-24",
       "source": {
-        "doc": "Credit agreement 8-K 9/30/24; Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000119312524228400/d852831d8k.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
       "as_of": "2026-06-30"
     },
@@ -2934,7 +2902,7 @@
       "rate": {
         "kind": "floating_other",
         "value": null,
-        "note": "EURIBOR + margin (spread not restated in latest filings — UNVERIFIED); weighted average 2.80% including swaps"
+        "note": "weighted average 3.08% (term loan category, Q2 10-Q); one-year extension exercised July 2026, maturity 2027-08-11"
       },
       "maturity": "2027-08-11",
       "maturity_note": "One-year extension option exercised July 2026 (Q2-26 10-Q)",
@@ -2946,9 +2914,9 @@
       "status": "confirmed",
       "issued": "2022-08-11",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
       "as_of": "2026-06-30"
     },
@@ -2963,7 +2931,7 @@
       "entity": "Digital Intrepid Holding B.V.",
       "name": "0.200% CHF notes due 2026",
       "instrument_type": "bond",
-      "size_usd_m": 344,
+      "size_usd_m": 340.2,
       "size_note": "CHF 275M",
       "rate": {
         "kind": "fixed",
@@ -2980,11 +2948,11 @@
       "status": "confirmed",
       "issued": "2021-07",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-chf-1700-2027",
@@ -2997,7 +2965,7 @@
       "entity": "Digital Intrepid Holding B.V.",
       "name": "1.700% CHF notes due 2027",
       "instrument_type": "bond",
-      "size_usd_m": 187.6,
+      "size_usd_m": 185.6,
       "size_note": "CHF 150M",
       "rate": {
         "kind": "fixed",
@@ -3014,11 +2982,11 @@
       "status": "confirmed",
       "issued": "2022-03",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-usd-3700-2027",
@@ -3048,11 +3016,11 @@
       "status": "confirmed",
       "issued": "2017-08",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-usd-5550-2028",
@@ -3082,11 +3050,11 @@
       "status": "confirmed",
       "issued": "2022-09",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-1125-2028",
@@ -3099,7 +3067,7 @@
       "entity": "Digital Euro Finco, LLC",
       "name": "1.125% EUR notes due 2028",
       "instrument_type": "bond",
-      "size_usd_m": 577.7,
+      "size_usd_m": 571.1,
       "size_note": "€500M",
       "rate": {
         "kind": "fixed",
@@ -3116,11 +3084,11 @@
       "status": "confirmed",
       "issued": "2019-10",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-usd-4450-2028",
@@ -3150,11 +3118,11 @@
       "status": "confirmed",
       "issued": "2018-06",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-chf-0550-2029",
@@ -3167,7 +3135,7 @@
       "entity": "Digital Intrepid Holding B.V.",
       "name": "0.550% CHF notes due 2029",
       "instrument_type": "bond",
-      "size_usd_m": 337.8,
+      "size_usd_m": 334.0,
       "size_note": "CHF 270M",
       "rate": {
         "kind": "fixed",
@@ -3184,11 +3152,11 @@
       "status": "confirmed",
       "issued": "2021-07",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-usd-3600-2029",
@@ -3218,11 +3186,11 @@
       "status": "confirmed",
       "issued": "2019-06",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-gbp-3300-2029",
@@ -3235,7 +3203,7 @@
       "entity": "Digital Stout Holding, LLC",
       "name": "3.300% GBP notes due 2029",
       "instrument_type": "bond",
-      "size_usd_m": 462.9,
+      "size_usd_m": 464.2,
       "size_note": "£350M",
       "rate": {
         "kind": "fixed",
@@ -3252,11 +3220,11 @@
       "status": "confirmed",
       "issued": "2017-07",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-exch-2029",
@@ -3286,11 +3254,11 @@
       "status": "confirmed",
       "issued": "2024-11-12",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-1500-2030",
@@ -3303,7 +3271,7 @@
       "entity": "Digital Dutch Finco B.V.",
       "name": "1.500% EUR notes due 2030",
       "instrument_type": "bond",
-      "size_usd_m": 866.5,
+      "size_usd_m": 856.6,
       "size_note": "€750M",
       "rate": {
         "kind": "fixed",
@@ -3320,11 +3288,11 @@
       "status": "confirmed",
       "issued": "2020-01",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-gbp-3750-2030",
@@ -3337,7 +3305,7 @@
       "entity": "Digital Stout Holding, LLC",
       "name": "3.750% GBP notes due 2030",
       "instrument_type": "bond",
-      "size_usd_m": 727.5,
+      "size_usd_m": 729.4,
       "size_note": "£550M",
       "rate": {
         "kind": "fixed",
@@ -3354,11 +3322,11 @@
       "status": "confirmed",
       "issued": "2018-10",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-1250-2031",
@@ -3371,7 +3339,7 @@
       "entity": "Digital Dutch Finco B.V.",
       "name": "1.250% EUR notes due 2031",
       "instrument_type": "bond",
-      "size_usd_m": 577.7,
+      "size_usd_m": 571.1,
       "size_note": "€500M",
       "rate": {
         "kind": "fixed",
@@ -3388,11 +3356,11 @@
       "status": "confirmed",
       "issued": "2020-06",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-0625-2031",
@@ -3405,7 +3373,7 @@
       "entity": "Digital Intrepid Holding B.V.",
       "name": "0.625% EUR notes due 2031",
       "instrument_type": "bond",
-      "size_usd_m": 1155.3,
+      "size_usd_m": 1142.2,
       "size_note": "€1,000M",
       "rate": {
         "kind": "fixed",
@@ -3422,11 +3390,11 @@
       "status": "confirmed",
       "issued": "2021-01",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-1000-2032",
@@ -3439,7 +3407,7 @@
       "entity": "Digital Dutch Finco B.V.",
       "name": "1.000% EUR notes due 2032",
       "instrument_type": "bond",
-      "size_usd_m": 866.5,
+      "size_usd_m": 856.6,
       "size_note": "€750M",
       "rate": {
         "kind": "fixed",
@@ -3456,11 +3424,11 @@
       "status": "confirmed",
       "issued": "2020-09",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-1375-2032",
@@ -3473,7 +3441,7 @@
       "entity": "Digital Intrepid Holding B.V.",
       "name": "1.375% EUR notes due 2032",
       "instrument_type": "bond",
-      "size_usd_m": 866.5,
+      "size_usd_m": 856.6,
       "size_note": "€750M",
       "rate": {
         "kind": "fixed",
@@ -3490,11 +3458,11 @@
       "status": "confirmed",
       "issued": "2022-01",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-3750-2033",
@@ -3507,7 +3475,7 @@
       "entity": "Digital Euro Finco, LLC",
       "name": "3.750% EUR notes due 2033",
       "instrument_type": "bond",
-      "size_usd_m": 693.2,
+      "size_usd_m": 685.3,
       "size_note": "€600M",
       "rate": {
         "kind": "fixed",
@@ -3524,11 +3492,11 @@
       "status": "confirmed",
       "issued": "2025-11",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-3875-2033",
@@ -3541,7 +3509,7 @@
       "entity": "Digital Dutch Finco B.V.",
       "name": "3.875% EUR notes due 2033",
       "instrument_type": "bond",
-      "size_usd_m": 982,
+      "size_usd_m": 970.9,
       "size_note": "€850M",
       "rate": {
         "kind": "fixed",
@@ -3558,11 +3526,11 @@
       "status": "confirmed",
       "issued": "2024-09",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-3875-2034",
@@ -3575,7 +3543,7 @@
       "entity": "Digital Dutch Finco B.V.",
       "name": "3.875% EUR notes due 2034",
       "instrument_type": "bond",
-      "size_usd_m": 982,
+      "size_usd_m": 970.9,
       "size_note": "€850M",
       "rate": {
         "kind": "fixed",
@@ -3592,11 +3560,11 @@
       "status": "confirmed",
       "issued": "2025-06",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-3875-2035",
@@ -3609,7 +3577,7 @@
       "entity": "Digital Dutch Finco B.V.",
       "name": "3.875% EUR notes due 2035",
       "instrument_type": "bond",
-      "size_usd_m": 982,
+      "size_usd_m": 970.9,
       "size_note": "€850M",
       "rate": {
         "kind": "fixed",
@@ -3626,11 +3594,11 @@
       "status": "confirmed",
       "issued": "2025-01",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-eur-4250-2037",
@@ -3643,7 +3611,7 @@
       "entity": "Digital Euro Finco, LLC",
       "name": "4.250% EUR notes due 2037",
       "instrument_type": "bond",
-      "size_usd_m": 924.2,
+      "size_usd_m": 913.8,
       "size_note": "€800M",
       "rate": {
         "kind": "fixed",
@@ -3660,11 +3628,11 @@
       "status": "confirmed",
       "issued": "2025-11",
       "source": {
-        "doc": "Q1-26 10-Q Note 8",
-        "date": "2026-05-01",
-        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926054255/dlr-20260331x10q.htm"
+        "doc": "10-Q Q2 2026 (Note 8, Debt of the Operating Partnership)",
+        "date": "2026-07-31",
+        "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926089296/dlr-20260630x10q.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "dlr-teraco",
@@ -3729,7 +3697,7 @@
       "issued": null,
       "source": {
         "doc": "FY25 10-K Note 10",
-        "date": "2026-02-27",
+        "date": "2026-02-13",
         "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926015365/dlr-20251231x10k.htm"
       },
       "as_of": "2026-03-31"
@@ -3765,7 +3733,7 @@
       "issued": null,
       "source": {
         "doc": "FY25 10-K Note 10",
-        "date": "2026-02-27",
+        "date": "2026-02-13",
         "url": "https://www.sec.gov/Archives/edgar/data/1297996/000110465926015365/dlr-20251231x10k.htm"
       },
       "as_of": "2026-03-31"
@@ -4251,7 +4219,7 @@
         "note": "9.5%, steps to 8% on Phase I completion/80% leased; minimum 1.1x MOIC; PIK option"
       },
       "maturity": "~2026-08-24",
-      "maturity_note": "90 days",
+      "maturity_note": "90 days from the 2026-05-26 draw (~2026-08-24); extendable by 30 days by mutual agreement of Borrower, Lender and Guarantor (10-Q Note 10). No repayment or extension disclosed through the 8-K filed 2026-09-14; next expected disclosure point is the Q3 10-Q.",
       "seniority": "Secured; WF Operating Partnership guarantee",
       "security": "Pledge of Enovum NC-1 Topco stock (NC-1 HPC datacenter, Madison NC)",
       "lenders": [
@@ -4264,7 +4232,7 @@
         "date": "2026-08-12",
         "url": "https://www.sec.gov/Archives/edgar/data/2042022/000121390026088026/ea0300877-10q_whitefiber.htm"
       },
-      "as_of": "2026-08-24"
+      "as_of": "2026-09-14"
     },
     {
       "id": "wyfi-ddtl-nc1",
@@ -6223,27 +6191,27 @@
       "name": "4.75% Convertible Senior Notes due 2032",
       "instrument_type": "convertible",
       "size_usd_m": 700,
-      "size_note": "$700M converts within a ~$1.6B financing (~$900M equity/pre-funded warrants); anchors Situational Awareness LP and Oaktree; proceeds fund the six-year NVIDIA compute collaboration (up to 40,000 GB300). Funds a six-year NVIDIA Master Cloud Services Agreement + Order Form 1 (8-K Jun-12: contract value UP TO $4.88B, up to 40,000 GB300, availability-conditioned, phased delivery to a common end date, revenue-share/audit mechanics; press calls it a 'backstop' — the filed instrument is an offtake).",
+      "size_note": "$700.0M face issued 6/22/26 under the Indenture dated 6/22/26 (U.S. Bank Trust Co., trustee); DVP settlement 6/22–6/26/26; closing announced 6/29/26. The 7/31/26 S-1 (333-297885, effective 8/14/26) and the 8/28/26 424B3 supplements register $691.7M for resale by the named selling securityholders; a registration figure, not a reduction of the outstanding principal. Balance sheet 6/30/26: convertible notes non-current $1,006.5M for both series combined (net of issuance costs; no per-series carrying amount). $700M converts within a ~$1.6B financing (~$900M equity/pre-funded warrants); anchors Situational Awareness LP and Oaktree; proceeds fund the six-year NVIDIA compute collaboration (up to 40,000 GB300). Funds a six-year NVIDIA Master Cloud Services Agreement + Order Form 1 (8-K Jun-12: contract value UP TO $4.88B, up to 40,000 GB300, availability-conditioned, phased delivery to a common end date, revenue-share/audit mechanics; press calls it a 'backstop' — the filed instrument is an offtake).",
       "rate": {
         "kind": "fixed",
         "value": 4.75,
-        "note": null
+        "note": "Interest frequency is stated inconsistently: quarterly Jan 1/Apr 1/Jul 1/Oct 1 per the 8-K 6/25/26, the S-1 and 10-Q MD&A; \"semi-annually\" in the 10-Q Note 13. Initial conversion rate 10.0343 shares per $1,000 of principal plus accrued interest (~$99.66, 45% over the $68.73 Nasdaq Minimum Price); maximum rate 14.5496. Not redeemable by the Company; forced conversion available after 18 months if VWAP > 200% of conversion price for 20 of 30 days plus $50M daily volume. Fundamental change put at 100% plus accrued interest."
       },
       "maturity": "2032-06-15",
       "maturity_note": "Maturity date confirmed as June 15, 2032 in the 7/31/26 S-1 (the closing release omitted the day)",
-      "seniority": "Senior unsecured",
+      "seniority": "Senior unsecured; fully and unconditionally guaranteed on a senior unsecured basis by the Subsidiary Guarantors named in the Indenture",
       "security": null,
       "lenders": [
         "144A QIBs"
       ],
       "status": "confirmed",
-      "issued": "2026-06-29",
+      "issued": "2026-06-22",
       "source": {
-        "doc": "8-K EX-99.1 (acc. 0001493152-26-030417)",
-        "date": "2026-06-29",
-        "url": "https://www.sec.gov/Archives/edgar/data/2068385/000149315226030417/ex99-1.htm"
+        "doc": "8-K 6/25/26 Item 1.01 (acc 0001493152-26-030158); S-1 7/31/26 (acc 0001493152-26-035629); 424B3 8/28/26 (acc 0001493152-26-040595)",
+        "date": "2026-06-25",
+        "url": "https://www.sec.gov/Archives/edgar/data/2068385/000149315226030158/form8-k.htm"
       },
-      "as_of": "2026-08-03"
+      "as_of": "2026-08-28"
     },
     {
       "id": "sharonai-conv-2031",
@@ -6257,11 +6225,11 @@
       "name": "6.00% Convertible Senior Notes due 2031",
       "instrument_type": "convertible",
       "size_usd_m": 350,
-      "size_note": "$350.0M aggregate principal. Securities Purchase Agreement with qualified institutional buyers 4/26/26; offering closed 5/20/26. Referred to in the S-1 as the \"May 2026 Convertible Notes\". First Supplemental Indenture (2026-08-21; 8-K 8/26/26, EX-4.1) removed the GPU-value covenant package: the \"GPU Value\", \"Secured GPU Debt\", \"Holdco Coverage Amount\" and related definitions, the debt-maintenance covenant, and the prohibition on secured debt above $25M. Dividend and buyback restrictions and affiliate-transaction protections remain. SAI US No. 1 LLC released as guarantor. No consent fee disclosed.",
+      "size_note": "$350.0M aggregate principal. Securities Purchase Agreement with qualified institutional buyers 4/26/26; issued 5/18/26 under the Indenture dated 5/18/26; offering closed 5/20/26. Referred to in the S-1 as the \"May 2026 Convertible Notes\". First Supplemental Indenture (2026-08-21; 8-K 8/26/26, EX-4.1) removed the GPU-value covenant package: the \"GPU Value\", \"Secured GPU Debt\", \"Holdco Coverage Amount\" and related definitions, the debt-maintenance covenant, and the prohibition on secured debt above $25M. Dividend and buyback restrictions and affiliate-transaction protections remain. SAI US No. 1 LLC released as guarantor. No consent fee disclosed.",
       "rate": {
         "kind": "fixed",
         "value": 6,
-        "note": "Semi-annual per the S-1 debt footnote (business section says quarterly; footnote governs)"
+        "note": "10-Q Q2-26 Note 13: \"payable quarterly in arrears\" (the S-1 footnote had read semi-annual). Initial conversion price $48.24. Company may force conversion beginning 18 months after issuance on market conditions; fundamental change put at 100% plus accrued interest."
       },
       "maturity": "2031-05-01",
       "maturity_note": "May 1, 2031 per the First Supplemental Indenture title; the S-1 stated the year only",
@@ -6271,13 +6239,13 @@
         "144A QIBs"
       ],
       "status": "confirmed",
-      "issued": "2026-05-20",
+      "issued": "2026-05-18",
       "source": {
         "doc": "S-1 (acc. 0001493152-26-035629), Recent Developments + Description of Securities; First Supplemental Indenture 8-K 8/26/26 EX-4.1 (acc. 0001493152-26-040152)",
         "date": "2026-07-31",
         "url": "https://www.sec.gov/Archives/edgar/data/2068385/000149315226035629/forms-1.htm"
       },
-      "as_of": "2026-08-26"
+      "as_of": "2026-08-28"
     },
     {
       "id": "usdai-quantum",
@@ -6351,11 +6319,11 @@
       "issuer": "Duos Edge AI, Inc. (Duos Technologies Group)",
       "ticker": "DUOT",
       "issuer_type": "public",
-      "entity": "Duos Edge AI, Inc., subsidiary of Duos Technologies Group, Inc.; deployment managed by Hydra Host (Brokkr AI Factory OS)",
+      "entity": "Duos Edge AI – GPUaaS, LLC (\"Edge GPU\"), bankruptcy-remote SPV subsidiary of Duos Technologies Group, Inc.; parent pledges its equity in Edge GPU and is not liable except for specified bad-boy events; managed by Hydra Host, Inc.",
       "name": "USD.AI debt financing — 2,304 NVIDIA B300 GPU deployment",
       "instrument_type": "credit_facility",
       "size_usd_m": 98.1,
-      "size_note": null,
+      "size_note": "$98.1M three-year asset-based facility per the 8-K. Closing conditioned on delivery and installation of the GPUs; the 10-Q for the quarter ended 2026-06-30 shows no drawn balance and describes the senior debt financing as still to be secured (~70% of GPU investment after ~$43.5M vendor funding). Not yet on the balance sheet as of 6/30/26.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -6363,7 +6331,7 @@
       },
       "maturity": "~2029",
       "maturity_note": "Three-year facility per release",
-      "seniority": "Non-recourse, asset-level",
+      "seniority": "Non-recourse to the parent except bad-boy events; parent equity pledge; asset-level (8-K)",
       "security": "2,304 NVIDIA B300 GPUs",
       "lenders": [
         "USD.AI Protocol (Permian Labs)"
@@ -6371,11 +6339,11 @@
       "status": "confirmed",
       "issued": "2026-06-05",
       "source": {
-        "doc": "USD.AI release via PR Newswire 6/5/26",
-        "date": "2026-06-05",
-        "url": "https://www.prnewswire.com/news-releases/usdai-provides-98-1m-debt-financing-to-support-duos-edge-ai-gpu-deployment-managed-by-hydra-host-302792700.html"
+        "doc": "DUOT 8-K Item 8.01 filed 2026-06-11 (event 2026-06-05), acc 0001079973-26-000826; 10-Q for the quarter ended 2026-06-30 Note 12, filed 2026-08-19 (facility not yet closed or drawn at 6/30/26)",
+        "date": "2026-08-19",
+        "url": "https://www.sec.gov/Archives/edgar/data/1396536/000107997326000826/duot_8k.htm"
       },
-      "as_of": "2026-07-04"
+      "as_of": "2026-08-19"
     },
     {
       "id": "firmus-southgate-blackstone",
@@ -6423,7 +6391,7 @@
       "name": "9.875% Senior Secured Notes due 2031 (Helios Phase II)",
       "instrument_type": "bond",
       "size_usd_m": 3507,
-      "size_note": "$3.507B private offering (144A/Reg S) priced 7/23/26; completed 7/28/26 at an issue price of 99.500% of principal (close 8-K). Amortizes 4.00%/yr of original principal, semi-annual (pricing release); per the close 8-K, no amortization before the first payment date at least ten months after Project completion. Proceeds fund Helios Phase II construction — two buildings, eight data halls, 400 MW utility / 260 MW critical IT, Dickens County, TX — and debt-service reserves. Indenture 7/28/26 with The Bank of New York Mellon as trustee and collateral agent; issuer's direct parent is Galaxy Helios II Qualified Opportunity Zone Business, LLC. Campus leased to CoreWeave (15-yr term, per Bloomberg — press)",
+      "size_note": "$3.507B private offering (144A/Reg S) priced 7/23/26; completed 7/28/26 at an issue price of 99.500% of principal (close 8-K). Amortizes 4.00%/yr of original principal, semi-annual (pricing release); per the close 8-K, no amortization before the first payment date at least ten months after Project completion. Proceeds fund Helios Phase II construction — two buildings, eight data halls, 400 MW utility / 260 MW critical IT, Dickens County, TX — and debt-service reserves. Indenture 7/28/26 with The Bank of New York Mellon as trustee and collateral agent; issuer's direct parent is Galaxy Helios II Qualified Opportunity Zone Business, LLC. Campus leased to CoreWeave (15-yr term, per Bloomberg — press) Q2-26 10-Q Note 24: GDH LP provided a customary, uncapped completion guarantee for the Project. Notes amortize semi-annually Feb 1 / Aug 1 at the rates specified in the Indenture, first payment at least ten months after Project completion.",
       "rate": {
         "kind": "fixed",
         "value": 9.875,
@@ -6443,7 +6411,7 @@
         "date": "2026-07-28",
         "url": "https://www.sec.gov/Archives/edgar/data/1859392/000185939226000079/glxy-20260728.htm"
       },
-      "as_of": "2026-07-30"
+      "as_of": "2026-08-10"
     },
     {
       "id": "palebluedot-brookfield-tor",
@@ -6652,42 +6620,6 @@
       "as_of": "2026-08-09"
     },
     {
-      "id": "related-saline-barn",
-      "exclude_from_issuance": true,
-      "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
-      "collateral_class": "landlord_spv",
-      "issuer": "Related Digital / Blackstone (Saline Twp, MI)",
-      "ticker": null,
-      "issuer_type": "private",
-      "entity": "Project entity, Saline Township MI campus ('The Barn'); Related Digital + Blackstone-affiliated funds equity",
-      "name": "Fixed-rate project debt - $16B Oracle campus (PIMCO-anchored)",
-      "instrument_type": "bond",
-      "size_usd_m": 14000,
-      "size_note": "~$14B fixed-rate long-term debt of a $16B total project (debt split and PIMCO ~$10B anchor per press; the releases state the $16B package without the split). BofA structuring agent/FA; Goldman Sachs + Wells Fargo advisors",
-      "rate": {
-        "kind": "fixed",
-        "value": null,
-        "note": "Fixed-rate, long-term; coupon undisclosed"
-      },
-      "maturity": "Undisclosed",
-      "maturity_note": null,
-      "seniority": "Project-level (structure not fully disclosed)",
-      "security": "Saline Township MI campus (~1 GW; 1,383 MW cited), purpose-built for Oracle; OpenAI end user (Stargate)",
-      "lenders": [
-        "PIMCO-managed funds and accounts (anchor, ~$10B per press)",
-        "Bank of America (structuring agent)",
-        "Goldman Sachs, Wells Fargo (advisors)"
-      ],
-      "status": "confirmed",
-      "issued": "2026-04-24",
-      "source": {
-        "doc": "Related Digital / Blackstone / BofA releases 4/24/26 ($16B project financing, PIMCO anchor, advisors); ~$14B/$10B debt detail = press (Bloomberg pickup)",
-        "date": "2026-04-24",
-        "url": "https://www.related.com/press-releases/2026-04-24/related-digital-announces-financing-16-billion-oracle-data-center-project"
-      },
-      "as_of": "2026-08-09"
-    },
-    {
       "id": "galaxy-helios1-facility",
       "exclude_from_issuance": true,
       "exclude_reason": "Data-center campus credit, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
@@ -6695,31 +6627,31 @@
       "issuer": "Galaxy Digital Inc.",
       "ticker": "GLXY",
       "issuer_type": "public",
-      "entity": "Helios Phase I project entities (project financing facility)",
-      "name": "Helios Phase I project financing facility (up to $1.4B)",
+      "entity": "Galaxy Helios I LLC (wholly owned subsidiary of GDH LP), borrower",
+      "name": "Senior secured term loan facility, up to $1.4B (Helios Phase I; Credit Agreement 8/15/25)",
       "instrument_type": "credit_facility",
       "size_usd_m": 1400,
-      "size_note": "Up to $1.4B senior secured project facility; 80% loan-to-cost, 36-month availability; Galaxy ~$350M equity contribution. Sibling of the Helios Phase II 9.875% notes (galaxy-helios2-9875-2031)",
+      "size_note": "Up to $1.4B senior secured term loan; $1.3B drawn at 6/30/26, recognized within Notes payable (Q2-26 10-Q Note 16). Use: construction and development of the Dickens County, TX data center project. Covenants: minimum DSCR 1.40x from the first full quarter after Stabilization; maximum loan-to-cost 80% at closing and each quarter until Stabilization. Prepayable subject to a Prepayment Premium. Interest cost $28.4M in Q2-26 / $49.5M H1-26, of which $21.1M / $42.1M capitalized. Sibling of the Helios Phase II 9.875% notes (galaxy-helios2-9875-2031); together the \"Project Financing Documents\".",
       "rate": {
-        "kind": "undisclosed",
-        "value": null,
-        "note": null
+        "kind": "sofr_spread",
+        "value": 4.75,
+        "note": "SOFR + 4.75%, SOFR floor 2.50%; hedged with interest rate caps designated as cash flow hedges (Q2-26 10-Q Note 16)"
       },
-      "maturity": "36-month facility (availability period); terms not fully disclosed",
-      "maturity_note": null,
+      "maturity": "2028-08-15",
+      "maturity_note": "Commitments mature August 15, 2028 (Q2-26 10-Q Note 16)",
       "seniority": "Senior secured, project-level",
       "security": "Helios Phase I data center (Dickens County, TX), leased to CoreWeave",
       "lenders": [
-        "Deutsche Bank (lead)"
+        "Deutsche Bank AG"
       ],
       "status": "confirmed",
       "issued": "2025-08-15",
       "source": {
-        "doc": "Galaxy press release 8/15/25",
-        "date": "2025-08-15",
-        "url": "https://www.prnewswire.com/news-releases/galaxy-closes-1-4-billion-project-financing-facility-to-accelerate-helios-ai-datacenter-development-302530804.html"
+        "doc": "Q2-26 10-Q Note 16 Notes Payable / Credit Agreement, filed 2026-08-10, acc 0001859392-26-000091; originally Galaxy release 8/15/25",
+        "date": "2026-08-10",
+        "url": "https://www.sec.gov/Archives/edgar/data/1859392/000185939226000091/glxy-20260630.htm"
       },
-      "as_of": "2026-08-09"
+      "as_of": "2026-08-10"
     },
     {
       "id": "novva-cim-financing",
@@ -7100,7 +7032,7 @@
       "name": "Residual value guaranties — PORTS-Pike leases (payment obligation capped at $105B)",
       "instrument_type": "other",
       "size_usd_m": 105000,
-      "size_note": "Not a principal amount. $105B is the cumulative cap on NVIDIA's aggregate payment obligation for its initial commitment under multiple residual value guaranties covering ~4.25 GW of IT load in the aggregate. NVIDIA may provide credit support for ~3.8 GW more at its sole discretion; that increment is an option, not an obligation, and is not included in the $105B. An Agreement generally becomes effective only on commencement of the applicable lease; payment obligations are further conditioned on the Lessor satisfying ready-for-service conditions, expected to begin in 2028. On a Trigger Event (OpenAI insolvency causing a lease default, or OpenAI payment failure) NVIDIA pays the shortfall between the guaranteed minimum lease value and amounts recovered through a replacement lease or sale, and may elect to assume the lease, require reletting, initiate a sale, allow termination, or defer remedies up to one year while paying specified project agreement costs. OpenAI has agreed to reimburse and indemnify NVIDIA for all amounts actually paid. Distinct from the NVIDIA $500B financing platforms announced 2026-08-10 with Apollo, BlackRock, Blackstone, Brookfield, Goldman Sachs and KKR: those are memorandums of understanding, no 8-K was filed for them, and no facility has priced or closed under any of them. SB Energy is not one of the six. Press in July 2026 reported a guarantee of \"over $250B\" for this site; the filed cap for the initial commitment is $105B. Separately, and equity rather than debt: NVIDIA will invest $1.5B in SB Energy. Form of the Agreements to be filed with the 10-Q for the quarter ended 2026-07-26.",
+      "size_note": "Not a principal amount. $105B is the cumulative cap on NVIDIA's aggregate payment obligation for its initial commitment under multiple residual value guaranties covering ~4.25 GW of IT load in the aggregate. NVIDIA may provide credit support for ~3.8 GW more at its sole discretion; that increment is an option, not an obligation, and is not included in the $105B. An Agreement generally becomes effective only on commencement of the applicable lease; payment obligations are further conditioned on the Lessor satisfying ready-for-service conditions, expected to begin in 2028. On a Trigger Event (OpenAI insolvency causing a lease default, or OpenAI payment failure) NVIDIA pays the shortfall between the guaranteed minimum lease value and amounts recovered through a replacement lease or sale, and may elect to assume the lease, require reletting, initiate a sale, allow termination, or defer remedies up to one year while paying specified project agreement costs. OpenAI has agreed to reimburse and indemnify NVIDIA for all amounts actually paid. Distinct from the NVIDIA $500B financing platforms announced 2026-08-10 with Apollo, BlackRock, Blackstone, Brookfield, Goldman Sachs and KKR: those are memorandums of understanding, no 8-K was filed for them, and no facility has priced or closed under any of them. SB Energy is not one of the six. Press in July 2026 reported a guarantee of \"over $250B\" for this site; the filed cap for the initial commitment is $105B. Separately, and equity rather than debt: NVIDIA will invest $1.5B in SB Energy. Form of Residual Value Guaranty filed as Exhibit 10.1 to the 10-Q for the quarter ended 2026-07-26 (filed 2026-08-26). 10-Q Note 10 adds: guarantee amounts increase as each of nine construction phases completes, the first expected in fiscal year 2029; the guarantees \"are limited to defined portions of lease and power payments and not the full cost of the site or all of the tenant's obligations\"; the amount \"is expected to decrease over the course of each phase's 20-year lease term\"; \"In exchange for the guarantees, the site will exclusively host NVIDIA AI infrastructure, subject to limited exceptions.\" Maximum gross exposure table: SB Energy guarantees $105.0B; total guarantees $108.5B including $3.5B AI-cloud land/power/shell guarantees. No liability or fee disclosed.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -7116,11 +7048,11 @@
       "status": "confirmed",
       "issued": "2026-08-17",
       "source": {
-        "doc": "8-K, Items 1.01 and 2.03 (event and filing date 2026-08-17), acc. 0001045810-26-000069, plus EX-99.1 press release of the same date",
-        "date": "2026-08-17",
-        "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm"
+        "doc": "10-Q for the quarter ended 2026-07-26, Note 10 Commitments and Contingencies (Guarantees) and Exhibit 10.1 Form of Residual Value Guaranty, filed 2026-08-26, acc 0001045810-26-000075; originally 8-K Items 1.01/2.03 filed 2026-08-17, acc 0001045810-26-000069",
+        "date": "2026-08-26",
+        "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"
       },
-      "as_of": "2026-08-17",
+      "as_of": "2026-08-26",
       "offtaker_label": "OpenAI lease (unrated tenant; guaranty releases on a satisfactory rating)"
     },
     {
@@ -7274,7 +7206,7 @@
       "name": "5.25% Convertible Senior Notes due 2029",
       "instrument_type": "convertible",
       "size_usd_m": 400,
-      "size_note": "Issued November 2024, $400.0M original. $200.0M repurchased during 2025 (US$119.3M cash + 10,661,140 Class A shares); further $135.0M repurchased Feb-2026 (~$138.2M cash). Remaining principal ~$65.0M is implied (400−200−135; the filings state the repurchases, not the remainder). Principal outstanding on the 12/31/25 balance sheet: $200.0M. Unreconciled filed figures: our ~$138.2M cash for the Feb-2026 repurchase vs the Q1-26 6-K cash-flow line 'US$93.0 million of repayments made in connection with the extinguishment of convertible senior notes' — both reproduced, not reconciled; revisit at the FY26 20-F.",
+      "size_note": "Issued November 2024, $400.0M original. $200.0M repurchased during 2025 (US$119.3M cash + 10,661,140 Class A shares); further $135.0M repurchased Feb-2026 (~$138.2M cash). Remaining principal ~$65.0M is implied (400−200−135; the filings state the repurchases, not the remainder). Principal outstanding on the 12/31/25 balance sheet: $200.0M. Unreconciled filed figures: our ~$138.2M cash for the Feb-2026 repurchase vs the Q1-26 6-K cash-flow line 'US$93.0 million of repayments made in connection with the extinguishment of convertible senior notes' — both reproduced, not reconciled; revisit at the FY26 20-F. Nov-2025 repurchase of $200.0M cost ~$267.9M in total (pricing release 11/13/25): US$119.3M cash + 10,661,140 shares at $13.94. Feb-2026 repurchase of $135.0M for ~$138.2M cash (pricing release 2/20/26; 20-F: \"repurchase for cash US$135.0 million\"). Hedge on this series was a zero-strike call (premium ~$160.0M, ~14.3M shares), not a capped call. Concurrent exchange of ~$74.8M of the 8.50% Aug-2029 notes for ~$16.6M cash + ~9.2M shares. Priced 2024-11-22; indenture 2024-11-26. Remaining principal is not stated per series in the 2026 6-Ks.",
       "rate": {
         "kind": "fixed",
         "value": 5.25,
@@ -7288,13 +7220,13 @@
         "144A QIBs"
       ],
       "status": "confirmed",
-      "issued": null,
+      "issued": "2024-11-26",
       "source": {
         "doc": "FY2025 20-F Note 16 + liquidity (acc 0001213900-26-049770)",
         "date": "2026-04-30",
         "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026049770/ea0282628-20f_bitdeer.htm"
       },
-      "as_of": "2026-04-30"
+      "as_of": "2026-08-10"
     },
     {
       "id": "btdr-conv-jul2031",
@@ -7308,11 +7240,11 @@
       "name": "4.875% Convertible Senior Notes due 2031 (July series)",
       "instrument_type": "convertible",
       "size_usd_m": 375,
-      "size_note": "Issued June 2025, $375.0M; outstanding in full at 12/31/25.",
+      "size_note": "Priced 6/18/25 ($330.0M, upsized from $300.0M); closed 6/23/25 (Indenture dated 6/23/25); $45.0M option closed 6/25/25; total $375.0M, outstanding in full at 12/31/25. Zero-strike call option, premium ~$129.6M. Concurrent exchange of ~$75.7M of the 8.50% Aug-2029 notes for ~$36.1M cash + ~8.1M shares. Holder put 7/6/29. No repurchase or conversion disclosed in the Q1/Q2-26 6-Ks.",
       "rate": {
         "kind": "fixed",
         "value": 4.875,
-        "note": "Payable Jan-1/Jul-1; initial conversion rate 62.9921 per $1,000 (~$15.87); holder put 7/6/29"
+        "note": "Payable Jan-1/Jul-1; initial conversion rate 62.9921 per $1,000 (approximately $15.88 per the pricing release; 25% premium over the 6/17/25 close); holder put 7/6/29"
       },
       "maturity": "2031-07-01",
       "maturity_note": null,
@@ -7322,13 +7254,13 @@
         "144A QIBs"
       ],
       "status": "confirmed",
-      "issued": null,
+      "issued": "2025-06-23",
       "source": {
         "doc": "FY2025 20-F Note 16 + liquidity (acc 0001213900-26-049770)",
         "date": "2026-04-30",
         "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026049770/ea0282628-20f_bitdeer.htm"
       },
-      "as_of": "2026-04-30"
+      "as_of": "2026-08-10"
     },
     {
       "id": "btdr-conv-nov2031",
@@ -7342,7 +7274,7 @@
       "name": "4.00% Convertible Senior Notes due 2031 (November series)",
       "instrument_type": "convertible",
       "size_usd_m": 400,
-      "size_note": "Issued November 2025, $400.0M; outstanding in full at 12/31/25. Capped calls: strike $17.77, cap $27.88 ($35.4M premium).",
+      "size_note": "Priced 11/12/25 (release dated 11/13/25 EST); closed 11/17/25, $400.0M; $60.0M option not disclosed as exercised (20-F carries $400.0M); outstanding in full at 12/31/25. Capped calls: cap price $27.88 (100% over the $13.94 registered direct price), cost ~$35.4M; carried as a $31.9M derivative asset at 12/31/25 (20-F Note 17). Holder put 11/20/29. Proceeds funded the $200.0M Nov-2029 note repurchase (~$267.9M total consideration with the equity offering).",
       "rate": {
         "kind": "fixed",
         "value": 4,
@@ -7356,13 +7288,13 @@
         "144A QIBs"
       ],
       "status": "confirmed",
-      "issued": null,
+      "issued": "2025-11-17",
       "source": {
         "doc": "FY2025 20-F Note 16 + liquidity (acc 0001213900-26-049770)",
         "date": "2026-04-30",
         "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026049770/ea0282628-20f_bitdeer.htm"
       },
-      "as_of": "2026-04-30"
+      "as_of": "2026-08-10"
     },
     {
       "id": "btdr-conv-2032",
@@ -7376,7 +7308,7 @@
       "name": "5.00% Convertible Senior Notes due 2032",
       "instrument_type": "convertible",
       "size_usd_m": 375,
-      "size_note": "Closed February 2026: $325.0M priced 2/20/26 + $50.0M initial-purchaser option exercised in full. Capped calls (initial cap $15.88). Concurrent registered direct at $7.94.",
+      "size_note": "$325.0M closed 2/24/26 (Indenture 2/24/26, U.S. Bank Trust Co.) + $50.0M option issued 2/26/26; total $375.0M. Capped calls entered 2/19/26: cap $15.88 (100% over the $7.94 registered direct price), base cost ~$29.2M; Q1-26 cash flow shows $33.7M paid (labelled \"capped call instrument\" in the Q1 6-K and \"zero-strike call option\" in the Q2 6-K for the same H1 line). Registered direct of 5,503,030 shares at $7.94 settled 2/26/26; proceeds plus part of the note proceeds repurchased $135.0M of the Nov-2029 notes for ~$138.2M cash. Q1-26 CF: convertible note proceeds net of costs $364.5M.",
       "rate": {
         "kind": "fixed",
         "value": 5,
@@ -7390,13 +7322,13 @@
         "144A QIBs"
       ],
       "status": "confirmed",
-      "issued": null,
+      "issued": "2026-02-24",
       "source": {
         "doc": "Pricing 6-K 2/20/26 Ex-99.2 (acc 0001213900-26-018592); FY2025 20-F subsequent events",
         "date": "2026-02-20",
         "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026018592/ea027781201ex99-2_bitdeer.htm"
       },
-      "as_of": "2026-04-30"
+      "as_of": "2026-08-10"
     },
     {
       "id": "apld-texas-capital",
@@ -7862,8 +7794,8 @@
       "maturity_note": null,
       "facility_ratings": [],
       "id": "related-digital-saline-2045",
-      "issuer": "Related Digital / Blackstone JV",
-      "entity": "RD Michigan Property Owner I LLC",
+      "issuer": "RD Michigan Property Owner I LLC (Related Digital / Blackstone JV)",
+      "entity": "RD Michigan Property Owner I LLC, owned by a joint venture between Related Digital and funds affiliated with Blackstone; Saline Township, MI campus known as \"The Barn\" (Related release: ~1 GW; KBRA: 974 MW, four buildings; an earlier press figure cited 1,383 MW), developed for Oracle as part of its partnership with OpenAI",
       "name": "~$14B senior secured project bonds (Saline Township, MI campus; Oracle tenant for the OpenAI build)",
       "instrument_type": "bond",
       "size_usd_m": 14000,
@@ -7879,7 +7811,8 @@
       "lenders": [
         "Bank of America (structuring agent, financial advisor)",
         "Goldman Sachs and Wells Fargo (advisors to Related Digital)",
-        "PIMCO (~$10B of the notes, press)"
+        "PIMCO (~$10B of the notes, press)",
+        "Initial purchasers advised by Paul Hastings: BofA Securities, Goldman Sachs, Wells Fargo Securities, Credit Agricole Securities"
       ],
       "status": "confirmed",
       "issued": "2026-04-24",
@@ -8175,6 +8108,108 @@
       },
       "offtaker_label": "CoreWeave (long-term leases)",
       "exclude_from_totals": true
+    },
+    {
+      "id": "duot-columbus-seller-earnout",
+      "collateral_class": "operator_campus",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Contingent purchase-price earnout secured by real estate, not GPUs; no principal is owed unless a power milestone is met.",
+      "issuer": "Duos Edge AI, Inc. (Duos Technologies Group)",
+      "ticker": "DUOT",
+      "issuer_type": "public",
+      "entity": "Duos Technologies Group, Inc. (Borrower); seller of 8 Corporate Ridge Parkway, Columbus, Muscogee County, GA (Lender; name blank in the filed form)",
+      "name": "Seller Contingent Earnout Note — Columbus, GA data center property (up to $15M)",
+      "instrument_type": "other",
+      "size_usd_m": 15,
+      "size_note": "Maximum Earnout Amount $15,000,000; three contingent payments of $5,000,000 each, due only on adding 5 MW of Qualifying Power Capacity above the 5 MW Base Power Capacity (10/15/20 MW total nameplate) within 36 months of closing. Unearned amounts expire at maturity. Part of the $30.0M purchase price ($15.0M cash + this note). At the seller's option on or after 2026-12-14 any earned payment may be settled in DUOT common stock at $10.50/share. The 10-Q filed 2026-08-19 calls it a \"two-year\" 0% seller promissory note; the 8-K and the filed form say three years.",
+      "rate": {
+        "kind": "fixed",
+        "value": 0,
+        "note": "0% on earned amounts; no interest on unearned amounts; default interest the lesser of 10% and the lawful maximum"
+      },
+      "maturity": "2029-07-14",
+      "maturity_note": "36 months after the Closing Date (2026-07-14 per the 8-K); no automatic extension",
+      "seniority": "Secured; first-priority deed to secure debt",
+      "security": "Deed to Secure Debt, Assignment of Leases and Rents, Security Agreement and Fixture Filing on 8 Corporate Ridge Parkway, Columbus, GA (~13.7 acres; building being equipped for the 2,304 NVIDIA B300 deployment); GPU Lessee liens permitted",
+      "lenders": [
+        "Property seller (not named in the filing)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-07-14",
+      "source": {
+        "doc": "DUOT 8-K Item 1.01 (event 2026-07-14, filed 2026-07-20), acc 0001079973-26-000961, EX-10.1 Form of Seller Contingent Earnout Note; 10-Q for the quarter ended 2026-06-30, Notes 12 and 18, filed 2026-08-19, acc 0001079973-26-001151",
+        "date": "2026-07-20",
+        "url": "https://www.sec.gov/Archives/edgar/data/1396536/000107997326000961/duot_8k.htm"
+      },
+      "as_of": "2026-08-19"
+    },
+    {
+      "id": "galaxy-exch-0050-2031",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Exchangeable / equity-linked note at the parent — not GPU-collateralized (strict scope).",
+      "issuer": "Galaxy Digital Inc.",
+      "ticker": "GLXY",
+      "issuer_type": "public",
+      "entity": "Galaxy Digital Holdings LP (GDH LP), issuer; exchangeable into Galaxy Digital Inc. Class A shares",
+      "name": "0.50% Exchangeable Senior Notes due 2031",
+      "instrument_type": "convertible",
+      "size_usd_m": 1300,
+      "size_note": "$1,300M including the $150M initial purchasers' option, issued 2025-10-30; issuance costs $26.7M; effective interest rate 0.9%. MD&A: net proceeds \"to support the build-out of high-performance computing infrastructure at our Helios data center\". Also outstanding at 6/30/26: 3.00% Exchangeable Notes due 2026 ($445.0M due in 2026 per the repayment table) and 2.500% Exchangeable Notes due 2029 ($402.5M); exchangeable notes principal outstanding $2.1B.",
+      "rate": {
+        "kind": "fixed",
+        "value": 0.5,
+        "note": "0.50% fixed, semi-annual; initial exchange rate 17.9352 Class A shares per $1,000"
+      },
+      "maturity": "2031",
+      "maturity_note": "Day not stated in the Q2-26 10-Q",
+      "seniority": "Senior unsecured (GDH LP)",
+      "security": null,
+      "lenders": [
+        "144A QIBs"
+      ],
+      "status": "confirmed",
+      "issued": "2025-10-30",
+      "source": {
+        "doc": "Q2-26 10-Q Note 16 Notes Payable and MD&A liquidity, filed 2026-08-10, acc 0001859392-26-000091",
+        "date": "2026-08-10",
+        "url": "https://www.sec.gov/Archives/edgar/data/1859392/000185939226000091/glxy-20260630.htm"
+      },
+      "as_of": "2026-08-10"
+    },
+    {
+      "id": "btdr-bit-assets-loan",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Related-party loans secured by mining rigs, inventories and data-center assets — not GPU-collateralized (strict scope).",
+      "issuer": "Bitdeer Technologies Group",
+      "ticker": "BTDR",
+      "issuer_type": "public",
+      "entity": "Bitdeer Technologies Group, borrower; BIT Group (related party), lender",
+      "name": "BIT Assets Collateralized Loan and additional facilities (related party)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 700,
+      "size_note": "April 2025 facility up to $400.0M (upsized July/October 2025 from $200.0M) plus $300.0M of additional facilities (October 2025 $100.0M; December 2025, January, February and March 2026 $50.0M each); all drawn in full as of the 20-F date. Each drawdown repays in fixed monthly instalments over 24 months. Related-party long-term borrowings $521.8M at 12/31/25; $545.6M long-term plus $167.8M short-term at 3/31/26; $633.1M at 6/30/26 (Q1/Q2-26 6-Ks). Separately, a BTC Collateralized Loan with BIT Group (up to $400.0M, fixed 8.35%, Bitcoin collateral) was drawn $118.0M and fully repaid as of the 20-F date.",
+      "rate": {
+        "kind": "floating_other",
+        "value": null,
+        "note": "9.0% plus a market-based reference rate (20-F Item 5)"
+      },
+      "maturity": "24-month term per drawdown",
+      "maturity_note": "Fixed monthly instalments over 24 months from each drawdown",
+      "seniority": "Secured, related party",
+      "security": "SEALMINER machines, expanded to mining rigs, inventories, data-center assets and other agreed collateral; loan-to-value maintained",
+      "lenders": [
+        "BIT Group (related party)"
+      ],
+      "status": "confirmed",
+      "issued": "2025-04",
+      "source": {
+        "doc": "FY2025 20-F Item 5 Liquidity, filed 2026-04-30, acc 0001213900-26-049770; balances from the Q1-26 6-K (2026-05-14) and Q2-26 6-K (2026-08-10)",
+        "date": "2026-08-10",
+        "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026049770/ea0272611-20f_bitdeer.htm"
+      },
+      "as_of": "2026-08-10"
     }
   ],
   "retired": [
@@ -8187,7 +8222,8 @@
     {
       "issuer": "Nebius Group N.V.",
       "items": [
-        "Verified negative: no bank/secured debt through 6/16/26; the Microsoft-contract-secured financing flagged Sep 2025 was not entered into as of 6/16/26 — SUPERSEDED 2026-07-17 by the $775M senior secured debt facility, now tracked as instrument nbis-secured-tl-775"
+        "Verified negative: no bank/secured debt through 6/16/26; the Microsoft-contract-secured financing flagged Sep 2025 was not entered into as of 6/16/26 — SUPERSEDED 2026-07-17 by the $775M senior secured debt facility, now tracked as instrument nbis-secured-tl-775",
+        "Legacy 0.75% converts due 2025-03-03 ($1,250M issued 2020-03-03, Yandex-era) — matured 2025-03-03; >99% repurchased after the March 2022 delisting-event put (93.2% in the June 2022 settlements); residual cash consideration for the remaining notes $5.3M at 12/31/25 and 3/31/26 (FY2025 20-F Note 12; Q1-26 6-K Ex. 99.2), no longer referenced in the Q2-26 6-K Ex. 99.2 — retired 2026-09-17 as matured, formerly nbis-legacy-2025"
       ]
     },
     {
@@ -8276,6 +8312,12 @@
       "issuer": "WhiteFiber, Inc.",
       "items": [
         "Original RBC credit agreement of 2025-06-18 (as amended 2025-07-04), up to ~CAD 60M (~$43.8M) across three facilities — conditions precedent were never satisfied, nothing was ever drawn and no borrowings were available; replaced by the Amended Credit Agreement on 2026-04-27."
+      ]
+    },
+    {
+      "issuer": "Related Digital / Blackstone (Saline Twp, MI)",
+      "items": [
+        "related-saline-barn — duplicate of related-digital-saline-2045 (same RD Michigan Property Owner I LLC $14B 7.500% senior secured notes due 2045, Saline Township MI campus, PIMCO anchor, BofA structuring agent, both dated 2026-04-24); merged 2026-09-17"
       ]
     }
   ]
