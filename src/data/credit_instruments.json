@@ -8110,40 +8110,6 @@
       "exclude_from_totals": true
     },
     {
-      "id": "duot-columbus-seller-earnout",
-      "collateral_class": "operator_campus",
-      "exclude_from_issuance": true,
-      "exclude_reason": "Contingent purchase-price earnout secured by real estate, not GPUs; no principal is owed unless a power milestone is met.",
-      "issuer": "Duos Edge AI, Inc. (Duos Technologies Group)",
-      "ticker": "DUOT",
-      "issuer_type": "public",
-      "entity": "Duos Technologies Group, Inc. (Borrower); seller of 8 Corporate Ridge Parkway, Columbus, Muscogee County, GA (Lender; name blank in the filed form)",
-      "name": "Seller Contingent Earnout Note — Columbus, GA data center property (up to $15M)",
-      "instrument_type": "other",
-      "size_usd_m": 15,
-      "size_note": "Maximum Earnout Amount $15,000,000; three contingent payments of $5,000,000 each, due only on adding 5 MW of Qualifying Power Capacity above the 5 MW Base Power Capacity (10/15/20 MW total nameplate) within 36 months of closing. Unearned amounts expire at maturity. Part of the $30.0M purchase price ($15.0M cash + this note). At the seller's option on or after 2026-12-14 any earned payment may be settled in DUOT common stock at $10.50/share. The 10-Q filed 2026-08-19 calls it a \"two-year\" 0% seller promissory note; the 8-K and the filed form say three years.",
-      "rate": {
-        "kind": "fixed",
-        "value": 0,
-        "note": "0% on earned amounts; no interest on unearned amounts; default interest the lesser of 10% and the lawful maximum"
-      },
-      "maturity": "2029-07-14",
-      "maturity_note": "36 months after the Closing Date (2026-07-14 per the 8-K); no automatic extension",
-      "seniority": "Secured; first-priority deed to secure debt",
-      "security": "Deed to Secure Debt, Assignment of Leases and Rents, Security Agreement and Fixture Filing on 8 Corporate Ridge Parkway, Columbus, GA (~13.7 acres; building being equipped for the 2,304 NVIDIA B300 deployment); GPU Lessee liens permitted",
-      "lenders": [
-        "Property seller (not named in the filing)"
-      ],
-      "status": "confirmed",
-      "issued": "2026-07-14",
-      "source": {
-        "doc": "DUOT 8-K Item 1.01 (event 2026-07-14, filed 2026-07-20), acc 0001079973-26-000961, EX-10.1 Form of Seller Contingent Earnout Note; 10-Q for the quarter ended 2026-06-30, Notes 12 and 18, filed 2026-08-19, acc 0001079973-26-001151",
-        "date": "2026-07-20",
-        "url": "https://www.sec.gov/Archives/edgar/data/1396536/000107997326000961/duot_8k.htm"
-      },
-      "as_of": "2026-08-19"
-    },
-    {
       "id": "galaxy-exch-0050-2031",
       "collateral_class": "out",
       "exclude_from_issuance": true,
