@@ -6,6 +6,7 @@
   "date": "2026-09-18",
   "source": "ECB reference"
  },
+ "ask_max_age_days": 21,
  "record": {
   "window": {
    "start": "2023-07",
@@ -347,9 +348,9 @@
     "n": 135
    },
    "ask": {
-    "med": 336.6,
-    "n": 207,
-    "sources": 4
+    "med": 336.56,
+    "n": 206,
+    "sources": 3
    },
    "vol3y": {
     "listings": 596,
@@ -687,9 +688,9 @@
     "n": 182
    },
    "ask": {
-    "med": 812.96,
-    "n": 173,
-    "sources": 6
+    "med": 816.48,
+    "n": 172,
+    "sources": 5
    },
    "vol3y": {
     "listings": 827,
@@ -3263,9 +3264,9 @@
     "n": 22
    },
    "ask": {
-    "med": 9767.95,
-    "n": 43,
-    "sources": 5
+    "med": 9593.58,
+    "n": 42,
+    "sources": 4
    },
    "vol3y": {
     "listings": 70,

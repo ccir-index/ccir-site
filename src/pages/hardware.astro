@@ -628,8 +628,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       Executed = median sale price across sold listings, trailing 90 days;
       cells with fewer than 3 sold listings show a dash. Posted ask = median
       current single-GPU ask across an official marketplace API and dealer
-      catalogs in the US and UK (source count shown per row; named, with
-      currency and VAT treatment, in Method). Hopper-class dealer pages are
+      catalogs (source count shown per row; currency and VAT treatment in
+      Method). Hopper-class dealer pages are
       largely quote-gated, which is why source counts vary by model. Asks
       are opening prices, never pooled with executed.
       Ask/executed is the posted premium. It narrows as a model
@@ -691,11 +691,11 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <p>
         <strong>Posted asks.</strong> Current single-GPU asks from the eBay
         Browse API (official, keyed) and dealer catalogs collected under
-        each source's terms: IT Creations and UnixSurplus (USD), Bargain
-        Hardware and ETB Technologies (GBP, ex-VAT basis, converted at the
-        ECB reference rate of the observation date: {hw.fx.gbpusd} as of
-        {hw.fx.date}). Additional dealers are tracked quote-gated
-        (presence, no price). Collected sources are named. Data contributed
+        each source's terms. A dealer catalog counts only while its latest
+        capture is within {(hw as any).ask_max_age_days ?? 21} days. Asks
+        posted in other currencies are on an ex-VAT basis and convert to US
+        dollars at the ECB reference rate of {hw.fx.date}. Additional
+        dealers are tracked quote-gated (presence, no price). Data contributed
         through the channel below is held source-confidential with its
         evidence grade disclosed. Asks are a stock of open offers. They
         lead and overstate executed prices and are shown only beside them,
