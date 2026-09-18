@@ -189,10 +189,20 @@ const docketDetail = (l: Letter): string => {
   const i = l.onDocket.indexOf('(');
   return i >= 0 ? l.onDocket.slice(i + 1, l.onDocket.length - 1) : 'filed';
 };
+// Newest first inside each group (John, 2026-09-18): the page is a running
+// docket, so a returning reader sees what landed since the last visit. Same
+// date: the later docket entry leads.
+const newestFirst = (a: Letter, b: Letter): number =>
+  b.date.localeCompare(a.date) || LETTERS.indexOf(b) - LETTERS.indexOf(a);
 const LETTER_GROUPS = [
-  { title: 'Filed on the docket', items: LETTERS.filter((l) => docketOf(l)) },
-  { title: 'Posted publicly, not filed', items: LETTERS.filter((l) => !docketOf(l)) },
+  { title: 'Filed on the docket', items: LETTERS.filter((l) => docketOf(l)).sort(newestFirst) },
+  { title: 'Posted publicly, not filed', items: LETTERS.filter((l) => !docketOf(l)).sort(newestFirst) },
 ];
+// The count in the section text is read from the list, never typed.
+const NUM_WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+  'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen', 'Twenty'];
+const nOnDocket = LETTER_GROUPS[0].items.length;
+const onDocketLine = `${NUM_WORDS[nOnDocket] ?? String(nOnDocket)} comment letter${nOnDocket === 1 ? ' is' : 's are'} on the docket.`;
 
 // Statements on the record: positions spoken or given to the press, not
 // filed. Same discipline as the letters: date, who, where, the words, link.
@@ -384,7 +394,7 @@ const TOPICS: Topic[] = [
     <section class="sec" id="letters">
       <h2><span class="n">02</span> Comment letters</h2>
       <p class="lede-para">
-        Seven comment letters are on the docket. The docket copy is the record.
+        {onDocketLine} The docket copy is the record.
         Each card gives the filer's own asks, in the filer's own words, with a
         link to the docket. A letter posted elsewhere is listed apart until it
         is filed. Remarks to the press and at Commission meetings are in
