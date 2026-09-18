@@ -1,8 +1,8 @@
 {
   "as_of_date": "2026-09-17",
-  "published_at_ct": "2026-09-18T03:26:58-05:00",
-  "published_at_utc": "2026-09-18T08:26:58+00:00",
-  "run_id": "export-20260918T082538Z-448b5076",
+  "published_at_ct": "2026-09-18T12:23:12-05:00",
+  "published_at_utc": "2026-09-18T17:23:12+00:00",
+  "run_id": "export-20260918T172151Z-7a9035b6",
   "methodology_version": "v2.4.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
   "contributing_today": 71,
@@ -19,7 +19,7 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 72758,
+    "total_rows": 66928,
     "window_days": 30,
     "window_end": "2026-09-17",
     "window_start": "2026-08-19"
@@ -43,7 +43,7 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 1980,
+    "total_rows": 1973,
     "window_days": 7,
     "window_end": "2026-09-17",
     "window_start": "2026-09-11"

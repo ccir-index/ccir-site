@@ -690,8 +690,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-04,latitude,b300-sxm-288gb,B300,288GB,SXM,RoCE,OnDemand,NonInterruptible,OnDemand,US-East,US,SIF,T2IF,T2,16.0000,True,local-nvme;free-egress,SoldOut,v2.4.0,panel,united-states
 2026-09-04,latitude,b300-sxm-288gb,B300,288GB,SXM,RoCE,1M,NonInterruptible,Reserved,US-East,US,SIF,T2IF,T2,8.0000,True,local-nvme;free-egress,SoldOut,v2.4.0,panel,united-states
 2026-09-04,latitude,b300-sxm-288gb,B300,288GB,SXM,RoCE,1Y,NonInterruptible,Reserved,US-East,US,SIF,T2IF,T2,5.6000,True,local-nvme;free-egress,SoldOut,v2.4.0,panel,united-states
-2026-09-04,lyceum,b300-sxm-288gb,B300,288GB,SXM,,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,8.4900,False,,Available,v2.4.0,candidate,EU (undisclosed)
 2026-09-04,lyceum,b300-sxm-288gb,B300,288GB,SXM,,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,7.9900,False,,Available,v2.4.0,candidate,EU (undisclosed)
+2026-09-04,lyceum,b300-sxm-288gb,B300,288GB,SXM,,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,8.4900,False,,Available,v2.4.0,candidate,EU (undisclosed)
 2026-09-04,massed_compute,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-East,US,DIF,T3IF,T3,6.6000,False,,Available,v2.4.0,panel,US
 2026-09-04,nebius,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,IIF,T1IF,T2,7.8500,True,observability;managed-ops-plane;free-egress,Available,v2.4.0,panel,
 2026-09-04,nebius,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,Other,Other,DIF,T1IF,T2,4.3000,True,observability;managed-ops-plane;free-egress,Available,v2.4.0,panel,
@@ -800,8 +800,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-06,latitude,b300-sxm-288gb,B300,288GB,SXM,RoCE,OnDemand,NonInterruptible,OnDemand,US-East,US,SIF,T2IF,T2,16.0000,True,local-nvme;free-egress,SoldOut,v2.4.0,panel,united-states
 2026-09-06,latitude,b300-sxm-288gb,B300,288GB,SXM,RoCE,1M,NonInterruptible,Reserved,US-East,US,SIF,T2IF,T2,8.0000,True,local-nvme;free-egress,SoldOut,v2.4.0,panel,united-states
 2026-09-06,latitude,b300-sxm-288gb,B300,288GB,SXM,RoCE,1Y,NonInterruptible,Reserved,US-East,US,SIF,T2IF,T2,5.6000,True,local-nvme;free-egress,SoldOut,v2.4.0,panel,united-states
-2026-09-06,lyceum,b300-sxm-288gb,B300,288GB,SXM,,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,8.4900,False,,Available,v2.4.0,candidate,EU (undisclosed)
 2026-09-06,lyceum,b300-sxm-288gb,B300,288GB,SXM,,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,7.9900,False,,Available,v2.4.0,candidate,EU (undisclosed)
+2026-09-06,lyceum,b300-sxm-288gb,B300,288GB,SXM,,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,8.4900,False,,Available,v2.4.0,candidate,EU (undisclosed)
 2026-09-06,massed_compute,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-East,US,DIF,T3IF,T3,6.6000,False,,Available,v2.4.0,panel,US
 2026-09-06,nebius,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,IIF,T1IF,T2,7.8500,True,observability;managed-ops-plane;free-egress,Available,v2.4.0,panel,
 2026-09-06,nebius,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,Interruptible,Spot,Other,Other,DIF,T1IF,T2,4.3000,True,observability;managed-ops-plane;free-egress,Available,v2.4.0,panel,
@@ -1314,17 +1314,17 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,3Y,NonInterruptible,Reserved,Other,Other,HIF,T1IF,T1,15.1810,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,sa-east-1
 2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-East,US,HIF,T1IF,T1,7.6905,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,us-east-1
 2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,3Y,NonInterruptible,Reserved,US-West,US,HIF,T1IF,T1,7.6905,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,us-west-2
-2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,5.8105,False,,Available,v2.4.0,panel,ap-northeast-2c
-2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.2382,False,,Available,v2.4.0,panel,ap-south-2a
-2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.2765,False,,Available,v2.4.0,panel,ap-south-2c
-2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,3.2231,False,,Available,v2.4.0,panel,ap-southeast-3a
-2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,3.2854,False,,Available,v2.4.0,panel,ap-southeast-3c
-2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,Other,Other,DIF,T2IF,T1,6.9751,False,,Available,v2.4.0,panel,sa-east-1b
-2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,Other,Other,DIF,T2IF,T1,7.7022,False,,Available,v2.4.0,panel,sa-east-1c
+2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,5.8398,False,,Available,v2.4.0,panel,ap-northeast-2c
+2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.1458,False,,Available,v2.4.0,panel,ap-south-2a
+2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,4.2427,False,,Available,v2.4.0,panel,ap-south-2c
+2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,3.1523,False,,Available,v2.4.0,panel,ap-southeast-3a
+2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,3.2644,False,,Available,v2.4.0,panel,ap-southeast-3c
+2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,Other,Other,DIF,T2IF,T1,6.9146,False,,Available,v2.4.0,panel,sa-east-1b
+2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,Other,Other,DIF,T2IF,T1,7.6928,False,,Available,v2.4.0,panel,sa-east-1c
 2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.6029,False,,Available,v2.4.0,panel,us-east-1b
 2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.5858,False,,Available,v2.4.0,panel,us-east-1d
 2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.5875,False,,Available,v2.4.0,panel,us-west-2a
-2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.5089,False,,Available,v2.4.0,panel,us-west-2b
+2026-09-16,aws,b300-sxm-288gb,B300,288GB,SXM,EFA,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.5098,False,,Available,v2.4.0,panel,us-west-2b
 2026-09-16,aws_capacity_blocks,b300-sxm-288gb,B300,288GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,Other,Other,HIF,T2IF,T1,14.0400,False,,Available,v2.4.0,term-panel,non-us
 2026-09-16,aws_capacity_blocks,b300-sxm-288gb,B300,288GB,SXM,EFA,CapacityBlock,NonInterruptible,Reserved,US-East,US,HIF,T2IF,T1,14.0400,False,,Available,v2.4.0,term-panel,us-east-1
 2026-09-16,civo,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,SIF,T2IF,T2,7.4900,False,,Available,v2.4.0,panel,
@@ -1358,7 +1358,7 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-16,runpod_secure,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T2IF,T3,7.8900,True,local-nvme,SoldOut,v2.4.0,panel,Global
 2026-09-16,runpod_secure,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-West,US,DIF,T2IF,T3,7.8900,True,local-nvme,Available,v2.4.0,panel,US-WA-2
 2026-09-16,scaleway,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T3IF,T2,8.6543,True,local-nvme,Available,v2.4.0,panel,fr-par-2
-2026-09-16,sesterce,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-West,US,IIF,T2IF,T2,7.7000,False,,Available,v2.4.0,panel,us-west-1
+2026-09-16,sesterce,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,US-West,US,IIF,T2IF,T2,4.9500,False,,Available,v2.4.0,panel,us-west-1
 2026-09-16,spheron,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,Interruptible,Spot,EU,EU,DIF,T3IF,T3,5.8455,False,,Available,v2.4.0,panel,uk-south-1
 2026-09-16,vast_ai,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,13.7500,False,,Available,v2.4.0,marketplace,", CA"
 2026-09-16,vast_ai,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-East,US,DIF,T3IF,T3,8.1250,False,,Available,v2.4.0,marketplace,"MASSACHUSETTS, US"
@@ -1414,7 +1414,6 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-17,oci,b300-sxm-288gb,B300,288GB,SXM,RoCE-v2,OnDemand,NonInterruptible,OnDemand,US-East,US,HIF,T1IF,T1,15.0000,True,local-nvme;egress-capped;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,us-ashburn-1
 2026-09-17,qubrid,b300-sxm-288gb,B300,288GB,SXM,Unknown,1Y,NonInterruptible,Reserved,Other,Other,SIF,T2IF,T2,5.5565,False,,Available,v2.4.0,panel,
 2026-09-17,runpod_community,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,6.9400,False,,SoldOut,v2.4.0,panel,Global
-2026-09-17,runpod_secure,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,EU,EU,DIF,T2IF,T3,7.8900,True,local-nvme,Available,v2.4.0,panel,EUR-IS-1
 2026-09-17,runpod_secure,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T2IF,T3,7.8900,True,local-nvme,Available,v2.4.0,panel,Global
 2026-09-17,runpod_secure,b300-sxm-288gb,B300,288GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-West,US,DIF,T2IF,T3,7.8900,True,local-nvme,Available,v2.4.0,panel,US-WA-2
 2026-09-17,scaleway,b300-sxm-288gb,B300,288GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T3IF,T2,8.6528,True,local-nvme,Available,v2.4.0,panel,fr-par-2
