@@ -450,7 +450,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         {NINE.map((p) => (
           <div class="chart-box nine-panel">
             <svg viewBox={`0 0 ${PW} ${PH}`} role="img"
-                 aria-label={`${p.label}, introduced ${p.ga}: the executed sales record as a percent of the launch basis over July 2023 to August 2026, with the current posted-ask median marked as an open circle at the right edge. Log scale fitted per panel.`}>
+                 aria-label={`${p.label}, introduced ${p.ga}: the executed sales record as a percent of the launch basis over ${monthLabel(rec.window.start)} to ${monthLabel(rec.window.end)}, with the current posted-ask median marked as an open circle at the right edge. Log scale fitted per panel.`}>
               {p.pyTicksP.map((t) => (
                 <g>
                   <line x1={pPL} x2={PW - pPR} y1={p.py(t)} y2={p.py(t)} class="grid" />
@@ -496,7 +496,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
           <summary>Chart notes</summary>
           <p class="tfoot">
             One panel per model with a locked launch-price basis. x = the
-            executed record's calendar window, July 2023 – August 2026,
+            executed record's calendar window, {recWindow},
             shared across panels. y = percent of the evidence-graded
             launch basis, log scale fitted per panel to that chip's own
             range, so panels are not directly overlayable by eye. The table
