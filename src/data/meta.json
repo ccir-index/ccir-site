@@ -1,11 +1,11 @@
 {
-  "as_of_date": "2026-09-18",
-  "published_at_ct": "2026-09-19T09:31:16-05:00",
-  "published_at_utc": "2026-09-19T14:31:16+00:00",
-  "run_id": "export-20260919T143004Z-b19b50ff",
+  "as_of_date": "2026-09-19",
+  "published_at_ct": "2026-09-20T03:11:37-05:00",
+  "published_at_utc": "2026-09-20T08:11:37+00:00",
+  "run_id": "export-20260920T081029Z-2956df23",
   "methodology_version": "v2.4.0",
   "independence_declaration": "All inputs publicly observable. No solicited quotes.",
-  "contributing_today": 69,
+  "contributing_today": 72,
   "listings_history": {
     "chips": [
       "h100-sxm-80gb",
@@ -19,10 +19,10 @@
     ],
     "filter": "global panel",
     "status": "ok",
-    "total_rows": 67066,
+    "total_rows": 67190,
     "window_days": 30,
-    "window_end": "2026-09-18",
-    "window_start": "2026-08-20"
+    "window_end": "2026-09-19",
+    "window_start": "2026-08-21"
   },
   "marketplace_history": {
     "chips": [
@@ -43,10 +43,10 @@
       "runpod_cluster"
     ],
     "status": "ok",
-    "total_rows": 1948,
+    "total_rows": 1906,
     "window_days": 7,
-    "window_end": "2026-09-18",
-    "window_start": "2026-09-12"
+    "window_end": "2026-09-19",
+    "window_start": "2026-09-13"
   },
   "vast": null,
   "availability": null,
@@ -59,7 +59,7 @@
       "a100-sxm-80gb",
       "a100-sxm-40gb"
     ],
-    "imu_series_start": "2026-06-21",
+    "imu_series_start": "2026-06-22",
     "intraday_window_days": 30,
     "n_sources": 17,
     "occupancy_chips": [
@@ -71,7 +71,7 @@
       "a100-sxm",
       "all"
     ],
-    "occupancy_cycles": 470,
+    "occupancy_cycles": 474,
     "occupancy_series_start": "2026-05-13",
     "runpod_occupancy_chips": [],
     "runpod_occupancy_cycles": 0,
@@ -93,15 +93,15 @@
     "models_tracked": 200,
     "models_tracked_basis": {
       "definition": "distinct canonical_model_id across the published panel (n>=3 providers) and the latest day of the first-party posted-price series",
-      "frontier_as_of": "2026-09-19",
-      "frontier_latest_day": 149,
-      "in_both_lanes": 25,
+      "frontier_as_of": "2026-09-20",
+      "frontier_latest_day": 147,
+      "in_both_lanes": 23,
       "panel_n3_gate": 76,
       "roster_file": "token_models_tracked.csv"
     },
-    "n_days": 79,
+    "n_days": 80,
     "n_models_published": 76,
-    "series_end": "2026-09-19",
+    "series_end": "2026-09-20",
     "series_id": "CCIR-TOKEN-B1",
     "series_start": "2026-07-03",
     "status": "ok"
