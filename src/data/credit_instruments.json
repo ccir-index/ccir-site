@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-09-17",
+    "as_of": "2026-09-21",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -557,14 +557,14 @@
       "ticker": "CRWV",
       "issuer_type": "public",
       "entity": null,
-      "name": "Convertible Senior Notes due 2033 (proposed; pricing pending)",
+      "name": "2.875% Convertible Senior Notes due 2033 (priced 9/18; settles 9/22)",
       "instrument_type": "convertible",
-      "size_usd_m": 3000,
-      "size_note": "Proposed $3.0B aggregate principal in a Rule 144A private offering, announced 2026-09-17; initial purchasers' option for up to $500M more (13-day settlement window). Coupon, initial conversion rate and other terms set at pricing. Capped call transactions expected at pricing; proceeds fund the capped calls, the remainder for general corporate purposes. Same 8-K: an Equity Distribution Agreement for up to 35,000,000 Class A shares (at-the-market sales and collared forward sales; no sales for at least 30 days after the notes' purchase agreement), not a credit row.",
+      "size_usd_m": 3700,
+      "size_note": "$3.7B aggregate principal, priced 2026-09-18 in a Rule 144A private offering, upsized from the $3.0B proposed on 2026-09-17; settlement scheduled 2026-09-22. Initial purchasers' option for up to $500M more within 13 days of first issuance. Initial conversion rate 10.2194 shares per $1,000 principal (conversion price about $97.85, a 22.50% premium to the $79.88 close on 2026-09-17). Net proceeds about $3,644.5M (about $4,137.0M if the option is exercised in full); about $498.8M funds capped calls with an initial cap price of $199.70 (150% premium), the remainder for general corporate purposes. Optional redemption from 2030-04-05, subject to a 130% stock-price test. The 9/17 8-K also filed an Equity Distribution Agreement for up to 35,000,000 Class A shares (at-the-market and collared forward sales), not a credit row.",
       "rate": {
-        "kind": "undisclosed",
-        "value": null,
-        "note": "Interest rate and conversion rate to be determined at pricing"
+        "kind": "fixed",
+        "value": 2.875,
+        "note": "Payable semiannually on April 1 and October 1, from 2027-04-01"
       },
       "maturity": "2033-04-01",
       "maturity_note": null,
@@ -572,13 +572,13 @@
       "security": null,
       "lenders": [],
       "status": "confirmed",
-      "issued": "2026-09-17",
+      "issued": "2026-09-18",
       "source": {
-        "doc": "8-K 9/17/26 Item 7.01 (EX-99.1 press release, EX-99.2 investor supplement) and Item 8.01 (equity distribution agreement), acc 0001769628-26-000429",
-        "date": "2026-09-17",
-        "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000429/crwv-20260917.htm"
+        "doc": "CoreWeave pricing release 2026-09-18 (investors.coreweave.com); proposal 8-K 9/17/26 acc 0001769628-26-000429. Pricing/closing 8-K not yet on EDGAR at 2026-09-21",
+        "date": "2026-09-18",
+        "url": "https://investors.coreweave.com/news/news-details/2026/CoreWeave-Prices-Upsized-3-7-Billion-Convertible-Senior-Notes-Offering/default.aspx"
       },
-      "as_of": "2026-09-17"
+      "as_of": "2026-09-21"
     },
     {
       "id": "crwv-rcf",
@@ -2817,6 +2817,39 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1839341/000119312526208905/d47435d8k.htm"
       },
       "as_of": "2026-05-06"
+    },
+    {
+      "id": "clsk-csdc-7875-2031",
+      "collateral_class": "operator_campus",
+      "issuer": "CleanSpark, Inc.",
+      "ticker": "CLSK",
+      "issuer_type": "public",
+      "entity": "CSDC Finance I, LLC (issuer); CSRE Properties Sandersville, LLC (guarantor)",
+      "name": "7.875% Senior Secured Notes due 2031 (Sandersville GA, 175 MW; priced 9/18, closing 9/25)",
+      "instrument_type": "bond",
+      "size_usd_m": 2276,
+      "size_note": "Priced 2026-09-18 at 98.500% of principal in a Rule 144A / Regulation S private offering; closing expected 2026-09-25. Proceeds fund the remaining build-out of the Sandersville Facility, reimburse CleanSpark for prior equity contributions and fund debt service reserves. The facility is under a 20-year lease with two five-year extensions to a tenant the filings describe only as a \"high-investment grade, leading global technology company\": about $6.6B of contracted revenue over the initial term, 175 MW of critical IT load, deliveries expected from Q4 2027 (8-K 7/14/26).",
+      "rate": {
+        "kind": "fixed",
+        "value": 7.875,
+        "note": "Issued at 98.500% of principal"
+      },
+      "maturity": "2031",
+      "maturity_note": "Exact maturity date not stated in the pricing release",
+      "seniority": "Senior secured, subsidiary-level; parent completion guarantee",
+      "security": "First-priority liens on substantially all assets of the issuer and CSRE Properties Sandersville (other than excluded property) and all equity of the issuer held by CSDC Holdings I, LLC; CleanSpark completion guarantee on the Sandersville Facility",
+      "lenders": [
+        "144A / Reg S (initial purchasers not named in the release)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-09-18",
+      "source": {
+        "doc": "8-K 9/18/26 EX-99.1 pricing release, acc 0001193125-26-395727; proposal 8-K 9/17/26 acc 0001193125-26-393758; lease 8-K 7/14/26 EX-99.1, acc 0001193125-26-302448",
+        "date": "2026-09-18",
+        "url": "https://www.sec.gov/Archives/edgar/data/827876/000119312526395727/clsk-ex99_1.htm"
+      },
+      "as_of": "2026-09-21",
+      "offtaker_label": "Investment-grade technology tenant (unnamed in the filings)"
     },
     {
       "id": "dlr-global-rcf",
@@ -6123,6 +6156,42 @@
         "url": "https://www.bloomberg.com/news/articles/2025-10-23/record-38-billion-debt-sale-nears-for-oracle-tied-data-centers"
       },
       "as_of": "2026-07-27"
+    },
+    {
+      "id": "vantage-na-dev-rcf-2026",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "issuer": "Vantage Data Centers",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": null,
+      "name": "$2B development revolving credit facility (North American platform)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 2000,
+      "size_note": "Closed 2026-09-14. Five-year revolving credit platform including extension options, funding early-stage development across Vantage's North American platform. Initial collateral pool of three development assets (not named), with additional assets contributable over time. Vantage says it has closed more than $40B of capital in 2026.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": null
+      },
+      "maturity": "Undisclosed",
+      "maturity_note": "Five-year revolving term including extension options; end date not stated",
+      "seniority": "Secured revolving facility (ranking not stated)",
+      "security": "Initial pool of three development assets (unnamed); additional assets may be contributed over time",
+      "lenders": [
+        "Evercore (lead arranger)",
+        "Wells Fargo Securities, LLC (lead arranger)",
+        "A dozen insurance and other institutional investors (unnamed)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-09-14",
+      "source": {
+        "doc": "Vantage release 2026-09-14",
+        "date": "2026-09-14",
+        "url": "https://vantage-dc.com/news/vantage-secures-2b-credit-facility-expanding-financing-to-support-growing-demand/"
+      },
+      "as_of": "2026-09-21"
     },
     {
       "id": "general-compute-upper90-sambanova",
