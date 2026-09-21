@@ -14,7 +14,6 @@ const priorVersions = versions.versions.filter(
   (v) => v.version !== versions.current && v.effective <= (currentVersion?.effective ?? ''),
 );
 const versionRows = currentVersion ? [currentVersion, ...priorVersions] : priorVersions;
-const pdfHref = (v) => (v.pdf ? `/documents/methodology/${v.pdf}` : null);
 
 const docs = [
   {
@@ -93,16 +92,14 @@ const docs = [
     <section class="versions" id="methodology-versions">
       <h2 class="versions-title">Methodology versions</h2>
       <p class="versions-note">
-        Each methodology version is a dated PDF. A version's PDF does not
-        change after publication. The change log entry records what changed
-        and when it took effect.
+        The change log entry for each version records what changed and when
+        it took effect.
       </p>
       <table class="versions-table">
         <thead>
           <tr>
             <th>Version</th>
             <th>Effective</th>
-            <th>Document</th>
             <th>Change log</th>
           </tr>
         </thead>
@@ -114,9 +111,6 @@ const docs = [
                 {v.version === versions.current && <span class="tag">current</span>}
               </td>
               <td>{v.effective}</td>
-              <td>
-                {pdfHref(v) ? <a href={pdfHref(v)}>PDF</a> : <span class="none">no PDF</span>}
-              </td>
               <td>
                 {v.changelog_id ? (
                   <a href={`/documents/changelog#${v.changelog_id}`}>{v.changelog_id}</a>

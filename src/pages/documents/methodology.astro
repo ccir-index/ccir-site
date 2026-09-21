@@ -17,7 +17,6 @@ const { title, standfirst, body } = await renderMethodology(raw);
 // Version bar. versions.json is the public index the mirror workflow writes:
 // one dated PDF per methodology version.
 const current = versions.versions.find((v) => v.version === versions.current);
-const pdfHref = current?.pdf ? `/documents/methodology/${current.pdf}` : null;
 ---
 <Base
   title="GPU Compute Price Index Methodology — Sources, Aggregation, Series Grammar · CCIR"
@@ -33,9 +32,6 @@ const pdfHref = current?.pdf ? `/documents/methodology/${current.pdf}` : null;
         <span class="sep">·</span> effective {current?.effective}
         {current?.document_revision && (
           <><span class="sep">·</span> document revised {current.document_revision}</>
-        )}
-        {pdfHref && (
-          <><span class="sep">·</span> <a href={pdfHref}>PDF</a></>
         )}
         <span class="sep">·</span> <a href="/documents#methodology-versions">All versions</a>
       </p>
