@@ -5621,29 +5621,38 @@
       "entity": "Nscale Services UK Ltd",
       "name": "GPU-backed delayed-draw term loan (DDTL)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 1400,
-      "size_note": "Oversubscribed. EDGAR-visible slices at 3/31/2026: Blue Owl BDC commitments $400M (OBDC $40M / OCIC $160M / OTF $200M; $16.6M par funded), PIMCO registered funds $350M par across 18 NPORT-P filers (Level 3, carried at par); LuminArx slice and remainder not EDGAR-visible. Draw window expires 8/2027 per Blue Owl 10-Qs",
+      "size_usd_m": 1422,
+      "size_note": "Delayed draw term loan commitments of $1,422,000,000 at signing (filed credit agreement, Exhibit 10.14); incremental capacity of up to $350M. Availability ends 2027-09-30 per the prospectus. Drawn: about $58.9M in early 2026 and a further $329.0M in August 2026; at 2026-06-30 the carrying amount was $48.2M with $1,363.1M unused. Per-lender commitments are redacted in the filed agreement. EDGAR-visible slices at 3/31/2026: Blue Owl BDC commitments $400M (OBDC $40M / OCIC $160M / OTF $200M; $16.6M par funded), PIMCO registered funds $350M par across 18 NPORT-P filers (Level 3, carried at par).",
       "rate": {
         "kind": "sofr_spread",
         "value": 5,
-        "note": "3M SOFR + 5.00% as disclosed in Blue Owl BDC Q1-2026 10-Qs (OBDC acc 0001655888-26-000033, OCIC 0001812554-26-000027, OTF 0001747777-26-000019)"
+        "note": "Term SOFR + 5.00% (base rate + 4.00%), 0.00% floor, per the filed credit agreement; the margin steps to 5.25% if a named customer assigns certain site capacity to a customer rated below Baa2/BBB. Undrawn fee 0.50% for the first six months after signing, then 1.00%. Prepayment premium 2.00% in year one and 1.00% in year two from each funding date. Upfront fees sit in an unfiled fee letter. Effective rate 11.30% at 2026-06-30 per the interim financial statements. Blue Owl BDC Q1-2026 10-Qs report the same 5.00% spread."
       },
-      "maturity": "2031-02",
-      "maturity_note": "Per Blue Owl BDC Q1-2026 10-Qs (2/2031). Conflict reproduced as disclosed: 18 PIMCO fund NPORT-P filings (period 2026-03-31) report maturity 2032-08-11 for the same instrument (CUSIP BA000WQD0); no primary document reconciles the two",
-      "seniority": "First lien senior secured DDTL (per Blue Owl BDC Q1-2026 10-Qs)",
-      "security": "Backed by GPUs, drawn as hardware deploys; funds clusters with signed customer contracts + pipeline (Norway, Portugal, Iceland, UK)",
+      "maturity": "2032-09-30",
+      "maturity_note": "Filed credit agreement: each loan matures at the earlier of its final scheduled amortization payment and five years after the last day of the availability period. The prospectus dates the end of the availability period at 2027-09-30, so the date shown is the outer limit. Amortization is quarterly on a redacted schedule. Holder filings report other dates for the same instrument: Blue Owl BDC Q1-2026 10-Qs report 2/2031, and 18 PIMCO fund NPORT-P filings (period 2026-03-31) report 2032-08-11 (CUSIP BA000WQD0).",
+      "seniority": "First lien senior secured DDTL",
+      "security": "First-priority security over substantially all assets and the equity of the loan parties; subsidiary guarantees and a parent guarantee; recourse to the loan parties is limited to available funds and the security. Draws fund GPU capital expenditures once servers are delivered and title has passed, sized on cost: up to 80% for investment-grade customer contracts, capped by a 1.20x sizing debt service coverage ratio; loans ahead of customer acceptance are capped at $425M. Covenants: historical debt service coverage of at least 1.05x, with a cash trap below 1.15x. Glomfjord, Norway is named; Icelandic and Portuguese security is referenced. Customer names are redacted.",
       "lenders": [
-        "Funds managed by PIMCO, Blue Owl, LuminArx + unnamed asset managers/banks",
-        "Goldman Sachs (sole structuring + placement agent)"
+        "Funds managed by PIMCO (29 funds and vehicles sign the filed amendments)",
+        "Blue Owl Capital Corporation, Blue Owl Credit Income Corp., Blue Owl Technology Finance Corp.",
+        "Stonepeak Infrastructure Credit Fund I; Hudson Waterfront Credit SPV I",
+        "Viola Credit ALF III (two vehicles)",
+        "NB SF Canada Investors 2021-1",
+        "NJORDX Holdings DAC; SPC OPPS Holdings S.à r.l.",
+        "ABN AMRO Bank N.V.",
+        "Abu Dhabi Commercial Bank P.J.S.C.",
+        "LuminArx (named in the issuer release)",
+        "Goldman Sachs Lending Partners (lead arranger); Goldman Sachs International (swap counterparty)",
+        "Global Loan Agency Services Limited (administrative agent); GLAS Trust Corporation Limited (collateral agent)"
       ],
       "status": "confirmed",
-      "issued": "2026-02-12",
+      "issued": "2026-02-11",
       "source": {
-        "doc": "Nscale release; Bloomberg; terms from Blue Owl BDC Q1-2026 10-Qs and PIMCO NPORT-P filings",
-        "date": "2026-02-12",
-        "url": "https://www.nscale.com/press-releases/nscale-signs-1-4bn-delayed-draw-term-loan"
+        "doc": "Nscale Form S-1 filed 2026-09-18 (acc 0001193125-26-395475): Exhibit 10.14 Credit Agreement dated 2026-02-11, Exhibits 10.15 to 10.17 amendments, and the prospectus; Nscale release 2026-02-12; Blue Owl BDC Q1-2026 10-Qs and PIMCO NPORT-P filings",
+        "date": "2026-09-18",
+        "url": "https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/"
       },
-      "as_of": "2026-07-12",
+      "as_of": "2026-09-20",
       "offtaker_label": "Signed customer contracts (counterparties unnamed)"
     },
     {
@@ -5652,35 +5661,37 @@
       "issuer": "Nscale",
       "ticker": null,
       "issuer_type": "private",
-      "entity": null,
-      "name": "Norway (Narvik) project financing",
+      "entity": "Nscale Norway DC DA (Narvik)",
+      "name": "Norway (Narvik) project financing: Kvandal South DC Facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 790,
-      "size_note": "$790M committed + uncommitted accordion (~$790M more reported) for 115 MW expansion",
+      "size_note": "$725M senior term loan plus a $65M revolving VAT facility; uncommitted accordion of up to $725M term and $65M revolving. Drawn in August 2026: $88.1M term and $19.1M VAT. The issuer release of 2026-05-11 announced the financing; the Senior Facilities Agreement is dated 2026-07-07.",
       "rate": {
-        "kind": "undisclosed",
+        "kind": "sofr_spread",
         "value": null,
-        "note": null
+        "value_low": 3,
+        "value_high": 3.75,
+        "note": "Term loan: Term SOFR (NIBOR for NOK loans), 0% floor, plus a margin of 3.50% before completion, then 3.00% in years 1-2, 3.25% in years 3-4, 3.50% in year 5 and 3.75% in year 6. VAT facility margin 2.00%. Commitment fee 35% of the applicable margin per the prospectus."
       },
-      "maturity": "Undisclosed",
-      "maturity_note": null,
+      "maturity": "2033-04",
+      "maturity_note": "Term loan matures six years from the target completion date of 2027-04-05, with quarterly installments from 2027-06-30. The VAT facility matures on the completion long-stop date of 2027-06-30.",
       "seniority": "Project financing",
-      "security": "Narvik campus (anchor customer Microsoft via ~$14B / 200k GB300 agreement); collateral unstated",
+      "security": "Finances the data center building at the Kvandal South site in Narvik (108 MW overall capacity); the filed agreement excludes the GPUs and GPU servers from the financed asset. Revenue is a data center services agreement with an affiliated GPU company, and the offtake counterparty is redacted. Parent company guarantee and transaction security. Covenants: historic debt service coverage of at least 1.05x and net leverage within 30% of the base case; cash trap below 1.15x; six-month debt service reserve.",
       "lenders": [
-        "ABN AMRO",
-        "DNB",
-        "Eksfin (Norwegian ECA)",
-        "Nordea",
-        "SEB"
+        "ABN AMRO Bank N.V. (mandated lead arranger, bookrunner)",
+        "DNB Bank ASA (mandated lead arranger, bookrunner; facility, security and administrative agent)",
+        "Nordea Bank Abp NUF (mandated lead arranger, bookrunner)",
+        "Export Finance Norway (Eksfin; mandated lead arranger and direct lender)",
+        "Skandinaviska Enskilda Banken AB (mandated lead arranger)"
       ],
       "status": "confirmed",
-      "issued": "2026-05-11",
+      "issued": "2026-07-07",
       "source": {
-        "doc": "Nscale release",
-        "date": "2026-05-11",
-        "url": "https://www.nscale.com/press-releases/nscale-secures-790-million-norway"
+        "doc": "Nscale Form S-1 filed 2026-09-18 (acc 0001193125-26-395475): Exhibit 10.21 Senior Facilities Agreement dated 2026-07-07 and the prospectus; Nscale release 2026-05-11",
+        "date": "2026-09-18",
+        "url": "https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/"
       },
-      "as_of": "2026-07-02"
+      "as_of": "2026-09-20"
     },
     {
       "id": "nscale-rcf-2026",
@@ -5688,20 +5699,20 @@
       "issuer": "Nscale",
       "ticker": null,
       "issuer_type": "private",
-      "entity": null,
+      "entity": "Nscale Global Holdings Limited (original borrower); Nscale Limited became successor borrower in July 2026",
       "name": "Revolving Credit Facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 900,
-      "size_note": "$900M senior RCF; fourth 2026 financing (after the Feb $1.4B DDTL and May Narvik project financing)",
+      "size_note": "Revolving Credit and Guaranty Agreement dated 2026-05-08 with initial commitments of $770M; Amendment No. 2 dated 2026-06-30 raised the commitments to $900M. Letter of credit sublimit $200M. Incremental capacity of up to $500M plus a leverage-based amount. Undrawn at 2026-06-30; $830.0M utilized since then per the prospectus. The issuer release is dated 2026-07-07.",
       "rate": {
-        "kind": "undisclosed",
-        "value": null,
-        "note": null
+        "kind": "sofr_spread",
+        "value": 1.75,
+        "note": "Term SOFR + 1.75% (alternate base rate + 0.75%), flat with no pricing grid, 0.00% floor; commitment fee 0.25% per annum on undrawn commitments"
       },
-      "maturity": "Undisclosed",
-      "maturity_note": null,
+      "maturity": "2029",
+      "maturity_note": "Third anniversary of the effective date, which falls within 60 days of the 2026-05-08 signing; two one-year extensions at the lenders' option.",
       "seniority": "Senior revolving credit facility",
-      "security": "Undisclosed; proceeds for US/Europe/APAC data-center buildout",
+      "security": "Guaranteed by certain subsidiaries and secured by first-priority security interests in substantially all personal property of the borrower and the guarantors; project finance vehicles are excluded subsidiaries. Financial covenant: total net leverage of no more than 6.00x, tested quarterly from 2026-06-30. Proceeds for working capital, general corporate purposes and letters of credit.",
       "lenders": [
         "J.P. Morgan",
         "Goldman Sachs",
@@ -5717,13 +5728,13 @@
         "KeyBank"
       ],
       "status": "confirmed",
-      "issued": "2026-07-07",
+      "issued": "2026-05-08",
       "source": {
-        "doc": "Nscale release",
-        "date": "2026-07-07",
-        "url": "https://www.nscale.com/press-releases/revolving-credit-facility"
+        "doc": "Nscale Form S-1 filed 2026-09-18 (acc 0001193125-26-395475): Exhibit 10.18 Revolving Credit and Guaranty Agreement dated 2026-05-08, Exhibits 10.18(a) and 10.18(b) amendments, and the prospectus; Nscale release 2026-07-07 (lender list)",
+        "date": "2026-09-18",
+        "url": "https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/"
       },
-      "as_of": "2026-07-10"
+      "as_of": "2026-09-20"
     },
     {
       "id": "mistral-essonne",
@@ -6903,35 +6914,37 @@
       "offtaker_label": "Microsoft lease (per press)"
     },
     {
-      "as_of": "2026-09-06",
+      "as_of": "2026-09-20",
       "collateral_class": "gpu",
       "entity": "Nscale Ward County Borrower SPV, LLC (bankruptcy-remote; Nscale Ward County LLC = data center tenant and affiliate guarantor; land owned by third-party DC operator)",
       "id": "nscale-ward-ddtl-baa1",
       "instrument_type": "credit_facility",
-      "issued": "2026-08-12",
+      "issued": "2026-08-27",
       "issuer": "Nscale",
       "issuer_type": "private",
       "lenders": [
         "J.P. Morgan (lead; joint lead arranger, joint bookrunner, co-structuring agent)",
         "Goldman Sachs (joint lead arranger, joint bookrunner, co-structuring agent)",
-        "Fixed + floating commitments; lenders not named (fixed-rate investors described by Moody's as high credit quality)"
+        "Mandated lead arrangers: Crédit Agricole CIB, Deutsche Bank, Mizuho, MUFG, RBC, SMBC, BBVA, OCBC",
+        "U.S. Bank Trust Company, National Association (administrative agent and collateral agent)",
+        "Lender commitments are omitted from the filed agreement (fixed-rate investors described by Moody's as high credit quality)"
       ],
-      "maturity": "Undisclosed",
-      "maturity_note": "Fully amortizing within the 6-year take-or-pay contract term; floating tranche >=85% hedged through maturity; last forecast funding date February 2027",
+      "maturity": "2033-02-27",
+      "maturity_note": "Filed credit agreement: the earlier of the customer's final scheduled payment and 2033-02-27; quarterly amortization by tranche once customer payments begin. Fully amortizing within the 6-year take-or-pay contract term; floating tranche >=85% hedged through maturity; last forecast funding date February 2027",
       "name": "Up to $1.85B senior secured DDTL (Moody's first-time Baa1, stable — Ward County, TX GPU-as-a-service SPV; closed per issuer release 2026-08-31)",
       "rate": {
-        "kind": "undisclosed",
-        "note": "Fixed + floating mix; pricing not disclosed in the rating action",
-        "value": null
+        "kind": "sofr_spread",
+        "note": "Floating tranche ($1,220M): three-month Term SOFR + 2.375% (base rate + 1.375%), 0.00% floor. Fixed tranche ($630M): 2.375% plus the interpolated U.S. dollar SOFR swap rate, set before funding. Undrawn fee 0.40% per annum. Prepayment premium on the fixed tranche 2.00% in year one and 1.00% in year two; on the floating tranche 1.00% in year one. Upfront fees sit in unfiled fee letters.",
+        "value": 2.375
       },
-      "security": "GPU infrastructure (NVIDIA GB300 and VR200/Vera Rubin systems, ~275 MW IT load) and related networking/storage/cooling at a Ward County, Texas data center campus; 6-year availability-based fixed-price take-or-pay GPU-as-a-service contract with an unnamed hyperscaler rated at least Aa3; direct agreements with the customer and the data center operator; strict funding conditions (Level 3 commissioning + power + hedges as draw conditions)",
+      "security": "GPU infrastructure (NVIDIA GB300 and VR200/Vera Rubin systems, ~275 MW IT load) and related networking/storage/cooling at a Ward County, Texas data center campus; 6-year availability-based fixed-price take-or-pay GPU-as-a-service contract with Microsoft Corporation, named as the Customer in the filed credit agreement (Moody's described an unnamed hyperscaler rated at least Aa3); customer contract tranches of 24,192 GB300, 16,128 VR200 and 32,256 VR200; first-priority lien on substantially all assets of the borrower and affiliate guarantor, with limited parent guarantees from Nscale Limited; covenants: historical debt service coverage of at least 1.05x, cash trap below 1.10x, loans sized at the lesser of 90% of GPU capital expenditures and a 1.30x sizing ratio; direct agreements with the customer and the data center operator; strict funding conditions (Level 3 commissioning + power + hedges as draw conditions)",
       "seniority": "Senior secured",
-      "size_note": "Issuer release 2026-08-31: 'up to $1.85 billion', part of 'approximately $3 billion in aggregate commitments across two senior secured delayed draw term loan facilities' (the other: Madison County, NC, separate row). J.P. Morgan and Goldman Sachs joint lead arrangers, joint bookrunners and co-structuring agents for both facilities; J.P. Morgan led this one. Release states ~200 MW of IT load (Moody's rating action of 2026-08-12 described ~275 MW and sized the facility at $1.831B; the release figure is the committed amount). Moody's assigned first-time Baa1 (stable) 2026-08-12 — one day after Lambda's Baa2; second IG GPU project rating in 24 hours, third overall (after CRWV DDTL 4.0 A3). Customer = unnamed hyperscaler rated at least Aa3; large per-tranche prepayments substitute for cash equity (no cash equity in the GPU financing; Moody's notes equity distributions exceed the separate DC-financing equity needs by commissioning). Moody's DSCR avg ~1.33x (range 1.15-1.40x); DSRA sized at 67% of next payment/2 months + 3-month opex reserve; BTM generation procurement pending for tranche 3; Dell service agreement covers 3 of 6 years; VR200 has no operating track record (stabilization period negotiated). Separate instrument from the Feb-2026 $1.4B Nscale GPU DDTL (Blue Owl BDC-disclosed, S+500, Europe clusters).",
+      "size_note": "Filed credit agreement dated 2026-08-27 (Exhibit 10.23): commitments of $1,850,000,000, split $630M fixed-rate and $1,220M floating-rate; availability six months from closing. Issuer release 2026-08-31: 'up to $1.85 billion', part of 'approximately $3 billion in aggregate commitments across two senior secured delayed draw term loan facilities' (the other: Madison County, NC, separate row). J.P. Morgan and Goldman Sachs joint lead arrangers, joint bookrunners and co-structuring agents for both facilities; J.P. Morgan led this one. Release states ~200 MW of IT load (Moody's rating action of 2026-08-12 described ~275 MW and sized the facility at $1.831B; the release figure is the committed amount). Moody's assigned first-time Baa1 (stable) 2026-08-12 — one day after Lambda's Baa2; second IG GPU project rating in 24 hours, third overall (after CRWV DDTL 4.0 A3). Customer: Microsoft Corporation per the filed credit agreement (Moody's: unnamed hyperscaler rated at least Aa3); large per-tranche prepayments substitute for cash equity (no cash equity in the GPU financing; Moody's notes equity distributions exceed the separate DC-financing equity needs by commissioning). Moody's DSCR avg ~1.33x (range 1.15-1.40x); DSRA sized at 67% of next payment/2 months + 3-month opex reserve; BTM generation procurement pending for tranche 3; Dell service agreement covers 3 of 6 years; VR200 has no operating track record (stabilization period negotiated). Separate instrument from the Feb-2026 $1.4B Nscale GPU DDTL (Blue Owl BDC-disclosed, S+500, Europe clusters).",
       "size_usd_m": 1850,
       "source": {
-        "doc": "Nscale release 'Nscale Closes Approximately $3 Billion in Financing for Both Ward County, Texas and Madison County, North Carolina AI Deployments' (London, 2026-08-31); Moody's rating action 2026-08-12 (on file)",
-        "date": "2026-08-31",
-        "url": "https://www.nscale.com/press-releases/nscale-3-billion-delayed-draw-term-loans"
+        "doc": "Nscale Form S-1 filed 2026-09-18 (acc 0001193125-26-395475): Exhibit 10.23 Credit Agreement dated 2026-08-27 and the prospectus; Nscale release 'Nscale Closes Approximately $3 Billion in Financing for Both Ward County, Texas and Madison County, North Carolina AI Deployments' (London, 2026-08-31); Moody's rating action 2026-08-12 (on file)",
+        "date": "2026-09-18",
+        "url": "https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/"
       },
       "status": "confirmed",
       "ticker": null,
@@ -6942,40 +6955,41 @@
           "public": "2026-08-12"
         }
       ],
-      "offtaker_label": "Hyperscaler take-or-pay (rated at least Aa3, unnamed)"
+      "offtaker_label": "Microsoft take-or-pay (named as Customer in the filed credit agreement)"
     },
     {
       "id": "nscale-madison-ddtl",
-      "collateral_class": "secured_undisclosed",
+      "collateral_class": "gpu",
       "issuer": "Nscale",
       "ticker": null,
       "issuer_type": "private",
-      "entity": "Nscale borrower for the Madison County, NC site (SPV name not stated in the release)",
+      "entity": "Nscale NC Borrower SPV, LLC (borrower); Nscale Services US Inc. (affiliate guarantor)",
       "name": "Up to $1.2B senior secured DDTL (investment-grade rated per issuer — Madison County, NC colocation site)",
       "instrument_type": "credit_facility",
       "size_usd_m": 1200,
-      "size_note": "Issuer release 2026-08-31: 'up to $1.2 billion' senior secured delayed draw term loan facility for a 96-acre colocation site in Madison County, North Carolina with up to 40 MW of IT load capacity; funds 'site retrofit capital expenditures, GPU infrastructure and associated networking'. The release says both facilities 'each received investment-grade ratings with stable outlooks' without naming the agency or grade; no rating action located as of 2026-09-06. Second of the two facilities announced together (~$3B aggregate); the Ward County, TX facility is a separate row.",
+      "size_note": "Filed credit agreement (Exhibit 10.24, dated 2026-08-27 per the prospectus): commitments of $1,200,000,000, split $370M fixed-rate and $830M floating-rate; availability four months from closing. Issuer release 2026-08-31: 'up to $1.2 billion' senior secured delayed draw term loan facility for a 96-acre colocation site in Madison County, North Carolina with up to 40 MW of IT load capacity; funds 'site retrofit capital expenditures, GPU infrastructure and associated networking'. The release says both facilities 'each received investment-grade ratings with stable outlooks' without naming the agency or grade; no rating action located as of 2026-09-06. Second of the two facilities announced together (~$3B aggregate); the Ward County, TX facility is a separate row.",
       "rate": {
-        "kind": "undisclosed",
-        "value": null,
-        "note": "Not disclosed in the release"
+        "kind": "sofr_spread",
+        "value": 2.375,
+        "note": "Floating tranche ($830M): three-month Term SOFR + 2.375% (base rate + 1.375%), 0.00% floor. Fixed tranche ($370M): 2.375% plus the U.S. dollar SOFR swap rate, set before funding. The undrawn fee and prepayment premiums are redacted in the filed agreement."
       },
-      "maturity": null,
-      "maturity_note": "Undisclosed",
-      "seniority": "Senior secured (per release)",
-      "security": "Secured per release; collateral not stated (the facility funds site retrofit, GPU infrastructure and networking). Classed secured_undisclosed until a filing or rating action names the collateral.",
+      "maturity": "2031-12-27",
+      "maturity_note": "Filed credit agreement: the earlier of the customer's final scheduled payment and 2031-12-27; quarterly amortization once customer payments begin.",
+      "seniority": "Senior secured",
+      "security": "First-priority lien on substantially all assets of the borrower and affiliate guarantor, including the GPU infrastructure bought with the loans, the customer contract and the collateral accounts, plus equity pledges; limited parent guarantees from Nscale Limited. The customer contract is a cloud services agreement assigned to the borrower; the customer name is redacted, and the agreement refers to GB300 rack uptime. Covenants: historical debt service coverage of at least 1.05x, cash trap below 1.10x, loans sized at the lesser of 90% of GPU capital expenditures and a 1.30x sizing ratio.",
       "lenders": [
         "Goldman Sachs (lead; joint lead arranger, joint bookrunner, co-structuring agent)",
-        "J.P. Morgan (joint lead arranger, joint bookrunner, co-structuring agent)"
+        "J.P. Morgan (joint lead arranger, joint bookrunner, co-structuring agent)",
+        "U.S. Bank Trust Company, National Association (administrative agent and collateral agent)"
       ],
       "status": "confirmed",
-      "issued": "2026-08-31",
+      "issued": "2026-08-27",
       "source": {
-        "doc": "Nscale release 'Nscale Closes Approximately $3 Billion in Financing for Both Ward County, Texas and Madison County, North Carolina AI Deployments' (London, 2026-08-31)",
-        "date": "2026-08-31",
-        "url": "https://www.nscale.com/press-releases/nscale-3-billion-delayed-draw-term-loans"
+        "doc": "Nscale Form S-1 filed 2026-09-18 (acc 0001193125-26-395475): Exhibit 10.24 Credit Agreement and the prospectus; Nscale release 'Nscale Closes Approximately $3 Billion in Financing for Both Ward County, Texas and Madison County, North Carolina AI Deployments' (London, 2026-08-31)",
+        "date": "2026-09-18",
+        "url": "https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/"
       },
-      "as_of": "2026-09-06",
+      "as_of": "2026-09-20",
       "facility_ratings": [
         {
           "agency": "Undisclosed",
@@ -6983,7 +6997,7 @@
           "public": "2026-08-31"
         }
       ],
-      "offtaker_label": "Not stated in release"
+      "offtaker_label": "Customer name redacted in the filed credit agreement"
     },
     {
       "id": "riot-dc-logistics-ddtl-573",
