@@ -1,7 +1,20 @@
 {
   "schema": 1,
-  "current": "v2.3.2",
+  "current": "v2.4.0",
   "versions": [
+    {
+      "version": "v2.4.0",
+      "effective": "2026-09-17",
+      "announced": "2026-09-17",
+      "changelog_id": "260917-1",
+      "document_revision": "2026-09-16",
+      "changed": "One construction, full record restated from 2026-04-24 (John 2026-09-16, 'all 5'; effective date set at publication): complete-day fixing; product identity in the silver key; one node-size rule (8-GPU node where posted, else largest); location-based US/EU cells for every source; every marketplace in the DIF cells on the same terms (spheron gate lifted); currency and tax basis fixes; GCP regional on-demand SSD fix and per-family orderable-region gate. Headline statistic = the operator-equal median at every depth (n>=10 mean switch retired). Implied forwards retired. Meta Contributor route priced at its posted cash rate. Pre-citation: one change-log version row, no notice.",
+      "pdf": "CCIR_Methodology_v2.4.0_effective_2026-09-17.pdf",
+      "markdown": "CCIR_Methodology_v2.4.0_effective_2026-09-17.md",
+      "source_sha256": "1a990581b7dccee5373134478977cba0d8a72b0f4a2902033d483bea7b4d5611",
+      "source_commit": "1a0b61ed49766737a095cd8f9a5c68dcd9672abb",
+      "rendered": "2026-09-21"
+    },
     {
       "version": "v2.3.3",
       "effective": "2026-09-11",
@@ -9,11 +22,11 @@
       "changelog_id": "260903-1",
       "document_revision": null,
       "changed": "Four operators join the on-demand rate panel: two European, two Asia-Pacific.",
-      "pdf": null,
-      "markdown": null,
-      "source_sha256": null,
-      "source_commit": null,
-      "rendered": null
+      "pdf": "CCIR_Methodology_v2.3.3_effective_2026-09-11.pdf",
+      "markdown": "CCIR_Methodology_v2.3.3_effective_2026-09-11.md",
+      "source_sha256": "66108b90a82aff9b97433252bee14c8698a5fb27eadc1849c94855ee5c69d15e",
+      "source_commit": "71b1c18361f8cd3dcf8a028de61f845b14a3b37d",
+      "rendered": "2026-09-11"
     },
     {
       "version": "v2.3.2",
