@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-09-21",
+    "as_of": "2026-09-22",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -7134,6 +7134,38 @@
       },
       "as_of": "2026-09-20",
       "offtaker_label": "Spring (SG) Pte. Ltd. (named in the filed facility agreement)"
+    },
+    {
+      "id": "nscale-dell-dfs-2026",
+      "collateral_class": "gpu",
+      "issuer": "Nscale",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "Nscale Ward County and North Carolina schedules (lessee); guaranteed by Nscale Global Holdings Ltd",
+      "name": "Dell Financial Services vendor financing (DFS Framework Agreements)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 2540,
+      "size_note": "Aggregate initial-term rent of approximately $2.54 billion across 40 fully executed payment schedules as of 2026-09-04, including combined financing charges of approximately $34.8 million (S-1 filed 2026-09-18). Initial terms are short: Ward County schedules run four months (rent monthly in advance) and North Carolina schedules three months (rent monthly in arrears), each commencing 2026-08-01 or 2026-09-01, with one- or two-month extension options at the customer's discretion. The figure is rent under equipment schedules, not a committed loan amount.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Financing charges of approximately $34.8 million on $2.54 billion of initial-term rent are the only pricing disclosed; the framework agreements are not filed as exhibits."
+      },
+      "maturity": "2026-12 to 2027-01 (initial terms; extensions at customer option)",
+      "maturity_note": "Three- and four-month initial terms from 2026-08-01 or 2026-09-01, extendable by one or two months.",
+      "seniority": "Secured (equipment)",
+      "security": "Security interest in the Products and all related proceeds; guaranteed by Nscale Global Holdings Ltd under a Corporate Guaranty dated 2026-04-18",
+      "lenders": [
+        "Dell Financial Services"
+      ],
+      "status": "confirmed",
+      "issued": "2026-04",
+      "source": {
+        "doc": "Form S-1 (Nscale Limited), Description of Certain Indebtedness, Dell Vendor Financing",
+        "date": "2026-09-18",
+        "url": "https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/ck0002110365-20260918.htm"
+      },
+      "as_of": "2026-09-04"
     },
     {
       "id": "riot-dc-logistics-ddtl-573",
