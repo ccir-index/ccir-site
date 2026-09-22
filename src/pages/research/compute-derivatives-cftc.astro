@@ -11,7 +11,7 @@
 import Base from '../../layouts/Base.astro';
 import NoteFooter from '../../components/NoteFooter.astro';
 
-const AS_OF = '2026-09-21';
+const AS_OF = '2026-09-22';
 const PUBLISHED = '2026-09-02';
 
 const LINKS = {
@@ -27,6 +27,7 @@ const LINKS = {
   c0007: 'https://www.regulations.gov/comment/CFTC-2026-1850-0007',
   c0008: 'https://www.regulations.gov/comment/CFTC-2026-1850-0008',
   c0010: 'https://www.regulations.gov/comment/CFTC-2026-1850-0010',
+  c0011: 'https://www.regulations.gov/comment/CFTC-2026-1850-0011',
   setara: 'https://www.setarafinancial.com/',
 };
 
@@ -178,6 +179,22 @@ const LETTERS: Letter[] = [
       'Perpetual contracts "will function more like swaps products and their structures should be more closely evaluated by the Commission".',
     ],
     note: 'Concludes that "the present underlying market is not ready to support listed derivatives", on concentration grounds: ten operators holding two thirds of one GPU generation, cited to a third-party report. Describes the announced exchange products and their index administrator. Carries a no-AI disclosure.',
+  },
+  {
+    date: '2026-09-15',
+    filer: 'AI Compute Markets Pty Limited, trading as ACU Markets (Brandon Combes, Founder), Queensland, Australia',
+    form: 'Formal comment letter, 14 pages, 13 numbered recommendations',
+    where: 'regulations.gov',
+    href: LINKS.c0011,
+    onDocket: 'Yes, CFTC-2026-1850-0011 (received Sep 16, posted Sep 21)',
+    topics: 'All four, answered question by question',
+    asks: [
+      'Publish compute-specific guidance under Appendix C "setting out what a compute settlement reference price must demonstrate", before first-of-kind contracts are listed.',
+      '"Provider-administered posted rates are not admissible as a primary settlement input, and where used at all are weight-capped and disclosed, with executed-transaction and live-market-quote primacy in the input hierarchy."',
+      'Per-cell contributor quorum and concentration limits "enforced fail-closed, with a null and reason code on breach"; "deterministic replayability" of every published value by a third party.',
+      'First-of-kind contracts by Commission approval under 17 CFR 40.3 rather than self-certification; defer perpetual compute futures; a comparability path for non-US administrators; consult BIS and OFAC before listing.',
+    ],
+    note: 'An index provider; discloses that it "would stand to benefit if the Commission established criteria for compute settlement reference prices". Its central claim is that "the sellers set the settlement price": posted rates are "a publication, not a transaction" and the firms that administer them are the natural short side. Answers Q2(g) "No, not today, and not from any provider, ourselves included."',
   },
 ];
 
