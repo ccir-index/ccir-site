@@ -11955,7 +11955,7 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,qubrid,h200-sxm-141gb,H200,141GB,SXM,Unknown,1Y,NonInterruptible,Reserved,Other,Other,SIF,T2IF,T2,3.0000,False,,Available,v2.4.0,panel,
 2026-09-21,qubrid,h200-sxm-141gb,H200,141GB,SXM,Unknown,3M,NonInterruptible,Reserved,Other,Other,SIF,T2IF,T2,3.1888,False,,Available,v2.4.0,panel,
 2026-09-21,runpod_cluster,h200-sxm-141gb,H200,141GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,US-East,US,DIF,T3IF,T3,4.3100,False,,Available,v2.4.0,panel,US
-2026-09-21,runpod_community,h200-sxm-141gb,H200,141GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,3.5900,False,,SoldOut,v2.4.0,panel,Global
+2026-09-21,runpod_community,h200-sxm-141gb,H200,141GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T3IF,T3,3.5900,False,,Available,v2.4.0,panel,Global
 2026-09-21,runpod_secure,h200-sxm-141gb,H200,141GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,APAC,APAC,DIF,T2IF,T3,4.5900,True,local-nvme,Available,v2.4.0,panel,AP-JP-1
 2026-09-21,runpod_secure,h200-sxm-141gb,H200,141GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T2IF,T3,4.5900,True,local-nvme,Available,v2.4.0,panel,CA-MTL-3
 2026-09-21,runpod_secure,h200-sxm-141gb,H200,141GB,SXM,IB-NDR,OnDemand,NonInterruptible,OnDemand,Other,Other,DIF,T2IF,T3,4.5900,True,local-nvme,Available,v2.4.0,panel,CA-MTL-4

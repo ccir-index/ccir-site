@@ -18814,8 +18814,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,APAC,APAC,HIF,T1IF,T1,15.1612,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,asia-southeast1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,APAC,APAC,HIF,T1IF,T1,14.6021,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,australia-southeast1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,APAC,APAC,HIF,T2IF,T1,14.3837,True,local-nvme,Available,v2.4.0,panel,australia-southeast2
-2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,EU,EU,HIF,T1IF,T1,12.8471,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,europe-west1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,EU,EU,HIF,T2IF,T1,12.1712,True,local-nvme,Available,v2.4.0,panel,europe-west1
+2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,EU,EU,HIF,T1IF,T1,12.8471,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,europe-west1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,EU,EU,HIF,T2IF,T1,13.0539,True,local-nvme,Available,v2.4.0,panel,europe-west3
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,EU,EU,HIF,T1IF,T1,15.1612,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,europe-west4
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,NonInterruptible,OnDemand,EU,EU,HIF,T2IF,T1,14.0676,True,local-nvme,Available,v2.4.0,panel,europe-west4
@@ -18837,8 +18837,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,9.8544,True,local-nvme,Available,v2.4.0,panel,asia-northeast3
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,7.9882,True,local-nvme,Available,v2.4.0,panel,asia-south1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,9.2159,True,local-nvme,Available,v2.4.0,panel,asia-south2
-2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,APAC,APAC,HIF,T1IF,T1,10.4232,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,asia-southeast1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,9.9100,True,local-nvme,Available,v2.4.0,panel,asia-southeast1
+2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,APAC,APAC,HIF,T1IF,T1,10.4232,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,asia-southeast1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,10.3103,True,local-nvme,Available,v2.4.0,panel,asia-southeast2
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,APAC,APAC,HIF,T1IF,T1,10.0375,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,australia-southeast1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,9.5964,True,local-nvme,Available,v2.4.0,panel,australia-southeast1
@@ -18851,8 +18851,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,11.7988,True,local-nvme,Available,v2.4.0,panel,europe-west10
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,9.8935,True,local-nvme,Available,v2.4.0,panel,europe-west12
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,8.7503,True,local-nvme,Available,v2.4.0,panel,europe-west2
-2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,EU,EU,HIF,T1IF,T1,9.4715,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,europe-west3
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,9.0551,True,local-nvme,Available,v2.4.0,panel,europe-west3
+2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,EU,EU,HIF,T1IF,T1,9.4715,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,europe-west3
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,EU,EU,HIF,T1IF,T1,10.4232,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,europe-west4
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,9.7589,True,local-nvme,Available,v2.4.0,panel,europe-west4
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,1Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,10.7286,True,local-nvme,Available,v2.4.0,panel,europe-west6
@@ -18881,8 +18881,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,Other,Other,HIF,T2IF,T1,6.3429,True,local-nvme,Available,v2.4.0,panel,africa-south1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,5.6193,True,local-nvme,Available,v2.4.0,panel,asia-east1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,6.7960,True,local-nvme,Available,v2.4.0,panel,asia-east2
-2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,6.9522,True,local-nvme,Available,v2.4.0,panel,asia-northeast1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,APAC,APAC,HIF,T1IF,T1,6.5259,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,asia-northeast1
+2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,6.9522,True,local-nvme,Available,v2.4.0,panel,asia-northeast1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,6.2393,True,local-nvme,Available,v2.4.0,panel,asia-northeast2
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,6.2393,True,local-nvme,Available,v2.4.0,panel,asia-northeast3
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,APAC,APAC,HIF,T2IF,T1,5.0583,True,local-nvme,Available,v2.4.0,panel,asia-south1
@@ -18896,8 +18896,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,6.2558,True,local-nvme,Available,v2.4.0,panel,europe-central2
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.3492,True,local-nvme,Available,v2.4.0,panel,europe-north1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.7325,True,local-nvme,Available,v2.4.0,panel,europe-southwest1
-2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.3455,True,local-nvme,Available,v2.4.0,panel,europe-west1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T1IF,T1,5.5912,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,europe-west1
+2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.3455,True,local-nvme,Available,v2.4.0,panel,europe-west1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,7.4688,True,local-nvme,Available,v2.4.0,panel,europe-west10
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,6.2636,True,local-nvme,Available,v2.4.0,panel,europe-west12
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.5404,True,local-nvme,Available,v2.4.0,panel,europe-west2
@@ -18925,8 +18925,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,4.8581,True,local-nvme,Available,v2.4.0,panel,us-west1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,5.8398,True,local-nvme,Available,v2.4.0,panel,us-west2
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,5.8398,True,local-nvme,Available,v2.4.0,panel,us-west3
-2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T1IF,T1,5.7221,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,us-west4
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,5.4707,True,local-nvme,Available,v2.4.0,panel,us-west4
+2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T1IF,T1,5.7221,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,us-west4
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,4.8581,True,local-nvme,Available,v2.4.0,panel,us-west8
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T2IF,T1,7.5781,True,local-nvme,Available,v2.4.0,panel,asia-east1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,APAC,APAC,DIF,T1IF,T1,4.5542,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,asia-northeast1
@@ -18944,8 +18944,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,US-Central,US,DIF,T2IF,T1,6.6203,True,local-nvme,Available,v2.4.0,panel,us-central1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,6.3218,True,local-nvme,Available,v2.4.0,panel,us-east4
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,US-East,US,DIF,T1IF,T1,3.7691,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,us-east4
-2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,US-East,US,DIF,T1IF,T1,5.5099,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,us-east5
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,US-East,US,DIF,T2IF,T1,5.8775,True,local-nvme,Available,v2.4.0,panel,us-east5
+2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,US-East,US,DIF,T1IF,T1,5.5099,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,us-east5
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,6.6203,True,local-nvme,Available,v2.4.0,panel,us-west1
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,US-West,US,DIF,T1IF,T1,3.5090,True,local-nvme;managed-ops-plane;support-tier;observability,Available,v2.4.0,panel,us-west4
 2026-09-21,gcp,h100-sxm-80gb,H100,80GB,SXM,Ethernet,OnDemand,Interruptible,Spot,US-West,US,DIF,T2IF,T1,5.6176,True,local-nvme,Available,v2.4.0,panel,us-west4
@@ -19022,8 +19022,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,6.6218,False,,Available,v2.4.0,candidate,europe-west10
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.5469,False,,Available,v2.4.0,candidate,europe-west12
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,4.9019,False,,Available,v2.4.0,candidate,europe-west2
-2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.3088,False,,Available,v2.4.0,candidate,europe-west3
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.0739,False,,Available,v2.4.0,candidate,europe-west3
+2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.3088,False,,Available,v2.4.0,candidate,europe-west3
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.8487,False,,Available,v2.4.0,candidate,europe-west4
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,5.5899,False,,Available,v2.4.0,candidate,europe-west4
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,EU,EU,HIF,T2IF,T1,6.0151,False,,Available,v2.4.0,candidate,europe-west6
@@ -19046,8 +19046,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,4.2999,False,,Available,v2.4.0,candidate,us-west1
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,5.1689,False,,Available,v2.4.0,candidate,us-west2
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,5.1689,False,,Available,v2.4.0,candidate,us-west3
-2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,4.8430,False,,Available,v2.4.0,candidate,us-west4
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,5.0672,False,,Available,v2.4.0,candidate,us-west4
+2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,4.8430,False,,Available,v2.4.0,candidate,us-west4
 2026-09-21,gcp_cud,h100-sxm-80gb,H100,80GB,SXM,Ethernet,3Y,NonInterruptible,Reserved,US-West,US,HIF,T2IF,T1,4.2999,False,,Available,v2.4.0,candidate,us-west8
 2026-09-21,gcp_dws,h100-sxm-80gb,H100,80GB,SXM,Ethernet,FlexStart,NonInterruptible,Reserved,US-Central,US,HIF,T2IF,T1,5.0400,False,,Available,v2.4.0,term-panel,us-central1
 2026-09-21,gcp_dws,h100-sxm-80gb,H100,80GB,SXM,Ethernet,FlexStart,NonInterruptible,Reserved,US-Central,US,HIF,T2IF,T1,4.7900,False,,Available,v2.4.0,term-panel,us-central1
@@ -19120,8 +19120,8 @@ as_of_date,source_name,silicon_id,gpu_model,gpu_variant,form_factor,interconnect
 2026-09-21,shakti_cloud,h100-sxm-80gb,H100,80GB,SXM,,1Y,NonInterruptible,Reserved,APAC,APAC,SIF,T2IF,T2,2.5827,False,,Available,v2.4.0,panel,IN
 2026-09-21,shakti_cloud,h100-sxm-80gb,H100,80GB,SXM,IB-Unspecified,2Y,NonInterruptible,Reserved,APAC,APAC,SIF,T2IF,T2,2.6388,False,,Available,v2.4.0,panel,IN
 2026-09-21,shakti_cloud,h100-sxm-80gb,H100,80GB,SXM,,3M,NonInterruptible,Reserved,APAC,APAC,SIF,T2IF,T2,2.7230,False,,Available,v2.4.0,panel,IN
-2026-09-21,shakti_cloud,h100-sxm-80gb,H100,80GB,SXM,IB-Unspecified,6M,NonInterruptible,Reserved,APAC,APAC,SIF,T2IF,T2,3.5253,False,,Available,v2.4.0,panel,IN
 2026-09-21,shakti_cloud,h100-sxm-80gb,H100,80GB,SXM,,6M,NonInterruptible,Reserved,APAC,APAC,SIF,T2IF,T2,2.6669,False,,Available,v2.4.0,panel,IN
+2026-09-21,shakti_cloud,h100-sxm-80gb,H100,80GB,SXM,IB-Unspecified,6M,NonInterruptible,Reserved,APAC,APAC,SIF,T2IF,T2,3.5253,False,,Available,v2.4.0,panel,IN
 2026-09-21,spheron,h100-sxm-80gb,H100,80GB,SXM,Unknown,OnDemand,NonInterruptible,OnDemand,EU,EU,DIF,T3IF,T3,5.0131,False,,Available,v2.4.0,panel,eu-north-1
 2026-09-21,spheron,h100-sxm-80gb,H100,80GB,SXM,Unknown,OnDemand,Interruptible,Spot,EU,EU,DIF,T3IF,T3,2.9076,False,,Available,v2.4.0,panel,eu-north-1
 2026-09-21,stackit,h100-sxm-80gb,H100,80GB,SXM,,OnDemand,NonInterruptible,OnDemand,EU,EU,SIF,T2IF,T2,9.2154,False,,Available,v2.4.0,candidate,EU01 (DE)
