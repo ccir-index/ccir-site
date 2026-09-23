@@ -126,9 +126,11 @@ as_of_date,canonical_model_id,model_display,in_panel,in_frontier,providers
 2026-09-23,llama4maverick17b128einstruct,Llama 4 Maverick,True,False,
 2026-09-23,llama4maverick17b128einstructfp8,Llama 4 Maverick (FP8),True,False,
 2026-09-23,llama4scout17b16einstruct,Llama 4 Scout,True,False,
-2026-09-23,mimov2.5,MiMo v2.5,True,False,
+2026-09-23,mimov2.5,mimo-v2.5 (to be deprecated),True,True,xiaomi
+2026-09-23,mimov2.5pro,mimo-v2.5-pro (to be deprecated),True,True,xiaomi
+2026-09-23,mimov2.6flash,mimo-v2.6-flash,False,True,xiaomi
 2026-09-23,mimov2.6pro,mimo-v2.6-pro,False,True,xiaomi
-2026-09-23,mimov2.6promimov2.5pro,mimo-v2.6-pro ã mimo-v2.5-pro (to be deprecated),False,True,xiaomi
+2026-09-23,mimov2.6proultraspeed,mimo-v2.6-pro-ultraspeed,False,True,xiaomi
 2026-09-23,minimaxm2,MiniMax-M2,True,True,minimax
 2026-09-23,minimaxm2.1,MiniMax-M2.1,True,True,minimax
 2026-09-23,minimaxm2.1highspeed,MiniMax-M2.1-highspeed,False,True,minimax
