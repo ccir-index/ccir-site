@@ -338,9 +338,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
           ))}
         </tbody>
       </table>
-      <p class="ivnote">Net earnings / yr: what the GPU earns in a contract year after power,
-        colocation and operations (65% margin), billed every hour, at its {Math.round((1 - IV_SHARE) * 100)}% share of the
-        deployed position. It needs no purchase price. * Vintage assumed. H200 SXM has no ask or sales record. Its estimated
+      <p class="ivnote">Net earnings / yr: what the GPU earns in a contract year, billed every
+        hour. It is after power, colocation and operations (65% margin), at
+        the GPU's {Math.round((1 - IV_SHARE) * 100)}% share of the deployed position. It needs no purchase price. * Vintage assumed. H200 SXM has no ask or sales record. Its estimated
         marks apply the H100 SXM-to-NVL ratio (sold {H200_EST.t90Ratio?.toFixed(2)}, asks
         {H200_EST.askRatio?.toFixed(2)}) to H200 NVL (sold {H200_EST.nvlT90 != null ? fmtK(H200_EST.nvlT90) : '—'},
         asks {H200_EST.nvlAsk != null ? fmtK(H200_EST.nvlAsk) : '—'}). They are estimates, drawn lighter.</p>
@@ -373,12 +373,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         35%. As a check, the deduction that makes the model match executed
         retail sales of {calibChips} is {retailPct}% today.
         The sensitivity range varies one input at a time around base:
-        discount rate 12.5–17.5%, decay 15–19% a year (the measured range for prior generations), and the rate band. For a
-        signed-rate chip, the rate is a GPU-weighted average of its deals
-        with recent deals weighted more: a deal loses half its weight for
-        each year of age. The rate band is the uncertainty of that average:
-        half the spread of its deals, divided by the square root of the
-        effective number of deals. For a fallback chip, it spans the lowest
+        discount rate 12.5–17.5%, decay 15–19% a year, and the rate band. The
+        decay range is the one measured on prior generations. For a
+        signed-rate chip, the rate is a GPU-weighted average of its deals,
+        with recent deals weighted more. A deal loses half its weight for
+        each year of age. The rate band is the uncertainty of that average.
+        It is half the spread of the deals, divided by the square root of
+        the effective number of deals. For a fallback chip, it spans the lowest
         and highest measured haircut. Corners are never stacked.
         Utilization, margin, and the 7-year life stay at base. The
         discount-rate band is anchored to observed GPU-asset-backed
@@ -696,7 +697,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         discounts the income a deployed unit can earn over its service
         life. Every leg is either observed or disclosed. The rate leg is
         observed. It averages every signed term deal for the chip, weighted
-        by GPUs and by recency: a deal loses half its weight for each year
+        by GPUs and by recency. A deal loses half its weight for each year
         of age. Options and subsidized or program
         deals stay out. A bundled deal enters only at its GPU-only estimate.
         The contract term is the tenor with the most GPUs signed. Where a
@@ -775,19 +776,16 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         range is the worst case on record: V100 from its scarcity peak.
       </p>
       <p>
-        <strong>Discount rate.</strong> The 15% base and the 10–20% band
-        are anchored to observed pricing in CCIR's
-        <a href="/credit">credit ledger</a>: GPU-asset-backed facilities
-        on record have signed at effective all-in yields from roughly 15%
-        (2023) to 7% (2026, rated). A going-concern discount rate sits at
+        <strong>Discount rate.</strong> The 15% base and the 12.5–17.5%
+        band are anchored to observed pricing in CCIR's
+        <a href="/credit">credit ledger</a>. GPU-asset-backed facilities
+        on record signed at all-in yields from about 15% (2023) to 7%
+        (2026, rated). A going-concern discount rate sits at
         or above the secured debt cost of the same collateral. The
         observed record skews to the sector's largest, highest-rated
         borrowers, a floor on the sector's cost of capital. The
         band's width above that floor carries the equity premium and the
-        typical operator's higher funding cost. The 20% upper bound sits
-        the same distance above the costliest GPU-backed debt on the
-        current record, near 10% all-in, that the prior 25% bound sat
-        above the 2023 cost of roughly 15%. The band follows the observed
+        typical operator's higher funding cost. The band follows the observed
         financing market as it reprices.
       </p>
       <p>
