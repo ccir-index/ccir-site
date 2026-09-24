@@ -79,7 +79,7 @@ const b4 = deals.find((d) => d.term === '4Y')!;
 ---
 <Base
   title="B300 Contract Prices Since March · CCIR Research"
-  description="Eleven B300 rental contracts disclosed since March show three-year rates up about 25%, roughly $22 million on a 1,000-GPU contract. From company filings."
+  description="Eleven B300 rental contracts disclosed since March show three-year rates up about 25%, from $3.39 to $4.23 per GPU-hour. From company filings."
   article={{ published: '2026-09-24' }}
 >
   <section class="wrap top">
@@ -88,8 +88,7 @@ const b4 = deals.find((d) => d.term === '4Y')!;
       <h1>B300 Contract Prices Since March</h1>
       <p class="standfirst">
         Eleven B300 rental contracts signed since March show three-year rates
-        up about 25%. That move is material, roughly ${Math.round(cost3)} million
-        on a 1,000-GPU contract.
+        up about {pct(f3.y0, f3.y1)}%, from {fmt2(f3.y0)} to {fmt2(f3.y1)} per GPU-hour.
       </p>
       <ul class="lede-index">
         <li><span class="arw">→</span> <a href="#prices">What prices did</a></li>
@@ -173,8 +172,15 @@ const b4 = deals.find((d) => d.term === '4Y')!;
         contract for 1,000 GPUs, it is about ${Math.round(cost5)} million.
       </p>
       <p>
-        These figures come from the trend across all sellers. Boost Run's own
-        two contracts put the move at about $13 million on the same order.
+        These figures come from the trend across all sellers. Two pairs of
+        contracts show the move directly.
+      </p>
+      <p>
+        Boost Run is the only same-seller pair: $3.45 in March, about $3.94
+        GPU-only in July. On 1,000 GPUs for three years that is about $13
+        million. SharonAI's 8,208-GPU five-year at $3.30 and Axe's 9,200-GPU
+        five-year at $3.72, four months later, is about $185 million on a
+        10,000-GPU order.
       </p>
     </section>
 
