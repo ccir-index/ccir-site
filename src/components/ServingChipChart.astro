@@ -1,0 +1,157 @@
+---
+/*
+  One chip's serving spread over time (build-time SVG + a small hover).
+  Three lines on one $/GPU-hr scale: token revenue, rent, spread. A line
+  breaks on a day its leg did not print. Record seams are ticks on the
+  baseline. Colors: amber for the spread (data emphasis), ink for the legs.
+*/
+import type { ServingRow } from '../data/serving';
+
+interface Props { chip: string; rows: ServingRow[]; seams: string[] }
+const { chip, rows, seams } = Astro.props;
+
+const W = 420, H = 230, PADL = 40, PADR = 60, PADT = 14, PADB = 24;
+const innerW = W - PADL - PADR, innerH = H - PADT - PADB;
+const n = rows.length;
+const vals = rows.flatMap((r) => [r.netback, r.rent, r.spread]).filter((v): v is number => v != null);
+const vMax = Math.max(...vals, 0);
+const vMin = Math.min(...vals, 0);
+const step = vMax - vMin > 20 ? 10 : vMax - vMin > 8 ? 2 : 1;
+const Y_MAX = Math.ceil(vMax / step) * step;
+const Y_MIN = Math.floor(vMin / step) * step;
+const x = (i: number) => PADL + (n > 1 ? (i * innerW) / (n - 1) : innerW / 2);
+const y = (v: number) => PADT + innerH - ((v - Y_MIN) / (Y_MAX - Y_MIN || 1)) * innerH;
+const yTicks: number[] = [];
+for (let t = Y_MIN; t <= Y_MAX + 1e-9; t += step) yTicks.push(t);
+
+// polyline segments, broken where the value is null
+function segs(get: (r: ServingRow) => number | null): string[] {
+  const out: string[] = [];
+  let cur: string[] = [];
+  rows.forEach((r, i) => {
+    const v = get(r);
+    if (v == null) { if (cur.length) out.push(cur.join(' ')); cur = []; return; }
+    cur.push(`${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+  });
+  if (cur.length) out.push(cur.join(' '));
+  return out.filter((s) => s.includes(' '));
+}
+const spreadSegs = segs((r) => (r.printed ? r.spread : null));
+const revSegs = segs((r) => (r.servedPrinted ? r.netback : null));
+const rentSegs = segs((r) => (r.rentPrinted ? r.rent : null));
+
+const seamIdx = rows.map((r, i) => (seams.includes(r.date) && r.rentFlag === 'rent_seam' ? i : -1)).filter((i) => i >= 0);
+const monthIdx = rows.map((r, i) => (i === 0 || r.date.slice(5, 7) !== rows[i - 1].date.slice(5, 7) ? i : -1)).filter((i) => i >= 0);
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const last = [...rows].reverse().find((r) => r.printed);
+const id = `srv-${chip.toLowerCase()}`;
+const D = rows.map((r) => ({
+  d: r.date, s: r.printed ? r.spread : null, t: r.servedPrinted ? r.netback : null,
+  r: r.rentPrinted ? r.rent : null, rn: r.rentN, p: r.served, pn: r.nProviders,
+  seam: r.rentFlag === 'rent_seam', gap: !r.printed,
+}));
+---
+<figure class="chip-fig">
+  <figcaption class="chip-head">
+    <span class="chip-name">{chip}</span>
+    {last && last.spread != null && (
+      <span class="chip-last">spread <b>{last.spread < 0 ? '−' : '+'}${Math.abs(last.spread).toFixed(2)}</b>/GPU-hr</span>
+    )}
+  </figcaption>
+  <div class="chart-box" id={id}>
+    <svg viewBox={`0 0 ${W} ${H}`} role="img"
+         aria-label={`${chip} serving spread, token revenue and rent in dollars per GPU-hour, daily.`}>
+      {yTicks.map((t) => (
+        <g>
+          <line x1={PADL} x2={W - PADR} y1={y(t)} y2={y(t)} class={t === 0 ? 'zero' : 'grid'} />
+          <text x={PADL - 6} y={y(t) + 3} class="tick" text-anchor="end">${t}</text>
+        </g>
+      ))}
+      {monthIdx.map((i) => (
+        <text x={x(i)} y={H - 6} class="tick" text-anchor="start">{MON[Number(rows[i].date.slice(5, 7)) - 1]}</text>
+      ))}
+      {seamIdx.map((i) => (
+        <line x1={x(i)} x2={x(i)} y1={PADT + innerH - 10} y2={PADT + innerH} class="seam" />
+      ))}
+      {revSegs.map((p) => <polyline points={p} class="ln-rev" />)}
+      {rentSegs.map((p) => <polyline points={p} class="ln-rent" />)}
+      {spreadSegs.map((p) => <polyline points={p} class="ln-spread" />)}
+      {last && last.netback != null && (
+        <text x={W - PADR + 6} y={y(last.netback) + 3} class="endlab lab-rev">rev</text>
+      )}
+      {last && last.rent != null && (
+        <text x={W - PADR + 6} y={y(last.rent) + 3} class="endlab lab-rent">rent</text>
+      )}
+      {last && last.spread != null && (
+        <text x={W - PADR + 6} y={y(last.spread) + 3} class="endlab lab-spread">spread</text>
+      )}
+      <line class="crosshair" x1="0" x2="0" y1={PADT} y2={PADT + innerH} style="display:none" />
+    </svg>
+    <div class="tip" style="display:none"></div>
+  </div>
+</figure>
+
+<script is:inline define:vars={{ id, D, W, PADL, PADR }}>
+  (function () {
+    var box = document.getElementById(id);
+    if (!box) return;
+    var svg = box.querySelector('svg');
+    var tip = box.querySelector('.tip');
+    var cross = box.querySelector('.crosshair');
+    var innerW = W - PADL - PADR;
+    function f(v) { return v == null ? 'gap' : '$' + v.toFixed(2); }
+    function show(ev) {
+      var r = svg.getBoundingClientRect();
+      var relX = ((ev.clientX - r.left) / r.width) * W;
+      var i = Math.round(((relX - PADL) / innerW) * (D.length - 1));
+      if (i < 0 || i > D.length - 1) { hide(); return; }
+      var d = D[i];
+      var xp = PADL + (i * innerW) / (D.length - 1);
+      cross.setAttribute('x1', xp); cross.setAttribute('x2', xp); cross.style.display = '';
+      tip.innerHTML = '<strong>' + d.d + '</strong>' +
+        '<br>Spread ' + f(d.s) +
+        '<br>Token revenue ' + f(d.t) +
+        '<br>Rent ' + f(d.r) + (d.rn ? ' <span class="tn">(n=' + d.rn + ')</span>' : '') +
+        '<br>Served ' + (d.p == null ? 'gap' : '$' + d.p.toFixed(2) + '/Mtok') +
+        (d.pn ? ' <span class="tn">(' + d.pn + ' hosts)</span>' : '') +
+        (d.seam ? '<br><span class="tn">record seam</span>' : '');
+      tip.style.display = '';
+      var left = (xp / W) * r.width + 10;
+      if (left > r.width - 170) left -= 185;
+      tip.style.left = left + 'px';
+      tip.style.top = '8px';
+    }
+    function hide() { tip.style.display = 'none'; cross.style.display = 'none'; }
+    box.addEventListener('mousemove', show);
+    box.addEventListener('mouseleave', hide);
+  })();
+</script>
+
+<style>
+  .chip-fig { margin: 0; }
+  .chip-head { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); margin-bottom: 4px; }
+  .chip-name { font-family: var(--font-display); font-size: var(--fs-lg); color: var(--ink); }
+  .chip-last b { color: var(--accent); font-weight: var(--weight-strong); }
+  .chart-box { position: relative; border: 1px solid var(--rule); background: var(--surface); overflow: hidden; }
+  .chart-box svg { display: block; width: 100%; height: auto; }
+  .grid { stroke: var(--rule); stroke-width: 1; }
+  .zero { stroke: var(--rule-2); stroke-width: 1; }
+  .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+  .seam { stroke: var(--ink-faint); stroke-width: 1.4; }
+  .ln-rev { fill: none; stroke: var(--ink-dim); stroke-width: 1.4; stroke-dasharray: 4 3; stroke-linejoin: round; }
+  .ln-rent { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; }
+  .ln-spread { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linejoin: round; }
+  .endlab { font-family: var(--font-mono); font-size: 10px; }
+  .lab-rev { fill: var(--ink-dim); }
+  .lab-rent { fill: var(--ink); }
+  .lab-spread { fill: var(--accent); font-weight: 600; }
+  .crosshair { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 3 3; }
+  .tip {
+    position: absolute; pointer-events: none;
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--ink); background: var(--surface-2);
+    border: 1px solid var(--rule-2); padding: 8px 10px; line-height: 1.6;
+    min-width: 150px;
+  }
+  .tip :global(.tn) { color: var(--ink-faint); }
+</style>

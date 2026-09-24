@@ -1,0 +1,323 @@
+---
+import Base from '../layouts/Base.astro';
+import ServingChipChart from '../components/ServingChipChart.astro';
+import {
+  chips, series, latest, versions, firstDate, lastDate, seamDates, HEADLINE, CEILING,
+} from '../data/serving';
+
+// Preview (2026-09-24): computed from the published snapshots with the
+// pipeline's library code. Not in the navigation yet; noindex until the
+// owner names the page.
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+  'August', 'September', 'October', 'November', 'December'];
+const longDate = (d: string) => `${MONTHS[Number(d.slice(5, 7)) - 1]} ${Number(d.slice(8, 10))}`;
+const usd = (v: number | null | undefined, dp = 2) => (v == null ? 'n/a' : `$${v.toFixed(dp)}`);
+const pct = (v: number | null | undefined) => (v == null ? 'n/a' : `${Math.round(v * 100)}%`);
+const signed = (v: number | null | undefined) =>
+  v == null ? 'n/a' : `${v < 0 ? '−' : '+'}$${Math.abs(v).toFixed(2)}`;
+
+const latestRows = chips.map((c) => {
+  const s = latest(c, HEADLINE);
+  const o = latest(c, CEILING);
+  return { chip: c, s, o };
+});
+
+const gapDays = [...new Set(
+  chips.flatMap((c) => series(c).filter((r) => !r.servedPrinted).map((r) => r.date)),
+)].sort();
+const rosterGrew = [...new Set(
+  chips.flatMap((c) => series(c).filter((r) => r.servedFlag === 'roster_grew').map((r) => r.date)),
+)].sort();
+const nDays = new Set(chips.flatMap((c) => series(c).map((r) => r.date))).size;
+
+const schedule = chips.map((c) => {
+  const sv = latest(c, HEADLINE) ?? series(c, HEADLINE).at(-1);
+  const of = latest(c, CEILING) ?? series(c, CEILING).at(-1);
+  return { chip: c, accel: sv?.accelerator ?? '', sv, of };
+});
+const servedNow = latestRows[0]?.s;
+---
+<Base
+  title="Serving Spread: Token Revenue per GPU-Hour Less Rent · CCIR"
+  description="A daily data series per chip: what a GPU earns serving a 70B model at a public throughput schedule, less the T2 neocloud guaranteed on-demand rent. Preview."
+  noindex={true}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Data series · preview · {longDate(firstDate)} to {longDate(lastDate)}, 2026</div>
+      <h1>Serving Spread: Token Revenue per GPU-Hour Less Rent</h1>
+      <p class="standfirst">
+        What a GPU earns serving a 70B model, less what it costs to rent.
+        One daily series per chip, built from two published CCIR legs and a
+        public throughput schedule.
+      </p>
+      <ul class="lede-index">
+        <li><span class="arw">→</span><a href="#series">The series by chip</a></li>
+        <li><span class="arw">→</span><a href="#latest">Latest values</a></li>
+        <li><span class="arw">→</span><a href="#method">Method, versions and gaps</a></li>
+      </ul>
+      <p class="preview-note">
+        Preview. The chip list and the page name may change before this page
+        joins the site navigation.
+      </p>
+    </header>
+
+    <section class="sec wide" id="series">
+      <h2><span class="n">01</span> The Series</h2>
+      <div class="chart-legend" aria-hidden="true">
+        <span><span class="swatch sw-spread"></span>Spread</span>
+        <span><span class="swatch sw-rev"></span>Token revenue</span>
+        <span><span class="swatch sw-rent"></span>Rent</span>
+        <span><span class="swatch sw-seam"></span>Record seam</span>
+      </div>
+      <div class="grid-chips">
+        {chips.map((c) => (
+          <ServingChipChart chip={c} rows={series(c, HEADLINE)} seams={seamDates} />
+        ))}
+      </div>
+      <p class="tfoot">
+        Dollars per GPU-hour, daily, {HEADLINE} scenario. Token revenue is the
+        MLPerf throughput times the served output price. Rent is the T2
+        guaranteed on-demand median. Spread is revenue less rent. A break in a
+        line marks a day that leg did not print. Each panel has its own scale.
+      </p>
+    </section>
+
+    <section class="sec wide" id="latest">
+      <h2><span class="n">02</span> Latest</h2>
+      <div class="twrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Chip</th>
+              <th>Date</th>
+              <th class="num">Rent</th>
+              <th class="num">Rent n</th>
+              <th class="num">Served $/Mtok</th>
+              <th class="num">Hosts</th>
+              <th class="num">Mtok/GPU-hr</th>
+              <th class="num">Token revenue</th>
+              <th class="num">Spread</th>
+              <th class="num">Spread, {CEILING}</th>
+              <th class="num">Break-even load</th>
+            </tr>
+          </thead>
+          <tbody>
+            {latestRows.map(({ chip, s, o }) => (
+              <tr>
+                <td>{chip}</td>
+                <td class="dim">{s?.date ?? 'n/a'}</td>
+                <td class="num">{usd(s?.rent)}</td>
+                <td class="num dim">{s?.rentN ?? 'n/a'}</td>
+                <td class="num">{usd(s?.served)}</td>
+                <td class="num dim">{s?.nProviders ?? 'n/a'}</td>
+                <td class="num">{s ? s.tputPeak.toFixed(2) : 'n/a'}</td>
+                <td class="num">{usd(s?.netback)}</td>
+                <td class="num strong">{signed(s?.spread)}</td>
+                <td class="num dim">{signed(o?.spread)}</td>
+                <td class="num">{pct(s?.breakevenLoad)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="tfoot">
+        Model class: dense 70B. Served price: Llama 3.3 70B Instruct output
+        tokens. Rent in $/GPU-hr. Break-even load is the share of the
+        {HEADLINE} schedule a chip must sell to cover its rent.
+      </p>
+    </section>
+
+    <section class="sec" id="method">
+      <h2><span class="n">03</span> Method</h2>
+
+      <h3>The arithmetic</h3>
+      <p class="formula">
+        token revenue = throughput (Mtok per GPU-hour) × served price ($ per Mtok)<br />
+        spread = token revenue − rent ($ per GPU-hour)<br />
+        break-even load = rent ÷ served price ÷ throughput
+      </p>
+      <p>
+        Every leg counts output tokens only. Token revenue assumes the chip
+        sells its full schedule. The spread leaves out every cost beyond rent,
+        such as networking, storage, staff and idle time.
+      </p>
+
+      <h3>Token leg</h3>
+      <p>
+        The token leg is the output price for Llama 3.3 70B Instruct. It is
+        the median across independent hosts, one vote per host, as published
+        on <a href="/tokens">/tokens</a>. The price is dated the same day as
+        the rent it is paired with.
+      </p>
+      {servedNow && (
+        <p>
+          The 70B cell printed ${servedNow.served?.toFixed(2)} per million output
+          tokens on {longDate(servedNow.date)}, from {servedNow.nProviders} hosts.
+          It held that value on every printed day of this record. The daily
+          moves in this preview therefore come from the rent leg.
+        </p>
+      )}
+
+      <h3>Rent leg</h3>
+      <p>
+        The rent leg is the T2 neocloud guaranteed on-demand cell for each
+        chip, series <code>CRI-T2-&lt;CHIP&gt;-ALL-GTD-OD-ALL</code> on
+        <a href="/rates">/rates</a>. We take the cell median. A rent cell
+        enters the spread only on days it is Published with three or more
+        sources.
+      </p>
+
+      <h3>Throughput schedule</h3>
+      <p>
+        Throughput comes from MLPerf Inference closed-division results, per
+        accelerator. We convert the best verified result for each accelerator
+        to million output tokens per GPU-hour. MLPerf measures Llama 2 70B, so
+        the 70B class pairs that schedule with the Llama 3.3 70B price.
+      </p>
+      <p>
+        The {HEADLINE} scenario is the headline. It is a latency-bound run.
+        The {CEILING} scenario is a batch run and serves as the ceiling.
+        Schedule version <code>{versions.throughput}</code> draws on rounds
+        v5.0 and v5.1. A new round changes the schedule under a new version,
+        announced before it takes effect.
+      </p>
+      <div class="twrap narrow">
+        <table>
+          <thead>
+            <tr>
+              <th>Chip</th><th>Accelerator</th>
+              <th class="num">{HEADLINE}</th><th class="num">{CEILING}</th>
+              <th>Result ID ({HEADLINE})</th><th class="num">Results</th>
+            </tr>
+          </thead>
+          <tbody>
+            {schedule.map((r) => (
+              <tr>
+                <td>{r.chip}</td>
+                <td class="dim">{r.accel}</td>
+                <td class="num">{r.sv ? r.sv.tputPeak.toFixed(3) : 'n/a'}</td>
+                <td class="num">{r.of ? r.of.tputPeak.toFixed(3) : 'n/a'}</td>
+                <td class="dim">{r.sv?.mlperfResult ?? 'n/a'}</td>
+                <td class="num dim">{r.sv?.mlperfN ?? 'n/a'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="tfoot">
+        Million output tokens per GPU-hour, best verified result per
+        accelerator. B300 and A100 have no dense 70B result in these rounds,
+        so they have no series.
+      </p>
+
+      <h3>Roster handling</h3>
+      <p>
+        A median can move when a host drops out for a day, with no price change
+        behind it. The token leg therefore follows a roster rule. Three or more
+        hosts print the median. Two hosts give an indicative value, labeled as
+        such, that never sets the baseline. One host gives a gap.
+      </p>
+      <p>
+        If the host count falls below the prior roster, the leg shows a gap for
+        up to three days. A smaller roster that holds for three days becomes the
+        new baseline, with a flag. A new host joins the median at once.
+      </p>
+
+      <h3>Gaps and seams in this record</h3>
+      <p>
+        The record runs {nDays} days, {longDate(firstDate)} to {longDate(lastDate)}.
+        {gapDays.length > 0 && (
+          <> The 70B cell had fewer than three hosts on {gapDays.map(longDate).join(', ')}, so
+          {gapDays.length === 1 ? ' that day is a gap' : ' those days are gaps'} on every chip.</>
+        )}
+        {rosterGrew.length > 0 && (
+          <> The host count rose on {rosterGrew.map(longDate).join(', ')} and the median held.</>
+        )}
+      </p>
+      <p>
+        A record seam is a day a capture change altered a rent cell's source
+        mix. The charts mark each one. The print stands on a seam day, but a
+        move across it is a composition change. Seam days in this record:
+        {' '}{seamDates.map(longDate).join(', ')}.
+      </p>
+
+      <h3>What the series is</h3>
+      <p>
+        This is a published data series with a public method. Its inputs are
+        posted prices and a public throughput schedule. It carries no
+        transaction prices and no host's own costs.
+      </p>
+
+      <h3>Versions</h3>
+      <p class="versions">
+        method <code>{versions.method}</code> · class map <code>{versions.classMap}</code> ·
+        throughput <code>{versions.throughput}</code> · token roster <code>{versions.tokenRoster}</code>
+      </p>
+      <p class="tm">
+        The MLPerf name and logo are registered and unregistered trademarks of
+        MLCommons Association in the United States and other countries. The
+        per-accelerator figures here are CCIR derivations from verified
+        results. They are not official MLPerf results.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 10px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .preview-note {
+      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-faint);
+      border-left: 2px solid var(--accent); padding: 4px 10px; margin: 14px 0 0;
+    }
+    .sec { margin: 32px 0; max-width: 80ch; }
+    .sec.wide { max-width: none; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 12px;
+      display: flex; align-items: baseline; gap: 12px;
+    }
+    .sec h3 {
+      font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--ink-dim);
+      text-transform: uppercase; letter-spacing: var(--tracking-eye);
+      margin: 22px 0 8px; font-weight: var(--weight-strong);
+    }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec code { font-family: var(--font-mono); font-size: 0.9em; background: var(--surface-2); padding: 1px 5px; border: 1px solid var(--rule); }
+    .sec p.formula { font-family: var(--font-mono); font-size: var(--fs-sm); background: var(--surface); border: 1px solid var(--rule); padding: 10px 14px; line-height: 1.9; }
+    .sec p.versions, .sec p.tm { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); }
+
+    .chart-legend { display: flex; flex-wrap: wrap; gap: 18px; font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); margin-bottom: 10px; }
+    .swatch { display: inline-block; width: 14px; height: 3px; vertical-align: middle; margin-right: 6px; }
+    .sw-spread { background: var(--accent); height: 4px; }
+    .sw-rev { background: var(--ink-dim); }
+    .sw-rent { background: var(--ink); }
+    .sw-seam { background: var(--ink-faint); width: 2px; height: 10px; }
+    .grid-chips {
+      display: grid; gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
+    .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin: 10px 0 0; line-height: 1.6; max-width: 90ch; }
+    .sec p.tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); }
+
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; }
+    .twrap.narrow { max-width: 820px; margin: 4px 0 0; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 6px 12px; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.dim { color: var(--ink-faint); }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); }
+  </style>
+</Base>
