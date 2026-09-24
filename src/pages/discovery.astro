@@ -1,0 +1,549 @@
+---
+/*
+  /discovery: daily spot price per GPU-hour for each chip, server and zone
+  of one hyperscaler's interruptible grade. No blending, no weights.
+
+  Built from the approved prototype (scratch/aws_spot_terminal, 2026-09-23).
+  Owner rulings carried here: CCIR place names and frozen zone labels
+  (src/data/discovery_zones.csv), chip + server labels, the 30-day
+  no-change display rule (src/data/discovery.ts), daily value = time-weighted
+  average over the UTC day, line = 7-day trailing average, candles daily,
+  COOL map palette with no legend, one page with MAP | CHARTS, deep links
+  #map and #charts&zone=<id>, no interruption measure, one day late.
+
+  Terms posture (tos_memo.md): derived per-GPU daily values and charts only.
+  No download, bulk file or endpoint for this data: the page embeds it.
+  "AWS" in plain text only; no AWS logo, AWS orange or console look; AWS is
+  not in the page name. Attribution + non-affiliation line and a replicable
+  method note are in the footer section.
+*/
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { series, chips, views, map, asOf, firstDay, closeThrough, STALE_DAYS } from '../data/discovery';
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const longDate = (d: string | null) => {
+  if (!d) return '';
+  const [y, m, day] = d.split('-').map(Number);
+  return `${MONTHS[m - 1]} ${day}, ${y}`;
+};
+// Compact on the wire: day offsets from each series' first day.
+const DAYMS = 86400000, ms = (d: string) => Date.parse(d + 'T00:00:00Z');
+const rows = series.map(({ pts, ...r }) => ({ ...r, start: pts[0][0], p: pts.map(([d, v]) => [(ms(d) - ms(pts[0][0])) / DAYMS, v]) }));
+const payload = { rows, asof: asOf, views, chips };
+const places = new Set(series.map((s) => s.place)).size;
+const [W0, H0] = map.frame;
+---
+<Base
+  title="Global AWS spot prices per GPU-hour · CCIR"
+  description="Daily spot prices per GPU-hour for H100, H200, B200, B300 and A100 servers in each zone of one hyperscaler's interruptible grade, on a world map with price histories. Derived daily values, one day late."
+  ogImage="/og/discovery.png?v=1"
+>
+  <section class="wrap page-top disc">
+    <PageHeader title="Hyperscaler Interruptible Grade Price Discovery" kicker="Discovery · Spot by zone" asOf={asOf}>
+      <p class="standfirst">Global AWS spot prices per GPU-hour</p>
+    </PageHeader>
+  </section>
+
+  <div class="disc disc-full">
+    <div class="tape" aria-label="Latest daily price per zone"><div class="tape-inner" id="tape"></div></div>
+
+    <div class="controls">
+      <div class="left">
+        <div class="seg modes" id="modes" role="tablist" aria-label="View">
+          <button type="button" data-mode="map" class="on">Map</button>
+          <button type="button" data-mode="charts">Charts</button>
+        </div>
+        <div class="seg" id="views" aria-label="Region">
+          {views.map((v, i) => <button type="button" data-view={v.name} class={i === 0 ? 'on' : ''}>{v.name}</button>)}
+        </div>
+      </div>
+      <div class="seg" id="chips" aria-label="Chip">
+        {chips.map((c) => <button type="button" data-chip={c} class={c === 'H100' ? 'on' : ''}>{c}</button>)}
+      </div>
+    </div>
+
+    <div class="mapwrap" id="mapwrap">
+      <div class="mapcell">
+        <svg id="zmap" viewBox={`0 0 ${W0} ${H0}`} role="img" aria-label="World map, one dot per zone, colored by price">
+          <g id="land">{map.land.map((d) => <path class="land" d={d} />)}</g>
+          <g id="usb" style="display:none"><path class="usb" d={map.usBorders} /></g>
+          <g id="labels"></g>
+          <g id="dots"></g>
+        </svg>
+      </div>
+      <div class="ladder">
+        <div class="lhead"><button type="button" data-sort="zone">Zone</button><span></span><button type="button" data-sort="price">Price</button></div>
+        <div id="ladder"></div>
+      </div>
+    </div>
+
+    <div class="layout" id="layout" style="display:none">
+      <aside class="side"><h2>Zones · 30-day change</h2><div id="rail"></div></aside>
+      <div class="maincol">
+        <div class="hero">
+          <div class="eyebrow" id="mq-eb"></div>
+          <div class="sid" id="mq-sid"></div>
+          <div class="price" id="mq-price"></div>
+          <div class="unit">USD / GPU-hour · as of <span id="mq-asof"></span></div>
+          <div class="deltas">
+            <span><kbd>1D $</kbd><span id="mq-d1abs">–</span></span><span><kbd>1D</kbd><span id="mq-d1">–</span></span>
+            <span><kbd>1W</kbd><span id="mq-d7">–</span></span><span><kbd>1M</kbd><span id="mq-d30">–</span></span>
+            <span id="mq-winwrap"><kbd id="mq-winlbl">WIN</kbd><span id="mq-win">–</span></span><span><kbd>RNG</kbd><span id="mq-rng">–</span></span>
+          </div>
+        </div>
+        <div class="chartpanel">
+          <h2>Price history <span id="chart-title"></span><span class="hr"></span>
+            <span class="seg" id="type-tabs"><button type="button" data-type="line" class="on">Line</button><button type="button" data-type="candle">Candle</button></span></h2>
+          <svg class="chart" id="chart" viewBox="0 0 920 360">
+            <defs>
+              <linearGradient id="posfade" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" style="stop-color:var(--pos);stop-opacity:.2" /><stop offset="100%" style="stop-color:var(--pos);stop-opacity:0" /></linearGradient>
+              <linearGradient id="negfade" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" style="stop-color:var(--neg);stop-opacity:.2" /><stop offset="100%" style="stop-color:var(--neg);stop-opacity:0" /></linearGradient>
+            </defs>
+            <g class="gridlines" id="gridlines"></g><path id="area" /><line id="baseline" style="display:none" />
+            <path id="line" fill="none" stroke-width="1.6" /><g id="candles"></g>
+            <g class="axis" id="xaxis"></g><g class="axis" id="yaxis"></g>
+            <rect id="selrect" class="selrect" style="display:none" y="0" height="336" />
+            <g id="xhair" style="display:none" pointer-events="none">
+              <line id="xh-v" y1="10" y2="336" /><line id="xh-h" /><circle id="xh-dot" r="3.5" />
+              <rect id="xh-box" width="132" height="30" rx="2" /><text id="xh-val" font-weight="600" /><text id="xh-date" class="dim" />
+            </g>
+            <text id="chart-mark" class="mark" text-anchor="end"></text>
+          </svg>
+          <div class="seg rangerow" id="ranges"><button type="button" data-range="7">1W</button><button type="button" data-range="30" class="on">1M</button><button type="button" data-range="90">3M</button><button type="button" data-range="max">Max</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="wrap disc-notes">
+    <p class="blend">For a blended view across providers, see the interruptible rates on <a href="/rates">/rates</a>.</p>
+    <div class="method">
+      <h2>Method</h2>
+      <ul>
+        <li>Prices come from Amazon EC2 Spot price history (Linux/UNIX), read through the EC2 API from CCIR's own account.</li>
+        <li>Each series is one chip, one server and one zone. We never average across zones.</li>
+        <li>Price per GPU is the server's spot price divided by its GPUs. Every server shown has 8 GPUs.</li>
+        <li>The daily value is the time-weighted average price over the UTC day, 00:00 to 24:00. Each price counts for the time it was in effect. The price in effect at 00:00 carries in from the day before.{closeThrough && <> Through {longDate(closeThrough)}, US history uses the last price of each UTC day.</>}</li>
+        <li>Line charts show the 7-day trailing average of daily values. Candles, prices, changes and map colors use the daily value.</li>
+        <li>A series whose price has not changed for {STALE_DAYS} days or more is not shown. It returns when its price moves.</li>
+        <li>Servers: H100 is p5.48xlarge. H200 standard server is p5e.48xlarge and upgraded server is p5en.48xlarge. B200 is p6-b200.48xlarge, B300 is p6-b300.48xlarge and A100 is p4d.24xlarge (40GB).</li>
+        <li>Places are CCIR's names for each region's metro. Zones are numbered Z1, Z2 and so on within each place, in zone ID order. The numbers do not change.</li>
+        <li>Data is published one day late and updated daily. History starts {longDate(firstDay)} in the US and late June elsewhere. Today: {series.length} series in {places} places.</li>
+      </ul>
+    </div>
+    <p class="source">
+      Source: CCIR calculations from <a href="https://aws.amazon.com/ec2/spot/pricing/" rel="noopener">Amazon EC2 Spot price history</a>. AWS and Amazon EC2 are trademarks of Amazon.com, Inc. or its affiliates. CCIR is not affiliated with or endorsed by AWS.
+    </p>
+  </section>
+
+  <script type="application/json" id="disc-data" set:html={JSON.stringify(payload)}></script>
+
+  <style>
+    .disc-full {
+      --map-land: var(--surface-3);
+      max-width: 1440px; margin: 0 auto; padding: 0 20px;
+      font-family: var(--font-mono); font-size: var(--fs-base);
+    }
+    .disc :global(.page-head) { margin-bottom: 8px; }
+    .disc .standfirst { color: var(--ink-dim); }
+    :global(.disc .up) { color: var(--pos); } :global(.disc .dn) { color: var(--neg); }
+
+    .tape { display: flex; overflow: hidden; white-space: nowrap; border: 1px solid var(--rule); background: var(--surface-2); padding: 7px 0; }
+    .tape:hover .tape-inner { animation-play-state: paused; }
+    .tape-inner { display: flex; animation: disc-scroll 60s linear infinite; }
+    @keyframes disc-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .tape-inner { animation: none; } .tape { overflow-x: auto; } }
+    :global(.disc .tcell) { display: inline-flex; gap: 8px; align-items: baseline; padding: 0 22px; border-right: 1px solid var(--rule); }
+    :global(.disc .tcell .sym) { color: var(--ink-dim); font-weight: 600; }
+    :global(.disc .tcell .val) { font-weight: 600; color: var(--ink); }
+
+    .controls { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; padding: 10px 0; }
+    .controls .left { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+    .seg { display: flex; gap: 2px; flex-wrap: wrap; }
+    .seg button {
+      background: var(--surface-2); border: 1px solid var(--rule); color: var(--ink-dim);
+      font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: .06em;
+      padding: 4px 12px; cursor: pointer; text-transform: uppercase;
+    }
+    .seg button:hover { color: var(--ink); }
+    .seg button.on { color: var(--link); border-color: var(--link-dim); }
+    .modes button { font-weight: 600; padding: 4px 16px; }
+
+    .mapwrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(250px, 1.3fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+    @media (max-width: 860px) { .mapwrap { grid-template-columns: 1fr; } }
+    .mapwrap > div { background: var(--surface); padding: 10px 14px; }
+    #zmap { width: 100%; height: auto; display: block; }
+    .land { fill: var(--map-land); stroke: var(--rule-2); stroke-width: .8; vector-effect: non-scaling-stroke; }
+    .usb { fill: none; stroke: var(--rule-2); stroke-width: .6; vector-effect: non-scaling-stroke; }
+    :global(.disc .zdot) { cursor: pointer; stroke: var(--bg); stroke-width: 1.5; }
+    :global(.disc .zdot.sel) { stroke: var(--ink); stroke-width: 2.5; }
+    :global(.disc .rlabel) { fill: var(--ink); font: 500 12px var(--font-sans); paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+
+    .lhead { display: grid; grid-template-columns: minmax(0, 1fr) 44px 46px; gap: 8px; margin: 0 0 6px; border-bottom: 1px solid var(--rule); padding-bottom: 4px; }
+    .lhead button { all: unset; cursor: pointer; font: var(--fs-xs) var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); }
+    .lhead button:last-child { text-align: right; }
+    .lhead button.on { color: var(--link); }
+    .lhead button::after { content: attr(data-dir); margin-left: 4px; }
+    :global(.disc .lrow) { display: grid; grid-template-columns: minmax(0, 1fr) 44px 46px; gap: 8px; align-items: center; padding: 3px 0; cursor: pointer; font-family: var(--font-sans); }
+    :global(.disc .lrow > span:first-child) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    :global(.disc .lrow:hover), :global(.disc .lrow:focus-visible) { background: var(--surface-2); }
+    :global(.disc .lrow.on) { color: var(--accent); }
+    :global(.disc .lbar) { height: 8px; background: var(--surface-3); position: relative; }
+    :global(.disc .lbar i) { position: absolute; left: 0; top: 0; bottom: 0; }
+
+    .layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+    @media (max-width: 760px) { .layout { grid-template-columns: 1fr; } }
+    .side { background: var(--surface); padding: 8px 0; max-height: 760px; overflow: auto; }
+    .side h2, .chartpanel h2 { font-family: var(--font-mono); margin: 2px 12px 8px; font-size: var(--fs-xs); letter-spacing: .1em; color: var(--ink-dim); text-transform: uppercase; font-weight: 600; }
+    :global(.disc .geogroup + .geogroup) { margin-top: 14px; }
+    :global(.disc .geohead) { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; padding: 5px 12px; font-size: 9.5px; letter-spacing: .14em; color: var(--ink); text-transform: uppercase; background: var(--surface-3); border-top: 1px solid var(--rule-2); border-bottom: 1px solid var(--rule-2); }
+    :global(.disc .geohead .n) { color: var(--ink-dim); letter-spacing: .04em; }
+    :global(.disc .srow) { display: grid; grid-template-columns: 62px 1fr 62px; gap: 6px; align-items: center; padding: 6px 10px; cursor: pointer; border-left: 2px solid transparent; border-bottom: 1px solid var(--rule); }
+    :global(.disc .srow:hover), :global(.disc .srow.on), :global(.disc .srow:focus-visible) { background: var(--surface-2); }
+    :global(.disc .srow.on) { border-left-color: var(--accent); }
+    :global(.disc .srow .sym) { font-size: var(--fs-sm); font-weight: 600; }
+    :global(.disc .srow .sub) { display: block; font-size: 9px; color: var(--ink-dim); font-weight: 400; }
+    :global(.disc .srow svg) { width: 100%; height: 38px; display: block; }
+    :global(.disc .srow .pr) { display: block; text-align: right; font-weight: 600; font-size: 11.5px; }
+    :global(.disc .srow .d) { display: block; text-align: right; font-size: 9.5px; }
+    :global(.disc .sbase) { stroke: var(--ink-dim); stroke-dasharray: 2 2; stroke-width: 1; opacity: .8; }
+
+    .maincol { background: var(--surface); min-width: 0; }
+    .hero { padding: 10px 18px 8px; border-bottom: 1px solid var(--rule); }
+    .eyebrow { font-size: var(--fs-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); }
+    .sid { font-size: var(--fs-base); margin: 4px 0 6px; }
+    .price { font-size: 38px; font-weight: 600; letter-spacing: -.01em; color: var(--accent); }
+    .unit { color: var(--ink-dim); font-size: var(--fs-sm); }
+    .deltas { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-top: 8px; font-size: var(--fs-base); }
+    .deltas > span { white-space: nowrap; }
+    .deltas kbd { color: var(--ink-faint); font-family: var(--font-mono); font-size: var(--fs-xs); margin-right: 6px; }
+    .chartpanel { padding: 12px 14px; }
+    .chartpanel h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; flex-wrap: wrap; }
+    .chartpanel h2 .hr { flex: 1; border-top: 1px solid var(--rule); }
+    .chart { width: 100%; height: 360px; display: block; cursor: crosshair; user-select: none; touch-action: pan-y; }
+    :global(.disc .axis text) { fill: var(--ink-dim); font-size: 10.5px; font-family: var(--font-sans); }
+    .mark { fill: var(--ink-faint); font-size: var(--fs-xs); font-family: var(--font-mono); }
+    :global(.disc .gridlines line) { stroke: var(--rule); stroke-dasharray: 2 3; }
+    #baseline { stroke: var(--ink-dim); stroke-dasharray: 4 3; stroke-width: 1.1; opacity: .85; }
+    .selrect { fill: var(--surface-3); fill-opacity: .6; stroke: var(--link-dim); }
+    #xhair line { stroke: var(--ink-dim); stroke-dasharray: 3 3; }
+    #xh-dot { stroke: var(--bg); stroke-width: 1.5; }
+    #xh-box { fill: var(--surface-2); stroke: var(--rule-2); }
+    #xhair text { fill: var(--ink); font-size: 10.5px; font-family: var(--font-sans); }
+    #xhair text.dim { fill: var(--ink-dim); }
+    .rangerow { margin-top: 10px; justify-content: center; }
+
+    .disc-notes { padding-top: 18px; padding-bottom: 32px; font-family: var(--font-sans); font-size: var(--fs-md); color: var(--ink-dim); }
+    .disc-notes p { max-width: var(--measure-wide); margin: 0 0 12px; }
+    .disc-notes .blend { color: var(--ink); }
+    .method { max-width: var(--measure-wide); border-top: 1px solid var(--rule); padding-top: 12px; margin-bottom: 12px; }
+    .method h2 { font-family: var(--font-mono); font-size: var(--fs-xs); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 6px; }
+    .method ul { margin: 0; padding-left: 18px; line-height: 1.6; }
+    .method li { margin: 2px 0; }
+    .disc-notes .source { font-size: var(--fs-sm); }
+  </style>
+
+  <script>
+    interface Row {
+      id: string; chip: string; instance: string; note: string; tip: string;
+      place: string; az: string; lat: number; lon: number; x: number; y: number;
+      pts: [string, number][]; st?: Stats;
+    }
+    interface Stats { v: number; d1: number | null; d1abs: number | null; d7: number | null; d30: number | null }
+    interface View { name: string; box: [[number, number], [number, number]] | null; k: number; tx: number; ty: number }
+
+    const DATA = JSON.parse(document.getElementById('disc-data')!.textContent || '{}') as { rows: (Row & { start: string; p: [number, number][] })[]; asof: string; views: View[]; chips: string[] };
+    const HASH0 = location.hash;
+    const DAY = 86400000, t = (d: string) => Date.parse(d + 'T00:00:00Z');
+    DATA.rows.forEach((s) => { const t0 = t(s.start); s.pts = s.p.map(([o, v]) => [new Date(t0 + o * DAY).toISOString().slice(0, 10), v]); });
+    const $ = (id: string) => document.getElementById(id)!;
+    const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    const dlabel = (ms: number) => { const d = new Date(ms); return `${MONTHS[d.getUTCMonth()]} ${String(d.getUTCDate()).padStart(2, '0')}`; };
+    const sgnp = (p: number | null, dp = 2) => p == null ? '–' : `${p >= 0 ? '+' : '−'}${Math.abs(p).toFixed(dp)}%`;
+    const clsOf = (p: number | null) => (p == null ? '' : p >= 0 ? 'up' : 'dn');
+    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
+    const groupBy = <T,>(a: T[], f: (x: T) => string) => { const m = new Map<string, T[]>(); a.forEach((x) => { const k = f(x); if (!m.has(k)) m.set(k, []); m.get(k)!.push(x); }); return m; };
+
+    // 1D strict; 1W and 1M allow a small gap in the record.
+    function stats(s: Row): Stats {
+      const P = s.pts, n = P.length, v = P[n - 1][1], last = t(P[n - 1][0]);
+      const at = (back: number, tol: number) => { const tg = last - back * DAY;
+        for (let i = n - 1; i >= 0; i--) { const ti = t(P[i][0]); if (ti <= tg) return ti >= tg - tol * DAY ? P[i][1] : null; } return null; };
+      const prev = n > 1 && last - t(P[n - 2][0]) === DAY ? P[n - 2][1] : null;
+      const pct = (b: number | null) => b ? 100 * (v / b - 1) : null;
+      return { v, d1: pct(prev), d1abs: prev != null ? v - prev : null, d7: pct(at(7, 2)), d30: pct(at(30, 4)) };
+    }
+    DATA.rows.forEach((s) => { s.st = stats(s); });
+    const V = (s: Row) => s.st!.v;
+
+    let sortKey = 'price', sortDir = 1;
+    let chip = DATA.chips.includes('H100') ? 'H100' : DATA.chips[0];
+    let selId: string | null = null, rangeDays: number | 'max' = 30, zoom: [number, number] | null = null, ctype = 'line';
+    let scaleState: { pts: [number, number][]; X: (x: number) => number; Y: (v: number) => number; base: number } | null = null;
+    let view = DATA.views[0], mode = 'map';
+    const ofChip = () => DATA.rows.filter((s) => s.chip === chip);
+    const cur = () => DATA.rows.find((s) => s.id === selId);
+    const median = (a: number[]) => { const b = [...a].sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+
+    // ---------- map ----------
+    // Five steps against the chip's median, blue cheaper to orange dearer
+    // (owner ruling: COOL, no legend). Green and red stay for price changes.
+    const COLS = ['#3b5b92', '#5d7fb8', '#9aa6b2', '#d98a6a', '#f2663a'];
+    const colFor = (r: number) => COLS[r <= -0.15 ? 0 : r < -0.03 ? 1 : r <= 0.03 ? 2 : r < 0.15 ? 3 : 4];
+    const SVGNS = 'http://www.w3.org/2000/svg';
+    const inView = (s: Row) => { const b = view.box; return !b || (s.lon >= b[0][0] && s.lon <= b[1][0] && s.lat >= b[0][1] && s.lat <= b[1][1]); };
+    function applyView() {
+      const tr = `translate(${view.tx},${view.ty}) scale(${view.k})`;
+      $('land').setAttribute('transform', tr); $('usb').setAttribute('transform', tr);
+      $('usb').style.display = view.name === 'North America' || view.name === 'US East' ? '' : 'none';
+      document.querySelectorAll<HTMLButtonElement>('#views button').forEach((b) => b.classList.toggle('on', b.dataset.view === view.name));
+    }
+    function renderMap() {
+      const rows = ofChip(), med = median(rows.map(V));
+      const zoomed = view.name !== 'World';
+      const byPlace = groupBy(rows, (s) => s.place);
+      let dots = '', labels: { place: string; x: number; y: number; n: number }[] = [];
+      byPlace.forEach((rs, place) => {
+        const cx = view.tx + view.k * rs[0].x, cy = view.ty + view.k * rs[0].y;
+        const rr = rs.length > 1 ? (zoomed ? 16 + 2 * rs.length : 7 + rs.length) : 0;
+        labels.push({ place, x: cx, y: cy + rr, n: rs.length });
+        [...rs].sort((a, b) => a.az.localeCompare(b.az, 'en', { numeric: true }) || a.instance.localeCompare(b.instance)).forEach((s, i) => {
+          const a = 2 * Math.PI * i / rs.length - Math.PI / 2;
+          const x = cx + rr * Math.cos(a), y = cy + rr * Math.sin(a);
+          dots += `<circle class="zdot${s.id === selId ? ' sel' : ''}" data-id="${esc(s.id)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${colFor(V(s) / med - 1)}"><title>${esc(`${s.place} ${s.az} · ${s.instance} · $${V(s).toFixed(2)}/GPU-hr`)}</title></circle>`;
+        });
+      });
+      // Drop a label that would collide with one already placed (larger places
+      // first); the zoomed views show every label.
+      const kept: typeof labels = [];
+      labels.sort((a, b) => b.n - a.n).forEach((l) => { if (kept.every((k) => Math.abs(k.x - l.x) > 90 || Math.abs(k.y - l.y) > 18)) kept.push(l); });
+      $('labels').innerHTML = kept.map((l) => `<text class="rlabel" x="${l.x.toFixed(1)}" y="${(l.y + 20).toFixed(1)}" text-anchor="middle">${esc(l.place)}</text>`).join('');
+      $('dots').innerHTML = dots;
+      $('dots').querySelectorAll<SVGCircleElement>('circle').forEach((c) => c.addEventListener('click', () => select(c.dataset.id!, true)));
+      // Ladder, sortable by zone or price; a second click flips the order.
+      const zoneCmp = (a: Row, b: Row) => a.place.localeCompare(b.place) || a.az.localeCompare(b.az, 'en', { numeric: true }) || a.instance.localeCompare(b.instance);
+      const sorted = [...rows].sort(sortKey === 'zone' ? zoneCmp : (a, b) => V(a) - V(b));
+      if (sortDir < 0) sorted.reverse();
+      const hi = Math.max(...rows.map(V));
+      document.querySelectorAll<HTMLButtonElement>('.lhead button').forEach((b) => { b.classList.toggle('on', b.dataset.sort === sortKey); b.dataset.dir = b.dataset.sort === sortKey ? (sortDir > 0 ? '▲' : '▼') : ''; });
+      $('ladder').innerHTML = sorted.map((s) => `<div class="lrow${s.id === selId ? ' on' : ''}" role="button" tabindex="0" data-id="${esc(s.id)}"${s.tip ? ` title="${esc(s.tip)}"` : ''}><span>${esc(s.place)} ${s.az}${s.note ? ' · ' + s.note : ''}</span>
+        <span class="lbar"><i style="width:${(100 * V(s) / hi).toFixed(1)}%;background:${colFor(V(s) / med - 1)}"></i></span><span style="text-align:right">$${V(s).toFixed(2)}</span></div>`).join('');
+      $('ladder').querySelectorAll<HTMLElement>('.lrow').forEach((el) => {
+        el.addEventListener('click', () => select(el.dataset.id!, true));
+        el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(el.dataset.id!, true); } });
+      });
+    }
+    document.querySelectorAll<HTMLButtonElement>('.lhead button').forEach((b) => b.addEventListener('click', () => {
+      if (sortKey === b.dataset.sort) sortDir = -sortDir; else { sortKey = b.dataset.sort!; sortDir = 1; }
+      renderMap();
+    }));
+
+    // ---------- ticker + rail ----------
+    // Sparklines share one scale of % change from the window start, so a
+    // line's height matches the % printed beside it. Capped at ±60%.
+    function spark(tail: [string, number][], maxAbs: number) {
+      if (tail.length < 2) return { d: '', lastY: '12' };
+      const v0 = tail[0][1], y = (v: number) => (12 - Math.max(-1, Math.min(1, (v / v0 - 1) / maxAbs)) * 10);
+      return { d: tail.map((p, i) => `${i ? 'L' : 'M'}${(2 + i * 86 / (tail.length - 1)).toFixed(1)},${y(p[1]).toFixed(1)}`).join(' '), lastY: y(tail[tail.length - 1][1]).toFixed(1) };
+    }
+    const tailOf = (s: Row) => { const last = t(s.pts[s.pts.length - 1][0]); return s.pts.filter(([d]) => t(d) >= last - 30 * DAY); };
+    function renderTape() {
+      const rows = ofChip();
+      const cells = rows.map((s) => `<span class="tcell"><span class="sym">${chip} · ${esc(s.place)} ${s.az}${s.note ? ' ' + s.note.split(' ')[0] : ''}</span><span class="val">${V(s).toFixed(2)}</span><span class="${clsOf(s.st!.d1)}">${sgnp(s.st!.d1)}</span></span>`).join('');
+      $('tape').innerHTML = cells + cells;
+      $('tape').style.animationDuration = `${Math.max(60, rows.length * 6)}s`;
+    }
+    function renderRail() {
+      const rows = ofChip();
+      const maxAbs = Math.min(0.6, Math.max(0.02, ...rows.map((s) => { const tl = tailOf(s); return Math.max(...tl.map((p) => Math.abs(p[1] / tl[0][1] - 1))); })));
+      let html = '';
+      groupBy(rows.filter(inView), (s) => s.place).forEach((rs, place) => {
+        html += `<div class="geogroup"><div class="geohead"><span>${esc(place)}</span><span class="n">${rs.length} zone${rs.length > 1 ? 's' : ''}</span></div>`;
+        [...rs].sort((a, b) => V(a) - V(b)).forEach((s) => {
+          const last = t(s.pts[s.pts.length - 1][0]), tail = tailOf(s);
+          // Under 30 days of prices: change since the first price, tagged new.
+          const isNew = t(s.pts[0][0]) > last - 30 * DAY;
+          const chg = tail.length >= 2 ? 100 * (tail[tail.length - 1][1] / tail[0][1] - 1) : null, up = chg == null || chg >= 0, sp = spark(tail, maxAbs);
+          const col = up ? 'var(--pos)' : 'var(--neg)';
+          html += `<div class="srow${s.id === selId ? ' on' : ''}" role="button" tabindex="0" data-id="${esc(s.id)}"${s.tip ? ` title="${esc(s.tip)}"` : ''}><span class="sym">${s.az}<span class="sub">${isNew ? 'new since ' + dlabel(t(s.pts[0][0])) : esc(s.note)}</span></span>
+            <svg viewBox="0 0 90 24" preserveAspectRatio="none" aria-hidden="true"><line class="sbase" x1="2" x2="88" y1="12" y2="12" vector-effect="non-scaling-stroke"/>
+            <path d="${sp.d}" fill="none" style="stroke:${col}" stroke-width="1.1" vector-effect="non-scaling-stroke"/><circle cx="88" cy="${sp.lastY}" r="2" style="fill:${col}"/></svg>
+            <span><span class="pr">$${V(s).toFixed(2)}</span><span class="d ${up ? 'up' : 'dn'}">${sgnp(chg, 1)}</span></span></div>`;
+        });
+        html += '</div>';
+      });
+      $('rail').innerHTML = html;
+      $('rail').querySelectorAll<HTMLElement>('.srow').forEach((el) => {
+        el.addEventListener('click', () => select(el.dataset.id!, false));
+        el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(el.dataset.id!, false); } });
+      });
+    }
+
+    // ---------- chart ----------
+    let W = 920; const H = 360, PADL = 46, PADR = 46, PADT = 10, PADB = 24;
+    const svg = $('chart') as unknown as SVGSVGElement;
+    function windowBounds(s: Row): [number, number] {
+      const t0 = t(s.pts[0][0]), t1 = t(s.pts[s.pts.length - 1][0]);
+      if (zoom) return [Math.max(zoom[0], t0), zoom[1]];
+      if (rangeDays === 'max') return [t0, t1];
+      return [Math.max(t1 - rangeDays * DAY, t0), t1];
+    }
+    // Monotone cubic through the points (no overshoot), like d3.curveMonotoneX.
+    function monotone(P: [number, number][]) {
+      const n = P.length; if (n < 2) return '';
+      const f = (v: number) => v.toFixed(1);
+      if (n === 2) return `M${f(P[0][0])},${f(P[0][1])}L${f(P[1][0])},${f(P[1][1])}`;
+      const dx: number[] = [], m: number[] = [], tg: number[] = [];
+      for (let i = 0; i < n - 1; i++) { dx[i] = P[i + 1][0] - P[i][0]; m[i] = dx[i] ? (P[i + 1][1] - P[i][1]) / dx[i] : 0; }
+      tg[0] = m[0]; tg[n - 1] = m[n - 2];
+      for (let i = 1; i < n - 1; i++) {
+        if (m[i - 1] * m[i] <= 0) tg[i] = 0;
+        else { const w1 = 2 * dx[i] + dx[i - 1], w2 = dx[i] + 2 * dx[i - 1]; tg[i] = (w1 + w2) / (w1 / m[i - 1] + w2 / m[i]); }
+      }
+      let d = `M${f(P[0][0])},${f(P[0][1])}`;
+      for (let i = 0; i < n - 1; i++) {
+        const h = dx[i] / 3;
+        d += `C${f(P[i][0] + h)},${f(P[i][1] + tg[i] * h)},${f(P[i + 1][0] - h)},${f(P[i + 1][1] - tg[i + 1] * h)},${f(P[i + 1][0])},${f(P[i + 1][1])}`;
+      }
+      return d;
+    }
+    function renderChart() {
+      const s = cur(); if (!s) return;
+      W = svg.clientWidth || W; svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      const [t0, t1] = windowBounds(s);
+      // Line: 7-day trailing average of daily values. Candles: daily values.
+      const src: [string, number][] = ctype === 'line'
+        ? s.pts.map(([d], i) => { const w = s.pts.slice(Math.max(0, i - 6), i + 1); return [d, w.reduce((a, p) => a + p[1], 0) / w.length]; })
+        : s.pts;
+      const pts = src.map(([d, v]) => [t(d), v] as [number, number]).filter(([x]) => x >= t0 && x <= t1);
+      const xg = $('xaxis'), yg = $('yaxis'), gg = $('gridlines');
+      xg.innerHTML = yg.innerHTML = gg.innerHTML = $('candles').innerHTML = '';
+      $('area').setAttribute('d', ''); $('line').setAttribute('d', ''); scaleState = null;
+      $('baseline').style.display = 'none';
+      const winLbl = zoom ? `${dlabel(t0)}–${dlabel(t1)}` : (rangeDays === 'max' ? 'MAX' : ({ 7: '1W', 30: '1M', 90: '3M' } as Record<number, string>)[rangeDays]);
+      if (pts.length >= 2) {
+        let lo = Math.min(...pts.map((p) => p[1])), hi = Math.max(...pts.map((p) => p[1]));
+        const steps = [0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 5], step = steps.find((st) => ((hi - lo) || 1) / st <= 6) || 5;
+        lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step; if (hi === lo) hi = lo + step;
+        const X = (x: number) => PADL + ((x - t0) / ((t1 - t0) || 1)) * (W - PADL - PADR), Y = (v: number) => H - PADB - ((v - lo) / (hi - lo)) * (H - PADT - PADB);
+        const up = pts[pts.length - 1][1] >= pts[0][1], col = up ? 'var(--pos)' : 'var(--neg)';
+        const bl = $('baseline'); bl.setAttribute('x1', String(PADL)); bl.setAttribute('x2', String(W - PADR)); bl.setAttribute('y1', String(Y(pts[0][1]))); bl.setAttribute('y2', String(Y(pts[0][1]))); bl.style.display = '';
+        $('line').style.stroke = col; $('area').setAttribute('fill', up ? 'url(#posfade)' : 'url(#negfade)'); $('xh-dot').style.fill = col;
+        if (ctype === 'candle') {
+          const wPix = Math.max(2.5, (DAY / ((t1 - t0) || 1)) * (W - PADL - PADR) * 0.55); let html = '';
+          for (let i = 1; i < pts.length; i++) {
+            const [x, v] = pts[i], pv = pts[i - 1][1], c = v >= pv ? 'var(--pos)' : 'var(--neg)', top = Y(Math.max(v, pv)), bot = Y(Math.min(v, pv));
+            html += `<rect x="${(X(x) - wPix / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${wPix.toFixed(1)}" height="${Math.max(1, bot - top).toFixed(1)}" style="fill:${c}"/>`;
+          }
+          $('candles').innerHTML = html;
+        } else {
+          const d = monotone(pts.map(([x, v]) => [X(x), Y(v)]));
+          $('line').setAttribute('d', d);
+          $('area').setAttribute('d', `${d}V${H - PADB}H${X(pts[0][0]).toFixed(1)}Z`);
+          scaleState = { pts, X, Y, base: pts[0][1] };
+        }
+        for (let v = lo; v <= hi + step / 2; v += step) {
+          const y = Y(v);
+          yg.insertAdjacentHTML('beforeend', `<text x="2" y="${(y + 3).toFixed(1)}">${v.toFixed(2)}</text><text x="${W - 2}" y="${(y + 3).toFixed(1)}" text-anchor="end">${v.toFixed(2)}</text>`);
+          gg.insertAdjacentHTML('beforeend', `<line x1="${PADL}" x2="${W - PADR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`);
+        }
+        const spanDays = (t1 - t0) / DAY, ticks: number[] = [];
+        if (spanDays <= 10) for (let x = t0; x <= t1 + DAY / 2; x += DAY) ticks.push(x);
+        else for (let i = 0; i <= 6; i++) ticks.push(t0 + (t1 - t0) * i / 6);
+        ticks.forEach((x, i) => { xg.insertAdjacentHTML('beforeend', `<text x="${X(x).toFixed(1)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle'}">${dlabel(x)}</text>`); });
+        const vs = pts.map((p) => p[1]), wchg = 100 * (vs[vs.length - 1] / vs[0] - 1);
+        $('mq-winlbl').textContent = winLbl; $('mq-win').textContent = sgnp(wchg); $('mq-win').className = clsOf(wchg);
+        $('mq-winwrap').style.display = (!zoom && (winLbl === '1W' || winLbl === '1M')) ? 'none' : '';
+        $('mq-rng').textContent = `${Math.min(...vs).toFixed(2)} – ${Math.max(...vs).toFixed(2)}`;
+      }
+      $('chart-title').textContent = `· ${s.chip} · ${s.place} ${s.az}${s.note ? ' · ' + s.note : ''} · ${winLbl}${ctype === 'candle' ? ' · daily candles' : ' · 7-day avg'}`;
+      const mk = $('chart-mark'); mk.setAttribute('x', String(W - PADR - 4)); mk.setAttribute('y', String(H - PADB - 10));
+      mk.textContent = `CCIR · ${s.chip} · ${s.place} ${s.az} · ccir.io/discovery`;
+      $('xhair').style.display = 'none';
+      document.querySelectorAll<HTMLButtonElement>('#ranges button').forEach((b) => b.classList.toggle('on', !zoom && String(rangeDays) === b.dataset.range));
+      document.querySelectorAll<HTMLButtonElement>('#type-tabs button').forEach((b) => b.classList.toggle('on', b.dataset.type === ctype));
+    }
+    function renderHero() {
+      const s = cur(); if (!s) return; const st = s.st!;
+      $('mq-eb').textContent = `AWS spot · ${s.chip} · ${s.place}`;
+      $('mq-sid').textContent = `${s.place} ${s.az} · ${s.instance}`; $('mq-sid').title = s.tip || '';
+      $('mq-price').textContent = `$${st.v.toFixed(2)}`; $('mq-asof').textContent = s.pts[s.pts.length - 1][0];
+      for (const [id, v] of [['mq-d1', st.d1], ['mq-d7', st.d7], ['mq-d30', st.d30]] as [string, number | null][]) { $(id).textContent = sgnp(v); $(id).className = clsOf(v); }
+      $('mq-d1abs').textContent = st.d1abs == null ? '–' : `${st.d1abs >= 0 ? '+' : '−'}${Math.abs(st.d1abs).toFixed(2)}`; $('mq-d1abs').className = clsOf(st.d1abs);
+    }
+    function select(id: string, toCharts: boolean) {
+      selId = id; zoom = null;
+      renderMap(); renderRail(); renderHero(); renderChart();
+      if (toCharts) setMode('charts'); else writeHash();
+    }
+
+    // Two views on one page: Map (today, where) and Charts (history).
+    function writeHash() { history.replaceState(null, '', '#' + mode + (mode === 'charts' && selId ? '&zone=' + encodeURIComponent(selId) : '')); }
+    function setMode(m: string) {
+      mode = m;
+      $('mapwrap').style.display = m === 'map' ? '' : 'none';
+      $('layout').style.display = m === 'charts' ? '' : 'none';
+      document.querySelectorAll<HTMLButtonElement>('#modes button').forEach((b) => b.classList.toggle('on', b.dataset.mode === m));
+      if (m === 'charts') { renderRail(); renderHero(); renderChart(); }
+      writeHash();
+    }
+    function setChip(c: string) {
+      chip = c;
+      document.querySelectorAll<HTMLButtonElement>('#chips button').forEach((b) => b.classList.toggle('on', b.dataset.chip === c));
+      renderTape();
+      const rows = ofChip().sort((a, b) => V(a) - V(b));
+      select(rows[Math.floor(rows.length / 2)].id, false);
+    }
+    document.querySelectorAll<HTMLButtonElement>('#modes button').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode!)));
+    document.querySelectorAll<HTMLButtonElement>('#chips button').forEach((b) => b.addEventListener('click', () => setChip(b.dataset.chip!)));
+    document.querySelectorAll<HTMLButtonElement>('#views button').forEach((b) => b.addEventListener('click', () => {
+      view = DATA.views.find((v) => v.name === b.dataset.view) || DATA.views[0];
+      applyView(); renderMap(); renderRail();
+    }));
+
+    // Crosshair and drag-to-zoom on the chart; double-click resets.
+    let dragX: number | null = null;
+    const px = (e: PointerEvent) => Math.max(0, Math.min(W, e.clientX - svg.getBoundingClientRect().left));
+    function moveCrosshair(x: number) {
+      if (!scaleState) return; const { pts, X, Y } = scaleState;
+      let best = pts[0], bd = Infinity; for (const p of pts) { const d = Math.abs(X(p[0]) - x); if (d < bd) { bd = d; best = p; } }
+      const sx = X(best[0]), sy = Y(best[1]);
+      const set = (id: string, a: Record<string, number>) => Object.entries(a).forEach(([k, v]) => $(id).setAttribute(k, String(v)));
+      set('xh-v', { x1: sx, x2: sx }); set('xh-h', { x1: PADL, x2: W - PADR, y1: sy, y2: sy }); set('xh-dot', { cx: sx, cy: sy });
+      const bx = sx + 144 > W - PADR ? sx - 144 : sx + 12, by = Math.max(PADT, Math.min(sy - 15, H - PADB - 32));
+      set('xh-box', { x: bx, y: by }); set('xh-val', { x: bx + 8, y: by + 13 }); set('xh-date', { x: bx + 8, y: by + 25 });
+      $('xh-val').textContent = `$${best[1].toFixed(2)}  ${sgnp(100 * (best[1] / scaleState.base - 1), 1)}`;
+      $('xh-date').textContent = dlabel(best[0]);
+      $('xhair').style.display = '';
+    }
+    svg.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse') { dragX = px(e); svg.setPointerCapture(e.pointerId); } });
+    svg.addEventListener('pointermove', (e) => {
+      const x = px(e); if (dragX == null) { moveCrosshair(x); return; }
+      $('xhair').style.display = 'none'; const r = $('selrect'); r.style.display = ''; r.setAttribute('x', String(Math.min(dragX, x))); r.setAttribute('width', String(Math.abs(x - dragX)));
+    });
+    svg.addEventListener('pointerleave', () => { $('xhair').style.display = 'none'; });
+    svg.addEventListener('pointerup', (e) => {
+      if (dragX == null) return; const x = px(e); $('selrect').style.display = 'none';
+      if (Math.abs(x - dragX) > 12) {
+        const [t0, t1] = windowBounds(cur()!), f = (p: number) => t0 + (t1 - t0) * Math.max(0, Math.min(1, (p - PADL) / (W - PADL - PADR)));
+        const a = f(Math.min(dragX, x)), b = f(Math.max(dragX, x)); if (b - a >= 3 * DAY) zoom = [a, b];
+      }
+      dragX = null; renderChart();
+    });
+    svg.addEventListener('dblclick', () => { zoom = null; renderChart(); });
+    document.querySelectorAll<HTMLButtonElement>('#ranges button').forEach((b) => b.addEventListener('click', () => { rangeDays = b.dataset.range === 'max' ? 'max' : +b.dataset.range!; zoom = null; renderChart(); }));
+    $('type-tabs').addEventListener('click', (e) => { const ty = (e.target as HTMLElement).dataset?.type; if (ty) { ctype = ty; renderChart(); } });
+    window.addEventListener('resize', () => { if (mode === 'charts') renderChart(); });
+
+    // Boot: default chip, then any deep link (#map, #charts&zone=<id>).
+    applyView();
+    setChip(chip);
+    {
+      const h = new URLSearchParams(HASH0.slice(1).replace(/^(map|charts)&?/, (_m, g) => { mode = g; return ''; }));
+      const z = h.get('zone'), row = z ? DATA.rows.find((s) => s.id === z) : undefined;
+      if (row) { if (row.chip !== chip) setChip(row.chip); select(row.id, false); }
+      setMode(mode);
+    }
+  </script>
+</Base>

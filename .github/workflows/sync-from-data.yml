@@ -488,6 +488,25 @@ jobs:
           set -euo pipefail
           python3 scripts/build_indices_history.py
 
+      - name: Shape /discovery data (daily spot per zone, derived per-GPU values)
+        if: steps.fetch.outputs.have_snapshot == 'true'
+        env:
+          GH_PAT: ${{ secrets.CCIR_V2_DATA_READ_PAT }}
+        run: |
+          set -euo pipefail
+          # The daily per-zone print (ccir-v2-notebooks aws-spot-terminal-print,
+          # 02:40Z) lands at aws_spot/az_daily.csv, outside the dated snapshot.
+          # Only the derived JSON is committed here: no raw file reaches this
+          # public repo or the site (terms posture: no download of this data).
+          tmp=$(mktemp)
+          if curl -fsSL -H "Authorization: token $GH_PAT" -o "$tmp" \
+               "https://raw.githubusercontent.com/ccir-index/ccir-v2-data/main/aws_spot/az_daily.csv"; then
+            python3 scripts/build_discovery_data.py "$tmp"
+          else
+            echo "no aws_spot/az_daily.csv — /discovery keeps previous"
+          fi
+          rm -f "$tmp"
+
       - name: Build public download CSVs (operator-tier only, page vocabulary)
         if: steps.fetch.outputs.have_snapshot == 'true'
         run: |
@@ -526,6 +545,8 @@ jobs:
           for tf in frontier_token_posted.csv token_models_latest.csv token_models_tracked.csv vvti_daily.csv; do
             if [ -f "src/data/$tf" ]; then git add "src/data/$tf"; fi
           done
+          # /discovery: derived daily values + the append-only zone table.
+          git add src/data/discovery_daily.json src/data/discovery_zones.csv
           # public/data/listings_history_*.csv only exists once the upstream
           # pipeline starts emitting these files; -A on a missing dir is fine.
           if [ -d public/data ]; then
