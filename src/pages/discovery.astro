@@ -39,14 +39,16 @@ const [W0, H0] = map.frame;
   description="Daily Amazon EC2 Spot prices per GPU-hour for H100, H200, B200, B300 and A100 servers, zone by zone across AWS regions, on a world map with price histories. Derived daily values, one day late."
   ogImage="/og/discovery.png?v=1"
 >
-  <section class="wrap page-top disc">
-    <PageHeader title="Hyperscaler Interruptible Grade Price Discovery" kicker="Discovery · Spot by zone" asOf={asOf}>
+  <div class="disc disc-full tape-top">
+    <div class="tape" aria-label="Latest daily price per zone"><div class="tape-inner" id="tape"></div></div>
+  </div>
+  <section class="wrap disc disc-head">
+    <PageHeader title="Hyperscaler Interruptible Grade Price Discovery" kicker="Discovery · Spot by zone">
       <p class="standfirst">Global AWS spot prices per GPU-hour</p>
     </PageHeader>
   </section>
 
   <div class="disc disc-full">
-    <div class="tape" aria-label="Latest daily price per zone"><div class="tape-inner" id="tape"></div></div>
 
     <div class="controls">
       <div class="left">
@@ -146,6 +148,8 @@ const [W0, H0] = map.frame;
       font-family: var(--font-mono); font-size: var(--fs-base);
     }
     .disc :global(.page-head) { margin-bottom: 8px; }
+    .tape-top { padding-top: 16px; }
+    .disc-head { padding-top: 20px; }
     .disc .standfirst { color: var(--ink-dim); }
     :global(.disc .up) { color: var(--pos); } :global(.disc .dn) { color: var(--neg); }
 
@@ -306,10 +310,14 @@ const [W0, H0] = map.frame;
       let dots = '', labels: { place: string; x: number; y: number; n: number }[] = [];
       byPlace.forEach((rs, place) => {
         const cx = view.tx + view.k * rs[0].x, cy = view.ty + view.k * rs[0].y;
-        const rr = rs.length > 1 ? (zoomed ? 16 + 2 * rs.length : 7 + rs.length) : 0;
+        // World view: the tightest ring that keeps 5px dots from touching, so
+        // a place's zones stay on its own ground (Aragon had one dot in France).
+        const ring = (n: number) => 5.5 / Math.sin(Math.PI / n);
+        const rr = rs.length > 1 ? (zoomed ? 16 + 2 * rs.length : ring(rs.length)) : 0;
         labels.push({ place, x: cx, y: cy + rr, n: rs.length });
         [...rs].sort((a, b) => a.az.localeCompare(b.az, 'en', { numeric: true }) || a.instance.localeCompare(b.instance)).forEach((s, i) => {
-          const a = 2 * Math.PI * i / rs.length - Math.PI / 2;
+          // Two zones sit side by side (same latitude); more go round a ring.
+          const a = rs.length === 2 ? Math.PI * i + Math.PI : 2 * Math.PI * i / rs.length - Math.PI / 2;
           const x = cx + rr * Math.cos(a), y = cy + rr * Math.sin(a);
           dots += `<circle class="zdot${s.id === selId ? ' sel' : ''}" data-id="${esc(s.id)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${colFor(V(s) / med - 1)}"><title>${esc(`${s.place} ${s.az} · ${s.instance} · $${V(s).toFixed(2)}/GPU-hr`)}</title></circle>`;
         });
