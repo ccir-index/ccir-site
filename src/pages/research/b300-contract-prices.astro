@@ -63,7 +63,7 @@ const fmt2 = (v: number) => '$' + v.toFixed(2);
 const pct = (a: number, b: number) => Math.round((b / a - 1) * 100);
 
 // ---- chart: rates by signing date ------------------------------------------
-const C1W = 760, C1H = 380, P1L = 54, P1R = 250, P1T = 18, P1B = 34;
+const C1W = 760, C1H = 360, P1L = 50, P1R = 185, P1T = 16, P1B = 30;
 const X0 = t('2026-03-01'), X1 = t('2026-08-31');
 const cx1 = (x: number) => P1L + ((x - X0) / (X1 - X0)) * (C1W - P1L - P1R);
 const cy1 = (y: number) => P1T + ((5.0 - y) / 2.0) * (C1H - P1T - P1B);
@@ -111,6 +111,7 @@ const b4 = deals.find((d) => d.term === '4Y')!;
 
     <section class="sec" id="prices">
       <h2><span class="n">01</span> What prices did</h2>
+      <div class="measure">
       <p class="lede-para">
         Since March, seven listed companies disclosed 11 B300 rental contracts
         in their filings. The contracts cover about {Math.round(totalGpus / 1000)},000 GPUs and about
@@ -130,6 +131,7 @@ const b4 = deals.find((d) => d.term === '4Y')!;
         four years at $4.13. After we remove our estimates of CPU server and
         storage costs (about 1% and 4%), the rate is about $3.94.
       </p>
+      </div>
 
       <figure class="chart">
         <div class="chart-box">
@@ -215,8 +217,7 @@ const b4 = deals.find((d) => d.term === '4Y')!;
       <p>
         <strong>Bundles.</strong> Three contracts include CPU servers or
         storage. We estimate those costs at posted cloud rates, at half of
-        list, and remove them. That lowers each rate by about 4% to 5%. At full
-        list, the deduction doubles.
+        list, and remove them. That lowers each rate by about 4% to 5%.
       </p>
       <p>
         <strong>Weights.</strong> Each contract counts in proportion to its
@@ -298,6 +299,11 @@ const b4 = deals.find((d) => d.term === '4Y')!;
     /* contracts table: full wrap width so all eight columns fit without a scroll */
     #contracts { max-width: none; }
     #contracts .twrap { max-width: 1120px; }
+    /* price chart: same width as the contracts table */
+    #prices { max-width: none; }
+    /* same measure as other sections: ch in the section font, not the p font */
+    #prices .measure { max-width: 80ch; }
+    #prices .chart { max-width: 1120px; }
     table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
     th, td { padding: 8px 10px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; white-space: nowrap; }
     thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
