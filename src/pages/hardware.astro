@@ -370,8 +370,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The sensitivity range varies one input at a time around base:
         discount rate 12.5–17.5%, decay 15–19% a year, and the rate band. The
         decay range is the one measured on prior generations. For a
-        signed-rate chip, the rate is a GPU-weighted average of its deals,
-        with recent deals weighted more. A deal loses half its weight for
+        signed-rate chip, the rate is an average of its deals weighted by
+        deal size, with recent deals weighted more. A deal loses half its weight for
         each year of age. The rate band is the uncertainty of that average.
         It is half the spread of the deals, divided by the square root of
         the effective number of deals. For a fallback chip, it spans the lowest
