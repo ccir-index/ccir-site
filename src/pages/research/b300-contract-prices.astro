@@ -1,0 +1,411 @@
+---
+import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
+
+// B300 contract prices since March (2026-09-24). Intelligence lane: company
+// filings only. No on-demand prices on this page (John, 2026-09-23).
+// Source register: scratch/term_filings/deals.csv (Sep-22 sweep). The three
+// bundled contracts are drawn at GPU-only estimates (CPU servers and storage
+// priced at posted neocloud list x 0.5 and taken out), as on the Sep-23 card.
+
+const SEC = 'https://www.sec.gov/Archives/edgar/data/';
+const DOC = {
+  brunS1: SEC + '2090646/000149315226031923/forms-1.htm',
+  sharon: SEC + '2068385/000149315226030363/form424b3.htm',
+  axeApr: SEC + '1446159/000117184326002636/exh_991.htm',
+  qmls: SEC + '2084026/000143774926020200/ex_973916.htm',
+  brunTM: SEC + '2090646/000149315226025672/form8-k.htm',
+  brun10q: SEC + '2090646/000149315226039031/0001493152-26-039031.txt',
+  wyfi: SEC + '2042022/000121390026088026/ea0300877-10q_whitefiber.htm',
+  kidz: SEC + '2022308/000147793226004422/kidz_ex991.htm',
+  axeJul: SEC + '1446159/000117184326004883/exh_991.htm',
+};
+
+interface Deal {
+  signed: string; label: string; seller: string; buyer: string; gpus: number; term: '3Y' | '4Y' | '5Y';
+  rate: number; est: number; basis: string; doc: string; href: string;
+  start?: string; startExact?: boolean;
+}
+// rate = as disclosed; est = GPU-only estimate used in charts and trends
+const deals: Deal[] = [
+  { signed: '2026-03-15', label: 'Mar 15', seller: 'Boost Run', buyer: 'unnamed', gpus: 1280, term: '3Y', rate: 3.45, est: 3.45, basis: 'stated; bare metal', doc: 'S-1', href: DOC.brunS1, start: '2026-04-21', startExact: true },
+  { signed: '2026-03-31', label: 'Mar 31', seller: 'SharonAI', buyer: 'ESDS', gpus: 8208, term: '5Y', rate: 3.30, est: 3.30, basis: 'stated; includes all taxes', doc: '424B3', href: DOC.sharon, start: '2026-09-15' },
+  { signed: '2026-04-22', label: 'Apr 22', seller: 'Axe Compute', buyer: 'unnamed', gpus: 2304, term: '3Y', rate: 4.29, est: 4.13, basis: 'from contract value; includes storage', doc: '8-K', href: DOC.axeApr, start: '2026-08-15' },
+  { signed: '2026-05-11', label: 'May 11', seller: 'QumulusAI', buyer: 'unnamed', gpus: 1024, term: '3Y', rate: 3.70, est: 3.70, basis: 'stated; bare metal', doc: 'S-1/A', href: DOC.qmls, start: '2026-08-15', startExact: true },
+  { signed: '2026-05-21', label: 'May 21', seller: 'Boost Run', buyer: 'Thinking Machines', gpus: 5000, term: '3Y', rate: 3.59, est: 3.40, basis: 'from contract value; includes storage, CPU', doc: '8-K', href: DOC.brunTM },
+  { signed: '2026-07-09', label: 'Jul 9', seller: 'Boost Run', buyer: 'unnamed', gpus: 1536, term: '4Y', rate: 4.13, est: 3.94, basis: 'from contract value; includes 15 CPU servers, about 5 PB storage', doc: '10-Q', href: DOC.brun10q, start: '2027-03-15' },
+  { signed: '2026-07-15', label: 'Jul', seller: 'WhiteFiber', buyer: 'unnamed', gpus: 128, term: '3Y', rate: 4.76, est: 4.76, basis: 'from "aggregate revenue opportunity"', doc: '10-Q', href: DOC.wyfi },
+  { signed: '2026-07-21', label: 'Jul 21', seller: 'KIDZ AI', buyer: 'Canopy Wave', gpus: 256, term: '5Y', rate: 3.98, est: 3.98, basis: 'from contract value', doc: '8-K', href: DOC.kidz, start: '2026-11-15' },
+  { signed: '2026-07-27', label: 'Jul 27', seller: 'Axe Compute', buyer: 'unnamed', gpus: 9200, term: '5Y', rate: 3.72, est: 3.72, basis: 'from contract value', doc: '8-K', href: DOC.axeJul, start: '2026-11-15' },
+  { signed: '2026-08-15', label: 'Aug', seller: 'WhiteFiber', buyer: 'BaseTen', gpus: 1392, term: '3Y', rate: 4.52, est: 4.52, basis: 'from "aggregate revenue opportunity"', doc: '10-Q', href: DOC.wyfi, start: '2026-11-15' },
+  { signed: '2026-08-15', label: 'Aug', seller: 'WhiteFiber', buyer: 'unnamed', gpus: 576, term: '5Y', rate: 3.47, est: 3.47, basis: 'from "aggregate revenue opportunity"; revenue share not in value', doc: '10-Q', href: DOC.wyfi },
+];
+
+const DAY = 86400000;
+const t = (s: string) => Date.parse(s + 'T00:00:00Z') / DAY;
+const totalGpus = deals.reduce((a, d) => a + d.gpus, 0);
+
+// GPU-weighted least squares per tenor (same fit as the Sep-23 card)
+function fit(term: string) {
+  const p = deals.filter((d) => d.term === term);
+  let sw = 0, sx = 0, sy = 0, sxx = 0, sxy = 0;
+  for (const d of p) { const w = d.gpus, x = t(d.signed); sw += w; sx += w * x; sy += w * d.est; sxx += w * x * x; sxy += w * x * d.est; }
+  const k = (sw * sxy - sx * sy) / (sw * sxx - sx * sx);
+  const b = (sy - k * sx) / sw;
+  const x0 = Math.min(...p.map((d) => t(d.signed))), x1 = Math.max(...p.map((d) => t(d.signed)));
+  return { k, b, x0, x1, y0: k * x0 + b, y1: k * x1 + b };
+}
+const f3 = fit('3Y'), f5 = fit('5Y');
+const HRS3 = 1000 * 3 * 8760, HRS5 = 1000 * 5 * 8760;
+const cost3 = ((f3.y1 - f3.y0) * HRS3) / 1e6, cost5 = ((f5.y1 - f5.y0) * HRS5) / 1e6;
+const fmt2 = (v: number) => '$' + v.toFixed(2);
+// rise per hour from the DISPLAYED endpoints, so the text agrees with the labels
+const rise3 = Number(f3.y1.toFixed(2)) - Number(f3.y0.toFixed(2));
+const pct = (a: number, b: number) => Math.round((b / a - 1) * 100);
+
+// ---- chart 1: rates by signing date --------------------------------------
+const C1W = 760, C1H = 380, P1L = 54, P1R = 250, P1T = 18, P1B = 34;
+const X0 = t('2026-03-01'), X1 = t('2026-08-31');
+const cx1 = (x: number) => P1L + ((x - X0) / (X1 - X0)) * (C1W - P1L - P1R);
+const cy1 = (y: number) => P1T + ((5.0 - y) / 2.0) * (C1H - P1T - P1B);
+const monthTicks = ['2026-03-01', '2026-04-01', '2026-05-01', '2026-06-01', '2026-07-01', '2026-08-01'].map((s) => ({ x: t(s), lab: new Date(s + 'T00:00:00Z').toLocaleString('en-US', { month: 'short', timeZone: 'UTC' }) }));
+const rateTicks = [3.0, 3.5, 4.0, 4.5, 5.0];
+const rad = (g: number) => Math.max(3, Math.sqrt(g) * 0.115);
+const dots = [...deals].sort((a, b) => b.gpus - a.gpus).map((d) => ({ x: cx1(t(d.signed)), y: cy1(d.est), r: rad(d.gpus), cls: 't' + d.term }));
+const fitLines = [
+  { f: f3, cls: 't3Y', lab: `3-year  ${fmt2(f3.y0)} to ${fmt2(f3.y1)} (+${pct(f3.y0, f3.y1)}%)`, dy: -8 },
+  { f: f5, cls: 't5Y', lab: `5-year  ${fmt2(f5.y0)} to ${fmt2(f5.y1)} (+${pct(f5.y0, f5.y1)}%)`, dy: 12 },
+].map((l) => ({ ...l, x1: cx1(l.f.x0), y1: cy1(l.f.y0), x2: cx1(l.f.x1), y2: cy1(l.f.y1) }));
+const b4 = deals.find((d) => d.term === '4Y')!;
+
+// ---- chart 3: signed to start ---------------------------------------------
+const starts = deals.filter((d) => d.start);
+const C3W = 760, ROW = 34, P3L = 210, P3R = 60, P3T = 14, P3B = 34;
+const C3H = P3T + P3B + ROW * starts.length;
+const S0 = t('2026-03-01'), S1 = t('2027-04-30');
+const cx3 = (x: number) => P3L + ((x - S0) / (S1 - S0)) * (C3W - P3L - P3R);
+const startTicks = ['2026-03-01', '2026-05-01', '2026-07-01', '2026-09-01', '2026-11-01', '2027-01-01', '2027-03-01'].map((s) => {
+  const d = new Date(s + 'T00:00:00Z');
+  const m = d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+  return { x: t(s), lab: d.getUTCMonth() === 0 || s === '2026-03-01' ? `${m} ’${String(d.getUTCFullYear()).slice(2)}` : m };
+});
+const bars = starts.map((d, i) => ({
+  y: P3T + ROW * i + ROW / 2,
+  xs: cx3(t(d.signed)), xe: cx3(t(d.start!)),
+  months: Math.round((t(d.start!) - t(d.signed)) / 30.4),
+  exact: !!d.startExact, cls: 't' + d.term,
+  lab: `${d.seller}${d.buyer !== 'unnamed' ? ' / ' + d.buyer : ''} · ${d.gpus.toLocaleString('en-US')}`,
+}));
+---
+<Base
+  title="B300 Contract Prices Since March · CCIR Research"
+  description="Eleven B300 rental contracts disclosed since March show three-year rates up about 25%, about $22 million on a 1,000-GPU contract. Moves of this size make contract pricing a risk-management question."
+  article={{ published: '2026-09-24' }}
+>
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · 2026-09-24 · Term</div>
+      <h1>B300 Contract Prices Since March</h1>
+      <p class="standfirst">
+        Eleven B300 rental contracts signed since March show three-year rates
+        up about 25%. On a 1,000-GPU contract, that move is worth about
+        ${Math.round(cost3)} million. Moves of this size make contract pricing a
+        risk-management question as well as a procurement one.
+      </p>
+      <ul class="lede-index">
+        <li><span class="arw">→</span> <a href="#prices">What prices did</a></li>
+        <li><span class="arw">→</span> <a href="#dollars">The move in dollars</a></li>
+        <li><span class="arw">→</span> <a href="#signing">Price risk before signing</a></li>
+        <li><span class="arw">→</span> <a href="#contracts">The eleven contracts</a></li>
+        <li><span class="arw">→</span> <a href="#method">Method and limits</a></li>
+      </ul>
+    </header>
+
+    <figure class="photo">
+      <img src="/img/research/dc-aisle.webp" width="1600" height="920"
+           alt="An aisle between two rows of metal server racks in a data center." loading="eager" />
+      <figcaption>
+        A data center aisle. Photo: İsmail Enes Ayhan,
+        <a href="https://unsplash.com/photos/server-room-aisle-with-metal-equipment-racks-lVZjvw-u9V8" rel="noopener" target="_blank">via Unsplash</a>
+        (<a href="https://unsplash.com/license" rel="noopener" target="_blank">Unsplash License</a>).
+      </figcaption>
+    </figure>
+
+    <section class="sec" id="prices">
+      <h2><span class="n">01</span> What prices did</h2>
+      <p class="lede-para">
+        Since March, seven listed companies disclosed 11 B300 rental contracts
+        in their filings. The contracts cover about {Math.round(totalGpus / 1000)},000 GPUs and about
+        $4 billion of contract value.
+      </p>
+      <p>
+        We fit a trend line to the rates and weight each contract by its GPU
+        count. Three-year rates rose from about {fmt2(f3.y0)} per GPU-hour in
+        March to {fmt2(f3.y1)} in August. That is a rise of about
+        <strong>{pct(f3.y0, f3.y1)}%</strong>. Five-year rates rose from
+        {fmt2(f5.y0)} to {fmt2(f5.y1)}, or about {pct(f5.y0, f5.y1)}%. Two large
+        contracts set most of the five-year line.
+      </p>
+      <p>
+        One seller shows the rise inside its own book. Boost Run rented 1,280
+        B300s for three years at $3.45 in March. In July it rented 1,536 for
+        four years at $4.13. After we remove our estimates of CPU server and
+        storage costs (about 1% and 4%), the rate is about $3.94.
+      </p>
+
+      <figure class="chart">
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${C1W} ${C1H}`} role="img"
+               aria-label={`Dot chart of eleven B300 rental contracts by signing date, March to August 2026, in dollars per GPU-hour. Dot size shows GPUs in each contract. GPU-weighted trend lines: three-year rates rise from ${fmt2(f3.y0)} to ${fmt2(f3.y1)}, five-year rates from ${fmt2(f5.y0)} to ${fmt2(f5.y1)}.`}>
+            {rateTicks.map((v) => (
+              <g>
+                <line x1={P1L} x2={C1W - P1R} y1={cy1(v)} y2={cy1(v)} class="grid" />
+                <text x={P1L - 8} y={cy1(v) + 3.5} text-anchor="end" class="tick">{fmt2(v)}</text>
+              </g>
+            ))}
+            {monthTicks.map((m) => (
+              <text x={cx1(m.x)} y={C1H - 12} text-anchor="middle" class="tick">{m.lab}</text>
+            ))}
+            {fitLines.map((l) => (
+              <g>
+                <line x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} class={`fit ${l.cls}`} />
+                <text x={C1W - P1R + 10} y={l.y2 + l.dy} class={`endlab ${l.cls}`}>{l.lab}</text>
+              </g>
+            ))}
+            {dots.map((d) => <circle cx={d.x} cy={d.y} r={d.r} class={`dot ${d.cls}`} />)}
+            <text x={cx1(t(b4.signed))} y={cy1(b4.est) + 22} text-anchor="middle" class="tick">4-year</text>
+          </svg>
+        </div>
+        <figcaption class="tfoot">
+          Dot area is proportional to GPUs in the contract. Dotted lines: trend
+          fitted to each term, weighted by GPUs. Three bundled contracts are
+          drawn at GPU-only estimates (see method).
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="sec" id="dollars">
+      <h2><span class="n">02</span> The move in dollars</h2>
+      <p>
+        On a three-year contract for 1,000 B300s, the move from the March rate
+        to the August rate is about <strong>${Math.round(cost3)} million</strong>.
+        On a five-year contract for 1,000 GPUs, it is about
+        ${Math.round(cost5)} million.
+      </p>
+
+      <p>
+        These figures come from the trend across all sellers. Boost Run's own
+        two contracts put the move at about $13 million on the same order.
+      </p>
+      <p>
+        At 10,000 GPUs, the same move is about $200 million. The two
+        largest contracts in the record show it at that scale. SharonAI rented
+        8,208 B300s to ESDS for five years at $3.30 in March. Axe Compute
+        rented 9,200 for five years at about $3.72 in July. That is about 13%
+        more, four months later, on a cluster of the same size. On 10,000 GPUs
+        over five years, the difference is about $185 million.
+      </p>
+      <p>
+        The largest three-year contract in the record is 5,000 GPUs. The
+        three-year contracts signed in July and August are 128 and 1,392
+        GPUs.
+      </p>
+    </section>
+
+    <section class="sec" id="signing">
+      <h2><span class="n">03</span> Price risk before signing</h2>
+      <p>
+        These contracts fix the price at signing. Service starts one to eight
+        months later.
+      </p>
+
+      <figure class="chart">
+        <div class="chart-box">
+          <svg viewBox={`0 0 ${C3W} ${C3H}`} role="img"
+               aria-label="Timeline of eight B300 contracts from signing date to service start. Gaps run from about one month to about eight months.">
+            {startTicks.map((m) => (
+              <g>
+                <line x1={cx3(m.x)} x2={cx3(m.x)} y1={P3T} y2={C3H - P3B} class="grid" />
+                <text x={cx3(m.x)} y={C3H - 12} text-anchor="middle" class="tick">{m.lab}</text>
+              </g>
+            ))}
+            {bars.map((b) => (
+              <g>
+                <text x={P3L - 12} y={b.y + 3.5} text-anchor="end" class="rowlab">{b.lab}</text>
+                <line x1={b.xs} x2={b.xe} y1={b.y} y2={b.y} class={`span ${b.cls} ${b.exact ? '' : 'est'}`} />
+                <circle cx={b.xs} cy={b.y} r="3.5" class={`dot ${b.cls}`} />
+                <circle cx={b.xe} cy={b.y} r="4.5" class={`end ${b.cls} ${b.exact ? 'solid' : 'open'}`} />
+                <text x={b.xe + 9} y={b.y + 3.5} class="tick">{b.months} mo</text>
+              </g>
+            ))}
+          </svg>
+        </div>
+        <figcaption class="tfoot">
+          Signing date to service start for the eight contracts that disclose
+          a start. Dashed with an open end: the filing gives a quarter or a
+          month, drawn at its midpoint.
+        </figcaption>
+      </figure>
+
+      <p>
+        Until a contract is signed, its price is open. Between March and
+        August, the three-year rate moved about {fmt2(rise3)} per GPU-hour. On
+        the contract sizes in this record, that is tens of millions of
+        dollars. A rise exposes the buyer. A fall exposes the seller.
+      </p>
+      <p>
+        Moves of this size make contract pricing a risk-management question
+        as well as a procurement one. Buyers and sellers of compute have few
+        tools to manage that risk today. We expect the market to demand
+        better ones.
+      </p>
+
+      <figure class="photo narrow">
+        <img src="/img/research/hgx-b200-tray.webp" width="1400" height="1421"
+             alt="An NVIDIA HGX B200 baseboard with eight GPU modules under heat sinks." loading="lazy" />
+        <figcaption>
+          An NVIDIA HGX B200 baseboard. The HGX B300 uses the same eight-GPU
+          board format. Photo: Pokiiri,
+          <a href="https://commons.wikimedia.org/wiki/File:Nvidia_DGX-B200-HGX.jpg" rel="noopener" target="_blank">via Wikimedia Commons</a>
+          (<a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank">CC BY-SA 4.0</a>).
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="sec" id="contracts">
+      <h2><span class="n">04</span> The eleven contracts</h2>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Signed</th><th>Seller</th><th>Buyer</th><th class="num">GPUs</th><th>Term</th><th class="num">$/GPU-hr</th><th>Basis</th><th>Filing</th></tr></thead>
+          <tbody>
+            {deals.map((d) => (
+              <tr>
+                <td class="dim">{d.label}</td>
+                <td class="gen">{d.seller}</td>
+                <td class="dim">{d.buyer}</td>
+                <td class="num">{d.gpus.toLocaleString('en-US')}</td>
+                <td>{d.term}</td>
+                <td class="num strong">{d.rate.toFixed(2)}</td>
+                <td class="basis">{d.basis}</td>
+                <td><a href={d.href} rel="noopener" target="_blank">{d.doc}</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div class="tfoot">
+        Rates as disclosed. Charts and trend lines use GPU-only estimates for
+        the three bundled contracts. Those are $4.13 for Axe Compute (April),
+        $3.40 for Boost Run / Thinking Machines and $3.94 for Boost Run
+        (July). Total: {totalGpus.toLocaleString('en-US')} GPUs.
+      </div>
+    </section>
+
+    <section class="sec" id="method">
+      <h2><span class="n">05</span> Method and limits</h2>
+      <p>
+        <strong>Rates.</strong> Where a filing states a rate, we use it.
+        Otherwise the rate is contract value divided by GPUs, years and 8,760
+        hours.
+      </p>
+      <p>
+        <strong>Bundles.</strong> Three contracts include CPU servers or
+        storage. We estimate those costs at posted cloud rates, at half of
+        list, and remove them. That lowers each rate by about 4% to 5%. At full
+        list, the deduction doubles.
+      </p>
+      <p>
+        <strong>Weights.</strong> Each contract counts in proportion to its
+        GPUs. One contract is 45% of the three-year weight. Two contracts are
+        95% of the five-year weight. With equal weights, three-year rates rose
+        about 35% and five-year rates about 11%.
+      </p>
+      <p>
+        <strong>Sample.</strong> The sellers are small listed companies that
+        must disclose. Their contracts are a sample of B300 pricing. Larger
+        private contracts are not in the record.
+      </p>
+      <p>
+        <strong>Product mix.</strong> The early three-year contracts are mostly
+        bare metal on large orders. The later ones are GPU cloud on smaller
+        orders. We checked posted prices for the same sellers. Bare metal and
+        GPU cloud differ by about 0% to 4%. If we take 4% off the two late
+        WhiteFiber contracts, the three-year rise is about 19%, or about $17
+        million on 1,000 GPUs.
+      </p>
+      <p>
+        <strong>Other terms.</strong> SharonAI's rate includes taxes.
+        WhiteFiber discloses "aggregate revenue opportunity," which may differ
+        from firm contract value. Start dates given as a quarter or a month
+        are drawn at the midpoint.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">06</span> Sources</h2>
+      <ul class="src-list">
+        <li>Boost Run: <a href={DOC.brunS1} rel="noopener" target="_blank">Form S-1</a> · <a href={DOC.brunTM} rel="noopener" target="_blank">Form 8-K (May 28, 2026)</a> · <a href={DOC.brun10q} rel="noopener" target="_blank">Form 10-Q, Q2 2026</a></li>
+        <li>SharonAI: <a href={DOC.sharon} rel="noopener" target="_blank">Form 424B3</a></li>
+        <li>Axe Compute: <a href={DOC.axeApr} rel="noopener" target="_blank">Form 8-K, Ex. 99.1 (April 22, 2026)</a> · <a href={DOC.axeJul} rel="noopener" target="_blank">Form 8-K, Ex. 99.1 (July 27, 2026)</a></li>
+        <li>QumulusAI: <a href={DOC.qmls} rel="noopener" target="_blank">Form S-1/A, customer order form</a></li>
+        <li>WhiteFiber: <a href={DOC.wyfi} rel="noopener" target="_blank">Form 10-Q, Q2 2026</a></li>
+        <li>KIDZ AI: <a href={DOC.kidz} rel="noopener" target="_blank">Form 8-K, Ex. 99.1 (July 21, 2026)</a></li>
+      </ul>
+    </section>
+
+    <NoteFooter title="B300 Contract Prices Since March" published="2026-09-24" />
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 18px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p, .sec ul { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    .sec strong { color: var(--accent); }
+    .photo { margin: 0 0 22px; max-width: 880px; }
+    .photo img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); filter: grayscale(0.1); }
+    .photo figcaption { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
+    .photo figcaption a { color: var(--ink-dim); }
+    .sec .photo { margin-top: 18px; }
+    .photo.narrow { max-width: 480px; }
+    .chart { margin: 16px 0 18px; max-width: 880px; }
+    .chart-box { border: 1px solid var(--rule); background: var(--surface); }
+    .chart-box svg { display: block; width: 100%; height: auto; }
+    .grid { stroke: var(--rule); stroke-width: 1; }
+    .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+    .rowlab { font-family: var(--font-mono); font-size: 10.5px; fill: var(--ink-dim); }
+    .endlab { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; }
+    .t3Y { --c: var(--accent); }
+    .t5Y { --c: var(--tier-t1); }
+    .t4Y { --c: var(--ink-faint); }
+    .endlab.t3Y, .endlab.t5Y { fill: var(--c); }
+    .dot { fill: var(--c); fill-opacity: 0.85; stroke: var(--surface); stroke-width: 1.2; }
+    .fit { stroke: var(--c); stroke-width: 2.4; stroke-dasharray: 1.5 5; stroke-linecap: round; }
+    .span { stroke: var(--c); stroke-width: 3; stroke-linecap: round; }
+    .span.est { stroke-dasharray: 5 4; stroke-linecap: butt; }
+    .end.solid { fill: var(--c); }
+    .end.open { fill: var(--surface); stroke: var(--c); stroke-width: 1.6; }
+    .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 8px; max-width: 880px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; white-space: nowrap; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.gen { color: var(--ink); font-weight: var(--weight-strong); }
+    td.dim { color: var(--ink-dim); }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); }
+    td.basis { color: var(--ink-dim); white-space: normal; min-width: 16ch; font-family: var(--font-body); }
+    .src-list { list-style: none; padding: 0; }
+    .src-list li { margin-bottom: 8px; font-size: var(--fs-sm); }
+  </style>
+</Base>
