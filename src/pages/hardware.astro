@@ -3,8 +3,10 @@ import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import hw from '../data/hardware_panels.json';
 import ChipLink from '../components/ChipLink.astro';
-import { ivCards, legText, IV_HAIRCUT } from '../lib/ivmodel';
+import { ivCards, legText, IV_HAIRCUT, IV_CALIB } from '../lib/ivmodel';
 const hcPct = IV_HAIRCUT ? Math.round(IV_HAIRCUT.haircut * 100) : '—';
+const calibPct = Math.round(IV_CALIB.k * 100);
+const calibChips = IV_CALIB.chips.map((c) => c.chip).join(' and ');
 const hcRange = IV_HAIRCUT ? `${Math.round(IV_HAIRCUT.lo * 100)}–${Math.round(IV_HAIRCUT.hi * 100)}%` : '—';
 
 // Record totals (full capture vs the tracked-model subset) come from the
@@ -284,10 +286,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
           <div class={'ivcard' + (v.modeledOnly ? ' ivmodelonly' : '')}>
             <div class="ivchip">{v.label}{v.modeledOnly && <span class="ivtag">modeled only</span>}</div>
             <div class="ivval">{fmtUsd(v.base)}</div>
-            <div class="ivrange">range {fmtK(v.lo)} – {fmtK(v.hi)}</div>
             <div class="ivstrip" aria-hidden="true">
-              <div class="ivband" style={`left:${p(v.lo)}%;width:${p(v.hi) - p(v.lo)}%`}></div>
-              <div class="ivdot" style={`left:${p(v.base)}%`} title={`model ${fmtUsd(v.base)}`}></div>
+              <div class="ivdot" style={`left:${p(v.base)}%`} title={`GPU value ${fmtUsd(v.base)}`}></div>
               {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`stress path ${fmtUsd(v.intStress)}: no term contract, the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) at ${Math.round((v.intUtil ?? 0) * 100)}% utilization and 65% net margin from day one`}></div>}
               {v.ask != null && <div class="ivtick" style={`left:${p(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
               {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)} (n=${v.t90N})`}></div>}
@@ -308,9 +308,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
             {v.newCost && (
               <div class="ivrow"><span class="g g-cost"></span>new-cost basis {fmtUsd(v.newCost.usd)}<span class="dim"> · {v.newCost.label} [{v.newCost.grade}]</span></div>
             )}
-            {v.aboveCost && <div class="ivrow ivabove">Income value is above the cost of a new GPU.</div>}
+            {v.aboveCost && <div class="ivrow ivabove">Value is above the cost of a new GPU.</div>}
             {v.intStress != null && (
-              <div class="ivrow"><span class="g g-int"></span>stress path {fmtUsd(v.intStress)}<span class="dim"> · no contract, interruptible rate at {Math.round((v.intUtil ?? 0) * 100)}% utilization</span></div>
+              <div class="ivrow"><span class="g g-int"></span>stress {fmtUsd(v.intStress)}<span class="dim"> · no contract, interruptible rate at {Math.round((v.intUtil ?? 0) * 100)}% utilization</span></div>
             )}
             <div class="ivmeta">
               rate leg ${l.rate.toFixed(2)}/hr at {l.tenor} · {legText(v)}{l.method === 'signed' && l.lastDate ? `, read at ${l.lastDate}` : ''}
@@ -344,10 +344,16 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The discount rate is 15%. Service life is 7 years from volume
         availability for every chip. A chip with no secondary-market record
         is published <em>modeled only</em>, with no ask or executed check.
-        The range varies one input at a time around base: discount rate
-        10–20%, decay 10–30% a year, and the rate band. For a signed-trend
-        chip, the rate band spans the 25th to 75th GPU-weighted percentile
-        of deals around the line. For a fallback chip, it spans the lowest
+        The value on each card is the GPU on its own. The income path above
+        values a deployed, earning position. A GPU alone is worth that less
+        its share of the server and network around it and the cost of
+        getting it earning. We calibrate that gap to executed sales: it is
+        {calibPct}% today, set so the model matches what {calibChips} sell
+        for. Chips with no sales record use the same share.
+        The sensitivity range varies one input at a time around base:
+        discount rate 10–20%, decay 10–30% a year, and the rate band. For a
+        signed-trend chip, the rate band spans the 25th to 75th percentile
+        of deals around the line, each deal counted once. For a fallback chip, it spans the lowest
         and highest measured haircut. Corners are never stacked.
         Utilization, margin, and the 7-year life stay at base. The
         discount-rate band is anchored to observed GPU-asset-backed

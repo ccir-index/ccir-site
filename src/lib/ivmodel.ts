@@ -204,7 +204,7 @@ function ivValue(rate: number, T: number, age: number, r = IV_BASE.r, g = IV_BAS
   return pv;
 }
 
-export const ivCards = IV_SPEC.map((s) => {
+const ivRaw = IV_SPEC.map((s) => {
   const hwm = hw.models.find((m: any) => m.key === s.key) as any;
   if (!s.modeledOnly && !hwm) return null;
   const leg = rateLeg(s);
@@ -248,8 +248,31 @@ export const ivCards = IV_SPEC.map((s) => {
     t90, t90N: hwm?.t90?.n ?? null,
     newCost, aboveCost: newCost != null && base > newCost.usd,
   };
-}).filter((x): x is NonNullable<typeof x> => x != null)
-  .sort((a, b) => b.base - a.base);
+}).filter((x): x is NonNullable<typeof x> => x != null);
+
+// GPU VALUE (John, 2026-09-24): the income stream above values a DEPLOYED,
+// earning position. A GPU alone is worth that less its share of the rest of
+// the system (server, networking) and the cost of getting it earning.
+// Calibrated at every build on chips with executed sales (sold 90d median):
+// k = 1 - mean(sold / deployed value). Sep-24: H100 0.754, A100 0.864 -> k 19%.
+// One published value per chip = deployed x (1 - k); the stress path takes
+// the same k. Chips with no sales record inherit the calibrated k.
+const calib = ivRaw.filter((c) => !c.modeledOnly && c.t90 != null && c.base > 0)
+  .map((c) => ({ chip: c.label, ratio: c.t90! / c.base }));
+export const IV_CALIB = {
+  k: calib.length ? 1 - calib.reduce((a, c) => a + c.ratio, 0) / calib.length : 0.2,
+  chips: calib,
+};
+const keep = 1 - IV_CALIB.k;
+export const ivCards = ivRaw.map((c) => {
+  const base = c.base * keep, lo = c.lo * keep, hi = c.hi * keep;
+  const intStress = c.intStress != null ? c.intStress * keep : null;
+  const smax = Math.max(base, c.ask ?? 0, c.t90 ?? 0, intStress ?? 0, c.newCost?.usd ?? 0) * 1.06;
+  return {
+    ...c, deployed: c.base, base, lo, hi, intStress, smax,
+    aboveCost: c.newCost != null && base > c.newCost.usd,
+  };
+}).sort((a, b) => b.base - a.base);
 
 export type IvCard = (typeof ivCards)[number];
 
