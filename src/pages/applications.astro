@@ -6,7 +6,7 @@ import {
 } from '../data/snapshot';
 import type { Rate } from '../data/types';
 import { bCurve, conCell } from '../data/term_b';
-import { ivCards, IV_HAIRCUT, REPLAY_TROUGH } from '../lib/ivmodel';
+import { ivCards, IV_HAIRCUT } from '../lib/ivmodel';
 
 // Calibrate against the global Neocloud B200 guaranteed on-demand series
 // (John, 2026-09-24: B200, better numbers). Global over US: the US B200 panel
@@ -172,33 +172,33 @@ const monitorTerms: { term: string; value: string }[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Use case 02: re-leasing (rollover) risk on B200 (John, 2026-09-24), built
-// on /term and /hardware:
-//  - anchor contract = the /term 2Y contracted cell (trailing 12 months,
-//    sqrt-GPU weighted, bundled at estimate);
-//  - base re-lease = posted global neocloud on-demand (the /term ladder
-//    start) less the measured posted-to-contracted discount (/hardware);
-//  - stress re-lease = base at the low of the 2024-25 H100 replay (/hardware).
+// Use case 01: re-leasing (rollover) risk on B200 (John, 2026-09-24).
+// Base re-lease is a RANGE: low = posted global neocloud on-demand (the
+// /term ladder start) less the measured posted-to-contracted discount; high
+// = the /term 2Y contracted cell (trailing 12 months). Triggers sit a set
+// percentage below the low end. Either test input can trip them: the 30-day
+// implied rate, or the rate in a new B200 filing on /term.
 const b200Curve = bCurve('B200');
 const anchorCell = conCell('B200', '2Y');
 const ANCHOR_RATE = anchorCell?.rate ?? 0;
 const postedOd = b200Curve.od?.value ?? 0;
 const discount = DISCOUNT;
 const reLeaseBase = postedOd * (1 - discount);
-const reLeaseStress = reLeaseBase * REPLAY_TROUGH;
+const baseLo = Math.min(reLeaseBase, ANCHOR_RATE || reLeaseBase);
+const baseHi = Math.max(reLeaseBase, ANCHOR_RATE);
+const WATCH_PCT = 0.10, TRIGGER_PCT = 0.20;
+const watchRate = baseLo * (1 - WATCH_PCT);
+const triggerRate = baseLo * (1 - TRIGGER_PCT);
 
 // Stylized facility for the rollover exhibit. Anchor share and closing DSCR
 // are illustrative; every rate is live.
 const FLEET_GPUS = FLEET;           // 1,000 8-GPU nodes
 const ANCHOR_SHARE = 0.70;          // capacity under the expiring anchor contract
 const CLOSE_DSCR = 1.45;            // DSCR at close, on total contracted book
-// At close the rest of the fleet sells at the base re-lease rate. At
-// rollover the whole fleet reprices: base, then stress.
+// At close the rest of the fleet sells at the implied rate. At rollover the
+// whole fleet reprices.
 const revClose = ANCHOR_SHARE * ANCHOR_RATE + (1 - ANCHOR_SHARE) * reLeaseBase;
 const dscrAt = (rate: number) => (revClose > 0 ? (rate / revClose) * CLOSE_DSCR : 0);
-const dscrBase = dscrAt(reLeaseBase);
-const dscrStress = dscrAt(reLeaseStress);
-const pctVsAnchor = (r: number) => (ANCHOR_RATE > 0 ? ((r - ANCHOR_RATE) / ANCHOR_RATE) * 100 : 0);
 
 // ---------------------------------------------------------------------------
 // UC01 history: the watch levels run against reconstructed history. Rates are
@@ -324,21 +324,17 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
       </header>
 
       <section class="uc-rate">
-        <div class="rate-kicker">Re-lease rate at rollover (live, calibrating this example)</div>
-        <div class="rate-id">B200 · global Neocloud · from <a href="/term">/term</a> and <a href="/hardware">/hardware</a></div>
-        <div class="rate-price">${fmt(reLeaseBase)}<span class="rate-unit">/GPU-hr · base re-lease</span></div>
+        <div class="rate-kicker">Base re-lease range (live, calibrating this example)</div>
+        <div class="rate-id">B200 · global Neocloud</div>
+        <div class="rate-price">${fmt(baseLo)}–${fmt(baseHi)}<span class="rate-unit">/GPU-hr</span></div>
         <div class="rate-meta">
-          Posted on-demand ${fmt(postedOd)} (/term ladder) less the measured
-          posted-to-contracted discount of {Math.round(discount * 100)}%
+          Posted on-demand less the measured discount, to contracted 2Y on <a href="/term">/term</a>
           <span class="sep">·</span>
           as of {meta.as_of_date}
         </div>
         <div class="rate-thresholds">
-          {anchorCell?.rate != null && (
-            <span><strong>Contracted 2Y</strong> ${fmt(ANCHOR_RATE)} <span class="dim">(range ${fmt(anchorCell.min!)}–${fmt(anchorCell.max!)})</span></span>
-          )}
-          <span><strong>Base re-lease</strong> ${fmt(reLeaseBase)}</span>
-          <span><strong>Stress re-lease</strong> ${fmt(reLeaseStress)} <span class="dim">(2024–25 replay low)</span></span>
+          <span><strong>Watch</strong> ${fmt(watchRate)} <span class="dim">({Math.round(WATCH_PCT * 100)}% below)</span></span>
+          <span><strong>Trigger</strong> ${fmt(triggerRate)} <span class="dim">({Math.round(TRIGGER_PCT * 100)}% below)</span></span>
         </div>
       </section>
 
@@ -352,12 +348,11 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
           capacity earns on re-lease is the credit question.
         </p>
         <p>
-          Three published numbers size it. The anchor contract is priced like
-          the contracted rates on <a href="/term">/term</a>. The rate a new
-          contract would sign at today is the posted on-demand rate less the
-          measured gap between posted and contracted prices. The downside is
-          the stress path on <a href="/hardware">/hardware</a>: a replay of the
-          2024–25 H100 decline, when on-demand rates fell 61% in 18 months.
+          Two published numbers bound the base case. The low end is the
+          posted on-demand rate less the measured gap between posted and
+          contracted prices. The high end is what B200 contracts signed at
+          over the last 12 months, from <a href="/term">/term</a>. The
+          lender sets triggers a fixed percentage below the low end.
         </p>
         <p>
           Commercial real estate lenders handle the same question with
@@ -372,31 +367,29 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
           Calibration: stylized facility of {FLEET_GPUS.toLocaleString('en-US')} B200
           GPUs (1,000 nodes). {(ANCHOR_SHARE * 100).toFixed(0)}% of capacity
           sits under a 2-year anchor contract at the /term 2Y contracted rate
-          of ${fmt(ANCHOR_RATE)}. The rest sells at the base re-lease rate.
+          of ${fmt(ANCHOR_RATE)}. The rest sells at the implied rate of
+          ${fmt(reLeaseBase)}.
           DSCR at close {CLOSE_DSCR.toFixed(2)}x. At rollover the whole fleet
           reprices. Margins and debt service stay constant to isolate the
           price effect. Every rate is live as of {meta.as_of_date}.
         </p>
         <div class="ftable-wrap">
           <table class="ftable">
-            <thead><tr><th>Case</th><th class="num">Rate $/GPU-hr</th><th class="num">vs anchor</th><th class="num">DSCR</th></tr></thead>
+            <thead><tr><th>Case at rollover</th><th class="num">Rate $/GPU-hr</th><th class="num">DSCR</th><th>Response</th></tr></thead>
             <tbody>
-              <tr><td>At close (anchor contract)</td><td class="num">{fmt(ANCHOR_RATE)}</td><td class="num">—</td><td class="num">{CLOSE_DSCR.toFixed(2)}x</td></tr>
-              <tr><td>Rollover, base re-lease</td><td class="num">{fmt(reLeaseBase)}</td><td class="num">{pctVsAnchor(reLeaseBase) >= 0 ? '+' : '−'}{Math.abs(pctVsAnchor(reLeaseBase)).toFixed(0)}%</td><td class="num"><strong>{dscrBase.toFixed(2)}x</strong></td></tr>
-              <tr><td>Rollover, stress re-lease</td><td class="num">{fmt(reLeaseStress)}</td><td class="num">{pctVsAnchor(reLeaseStress) >= 0 ? '+' : '−'}{Math.abs(pctVsAnchor(reLeaseStress)).toFixed(0)}%</td><td class="num"><strong>{dscrStress.toFixed(2)}x</strong></td></tr>
+              <tr><td>At close</td><td class="num">{fmt(ANCHOR_RATE)}</td><td class="num">{CLOSE_DSCR.toFixed(2)}x</td><td>Record the base range</td></tr>
+              <tr><td>Base range</td><td class="num">{fmt(baseLo)}–{fmt(baseHi)}</td><td class="num">{dscrAt(baseLo).toFixed(2)}x–{dscrAt(baseHi).toFixed(2)}x</td><td>Standard review</td></tr>
+              <tr><td>Watch, {Math.round(WATCH_PCT * 100)}% below the low end</td><td class="num">{fmt(watchRate)}</td><td class="num">{dscrAt(watchRate).toFixed(2)}x</td><td>Monthly review; request the re-leasing pipeline</td></tr>
+              <tr><td>Trigger, {Math.round(TRIGGER_PCT * 100)}% below the low end</td><td class="num">{fmt(triggerRate)}</td><td class="num"><strong>{dscrAt(triggerRate).toFixed(2)}x</strong></td><td>Coverage test; reserve and sweep terms</td></tr>
             </tbody>
           </table>
         </div>
         <p>
-          <strong>The exhibit sizes the risk ahead of the expiry.</strong> The
-          base and stress cases are computable on any publication date. They
-          need only the borrower's contract book and the published rates. The
-          lender can see the gap months before the revenue changes.
-        </p>
-        <p>
-          <strong>A coverage flag at 1.20x</strong> prompts a review of the
-          borrower's re-leasing plan and pipeline. It also prompts a check of
-          any reserve terms already in the facility.
+          <strong>The trigger lands where coverage breaks.</strong> At
+          {Math.round(TRIGGER_PCT * 100)}% below the low end, projected DSCR
+          falls under 1.20x. The lender can see that point months before the
+          contract expires, from published data and the borrower's contract
+          book.
         </p>
       </section>
 
@@ -412,16 +405,17 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
           renewed.
         </p>
         <p>
-          <strong>Re-price only the expiring block.</strong> Hold every other
-          contract at its contracted rate. Re-price the expiring capacity at
-          the base re-lease rate, then at the stress rate. Compare projected
-          cash flow with scheduled debt service in both cases.
+          <strong>Two inputs can trip the trigger.</strong> The first is the
+          30-day average of the implied rate: posted on-demand less the
+          measured discount. The second is the rate in any new B200 filing on
+          <a href="/term">/term</a>. Either one below the watch or trigger
+          level sets the response.
         </p>
         <p>
-          <strong>Watch the contracted rates as they file.</strong> New deals
-          on <a href="/term">/term</a> show where contracts are signing now.
-          A new filing below the base re-lease rate is an early sign that the
-          discount is widening.
+          <strong>Re-price only the expiring block.</strong> Hold every other
+          contract at its contracted rate. Re-price the expiring capacity at
+          the current test rate. Compare projected cash flow with scheduled
+          debt service.
         </p>
         <p>
           <strong>Every moving input comes from outside the borrower.</strong>
@@ -435,11 +429,11 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         <p>
           <strong>This is illustrative.</strong> Fleet size, anchor share and
           closing DSCR are stylized. The contracted rate rests on a few filed
-          deals, and their range prints above. The posted-to-contracted
-          discount is measured across chips and tenors, and a single deal can
-          sit well above or below it. The stress applies H100's history to
-          B200, which has not yet been through a downturn. Utilization on
-          re-leased capacity stays at the contracted level.
+          deals. The posted-to-contracted discount is measured across chips
+          and tenors, and a single deal can sit well above or below it. The
+          10% and 20% trigger distances are examples. Utilization on
+          re-leased capacity stays at the contracted level. Any contractual
+          terms are for the parties and their counsel.
         </p>
       </section>
 
