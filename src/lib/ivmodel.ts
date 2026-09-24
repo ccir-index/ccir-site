@@ -171,14 +171,15 @@ function rateLeg(s: Spec): RateLeg | null {
   const all = signedDeals(s.model, true);
   if (all.length >= 3) {
     // Recency weighting (John, 2026-09-24): through-life, weighted toward
-    // recent deals. Weight = GPUs x 0.5^(age in years / IV_HALF_LIFE).
+    // recent deals. Weight = sqrt(GPUs) x 0.5^(age in years / IV_HALF_LIFE)
+    // (sqrt: John, 2026-09-24, matches /term).
     // The band uses recency weight only (each deal counted once, older
     // deals discounted), so no single large deal sets it.
     const nowD = dayNum(meta.as_of_date);
     const rw = all.map((d) => Math.pow(0.5, (nowD - dayNum(d.signed)) / 365.25 / IV_HALF_LIFE));
     const W = all.reduce((a, d) => a + d.gpus, 0);
-    const WW = all.reduce((a, d, i) => a + d.gpus * rw[i]!, 0);
-    const rate = all.reduce((a, d, i) => a + d.value * d.gpus * rw[i]!, 0) / WW;
+    const WW = all.reduce((a, d, i) => a + Math.sqrt(d.gpus) * rw[i]!, 0);
+    const rate = all.reduce((a, d, i) => a + d.value * Math.sqrt(d.gpus) * rw[i]!, 0) / WW;
     const vals = all.map((d) => d.value), ones = rw;
     const nEff = rw.reduce((a, w) => a + w, 0) ** 2 / rw.reduce((a, w) => a + w * w, 0);
     const dates = all.map((d) => d.signed).sort();

@@ -346,8 +346,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         asks {H200_EST.nvlAsk != null ? fmtK(H200_EST.nvlAsk) : '—'}). They are estimates, drawn lighter.</p>
       <p class="ivnote">
         Rate leg: the chip's through-life signed rate, weighted toward
-        recent deals. It averages every signed term deal for the chip, by
-        GPUs, and a deal loses half its weight for each year of age. Renewal options and
+        recent deals. It averages every signed term deal for the chip. Each deal
+        weighs by the square root of its GPU count and loses half its weight
+        for each year of age. Renewal options and
         subsidized or program deals are excluded. A bundled deal enters at
         a GPU-only estimate. The contract term is the tenor with the
         most GPUs signed. A chip needs three or more deals. With fewer, the
@@ -697,7 +698,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         discounts the income a deployed unit can earn over its service
         life. Every leg is either observed or disclosed. The rate leg is
         observed. It averages every signed term deal for the chip, weighted
-        by GPUs and by recency. A deal loses half its weight for each year
+        by deal size and by recency. Each deal weighs by the square root of
+        its GPU count. A deal loses half its weight for each year
         of age. Renewal options and subsidized or program
         deals are excluded. A bundled deal enters at a GPU-only estimate.
         The contract term is the tenor with the most GPUs signed. Where a
