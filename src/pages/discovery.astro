@@ -126,7 +126,7 @@ const [W0, H0] = map.frame;
         <li>Price per GPU is the server's spot price divided by its GPUs. Every server shown has 8 GPUs.</li>
         <li>The daily value is the time-weighted average price over the UTC day, 00:00 to 24:00. Each price counts for the time it was in effect. The price in effect at 00:00 carries in from the day before.{closeThrough && <> Through {longDate(closeThrough)}, US history uses the last price of each UTC day.</>}</li>
         <li>Line charts show the 7-day trailing average of daily values. Candles, prices, changes and map colors use the daily value.</li>
-        <li>A series whose price has not changed for {STALE_DAYS} days or more is not shown. It returns when its price moves.</li>
+        <li>A series whose price has not changed for {STALE_DAYS} days or more is not shown.</li>
         <li>Servers: H100 is p5.48xlarge. H200 standard server is p5e.48xlarge and upgraded server is p5en.48xlarge. B200 is p6-b200.48xlarge, B300 is p6-b300.48xlarge and A100 is p4d.24xlarge (40GB).</li>
         <li>Places are CCIR's names for each region's metro. Zones are numbered Z1, Z2 and so on within each place, in zone ID order. The numbers do not change.</li>
         <li>Data is published one day late and updated daily. History starts {longDate(firstDay)} in the US and late June elsewhere. Today: {series.length} series in {places} places.</li>
