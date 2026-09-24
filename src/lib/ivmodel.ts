@@ -311,6 +311,6 @@ export type IvCard = (typeof ivCards)[number];
 export function legText(v: IvCard): string {
   const l = v.leg;
   return l.method === 'signed'
-    ? `recency-weighted signed average (${l.n} deals, ${l.gpus.toLocaleString('en-US')} GPUs, ${l.firstDate?.slice(0, 4) === l.lastDate?.slice(0, 4) ? l.lastDate?.slice(0, 4) : `${l.firstDate?.slice(0, 4)}–${l.lastDate?.slice(0, 4)}`})`
+    ? `recency-weighted contracted average (${l.n} deals, ${l.gpus.toLocaleString('en-US')} GPUs, ${l.firstDate?.slice(0, 4) === l.lastDate?.slice(0, 4) ? l.lastDate?.slice(0, 4) : `${l.firstDate?.slice(0, 4)}–${l.lastDate?.slice(0, 4)}`})`
     : `posted on-demand less measured haircut (${Math.round((l.haircut ?? 0) * 100)}%)`;
 }

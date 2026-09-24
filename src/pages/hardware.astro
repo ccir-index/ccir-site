@@ -28,7 +28,7 @@ const fmtM = (usd: number) => `$${(usd / 1e6).toFixed(1)}M`;
 // sold record, human-captured via Seller Hub research; see Method) paired
 // with current multi-source posted asks, and — per the 2026-07-22 ruling —
 // an INCOME-DERIVED, model-implied value per deployed chip (going-concern
-// lens for lenders), computed at build time from signed term deals (or posted
+// lens for lenders), computed at build time from contracted term deals (or posted
 // on-demand less a measured haircut), with the two tapes shown as corroboration and disposition
 // record (never "LGD floor" — retired 2026-07-24: LGD is transaction-level
 // and single-unit retail is not a lower bound on bulk recovery).
@@ -228,7 +228,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: 'CCIR Secondary-Market Hardware Prices',
-    description: 'Income-derived, model-implied values for datacenter GPUs (H100, and H200, B200 and B300 modeled-only) computed from through-life signed term deal rates, or posted on-demand rates less a measured haircut, with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a sales record exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
+    description: 'Income-derived, model-implied values for datacenter GPUs (H100, and H200, B200 and B300 modeled-only) computed from through-life contracted term rates, or posted on-demand rates less a measured haircut, with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a sales record exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
     url: 'https://ccir.io/hardware',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2023-07/..',
@@ -261,7 +261,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <p class="standfirst">
         One value and one stress figure per chip. The value is
         <strong>model-implied</strong>: the GPU's share of what it earns over
-        its life at signed contract rates, with every assumption disclosed.
+        its life at contracted rates, with every assumption disclosed.
         Asks, sales and new-chip prices sit beside it as checks.
       </p>
       <ul class="lede-index">
@@ -275,9 +275,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <h2><span class="n">§</span> Income-derived value</h2>
       <p class="secintro">
         Model-implied value of a deployed unit. The rate leg comes from
-        signed term deals where the record is deep enough. Elsewhere it
+        contracted term deals where the record is deep enough. Elsewhere it
         comes from the posted neocloud on-demand rate, less the measured
-        gap between posted and signed prices. The value is recomputed on
+        gap between posted and contracted prices. The value is recomputed on
         each daily data refresh. It is a model output. The market records
         that check it sit beside each figure.
       </p>
@@ -339,20 +339,20 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         hour. It is after power, colocation and operations (65% margin), at
         the GPU's {Math.round((1 - IV_SHARE) * 100)}% share of the deployed position. * Vintage assumed. H200 SXM has no ask or sales record yet.</p>
       <p class="ivnote">
-        Rate leg: the chip's through-life signed rate, weighted toward
-        recent deals. It averages every signed term deal for the chip. Each deal
+        Rate leg: the chip's through-life contracted rate, weighted toward
+        recent deals. It averages every contracted term deal for the chip. Each deal
         weighs by the square root of its GPU count and loses half its weight
         for each year of age. Renewal options and
         subsidized or program deals are excluded. A bundled deal enters at
         a GPU-only estimate. The contract term is the tenor with the
         most GPUs signed. A chip needs three or more deals. With fewer, the
         rate is the posted global neocloud
-        on-demand rate less a measured haircut. The haircut compares signed
+        on-demand rate less a measured haircut. The haircut compares contracted
         medians with posted on-demand rates for every chip and tenor that
-        has signed deals. It is {hcPct}% today, with a range of {hcRange}.
-        A fallback chip uses its own anchor tenor where it has any signed
-        deal, else 2Y. Where a chip's signed deals are all shorter than two
-        years, the contract runs two years at that chip's signed rate.
+        has contracted deals. It is {hcPct}% today, with a range of {hcRange}.
+        A fallback chip uses its own anchor tenor where it has any contracted
+        deal, else 2Y. Where a chip's contracted deals are all shorter than two
+        years, the contract runs two years at that chip's contracted rate.
         Income path: the contract years bill every hour. This take-or-pay
         treatment is an assumption. After the contract, the unit re-leases
         at the rate less 18% a year, at 75% utilization. The 18% base is
@@ -370,7 +370,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The sensitivity range varies one input at a time around base:
         discount rate 12.5–17.5%, decay 15–19% a year, and the rate band. The
         decay range is the one measured on prior generations. For a
-        signed-rate chip, the rate is an average of its deals weighted by
+        contracted-rate chip, the rate is an average of its deals weighted by
         deal size, with recent deals weighted more. A deal loses half its weight for
         each year of age. The rate band is the uncertainty of that average.
         It is half the spread of the deals, divided by the square root of
@@ -384,12 +384,12 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         a new chip is known, it prints beside the value. The card says so
         when the value is higher.
         The stress path replays a real event. The unit signs no term
-        contract. Its rate starts at the signed rate and follows the path
+        contract. Its rate starts at the contracted rate and follows the path
         H100 on-demand took from its 2024 high. It fell 61% over 18 months.
         A year later it stood at 71% of the start. After that it declines at
         the base rate. Utilization and margin stay at base.
         Crash after contract, in the table: the contract runs its term at
-        the signed rate. The rate then drops to the replay's low and stays
+        the contracted rate. The rate then drops to the replay's low and stays
         there. The gap to the value shows what the contract protects.
         The executed lane is an observed disposition record. It does not
         estimate recovery. Single-unit retail clearings can sit above or
@@ -695,7 +695,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         <strong>Income approach (model-implied).</strong> The headline value
         discounts the income a deployed unit can earn over its service
         life. Every leg is either observed or disclosed. The rate leg is
-        observed. It averages every signed term deal for the chip, weighted
+        observed. It averages every contracted term deal for the chip, weighted
         by deal size and by recency. Each deal weighs by the square root of
         its GPU count. A deal loses half its weight for each year
         of age. Renewal options and subsidized or program
@@ -704,8 +704,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         chip has fewer than three deals, the
         rate is the posted global neocloud on-demand rate less a haircut.
         The haircut is measured on each build. It is the median gap between
-        signed and posted on-demand prices across every chip and tenor with
-        signed deals. Each card names its method, deal count and anchor
+        contracted and posted on-demand prices across every chip and tenor with
+        contracted deals. Each card names its method, deal count and anchor
         tenor.
         The assumed legs print with the figure: take-or-pay contract years,
         decay after the contract, utilization, net margin, discount rate,
@@ -793,7 +793,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         figure on this page is a model output: the income-derived value.
         It is labeled model-implied wherever it appears, with its
         assumption set printed beside it. Everything else is an observed
-        price with provenance. The rate input is an observed signed or
+        price with provenance. The rate input is an observed contracted or
         posted price. After the contract, a decay rate calibrated from
         realized rate history applies and is disclosed with the figure.
         CCIR publishes no depreciation schedule as a product. The model

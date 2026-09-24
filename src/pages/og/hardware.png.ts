@@ -60,7 +60,7 @@ function ivCard(v: (typeof ivCards)[number], CARD_W: number) {
 
   const l = v.leg;
   const meta = el('div', { display: 'flex', fontSize: 11.5, color: C.faint, marginTop: 6 },
-    `$${l.rate.toFixed(2)}/hr ${l.tenor} · ${l.method === 'signed' ? `signed, ${l.n} deals` : `on-demand less ${Math.round((l.haircut ?? 0) * 100)}%`} · ${v.remaining.toFixed(1)}yr left`);
+    `$${l.rate.toFixed(2)}/hr ${l.tenor} · ${l.method === 'signed' ? `contracted, ${l.n} deals` : `on-demand less ${Math.round((l.haircut ?? 0) * 100)}%`} · ${v.remaining.toFixed(1)}yr left`);
 
   return el('div', {
     display: 'flex', flexDirection: 'column', width: CARD_W, height: CARD_H,
@@ -89,7 +89,7 @@ export const GET: APIRoute = async () => {
 
   const png = await toPng(frame(
     'Model-implied GPU value',
-    'Income model on signed term rates · discount rate grounded in the credit ledger · checked against sales and asks',
+    'Income model on contracted term rates · discount rate grounded in the credit ledger · checked against sales and asks',
     body,
     meta.as_of_date,
   ));
