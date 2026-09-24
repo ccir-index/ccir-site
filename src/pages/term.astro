@@ -107,7 +107,7 @@ const optionLines = ladderChips.flatMap((chip) => renewalOptions(chip).map((o) =
 // --- Section 03: signed rates by vintage (table) -----------------------------
 // Rows = chip x tenor with at least one GPU-only deal; columns = signing
 // half-years that hold a deal; last column = today's posted ladder value.
-// A cell is the GPU-weighted average of deals signed in that half (John,
+// A cell is the sqrt-GPU-weighted average of deals signed in that half (John,
 // 2026-09-24); hover lists each deal. Bundled deals enter at their GPU-only
 // estimate. Renewal options and subsidized deals stay out.
 // The standalone B300 chart from the preview is replaced by a link to the
@@ -207,7 +207,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
           </tbody>
         </table>
         <div class="ladder-legend">
-          Each cell is the signed rate of deals signed in that half-year, weighted by GPU count. Hover for the deals.
+          Each cell is the signed rate of deals signed in that half-year, weighted by deal size. Hover for the deals.
           <sup class="mod-mark lg-m">b</sup>: holds a bundled deal at its GPU-only estimate.
           Renewal options and subsidized deals stay out.
         </div>
@@ -316,7 +316,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
           ))}
         </table>
         <div class="ladder-legend">
-          Posted: the ladder above · Signed: filed deals, weighted by GPU count ·
+          Posted: the ladder above · Signed: filed deals, weighted by deal size ·
           <sup class="mod-mark lg-m">b</sup>: holds a bundled deal at its GPU-only estimate, hover for details ·
           Gap: signed vs posted
         </div>
@@ -328,7 +328,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
             the value by GPUs times term hours and bill every hour at a flat
             price. We leave out deals priced under a government subsidy.</p>
             <p>Each cell holds deals signed in the twelve months before the
-            snapshot date. Each deal counts by its GPU count. The vintage table in Section 01 shows older deals.</p>
+            snapshot date. Each deal weighs by the square root of its GPU count. The vintage table in Section 01 shows older deals.</p>
             {conLines.length > 0 && <p>{conLines.join(' ')}</p>}
             {fourYearLines.length > 0 && <p>{fourYearLines.join(' ')}</p>}
             {optionLines.length > 0 && <p>Renewal options, listed and never pooled: {optionLines.join(' · ')}.</p>}

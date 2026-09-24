@@ -213,12 +213,13 @@ export interface ConCell {
   sellers: number;
   bundled: BundledDeal[];         // the bundled deals inside the rate, for hover text
 }
-// GPU-weighted average (John, 2026-09-24): each deal counts by its GPU count.
+// GPU-weighted average (John, 2026-09-24): each deal counts by the square
+// root of its GPU count, so size counts without one megadeal setting the cell.
 // Every pooled deal carries a count; the rows without one are the subsidized
 // IndiaAI rate card, which never pools.
 export function gpuWeighted(xs: { value: number; gpus: number | null }[]): number {
-  const w = xs.reduce((a, x) => a + (x.gpus ?? 0), 0);
-  return w > 0 ? xs.reduce((a, x) => a + x.value * (x.gpus ?? 0), 0) / w : xs.reduce((a, x) => a + x.value, 0) / xs.length;
+  const w = xs.reduce((a, x) => a + Math.sqrt(x.gpus ?? 0), 0);
+  return w > 0 ? xs.reduce((a, x) => a + x.value * Math.sqrt(x.gpus ?? 0), 0) / w : xs.reduce((a, x) => a + x.value, 0) / xs.length;
 }
 export function conCell(chip: string, tenor: string): ConCell | null {
   const pool = deals.filter((d) => d.chip === chip && d.tenor === tenor && !d.subsidized && !isOption(d)
