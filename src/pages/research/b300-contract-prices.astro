@@ -29,12 +29,12 @@ interface Deal {
 }
 // rate = as disclosed; est = GPU-only estimate used in the chart and trends
 const deals: Deal[] = [
-  { signed: '2026-03-15', label: 'Mar 15', seller: 'Boost Run', buyer: 'unnamed', gpus: 1280, term: '3Y', rate: 3.45, est: 3.45, basis: 'stated; bare metal', doc: 'S-1', href: DOC.brunS1 },
+  { signed: '2026-03-15', label: 'Mar 15', seller: 'Boost Run', buyer: 'unnamed', gpus: 1280, term: '3Y', rate: 3.45, est: 3.45, basis: 'stated; GPU servers only', doc: 'S-1', href: DOC.brunS1 },
   { signed: '2026-03-31', label: 'Mar 31', seller: 'SharonAI', buyer: 'ESDS', gpus: 8208, term: '5Y', rate: 3.30, est: 3.30, basis: 'stated', doc: '10-Q Ex. 10.17', href: DOC.sharon },
   { signed: '2026-04-22', label: 'Apr 22', seller: 'Axe Compute', buyer: 'unnamed', gpus: 2304, term: '3Y', rate: 4.29, est: 4.13, basis: 'from contract value; includes storage', doc: '8-K', href: DOC.axeApr },
   { signed: '2026-05-11', label: 'May 11', seller: 'QumulusAI', buyer: 'unnamed', gpus: 1024, term: '3Y', rate: 3.70, est: 3.70, basis: 'stated; bare metal', doc: 'S-1/A', href: DOC.qmls },
   { signed: '2026-05-21', label: 'May 21', seller: 'Boost Run', buyer: 'Thinking Machines', gpus: 5000, term: '3Y', rate: 3.59, est: 3.40, basis: 'from contract value; includes storage, CPU', doc: '8-K', href: DOC.brunTM },
-  { signed: '2026-07-09', label: 'Jul 9', seller: 'Boost Run', buyer: 'unnamed', gpus: 1536, term: '4Y', rate: 4.13, est: 3.94, basis: 'from contract value; includes 15 CPU servers, about 5 PB storage', doc: '10-Q', href: DOC.brun10q },
+  { signed: '2026-07-09', label: 'Jul 9', seller: 'Boost Run', buyer: 'unnamed', gpus: 1536, term: '4Y', rate: 4.13, est: 3.94, basis: 'from contract value; includes 15 separate CPU servers, about 5 PB storage', doc: '10-Q', href: DOC.brun10q },
   { signed: '2026-07-15', label: 'Jul', seller: 'WhiteFiber', buyer: 'unnamed', gpus: 128, term: '3Y', rate: 4.76, est: 4.76, basis: 'from "aggregate revenue opportunity"', doc: '10-Q', href: DOC.wyfi },
   { signed: '2026-07-21', label: 'Jul 21', seller: 'KIDZ AI', buyer: 'Canopy Wave', gpus: 256, term: '5Y', rate: 3.98, est: 3.98, basis: 'from contract value', doc: '8-K', href: DOC.kidz },
   { signed: '2026-07-27', label: 'Jul 27', seller: 'Axe Compute', buyer: 'unnamed', gpus: 9200, term: '5Y', rate: 3.72, est: 3.72, basis: 'from contract value', doc: '8-K', href: DOC.axeJul },
@@ -127,10 +127,11 @@ const b4 = deals.find((d) => d.term === '4Y')!;
         contracts set most of the five-year line.
       </p>
       <p>
-        One seller shows the rise inside its own book. Boost Run rented 1,280
-        B300s for three years at $3.45 in March. In July it rented 1,536 for
-        four years at $4.13. After we remove our estimates of CPU server and
-        storage costs (about 1% and 4%), the rate is about $3.94.
+        One seller shows the rise inside its own book. In March, Boost Run
+        rented 1,280 B300s for three years at $3.45, for GPU servers only. In
+        July it rented 1,536 for four years at $4.13, a price that also covers
+        15 CPU servers and storage. On the same GPU-only basis, the July rate
+        is about $3.94.
       </p>
       </div>
 
@@ -179,8 +180,8 @@ const b4 = deals.find((d) => d.term === '4Y')!;
         contracts show the move directly.
       </p>
       <p>
-        Boost Run is the only same-seller pair: $3.45 in March, about $3.94
-        GPU-only in July. On 10,000 GPUs for three years that is about $130
+        Boost Run is the only same-seller pair. On a GPU-only basis, its rate
+        rose from $3.45 in March to about $3.94 in July. On 10,000 GPUs for three years that is about $130
         million. SharonAI's 8,208-GPU five-year at $3.30 and Axe's 9,200-GPU
         five-year at $3.72, four months later, is about $185 million on a
         10,000-GPU order.
