@@ -118,16 +118,13 @@ const dscrAt = (rate: number) => (revClose > 0 ? (rate / revClose) * CLOSE_DSCR 
 // run on H100, the only chip with a full cycle. Rates are the stepped-panel
 // monthly posted medians from the archived-page backfill
 // (/research/od-vs-committed), NOT the live series. Close = 2024-02 at $4.30.
-// With a steady discount, posted and implied rates cross each level on the
-// same dates, so the levels sit at 90% / 80% of the posted close.
+// Levels sit at 90% / 80% of the posted close; the table ends Feb 2026
+// (John, 2026-09-24: one full two-year cycle).
 const BACKTEST_CLOSE = 4.30;
 const backtest: { period: string; rate: string; level: string; cls: string }[] = [
-  { period: 'Feb – Jul 2024', rate: '$4.30 → $3.92', level: 'Base', cls: 't1' },
+  { period: 'Feb 2024 (close)', rate: '$4.30', level: 'Base', cls: 't1' },
   { period: 'Aug 2024', rate: '$3.49', level: 'Watch', cls: 't2' },
   { period: 'Sep 2024 – Feb 2026', rate: '$3.24 → $2.79 → $3.18', level: 'Trigger (18 months)', cls: 't4' },
-  { period: 'Mar – Apr 2026', rate: '$3.74', level: 'Watch', cls: 't2' },
-  { period: 'May 2026', rate: '$3.98', level: 'Base', cls: 't1' },
-  { period: 'Jun 2026', rate: '$3.39', level: 'Trigger', cls: 't4' },
 ];
 
 // On-page contents. ids match the anchored use-case articles and section h3s.
@@ -332,8 +329,7 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
           B200 has not yet been through a full price cycle. H100 has. The
           table runs the same levels on H100's posted history, from a close
           in February 2024 at ${fmt(BACKTEST_CLOSE)}. Watch sits 10% below
-          and trigger 20% below. With a steady discount, the implied rate
-          crosses each level on the same dates.
+          and trigger 20% below.
         </p>
         <div class="ftable-wrap">
           <table class="traj">
@@ -353,10 +349,9 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         </div>
         <p>
           <strong>The trigger held for 18 months.</strong> It tripped in
-          September 2024 and cleared to watch in March 2026. A borrower
-          rolling contracts in that window would have re-leased well below
-          its close. The single-month drop in June 2026 shows why the test
-          uses a 30-day average.
+          September 2024 and was still in place in February 2026, two years
+          after close. A borrower rolling contracts in that window would have
+          re-leased well below its close.
         </p>
         <p class="calib-note">
           Calibration notes: monthly posted medians from CCIR's archived-page
