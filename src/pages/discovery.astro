@@ -59,7 +59,7 @@ const [W0, H0] = map.frame;
         </div>
       </div>
       <div class="seg" id="chips" aria-label="Chip">
-        {chips.map((c) => <button type="button" data-chip={c} class={c === 'H100' ? 'on' : ''}>{c}</button>)}
+        {chips.map((c) => <button type="button" data-chip={c} class={c === 'H200' ? 'on' : ''}>{c}</button>)}
       </div>
     </div>
 
@@ -278,7 +278,7 @@ const [W0, H0] = map.frame;
     const V = (s: Row) => s.st!.v;
 
     let sortKey = 'price', sortDir = 1;
-    let chip = DATA.chips.includes('H100') ? 'H100' : DATA.chips[0];
+    let chip = DATA.chips.includes('H200') ? 'H200' : DATA.chips[0];  // lands on H200 (John, 2026-09-24)
     let selId: string | null = null, rangeDays: number | 'max' = 30, zoom: [number, number] | null = null, ctype = 'line';
     let scaleState: { pts: [number, number][]; X: (x: number) => number; Y: (v: number) => number; base: number } | null = null;
     let view = DATA.views[0], mode = 'map';
