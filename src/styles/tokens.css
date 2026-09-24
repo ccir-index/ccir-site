@@ -28,8 +28,8 @@
   hues are not UI accents.
 
   AA floors (checked): dark ink 13.9:1 on #050607, dim 6.0:1; light ink
-  15.9:1 on #fafbfc, dim 6.2:1; blue 7.0:1 (dark) / 5.7:1 (light);
-  amber 9.6:1 (dark) / 5.6:1 (light).
+  14.9:1 on #e9ebee, dim 6.0:1; blue 7.0:1 (dark) / 5.6:1 (light);
+  amber 9.6:1 (dark) / 5.3:1 (light).
 */
 
 :root {
@@ -108,32 +108,35 @@ html[data-theme="terminal"] {
 }
 
 html[data-theme="editorial"] {
-  /* LIGHT — terminal-pro in daylight: same system, flipped axis */
-  --bg: #fafbfc;
-  --surface: #ffffff;
-  --surface-2: #f2f4f6;
-  --surface-3: #e9ecef;
-  --rule: #dde1e5;
-  --rule-2: #c3c9cf;
+  /* LIGHT — terminal-pro in daylight: same system, flipped axis.
+     Softened 2026-09-24 (John: "editorial seems too bright"): gray paper
+     in place of near-white; amber, green and dim ink stepped darker to
+     hold AA on the softer ground. */
+  --bg: #e9ebee;
+  --surface: #f0f1f3;
+  --surface-2: #e1e4e8;
+  --surface-3: #d8dce1;
+  --rule: #cdd2d8;
+  --rule-2: #b3bac2;
 
-  --ink: #16181a;      /* 15.9:1 on #fafbfc */
-  --ink-dim: #575e66;  /* 6.2:1 */
-  --ink-faint: #8a9096;
+  --ink: #16181a;      /* 14.9:1 on #e9ebee */
+  --ink-dim: #51585f;  /* 6.0:1 */
+  --ink-faint: #858b92;
 
   /* The same two roles, stepped down for AA at dense text sizes. */
-  --accent: #996300;   /* 5.6:1 on #fafbfc — data emphasis only */
-  --accent-2: #b57807;
-  --link: #1d4ed8;     /* 5.7:1 — wayfinding only */
+  --accent: #855500;   /* 5.3:1 on #e9ebee — data emphasis only */
+  --accent-2: #9a6606;
+  --link: #1d4ed8;     /* 5.6:1 — wayfinding only */
   --link-dim: #4a6fc4;
-  --pos: #217a50;
+  --pos: #1b6b46;
   --neg: #b03a3a;
-  --warn: #a16207;
+  --warn: #8f5606;
   --info: #1d4ed8;
   --neutral: #6b7176;
 
   /* Monochrome tier ramp, light: near-ink dominant, gray mid, light tail. */
   --tier-t1: #16181a;
-  --tier-t2: #575e66;
+  --tier-t2: #51585f;
   --tier-t3: #aab0b6;
 
   --font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system, sans-serif;
