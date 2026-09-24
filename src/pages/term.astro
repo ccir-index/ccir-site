@@ -49,7 +49,7 @@ function ladderCell(chip: string, col: Col): LadderCell | null {
   };
 }
 
-const ladderChips = B_CHIPS.map((x) => x.chip).filter((chip) => bCurve(chip).od);
+const ladderChips = B_CHIPS.map((x) => x.chip).filter((chip) => chip !== 'GB200' && bCurve(chip).od);  // GB200 off the ladder (John, 2026-09-24): on-demand only, no tenors
 const ladder = ladderChips.map((chip) => ({ chip, cells: COLS.map((col) => ({ col, cell: ladderCell(chip, col) })) }));
 const curveAsOf = bCurve('H100').asOf;
 
