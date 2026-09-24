@@ -347,8 +347,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <p class="ivnote">
         Rate leg: the chip's through-life signed rate, weighted toward
         recent deals. It averages every signed term deal for the chip, by
-        GPUs, and a deal loses half its weight for each year of age. Options and
-        subsidized or program deals are left out. A bundled deal enters at
+        GPUs, and a deal loses half its weight for each year of age. Renewal options and
+        subsidized or program deals are excluded. A bundled deal enters at
         a GPU-only estimate. The contract term is the tenor with the
         most GPUs signed. A chip needs three or more deals. With fewer, the
         rate is the posted global neocloud
@@ -698,8 +698,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         life. Every leg is either observed or disclosed. The rate leg is
         observed. It averages every signed term deal for the chip, weighted
         by GPUs and by recency. A deal loses half its weight for each year
-        of age. Options and subsidized or program
-        deals stay out. A bundled deal enters at a GPU-only estimate.
+        of age. Renewal options and subsidized or program
+        deals are excluded. A bundled deal enters at a GPU-only estimate.
         The contract term is the tenor with the most GPUs signed. Where a
         chip has fewer than three deals, the
         rate is the posted global neocloud on-demand rate less a haircut.
