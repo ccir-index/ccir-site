@@ -58,3 +58,6 @@
 # analytics show visitors landing on /research/dGhlXJhdG (the L dropped, then
 # truncated). Splat catches every variant and sends them to the piece.
 /research/dGhl* /research/the-rating-case-goes-investment-grade 301
+
+# 2026-09-24: Marketplace Basis retired from the live site (John).
+/basis /rates 301
