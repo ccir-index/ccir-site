@@ -131,10 +131,12 @@ function buildCurve(chip: string, silicon: string): BCurve {
 }
 
 const _curves = new Map<string, BCurve>();
-export function bCurve(chip: string): BCurve {
+// `silicon` lets a chip off the /term ladder (A100 on /hardware) read the
+// same global neocloud on-demand anchor without joining B_CHIPS.
+export function bCurve(chip: string, silicon?: string): BCurve {
   const hit = _curves.get(chip);
   if (hit) return hit;
-  const c = B_CHIPS.find((x) => x.chip === chip);
+  const c = B_CHIPS.find((x) => x.chip === chip) ?? (silicon ? { chip, silicon } : undefined);
   if (!c) throw new Error(`unknown chip ${chip}`);
   const curve = buildCurve(c.chip, c.silicon);
   _curves.set(chip, curve);
@@ -144,7 +146,7 @@ export function bCurve(chip: string): BCurve {
 // --- contracted --------------------------------------------------------------
 interface DealRow {
   deal_id: string; chip: string; tenor: string; tenor_raw: string; signed_key: string;
-  usd_gpu_hr: number; basis: string; tags: string[]; bundle: string;
+  usd_gpu_hr: number; gpus: number | null; basis: string; tags: string[]; bundle: string;
   seller: string; bundled: string; subsidized: boolean;
 }
 const deals: DealRow[] = (contractedJson as { rows: DealRow[] }).rows;
@@ -228,4 +230,20 @@ export function vintagePoints(): VintagePoint[] {
   return deals.filter((d) => !d.subsidized).map((d) => ({
     chip: d.chip, tenor: d.tenor, signed: d.signed_key, value: d.usd_gpu_hr, bundled: isBundled(d), option: isOption(d),
   }));
+}
+
+// Signed deals for the /hardware rate leg (John, 2026-09-24): trailing 12
+// months to the snapshot, options, subsidized and program deals out, bundled
+// deals only at their GPU-only estimate (GPU_ONLY_EST above, the one copy).
+export interface SignedDeal { deal_id: string; tenor: string; signed: string; value: number; gpus: number; estimated: boolean }
+export function signedDeals(chip: string): SignedDeal[] {
+  return deals.filter((d) => d.chip === chip && !d.subsidized && !isOption(d) && !d.tags.includes('program')
+    && d.signed_key >= CON_WINDOW_START && d.signed_key <= meta.as_of_date
+    && (!isBundled(d) || GPU_ONLY_EST[d.deal_id] != null)
+    && d.gpus != null && d.gpus > 0)
+    .map((d) => ({
+      deal_id: d.deal_id, tenor: d.tenor, signed: d.signed_key,
+      value: isBundled(d) ? GPU_ONLY_EST[d.deal_id]!.value : d.usd_gpu_hr,
+      gpus: d.gpus!, estimated: isBundled(d),
+    }));
 }

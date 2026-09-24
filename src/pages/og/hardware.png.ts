@@ -6,7 +6,7 @@ import hw from '../../data/hardware_panels.json';
 export const prerender = true;
 
 /*
-  OG card for /hardware: the four model-implied value cards, rendered from
+  OG card for /hardware: the model-implied value cards, rendered from
   the SAME computation the page uses (src/lib/ivmodel.ts) — the share card
   can never disagree with the page. Layout mirrors the on-page IV grid:
   headline value, sensitivity band strip with ask/sold/floor marks, and the
@@ -19,9 +19,12 @@ const usd = (v: number | null | undefined) =>
   v == null ? '—' : '$' + Math.round(v).toLocaleString('en-US');
 const k = (v: number) => (v >= 1000 ? '$' + (v / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : '$' + Math.round(v));
 
-const CARD_W = 544, CARD_H = 186, STRIP_W = CARD_W - 44;
+// Two cards per row up to four cards; three per row beyond (B300 joined
+// 2026-09-24), so the grid stays two rows tall inside the frame.
+const GRID_W = 1104, GAP = 16, CARD_H = 186;
 
-function ivCard(v: (typeof ivCards)[number]) {
+function ivCard(v: (typeof ivCards)[number], CARD_W: number) {
+  const STRIP_W = CARD_W - 44;
   const p = (x: number) => Math.max(0, Math.min(1, x / v.smax)) * STRIP_W;
 
   const head = el('div', { display: 'flex', alignItems: 'center', gap: 10 }, [
@@ -33,7 +36,7 @@ function ivCard(v: (typeof ivCards)[number]) {
 
   const value = el('div', { display: 'flex', alignItems: 'baseline', gap: 14, marginTop: 6 }, [
     el('div', { display: 'flex', fontFamily: 'IBM Plex Serif', fontSize: 34, fontWeight: 600, color: C.ink }, usd(v.base)),
-    el('div', { display: 'flex', fontSize: 12.5, color: C.dim }, `sensitivity ${k(v.lo)} – ${k(v.hi)}`),
+    el('div', { display: 'flex', fontSize: 12.5, color: C.dim }, `range ${k(v.lo)} – ${k(v.hi)}`),
   ]);
 
   // Strip carries only the sensitivity band and the model dot (2026-08-04
@@ -45,25 +48,19 @@ function ivCard(v: (typeof ivCards)[number]) {
   ];
   const strip = el('div', { position: 'relative', display: 'flex', width: STRIP_W, height: 18, marginTop: 10 }, marks);
 
-  const rows = v.modeledOnly
-    ? [
-        // MODELED ONLY tag already says not-triangulated; keep this to one
-        // line so the card never wraps.
-        el('div', { display: 'flex', alignItems: 'center', gap: 18, fontSize: 12.5, marginTop: 8 }, [
-          el('div', { display: 'flex', color: C.faint }, 'no ask or executed lane yet'),
-          ...(v.intStress != null ? [el('div', { display: 'flex', color: C.dim }, `no-contract floor ${usd(v.intStress)}`)] : []),
-        ]),
-      ]
-    : [
-        el('div', { display: 'flex', alignItems: 'center', gap: 18, fontSize: 12.5, marginTop: 8 }, [
-          el('div', { display: 'flex', color: C.dim }, `ask ${usd(v.ask)}`),
-          el('div', { display: 'flex', color: C.dim }, `sold 90d ${usd(v.t90)}`),
-          ...(v.intStress != null ? [el('div', { display: 'flex', color: C.dim }, `no-contract floor ${usd(v.intStress)}`)] : []),
-        ]),
-      ];
+  const items = [
+    ...(v.modeledOnly ? [] : [`ask ${usd(v.ask)}`, `sold 90d ${usd(v.t90)}`]),
+    ...(v.newCost ? [`new-cost basis ${usd(v.newCost.usd)}`] : []),
+    ...(v.intStress != null ? [`floor ${usd(v.intStress)}`] : []),
+  ];
+  const rows = [
+    el('div', { display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 16, fontSize: 12.5, marginTop: 8 },
+      items.map((t) => el('div', { display: 'flex', color: C.dim }, t))),
+  ];
 
+  const l = v.leg;
   const meta = el('div', { display: 'flex', fontSize: 11.5, color: C.faint, marginTop: 6 },
-    `rate leg $${v.spot.toFixed(2)}/hr · curve to ${v.curveTo} · ${v.remaining.toFixed(1)}yr remaining at 6yr life`);
+    `$${l.rate.toFixed(2)}/hr ${l.tenor} · ${l.method === 'signed' ? `signed, ${l.n} deals` : `on-demand less ${Math.round((l.haircut ?? 0) * 100)}%`} · ${v.remaining.toFixed(1)}yr left`);
 
   return el('div', {
     display: 'flex', flexDirection: 'column', width: CARD_W, height: CARD_H,
@@ -79,8 +76,10 @@ export const GET: APIRoute = async () => {
   // price today, two per row, and never decides whether the site deploys.
   const cards = ivCards.filter((c): c is NonNullable<typeof c> => c != null);
   const rows: ReturnType<typeof el>[] = [];
-  for (let i = 0; i < cards.length; i += 2) {
-    rows.push(el('div', { display: 'flex', gap: 16 }, cards.slice(i, i + 2).map((c) => ivCard(c))));
+  const per = cards.length > 4 ? 3 : 2;
+  const cardW = Math.floor((GRID_W - GAP * (per - 1)) / per);
+  for (let i = 0; i < cards.length; i += per) {
+    rows.push(el('div', { display: 'flex', gap: GAP }, cards.slice(i, i + per).map((c) => ivCard(c, cardW))));
   }
   if (rows.length === 0) {
     rows.push(el('div', { display: 'flex', color: C.dim, fontSize: 16, padding: 24 },
@@ -90,7 +89,7 @@ export const GET: APIRoute = async () => {
 
   const png = await toPng(frame(
     'Model-implied GPU value',
-    'Income model on the CRI rate · discount rate grounded in the credit ledger · corroborated by sales and asks',
+    'Income model on signed term rates · discount rate grounded in the credit ledger · checked against sales and asks',
     body,
     hw.as_of,
   ));

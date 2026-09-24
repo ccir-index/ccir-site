@@ -3,7 +3,9 @@ import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import hw from '../data/hardware_panels.json';
 import ChipLink from '../components/ChipLink.astro';
-import { ivCards } from '../lib/ivmodel';
+import { ivCards, legText, IV_HAIRCUT } from '../lib/ivmodel';
+const hcPct = IV_HAIRCUT ? Math.round(IV_HAIRCUT.haircut * 100) : '—';
+const hcRange = IV_HAIRCUT ? `${Math.round(IV_HAIRCUT.lo * 100)}–${Math.round(IV_HAIRCUT.hi * 100)}%` : '—';
 
 // Record totals (full capture vs the tracked-model subset) come from the
 // generator so the standfirst and the Method foot can never disagree.
@@ -20,8 +22,8 @@ const fmtM = (usd: number) => `$${(usd / 1e6).toFixed(1)}M`;
 // sold record, human-captured via Seller Hub research; see Method) paired
 // with current multi-source posted asks, and — per the 2026-07-22 ruling —
 // an INCOME-DERIVED, model-implied value per deployed chip (going-concern
-// lens for lenders), computed at build time from the CRI rate + committed
-// term curve, with the two tapes shown as corroboration and disposition
+// lens for lenders), computed at build time from signed term deals (or posted
+// on-demand less a measured haircut), with the two tapes shown as corroboration and disposition
 // record (never "LGD floor" — retired 2026-07-24: LGD is transaction-level
 // and single-unit retail is not a lower bound on bulk recovery).
 const fmtUsd = (v: number | null | undefined, dp = 0) =>
@@ -214,13 +216,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
 <Base
   title="Used GPU Prices & Collateral Valuation — H100, A100, V100 Secondary Market · CCIR"
   description="What used datacenter GPUs sell for and are listed at over time — H100, H200, A100, V100, L40S, RTX A6000. A three-year executed sales record with current multi-source posted asks. Observed prices, not residual value opinions. An observed-price input for collateral valuation and residual-value work on GPU-backed exposure."
-  ogImage="/og/hardware.png?v=iv-cards3"
+  ogImage="/og/hardware.png?v=iv-cards4"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: 'CCIR Secondary-Market Hardware Prices',
-    description: 'Income-derived, model-implied values for datacenter GPUs (H100, H200, A100, and B200 modeled-only) computed from the CRI rental rate and committed term curve with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a sales record exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
+    description: 'Income-derived, model-implied values for datacenter GPUs (H100, A100, and H200, B200 and B300 modeled-only) computed from signed term deal rates, or posted on-demand rates less a measured haircut, with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a sales record exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
     url: 'https://ccir.io/hardware',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2023-07/..',
@@ -267,46 +269,54 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     <section class="sec iv" id="income-value">
       <h2><span class="n">§</span> Income-derived value</h2>
       <p class="secintro">
-        Model-implied value of a deployed unit, derived from the CRI T2
-        (neocloud) US guaranteed on-demand rate and the neocloud committed
-        term curve, recomputed on each daily data refresh. It is not a
-        transacted price: the corroborating market records are beside each
-        figure.
+        Model-implied value of a deployed unit. The rate leg comes from
+        signed term deals where the record is deep enough. Elsewhere it
+        comes from the posted neocloud on-demand rate, less the measured
+        gap between posted and signed prices. The value is recomputed on
+        each daily data refresh. It is a model output. The market records
+        that check it sit beside each figure.
       </p>
       <div class="ivgrid">
         {ivCards.map((v) => {
           const p = (x: number) => (100 * x) / v.smax;
+          const l = v.leg;
           return (
           <div class={'ivcard' + (v.modeledOnly ? ' ivmodelonly' : '')}>
             <div class="ivchip">{v.label}{v.modeledOnly && <span class="ivtag">modeled only</span>}</div>
             <div class="ivval">{fmtUsd(v.base)}</div>
-            <div class="ivrange">sensitivity {fmtK(v.lo)} – {fmtK(v.hi)}</div>
+            <div class="ivrange">range {fmtK(v.lo)} – {fmtK(v.hi)}</div>
             <div class="ivstrip" aria-hidden="true">
               <div class="ivband" style={`left:${p(v.lo)}%;width:${p(v.hi) - p(v.lo)}%`}></div>
               <div class="ivdot" style={`left:${p(v.base)}%`} title={`model ${fmtUsd(v.base)}`}></div>
-              {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`no-contract floor ${fmtUsd(v.intStress)} — earning the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) at the same 75% utilization and 65% net margin as the base case; the rate is the only changed input`}></div>}
+              {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`no-contract floor ${fmtUsd(v.intStress)}: the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) at 75% utilization and 65% net margin from day one`}></div>}
               {v.ask != null && <div class="ivtick" style={`left:${p(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
               {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)} (n=${v.t90N})`}></div>}
+              {v.newCost && <div class="ivcost" style={`left:${p(v.newCost.usd)}%`} title={`new-cost basis ${fmtUsd(v.newCost.usd)}`}></div>}
               {/* right endpoint intentionally unlabeled: it is the padded
-                  axis max (1.06× the largest mark), not a quantity — every
+                  axis max (1.06x the largest mark), not a quantity. Every
                   real value on the strip is named in the rows below. */}
               <span class="ivs0">0</span>
             </div>
             {v.modeledOnly ? (
-              <>
-                <div class="ivrow dim">not triangulated — no ask or executed lane yet</div>
-                <div class="ivrow dim">curve to {v.curveTo}{v.rateStatus === 'Provisional' ? ' · provisional headline' : ''} · vintage assumed</div>
-              </>
+              <div class="ivrow dim">not triangulated · no ask or executed lane yet</div>
             ) : (
               <>
                 <div class="ivrow"><span class="g g-ask"></span>ask {fmtUsd(v.ask)}<span class="dim"> · {v.ask ? (v.base / v.ask).toFixed(2) + '× model/ask' : ''}</span></div>
                 <div class="ivrow"><span class="g g-t90"></span>sold 90d {fmtUsd(v.t90)}</div>
               </>
             )}
-            {v.intStress != null && (
-              <div class="ivrow"><span class="g g-int"></span>no-contract floor {fmtUsd(v.intStress)}<span class="dim"> · interruptible rate, base-case assumptions</span></div>
+            {v.newCost && (
+              <div class="ivrow"><span class="g g-cost"></span>new-cost basis {fmtUsd(v.newCost.usd)}<span class="dim"> · {v.newCost.label} [{v.newCost.grade}]</span></div>
             )}
-            <div class="ivmeta">rate leg ${v.spot.toFixed(2)}/hr · curve to {v.curveTo} · {v.remaining.toFixed(1)}yr remaining at 6yr service life</div>
+            {v.aboveCost && <div class="ivrow ivabove">Income value is above the cost of a new GPU.</div>}
+            {v.intStress != null && (
+              <div class="ivrow"><span class="g g-int"></span>no-contract floor {fmtUsd(v.intStress)}<span class="dim"> · interruptible rate from day one</span></div>
+            )}
+            <div class="ivmeta">
+              rate leg ${l.rate.toFixed(2)}/hr at {l.tenor} · {legText(v)}{l.method === 'signed' && l.lastDate ? `, read at ${l.lastDate}` : ''}
+              · rate band ${l.lo.toFixed(2)}–${l.hi.toFixed(2)}/hr
+              · {v.remaining.toFixed(1)}yr remaining at 7yr service life{v.vintageAssumed ? ' · vintage assumed' : ''}
+            </div>
           </div>
           );
         })}
@@ -314,43 +324,50 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <details class="ivnote-d">
       <summary>Model assumptions & sensitivity</summary>
       <p class="ivnote">
-        Base case: the posted committed rate of the longest observed tenor,
-        flat over the years that contract covers (a 3Y contract pays the 3Y
-        rate for three years); 18%/yr decay beyond the last
-        observed tenor of each chip's curve, a measured base calibrated
-        to the realized decline of prior-generation rates (Method); 75%
-        utilization; 65% net margin after power, colocation, and operations;
-        15% discount rate; 6-year service life from volume availability.
-        Where a chip's committed curve ends short of year 3 (B200: 1Y),
-        decay applies from the end of its observed curve. Missing tenors
-        are never extended flat. A chip with no secondary-market record
-        is published <em>modeled only</em>, so marked, and carries no
-        ask or executed corroboration until one exists.
-        The sensitivity band varies the rate assumptions one at a time
-        around base: discount rate 10–20%, decay 10–30%/yr (the 30% bound
-        is the worst case on record: V100 from its scarcity peak). The
-        band shows the min–max of those legs. Jointly optimistic or
-        pessimistic corners are not stacked. Utilization, margin, and the
-        6-year service life are held at base; the band prices rate
-        uncertainty around the stated life, and each card states the
-        remaining years that life implies. The discount-rate band is
-        anchored to observed GPU-asset-backed financing yields in CCIR's
-        <a href="/credit">credit ledger</a> (see Method below).
-        The no-contract floor is the same model with one input changed:
-        the published Neocloud interruptible rate as the earning path from
-        day one. That path is flat in year 1, decays beyond, and has no
-        committed curve by construction. Utilization stays at the base
-        75% deliberately. A floating interruptible rate is the price at
-        which spare capacity clears, so the rate already carries the
-        demand risk. Haircutting utilization as well would count it twice.
-        The executed
-        lane is an observed disposition record, not a recovery estimate.
-        Single-unit retail clearings can sit above or below a bulk
-        disposition, and no current record measures market impact at volume.
-        Loss-given-default is a transaction-level parameter (lien
-        position, priority, workout cost, timing, pool composition) and
-        belongs to the party doing the recovery analysis. This record is one
-        of its inputs.
+        Rate leg: signed term deals from the last 12 months. Options and
+        subsidized or program deals are left out. A bundled deal enters only
+        at its GPU-only estimate. The anchor tenor is the tenor with the
+        most GPUs signed. With three or more deals at that tenor, the rate
+        is a GPU-weighted straight line through the deals by signing date.
+        It is read at the last deal date and never carried forward to
+        today. With fewer deals, the rate is the posted global neocloud
+        on-demand rate less a measured haircut. The haircut compares signed
+        medians with posted on-demand rates for every chip and tenor that
+        has signed deals. It is {hcPct}% today, with a range of {hcRange}.
+        A fallback chip uses its own anchor tenor where it has any signed
+        deal, else 2Y.
+        Income path: the contract years bill every hour. This take-or-pay
+        treatment is an assumption. After the contract, the unit re-leases
+        at the rate less 18% a year, at 75% utilization. The 18% base is
+        calibrated to the realized decline of prior-generation rates
+        (Method). Net margin after power, colocation, and operations is 65%.
+        The discount rate is 15%. Service life is 7 years from volume
+        availability for every chip. A chip with no secondary-market record
+        is published <em>modeled only</em>, with no ask or executed check.
+        The range varies one input at a time around base: discount rate
+        10–20%, decay 10–30% a year, and the rate band. For a signed-trend
+        chip, the rate band spans the 25th to 75th GPU-weighted percentile
+        of deals around the line. For a fallback chip, it spans the lowest
+        and highest measured haircut. Corners are never stacked.
+        Utilization, margin, and the 7-year life stay at base. The
+        discount-rate band is anchored to observed GPU-asset-backed
+        financing yields in CCIR's <a href="/credit">credit ledger</a>
+        (see Method below).
+        The value carries no replacement-cost cap. Where a new-cost basis
+        is known, it prints beside the value. The card says so when the
+        income value is higher.
+        The no-contract floor runs the same model on the published Neocloud
+        interruptible rate from day one. That path is flat in year 1,
+        decays beyond, and has no contract years. Utilization stays at 75%.
+        A floating interruptible rate already carries the demand risk. A
+        lower utilization would count that risk twice.
+        The executed lane is an observed disposition record. It does not
+        estimate recovery. Single-unit retail clearings can sit above or
+        below a bulk disposition, and no current record measures market
+        impact at volume. Loss-given-default is a transaction-level
+        parameter (lien position, priority, workout cost, timing, pool
+        composition) and belongs to the party doing the recovery analysis.
+        This record is one of its inputs.
       </p>
       </details>
     </section>
@@ -645,27 +662,30 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <h2><span class="n">§</span> Method</h2>
       <p>
         <strong>Income approach (model-implied).</strong> The headline value
-        is a discounted-cash-flow over the income a deployed unit can
-        contract for, with every leg either observable or disclosed. The
-        observable legs: the CRI T2 US guaranteed on-demand headline as the
-        spot rate, and the neocloud committed term curve (per-operator
-        median discounts by tenor), whose longest observed tenor prices the
-        years that contract covers at its posted rate.
-        The curve is the market's own price for locked duration, not a
-        forecast. The
-        assumed legs are printed with the figure: decay beyond the curve,
-        utilization, net margin, discount rate, service life. It is a model
-        output and is labeled as one everywhere it appears. The sale and
-        ask records below
-        corroborate it. The model-to-ask ratio and executed price are
-        shown beside every figure, so the reader holds all three numbers at
-        once. Where no market record exists for a chip (B200), the value is
-        published modeled-only and marked as such on its card. It is not
-        triangulated against asks or executed sales. Its committed curve is
-        observed to 1Y with decay applied beyond, its rate leg is a
-        provisional headline, and its volume-availability vintage is
-        assumed rather than sourced. It graduates to the corroborated
-        treatment when a market record exists.
+        discounts the income a deployed unit can earn over its service
+        life. Every leg is either observed or disclosed. The rate leg is
+        observed. It comes from signed term deals filed in the last 12
+        months. Options and subsidized or program deals stay out. A bundled
+        deal enters only at its GPU-only estimate. The anchor tenor is the
+        tenor with the most GPUs signed. Where three or more deals sit at
+        that tenor, a GPU-weighted straight line runs through them by
+        signing date. The rate is that line at the last deal date. The
+        model never extends the line to today. Where fewer deals exist, the
+        rate is the posted global neocloud on-demand rate less a haircut.
+        The haircut is measured on each build. It is the median gap between
+        signed and posted on-demand prices across every chip and tenor with
+        signed deals. Each card names its method, deal count and anchor
+        tenor.
+        The assumed legs print with the figure: take-or-pay contract years,
+        decay after the contract, utilization, net margin, discount rate,
+        and a 7-year service life. The model carries no replacement-cost
+        cap. A new-cost basis prints beside the value where one is known.
+        The value is labeled as a model output everywhere it appears. The
+        sale and ask records below check it, and each card shows them.
+        Where no market record exists for a chip (H200 SXM, B200, B300),
+        the value is published modeled-only and marked on its card. Its
+        volume-availability vintage is assumed where the card says so. It
+        moves to the checked treatment when a market record exists.
       </p>
       <p>
         <strong>Executed record.</strong> Dated, human-captured snapshots of
@@ -717,12 +737,11 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         depreciation assumptions, or residual analyses.
       </p>
       <p>
-        <strong>Decay beyond the curve.</strong> The decay base is
-        measured, not assumed: archived pricing pages and the live record
-        together show A100 and V100 rental rates fell 15–19% a year as
-        those chips aged, and the 18%/yr base sits inside that measured
-        range. The 30%/yr bound of the sensitivity band is the worst case
-        on record: V100 from its scarcity peak.
+        <strong>Decay after the contract.</strong> The decay base is
+        measured. Archived pricing pages and the live record together show
+        A100 and V100 rental rates fell 15–19% a year as those chips aged.
+        The 18%/yr base sits inside that range. The 30%/yr bound of the
+        range is the worst case on record: V100 from its scarcity peak.
       </p>
       <p>
         <strong>Discount rate.</strong> The 15% base and the 10–20% band
@@ -745,11 +764,11 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         figure on this page is a model output: the income-derived value.
         It is labeled model-implied wherever it appears, with its
         assumption set printed beside it. Everything else is an observed
-        price with provenance. Rate inputs are observed prices out to the
-        last observed tenor. Beyond it, a decay rate calibrated from
+        price with provenance. The rate input is an observed signed or
+        posted price. After the contract, a decay rate calibrated from
         realized rate history applies and is disclosed with the figure.
         CCIR publishes no depreciation schedule as a product. The model
-        prices today's curve plus disclosed, history-calibrated
+        prices observed rates plus disclosed, history-calibrated
         assumptions, not a predicted market. Statistics follow the
         methodology's stat policy: counts ship with every median in the
         series data, thin cells are gated, and windows are labeled on
@@ -849,6 +868,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       background: var(--surface); border: 2px solid var(--ink-dim);
       vertical-align: -1px;
     }
+    /* New-cost basis: dashed tick on the strip, dashed glyph in the row. */
+    .iv .ivcost {
+      position: absolute; top: 1px; width: 0; height: 17px;
+      border-left: 2px dashed var(--ink-dim); transform: translateX(-50%);
+    }
+    .iv .g-cost { width: 0; height: 11px; border-left: 2px dashed var(--ink-dim); }
+    .iv .ivabove { color: var(--ink); font-weight: 600; }
     .iv .ivmeta {
       margin-top: 8px; font-family: var(--font-mono); font-size: var(--fs-xs);
       color: var(--ink-faint); line-height: 1.5;

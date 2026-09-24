@@ -161,6 +161,9 @@ for (const r of table.slice(1)) {
     tenor_raw: tenorRaw,
     signed_key: key,
     usd_gpu_hr: price,
+    // GPU count from the register (John, 2026-09-24): /hardware GPU-weights
+    // the signed-rate trend. Null when the register leaves it blank.
+    gpus: num(r[col('gpus')]),
     basis: stated != null ? 'stated' : 'implied',
     grade,
     comparability: comp,

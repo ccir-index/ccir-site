@@ -256,7 +256,7 @@ const datasetLd = JSON.stringify({
           <>
             <span class="st-value" title={`income-derived model output — /hardware's own figure, recomputed on each daily data refresh`}>{fmtUsd(iv.base)}</span>
             <span class="st-unit">USD/unit</span>
-            <span class="st-meta">income-derived · sensitivity {fmtK(iv.lo)}–{fmtK(iv.hi)} · curve to {iv.curveTo}</span>
+            <span class="st-meta">income-derived · range {fmtK(iv.lo)}–{fmtK(iv.hi)} · rate leg {iv.leg.tenor}</span>
             <span class="st-mi">Model output — not a transacted price</span>
           </>
         ) : <span class="st-value">—</span>}
