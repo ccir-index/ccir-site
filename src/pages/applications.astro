@@ -17,15 +17,21 @@ const ref = headlineRates.find((r) => r.series_id === REF_SERIES_ID);
 // (n>=10 sources), median below.
 const closingRate = ref ? headlineValue(ref) : 0;
 const statKind = ref ? headlineStatOf(ref) : 'median';
+// Use case 03 watches the IMPLIED contracted rate (John, 2026-09-24): posted
+// on-demand less the measured posted-to-contracted discount (/hardware). The
+// posted series is the daily direction signal; contracts sign near the
+// implied level.
+const DISCOUNT = IV_HAIRCUT?.haircut ?? 0;
+const impliedClose = closingRate * (1 - DISCOUNT);
 
 const round5c = (n: number) => Math.round(n / 0.05) * 0.05;
 const round1c = (n: number) => Math.round(n * 100) / 100;
 const fmt = (n: number) => n.toFixed(2);
 
-// Watch levels, set at close as a share of the closing level.
-const LEVEL_2 = round5c(closingRate * 0.92);
-const LEVEL_3 = round5c(closingRate * 0.80);
-const LEVEL_4 = round5c(closingRate * 0.69);
+// Watch levels, set at close as a share of the implied contracted rate.
+const LEVEL_2 = round5c(impliedClose * 0.92);
+const LEVEL_3 = round5c(impliedClose * 0.80);
+const LEVEL_4 = round5c(impliedClose * 0.69);
 
 interface TrajRow {
   month: string;
@@ -75,7 +81,7 @@ const trajPcts: { month: string; pct: number; check: string }[] = [
 ];
 let prevLevel: 1 | 2 | 3 | 4 = 1;
 const trajectory: TrajRow[] = trajPcts.map(({ month, pct, check }) => {
-  const value = round1c(closingRate * pct);
+  const value = round1c(impliedClose * pct);
   const level = classify(value);
   const transition = level > prevLevel;
   const improvement = level < prevLevel;
@@ -90,13 +96,46 @@ const trajectory: TrajRow[] = trajPcts.map(({ month, pct, check }) => {
   return row;
 });
 
-// Collateral value at close from /hardware: the B200 model value per GPU.
+// Use case 01: collateral value and loan-to-value from /hardware (John,
+// 2026-09-24). The fleet is marked at the model value per GPU, with its range
+// and the 2024-25 replay stress. LTV watch levels are illustrative.
 const FLEET = 8000;
 const FACILITY = 200_000_000;
 const b200Card = ivCards.find((c) => c.model === 'B200');
 const fleetValue = b200Card ? b200Card.base * FLEET : 0;
 const ltv = fleetValue > 0 ? FACILITY / fleetValue : 0;
 const fmtM = (n: number) => `$${Math.round(n / 1e6).toLocaleString('en-US')}M`;
+const fmtK = (n: number) => `$${(n / 1000).toFixed(1)}k`;
+const pctS = (x: number) => `${Math.round(x * 100)}%`;
+
+const LTV_LEVELS = [0.80, 0.90, 1.00];
+function ltvLevel(x: number): 1 | 2 | 3 | 4 {
+  if (x <= LTV_LEVELS[0]) return 1;
+  if (x <= LTV_LEVELS[1]) return 2;
+  if (x <= LTV_LEVELS[2]) return 3;
+  return 4;
+}
+const LTV_RESPONSES: Record<number, string> = {
+  1: 'Quarterly value review; standard borrower reporting',
+  2: 'Monthly value review; request the contract book',
+  3: 'Monthly review; test coverage at current rates; check reserve and sweep terms already in the facility',
+  4: 'Credit committee review; stress re-leasing; weekly value tracking',
+};
+const ltvLevels = [
+  { label: LEVEL_LABELS[1], range: `LTV at or below ${pctS(LTV_LEVELS[0])}`, response: LTV_RESPONSES[1] },
+  { label: LEVEL_LABELS[2], range: `${pctS(LTV_LEVELS[0])} to ${pctS(LTV_LEVELS[1])}`, response: LTV_RESPONSES[2] },
+  { label: LEVEL_LABELS[3], range: `${pctS(LTV_LEVELS[1])} to ${pctS(LTV_LEVELS[2])}`, response: LTV_RESPONSES[3] },
+  { label: LEVEL_LABELS[4], range: `Above ${pctS(LTV_LEVELS[2])}`, response: LTV_RESPONSES[4] },
+];
+const valueCases = b200Card ? [
+  { name: 'Model value', per: b200Card.base },
+  { name: 'Range, low', per: b200Card.lo },
+  { name: 'Range, high', per: b200Card.hi },
+  { name: 'Stress (2024–25 replay)', per: b200Card.intStress },
+].map((c) => {
+  const v = c.per * FLEET, x = FACILITY / v, lv = ltvLevel(x);
+  return { ...c, value: v, ltv: x, level: lv, label: LEVEL_LABELS[lv] };
+}) : [];
 
 const exposureTerms: { term: string; value: string }[] = [
   { term: 'Borrower', value: 'A GPU-rich neocloud special-purpose entity (SPE)' },
@@ -104,9 +143,31 @@ const exposureTerms: { term: string; value: string }[] = [
   { term: 'Facility size', value: '$200,000,000' },
   { term: 'Tenor', value: '4 years, scheduled amortization with bullet at maturity' },
   { term: 'Collateral', value: 'First-lien security interest in 1,000 B200 8-GPU nodes (8,000 GPUs)' },
-  { term: 'Collateral value at close', value: `${fmtM(fleetValue)} at the CCIR modeled value of $${Math.round(b200Card?.base ?? 0).toLocaleString('en-US')} per GPU (/hardware); loan-to-value ${Math.round(ltv * 100)}%` },
+  { term: 'Collateral value at close', value: `${fmtM(fleetValue)} at the CCIR model value of $${Math.round(b200Card?.base ?? 0).toLocaleString('en-US')} per GPU` },
+  { term: 'Loan-to-value at close', value: pctS(ltv) },
+  { term: 'Review date', value: 'Last business day of each month' },
+];
+
+// Pool: unit weights across generations, each marked at its own /hardware
+// value. Same 8,000-GPU size as the single-chip example.
+const POOL = [
+  { chip: 'B200', weight: 0.50 },
+  { chip: 'H200', weight: 0.30 },
+  { chip: 'H100', weight: 0.20 },
+];
+const poolRows = POOL.map((p) => {
+  const c = ivCards.find((x) => x.model === p.chip);
+  return c ? { ...p, units: Math.round(p.weight * FLEET), per: c.base, stress: c.intStress } : null;
+}).filter((r): r is NonNullable<typeof r> => r != null);
+const poolValue = poolRows.reduce((a, r) => a + r.units * r.per, 0);
+const poolStress = poolRows.reduce((a, r) => a + r.units * r.stress, 0);
+
+// Use case 03 monitor terms.
+const monitorTerms: { term: string; value: string }[] = [
   { term: 'Monitored series', value: `${REF_SERIES_ID}, published by CCIR (Neocloud operator segment, B200, guaranteed on-demand, global)` },
-  { term: 'Series level at close', value: `$${fmt(closingRate)} per GPU per hour (as of ${meta.as_of_date})` },
+  { term: 'Posted level at close', value: `$${fmt(closingRate)} per GPU per hour (as of ${meta.as_of_date})` },
+  { term: 'Posted-to-contracted discount', value: `${Math.round(DISCOUNT * 100)}%, measured across filed deals (/hardware)` },
+  { term: 'Implied contracted rate at close', value: `$${fmt(impliedClose)} per GPU per hour` },
   { term: 'Smoothing', value: '30-day average of daily prints' },
   { term: 'Review date', value: 'Last business day of each month' },
 ];
@@ -124,7 +185,7 @@ const anchorCell = conCell('B200', '2Y');
 const ANCHOR_RATE = anchorCell?.rate ?? 0;
 const postedOd = b200Curve.od?.value ?? 0;
 const postedOdSellers = b200Curve.od?.sellers ?? 0;
-const discount = IV_HAIRCUT?.haircut ?? 0;
+const discount = DISCOUNT;
 const reLeaseBase = postedOd * (1 - discount);
 const reLeaseStress = reLeaseBase * REPLAY_TROUGH;
 
@@ -158,66 +219,43 @@ const backtest: { period: string; rate: string; level: string; cls: string; post
   { period: 'Jun 2026', rate: '$3.39', level: 'Level 3 · re-tightening', cls: 't3', posture: 'Sharp one-month drop; the 15% fast-move check applies' },
 ];
 
-// ---------------------------------------------------------------------------
-// Use case 03: multi-generation pool monitoring. Pool rate = unit-weighted
-// average of the published per-generation global Neocloud guaranteed
-// on-demand cells (global, matching Use case 01 and the /term ladder start),
-// weights fixed at closing per the asset schedule.
-function poolCell(chip: string): Rate | undefined {
-  return headlineRates
-    .filter((r) => r.tier === 'T2' && r.gpu_model === chip &&
-                   r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
-                   r.promotion_status !== 'Shadow')
-    .sort((a, b) => (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
-}
-const POOL = [
-  { chip: 'B200', weight: 0.50 },
-  { chip: 'H200', weight: 0.30 },
-  { chip: 'H100', weight: 0.20 },
-];
-const poolRows = POOL.map((p) => {
-  const cell = poolCell(p.chip);
-  return { ...p, cell, rate: cell ? headlineValue(cell) : null };
-}).filter((r) => r.rate != null);
-const poolWeightSum = poolRows.reduce((s, r) => s + r.weight, 0);
-const poolRate = poolRows.reduce((s, r) => s + r.weight * (r.rate as number), 0) / (poolWeightSum || 1);
-
 // On-page contents. ids match the anchored use-case articles and section h3s.
 const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
   {
     id: 'uc-01',
     kicker: 'Use case 01',
-    label: 'Tracking Collateral Earning Power',
+    label: 'Re-Leasing Risk Sized Against the Term Curve',
     secs: [
-      ['uc-01-s01', 'Why Watch the Market Rate'],
-      ['uc-01-s02', 'Hypothetical Exposure'],
-      ['uc-01-s03', 'Setting Watch Levels'],
-      ['uc-01-s04', 'Worked Numerical Example'],
-      ['uc-01-s05', 'The Watch Levels Against Three Years of History'],
-      ['uc-01-s06', 'Weighting by Exposed Capacity'],
-      ['uc-01-s07', 'Limitations'],
+      ['uc-01-s01', 'Why Rollover Is the Central Credit Question'],
+      ['uc-01-s02', 'Worked Rollover Exhibit'],
+      ['uc-01-s03', 'What to Watch and When'],
+      ['uc-01-s04', 'Limitations'],
     ],
   },
   {
     id: 'uc-02',
     kicker: 'Use case 02',
-    label: 'Re-Leasing Risk Sized Against the Term Curve',
+    label: 'Collateral Value and Loan-to-Value',
     secs: [
-      ['uc-02-s01', 'Why Rollover Is the Central Credit Question'],
-      ['uc-02-s02', 'Worked Rollover Exhibit'],
-      ['uc-02-s03', 'What to Watch and When'],
-      ['uc-02-s04', 'Limitations'],
+      ['uc-02-s01', 'Why Mark the Collateral'],
+      ['uc-02-s02', 'Hypothetical Exposure'],
+      ['uc-02-s03', 'Value, Range and Stress'],
+      ['uc-02-s04', 'Mixed-Generation Pools'],
+      ['uc-02-s05', 'Limitations'],
     ],
   },
   {
     id: 'uc-03',
     kicker: 'Use case 03',
-    label: 'Monitoring a Multi-Generation Pool',
+    label: 'Watching Market Direction',
     secs: [
-      ['uc-03-s01', 'The Pool Rate'],
-      ['uc-03-s02', 'The Property That Makes Pools Monitorable'],
-      ['uc-03-s03', 'Adjacent Practice and Limitations'],
+      ['uc-03-s01', 'Why Watch the Daily Rate'],
+      ['uc-03-s02', 'The Monitor'],
+      ['uc-03-s03', 'Setting Watch Levels'],
+      ['uc-03-s04', 'Worked Numerical Example'],
+      ['uc-03-s05', 'The Watch Levels Against Three Years of History'],
+      ['uc-03-s06', 'Weighting by Exposed Capacity'],
+      ['uc-03-s07', 'Limitations'],
     ],
   },
   {
@@ -231,7 +269,7 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
 <Base
   title="Monitoring GPU-Backed Credit with Market Data · CCIR"
   ogImage="/og/applications.png"
-  description="Worked examples showing how lenders, credit analysts and risk teams can use CCIR's published GPU rental price data to monitor GPU-backed exposures. Covers price tracking against market rates, re-leasing risk sized against the published term curve, and monitoring a multi-generation pool."
+  description="Worked examples showing how lenders, credit analysts and risk teams can use CCIR's published data to monitor GPU-backed exposures: re-leasing risk sized against contracted and posted term rates, collateral value and loan-to-value, and market direction from the daily rate."
 >
   <nav class="apps-navband" aria-label="Use cases">
     <div class="wrap apps-nav-inner">
@@ -274,61 +312,188 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
 
     <article class="usecase" id="uc-01">
       <header class="uc-head">
-        <span class="uc-kicker">Use case 01 · Senior-secured term loan</span>
-        <h2>Tracking Collateral Earning Power Against the Market Rate</h2>
+        <span class="uc-kicker">Use case 01 · Contract rollover</span>
+        <h2>Re-Leasing Risk Sized Against the Published Term Curve</h2>
         <p class="uc-lede">
-          A worked example of how a lender tracking collateral earning power
-          might watch a published CCIR series. The lender sets watch levels
-          below the level at close. Each level maps to a monitoring response,
-          such as a more frequent review or a request for the contract book.
-          The example is illustrative. It is not a model form or a
-          recommended practice.
+          A worked example of contract rollover in GPU-backed lending. A
+          borrower's anchor customer contract expires mid-loan. The freed
+          capacity must be re-leased at then-prevailing rates. A lender
+          watching this risk can size it against the published term curve
+          months before the contract expires. The approach mirrors the
+          market-rent assumptions used in commercial real estate and aircraft
+          leasing. The example is illustrative.
         </p>
       </header>
 
       <section class="uc-rate">
-        <div class="rate-kicker">Monitored series (live, calibrating this example)</div>
-        <div class="rate-id">{REF_SERIES_ID}</div>
-        <div class="rate-price">${fmt(closingRate)}<span class="rate-unit">/GPU-hr</span></div>
+        <div class="rate-kicker">Re-lease rate at rollover (live, calibrating this example)</div>
+        <div class="rate-id">B200 · global Neocloud · from <a href="/term">/term</a> and <a href="/hardware">/hardware</a></div>
+        <div class="rate-price">${fmt(reLeaseBase)}<span class="rate-unit">/GPU-hr · base re-lease</span></div>
         <div class="rate-meta">
-          Neocloud operator segment · B200 · Guaranteed on-demand · Global
-          <span class="sep">·</span>
-          <span title="Observations are qualifying posted listings in the computation window; a source contributes one vote to the statistic however many of its listings pool into the cell (operator-equal aggregation).">{statKind} of {ref?.n_sources} sources / {ref?.n_observations} observations</span>
+          Posted on-demand ${fmt(postedOd)} (/term ladder, {postedOdSellers} sellers) less the measured
+          posted-to-contracted discount of {Math.round(discount * 100)}%
           <span class="sep">·</span>
           as of {meta.as_of_date}
         </div>
         <div class="rate-thresholds">
-          <span><strong>Level 2 watch</strong> ${fmt(LEVEL_2)} <span class="dim">(92% of close)</span></span>
-          <span><strong>Level 3 watch</strong> ${fmt(LEVEL_3)} <span class="dim">(80% of close)</span></span>
-          <span><strong>Level 4 watch</strong> ${fmt(LEVEL_4)} <span class="dim">(69% of close)</span></span>
+          {anchorCell?.rate != null && (
+            <span><strong>Contracted 2Y</strong> ${fmt(ANCHOR_RATE)} <span class="dim">({anchorCell.n} deals, ${fmt(anchorCell.min!)}–${fmt(anchorCell.max!)})</span></span>
+          )}
+          <span><strong>Base re-lease</strong> ${fmt(reLeaseBase)}</span>
+          <span><strong>Stress re-lease</strong> ${fmt(reLeaseStress)} <span class="dim">(2024–25 replay low)</span></span>
         </div>
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s01"><span class="sec-n">01</span> Why Watch the Market Rate</h3>
+        <h3 id="uc-01-s01"><span class="sec-n">01</span> Why Rollover Is the Central Credit Question</h3>
         <p>
-          A GPU earns what the rental market pays for it. A published market
-          rate is therefore a direct read on the earning power behind a
-          GPU-backed loan. Borrower reports arrive monthly or quarterly and
-          reflect the borrower's own pricing. A daily series from an outside
-          source gives the lender an independent view between reports.
+          Customer contracts usually run two to five years. The facilities
+          they support often mature later. The capacity behind the loan must
+          then be re-contracted at least once before repayment. No one has
+          locked that future rate, and few tools exist to hedge it. What the
+          capacity earns on re-lease is the credit question.
         </p>
         <p>
-          Commodity lenders already work this way. Reserve-based lenders watch
-          oil and gas strip prices. Other commodity lenders track Henry Hub,
-          Platts assessments and LME cash prices. GPU rental prices can play
-          the same role for compute collateral.
+          Three published numbers size it. The anchor contract is priced like
+          the contracted rates on <a href="/term">/term</a>. The rate a new
+          contract would sign at today is the posted on-demand rate less the
+          measured gap between posted and contracted prices. The downside is
+          the stress path on <a href="/hardware">/hardware</a>: a replay of the
+          2024–25 H100 decline, when on-demand rates fell 61% in 18 months.
         </p>
         <p>
-          Watch levels turn the series into a routine. The lender fixes the
-          levels at close. On each review date, the 30-day average sits either
-          above or below each level. The response steps up in stages. Small
-          moves prompt a closer look, and large moves prompt a full review.
+          Commercial real estate lenders handle the same question with
+          market-rent assumptions. Aircraft lessors use appraiser-published
+          re-leasing rates. For GPUs, the market rent is observable daily.
         </p>
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s02"><span class="sec-n">02</span> Hypothetical Exposure</h3>
+        <h3 id="uc-01-s02"><span class="sec-n">02</span> Worked Rollover Exhibit</h3>
+        <p class="calib-note">
+          Calibration: stylized facility of {FLEET_GPUS.toLocaleString('en-US')} B200
+          GPUs (1,000 nodes). {(ANCHOR_SHARE * 100).toFixed(0)}% of capacity
+          sits under a 2-year anchor contract at the /term 2Y contracted rate
+          of ${fmt(ANCHOR_RATE)}. The rest sells at the base re-lease rate.
+          DSCR at close {CLOSE_DSCR.toFixed(2)}x. At rollover the whole fleet
+          reprices. Margins and debt service stay constant to isolate the
+          price effect. Every rate is live as of {meta.as_of_date}.
+        </p>
+        <div class="ftable-wrap">
+          <table class="ftable">
+            <thead><tr><th>Case</th><th class="num">Rate $/GPU-hr</th><th class="num">vs anchor</th><th class="num">DSCR</th></tr></thead>
+            <tbody>
+              <tr><td>At close (anchor contract)</td><td class="num">{fmt(ANCHOR_RATE)}</td><td class="num">—</td><td class="num">{CLOSE_DSCR.toFixed(2)}x</td></tr>
+              <tr><td>Rollover, base re-lease</td><td class="num">{fmt(reLeaseBase)}</td><td class="num">{pctVsAnchor(reLeaseBase) >= 0 ? '+' : '−'}{Math.abs(pctVsAnchor(reLeaseBase)).toFixed(0)}%</td><td class="num"><strong>{dscrBase.toFixed(2)}x</strong></td></tr>
+              <tr><td>Rollover, stress re-lease</td><td class="num">{fmt(reLeaseStress)}</td><td class="num">{pctVsAnchor(reLeaseStress) >= 0 ? '+' : '−'}{Math.abs(pctVsAnchor(reLeaseStress)).toFixed(0)}%</td><td class="num"><strong>{dscrStress.toFixed(2)}x</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>The exhibit sizes the risk ahead of the expiry.</strong> The
+          base and stress cases are computable on any publication date. They
+          need only the borrower's contract book and the published rates. The
+          lender can see the gap months before the revenue changes.
+        </p>
+        <p>
+          <strong>A coverage flag at 1.20x</strong> prompts a review of the
+          borrower's re-leasing plan and pipeline. It also prompts a check of
+          any reserve terms already in the facility.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-01-s03"><span class="sec-n">03</span> What to Watch and When</h3>
+        <p>
+          A lender tracking rollover risk might follow a simple routine.
+        </p>
+        <p>
+          <strong>Start 180 days out.</strong> Begin the rollover check 180
+          days before any contract that supplies 20% or more of gross rental
+          revenue expires. Repeat it monthly until the contract is replaced or
+          renewed.
+        </p>
+        <p>
+          <strong>Re-price only the expiring block.</strong> Hold every other
+          contract at its contracted rate. Re-price the expiring capacity at
+          the base re-lease rate, then at the stress rate. Compare projected
+          cash flow with scheduled debt service in both cases.
+        </p>
+        <p>
+          <strong>Watch the contracted rates as they file.</strong> New deals
+          on <a href="/term">/term</a> show where contracts are signing now.
+          A new filing below the base re-lease rate is an early sign that the
+          discount is widening.
+        </p>
+        <p>
+          <strong>Every moving input comes from outside the borrower.</strong>
+          The rates come from published data. The check date comes from the
+          contract calendar.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-01-s04"><span class="sec-n">04</span> Limitations</h3>
+        <p>
+          <strong>This is illustrative.</strong> Fleet size, anchor share and
+          closing DSCR are stylized. The contracted rate rests on a few filed
+          deals, and the count and range print above. The posted-to-contracted
+          discount is measured across chips and tenors, and a single deal can
+          sit well above or below it. The stress applies H100's history to
+          B200, which has not yet been through a downturn. Utilization on
+          re-leased capacity stays at the contracted level.
+        </p>
+      </section>
+
+    </article>
+
+    <article class="usecase" id="uc-02">
+      <header class="uc-head">
+        <span class="uc-kicker">Use case 02 · Senior-secured term loan</span>
+        <h2>Collateral Value and Loan-to-Value</h2>
+        <p class="uc-lede">
+          A worked example of marking GPU collateral at a published model
+          value. The lender tracks loan-to-value against levels set at close.
+          Each level maps to a monitoring response. The example is
+          illustrative. It is not a model form or a recommended practice.
+        </p>
+      </header>
+
+      <section class="uc-rate">
+        <div class="rate-kicker">Collateral value (live, calibrating this example)</div>
+        <div class="rate-id">1,000 B200 nodes · 8,000 GPUs · <a href="/hardware">/hardware</a></div>
+        <div class="rate-price">{fmtM(fleetValue)}<span class="rate-unit"> · LTV {pctS(ltv)}</span></div>
+        <div class="rate-meta">
+          Model value {fmtK(b200Card?.base ?? 0)} per GPU
+          <span class="sep">·</span>
+          as of {meta.as_of_date}
+        </div>
+        <div class="rate-thresholds">
+          <span><strong>Level 2 watch</strong> LTV above {pctS(LTV_LEVELS[0])}</span>
+          <span><strong>Level 3 watch</strong> above {pctS(LTV_LEVELS[1])}</span>
+          <span><strong>Level 4 watch</strong> above {pctS(LTV_LEVELS[2])}</span>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-02-s01"><span class="sec-n">01</span> Why Mark the Collateral</h3>
+        <p>
+          A GPU is worth what it can earn over its remaining life. The
+          <a href="/hardware">/hardware</a> model values each chip on that
+          basis. It uses contracted rates where enough deals are on file, a
+          disclosed discount rate and a disclosed life. Asks, sales and
+          new-chip prices sit beside it as checks.
+        </p>
+        <p>
+          Most credit documents amortize GPU collateral on a fixed schedule.
+          A published value gives the lender a second view that moves with
+          the market. It comes with a range and a stress case, so the lender
+          can see how much cushion the loan has in each.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-02-s02"><span class="sec-n">02</span> Hypothetical Exposure</h3>
         <div class="ftable-wrap">
           <table class="ftable">
             <tbody>
@@ -344,10 +509,195 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s03"><span class="sec-n">03</span> Setting Watch Levels</h3>
+        <h3 id="uc-02-s03"><span class="sec-n">03</span> Value, Range and Stress</h3>
+        <p>
+          The example sets loan-to-value levels at {pctS(LTV_LEVELS[0])},
+          {' '}{pctS(LTV_LEVELS[1])} and {pctS(LTV_LEVELS[2])}. The table marks
+          the fleet at the model value, both ends of its range and the stress
+          case. The stress case assumes no contract and replays the 2024–25
+          H100 decline, when on-demand rates fell 61% in 18 months.
+        </p>
+        <div class="ftable-wrap">
+          <table class="ftable">
+            <thead>
+              <tr><th>Level</th><th>LTV range</th><th>Monitoring response</th></tr>
+            </thead>
+            <tbody>
+              {ltvLevels.map((l) => (
+                <tr>
+                  <td class="feat">{l.label}</td>
+                  <td>{l.range}</td>
+                  <td>{l.response}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div class="ftable-wrap">
+          <table class="traj">
+            <thead>
+              <tr><th>Case</th><th class="num">Per GPU</th><th class="num">Fleet value</th><th class="num">LTV</th><th>Level</th></tr>
+            </thead>
+            <tbody>
+              {valueCases.map((c) => (
+                <tr>
+                  <td>{c.name}</td>
+                  <td class="num">{fmtK(c.per)}</td>
+                  <td class="num">{fmtM(c.value)}</td>
+                  <td class="num">{pctS(c.ltv)}</td>
+                  <td class={`tier tier-${c.level}`}>{c.label}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>
+          <strong>The stress case is where the cushion shows.</strong> A loan
+          that sits at baseline on the model value can move to escalation if
+          the fleet loses its contracts in a downturn. The contract book is
+          what protects the lender, and Use case 01 sizes that risk.
+        </p>
+        <p>
+          The value is recomputed with each daily data refresh. The levels in
+          this example set monitoring responses only. They have no
+          contractual effect.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-02-s04"><span class="sec-n">04</span> Mixed-Generation Pools</h3>
+        <p>
+          Warehouse and securitized pools usually hold several generations.
+          Each generation is marked at its own model value and weighted by
+          its units in the asset schedule. The same loan-to-value levels
+          apply to the pool.
+        </p>
+        <div class="ftable-wrap">
+          <table class="traj">
+            <thead>
+              <tr><th>Generation</th><th class="num">Units</th><th class="num">Per GPU</th><th class="num">Value</th><th class="num">Stress</th></tr>
+            </thead>
+            <tbody>
+              {poolRows.map((r) => (
+                <tr>
+                  <td>{r.chip}</td>
+                  <td class="num">{r.units.toLocaleString('en-US')}</td>
+                  <td class="num">{fmtK(r.per)}</td>
+                  <td class="num">{fmtM(r.units * r.per)}</td>
+                  <td class="num">{fmtM(r.units * r.stress)}</td>
+                </tr>
+              ))}
+              <tr>
+                <td><strong>Pool</strong></td>
+                <td class="num">{FLEET.toLocaleString('en-US')}</td>
+                <td class="num">{fmtK(poolValue / FLEET)}</td>
+                <td class="num"><strong>{fmtM(poolValue)}</strong></td>
+                <td class="num">{fmtM(poolStress)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Surveillance watches the pool value against its closing level, mix
+          drift in the servicer report, and whether substitutions entered on
+          schedule. A generation without a published value stays outside the
+          pool mark until one publishes.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-02-s05"><span class="sec-n">05</span> Limitations</h3>
+        <p>
+          <strong>This is illustrative.</strong> The exposure, levels and
+          responses are designed for clarity. The value is a model output with
+          every assumption disclosed on <a href="/hardware">/hardware</a>. It
+          is not an appraisal. B300, B200 and H200 values are modeled only,
+          with no sales record yet to check them against.
+        </p>
+      </section>
+    </article>
+
+    <article class="usecase" id="uc-03">
+      <header class="uc-head">
+        <span class="uc-kicker">Use case 03 · Daily monitoring</span>
+        <h2>Watching Market Direction</h2>
+        <p class="uc-lede">
+          The posted rate is the only GPU price published every day. Contracts
+          sign well below it, so the monitor watches the implied contracted
+          rate: the posted rate less the measured posted-to-contracted
+          discount. Watch levels below the closing level map to monitoring
+          responses. The example is illustrative. It is not a model form or
+          a recommended practice.
+        </p>
+      </header>
+
+      <section class="uc-rate">
+        <div class="rate-kicker">Implied contracted rate (live, calibrating this example)</div>
+        <div class="rate-id">{REF_SERIES_ID}</div>
+        <div class="rate-price">${fmt(impliedClose)}<span class="rate-unit">/GPU-hr · implied contracted</span></div>
+        <div class="rate-meta">
+          Posted ${fmt(closingRate)} less the measured {Math.round(DISCOUNT * 100)}% discount
+          <span class="sep">·</span>
+          Neocloud · B200 · Guaranteed on-demand · Global
+          <span class="sep">·</span>
+          <span title="Observations are qualifying posted listings in the computation window; a source contributes one vote to the statistic however many of its listings pool into the cell (operator-equal aggregation).">{statKind} of {ref?.n_sources} sources / {ref?.n_observations} observations</span>
+          <span class="sep">·</span>
+          as of {meta.as_of_date}
+        </div>
+        <div class="rate-thresholds">
+          <span><strong>Level 2 watch</strong> ${fmt(LEVEL_2)} <span class="dim">(92%)</span></span>
+          <span><strong>Level 3 watch</strong> ${fmt(LEVEL_3)} <span class="dim">(80%)</span></span>
+          <span><strong>Level 4 watch</strong> ${fmt(LEVEL_4)} <span class="dim">(69%)</span></span>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-03-s01"><span class="sec-n">01</span> Why Watch the Daily Rate</h3>
+        <p>
+          Contracted rates arrive a few filings at a time, often months apart.
+          The posted on-demand rate prints every day. It sits well above what
+          contracts sign at, so its level overstates what a fleet earns. Its
+          direction is the early read. CCIR's archived history shows the gap
+          between posted on-demand and posted committed prices held roughly
+          steady from 2024 to 2026.
+        </p>
+        <p>
+          The monitor therefore converts the posted rate to an implied
+          contracted rate. It applies the posted-to-contracted discount
+          measured across filed deals, {Math.round(DISCOUNT * 100)}% today. The
+          implied rate sits near the borrower's own contract book, so watch
+          levels on it read in the same units as the revenue.
+        </p>
+        <p>
+          Commodity lenders already work this way. Reserve-based lenders watch
+          oil and gas strip prices. Other commodity lenders track Henry Hub,
+          Platts assessments and LME cash prices. Watch levels turn the series
+          into a routine. The lender fixes the levels at close. Small moves
+          prompt a closer look, and large moves prompt a full review.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-03-s02"><span class="sec-n">02</span> The Monitor</h3>
+        <div class="ftable-wrap">
+          <table class="ftable">
+            <tbody>
+              {monitorTerms.map(({ term, value }) => (
+                <tr>
+                  <th>{term}</th>
+                  <td>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-03-s03"><span class="sec-n">03</span> Setting Watch Levels</h3>
         <p>
           The example sets three watch levels at 92%, 80% and 69% of the
-          closing level, rounded to the nearest $0.05. The monitor tests the
+          implied contracted rate at close, rounded to the nearest $0.05. The monitor tests the
           30-day average of daily prints on the last business day of each
           month. The average smooths day-to-day changes in panel composition.
         </p>
@@ -385,13 +735,13 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s04"><span class="sec-n">04</span> Worked Numerical Example</h3>
+        <h3 id="uc-03-s04"><span class="sec-n">04</span> Worked Numerical Example</h3>
         <p class="calib-note">
-          Calibration: values below derive from a closing level of
-          <strong>${fmt(closingRate)}</strong> per GPU per hour
-          ({REF_SERIES_ID}, published by CCIR on {meta.as_of_date}) and a
-          stylized 24-month rate path. Watch levels sit at 92% / 80% / 69% of
-          close, rounded to the nearest $0.05.
+          Calibration: an implied contracted rate at close of
+          <strong>${fmt(impliedClose)}</strong> per GPU per hour
+          ({REF_SERIES_ID} at ${fmt(closingRate)} on {meta.as_of_date}, less
+          the {Math.round(DISCOUNT * 100)}% discount). The path is stylized
+          over 24 months.
         </p>
         <div class="ftable-wrap">
           <table class="traj">
@@ -439,11 +789,12 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s05"><span class="sec-n">05</span> The Watch Levels Against Three Years of History</h3>
+        <h3 id="uc-03-s05"><span class="sec-n">05</span> The Watch Levels Against Three Years of History</h3>
         <p>
           B200 has not yet been through a full price cycle. H100 has, so this
           section runs the same watch structure on H100 history in place of
-          a stylized path. Rates are the monthly neocloud H100 guaranteed
+          a stylized path. With a steady discount, the posted and implied
+          rates cross each level on the same dates. Rates are the monthly neocloud H100 guaranteed
           on-demand medians from CCIR's archived-page backfill
           (<a href="/research/od-vs-committed">On-Demand vs Committed, Three
           Years</a>). The exposure starts in February 2024 at
@@ -489,50 +840,27 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s06"><span class="sec-n">06</span> Weighting by Exposed Capacity</h3>
+        <h3 id="uc-03-s06"><span class="sec-n">06</span> Weighting by Exposed Capacity</h3>
         <p>
           A heavily contracted borrower's revenue does not move with the
-          market rate. A raw price level would flag that borrower as often as
-          an uncontracted one. Reserve-based lenders handle the same issue by
-          valuing hedged volumes at their hedge prices. Committed customer
-          contracts play that role for compute.
+          market. The monitor can blend the two. Contracted capacity counts at
+          its contract rate. Exposed capacity counts at the implied contracted
+          rate. Exposed capacity is anything uncontracted or under a contract
+          that expires within 12 months. The monitor compares the blended rate
+          with the watch levels.
         </p>
         <p>
-          The monitor can blend the two. Contracted capacity counts at its
-          contract rate. Exposed capacity counts at the 30-day market average.
-          Exposed capacity is anything uncontracted or under a contract that
-          expires within 12 months. The monitor compares the blended rate with
-          the watch levels.
-        </p>
-        <p>
-          The blend tracks contract expiry. Far from expiry, the market rate
-          touches only the uncontracted share. As contracts approach expiry,
-          more capacity is exposed, and the same market level weighs more
-          heavily. The table shows the 2025 floor in the Section 05 history,
-          with the market at $2.79 and contracts written at close.
-        </p>
-        <div class="ftable-wrap">
-          <table class="ftable">
-            <thead><tr><th>Contracted share (beyond 12 mo)</th><th>Blended rate</th><th>Level at the 2025 floor</th></tr></thead>
-            <tbody>
-              <tr><td>85%</td><td>$4.07</td><td>Level 1 · Baseline</td></tr>
-              <tr><td>50%</td><td>$3.55</td><td>Level 2 · Watch</td></tr>
-              <tr><td>15%</td><td>$3.02</td><td>Level 3 · Review</td></tr>
-              <tr><td>0% (market rate only)</td><td>$2.79</td><td>Level 4 · Escalate</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          <strong>What the blend needs from the borrower:</strong> a monthly
-          schedule of contracted rates, covered capacity and expiry dates. The
-          same inputs drive the rollover exhibit in Use case 02. One data set
-          supports both: the published series plus the borrower's contract
-          ladder.
+          The blend tracks contract expiry. Far from expiry, the market touches
+          only the uncontracted share. As contracts approach expiry, more
+          capacity is exposed, and the same market level weighs more heavily.
+          The blend needs a monthly schedule of contracted rates, covered
+          capacity and expiry dates from the borrower. The rollover exhibit in
+          Use case 01 uses the same inputs.
         </p>
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s07"><span class="sec-n">07</span> Limitations</h3>
+        <h3 id="uc-03-s07"><span class="sec-n">07</span> Limitations</h3>
         <p>
           <strong>This is illustrative.</strong> The hypothetical exposure,
           dollar levels, breakpoints and responses are designed for clarity. A
@@ -545,235 +873,11 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
           instead use absolute dollar levels or a mix of both.
         </p>
         <p>
-          <strong>Panel depth matters.</strong> Each series discloses its
-          number of sources. A thin series moves more from day to day, and a
-          monitor should read it with that in mind.
-        </p>
-      </section>
-    </article>
-
-    <article class="usecase" id="uc-02">
-      <header class="uc-head">
-        <span class="uc-kicker">Use case 02 · Contract rollover</span>
-        <h2>Re-Leasing Risk Sized Against the Published Term Curve</h2>
-        <p class="uc-lede">
-          A worked example of contract rollover in GPU-backed lending. A
-          borrower's anchor customer contract expires mid-loan. The freed
-          capacity must be re-leased at then-prevailing rates. A lender
-          watching this risk can size it against the published term curve
-          months before the contract expires. The approach mirrors the
-          market-rent assumptions used in commercial real estate and aircraft
-          leasing. The example is illustrative.
-        </p>
-      </header>
-
-      <section class="uc-rate">
-        <div class="rate-kicker">Re-lease rate at rollover (live, calibrating this example)</div>
-        <div class="rate-id">B200 · global Neocloud · from <a href="/term">/term</a> and <a href="/hardware">/hardware</a></div>
-        <div class="rate-price">${fmt(reLeaseBase)}<span class="rate-unit">/GPU-hr · base re-lease</span></div>
-        <div class="rate-meta">
-          Posted on-demand ${fmt(postedOd)} (/term ladder, {postedOdSellers} sellers) less the measured
-          posted-to-contracted discount of {Math.round(discount * 100)}%
-          <span class="sep">·</span>
-          as of {meta.as_of_date}
-        </div>
-        <div class="rate-thresholds">
-          {anchorCell?.rate != null && (
-            <span><strong>Contracted 2Y</strong> ${fmt(ANCHOR_RATE)} <span class="dim">({anchorCell.n} deals, ${fmt(anchorCell.min!)}–${fmt(anchorCell.max!)})</span></span>
-          )}
-          <span><strong>Base re-lease</strong> ${fmt(reLeaseBase)}</span>
-          <span><strong>Stress re-lease</strong> ${fmt(reLeaseStress)} <span class="dim">(2024–25 replay low)</span></span>
-        </div>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-02-s01"><span class="sec-n">01</span> Why Rollover Is the Central Credit Question</h3>
-        <p>
-          Customer contracts usually run two to five years. The facilities
-          they support often mature later. The capacity behind the loan must
-          then be re-contracted at least once before repayment. No one has
-          locked that future rate, and few tools exist to hedge it. What the
-          capacity earns on re-lease is the credit question.
-        </p>
-        <p>
-          Three published numbers size it. The anchor contract is priced like
-          the contracted rates on <a href="/term">/term</a>. The rate a new
-          contract would sign at today is the posted on-demand rate less the
-          measured gap between posted and contracted prices. The downside is
-          the stress path on <a href="/hardware">/hardware</a>: a replay of the
-          2024–25 H100 decline, when on-demand rates fell 61% in 18 months.
-        </p>
-        <p>
-          Commercial real estate lenders handle the same question with
-          market-rent assumptions. Aircraft lessors use appraiser-published
-          re-leasing rates. For GPUs, the market rent is observable daily.
-        </p>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-02-s02"><span class="sec-n">02</span> Worked Rollover Exhibit</h3>
-        <p class="calib-note">
-          Calibration: stylized facility of {FLEET_GPUS.toLocaleString('en-US')} B200
-          GPUs (1,000 nodes). {(ANCHOR_SHARE * 100).toFixed(0)}% of capacity
-          sits under a 2-year anchor contract at the /term 2Y contracted rate
-          of ${fmt(ANCHOR_RATE)}. The rest sells at the base re-lease rate.
-          DSCR at close {CLOSE_DSCR.toFixed(2)}x. At rollover the whole fleet
-          reprices. Margins and debt service stay constant to isolate the
-          price effect. Every rate is live as of {meta.as_of_date}.
-        </p>
-        <div class="ftable-wrap">
-          <table class="ftable">
-            <thead><tr><th>Case</th><th class="num">Rate $/GPU-hr</th><th class="num">vs anchor</th><th class="num">DSCR</th></tr></thead>
-            <tbody>
-              <tr><td>At close (anchor contract)</td><td class="num">{fmt(ANCHOR_RATE)}</td><td class="num">—</td><td class="num">{CLOSE_DSCR.toFixed(2)}x</td></tr>
-              <tr><td>Rollover, base re-lease</td><td class="num">{fmt(reLeaseBase)}</td><td class="num">{pctVsAnchor(reLeaseBase) >= 0 ? '+' : '−'}{Math.abs(pctVsAnchor(reLeaseBase)).toFixed(0)}%</td><td class="num"><strong>{dscrBase.toFixed(2)}x</strong></td></tr>
-              <tr><td>Rollover, stress re-lease</td><td class="num">{fmt(reLeaseStress)}</td><td class="num">{pctVsAnchor(reLeaseStress) >= 0 ? '+' : '−'}{Math.abs(pctVsAnchor(reLeaseStress)).toFixed(0)}%</td><td class="num"><strong>{dscrStress.toFixed(2)}x</strong></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          <strong>The exhibit sizes the risk ahead of the expiry.</strong> The
-          base and stress cases are computable on any publication date. They
-          need only the borrower's contract book and the published rates. The
-          lender can see the gap months before the revenue changes.
-        </p>
-        <p>
-          <strong>A coverage flag at 1.20x</strong> prompts a review of the
-          borrower's re-leasing plan and pipeline, and a check of any reserve
-          terms already in the facility.
-        </p>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-02-s03"><span class="sec-n">03</span> What to Watch and When</h3>
-        <p>
-          A lender tracking rollover risk might follow a simple routine.
-        </p>
-        <p>
-          <strong>Start 180 days out.</strong> Begin the rollover check 180
-          days before any contract that supplies 20% or more of gross rental
-          revenue expires. Repeat it monthly until the contract is replaced or
-          renewed.
-        </p>
-        <p>
-          <strong>Re-price only the expiring block.</strong> Hold every other
-          contract at its contracted rate. Re-price the expiring capacity at
-          the base re-lease rate, then at the stress rate. Compare projected
-          cash flow with scheduled debt service in both cases.
-        </p>
-        <p>
-          <strong>Watch the contracted rates as they file.</strong> New deals
-          on <a href="/term">/term</a> show where contracts are signing now.
-          A new filing below the base re-lease rate is an early sign that the
-          discount is widening.
-        </p>
-        <p>
-          <strong>Every moving input comes from outside the borrower.</strong>
-          The rates come from published data. The check date comes from the
-          contract calendar.
-        </p>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-02-s04"><span class="sec-n">04</span> Limitations</h3>
-        <p>
-          <strong>This is illustrative.</strong> Fleet size, anchor share and
-          closing DSCR are stylized. The contracted rate rests on a few filed
-          deals, and the count and range print above. The posted-to-contracted
-          discount is measured across chips and tenors, and a single deal can
-          sit well above or below it. The stress applies H100's history to
-          B200, which has not yet been through a downturn. Utilization on
-          re-leased capacity stays at the contracted level.
-        </p>
-      </section>
-
-    </article>
-
-    <article class="usecase" id="uc-03">
-      <header class="uc-head">
-        <span class="uc-kicker">Use case 03 · Pool surveillance</span>
-        <h2>Monitoring a Multi-Generation Pool</h2>
-        <p class="uc-lede">
-          Securitized and warehouse pools usually hold mixed fleets across chip
-          generations. This worked example builds a pool rate for such a fleet.
-          It is a unit-weighted basket of the published per-generation series,
-          with weights from the asset schedule. Aircraft and auto lenders watch
-          mixed fleets in a similar way. The example is illustrative.
-        </p>
-      </header>
-
-      <section class="uc-rate">
-        <div class="rate-kicker">Worked pool (live, calibrating this example)</div>
-        <div class="rate-id">{poolRows.map((r) => `${(r.weight * 100).toFixed(0)}% ${r.chip}`).join(' · ')}</div>
-        <div class="rate-price">${fmt(poolRate)}<span class="rate-unit">/GPU-hr · Pool rate</span></div>
-        <div class="rate-meta">
-          Unit-weighted basket of Neocloud guaranteed on-demand cells
-          <span class="sep">·</span>
-          as of {meta.as_of_date}
-        </div>
-        <div class="rate-thresholds">
-          {poolRows.map((r) => (
-            <span><strong>{r.chip}</strong> ${fmt(r.rate as number)} <span class="dim">× {(r.weight * 100).toFixed(0)}%</span></span>
-          ))}
-        </div>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-03-s01"><span class="sec-n">01</span> The Pool Rate</h3>
-        <p>
-          The pool rate is the weighted average of the CCIR series for each
-          generation in the asset schedule. For each generation, the example
-          uses the global Neocloud guaranteed on-demand series.
-          Each weight is that generation's share of pool GPU units. Weights
-          stay fixed until a servicer report shows a substitution, addition or
-          disposition.
-        </p>
-        <p>
-          Every input is a published series with disclosed panel depth. The
-          weights come from the deal's own asset schedule. Trustee, servicer,
-          rating analysts and investors can all compute the same number. The
-          watch levels in Use case 01 apply unchanged to the pool rate.
-        </p>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-03-s02"><span class="sec-n">02</span> The Property That Makes Pools Monitorable</h3>
-        <p>
-          The cross-section of generation pricing is log-linear in age at a
-          common slope (≈ −26% per year; see
-          <a href="/research/gpu-age-curve">the age-curve note</a>). That has
-          a direct consequence for pools. <strong>A static pool's earning
-          power declines at about the same rate regardless of its generation
-          mix.</strong> Mix sets the level. It does not change the slope. The
-          only lever that changes a pool's decline path is substitution,
-          replacing aging units with newer generations. Surveillance checks
-          that servicer behavior.
-        </p>
-        <p>
-          Surveillance therefore watches four things. The first is the pool
-          rate against its closing level. The second is mix drift in the
-          servicer report against the weights in use. The third is whether
-          substitutions entered the basket on schedule. The fourth is panel
-          depth <em>n</em> on each underlying cell, so a thinning input shows
-          early. A generation without a published cell (a new chip in its
-          first weeks) stays outside the basket until its series publishes.
-        </p>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-03-s03"><span class="sec-n">03</span> Adjacent Practice and Limitations</h3>
-        <p>
-          Adjacent asset classes use the same construction. Aircraft ABS
-          monitors fleet value on appraisals weighted by airframe type and
-          vintage. Container ABS tracks per-diem rates by box type and age.
-          Auto ABS surveillance marks pools against vintage and segment auction
-          data. The per-generation GPU series publish daily.
-        </p>
-        <p>
-          Limitations: the basket inherits each cell's panel depth, and thin
-          cells are disclosed. Unit weighting is one convention. Cost-basis or
-          capacity weighting are alternatives. The pool rate measures the
-          earning power of the collateral. It is not a valuation of it.
+          <strong>The discount is measured today.</strong> It comes from the
+          deals on file across chips and tenors. It may widen or narrow over
+          time, and new filings on <a href="/term">/term</a> show which way.
+          Each series also discloses its number of sources. A thin series
+          moves more from day to day.
         </p>
       </section>
     </article>
