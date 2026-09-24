@@ -11,7 +11,7 @@ import NoteFooter from '../../components/NoteFooter.astro';
 const SEC = 'https://www.sec.gov/Archives/edgar/data/';
 const DOC = {
   brunS1: SEC + '2090646/000149315226031923/forms-1.htm',
-  sharon: SEC + '2068385/000149315226030363/form424b3.htm',
+  sharon: SEC + '2068385/000149315226023769/ex10-17.htm',
   axeApr: SEC + '1446159/000117184326002636/exh_991.htm',
   qmls: SEC + '2084026/000143774926020200/ex_973916.htm',
   brunTM: SEC + '2090646/000149315226025672/form8-k.htm',
@@ -29,7 +29,7 @@ interface Deal {
 // rate = as disclosed; est = GPU-only estimate used in charts and trends
 const deals: Deal[] = [
   { signed: '2026-03-15', label: 'Mar 15', seller: 'Boost Run', buyer: 'unnamed', gpus: 1280, term: '3Y', rate: 3.45, est: 3.45, basis: 'stated; bare metal', doc: 'S-1', href: DOC.brunS1, start: '2026-04-21', startExact: true },
-  { signed: '2026-03-31', label: 'Mar 31', seller: 'SharonAI', buyer: 'ESDS', gpus: 8208, term: '5Y', rate: 3.30, est: 3.30, basis: 'stated; includes all taxes', doc: '424B3', href: DOC.sharon, start: '2026-09-15' },
+  { signed: '2026-03-31', label: 'Mar 31', seller: 'SharonAI', buyer: 'ESDS', gpus: 8208, term: '5Y', rate: 3.30, est: 3.30, basis: 'stated', doc: '10-Q Ex. 10.17', href: DOC.sharon, start: '2026-09-15' },
   { signed: '2026-04-22', label: 'Apr 22', seller: 'Axe Compute', buyer: 'unnamed', gpus: 2304, term: '3Y', rate: 4.29, est: 4.13, basis: 'from contract value; includes storage', doc: '8-K', href: DOC.axeApr, start: '2026-08-15' },
   { signed: '2026-05-11', label: 'May 11', seller: 'QumulusAI', buyer: 'unnamed', gpus: 1024, term: '3Y', rate: 3.70, est: 3.70, basis: 'stated; bare metal', doc: 'S-1/A', href: DOC.qmls, start: '2026-08-15', startExact: true },
   { signed: '2026-05-21', label: 'May 21', seller: 'Boost Run', buyer: 'Thinking Machines', gpus: 5000, term: '3Y', rate: 3.59, est: 3.40, basis: 'from contract value; includes storage, CPU', doc: '8-K', href: DOC.brunTM },
@@ -334,7 +334,10 @@ const bars = starts.map((d, i) => ({
         million on 1,000 GPUs.
       </p>
       <p>
-        <strong>Other terms.</strong> SharonAI's rate includes taxes.
+        <strong>Other terms.</strong> SharonAI's order describes its total as
+        "inclusive of all taxes." Its master agreement adds VAT or sales tax
+        to invoices and grosses up any withholding. We treat $3.30 as the
+        rate before tax.
         WhiteFiber discloses "aggregate revenue opportunity," which may differ
         from firm contract value. Start dates given as a quarter or a month
         are drawn at the midpoint.
@@ -345,7 +348,7 @@ const bars = starts.map((d, i) => ({
       <h2><span class="n">06</span> Sources</h2>
       <ul class="src-list">
         <li>Boost Run: <a href={DOC.brunS1} rel="noopener" target="_blank">Form S-1</a> · <a href={DOC.brunTM} rel="noopener" target="_blank">Form 8-K (May 28, 2026)</a> · <a href={DOC.brun10q} rel="noopener" target="_blank">Form 10-Q, Q2 2026</a></li>
-        <li>SharonAI: <a href={DOC.sharon} rel="noopener" target="_blank">Form 424B3</a></li>
+        <li>SharonAI: <a href={DOC.sharon} rel="noopener" target="_blank">Form 10-Q, Ex. 10.17 (master services agreement and service order)</a></li>
         <li>Axe Compute: <a href={DOC.axeApr} rel="noopener" target="_blank">Form 8-K, Ex. 99.1 (April 22, 2026)</a> · <a href={DOC.axeJul} rel="noopener" target="_blank">Form 8-K, Ex. 99.1 (July 27, 2026)</a></li>
         <li>QumulusAI: <a href={DOC.qmls} rel="noopener" target="_blank">Form S-1/A, customer order form</a></li>
         <li>WhiteFiber: <a href={DOC.wyfi} rel="noopener" target="_blank">Form 10-Q, Q2 2026</a></li>
