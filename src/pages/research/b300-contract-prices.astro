@@ -76,12 +76,29 @@ const fitLines = [
   { f: f5, cls: 't5Y', lab: `5-year  ${fmt2(f5.y0)} to ${fmt2(f5.y1)} (+${pct(f5.y0, f5.y1)}%)`, dy: 12 },
 ].map((l) => ({ ...l, x1: cx1(l.f.x0), y1: cy1(l.f.y0), x2: cx1(l.f.x1), y2: cy1(l.f.y1) }));
 const b4 = deals.find((d) => d.term === '4Y')!;
+
+// Dataset structured data for the contracts table (search engines index it).
+const datasetLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'NVIDIA B300 GPU rental contract prices, March to August 2026',
+  description: `Eleven disclosed B300 rental contracts from SEC filings: signing date, seller, buyer, GPUs, term and rate per GPU-hour. GPU-weighted three-year trend ${fmt2(f3.y0)} to ${fmt2(f3.y1)}; five-year ${fmt2(f5.y0)} to ${fmt2(f5.y1)}.`,
+  url: 'https://ccir.io/research/b300-contract-prices',
+  keywords: ['B300', 'NVIDIA B300', 'GPU rental price', 'price per GPU-hour', 'GPU lease rate', 'compute contract', 'Blackwell Ultra'],
+  temporalCoverage: '2026-03-15/2026-08-31',
+  creator: { '@type': 'Organization', name: 'Compute Credit Index Research', url: 'https://ccir.io' },
+  isAccessibleForFree: true,
+  variableMeasured: ['rental rate, USD per GPU-hour', 'GPUs under contract', 'contract term, years'],
+  citation: [...new Set(deals.map((d) => d.href))],
+});
 ---
 <Base
-  title="B300 Contract Prices Since March · CCIR Research"
-  description="Eleven B300 rental contracts disclosed since March show three-year rates up about 25%, from $3.39 to $4.23 per GPU-hour. From company filings."
+  title="B300 Rental Prices per GPU-Hour: Signed Contracts Since March 2026 · CCIR"
+  description="Eleven NVIDIA B300 GPU rental contracts from SEC filings, March to August 2026. Three-year rates rose from $3.39 to $4.23 per GPU-hour, about 25%. Sellers, buyers, terms and filing links."
+  ogImage="/og/b300-contract-prices.png"
   article={{ published: '2026-09-24' }}
 >
+  <script is:inline type="application/ld+json" slot="head" set:html={datasetLd} />
   <section class="wrap top">
     <header class="page-head">
       <div class="kicker">Research · 2026-09-24 · Term</div>
