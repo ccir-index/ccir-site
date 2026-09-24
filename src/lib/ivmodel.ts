@@ -29,25 +29,20 @@
   The value is a model output, never presented as a transacted price.
 */
 import hw from '../data/hardware_panels.json';
-import ivRatesRaw from '../data/rates_daily.csv?raw';
 import { bCurve, signedDeals, type SignedDeal } from '../data/term_b';
 import { meta } from '../data/snapshot';
 
 
-const ivParse = (raw: string) => {
-  const [head, ...lines] = raw.trim().split(/\r?\n/);
-  const cols = head!.split(',');
-  return lines.map((l) => {
-    const cells = l.split(',');
-    return Object.fromEntries(cols.map((c, i) => [c, cells[i] ?? ''])) as Record<string, string>;
-  });
-};
-const ivRates = ivParse(ivRatesRaw);
 
-// Stress path utilization (John, 2026-09-24): a fixed, deliberately low
-// utilization for the interruptible (hourly-rental) path, set as a stress
-// case and NOT tied to measured market utilization today.
-export const IV_STRESS_U = 0.50;   // 40% -> 50% (John, 2026-09-24)
+// Stress path (John, 2026-09-24): a replay of a real event, replacing the
+// earlier 50%-utilization interruptible path. No term contract. The rate
+// starts at the chip's signed rate and follows the path H100 on-demand took
+// at the repricing sellers from the 2024 high (scratch/g_recalibration_20260825.md):
+// -46.9%/yr for 18 months (to ~39% of start), back to 71% of start one year
+// later (net -12.7%/yr over 2.5 years), then normal decay g. Utilization and
+// margin stay at base.
+export const IV_REPLAY = { fallPerYr: 0.469, fallYears: 1.5, recoverTo: 0.71, recoverYears: 1 };
+const REPLAY_TROUGH = Math.pow(1 - IV_REPLAY.fallPerYr, IV_REPLAY.fallYears);
 const IV_HOURS = 8766;
 // g (decay after the contract) is MEASURED, not assumed: calibrated
 // 2026-07-27 from the wayback prior-gen rate panel spliced with the live
@@ -224,6 +219,23 @@ function ivValue(rate: number, T: number, age: number, r = IV_BASE.r, g = IV_BAS
   return pv;
 }
 
+// Monthly present value of an earning path level(t) x rate, t in years.
+function pathValue(rate: number, level: (t: number) => number, age: number): number {
+  const rem = Math.max(0, IV_BASE.life - age);
+  let pv = 0;
+  for (let k = 0; k < Math.round(rem * 12); k++) {
+    const t = (k + 0.5) / 12;
+    pv += (rate * level(t) * IV_HOURS / 12 * IV_BASE.m) / Math.pow(1 + IV_BASE.r, t);
+  }
+  return pv;
+}
+function replayLevel(t: number): number {
+  const { fallPerYr, fallYears, recoverTo, recoverYears } = IV_REPLAY;
+  if (t < fallYears) return Math.pow(1 - fallPerYr, t);
+  if (t < fallYears + recoverYears) return REPLAY_TROUGH + (recoverTo - REPLAY_TROUGH) * (t - fallYears) / recoverYears;
+  return recoverTo * Math.pow(1 - IV_BASE.g, t - fallYears - recoverYears);
+}
+
 const ivRaw = IV_SPEC.map((s) => {
   const hwm = hw.models.find((m: any) => m.key === s.key) as any;
   if (!s.modeledOnly && !hwm) return null;
@@ -245,13 +257,11 @@ const ivRaw = IV_SPEC.map((s) => {
   combos.push(bandLo, bandHi);
   const ask = hwm?.ask?.med ?? null;
   const t90 = hwm?.t90?.med ?? null;
-  // Stress path: no term contract, the published Neocloud interruptible
-  // cell as the earning path from day one at IV_STRESS_U utilization: flat
-  // year 1, decay beyond.
-  const intRow = ivRates.find((r) => r['series_id'] === `CRI-T2-${s.model}-ALL-INT-OD-ALL`
-                                     && r['promotion_status'] === 'Published');
-  const intRate = intRow ? Number(intRow['price_headline']) : NaN;
-  const intStress = Number.isFinite(intRate) ? ivValue(intRate, 1, age, IV_BASE.r, IV_BASE.g, IV_STRESS_U, IV_STRESS_U) : null;
+  // Stress (replay): no contract, the 2024-25 H100 path from the signed rate.
+  const intStress = pathValue(leg.rate, (t) => replayLevel(t) * IV_BASE.u, age);
+  // Crash after the contract: take-or-pay years at the signed rate, then the
+  // replay trough held flat with no recovery. Shows what the contract protects.
+  const crashAfter = pathValue(leg.rate, (t) => (t < T ? IV_BASE.uContract : REPLAY_TROUGH * IV_BASE.u), age);
   // New cost is the chip alone, where a sourced figure exists (B200 today).
   const newCost: NewCost | null = s.newCost ?? null;
   const lo = Math.min(...combos), hi = Math.max(...combos);
@@ -261,9 +271,7 @@ const ivRaw = IV_SPEC.map((s) => {
     key: s.key, label: s.label, model: s.model, silicon: s.silicon,
     modeledOnly: s.modeledOnly, vintageAssumed: s.vintageAssumed,
     base, lo, hi, smax, bandLo, bandHi, leg,
-    intStress, intRate: Number.isFinite(intRate) ? intRate : null,
-    intN: intRow ? Number(intRow['n_sources']) || null : null,
-    intUtil: IV_STRESS_U,
+    intStress, crashAfter,
     remaining: Math.max(0, IV_BASE.life - age),
     ask, askN: hwm?.ask?.n ?? null, askSources: hwm?.ask?.sources ?? null,
     t90, t90N: hwm?.t90?.n ?? null,
@@ -288,10 +296,10 @@ export const IV_CALIB = {
 const keep = 1 - IV_CALIB.k;
 export const ivCards = ivRaw.map((c) => {
   const base = c.base * keep, lo = c.lo * keep, hi = c.hi * keep;
-  const intStress = c.intStress != null ? c.intStress * keep : null;
+  const intStress = c.intStress * keep, crashAfter = c.crashAfter * keep;
   const smax = Math.max(base, c.ask ?? 0, c.t90 ?? 0, intStress ?? 0, c.newCost?.usd ?? 0) * 1.06;
   return {
-    ...c, deployed: c.base, base, lo, hi, intStress, smax,
+    ...c, deployed: c.base, base, lo, hi, intStress, crashAfter, smax,
     aboveCost: c.newCost != null && base > c.newCost.usd,
   };
 }).filter((c) => IV_SPEC.find((s) => s.key === c.key)?.published !== false)

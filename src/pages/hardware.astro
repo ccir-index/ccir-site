@@ -319,7 +319,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <details class="ivnote-d">
       <summary>Model assumptions & sensitivity</summary>
       <table class="ivlegs">
-        <thead><tr><th>Chip</th><th class="num">Rate $/hr</th><th class="num">Band</th><th>Term</th><th>Basis</th><th class="num">Net earnings / yr</th><th class="num">Life left</th></tr></thead>
+        <thead><tr><th>Chip</th><th class="num">Rate $/hr</th><th class="num">Band</th><th>Term</th><th>Basis</th><th class="num">Net earnings / yr</th><th class="num">Crash after contract</th><th class="num">Life left</th></tr></thead>
         <tbody>
           {ivCards.map((v) => (
             <tr>
@@ -329,6 +329,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
               <td>{Math.max(v.leg.years, 2)}Y</td>
               <td>{legText(v)}</td>
               <td class="num">{fmtK(earn(v.leg.rate))}</td>
+              <td class="num">{fmtK(v.crashAfter)}</td>
               <td class="num">{v.remaining.toFixed(1)}y{v.vintageAssumed ? '*' : ''}</td>
             </tr>
           ))}
@@ -382,10 +383,14 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The value carries no replacement-cost cap. Where a sourced price for
         a new chip is known, it prints beside the value. The card says so
         when the value is higher.
-        The stress path assumes the unit never signs a term contract. It
-        earns the published Neocloud interruptible rate from day one at 50%
-        utilization, flat in year 1 and declining after. The 50% is a stress
-        assumption. It is set well below what marketplaces report today.
+        The stress path replays a real event. The unit signs no term
+        contract. Its rate starts at the signed rate and follows the path
+        H100 on-demand took from its 2024 high. It fell 61% over 18 months.
+        A year later it stood at 71% of the start. After that it declines at
+        the base rate. Utilization and margin stay at base.
+        Crash after contract, in the table: the contract runs its term at
+        the signed rate. The rate then drops to the replay's low and stays
+        there. The gap to the value shows what the contract protects.
         The executed lane is an observed disposition record. It does not
         estimate recovery. Single-unit retail clearings can sit above or
         below a bulk disposition, and no current record measures market
@@ -848,7 +853,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       transform: translate(-50%, -50%);
       box-shadow: 0 0 0 2px var(--surface);
     }
-    /* Interruptible stress — hollow ring: the same model on the revocable-
+    /* Stress (2024-25 replay) — hollow ring: the same model on the revocable-
        occupancy earning path (no contract). */
     .iv .ivint {
       position: absolute; top: 9.5px; width: 9px; height: 9px;
