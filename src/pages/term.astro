@@ -322,7 +322,6 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
             <tr>
               <th class="chip-col">Silicon · tenor</th>
               {halves.map((h) => <th class="tenor-col">{h}</th>)}
-              <th class="tenor-col posted-col">Posted today</th>
             </tr>
           </thead>
           <tbody>
@@ -332,16 +331,13 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
                 {r.cells.map((c) => c
                   ? <td class="num v-con" title={c.title}>{fmt(c.value)}</td>
                   : <td class="num empty">·</td>)}
-                {r.posted
-                  ? <td class={`num posted-col v-${r.posted.depth}`}>{fmt(r.posted.value)}</td>
-                  : <td class="num posted-col empty">—</td>}
               </tr>
             ))}
           </tbody>
         </table>
         <div class="ladder-legend">
           Each cell is the median signed rate of deals signed in that half-year. Hover for the deals.
-          Posted today: the ladder above. The table leaves out bundled deals, renewal options and subsidized deals.
+          The table leaves out bundled deals, renewal options and subsidized deals.
         </div>
       </div>
       <p class="instrument-note">
