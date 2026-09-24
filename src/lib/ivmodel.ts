@@ -94,7 +94,9 @@ const IV_SPEC: Spec[] = [
   { key: 'B200-180-SXM6', label: 'B200 SXM', model: 'B200', silicon: 'b200-sxm-180gb', vintage: 2025 + 2 / 12, modeledOnly: true, vintageAssumed: true,
     // New cost = the GPU chip alone, to match a value that is the GPU alone.
     newCost: { usd: 35000, label: 'new chip, NVIDIA CEO guidance $30k–$40k (Mar 2024)', grade: 'B' } },
-  { key: 'B300-288-SXM6', label: 'B300 SXM', model: 'B300', silicon: 'b300-sxm-288gb', vintage: 2026, modeledOnly: true, vintageAssumed: true },
+  { key: 'B300-288-SXM6', label: 'B300 SXM', model: 'B300', silicon: 'b300-sxm-288gb', vintage: 2026, modeledOnly: true, vintageAssumed: true,
+    // Market estimates, not an NVIDIA figure (grade C): $50k-$55k per GPU (2026).
+    newCost: { usd: 52500, label: 'new chip, market estimates $50k–$55k (2026)', grade: 'C' } },
 ];
 
 const median = (xs: number[]): number => {
