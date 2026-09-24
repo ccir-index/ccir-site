@@ -3,15 +3,15 @@ import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import {
   headlineRates, meta, headlineValue, headlineStatOf,
-  neocloudCommittedCell, neocloudCommittedTenors,
 } from '../data/snapshot';
-import { TERM_DISPLAY } from '../data/types';
 import type { Rate } from '../data/types';
+import { bCurve, conCell } from '../data/term_b';
+import { ivCards, IV_HAIRCUT, REPLAY_TROUGH } from '../lib/ivmodel';
 
-// Calibrate against the Neocloud H100 guaranteed on-demand series for the
-// United States. GPU-backed credit is mostly written in this segment, and it
-// carries the deepest guaranteed panel.
-const REF_SERIES_ID = 'CRI-T2-H100-ALL-GTD-OD-US';
+// Calibrate against the global Neocloud B200 guaranteed on-demand series
+// (John, 2026-09-24: B200, better numbers). Global over US: the US B200 panel
+// is thin, and the global rate is where the /term ladder starts.
+const REF_SERIES_ID = 'CRI-T2-B200-ALL-GTD-OD-ALL';
 const ref = headlineRates.find((r) => r.series_id === REF_SERIES_ID);
 // Headline stat per published convention: mean where the panel is deep
 // (n>=10 sources), median below.
@@ -90,51 +90,58 @@ const trajectory: TrajRow[] = trajPcts.map(({ month, pct, check }) => {
   return row;
 });
 
+// Collateral value at close from /hardware: the B200 model value per GPU.
+const FLEET = 8000;
+const FACILITY = 200_000_000;
+const b200Card = ivCards.find((c) => c.model === 'B200');
+const fleetValue = b200Card ? b200Card.base * FLEET : 0;
+const ltv = fleetValue > 0 ? FACILITY / fleetValue : 0;
+const fmtM = (n: number) => `$${Math.round(n / 1e6).toLocaleString('en-US')}M`;
+
 const exposureTerms: { term: string; value: string }[] = [
   { term: 'Borrower', value: 'A GPU-rich neocloud special-purpose entity (SPE)' },
   { term: 'Facility type', value: 'Senior-secured term loan' },
   { term: 'Facility size', value: '$200,000,000' },
   { term: 'Tenor', value: '4 years, scheduled amortization with bullet at maturity' },
-  { term: 'Collateral', value: 'First-lien security interest in 1,000 H100 SXM 8-GPU nodes' },
-  { term: 'Monitored series', value: `${REF_SERIES_ID}, published by CCIR (Neocloud operator segment, H100, guaranteed on-demand, United States)` },
+  { term: 'Collateral', value: 'First-lien security interest in 1,000 B200 8-GPU nodes (8,000 GPUs)' },
+  { term: 'Collateral value at close', value: `${fmtM(fleetValue)} at the CCIR modeled value of $${Math.round(b200Card?.base ?? 0).toLocaleString('en-US')} per GPU (/hardware); loan-to-value ${Math.round(ltv * 100)}%` },
+  { term: 'Monitored series', value: `${REF_SERIES_ID}, published by CCIR (Neocloud operator segment, B200, guaranteed on-demand, global)` },
   { term: 'Series level at close', value: `$${fmt(closingRate)} per GPU per hour (as of ${meta.as_of_date})` },
   { term: 'Smoothing', value: '30-day average of daily prints' },
   { term: 'Review date', value: 'Last business day of each month' },
 ];
 
 // ---------------------------------------------------------------------------
-// Use case 02: re-leasing (rollover) risk, calibrated to the live committed
-// term curve. Re-lease rate = the Neocloud H100 1Y committed cell (region-
-// pooled, the deepest 1Y panel). The US 1Y series is the primary series in
-// the monitoring routine, with the pooled series used when the US panel is thin.
-const RELEASE_SERIES_US = 'CRI-T2-H100-ALL-GTD-1yr-US';
-const RELEASE_SERIES_ALL = 'CRI-T2-H100-ALL-GTD-1yr-ALL';
-const OD_ALL_SERIES = 'CRI-T2-H100-ALL-GTD-OD-ALL';
+// Use case 02: re-leasing (rollover) risk on B200 (John, 2026-09-24), built
+// on /term and /hardware:
+//  - anchor contract = the /term 2Y contracted cell (trailing 12 months,
+//    sqrt-GPU weighted, bundled at estimate);
+//  - base re-lease = posted global neocloud on-demand (the /term ladder
+//    start) less the measured posted-to-contracted discount (/hardware);
+//  - stress re-lease = base at the low of the 2024-25 H100 replay (/hardware).
+const b200Curve = bCurve('B200');
+const anchorCell = conCell('B200', '2Y');
+const ANCHOR_RATE = anchorCell?.rate ?? 0;
+const postedOd = b200Curve.od?.value ?? 0;
+const postedOdSellers = b200Curve.od?.sellers ?? 0;
+const discount = IV_HAIRCUT?.haircut ?? 0;
+const reLeaseBase = postedOd * (1 - discount);
+const reLeaseStress = reLeaseBase * REPLAY_TROUGH;
 
-const curveTenors = neocloudCommittedTenors();
-const curveCells = curveTenors
-  .map((t) => ({ term: t, cell: neocloudCommittedCell('H100', t) }))
-  .filter((r) => r.cell);
-const odAll = headlineRates.find((r) => r.series_id === OD_ALL_SERIES);
-const reLeaseCell = neocloudCommittedCell('H100', '1Y');
-const reLeaseRate = reLeaseCell ? headlineValue(reLeaseCell) : 0;
-const odAllRate = odAll ? headlineValue(odAll) : 0;
-
-// Stylized facility for the rollover exhibit. The vintage anchor-contract
-// rate is illustrative; the re-lease rate is live.
-const FLEET_GPUS = 8000;            // 1,000 8-GPU nodes
+// Stylized facility for the rollover exhibit. Anchor share and closing DSCR
+// are illustrative; every rate is live.
+const FLEET_GPUS = FLEET;           // 1,000 8-GPU nodes
 const ANCHOR_SHARE = 0.70;          // capacity under the expiring anchor contract
-const VINTAGE_RATE = 4.25;          // $/GPU-hr, stylized 2-year contract at close
 const CLOSE_DSCR = 1.45;            // DSCR at close, on total contracted book
+// At close the rest of the fleet sells at the base re-lease rate. At
+// rollover the whole fleet reprices: base, then stress.
+const revClose = ANCHOR_SHARE * ANCHOR_RATE + (1 - ANCHOR_SHARE) * reLeaseBase;
+const dscrAt = (rate: number) => (revClose > 0 ? (rate / revClose) * CLOSE_DSCR : 0);
+const dscrBase = dscrAt(reLeaseBase);
+const dscrStress = dscrAt(reLeaseStress);
+const pctVsAnchor = (r: number) => (ANCHOR_RATE > 0 ? ((r - ANCHOR_RATE) / ANCHOR_RATE) * 100 : 0);
 
-const revClose = ANCHOR_SHARE * FLEET_GPUS * VINTAGE_RATE
-  + (1 - ANCHOR_SHARE) * FLEET_GPUS * odAllRate;
-const revPost = ANCHOR_SHARE * FLEET_GPUS * reLeaseRate
-  + (1 - ANCHOR_SHARE) * FLEET_GPUS * odAllRate;
-const rolloverDscr = revClose > 0 ? (revPost / revClose) * CLOSE_DSCR : 0;
-const anchorRepricePct = VINTAGE_RATE > 0
-  ? ((reLeaseRate - VINTAGE_RATE) / VINTAGE_RATE) * 100 : 0;
-
+// ---------------------------------------------------------------------------
 // UC01 history: the watch levels run against reconstructed history. Rates are
 // the stepped-panel monthly medians from the archived-page backfill
 // (/research/od-vs-committed), NOT the live series; close = 2024-02 at $4.30,
@@ -153,23 +160,21 @@ const backtest: { period: string; rate: string; level: string; cls: string; post
 
 // ---------------------------------------------------------------------------
 // Use case 03: multi-generation pool monitoring. Pool rate = unit-weighted
-// average of the published per-generation Neocloud guaranteed on-demand US
-// cells (US only. NOTE 2026-08-09: this no longer matches the /rates ladder,
-// which now pools the US & EU core. Kept US here deliberately so the worked
-// example stays a single-geography pool; revisit if the example should
-// reproduce from /rates), weights fixed at closing per the asset schedule.
+// average of the published per-generation global Neocloud guaranteed
+// on-demand cells (global, matching Use case 01 and the /term ladder start),
+// weights fixed at closing per the asset schedule.
 function poolCell(chip: string): Rate | undefined {
   return headlineRates
     .filter((r) => r.tier === 'T2' && r.gpu_model === chip &&
                    r.commitment_term === 'OnDemand' && r.form_factor === 'ALL' &&
-                   r.region === 'US' && r.interruptibility === 'GTD' &&
+                   r.region === 'ALL' && r.interruptibility === 'GTD' &&
                    r.promotion_status !== 'Shadow')
     .sort((a, b) => (b.n_sources ?? 0) - (a.n_sources ?? 0))[0];
 }
 const POOL = [
-  { chip: 'H100', weight: 0.50 },
+  { chip: 'B200', weight: 0.50 },
   { chip: 'H200', weight: 0.30 },
-  { chip: 'A100', weight: 0.20 },
+  { chip: 'H100', weight: 0.20 },
 ];
 const poolRows = POOL.map((p) => {
   const cell = poolCell(p.chip);
@@ -243,17 +248,7 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
       Worked examples showing how lenders, credit analysts and risk teams can
       use CCIR's published market data to monitor GPU-backed exposures. Each
       example uses a specific CCIR data series and calibrates to today's
-      snapshot. The main series here is the Neocloud H100 guaranteed
-      on-demand rate for the United States. A monitor picks the series that
-      matches the operator segment, chip and geography of the collateral.
-      The operator segment is a peer group defined by capability and service
-      level. Operators with comparable fabric, interconnect and service sit
-      in the same group, so a borrower is compared with its peers. CCIR
-      publishes observed posted prices. The lender owns the credit judgment
-      built on them. The <a href="/research/gpu-as-income-asset">income-asset
-      primer</a> explains why a GPU's earning power follows a market lease
-      rate. The <a href="/documents/methodology">Methodology</a> describes how
-      each series is built.
+      snapshot.
     </p>
 
     <nav class="toc" id="contents" aria-label="Contents">
@@ -296,7 +291,7 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         <div class="rate-id">{REF_SERIES_ID}</div>
         <div class="rate-price">${fmt(closingRate)}<span class="rate-unit">/GPU-hr</span></div>
         <div class="rate-meta">
-          Neocloud operator segment · H100 · Guaranteed on-demand · US
+          Neocloud operator segment · B200 · Guaranteed on-demand · Global
           <span class="sep">·</span>
           <span title="Observations are qualifying posted listings in the computation window; a source contributes one vote to the statistic however many of its listings pool into the cell (operator-equal aggregation).">{statKind} of {ref?.n_sources} sources / {ref?.n_observations} observations</span>
           <span class="sep">·</span>
@@ -446,7 +441,8 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
       <section class="sec">
         <h3 id="uc-01-s05"><span class="sec-n">05</span> The Watch Levels Against Three Years of History</h3>
         <p>
-          The same watch levels, run against reconstructed history in place of
+          B200 has not yet been through a full price cycle. H100 has, so this
+          section runs the same watch structure on H100 history in place of
           a stylized path. Rates are the monthly neocloud H100 guaranteed
           on-demand medians from CCIR's archived-page backfill
           (<a href="/research/od-vs-committed">On-Demand vs Committed, Three
@@ -572,84 +568,79 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
       </header>
 
       <section class="uc-rate">
-        <div class="rate-kicker">Re-lease rate (live, calibrating this example)</div>
-        <div class="rate-id">{RELEASE_SERIES_ALL}</div>
-        <div class="rate-price">${fmt(reLeaseRate)}<span class="rate-unit">/GPU-hr · 1Y committed</span></div>
+        <div class="rate-kicker">Re-lease rate at rollover (live, calibrating this example)</div>
+        <div class="rate-id">B200 · global Neocloud · from <a href="/term">/term</a> and <a href="/hardware">/hardware</a></div>
+        <div class="rate-price">${fmt(reLeaseBase)}<span class="rate-unit">/GPU-hr · base re-lease</span></div>
         <div class="rate-meta">
-          Neocloud operator segment · H100 · Guaranteed · 1-year committed
-          <span class="sep">·</span>
-          {reLeaseCell ? headlineStatOf(reLeaseCell) : 'median'} of {reLeaseCell?.n_sources} sources
+          Posted on-demand ${fmt(postedOd)} (/term ladder, {postedOdSellers} sellers) less the measured
+          posted-to-contracted discount of {Math.round(discount * 100)}%
           <span class="sep">·</span>
           as of {meta.as_of_date}
         </div>
         <div class="rate-thresholds">
-          {curveCells.map(({ term, cell }) => (
-            <span><strong>{TERM_DISPLAY[term] ?? term}</strong> ${fmt(headlineValue(cell!))} <span class="dim">(n={cell!.n_sources})</span></span>
-          ))}
-          {odAll && (
-            <span><strong>On-demand</strong> ${fmt(odAllRate)} <span class="dim">(n={odAll.n_sources})</span></span>
+          {anchorCell?.rate != null && (
+            <span><strong>Contracted 2Y</strong> ${fmt(ANCHOR_RATE)} <span class="dim">({anchorCell.n} deals, ${fmt(anchorCell.min!)}–${fmt(anchorCell.max!)})</span></span>
           )}
+          <span><strong>Base re-lease</strong> ${fmt(reLeaseBase)}</span>
+          <span><strong>Stress re-lease</strong> ${fmt(reLeaseStress)} <span class="dim">(2024–25 replay low)</span></span>
         </div>
       </section>
 
       <section class="sec">
         <h3 id="uc-02-s01"><span class="sec-n">01</span> Why Rollover Is the Central Credit Question</h3>
         <p>
-          Customer contracts usually run three to five years. The facilities
+          Customer contracts usually run two to five years. The facilities
           they support often mature later. The capacity behind the loan must
           then be re-contracted at least once before repayment. No one has
           locked that future rate, and few tools exist to hedge it. What the
-          capacity earns on re-lease is the credit question. The current
-          re-lease rate is observable and published daily.
+          capacity earns on re-lease is the credit question.
         </p>
         <p>
-          When an anchor contract ends, the operator chooses how to redeploy
-          the capacity. It can re-contract along the committed-term curve. It
-          can also sell on the on-demand market at a higher headline rate with
-          no occupancy guarantee. Both paths clear at then-prevailing rates. If
-          the market has repriced below the expiring contract, coverage falls
-          on either path.
+          Three published numbers size it. The anchor contract is priced like
+          the contracted rates on <a href="/term">/term</a>. The rate a new
+          contract would sign at today is the posted on-demand rate less the
+          measured gap between posted and contracted prices. The downside is
+          the stress path on <a href="/hardware">/hardware</a>: a replay of the
+          2024–25 H100 decline, when on-demand rates fell 61% in 18 months.
         </p>
         <p>
-          The example below uses the 1-year committed rate for that choice.
-          Renters sign at that tenor, and it prices the occupancy the debt
-          relies on. Commercial real estate lenders handle the same question
-          with market-rent assumptions. Aircraft lessors use appraiser-published
-          re-leasing rates. For GPUs, the market rent is the committed term
-          curve for the borrower's operator segment. For a neocloud, that is
-          the CCIR Neocloud committed series shown above.
+          Commercial real estate lenders handle the same question with
+          market-rent assumptions. Aircraft lessors use appraiser-published
+          re-leasing rates. For GPUs, the market rent is observable daily.
         </p>
       </section>
 
       <section class="sec">
         <h3 id="uc-02-s02"><span class="sec-n">02</span> Worked Rollover Exhibit</h3>
         <p class="calib-note">
-          Calibration: stylized facility of {FLEET_GPUS.toLocaleString()} GPUs
-          (1,000 nodes). {(ANCHOR_SHARE * 100).toFixed(0)}% of capacity sits
-          under an anchor contract written at ${fmt(VINTAGE_RATE)}/GPU-hr
-          (illustrative vintage). The remainder sells at the on-demand rate
-          (live: ${fmt(odAllRate)}). DSCR at close {CLOSE_DSCR.toFixed(2)}x.
-          Re-lease at the live 1Y committed rate of ${fmt(reLeaseRate)}
-          ({RELEASE_SERIES_ALL}, as of {meta.as_of_date}). Margins and debt
-          service stay constant to isolate the price effect.
+          Calibration: stylized facility of {FLEET_GPUS.toLocaleString('en-US')} B200
+          GPUs (1,000 nodes). {(ANCHOR_SHARE * 100).toFixed(0)}% of capacity
+          sits under a 2-year anchor contract at the /term 2Y contracted rate
+          of ${fmt(ANCHOR_RATE)}. The rest sells at the base re-lease rate.
+          DSCR at close {CLOSE_DSCR.toFixed(2)}x. At rollover the whole fleet
+          reprices. Margins and debt service stay constant to isolate the
+          price effect. Every rate is live as of {meta.as_of_date}.
         </p>
         <div class="ftable-wrap">
           <table class="ftable">
+            <thead><tr><th>Case</th><th class="num">Rate $/GPU-hr</th><th class="num">vs anchor</th><th class="num">DSCR</th></tr></thead>
             <tbody>
-              <tr><th>Anchor contract rate at close (stylized)</th><td>${fmt(VINTAGE_RATE)} /GPU-hr</td></tr>
-              <tr><th>Re-lease rate today (live)</th><td>${fmt(reLeaseRate)} /GPU-hr · 1Y committed, Neocloud segment</td></tr>
-              <tr><th>Repricing on the expiring block</th><td>{anchorRepricePct.toFixed(0)}%</td></tr>
-              <tr><th>Book revenue (close = 100)</th><td>{((revPost / revClose) * 100).toFixed(0)}</td></tr>
-              <tr><th>DSCR at close → Projected rollover DSCR</th><td>{CLOSE_DSCR.toFixed(2)}x → <strong>{rolloverDscr.toFixed(2)}x</strong></td></tr>
-              <tr><th>Monitoring flag at &lt; 1.20x</th><td>Escalate for review; request the borrower's re-leasing plan and pipeline</td></tr>
+              <tr><td>At close (anchor contract)</td><td class="num">{fmt(ANCHOR_RATE)}</td><td class="num">—</td><td class="num">{CLOSE_DSCR.toFixed(2)}x</td></tr>
+              <tr><td>Rollover, base re-lease</td><td class="num">{fmt(reLeaseBase)}</td><td class="num">{pctVsAnchor(reLeaseBase) >= 0 ? '+' : '−'}{Math.abs(pctVsAnchor(reLeaseBase)).toFixed(0)}%</td><td class="num"><strong>{dscrBase.toFixed(2)}x</strong></td></tr>
+              <tr><td>Rollover, stress re-lease</td><td class="num">{fmt(reLeaseStress)}</td><td class="num">{pctVsAnchor(reLeaseStress) >= 0 ? '+' : '−'}{Math.abs(pctVsAnchor(reLeaseStress)).toFixed(0)}%</td><td class="num"><strong>{dscrStress.toFixed(2)}x</strong></td></tr>
             </tbody>
           </table>
         </div>
         <p>
           <strong>The exhibit sizes the risk ahead of the expiry.</strong> The
-          projected rollover DSCR is computable on any publication date. It
-          needs only the borrower's contract book and the published curve. The
+          base and stress cases are computable on any publication date. They
+          need only the borrower's contract book and the published rates. The
           lender can see the gap months before the revenue changes.
+        </p>
+        <p>
+          <strong>A coverage flag at 1.20x</strong> prompts a review of the
+          borrower's re-leasing plan and pipeline, and a check of any reserve
+          terms already in the facility.
         </p>
       </section>
 
@@ -665,44 +656,34 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
           renewed.
         </p>
         <p>
-          <strong>Use the 30-day average of the US 1-year series.</strong> The
-          monitored series is {RELEASE_SERIES_US}. If it printed on fewer than
-          20 of the last 30 publication dates, use the region-pooled
-          {RELEASE_SERIES_ALL} instead.
-        </p>
-        <p>
           <strong>Re-price only the expiring block.</strong> Hold every other
-          contract at its contracted rate. Re-price the expiring capacity at the
-          1-year average. Then compare projected cash flow with scheduled debt
-          service.
+          contract at its contracted rate. Re-price the expiring capacity at
+          the base re-lease rate, then at the stress rate. Compare projected
+          cash flow with scheduled debt service in both cases.
         </p>
         <p>
-          <strong>Flag coverage below 1.20x.</strong> A projected DSCR below
-          that level prompts a review of the borrower's re-leasing pipeline. It
-          also prompts a check of any reserve terms already in the facility.
+          <strong>Watch the contracted rates as they file.</strong> New deals
+          on <a href="/term">/term</a> show where contracts are signing now.
+          A new filing below the base re-lease rate is an early sign that the
+          discount is widening.
         </p>
         <p>
-          <strong>The 1-year tenor matches observed behavior.</strong> Renters
-          of expiring capacity rarely commit beyond one year. Pricing the block
-          at the 1-year rate reflects the contracts they actually sign.
-        </p>
-        <p>
-          <strong>Both moving inputs come from outside the borrower.</strong>
-          The re-lease rate comes from the published series. The check date
-          comes from the contract calendar.
+          <strong>Every moving input comes from outside the borrower.</strong>
+          The rates come from published data. The check date comes from the
+          contract calendar.
         </p>
       </section>
 
       <section class="sec">
         <h3 id="uc-02-s04"><span class="sec-n">04</span> Limitations</h3>
         <p>
-          <strong>This is illustrative.</strong> The vintage contract rate,
-          fleet size, anchor share and closing DSCR are stylized. Only the
-          re-lease rate and the term curve are live. Panel depth on committed
-          tenors is disclosed per cell above. Treat thin cells (n&lt;3) as
-          indicative. The region-pooled fallback exists for that reason.
-          Utilization on re-leased capacity stays at the contracted level. A
-          fuller exhibit would stress utilization and rate together.
+          <strong>This is illustrative.</strong> Fleet size, anchor share and
+          closing DSCR are stylized. The contracted rate rests on a few filed
+          deals, and the count and range print above. The posted-to-contracted
+          discount is measured across chips and tenors, and a single deal can
+          sit well above or below it. The stress applies H100's history to
+          B200, which has not yet been through a downturn. Utilization on
+          re-leased capacity stays at the contracted level.
         </p>
       </section>
 
@@ -748,7 +729,7 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         <p>
           The pool rate is the weighted average of the CCIR series for each
           generation in the asset schedule. For each generation, the example
-          uses the Neocloud guaranteed on-demand series for the United States.
+          uses the global Neocloud guaranteed on-demand series.
           Each weight is that generation's share of pool GPU units. Weights
           stay fixed until a servicer report shows a substitution, addition or
           disposition.

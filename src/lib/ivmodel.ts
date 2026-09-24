@@ -42,7 +42,7 @@ import { meta } from '../data/snapshot';
 // later (net -12.7%/yr over 2.5 years), then normal decay g. Utilization and
 // margin stay at base.
 export const IV_REPLAY = { fallPerYr: 0.469, fallYears: 1.5, recoverTo: 0.71, recoverYears: 1 };
-const REPLAY_TROUGH = Math.pow(1 - IV_REPLAY.fallPerYr, IV_REPLAY.fallYears);
+export const REPLAY_TROUGH = Math.pow(1 - IV_REPLAY.fallPerYr, IV_REPLAY.fallYears);
 const IV_HOURS = 8766;
 // g (decay after the contract) is MEASURED, not assumed: calibrated
 // 2026-07-27 from the wayback prior-gen rate panel spliced with the live
