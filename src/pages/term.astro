@@ -130,7 +130,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
 // record and must not be reinstated without a new ruling.
 ---
 <Base
-  title="GPU Term Rates: Reserved and Signed Contract Prices by Tenor · CCIR"
+  title="GPU Term Rates: Posted and Contracted Prices by Tenor · CCIR"
   description="GPU term rates by tenor: signed contract prices from SEC filings by vintage, the posted reserved-price ladder for H100, H200, B200 and B300, and the gap between them. Updated daily."
   ogImage="/og/term-structure-2026-07.png"
 >
@@ -138,7 +138,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: 'CCIR GPU Committed Term Rates',
-    description: 'Committed-term GPU rental rates by tenor. Each cell is the chip’s global neocloud on-demand rate times the chip’s own tenor factor, computed daily from posted prices. Signed rates from filed contracts sit beside the posted cells.',
+    description: 'Committed-term GPU rental rates by tenor. Each cell is the chip’s global neocloud on-demand rate times the chip’s own tenor factor, computed daily from posted prices. Contracted rates from filed deals sit beside the posted cells.',
     url: 'https://ccir.io/term',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2026-05/..',
@@ -156,7 +156,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
       <p class="standfirst">
         The price of guaranteed capacity by tenor, for the chips lenders
         finance. Posted rates start from each chip's global on-demand rate.
-        Signed rates from filed contracts sit beside them.
+        Contracted rates from filed deals sit beside them.
       </p>
       <ul class="lede-index">
         <li><span class="arw">→</span> <a href="/research/b300-contract-prices">Signed B300 contract rates, March to August 2026</a></li>
@@ -173,8 +173,8 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
 
     <section class="curve-section vintage-section">
       <header class="sec-head">
-        <div class="kicker">Section 01 · Signed rates by vintage</div>
-        <h2>Signed Rates by Vintage</h2>
+        <div class="kicker">Section 01 · Contracted rates by vintage</div>
+        <h2>Contracted Rates by Vintage</h2>
       </header>
       <div class="table-wrap">
         <div class="table-head">
@@ -200,7 +200,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
           </tbody>
         </table>
         <div class="ladder-legend">
-          Each cell is the signed rate of deals signed in that half-year, weighted by deal size. Hover for the deals.
+          Each cell is the contracted rate of deals signed in that half-year, weighted by deal size. Hover for the deals.
           <sup class="mod-mark lg-m">b</sup>: holds a bundled deal at its GPU-only estimate.
           Renewal options and subsidized deals are excluded.
         </div>
@@ -268,13 +268,13 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
 
     <section class="curve-section covenant-section">
       <header class="sec-head">
-        <div class="kicker">Section 03 · Posted and signed</div>
-        <h2>Posted and Signed Rates</h2>
+        <div class="kicker">Section 03 · Posted vs contracted</div>
+        <h2>Posted vs Contracted Rates</h2>
       </header>
 
       <div class="table-wrap">
         <div class="table-head">
-          <span class="th-scope">Signed: filed deals, GPU-only, signed from {CON_WINDOW_START}</span>
+          <span class="th-scope">Contracted: filed deals, GPU-only, signed from {CON_WINDOW_START}</span>
           <span class="th-meta">USD/GPU-hr</span>
         </div>
         <table class="data ladder-table cov-table">
@@ -293,7 +293,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
                   : <td class="num empty">—</td>)}
               </tr>
               <tr>
-                <td class="chip-cell"><span class="layer-tag">Signed</span></td>
+                <td class="chip-cell"><span class="layer-tag">Contracted</span></td>
                 {b.cells.map(({ con }) => con?.rate != null
                   ? <td class="num v-con" title={`${con.n} deal${con.n === 1 ? '' : 's'}, ${con.gpus.toLocaleString('en-US')} GPUs${con.min === con.max ? '' : `, range ${fmt(con.min!)} to ${fmt(con.max!)}`}${con.bundled.length ? `. Bundled: ${con.bundled.map(bundledText).join('; ')}` : ''}`}>{fmt(con.rate)}{con.bundled.length > 0 && <sup class="mod-mark">b</sup>}</td>
                   : <td class="num empty">—</td>)}
@@ -301,21 +301,21 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
               <tr class="cov-row-gap">
                 <td class="chip-cell"><span class="layer-tag">Gap</span></td>
                 {b.cells.map(({ gap }) => gap != null
-                  ? <td class="num v-gap" title="signed rate vs posted ladder value">{signedPct(gap)}</td>
+                  ? <td class="num v-gap" title="contracted rate vs posted ladder value">{signedPct(gap)}</td>
                   : <td class="num empty">—</td>)}
               </tr>
             </tbody>
           ))}
         </table>
         <div class="ladder-legend">
-          Posted: the ladder above · Signed: filed deals, weighted by deal size ·
+          Posted: the ladder above · Contracted: filed deals, weighted by deal size ·
           <sup class="mod-mark lg-m">b</sup>: holds a bundled deal at its GPU-only estimate, hover for details ·
-          Gap: signed vs posted
+          Gap: contracted vs posted
         </div>
         <details class="table-foot">
-          <summary>How to read the signed rates</summary>
+          <summary>How to read the contracted rates</summary>
           <div class="tf-body tf-prose">
-            <p>A signed rate is the price in a filed contract at its tenor. A
+            <p>A contracted rate is the price in a filed contract at its tenor. A
             filing states a rate, or a unit count, a term and a value. We divide
             the value by GPUs times term hours and bill every hour at a flat
             price. We leave out deals priced under a government subsidy.</p>
