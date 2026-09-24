@@ -687,12 +687,6 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         </p>
       </section>
 
-      <p class="source-note">
-        This example draws on rollover analysis used in commercial real
-        estate, aircraft and container leasing, and merchant power. It adapts
-        that practice to a compute market where the re-lease price is
-        published daily.
-      </p>
     </article>
 
     <article class="usecase" id="uc-03">
@@ -719,7 +713,7 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         </div>
         <div class="rate-thresholds">
           {poolRows.map((r) => (
-            <span><strong>{r.chip}</strong> ${fmt(r.rate as number)} <span class="dim">× {(r.weight * 100).toFixed(0)}% (n={r.cell?.n_sources})</span></span>
+            <span><strong>{r.chip}</strong> ${fmt(r.rate as number)} <span class="dim">× {(r.weight * 100).toFixed(0)}%</span></span>
           ))}
         </div>
       </section>
