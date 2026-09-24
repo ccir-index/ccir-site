@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import hw from '../data/hardware_panels.json';
 import ChipLink from '../components/ChipLink.astro';
+import { meta } from '../data/snapshot';
 import { ivCards, legText, IV_HAIRCUT, IV_CALIB, H200_EST, IV_BASE, IV_SHARE } from '../lib/ivmodel';
 // Net earnings per GPU in a contract year: rate x hours x take-or-pay (1.0)
 // x net margin x the GPU's cost share. No purchase price needed.
@@ -255,7 +256,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     }],
   })} />
   <section class="wrap page-top">
-    <PageHeader title="The Secondary Market" kicker="Market Intelligence · Hardware Residual" asOf={hw.as_of}>
+    <PageHeader title="The Secondary Market" kicker="Market Intelligence · Hardware Residual" asOf={meta.as_of_date}>
       <p class="subhead">What a GPU is worth as an earning asset, and what machines list and sell for.</p>
       <p class="standfirst">
         One value and one stress figure per chip. The value is
@@ -427,7 +428,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         {recWindow}, {fmtN(rec.tracked.listings)} sold listings,
         {fmtN(rec.tracked.units)} units, {fmtM(rec.tracked.usd)} of the
         models tracked here, from a {fmtN(rec.full.listings)}-listing
-        capture. The rental market prices an hour of compute. This page
+        capture. Sales record through {hw.as_of}; values above use the
+        {meta.as_of_date} data. The rental market prices an hour of compute. This page
         prices the machine itself.
       </p>
     </section>
