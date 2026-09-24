@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { frame, toPng, el, C } from '../../lib/og';
 import { ivCards } from '../../lib/ivmodel';
-import hw from '../../data/hardware_panels.json';
+import { meta } from '../../data/snapshot';
 
 export const prerender = true;
 
@@ -50,7 +50,7 @@ function ivCard(v: (typeof ivCards)[number], CARD_W: number) {
 
   const items = [
     ...(v.modeledOnly ? [] : [`ask ${usd(v.ask)}`, `sold 90d ${usd(v.t90)}`]),
-    ...(v.newCost ? [`new-cost basis ${usd(v.newCost.usd)}`] : []),
+    ...(v.newCost ? [`new chip ${usd(v.newCost.usd)}`] : []),
     ...(v.intStress != null ? [`stress ${usd(v.intStress)}`] : []),
   ];
   const rows = [
@@ -91,7 +91,7 @@ export const GET: APIRoute = async () => {
     'Model-implied GPU value',
     'Income model on signed term rates · discount rate grounded in the credit ledger · checked against sales and asks',
     body,
-    hw.as_of,
+    meta.as_of_date,
   ));
   return new Response(png as BodyInit, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=3600' } });
 };

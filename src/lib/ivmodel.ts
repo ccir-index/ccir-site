@@ -307,23 +307,6 @@ export const ivCards = ivRaw.map((c) => {
 
 export type IvCard = (typeof ivCards)[number];
 
-// H200 SXM ESTIMATED checks (John, 2026-09-24): H200 SXM has no ask or sales
-// record. H200 NVL does. H100 trades in both forms, so its SXM / NVL ratio
-// (sold 90d and asks, separately) maps H200 NVL onto an estimated SXM level.
-// Shown as estimated marks, never as observed ones. A labeled, narrow
-// exception to the 2026-08-31 no-cross-form rule.
-const hwOf = (k: string) => hw.models.find((m: any) => m.key === k) as any;
-const h1S = hwOf('H100-80-SXM5'), h1N = hwOf('H100-94-NVL'), h2N = hwOf('H200-141-NVL');
-const est = (a?: number, b?: number, c?: number) =>
-  a != null && b != null && c != null && b > 0 ? (a / b) * c : null;
-export const H200_EST = {
-  t90: est(h1S?.t90?.med, h1N?.t90?.med, h2N?.t90?.med),
-  ask: est(h1S?.ask?.med, h1N?.ask?.med, h2N?.ask?.med),
-  t90Ratio: h1S?.t90?.med && h1N?.t90?.med ? h1S.t90.med / h1N.t90.med : null,
-  askRatio: h1S?.ask?.med && h1N?.ask?.med ? h1S.ask.med / h1N.ask.med : null,
-  nvlT90: h2N?.t90?.med ?? null, nvlAsk: h2N?.ask?.med ?? null,
-};
-
 // Plain-words label for a card's rate leg, shared by page and share card.
 export function legText(v: IvCard): string {
   const l = v.leg;
