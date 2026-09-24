@@ -3,7 +3,10 @@ import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import hw from '../data/hardware_panels.json';
 import ChipLink from '../components/ChipLink.astro';
-import { ivCards, legText, IV_HAIRCUT, IV_CALIB, H200_EST } from '../lib/ivmodel';
+import { ivCards, legText, IV_HAIRCUT, IV_CALIB, H200_EST, IV_BASE, IV_SHARE } from '../lib/ivmodel';
+// Net earnings per GPU in a contract year: rate x hours x take-or-pay (1.0)
+// x net margin x the GPU's cost share. No purchase price needed.
+const earn = (rate: number) => rate * 8766 * IV_BASE.uContract * IV_BASE.m * (1 - IV_SHARE);
 const hcPct = IV_HAIRCUT ? Math.round(IV_HAIRCUT.haircut * 100) : '—';
 const retailPct = IV_CALIB.retailK != null ? Math.round(IV_CALIB.retailK * 100) : '—';
 const calibChips = IV_CALIB.chips.map((c) => c.chip).join(' and ');
@@ -320,7 +323,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <details class="ivnote-d">
       <summary>Model assumptions & sensitivity</summary>
       <table class="ivlegs">
-        <thead><tr><th>Chip</th><th class="num">Rate $/hr</th><th class="num">Band</th><th>Term</th><th>Basis</th><th class="num">Life left</th></tr></thead>
+        <thead><tr><th>Chip</th><th class="num">Rate $/hr</th><th class="num">Band</th><th>Term</th><th>Basis</th><th class="num">Net earnings / yr</th><th class="num">Life left</th></tr></thead>
         <tbody>
           {ivCards.map((v) => (
             <tr>
@@ -329,12 +332,15 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
               <td class="num">{v.leg.lo.toFixed(2)}–{v.leg.hi.toFixed(2)}</td>
               <td>{Math.max(v.leg.years, 2)}Y</td>
               <td>{legText(v)}</td>
+              <td class="num">{fmtK(earn(v.leg.rate))}</td>
               <td class="num">{v.remaining.toFixed(1)}y{v.vintageAssumed ? '*' : ''}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p class="ivnote">* Vintage assumed. H200 SXM has no ask or sales record. Its estimated
+      <p class="ivnote">Net earnings / yr: what the GPU earns in a contract year after power,
+        colocation and operations (65% margin), billed every hour, at its {Math.round((1 - IV_SHARE) * 100)}% share of the
+        deployed position. It needs no purchase price. * Vintage assumed. H200 SXM has no ask or sales record. Its estimated
         marks apply the H100 SXM-to-NVL ratio (sold {H200_EST.t90Ratio?.toFixed(2)}, asks
         {H200_EST.askRatio?.toFixed(2)}) to H200 NVL (sold {H200_EST.nvlT90 != null ? fmtK(H200_EST.nvlT90) : '—'},
         asks {H200_EST.nvlAsk != null ? fmtK(H200_EST.nvlAsk) : '—'}). They are estimates, drawn lighter.</p>
