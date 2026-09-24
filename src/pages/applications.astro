@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
 import {
-  headlineRates, meta, headlineValue, headlineStatOf,
+  headlineRates, meta, headlineValue,
 } from '../data/snapshot';
 import type { Rate } from '../data/types';
 import { bCurve, conCell } from '../data/term_b';
@@ -16,7 +16,6 @@ const ref = headlineRates.find((r) => r.series_id === REF_SERIES_ID);
 // Headline stat per published convention: mean where the panel is deep
 // (n>=10 sources), median below.
 const closingRate = ref ? headlineValue(ref) : 0;
-const statKind = ref ? headlineStatOf(ref) : 'median';
 // Use case 03 watches the IMPLIED contracted rate (John, 2026-09-24): posted
 // on-demand less the measured posted-to-contracted discount (/hardware). The
 // posted series is the daily direction signal; contracts sign near the
@@ -184,7 +183,6 @@ const b200Curve = bCurve('B200');
 const anchorCell = conCell('B200', '2Y');
 const ANCHOR_RATE = anchorCell?.rate ?? 0;
 const postedOd = b200Curve.od?.value ?? 0;
-const postedOdSellers = b200Curve.od?.sellers ?? 0;
 const discount = DISCOUNT;
 const reLeaseBase = postedOd * (1 - discount);
 const reLeaseStress = reLeaseBase * REPLAY_TROUGH;
@@ -330,14 +328,14 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         <div class="rate-id">B200 · global Neocloud · from <a href="/term">/term</a> and <a href="/hardware">/hardware</a></div>
         <div class="rate-price">${fmt(reLeaseBase)}<span class="rate-unit">/GPU-hr · base re-lease</span></div>
         <div class="rate-meta">
-          Posted on-demand ${fmt(postedOd)} (/term ladder, {postedOdSellers} sellers) less the measured
+          Posted on-demand ${fmt(postedOd)} (/term ladder) less the measured
           posted-to-contracted discount of {Math.round(discount * 100)}%
           <span class="sep">·</span>
           as of {meta.as_of_date}
         </div>
         <div class="rate-thresholds">
           {anchorCell?.rate != null && (
-            <span><strong>Contracted 2Y</strong> ${fmt(ANCHOR_RATE)} <span class="dim">({anchorCell.n} deals, ${fmt(anchorCell.min!)}–${fmt(anchorCell.max!)})</span></span>
+            <span><strong>Contracted 2Y</strong> ${fmt(ANCHOR_RATE)} <span class="dim">(range ${fmt(anchorCell.min!)}–${fmt(anchorCell.max!)})</span></span>
           )}
           <span><strong>Base re-lease</strong> ${fmt(reLeaseBase)}</span>
           <span><strong>Stress re-lease</strong> ${fmt(reLeaseStress)} <span class="dim">(2024–25 replay low)</span></span>
@@ -437,7 +435,7 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         <p>
           <strong>This is illustrative.</strong> Fleet size, anchor share and
           closing DSCR are stylized. The contracted rate rests on a few filed
-          deals, and the count and range print above. The posted-to-contracted
+          deals, and their range prints above. The posted-to-contracted
           discount is measured across chips and tenors, and a single deal can
           sit well above or below it. The stress applies H100's history to
           B200, which has not yet been through a downturn. Utilization on
@@ -639,8 +637,6 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
           Posted ${fmt(closingRate)} less the measured {Math.round(DISCOUNT * 100)}% discount
           <span class="sep">·</span>
           Neocloud · B200 · Guaranteed on-demand · Global
-          <span class="sep">·</span>
-          <span title="Observations are qualifying posted listings in the computation window; a source contributes one vote to the statistic however many of its listings pool into the cell (operator-equal aggregation).">{statKind} of {ref?.n_sources} sources / {ref?.n_observations} observations</span>
           <span class="sep">·</span>
           as of {meta.as_of_date}
         </div>
@@ -876,8 +872,6 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
           <strong>The discount is measured today.</strong> It comes from the
           deals on file across chips and tenors. It may widen or narrow over
           time, and new filings on <a href="/term">/term</a> show which way.
-          Each series also discloses its number of sources. A thin series
-          moves more from day to day.
         </p>
       </section>
     </article>
