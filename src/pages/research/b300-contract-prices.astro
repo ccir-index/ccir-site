@@ -108,8 +108,8 @@ const bars = starts.map((d, i) => ({
       <h1>B300 Contract Prices Since March</h1>
       <p class="standfirst">
         Eleven B300 rental contracts signed since March show three-year rates
-        up about 25%. On a 1,000-GPU contract, that move is worth about
-        ${Math.round(cost3)} million. Moves of this size make contract pricing a
+        up about 25%. That move is material, roughly ${Math.round(cost3)} million
+        on a 1,000-GPU contract. Moves of this size make contract pricing a
         risk-management question as well as a procurement one.
       </p>
       <ul class="lede-index">
@@ -397,14 +397,17 @@ const bars = starts.map((d, i) => ({
     .end.open { fill: var(--surface); stroke: var(--c); stroke-width: 1.6; }
     .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
     .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 8px; max-width: 880px; }
+    /* contracts table: full wrap width so all eight columns fit without a scroll */
+    #contracts { max-width: none; }
+    #contracts .twrap { max-width: 1120px; }
     table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
-    th, td { padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; white-space: nowrap; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; white-space: nowrap; }
     thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
     th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
     td.gen { color: var(--ink); font-weight: var(--weight-strong); }
     td.dim { color: var(--ink-dim); }
     td.strong { color: var(--accent); font-weight: var(--weight-strong); }
-    td.basis { color: var(--ink-dim); white-space: normal; min-width: 16ch; font-family: var(--font-body); }
+    td.basis { color: var(--ink-dim); white-space: normal; min-width: 24ch; font-family: var(--font-body); }
     .src-list { list-style: none; padding: 0; }
     .src-list li { margin-bottom: 8px; font-size: var(--fs-sm); }
   </style>
