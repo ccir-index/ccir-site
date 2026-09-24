@@ -30,7 +30,7 @@ const SPEC = {
     ],
     [
       "Track it",
-      "Committed-term + on-demand reference rates, posted daily",
+      "Committed-term + on-demand market rates, posted daily",
       "ccir.io/term"
     ]
   ],
