@@ -3,7 +3,7 @@
   SiteFooter (redesign/v1) — disclosure line + full sitemap.
 
   Before this, the footer carried four links and several monitor pages
-  were reachable only through in-prose links. A benchmark administrator's
+  were reachable only through in-prose links. A data publisher's
   footer is its registry: every public surface, grouped by role, plus
   the governance documents on every page. (Six thin monitors retired
   2026-08-13; their routes 301 in public/_redirects.)
@@ -14,8 +14,8 @@ interface Link { href: string; label: string }
 interface Col { head: string; links: Link[] }
 
 const cols: Col[] = [
-  { head: 'Benchmark', links: [
-    { href: '/rates', label: 'Reference Rates' },
+  { head: 'Rates & Data', links: [
+    { href: '/rates', label: 'Daily Rates' },
     { href: '/term', label: 'Term Structure' },
     { href: '/tokens', label: 'Token Prices' },
     { href: '/explorer', label: 'Series Explorer' },
@@ -76,8 +76,8 @@ const cols: Col[] = [
   </nav>
   <div class="wrap footer-inner">
     <div class="lhs">
-      <strong>CCIR</strong> · Citable reference rates and independent
-      analysis of the GPU compute market, updated each morning by 07:30 ET.
+      <strong>CCIR</strong> · Independent data and research on GPU compute
+      prices and credit, updated each morning by 07:30 ET.
     </div>
     <div class="rhs">
       <span class="social">
@@ -91,7 +91,7 @@ const cols: Col[] = [
     </div>
   </div>
   <div class="wrap runid">
-    CCIR publishes benchmark data for information. It is not investment,
+    CCIR publishes market data and research for information. It is not investment,
     legal or tax advice, and not an offer or solicitation.
   </div>
   <div class="wrap runid">

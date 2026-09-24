@@ -98,7 +98,7 @@ export const GET: APIRoute = async ({ props }) => {
   ]);
 
   const foot = el('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `22px ${PAD}px 30px` }, [
-    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 14, color: T.dim }, 'No positions. Public prices, citable.'),
+    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 14, color: T.dim }, 'No positions. Public prices, documented.'),
     el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 15, fontWeight: 600, letterSpacing: 1, color: T.accent }, `ccir.io/chip/${def.slug}`),
   ]);
 

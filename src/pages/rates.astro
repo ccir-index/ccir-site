@@ -67,29 +67,29 @@ function cellTitle(c: Rate): string {
 }
 ---
 <Base
-  title="GPU Rental Price Index — Daily H100, H200, B200 Rates · CCIR"
-  description="Daily GPU rental price benchmarks per GPU-hour — H100, H200, B200, A100 — guaranteed on-demand rates across Hyperscaler, Neocloud, and Marketplace segments, from a fixed provider panel under a published methodology. Built for citation in compute-rate covenants and for valuation of GPU-backed exposure; drafting examples at /applications."
+  title="GPU Rental Prices: Daily H100, H200, B200 Rates per GPU-Hour · CCIR"
+  description="Daily GPU rental rates per GPU-hour for H100, H200, B200 and A100: guaranteed and interruptible on-demand rates across hyperscaler, neocloud and marketplace segments, from a fixed provider panel under a published method."
   ogImage="/og/rates.png?v=live"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: 'CCIR GPU Compute Reference Rates',
-    description: 'Daily reference rates for GPU compute rental — chip × deployment class × interruptibility × commitment term × region — computed from publicly posted rates across a fixed provider panel under a published methodology.',
+    name: 'CCIR Daily GPU Rental Rates',
+    description: 'Daily GPU rental rates by chip, deployment class, interruptibility, commitment term and region, computed from publicly posted rates across a fixed provider panel under a published method.',
     url: 'https://ccir.io/rates',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2026-04/..',
     spatialCoverage: 'United States, European Union',
-    keywords: ['GPU rental rates', 'compute pricing', 'H100', 'H200', 'B200', 'reference rates', 'GPU-backed financing', 'AI infrastructure'],
+    keywords: ['GPU rental rates', 'compute pricing', 'H100', 'H200', 'B200', 'GPU price index', 'GPU-backed financing', 'AI infrastructure'],
     license: 'https://ccir.io/documents/data-terms',
     isAccessibleForFree: true,
   })} />
   <section class="wrap page-top">
-    <PageHeader title="Reference Rates" kicker="Benchmark · US &amp; EU" asOfLabel="" asOf={printLine(meta)}>
+    <PageHeader title="Daily Rates" kicker="Measured Rates · US &amp; EU" asOfLabel="" asOf={printLine(meta)}>
       <p class="standfirst">
-        Guaranteed and interruptible on-demand reference rates per chip,
-        across the three operator segments. Every cell is a published,
-        citable series.
+        Guaranteed and interruptible on-demand rates per chip,
+        across the three operator segments. Every cell is a documented
+        series with a public method.
       </p>
       <ul class="lede-index">
         <li><span class="arw">→</span> <a href="/term">/term</a> — committed tenors</li>
@@ -190,7 +190,7 @@ function cellTitle(c: Rate): string {
     <section class="defs-section">
       <TierDefinitions headerless={true} />
     </section>
-    <CiteBlock what="GPU Reference Rates" path="/rates" date={meta.as_of_date} />
+    <CiteBlock what="Daily GPU Rental Rates" path="/rates" date={meta.as_of_date} />
   </section>
 
   <style>

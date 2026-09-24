@@ -247,15 +247,15 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
 ---
 
 <Base
-  title="Compute Credit Spreads & Lender Marks — Reference Series · CCIR"
-  description="Credit reference series for GPU-backed lending: spread at signing on GPU-backed loans, refinancing velocity, and lender-filed fair-value marks — computed only from filed numbers. Credit-risk inputs for monitoring GPU-backed exposure: spread benchmarking, refinancing risk, and third-party marks."
+  title="Compute Credit Spreads & Lender Marks — Credit Series · CCIR"
+  description="Credit data series for GPU-backed lending: spread at signing on GPU-backed loans, refinancing velocity, and lender-filed fair-value marks — computed only from filed numbers. Credit-risk inputs for monitoring GPU-backed exposure: spread comparison, refinancing risk, and third-party marks."
   ogImage="/og/credit-series.png"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: 'CCIR Credit Reference Series',
-    description: 'Derived reference series for GPU-backed lending: spread at signing, refinancing velocity, and lender-filed fair-value marks on compute credit — computed only from filed numbers, with a CSV endpoint.',
+    name: 'CCIR Credit Series',
+    description: 'Derived data series for GPU-backed lending: spread at signing, refinancing velocity, and lender-filed fair-value marks on compute credit — computed only from filed numbers, with a CSV endpoint.',
     url: 'https://ccir.io/credit/series',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     keywords: ['GPU-backed loan spreads', 'compute credit spreads', 'GPU loan pricing', 'BDC marks compute', 'GPU-backed lending data', 'refinancing velocity'],
@@ -283,9 +283,9 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
   <section class="wrap page-top">
     <div class="hero-solo">
       <PageHeader
-        title="Credit Reference Series"
+        title="Credit Series"
         crumbs={[{ href: '/credit', label: 'Credit' }]}
-        kicker="Reference Series"
+        kicker="Data Series"
         asOf={AS_OF}
       />
       <p class="standfirst lede">
@@ -651,7 +651,7 @@ const nHolders = new Set(marks.map((m: any) => m.holder)).size;
         <strong>Cadence.</strong> The marks panel refreshes with the quarterly
         BDC/registered-fund filing cycle. Spread and refi series update as
         signing or resolving documents are filed. This page carries
-        reference-series governance: series definitions do not change without
+        series governance: series definitions do not change without
         a dated method note.
       </p>
     </div>

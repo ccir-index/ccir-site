@@ -160,9 +160,9 @@ const hwPath = (() => {
 
 // --- SEO -------------------------------------------------------------------
 const SITE = 'https://ccir.io';
-const pageTitle = `${def.name} Rental Price — CCIR Reference Rates`;
+const pageTitle = `${def.name} Rental Price · CCIR Daily Rates`;
 const pageDescription =
-  `Daily published reference rates for the ${def.name} (${def.formFactor} ${def.memory}): ` +
+  `Daily measured rates for the ${def.name} (${def.formFactor} ${def.memory}): ` +
   `guaranteed and interruptible on-demand USD/GPU-hr, committed term structure, ` +
   `secondary-market record, and an income-derived model-implied unit value. ` +
   `Every figure inherits from the surface that publishes it.`;
@@ -173,9 +173,9 @@ const pageDescription =
 const datasetLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'Dataset',
-  name: `CCIR ${def.short} rental reference rates`,
+  name: `CCIR ${def.short} daily rental rates`,
   description:
-    `Daily reference rates for ${def.name} (${def.formFactor} ${def.memory}) GPU rental: ` +
+    `Daily measured rates for ${def.name} (${def.formFactor} ${def.memory}) GPU rental: ` +
     `guaranteed and interruptible on-demand rates in USD per GPU-hour by operator segment, ` +
     `committed term structure (market intelligence), the secondary-market record, ` +
     `and an income-derived model-implied unit value in USD per unit.`,
@@ -188,8 +188,8 @@ const datasetLd = JSON.stringify({
     `${def.short} rental price`,
     `${def.short} GPU price per hour`,
     `${def.name}`,
-    'GPU reference rates',
-    'GPU rental benchmark',
+    'GPU rental rates',
+    'GPU rental price data',
   ],
   measurementTechnique:
     `Publicly posted asks aggregated per operator segment; headline = panel mean at n>=10, else median. Methodology: ${SITE}/documents/methodology`,
@@ -236,7 +236,7 @@ const datasetLd = JSON.stringify({
             <span class="st-value" title={`${CHIP} ${committed.term}: $${fmt(odAnchorValue)} on-demand anchor stepped by the within-provider committed spread — the /term construction`}>${fmt(committed.value)}</span>
             <span class="st-unit">USD/GPU-hr</span>
             <span class="st-meta">implied off OD anchor{committed.prov ? ' · provisional' : ''}</span>
-            <span class="st-mi">Market intelligence — not a citable reference rate</span>
+            <span class="st-mi">Market intelligence · modeled estimate</span>
           </>
         ) : <span class="st-value">—</span>}
       </div>
@@ -296,7 +296,7 @@ const datasetLd = JSON.stringify({
         <p class="mod-line">
           Posted committed asks by tenor, each level implied off the
           on-demand anchor by that operator population's own spread.
-          <span class="mi-inline">Market intelligence — not a citable reference rate.</span>
+          <span class="mi-inline">Market intelligence · modeled estimate.</span>
         </p>
       </section>
 

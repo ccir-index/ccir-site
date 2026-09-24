@@ -229,12 +229,12 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       'used H100 price', 'H100 resale price', 'used A100 price',
       'A100 secondary market', 'used V100 price', 'GPU secondary market',
       'datacenter GPU prices', 'GPU price history', 'H200 resale price',
-      'RTX A6000 used price', 'L40S price', 'GPU hardware price index',
+      'RTX A6000 used price', 'L40S price', 'GPU hardware price tracker',
       'what does a used H100 cost',
       'GPU collateral value', 'GPU residual value data', 'GPU value retention',
       'H100 depreciation', 'GPU depreciation data', 'GPU recovery value',
       'GPU-backed lending collateral', 'datacenter GPU useful life',
-      'GPU secondary market liquidity', 'GPU price benchmark',
+      'GPU secondary market liquidity', 'GPU price data',
       'Manheim for GPUs',
       'GPU asset-based lending', 'GPU advance rate data',
       'GPU borrowing base', 'sizing GPU-backed facilities',
@@ -254,7 +254,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         One value per chip: what a machine is worth deployed and earning,
         triangulated against the market. The value is
         <strong>model-implied</strong>, an income approach over CCIR's own
-        benchmark, every assumption disclosed. The market checks are
+        daily rental rates, every assumption disclosed. The market checks are
         observational, in separate lanes.
       </p>
       <ul class="lede-index">
@@ -706,10 +706,10 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         advance rates against GPU collateral, rating agencies testing
         value-retention and useful-life assumptions, insurers underwriting
         residual value, and borrowers negotiating either side of those
-        terms all face the same gap: no citable, neutral record of what
+        terms all face the same gap: no documented, independent record of what
         datacenter hardware sells for. Today, credit documents
         overwhelmingly amortize GPU collateral to zero, not because the
-        hardware is worthless, but because no reference existed. This page
+        hardware is worthless, but because no record existed. This page
         is the record: observed secondary-market prices with provenance.
         It carries executed levels, posted asks, volumes, and the spread
         between them. These are the raw inputs from which the parties who

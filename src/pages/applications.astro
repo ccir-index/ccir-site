@@ -6,10 +6,11 @@ import {
   neocloudCommittedCell, neocloudCommittedTenors,
 } from '../data/snapshot';
 import { TERM_DISPLAY } from '../data/types';
+import type { Rate } from '../data/types';
 
-// Calibrate against the Neocloud H100 guaranteed on-demand rate for the
-// United States — the segment where GPU-backed credit is actually being
-// written, and the deepest guaranteed panel in the index.
+// Calibrate against the Neocloud H100 guaranteed on-demand series for the
+// United States. GPU-backed credit is mostly written in this segment, and it
+// carries the deepest guaranteed panel.
 const REF_SERIES_ID = 'CRI-T2-H100-ALL-GTD-OD-US';
 const ref = headlineRates.find((r) => r.series_id === REF_SERIES_ID);
 // Headline stat per published convention: mean where the panel is deep
@@ -21,99 +22,91 @@ const round5c = (n: number) => Math.round(n / 0.05) * 0.05;
 const round1c = (n: number) => Math.round(n * 100) / 100;
 const fmt = (n: number) => n.toFixed(2);
 
-const TIER_2_THRESHOLD = round5c(closingRate * 0.92);
-const TIER_3_THRESHOLD = round5c(closingRate * 0.80);
-const TIER_4_THRESHOLD = round5c(closingRate * 0.69);
+// Watch levels, set at close as a share of the closing level.
+const LEVEL_2 = round5c(closingRate * 0.92);
+const LEVEL_3 = round5c(closingRate * 0.80);
+const LEVEL_4 = round5c(closingRate * 0.69);
 
 interface TrajRow {
   month: string;
   pct: number;
   value: number;
-  tier: 1 | 2 | 3 | 4;
-  tierLabel: string;
+  level: 1 | 2 | 3 | 4;
+  levelLabel: string;
   transition: boolean;
   improvement: boolean;
-  triggered: string;
-  cure: string;
+  response: string;
+  check: string;
 }
 function classify(value: number): 1 | 2 | 3 | 4 {
-  if (value >= TIER_2_THRESHOLD) return 1;
-  if (value >= TIER_3_THRESHOLD) return 2;
-  if (value >= TIER_4_THRESHOLD) return 3;
+  if (value >= LEVEL_2) return 1;
+  if (value >= LEVEL_3) return 2;
+  if (value >= LEVEL_4) return 3;
   return 4;
 }
-const TIER_LABELS: Record<number, string> = {
-  1: 'Tier 1 (Baseline)',
-  2: 'Tier 2 (Watch)',
-  3: 'Tier 3 (Step-Up)',
-  4: 'Tier 4 (Triggered)',
+const LEVEL_LABELS: Record<number, string> = {
+  1: 'Level 1 (Baseline)',
+  2: 'Level 2 (Watch)',
+  3: 'Level 3 (Review)',
+  4: 'Level 4 (Escalate)',
 };
-const TIER_REQS: Record<number, string> = {
-  1: '30% Committed Revenue Coverage; quarterly reporting',
-  2: '50% CRC; monthly reporting; no Restricted Payments',
-  3: '70% CRC; Reserve Account funded to 6 mo. debt service; 50% ECF Sweep; monthly reporting; no RP',
-  4: '85% CRC; Reserve Account to 12 mo. debt service; 100% ECF Sweep monthly; mandatory 2.5% accelerated amortization quarterly; monthly reporting; no RP',
+const LEVEL_RESPONSES: Record<number, string> = {
+  1: 'Quarterly price review; standard borrower reporting',
+  2: 'Monthly price review; request the borrower\'s contract book',
+  3: 'Monthly review; test debt service coverage at current rates; check reserve and sweep terms already in the facility',
+  4: 'Credit committee review; stress re-leasing against the current term curve; weekly price tracking',
 };
-
-const trajPcts: { month: string; pct: number; cure: string }[] = [
-  { month: 'Month 0 (Close)', pct: 1.00, cure: 'None — facility closes in compliance' },
-  { month: 'Month 3',         pct: 0.95, cure: 'None required' },
-  { month: 'Month 6',         pct: 0.88, cure: 'Commit additional customer contracts within 90 days; halt distributions immediately' },
-  { month: 'Month 9',         pct: 0.82, cure: 'None required (CRC already at floor from prior cure)' },
-  { month: 'Month 12',        pct: 0.76, cure: 'Commit additional contracts (90 days); fund Reserve Account (45 days); next quarterly sweep applies 50% of ECF' },
-  { month: 'Month 15',        pct: 0.71, cure: 'None required' },
-  { month: 'Month 18',        pct: 0.65, cure: 'Commit additional contracts (90 days); top up Reserve Account (45 days); first accelerated amortization on next quarterly date' },
-  { month: 'Month 21',        pct: 0.74, cure: 'Excess Reserve Account balance above 6-mo. floor releasable subject to compliance certificate' },
+const levels = [
+  { label: LEVEL_LABELS[1], range: `30-day average at or above $${fmt(LEVEL_2)}`, response: LEVEL_RESPONSES[1] },
+  { label: LEVEL_LABELS[2], range: `$${fmt(LEVEL_3)} to $${fmt(LEVEL_2)}`, response: LEVEL_RESPONSES[2] },
+  { label: LEVEL_LABELS[3], range: `$${fmt(LEVEL_4)} to $${fmt(LEVEL_3)}`, response: LEVEL_RESPONSES[3] },
+  { label: LEVEL_LABELS[4], range: `Below $${fmt(LEVEL_4)}`, response: LEVEL_RESPONSES[4] },
 ];
-let prevTier: 1 | 2 | 3 | 4 = 1;
-const trajectory: TrajRow[] = trajPcts.map(({ month, pct, cure }) => {
+
+const trajPcts: { month: string; pct: number; check: string }[] = [
+  { month: 'Month 0 (Close)', pct: 1.00, check: 'Record the closing level and set watch levels' },
+  { month: 'Month 3',         pct: 0.95, check: 'No change in posture' },
+  { month: 'Month 6',         pct: 0.88, check: 'Check how much capacity sits under committed contracts' },
+  { month: 'Month 9',         pct: 0.82, check: 'No change in posture' },
+  { month: 'Month 12',        pct: 0.76, check: 'Recompute debt service coverage at the current 30-day average' },
+  { month: 'Month 15',        pct: 0.71, check: 'No change in posture' },
+  { month: 'Month 18',        pct: 0.65, check: 'Size re-leasing risk on contracts expiring within 12 months' },
+  { month: 'Month 21',        pct: 0.74, check: 'Record the recovery; step review frequency back down' },
+];
+let prevLevel: 1 | 2 | 3 | 4 = 1;
+const trajectory: TrajRow[] = trajPcts.map(({ month, pct, check }) => {
   const value = round1c(closingRate * pct);
-  const tier = classify(value);
-  const transition = tier > prevTier;
-  const improvement = tier < prevTier;
+  const level = classify(value);
+  const transition = level > prevLevel;
+  const improvement = level < prevLevel;
   const row: TrajRow = {
-    month, pct, value, tier,
-    tierLabel: TIER_LABELS[tier],
+    month, pct, value, level,
+    levelLabel: LEVEL_LABELS[level],
     transition, improvement,
-    triggered: TIER_REQS[tier],
-    cure,
+    response: LEVEL_RESPONSES[level],
+    check,
   };
-  prevTier = tier;
+  prevLevel = level;
   return row;
 });
 
-const facilityTerms: { term: string; value: string }[] = [
-  { term: 'Borrower', value: 'A GPU-rich neocloud special-purpose entity (SPE) (the "Borrower")' },
+const exposureTerms: { term: string; value: string }[] = [
+  { term: 'Borrower', value: 'A GPU-rich neocloud special-purpose entity (SPE)' },
   { term: 'Facility type', value: 'Senior-secured term loan' },
   { term: 'Facility size', value: '$200,000,000' },
   { term: 'Tenor', value: '4 years, scheduled amortization with bullet at maturity' },
-  { term: 'Collateral', value: 'First-lien security interest in 1,000 H100 SXM 8-GPU nodes plus customary blanket lien' },
-  { term: 'Reference Rate', value: 'CRI-T2-H100-ALL-GTD-OD-US, as published by CCIR (Neocloud operator segment, H100, guaranteed on-demand, United States)' },
-  { term: 'Closing Date Reference Rate', value: `$${fmt(closingRate)} per GPU per hour (as of ${meta.as_of_date})` },
-  { term: 'Reference Rate Average lookback', value: '30 days' },
-  { term: 'Test frequency', value: 'Monthly (Determination Date = last business day of each calendar month)' },
-];
-
-const precedentRows: { feature: string; precedent: string }[] = [
-  { feature: 'Reference rate naming convention (publication + administrator + field)', precedent: 'Modern oil-swap confirmations (Brent Dated / S&P Global Platts / Crude Oil Marketwire); ICE Dated Brent Future' },
-  { feature: '30-day arithmetic average lookback', precedent: 'Adapted from RBL 24-month forward-strip averages; U.S. Securities and Exchange Commission (SEC) 12-month first-of-month averages' },
-  { feature: 'Tiered operating requirements driven by published price', precedent: 'RBL minimum hedging covenant (e.g., Amplify Energy 60% proved developed producing (PDP) hedge requirement scaled by price tier); high-yield indenture price-driven covenant suite' },
-  { feature: 'Committed Revenue Coverage as functional analog to hedging', precedent: 'Adapted to GPU context where futures markets do not yet exist; hedging via committed customer contracts' },
-  { feature: 'Reserve Account funding triggered by price tier', precedent: 'exploration and production (E&P) credit agreement reserve-account covenants; PDP asset-backed securities (ABS) reserve account requirements' },
-  { feature: 'Cash sweep activation at price thresholds', precedent: 'Standard high-yield and leveraged loan cash sweep triggers, here keyed to a published commodity index rather than to leverage ratios' },
-  { feature: 'Mandatory accelerated amortization at lowest tier', precedent: 'RBL borrowing-base deficiency cure mechanics in tail tiers; PDP ABS amortization triggers' },
-  { feature: 'Disruption Events (Cessation / Administrator / Methodology / Publication)', precedent: 'ISDA 2018 Benchmarks Supplement; 2005 ISDA Commodity Definitions Market Disruption Events' },
-  { feature: 'Replacement Rate waterfall', precedent: 'ARRC hardwired LIBOR transition language' },
-  { feature: 'Tier Threshold Adjustment Spread', precedent: 'ARRC LIBOR transition; ISDA Benchmarks Supplement Adjustment Payment' },
-  { feature: 'Material Methodology Change with numerical threshold', precedent: 'Adapted from ISDA "Material Change in Formula/Content" with objective calibration to historical data' },
-  { feature: 'Conforming Changes authority', precedent: 'ARRC LIBOR transition language verbatim' },
+  { term: 'Collateral', value: 'First-lien security interest in 1,000 H100 SXM 8-GPU nodes' },
+  { term: 'Monitored series', value: `${REF_SERIES_ID}, published by CCIR (Neocloud operator segment, H100, guaranteed on-demand, United States)` },
+  { term: 'Series level at close', value: `$${fmt(closingRate)} per GPU per hour (as of ${meta.as_of_date})` },
+  { term: 'Smoothing', value: '30-day average of daily prints' },
+  { term: 'Review date', value: 'Last business day of each month' },
 ];
 
 // ---------------------------------------------------------------------------
-// Use case 02 — re-leasing (rollover) risk, calibrated to the live committed
-// term curve. Re-lease anchor = the Neocloud H100 1Y committed cell (region-
-// pooled — the deepest 1Y panel); the US 1Y series is the primary reference
-// in the drafting, with the pooled series as its thin-panel fallback.
+// Use case 02: re-leasing (rollover) risk, calibrated to the live committed
+// term curve. Re-lease rate = the Neocloud H100 1Y committed cell (region-
+// pooled, the deepest 1Y panel). The US 1Y series is the primary series in
+// the monitoring routine, with the pooled series used when the US panel is thin.
 const RELEASE_SERIES_US = 'CRI-T2-H100-ALL-GTD-1yr-US';
 const RELEASE_SERIES_ALL = 'CRI-T2-H100-ALL-GTD-1yr-ALL';
 const OD_ALL_SERIES = 'CRI-T2-H100-ALL-GTD-OD-ALL';
@@ -142,30 +135,29 @@ const rolloverDscr = revClose > 0 ? (revPost / revClose) * CLOSE_DSCR : 0;
 const anchorRepricePct = VINTAGE_RATE > 0
   ? ((reLeaseRate - VINTAGE_RATE) / VINTAGE_RATE) * 100 : 0;
 
-// UC01 backtest — the covenant run against reconstructed history. Rates are
+// UC01 history: the watch levels run against reconstructed history. Rates are
 // the stepped-panel monthly medians from the archived-page backfill
 // (/research/od-vs-committed), NOT the live series; close = 2024-02 at $4.30,
-// thresholds at 92/80/69% of close rounded to $0.05: 3.95 / 3.45 / 2.95.
+// levels at 92/80/69% of close rounded to $0.05: 3.95 / 3.45 / 2.95.
 const BACKTEST_CLOSE = 4.30;
-const backtest: { period: string; rate: string; tier: string; cls: string; consequence: string }[] = [
-  { period: 'Feb – Jun 2024', rate: '$4.30', tier: 'Tier 1 · Baseline', cls: 't1', consequence: '30% CRC; quarterly reporting' },
-  { period: 'Jul – Aug 2024', rate: '$3.92 → $3.49', tier: 'Tier 2 · Watch', cls: 't2', consequence: '50% CRC; monthly reporting; no Restricted Payments' },
-  { period: 'Sep – Nov 2024', rate: '$3.24 → $2.99', tier: 'Tier 3 · Step-Up', cls: 't3', consequence: '70% CRC; Reserve to 6 mo debt service; 50% ECF sweep' },
-  { period: 'Dec 2024 – Nov 2025', rate: '$2.79 – $2.92', tier: 'Tier 4 · Triggered — 12 months', cls: 't4', consequence: '85% CRC; Reserve to 12 mo; 100% monthly sweep; 2.5% accelerated amortization per quarter' },
-  { period: 'Dec 2025 – Feb 2026', rate: '$3.18', tier: 'Tier 3 · improvement', cls: 't3', consequence: 'Automatic step-down; reserve release above 6-mo floor on compliance certificate' },
-  { period: 'Mar – Apr 2026', rate: '$3.74', tier: 'Tier 2', cls: 't2', consequence: 'Further step-down' },
-  { period: 'May 2026', rate: '$3.98', tier: 'Tier 1 · restored', cls: 't1', consequence: 'Full restoration' },
-  { period: 'Jun 2026', rate: '$3.39', tier: 'Tier 3 · re-tightening', cls: 't3', consequence: 'Phase-in restarts — the month the 15% interim test exists for' },
+const backtest: { period: string; rate: string; level: string; cls: string; posture: string }[] = [
+  { period: 'Feb – Jun 2024', rate: '$4.30', level: 'Level 1 · Baseline', cls: 't1', posture: 'Quarterly review' },
+  { period: 'Jul – Aug 2024', rate: '$3.92 → $3.49', level: 'Level 2 · Watch', cls: 't2', posture: 'Monthly review; contract book requested' },
+  { period: 'Sep – Nov 2024', rate: '$3.24 → $2.99', level: 'Level 3 · Review', cls: 't3', posture: 'Debt service coverage tested at current rates' },
+  { period: 'Dec 2024 – Nov 2025', rate: '$2.79 – $2.92', level: 'Level 4 · Escalate (12 months)', cls: 't4', posture: 'Committee review; re-leasing stressed against the term curve' },
+  { period: 'Dec 2025 – Feb 2026', rate: '$3.18', level: 'Level 3 · improvement', cls: 't3', posture: 'Review frequency steps down' },
+  { period: 'Mar – Apr 2026', rate: '$3.74', level: 'Level 2', cls: 't2', posture: 'Further step-down' },
+  { period: 'May 2026', rate: '$3.98', level: 'Level 1 · restored', cls: 't1', posture: 'Back to quarterly review' },
+  { period: 'Jun 2026', rate: '$3.39', level: 'Level 3 · re-tightening', cls: 't3', posture: 'Sharp one-month drop; the 15% fast-move check applies' },
 ];
 
 // ---------------------------------------------------------------------------
-// Use case 03 — multi-generation pool surveillance. Pool Reference Rate =
-// unit-weighted average of the published per-generation Neocloud guaranteed
-// on-demand US cells (US only — NOTE 2026-08-09: this no longer matches the
-// /rates ladder, which now pools the US & EU core. Kept US here deliberately
-// so the worked example stays a single-geography pool; revisit if the example
-// should reproduce from /rates), weights fixed at closing per the asset
-// schedule.
+// Use case 03: multi-generation pool monitoring. Pool rate = unit-weighted
+// average of the published per-generation Neocloud guaranteed on-demand US
+// cells (US only. NOTE 2026-08-09: this no longer matches the /rates ladder,
+// which now pools the US & EU core. Kept US here deliberately so the worked
+// example stays a single-geography pool; revisit if the example should
+// reproduce from /rates), weights fixed at closing per the asset schedule.
 function poolCell(chip: string): Rate | undefined {
   return headlineRates
     .filter((r) => r.tier === 'T2' && r.gpu_model === chip &&
@@ -186,30 +178,20 @@ const poolRows = POOL.map((p) => {
 const poolWeightSum = poolRows.reduce((s, r) => s + r.weight, 0);
 const poolRate = poolRows.reduce((s, r) => s + r.weight * (r.rate as number), 0) / (poolWeightSum || 1);
 
-const rolloverPrecedents: { feature: string; precedent: string }[] = [
-  { feature: 'Lease Sweep Period triggered ahead of a major contract expiry', precedent: 'CMBS lease-sweep / specified-tenant sweep provisions (cash trap commencing 12-18 months before a major tenant lease expiration)' },
-  { feature: 'Re-lease rate assumption drawn from a published market series', precedent: 'Aircraft ABS re-leasing assumptions keyed to appraiser-published lease-rate data; container ABS per-diem re-lease assumptions' },
-  { feature: 'Projected (look-forward) DSCR test on expiring capacity', precedent: 'CMBS underwritten rollover net operating income (NOI); project-finance re-contracting cases in merchant power' },
-  { feature: 'Rollover Reserve sized in months of debt service', precedent: 'CMBS rollover/tenant improvement and leasing commission (TI/LC) reserves; aircraft ABS maintenance and remarketing reserves' },
-];
-
-// On-page contents — ids match the anchored use-case articles and section h3s.
-const toc = [
+// On-page contents. ids match the anchored use-case articles and section h3s.
+const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
   {
     id: 'uc-01',
     kicker: 'Use case 01',
-    label: 'Market Price Monitoring Covenant',
+    label: 'Tracking Collateral Earning Power',
     secs: [
-      ['uc-01-s01', 'What a Market Price Monitoring Covenant Is'],
-      ['uc-01-s02', 'Hypothetical Facility Terms'],
-      ['uc-01-s03', 'Defined Terms'],
-      ['uc-01-s04', 'The Covenant'],
-      ['uc-01-s05', 'Fallback Architecture'],
-      ['uc-01-s06', 'Worked Numerical Example'],
-      ['uc-01-s07', 'Precedent Map'],
-      ['uc-01-s08', 'Limitations and Notes for Practitioners'],
-      ['uc-01-s09', 'The Covenant Against Three Years of History'],
-      ['uc-01-s10', 'The Exposure-Weighted Variant'],
+      ['uc-01-s01', 'Why Watch the Market Rate'],
+      ['uc-01-s02', 'Hypothetical Exposure'],
+      ['uc-01-s03', 'Setting Watch Levels'],
+      ['uc-01-s04', 'Worked Numerical Example'],
+      ['uc-01-s05', 'The Watch Levels Against Three Years of History'],
+      ['uc-01-s06', 'Weighting by Exposed Capacity'],
+      ['uc-01-s07', 'Limitations'],
     ],
   },
   {
@@ -219,9 +201,8 @@ const toc = [
     secs: [
       ['uc-02-s01', 'Why Rollover Is the Central Credit Question'],
       ['uc-02-s02', 'Worked Rollover Exhibit'],
-      ['uc-02-s03', 'Defined Terms and Covenant'],
-      ['uc-02-s04', 'Precedent Map'],
-      ['uc-02-s05', 'Limitations'],
+      ['uc-02-s03', 'What to Watch and When'],
+      ['uc-02-s04', 'Limitations'],
     ],
   },
   {
@@ -229,27 +210,23 @@ const toc = [
     kicker: 'Use case 03',
     label: 'Monitoring a Multi-Generation Pool',
     secs: [
-      ['uc-03-s01', 'The Pool Reference Rate'],
+      ['uc-03-s01', 'The Pool Rate'],
       ['uc-03-s02', 'The Property That Makes Pools Monitorable'],
-      ['uc-03-s03', 'Precedent and Limitations'],
+      ['uc-03-s03', 'Adjacent Practice and Limitations'],
     ],
   },
   {
-    id: 'citation-annex',
-    kicker: 'Annex',
-    label: 'Series Citation & Disruption Provisions',
-    secs: [
-      ['annex-a', 'Part A — Definitions'],
-      ['annex-b', 'Part B — Reference Rate Disruption'],
-      ['annex-cal', 'Calibration Notes'],
-    ],
+    id: 'data-note',
+    kicker: 'Note',
+    label: 'How to Reference CCIR Data',
+    secs: [],
   },
 ];
 ---
 <Base
-  title="Compute Rate Covenants & Risk Monitoring — Drafting Examples for Credit Agreements · CCIR"
+  title="Monitoring GPU-Backed Credit with Market Data · CCIR"
   ogImage="/og/applications.png"
-  description="Worked drafting examples showing how a CCIR reference rate fits into credit agreements and structured finance: market-price monitoring covenants tied to a compute rate index, series citation and disruption fallback provisions, re-leasing risk sized against the published term curve, and multi-generation pool monitoring. Reference language for credit, risk and valuation teams underwriting GPU-backed exposure."
+  description="Worked examples showing how lenders, credit analysts and risk teams can use CCIR's published GPU rental price data to monitor GPU-backed exposures. Covers price tracking against market rates, re-leasing risk sized against the published term curve, and monitoring a multi-generation pool."
 >
   <nav class="apps-navband" aria-label="Use cases">
     <div class="wrap apps-nav-inner">
@@ -261,28 +238,22 @@ const toc = [
     </div>
   </nav>
   <section class="wrap page-top">
-    <PageHeader title="Applications" kicker="Worked Drafting Examples" asOf={meta.as_of_date} display />
+    <PageHeader title="Applications" kicker="Worked Monitoring Examples" asOf={meta.as_of_date} display />
     <p class="dek">
-      Worked drafting examples showing how a CCIR rate fits into established
-      commodity-credit-document conventions. Each example references a
-      specific CCIR series (the published, observable rate that anchors the
-      mechanic), calibrated against today's snapshot. The reference series
-      here is the Neocloud H100 guaranteed on-demand rate for the United
-      States: a lender anchors to the CCIR series matching the operator
-      segment, silicon, and geography of the collateral it lends against.
+      Worked examples showing how lenders, credit analysts and risk teams can
+      use CCIR's published market data to monitor GPU-backed exposures. Each
+      example uses a specific CCIR data series and calibrates to today's
+      snapshot. The main series here is the Neocloud H100 guaranteed
+      on-demand rate for the United States. A monitor picks the series that
+      matches the operator segment, chip and geography of the collateral.
       The operator segment is a peer group defined by capability and service
-      level: operators offering comparable fabric, interconnect, and service
-      are benchmarked against one another. A borrower is therefore marked
-      against its true peers rather than against differently-specified
-      capacity. CCIR publishes observed posted prices. The lender owns the
-      credit judgment built on them. Why these examples anchor to a lease
-      rate at all (a GPU's earning power is a market rate) is set out in the
-      <a href="/research/gpu-as-income-asset">income-asset primer</a>. The
-      documents these examples cite are public at
-      <a href="/documents">/documents</a>: the
-      published <a href="/documents/methodology">Methodology</a>, the
-      <a href="/documents/change-management">Change Management Policy</a>, and
-      the administrator's <a href="/documents/governance">governance</a>.
+      level. Operators with comparable fabric, interconnect and service sit
+      in the same group, so a borrower is compared with its peers. CCIR
+      publishes observed posted prices. The lender owns the credit judgment
+      built on them. The <a href="/research/gpu-as-income-asset">income-asset
+      primer</a> explains why a GPU's earning power follows a market lease
+      rate. The <a href="/documents/methodology">Methodology</a> describes how
+      each series is built.
     </p>
 
     <nav class="toc" id="contents" aria-label="Contents">
@@ -294,11 +265,13 @@ const toc = [
               <span class="toc-uc-kicker">{u.kicker}</span>
               {u.label}
             </a>
-            <ol class="toc-secs">
-              {u.secs.map((s) => (
-                <li><a href={'#' + s[0]}>{s[1]}</a></li>
-              ))}
-            </ol>
+            {u.secs.length > 0 && (
+              <ol class="toc-secs">
+                {u.secs.map((s) => (
+                  <li><a href={'#' + s[0]}>{s[1]}</a></li>
+                ))}
+              </ol>
+            )}
           </div>
         ))}
       </div>
@@ -307,21 +280,19 @@ const toc = [
     <article class="usecase" id="uc-01">
       <header class="uc-head">
         <span class="uc-kicker">Use case 01 · Senior-secured term loan</span>
-        <h2>Market Price Monitoring Covenant Tied to a Compute Rental Index (CRI) Rate</h2>
+        <h2>Tracking Collateral Earning Power Against the Market Rate</h2>
         <p class="uc-lede">
-          A worked drafting example showing how a CCIR rate would be cited in
-          a senior-secured term loan facility as the trigger input to a
-          tiered market price monitoring covenant. Modeled on the
-          reserve-based lending minimum hedging covenant: a structure in
-          which falling New York Mercantile Exchange (NYMEX) strip prices automatically tighten operational
-          requirements (hedging floors, reserve funding, cash sweeps) without
-          immediately triggering default. Drafting illustration, not a model
-          form.
+          A worked example of how a lender tracking collateral earning power
+          might watch a published CCIR series. The lender sets watch levels
+          below the level at close. Each level maps to a monitoring response,
+          such as a more frequent review or a request for the contract book.
+          The example is illustrative. It is not a model form or a
+          recommended practice.
         </p>
       </header>
 
       <section class="uc-rate">
-        <div class="rate-kicker">Reference rate (live, calibrating this example)</div>
+        <div class="rate-kicker">Monitored series (live, calibrating this example)</div>
         <div class="rate-id">{REF_SERIES_ID}</div>
         <div class="rate-price">${fmt(closingRate)}<span class="rate-unit">/GPU-hr</span></div>
         <div class="rate-meta">
@@ -332,51 +303,41 @@ const toc = [
           as of {meta.as_of_date}
         </div>
         <div class="rate-thresholds">
-          <span><strong>Tier 2 threshold</strong> ${fmt(TIER_2_THRESHOLD)} <span class="dim">(92% of close)</span></span>
-          <span><strong>Tier 3 threshold</strong> ${fmt(TIER_3_THRESHOLD)} <span class="dim">(80% of close)</span></span>
-          <span><strong>Tier 4 threshold</strong> ${fmt(TIER_4_THRESHOLD)} <span class="dim">(69% of close)</span></span>
+          <span><strong>Level 2 watch</strong> ${fmt(LEVEL_2)} <span class="dim">(92% of close)</span></span>
+          <span><strong>Level 3 watch</strong> ${fmt(LEVEL_3)} <span class="dim">(80% of close)</span></span>
+          <span><strong>Level 4 watch</strong> ${fmt(LEVEL_4)} <span class="dim">(69% of close)</span></span>
         </div>
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s01"><span class="sec-n">01</span> What a Market Price Monitoring Covenant Is</h3>
+        <h3 id="uc-01-s01"><span class="sec-n">01</span> Why Watch the Market Rate</h3>
         <p>
-          A market price monitoring covenant is a covenant that tests a
-          published reference price (or a function of published prices)
-          directly against contractually defined thresholds, with the price
-          level itself driving the triggered consequence. It is functionally
-          distinct from a valuation covenant (such as a loan-to-value (LTV) maintenance
-          test), in which the published price is an input to a calculation
-          and the test runs against the calculation rather than the price.
+          A GPU earns what the rental market pays for it. A published market
+          rate is therefore a direct read on the earning power behind a
+          GPU-backed loan. Borrower reports arrive monthly or quarterly and
+          reflect the borrower's own pricing. A daily series from an outside
+          source gives the lender an independent view between reports.
         </p>
         <p>
-          The canonical commodity-credit structure is the RBL minimum hedging
-          covenant, which tightens the borrower's hedging floor as the NYMEX
-          strip price falls beneath defined thresholds. Other examples found
-          across commodity credit documents include reserve-account funding
-          triggers tied to Henry Hub levels, cash sweep activations tied to
-          Platts assessments, dividend blockers tied to LME cash prices, and
-          springing covenants that come into effect only when a published
-          price index crosses a threshold.
+          Commodity lenders already work this way. Reserve-based lenders watch
+          oil and gas strip prices. Other commodity lenders track Henry Hub,
+          Platts assessments and LME cash prices. GPU rental prices can play
+          the same role for compute collateral.
         </p>
         <p>
-          The structural appeal is that the covenant operates on a
-          <em>signal</em>, not an <em>event</em>. There is no defaulting
-          borrower behavior to litigate. The published rate either is or is
-          not below the threshold on the test date. The lender's contractual
-          remedy is correspondingly graduated: operational tightening at
-          lower thresholds, financial tightening at lower-still thresholds,
-          mandatory action at the lowest. The borrower has visibility into
-          where the trigger sits and can manage its operations accordingly.
+          Watch levels turn the series into a routine. The lender fixes the
+          levels at close. On each review date, the 30-day average sits either
+          above or below each level. The response steps up in stages. Small
+          moves prompt a closer look, and large moves prompt a full review.
         </p>
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s02"><span class="sec-n">02</span> Hypothetical Facility Terms</h3>
+        <h3 id="uc-01-s02"><span class="sec-n">02</span> Hypothetical Exposure</h3>
         <div class="ftable-wrap">
           <table class="ftable">
             <tbody>
-              {facilityTerms.map(({ term, value }) => (
+              {exposureTerms.map(({ term, value }) => (
                 <tr>
                   <th>{term}</th>
                   <td>{value}</td>
@@ -388,301 +349,65 @@ const toc = [
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s03"><span class="sec-n">03</span> Defined Terms</h3>
+        <h3 id="uc-01-s03"><span class="sec-n">03</span> Setting Watch Levels</h3>
         <p>
-          Drafted to be embeddable in a credit agreement's Definitions
-          section. The dual-anchor convention (naming the publication, the
-          administrator, and the specific data field separately) is the
-          same as in modern oil-swap confirmations referencing "Brent
-          (Dated) as published by S&amp;P Global Platts" and in post-LIBOR
-          (the London Interbank Offered Rate) Alternative Reference Rates
-          Committee (ARRC) fallback language.
+          The example sets three watch levels at 92%, 80% and 69% of the
+          closing level, rounded to the nearest $0.05. The monitor tests the
+          30-day average of daily prints on the last business day of each
+          month. The average smooths day-to-day changes in panel composition.
         </p>
-        <pre class="cov-body">
-<span class="cov-h">"CRI Reference Rate"</span> means, as of any date of determination, the rate
-published as <strong>{REF_SERIES_ID}</strong> by the Reference Rate Administrator
-on its principal website (currently ccir.io), expressed in U.S. dollars
-per GPU per hour, for the most recent Publication Date on or prior to
-such date.
-
-<span class="cov-h">"Reference Rate Administrator"</span> means Compute Credit Index Research LLC,
-a Delaware limited liability company, or any successor administrator of
-the {REF_SERIES_ID} rate that (i) maintains a published methodology
-substantially consistent with the CCIR Methodology in effect on the
-Closing Date (or any successor version adopted in compliance with the
-Reference Rate Administrator's published Change Management Policy) and
-(ii) operates with structural independence from counterparties to GPU
-compute transactions.
-
-<span class="cov-h">"Reference Rate Average"</span> means, as of any Determination Date, the
-arithmetic mean of the CRI Reference Rate for each of the thirty (30)
-consecutive Publication Dates ending on (and including) such
-Determination Date.
-
-<span class="cov-h">"Committed Customer Contracts"</span> means binding customer agreements for
-compute capacity having a remaining contractual term of not less than
-six (6) months from the relevant Determination Date and providing for
-fixed pricing or pricing subject only to a contractually agreed
-adjustment formula.
-
-<span class="cov-h">"Committed Revenue Coverage"</span> means, as of any Determination Date, the
-quotient (expressed as a percentage) of (a) the projected revenue
-receivable under Committed Customer Contracts during the twelve (12)-
-month period beginning on such Determination Date, divided by (b) the
-Borrower's projected gross rental revenue from the Pool Nodes during
-such twelve-month period (assuming utilization at the Borrower's
-then-current operating run rate and pricing at the most recently
-published CRI Reference Rate).
-
-<span class="cov-h">"Excess Cash Flow"</span> has the meaning given to that term on Schedule 1.01(b).
-
-<span class="cov-h">"Reserve Account"</span> means the segregated, blocked deposit account
-established with the Administrative Agent pursuant to Section 4.05.</pre>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-01-s04"><span class="sec-n">04</span> The Covenant</h3>
-        <pre class="cov-body">
-<span class="cov-h">Section 7.01   Market Price Maintenance Covenant.</span>
-
-<span class="cov-h">(a)  Reference Rate Tiers.</span> As of each Determination Date, the
-Reference Rate Average shall be classified into one of the following
-tiers (each, a "Reference Rate Tier"):
-
-    "Tier 1 (Baseline)"     Reference Rate Average  ≥  ${fmt(TIER_2_THRESHOLD)} per GPU per hour
-    "Tier 2 (Watch)"        ${fmt(TIER_3_THRESHOLD)}   ≤  Reference Rate Average  &lt;  ${fmt(TIER_2_THRESHOLD)}
-    "Tier 3 (Step-Up)"      ${fmt(TIER_4_THRESHOLD)}   ≤  Reference Rate Average  &lt;  ${fmt(TIER_3_THRESHOLD)}
-    "Tier 4 (Triggered)"    Reference Rate Average  &lt;  ${fmt(TIER_4_THRESHOLD)}
-
-Each threshold dollar amount set forth above is referred to herein as
-a "Tier Threshold."
-
-<span class="cov-h">(b)  Tier-Based Operating Requirements.</span> From and after each
-Determination Date and until the next succeeding Determination Date,
-the Borrower shall comply with the operating requirements applicable
-to the Reference Rate Tier in effect for such Determination Date, as
-follows:
-
-  <span class="cov-h">Tier 1 (Baseline):</span>
-    (i)   Committed Revenue Coverage of not less than thirty percent (30%);
-    (ii)  Quarterly compliance certificates as set forth in Section 6.01.
-
-  <span class="cov-h">Tier 2 (Watch):</span>
-    (i)   Committed Revenue Coverage of not less than fifty percent (50%);
-    (ii)  Monthly compliance certificates;
-    (iii) No Restricted Payments to be made until restoration to Tier 1.
-
-  <span class="cov-h">Tier 3 (Step-Up):</span>
-    (i)   Committed Revenue Coverage of not less than seventy percent (70%);
-    (ii)  Monthly compliance certificates;
-    (iii) No Restricted Payments;
-    (iv)  Reserve Account funded with cash and Permitted Investments having
-          a market value of not less than six (6) months of scheduled debt
-          service (the "Tier 3 Reserve Floor");
-    (v)   Excess Cash Flow Sweep of fifty percent (50%) at the end of each
-          calendar quarter, applied to scheduled amortization in inverse
-          order of maturity.
-
-  <span class="cov-h">Tier 4 (Triggered):</span>
-    (i)   Committed Revenue Coverage of not less than eighty-five percent
-          (85%);
-    (ii)  Monthly compliance certificates;
-    (iii) No Restricted Payments;
-    (iv)  Reserve Account funded with cash and Permitted Investments having
-          a market value of not less than twelve (12) months of scheduled
-          debt service (the "Tier 4 Reserve Floor");
-    (v)   Excess Cash Flow Sweep of one hundred percent (100%) at the end
-          of each calendar month, applied to scheduled amortization in
-          inverse order of maturity;
-    (vi)  Mandatory accelerated amortization of two and one-half percent
-          (2.50%) of the original principal amount of the Loans on the
-          last Business Day of each calendar quarter, in addition to
-          scheduled amortization.
-
-<span class="cov-h">(c)  Phase-In on Tier Transition.</span> If the Reference Rate Tier in
-effect for any Determination Date is more restrictive than the
-Reference Rate Tier that was in effect for the immediately preceding
-Determination Date, the Borrower shall achieve compliance with the
-operating requirements of the new Reference Rate Tier no later than
-thirty (30) days after such Determination Date (the "Tier Transition
-Cure Period"); provided that (i) any change in Committed Revenue
-Coverage requirement shall be required to be achieved within ninety
-(90) days, and (ii) any change in the Reserve Account funding floor
-shall be required to be achieved within forty-five (45) days.
-
-<span class="cov-h">(d)  Step-Down on Tier Improvement.</span> If the Reference Rate Tier in
-effect for any Determination Date is less restrictive than the
-Reference Rate Tier that was in effect for the immediately preceding
-Determination Date, the operating requirements applicable to the new
-Reference Rate Tier shall apply automatically; provided that release
-of any cash from the Reserve Account in excess of the new applicable
-Reserve Floor shall require delivery of a compliance certificate
-confirming that no Default or Event of Default has occurred and is
-continuing.
-
-<span class="cov-h">(e)  Failure to Comply.</span> The failure of the Borrower to achieve
-compliance with the operating requirements of the applicable Reference
-Rate Tier within the Tier Transition Cure Period shall constitute an
-Event of Default.
-
-<span class="cov-h">(f)  Interim Test.</span> The Administrative Agent may, at the direction of
-the Required Lenders, designate any Business Day as an interim
-Determination Date upon five (5) Business Days' written notice to the
-Borrower if (i) the most recently published CRI Reference Rate is more
-than fifteen percent (15%) below the Reference Rate Average used for
-the most recent Determination Date or (ii) a Reference Rate Disruption
-Event has occurred and is continuing.</pre>
+        <div class="ftable-wrap">
+          <table class="ftable">
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Series range</th>
+                <th>Monitoring response</th>
+              </tr>
+            </thead>
+            <tbody>
+              {levels.map((l) => (
+                <tr>
+                  <td class="feat">{l.label}</td>
+                  <td>{l.range}</td>
+                  <td>{l.response}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <p>
-          The structure matches the RBL minimum hedging covenant's tiered
-          logic (falling published price automatically drives tighter
-          operational and cash-flow requirements), adapted to the operational
-          realities of GPU-backed lending. Committed Revenue Coverage plays
-          the role that hedge coverage plays in RBL: it locks in expected
-          cash flow at progressively higher floors as rental rates fall,
-          insulating debt service capacity from further spot-price decline.
+          The monitor also runs a fast-move check between review dates. If a
+          daily print falls more than 15% below the last 30-day average, the
+          lender reviews early. Without this check, a sharp fall early in the
+          month would wait weeks for the next review.
         </p>
         <p>
-          The Tier Transition Cure Period exists because some operational
-          responses (signing customer contracts, funding a reserve account)
-          cannot be executed within the 5-day reporting window that
-          triggered the tier change. The 30/45/90-day phase-in periods are
-          calibrated to the realistic timelines for each action.
-        </p>
-        <p>
-          The 15% interim-test threshold guards against fast moves between
-          Determination Dates. Without an interim test, a borrower could
-          stay in Tier 1 on a Friday Determination Date while the published
-          rate falls through Tier 4 over the subsequent week, with no
-          covenant response until the next month-end.
+          The levels in this example set monitoring responses only. They have
+          no contractual effect. Any contractual terms in a facility are for
+          the parties and their counsel.
         </p>
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s05"><span class="sec-n">05</span> Fallback Architecture</h3>
-        <p>
-          The fallback waterfall draws from the International Swaps and
-          Derivatives Association (ISDA) 2018 Benchmarks
-          Supplement and the ARRC hardwired LIBOR transition language,
-          adapted to a price reporting agency (PRA)-style commodity index. The rate-disruption
-          mechanics are common to any covenant citing this rate.
-        </p>
-        <pre class="cov-body">
-<span class="cov-h">Section 7.01(g)  Reference Rate Disruption.</span>
-
-<span class="cov-h">(i)  Reference Rate Disruption Events.</span> Each of the following shall
-constitute a "Reference Rate Disruption Event":
-
-    (A)  <span class="cov-h">Cessation Event:</span> the Reference Rate Administrator publicly
-    announces that it has ceased or will cease to publish the CRI
-    Reference Rate, and no successor administrator has assumed
-    publication;
-
-    (B)  <span class="cov-h">Administrator Event:</span> the Reference Rate Administrator (1)
-    ceases to maintain a published methodology, (2) loses material
-    structural independence from counterparties to GPU compute
-    transactions, or (3) becomes the subject of an enforcement action
-    by a financial regulator for benchmark-related conduct;
-
-    (C)  <span class="cov-h">Material Methodology Change:</span> the Reference Rate Administrator
-    implements a change to the methodology governing the CRI Reference
-    Rate that, in the reasonable determination of the Administrative
-    Agent, is not substantively similar to the methodology in effect
-    on the Closing Date and would, if applied to the historical
-    period, have produced a Reference Rate Average more than ten
-    percent (10%) different from the actual published values; or
-
-    (D)  <span class="cov-h">Publication Disruption:</span> the Reference Rate Administrator
-    fails to publish the CRI Reference Rate for five (5) or more
-    consecutive Publication Dates other than as a result of a
-    scheduled publication holiday.
-
-<span class="cov-h">(ii) Replacement Rate Waterfall.</span> Upon the occurrence and during the
-continuance of a Reference Rate Disruption Event, the "Replacement
-Rate" shall be determined in the following order of priority:
-
-    First, any rate published by a successor administrator that has
-    publicly assumed responsibility for continued publication of the
-    {REF_SERIES_ID} rate using a methodology substantially consistent
-    with the CCIR Methodology then in effect;
-
-    Second, a rate constructed by the Administrative Agent from
-    seller-posted prices of the type and from the source categories
-    specified in the CCIR Methodology, applying the aggregation
-    methodology specified in the CCIR Methodology in effect
-    immediately prior to the Reference Rate Disruption Event;
-
-    Third, any other published GPU compute reference rate selected by
-    the Administrative Agent (with the consent of the Required Lenders)
-    that (1) is administered by an entity structurally independent from
-    counterparties to GPU compute transactions, (2) covers guaranteed
-    on-demand H100 pricing offered by neocloud operators in the United
-    States, and (3) is published with a frequency of at least weekly; or
-
-    Fourth, a rate determined in good faith by the Administrative
-    Agent, based on then-available information regarding seller-posted
-    noninterruptible H100 prices from neocloud operators of the type
-    historically used by the Reference Rate Administrator.
-
-<span class="cov-h">(iii) Tier Threshold Adjustment.</span> Upon application of any Replacement
-Rate, the Administrative Agent shall adjust each Tier Threshold by
-applying an adjustment spread (which may be positive or negative)
-calculated to neutralize the change in expected Reference Rate Tier
-classification arising solely from the change in rate input, measured
-over the thirty (30)-day period ending on the date of the Reference
-Rate Disruption Event.
-
-<span class="cov-h">(iv) Conforming Changes.</span> The Administrative Agent may, in connection
-with the implementation of any Replacement Rate, make such technical,
-administrative, or operational changes to this Agreement (including
-to the Determination Date schedule, publication-date references, and
-Tier Threshold dollar amounts) as the Administrative Agent reasonably
-determines are appropriate, without further consent of the Borrower
-or any Lender.</pre>
-        <p>
-          <strong>Material Methodology Change is operationalized with a
-          numerical test.</strong> Rather than leaving "material change" to
-          argument, the draft requires the change to produce more than a 10%
-          deviation from historical published values. This anchors the test
-          to objective data and is calibratable against CCIR's Change
-          Management Policy.
-        </p>
-        <p>
-          <strong>The second-tier fallback replicates the methodology, not
-          the database.</strong> Because the rate's inputs are publicly
-          posted prices and the methodology is published, an agent bank can
-          construct a substantially consistent rate directly from the public
-          market surface without access to any CCIR-held data. This is a
-          structural property of the no-submitter, posted-price design: the
-          fallback depends on documents CCIR already publishes, not on
-          confidential data it would have to release.
-        </p>
-        <p>
-          <strong>The Tier Threshold Adjustment is mandatory.</strong> Without
-          it, a benchmark replacement could re-tier the borrower arbitrarily.
-          The adjustment spread mechanic is the same one ARRC adopted for the
-          LIBOR transition.
-        </p>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-01-s06"><span class="sec-n">06</span> Worked Numerical Example</h3>
+        <h3 id="uc-01-s04"><span class="sec-n">04</span> Worked Numerical Example</h3>
         <p class="calib-note">
-          Calibration: example values below are derived from a Closing Date
-          Reference Rate of <strong>${fmt(closingRate)}</strong> per GPU per
-          hour ({REF_SERIES_ID}, as published by CCIR on {meta.as_of_date})
-          and a stylized 24-month rate trajectory. Tier Thresholds set at
-          92% / 80% / 69% of close, rounded to nearest $0.05.
+          Calibration: values below derive from a closing level of
+          <strong>${fmt(closingRate)}</strong> per GPU per hour
+          ({REF_SERIES_ID}, published by CCIR on {meta.as_of_date}) and a
+          stylized 24-month rate path. Watch levels sit at 92% / 80% / 69% of
+          close, rounded to the nearest $0.05.
         </p>
         <div class="ftable-wrap">
           <table class="traj">
             <thead>
               <tr>
-                <th>Determination Date</th>
+                <th>Review Date</th>
                 <th class="num">30-Day Avg</th>
                 <th class="num">% of Close</th>
-                <th>Tier</th>
-                <th>Triggered Operating Requirements</th>
-                <th>Cure Action by Borrower</th>
+                <th>Level</th>
+                <th>Monitoring Response</th>
+                <th>What the Monitor Checks</th>
               </tr>
             </thead>
             <tbody>
@@ -691,245 +416,142 @@ or any Lender.</pre>
                   <td>{r.month}</td>
                   <td class="num">${fmt(r.value)}</td>
                   <td class="num">{(r.pct * 100).toFixed(0)}%</td>
-                  <td class={`tier tier-${r.tier} ${r.transition ? 'tier-transition' : ''} ${r.improvement ? 'tier-improvement' : ''}`}>
-                    {r.tierLabel}
+                  <td class={`tier tier-${r.level} ${r.transition ? 'tier-transition' : ''} ${r.improvement ? 'tier-improvement' : ''}`}>
+                    {r.levelLabel}
                   </td>
-                  <td class="reqs">{r.triggered}</td>
-                  <td class="cure">{r.cure}</td>
+                  <td class="reqs">{r.response}</td>
+                  <td class="cure">{r.check}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <p>
-          <strong>The covenant tightens automatically without negotiation.</strong>
-          Each tier transition triggers its consequences mechanically based on
-          the published rate. There is no lender consent required, no waiver
-          to negotiate, no event-of-default to declare.
+          <strong>The series sets the pace of review.</strong> Each change in
+          level comes from the published data. The lender decides in advance
+          what each level means for its own process.
         </p>
         <p>
-          <strong>Operational responses lag tier transitions, by design.</strong>
-          Customer contracts cannot be signed in five days. Reserve accounts
-          can be funded faster. The Phase-In provisions accommodate this with
-          30/45/90-day windows.
+          <strong>Some checks take longer than others.</strong> A price review
+          takes a day. Gathering a contract book or rerunning a coverage model
+          takes weeks. Staged levels give the lender time to prepare each step.
         </p>
         <p>
-          <strong>Step-down on improvement is automatic but releases require
-          certification.</strong> When the rate recovers (Month 21 in the
-          example), the borrower's operating constraints loosen
-          automatically, but cash held in the Reserve Account does not
-          release without a compliance certificate.
-        </p>
-        <p>
-          <strong>The covenant signals economic stress without triggering
-          default.</strong> Tier 4 is restrictive but not default. Default
-          occurs only on cure failure within the Phase-In window, a
-          separable, narrower event.
+          <strong>Recovery steps the review back down.</strong> When the rate
+          recovers (Month 21 in the example), review frequency falls back. The
+          lender records the recovery with the data that drove it.
         </p>
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s07"><span class="sec-n">07</span> Precedent Map</h3>
+        <h3 id="uc-01-s05"><span class="sec-n">05</span> The Watch Levels Against Three Years of History</h3>
         <p>
-          The covenant structure illustrated above maps to established
-          commodity-credit precedent as follows:
-        </p>
-        <div class="ftable-wrap">
-          <table class="ftable">
-            <thead>
-              <tr>
-                <th>Covenant feature</th>
-                <th>Precedent</th>
-              </tr>
-            </thead>
-            <tbody>
-              {precedentRows.map(({ feature, precedent }) => (
-                <tr>
-                  <td class="feat">{feature}</td>
-                  <td>{precedent}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p>
-          The drafting innovation, to the extent there is one, is the
-          operationalization of a published commodity-index trigger into an
-          asset class (GPU compute) in which forward markets do not yet
-          exist. The hedging-floor concept that has carried RBL minimum
-          hedging covenants since their inception relies on the existence of
-          a liquid futures market into which producers can sell forward
-          production. For GPU compute, the functional analog is the
-          customer-contract market: locking in fixed-price customer
-          contracts at progressively higher floors achieves the same
-          insulation against further spot-rate decline.
-        </p>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-01-s08"><span class="sec-n">08</span> Limitations and Notes for Practitioners</h3>
-        <p>
-          <strong>This is illustrative, not transactional.</strong> The
-          hypothetical facility, dollar thresholds, tier breakpoints, and
-          percentage requirements are designed for clarity. Actual
-          transaction terms will depend on borrower credit, pool composition,
-          counterparty considerations, and market conditions at execution.
-        </p>
-        <p>
-          <strong>Tier breakpoint calibration is the central judgment input.</strong>
-          The illustrative thresholds (92% / 80% / 69% of Closing Date
-          Reference Rate) are calibrated to deliver meaningful covenant
-          response across a realistic range of rate movement. Real
-          transactions might use absolute dollar thresholds,
-          percentage-from-close thresholds (as drafted here), or hybrid
-          structures.
-        </p>
-        <p>
-          <strong>Committed Revenue Coverage requires careful definition.</strong>
-          The drafting above defines CRC by reference to a 12-month forward
-          window. Other formulations are possible: trailing 12-month (less
-          reactive but more verifiable); remaining-tenor-of-loan (more
-          stringent); weighted-average remaining-term (more sophisticated).
-          Each formulation produces different incentives for the borrower's
-          customer-contracting strategy.
-        </p>
-        <p>
-          <strong>The lender population for GPU-backed lending is still
-          forming.</strong> Unlike RBL, where decades of standardized
-          practice support a deep agent-bank ecosystem, GPU-backed lending
-          lacks established lender-internal alternatives to a published
-          reference rate. This means a CRI rate plays a structurally more
-          central role in the credit document than NYMEX strip plays in
-          RBL. Governance, methodology transparency, and fallback
-          architecture matter more, not less, in this asset class than in
-          mature commodity markets.
-        </p>
-      </section>
-
-      <p class="source-note">
-        This example draws on conventions identified in the CCIR
-        commodity-index citation precedent survey, including reserve-based
-        lending borrowing-base mechanics (with particular reference to
-        minimum hedging covenants and reserve-account funding triggers),
-        PDP oil &amp; gas ABS indenture practice, the 2005 ISDA Commodity
-        Definitions, the ISDA 2018 Benchmarks Supplement, and ARRC
-        hardwired LIBOR transition language.
-      </p>
-
-      <section class="sec">
-        <h3 id="uc-01-s09"><span class="sec-n">09</span> The Covenant Against Three Years of History</h3>
-        <p>
-          The same tier mechanics, run against reconstructed history instead
-          of a stylized trajectory. Rates are the monthly neocloud H100
-          guaranteed on-demand medians from CCIR's archived-page backfill
+          The same watch levels, run against reconstructed history in place of
+          a stylized path. Rates are the monthly neocloud H100 guaranteed
+          on-demand medians from CCIR's archived-page backfill
           (<a href="/research/od-vs-committed">On-Demand vs Committed, Three
-          Years</a>); the facility closes February 2024 at
-          ${fmt(BACKTEST_CLOSE)} with Tier Thresholds at 92% / 80% / 69% of
-          close ($3.95 / $3.45 / $2.95).
+          Years</a>). The exposure starts in February 2024 at
+          ${fmt(BACKTEST_CLOSE)}. Watch levels sit at 92% / 80% / 69% of that
+          level ($3.95 / $3.45 / $2.95).
         </p>
         <div class="ftable-wrap">
           <table class="traj">
             <thead>
-              <tr><th>Period</th><th class="num">Reference rate</th><th>Tier</th><th>Operating requirements in force</th></tr>
+              <tr><th>Period</th><th class="num">Series level</th><th>Level</th><th>Monitoring posture</th></tr>
             </thead>
             <tbody>
               {backtest.map((r) => (
                 <tr>
                   <td>{r.period}</td>
                   <td class="num">{r.rate}</td>
-                  <td class={`tier tier-${r.cls.slice(1)}`}>{r.tier}</td>
-                  <td class="reqs">{r.consequence}</td>
+                  <td class={`tier tier-${r.cls.slice(1)}`}>{r.level}</td>
+                  <td class="reqs">{r.posture}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <p>
-          <strong>Twelve months in Tier 4 and no default.</strong> Through the
-          2025 price floor the facility ran a funded reserve, a full cash
-          sweep, and accelerated amortization. The lender de-risked
-          mechanically through the trough while the borrower kept operating.
-          When the market turned in December 2025, restrictions stepped down
-          automatically, reaching full restoration by May 2026.
+          <strong>Twelve months at Level 4.</strong> Through the 2025 price
+          floor, a lender following this routine would have run its fullest
+          review for a year. When the market turned in December 2025, the
+          posture stepped down. It reached baseline by May 2026.
         </p>
         <p>
-          <strong>Every transition came from the published rate.</strong> No
-          waiver negotiations, no amendment cycle, no dispute about what the
-          market was doing: eight tier events in twenty-nine months, each one
-          mechanical.
+          <strong>Every change in level came from the published data.</strong>
+          The record shows eight level changes in twenty-nine months. Each one
+          traces to a monthly print.
         </p>
         <p class="calib-note">
-          Calibration notes: the exhibit uses monthly stepped-panel medians as
-          a stand-in for the drafting's 30-day daily Reference Rate Average.
-          The backfill panel is thin early and is a different collection
-          method from the live daily series (no splicing implied). June
-          2026's single-month re-tightening illustrates why the drafting
-          smooths on a 30-day average and includes the 15% interim test.
+          Calibration notes: the exhibit uses monthly stepped-panel medians in
+          place of the 30-day daily average. The backfill panel is thin early.
+          It uses a different collection method from the live daily series,
+          and no splicing is implied. The single-month drop in June 2026 shows
+          why the routine smooths on a 30-day average and adds a 15% fast-move
+          check.
         </p>
       </section>
 
       <section class="sec">
-        <h3 id="uc-01-s10"><span class="sec-n">10</span> The Exposure-Weighted Variant</h3>
+        <h3 id="uc-01-s06"><span class="sec-n">06</span> Weighting by Exposed Capacity</h3>
         <p>
-          The predictable borrower objection to Section 7.01 as drafted: a
-          heavily contracted borrower's revenue does not move when the index
-          moves, so a raw-index trigger over-tightens exactly the borrower
-          the lender likes most. The objection is sound, and the repair is
-          established practice: reserve-based lending credits hedged volumes
-          into the borrowing base at their hedge prices and applies the price
-          deck only to unhedged volumes. Committed customer contracts are
-          this market's hedge, so contracted capacity earns contract-price
-          credit in the <em>test</em>, not merely in the coverage
-          requirement. The covenant classifies tiers on a blended rate
-          rather than the bare index.
+          A heavily contracted borrower's revenue does not move with the
+          market rate. A raw price level would flag that borrower as often as
+          an uncontracted one. Reserve-based lenders handle the same issue by
+          valuing hedged volumes at their hedge prices. Committed customer
+          contracts play that role for compute.
         </p>
-        <pre class="cov-body">
-<span class="cov-h">"Exposed Capacity"</span> means, as of any Determination Date, the portion of
-the Pool Nodes' capacity that is either (a) not subject to a Committed
-Customer Contract or (b) subject to a Committed Customer Contract
-scheduled to expire within twelve (12) months of such date.
-
-<span class="cov-h">"Effective Revenue Rate"</span> means, as of any Determination Date, the
-capacity-weighted average of (a) the contracted rates applicable to
-capacity that is not Exposed Capacity and (b) the Reference Rate
-Average applied to Exposed Capacity.
-
-<span class="cov-h">Section 7.01(a) (Exposure-Weighted Variant).</span> As of each Determination
-Date, the Effective Revenue Rate (in place of the Reference Rate
-Average) shall be classified against the Tier Thresholds. The Borrower
-shall deliver with each compliance certificate a schedule of Committed
-Customer Contracts (contracted rates, covered capacity, and scheduled
-expirations) certified by a Responsible Officer.</pre>
         <p>
-          The variant encodes the expiry dynamic mechanically: far from
-          expiry, the index flows through only the uncontracted sliver and
-          the covenant barely engages. As contracts roll toward their
-          expiration dates, Exposed Capacity grows and the same index level
-          bites progressively harder, reaching full force at the cliff. At
-          the 2025 floor in the Section 09 backtest (index at $2.79 against
-          contracts written at close):
+          The monitor can blend the two. Contracted capacity counts at its
+          contract rate. Exposed capacity counts at the 30-day market average.
+          Exposed capacity is anything uncontracted or under a contract that
+          expires within 12 months. The monitor compares the blended rate with
+          the watch levels.
+        </p>
+        <p>
+          The blend tracks contract expiry. Far from expiry, the market rate
+          touches only the uncontracted share. As contracts approach expiry,
+          more capacity is exposed, and the same market level weighs more
+          heavily. The table shows the 2025 floor in the Section 05 history,
+          with the market at $2.79 and contracts written at close.
         </p>
         <div class="ftable-wrap">
           <table class="ftable">
-            <thead><tr><th>Contracted share (beyond 12 mo)</th><th>Effective Revenue Rate</th><th>Tier at the 2025 floor</th></tr></thead>
+            <thead><tr><th>Contracted share (beyond 12 mo)</th><th>Blended rate</th><th>Level at the 2025 floor</th></tr></thead>
             <tbody>
-              <tr><td>85%</td><td>$4.07</td><td>Tier 1 · Baseline</td></tr>
-              <tr><td>50%</td><td>$3.55</td><td>Tier 2 · Watch</td></tr>
-              <tr><td>15%</td><td>$3.02</td><td>Tier 3 · Step-Up</td></tr>
-              <tr><td>0% (raw index)</td><td>$2.79</td><td>Tier 4 · Triggered</td></tr>
+              <tr><td>85%</td><td>$4.07</td><td>Level 1 · Baseline</td></tr>
+              <tr><td>50%</td><td>$3.55</td><td>Level 2 · Watch</td></tr>
+              <tr><td>15%</td><td>$3.02</td><td>Level 3 · Review</td></tr>
+              <tr><td>0% (market rate only)</td><td>$2.79</td><td>Level 4 · Escalate</td></tr>
             </tbody>
           </table>
         </div>
         <p>
-          <strong>What the lender receives for the relief:</strong> a
-          certified monthly contract-book schedule (rates, shares, expiry
-          ladder) it would otherwise negotiate for separately, and no
-          softening on the exposed slice. The variant also shares its inputs
-          with Use case 02: the Effective Revenue Rate here and the Projected
-          Rollover DSCR (debt-service coverage ratio) there are the same
-          computation at different horizons,
-          so one covenant package runs on one data feed: the published
-          series plus the borrower's contract ladder.
+          <strong>What the blend needs from the borrower:</strong> a monthly
+          schedule of contracted rates, covered capacity and expiry dates. The
+          same inputs drive the rollover exhibit in Use case 02. One data set
+          supports both: the published series plus the borrower's contract
+          ladder.
+        </p>
+      </section>
+
+      <section class="sec">
+        <h3 id="uc-01-s07"><span class="sec-n">07</span> Limitations</h3>
+        <p>
+          <strong>This is illustrative.</strong> The hypothetical exposure,
+          dollar levels, breakpoints and responses are designed for clarity. A
+          real monitoring program depends on the borrower, the pool, the
+          facility terms and market conditions.
+        </p>
+        <p>
+          <strong>Watch-level calibration is the central judgment.</strong> The
+          example uses 92% / 80% / 69% of the closing level. A lender might
+          instead use absolute dollar levels or a mix of both.
+        </p>
+        <p>
+          <strong>Panel depth matters.</strong> Each series discloses its
+          number of sources. A thin series moves more from day to day, and a
+          monitor should read it with that in mind.
         </p>
       </section>
     </article>
@@ -939,19 +561,18 @@ expirations) certified by a Responsible Officer.</pre>
         <span class="uc-kicker">Use case 02 · Contract rollover</span>
         <h2>Re-Leasing Risk Sized Against the Published Term Curve</h2>
         <p class="uc-lede">
-          A worked underwriting exhibit and drafting example for the rollover
-          problem in GPU-backed lending: a borrower's anchor customer
-          contract expires mid-loan and the expiring capacity must be
-          re-leased into the open market at then-prevailing rates. Modeled
-          on commercial mortgage-backed securities (CMBS) lease-sweep
-          mechanics and the re-leasing assumptions used
-          in aircraft and container ABS. Drafting illustration, not a model
-          form.
+          A worked example of the rollover problem in GPU-backed lending. A
+          borrower's anchor customer contract expires mid-loan. The freed
+          capacity must be re-leased at then-prevailing rates. A lender
+          watching this risk can size it against the published term curve
+          months before the contract expires. The approach mirrors the
+          market-rent assumptions used in commercial real estate and aircraft
+          leasing. The example is illustrative.
         </p>
       </header>
 
       <section class="uc-rate">
-        <div class="rate-kicker">Re-lease anchor (live, calibrating this example)</div>
+        <div class="rate-kicker">Re-lease rate (live, calibrating this example)</div>
         <div class="rate-id">{RELEASE_SERIES_ALL}</div>
         <div class="rate-price">${fmt(reLeaseRate)}<span class="rate-unit">/GPU-hr · 1Y committed</span></div>
         <div class="rate-meta">
@@ -974,32 +595,29 @@ expirations) certified by a Responsible Officer.</pre>
       <section class="sec">
         <h3 id="uc-02-s01"><span class="sec-n">01</span> Why Rollover Is the Central Credit Question</h3>
         <p>
-          The debt outlives the contracts that service it. Customer contracts
-          run three to five years. The facility matures later, so the capacity
-          behind the loan has to be re-contracted at least once before the
-          debt is repaid, at a rate no one has locked today, with no forward
-          market to hedge it. What that capacity earns when it is re-leased is
-          the credit question, and it is an observable number, published
-          daily.
+          Customer contracts usually run three to five years. The facilities
+          they support often mature later. The capacity behind the loan must
+          then be re-contracted at least once before repayment. No one has
+          locked that future rate, and few tools exist to hedge it. What the
+          capacity earns on re-lease is the credit question. The current
+          re-lease rate is observable and published daily.
         </p>
         <p>
-          When an anchor contract rolls off, the operator chooses how to
-          redeploy the freed capacity: re-contract it along the committed-term
-          curve, or sell it on the on-demand market at a higher headline rate
-          that carries no occupancy guarantee. Each path clears at
-          then-prevailing rates, so if the market has repriced below the
-          expiring vintage contract, coverage erodes regardless of which the
-          operator takes. The drafting below references the 1-year committed
-          rate as the reference point for that choice set: the tenor renters
-          will actually sign, priced for the occupancy the debt relies on.
+          When an anchor contract ends, the operator chooses how to redeploy
+          the capacity. It can re-contract along the committed-term curve. It
+          can also sell on the on-demand market at a higher headline rate with
+          no occupancy guarantee. Both paths clear at then-prevailing rates. If
+          the market has repriced below the expiring contract, coverage falls
+          on either path.
         </p>
         <p>
-          This is the same rollover problem that CMBS underwriting prices
-          with market-rent assumptions and lease-sweep periods, and that
-          aircraft lessors price with appraiser-published re-leasing rates.
-          The GPU market's equivalent of the market rent is the committed
-          term curve at the operator segment of the borrower: for a
-          neocloud, the CCIR Neocloud committed series shown above.
+          The example below uses the 1-year committed rate for that choice.
+          Renters sign at that tenor, and it prices the occupancy the debt
+          relies on. Commercial real estate lenders handle the same problem
+          with market-rent assumptions. Aircraft lessors use appraiser-published
+          re-leasing rates. For GPUs, the market rent is the committed term
+          curve for the borrower's operator segment. For a neocloud, that is
+          the CCIR Neocloud committed series shown above.
         </p>
       </section>
 
@@ -1007,142 +625,91 @@ expirations) certified by a Responsible Officer.</pre>
         <h3 id="uc-02-s02"><span class="sec-n">02</span> Worked Rollover Exhibit</h3>
         <p class="calib-note">
           Calibration: stylized facility of {FLEET_GPUS.toLocaleString()} GPUs
-          (1,000 nodes), {(ANCHOR_SHARE * 100).toFixed(0)}% of capacity under
-          an anchor contract written at ${fmt(VINTAGE_RATE)}/GPU-hr
-          (illustrative vintage), remainder sold at the on-demand rate
+          (1,000 nodes). {(ANCHOR_SHARE * 100).toFixed(0)}% of capacity sits
+          under an anchor contract written at ${fmt(VINTAGE_RATE)}/GPU-hr
+          (illustrative vintage). The remainder sells at the on-demand rate
           (live: ${fmt(odAllRate)}). DSCR at close {CLOSE_DSCR.toFixed(2)}x.
           Re-lease at the live 1Y committed rate of ${fmt(reLeaseRate)}
           ({RELEASE_SERIES_ALL}, as of {meta.as_of_date}). Margins and debt
-          service held constant to isolate the price effect.
+          service stay constant to isolate the price effect.
         </p>
         <div class="ftable-wrap">
           <table class="ftable">
             <tbody>
               <tr><th>Anchor contract rate at close (stylized)</th><td>${fmt(VINTAGE_RATE)} /GPU-hr</td></tr>
-              <tr><th>Market Re-Lease Rate today (live)</th><td>${fmt(reLeaseRate)} /GPU-hr · 1Y committed, Neocloud segment</td></tr>
+              <tr><th>Re-lease rate today (live)</th><td>${fmt(reLeaseRate)} /GPU-hr · 1Y committed, Neocloud segment</td></tr>
               <tr><th>Repricing on the expiring block</th><td>{anchorRepricePct.toFixed(0)}%</td></tr>
-              <tr><th>Book revenue, indexed (close = 100)</th><td>{((revPost / revClose) * 100).toFixed(0)}</td></tr>
-              <tr><th>DSCR at close → Projected Rollover DSCR</th><td>{CLOSE_DSCR.toFixed(2)}x → <strong>{rolloverDscr.toFixed(2)}x</strong></td></tr>
-              <tr><th>Covenant response at &lt; 1.20x</th><td>Lease Sweep Period commences; excess cash trapped to the Rollover Reserve until re-leasing or reserve floor is met</td></tr>
+              <tr><th>Book revenue (close = 100)</th><td>{((revPost / revClose) * 100).toFixed(0)}</td></tr>
+              <tr><th>DSCR at close → Projected rollover DSCR</th><td>{CLOSE_DSCR.toFixed(2)}x → <strong>{rolloverDscr.toFixed(2)}x</strong></td></tr>
+              <tr><th>Monitoring flag at &lt; 1.20x</th><td>Escalate for review; request the borrower's re-leasing plan and pipeline</td></tr>
             </tbody>
           </table>
         </div>
         <p>
-          <strong>The exhibit prices the risk before it happens.</strong> The
-          Projected Rollover DSCR is computable on any publication date from
-          the borrower's contract book and the published curve. Nothing in it
-          waits for the borrower to re-lease. That is what lets the covenant
-          act ahead of the expiry rather than after the revenue is gone.
+          <strong>The exhibit sizes the risk ahead of the expiry.</strong> The
+          projected rollover DSCR is computable on any publication date. It
+          needs only the borrower's contract book and the published curve. The
+          lender can see the gap months before the revenue changes.
         </p>
       </section>
 
       <section class="sec">
-        <h3 id="uc-02-s03"><span class="sec-n">03</span> Defined Terms and Covenant</h3>
-        <pre class="cov-body">
-<span class="cov-h">"Anchor Contract"</span> means any Committed Customer Contract projected to
-account for twenty percent (20%) or more of the Borrower's gross rental
-revenue during any twelve-month period.
-
-<span class="cov-h">"Market Re-Lease Rate"</span> means, as of any date of determination, the
-arithmetic mean of the rate published as <strong>{RELEASE_SERIES_US}</strong> by the
-Reference Rate Administrator for the thirty (30) consecutive Publication
-Dates ending on such date; provided that if such rate has been published
-on fewer than twenty (20) of such Publication Dates, the corresponding
-region-pooled series <strong>{RELEASE_SERIES_ALL}</strong> shall be used in its place.
-
-<span class="cov-h">"Rollover Determination Date"</span> means the date one hundred eighty (180)
-days prior to the scheduled expiration of any Anchor Contract, and each
-monthly Determination Date thereafter until such Anchor Contract has been
-replaced or renewed.
-
-<span class="cov-h">"Projected Rollover DSCR"</span> means, as of any Rollover Determination Date,
-the ratio of (a) projected Net Operating Cash Flow for the twelve-month
-period beginning on the scheduled expiration date of the applicable
-Anchor Contract, computed by re-pricing the capacity subject to such
-Anchor Contract at the then-current Market Re-Lease Rate (and holding
-all other Committed Customer Contracts at their contracted rates), to
-(b) scheduled debt service for such period.
-
-<span class="cov-h">Section 7.02   Contract Rollover.</span>
-
-(a)  If, as of any Rollover Determination Date, the Projected Rollover
-DSCR is less than 1.20 to 1.00, a "Lease Sweep Period" shall commence
-on such date.
-
-(b)  During a Lease Sweep Period, one hundred percent (100%) of Excess
-Cash Flow shall be deposited monthly into the Rollover Reserve Account.
-
-(c)  A Lease Sweep Period shall end when either (i) the Borrower has
-entered into replacement Committed Customer Contracts covering not less
-than seventy-five percent (75%) of the expiring capacity such that the
-Projected Rollover DSCR (recomputed giving effect thereto) equals or
-exceeds 1.20 to 1.00, or (ii) the balance of the Rollover Reserve
-Account equals or exceeds six (6) months of scheduled debt service.
-
-(d)  Amounts in the Rollover Reserve Account shall be released to the
-Borrower upon the end of a Lease Sweep Period under clause (c)(i), or
-applied to debt service as incurred during any period in which the
-capacity formerly subject to the Anchor Contract remains un-leased.</pre>
+        <h3 id="uc-02-s03"><span class="sec-n">03</span> What to Watch and When</h3>
         <p>
-          <strong>The trigger runs on the published curve, not on borrower
-          projections.</strong> Both inputs to the Projected Rollover DSCR
-          that move (the re-lease rate and the trigger date) come from
-          outside the borrower: one from the Reference Rate Administrator's
-          publication, one from the contract calendar. The negotiation
-          surface is confined to the thresholds.
+          A lender tracking rollover risk might follow a simple routine.
         </p>
         <p>
-          <strong>The 1Y tenor is the honest re-lease assumption.</strong>
-          Renters of expiring capacity are predominantly unwilling to commit
-          beyond one year. Re-pricing expiring capacity at the 1-year
-          committed rate, rather than at on-demand or at a longer tenor the
-          market will not sign, matches observed contracting
-          behavior.
+          <strong>Start 180 days out.</strong> Begin the rollover check 180
+          days before any contract that supplies 20% or more of gross rental
+          revenue expires. Repeat it monthly until the contract is replaced or
+          renewed.
+        </p>
+        <p>
+          <strong>Use the 30-day average of the US 1-year series.</strong> The
+          monitored series is {RELEASE_SERIES_US}. If it printed on fewer than
+          20 of the last 30 publication dates, use the region-pooled
+          {RELEASE_SERIES_ALL} instead.
+        </p>
+        <p>
+          <strong>Re-price only the expiring block.</strong> Hold every other
+          contract at its contracted rate. Re-price the expiring capacity at the
+          1-year average. Then compare projected cash flow with scheduled debt
+          service.
+        </p>
+        <p>
+          <strong>Flag coverage below 1.20x.</strong> A projected DSCR below
+          that level prompts a review of the borrower's re-leasing pipeline. It
+          also prompts a check of any reserve terms already in the facility.
+        </p>
+        <p>
+          <strong>The 1-year tenor matches observed behavior.</strong> Renters
+          of expiring capacity rarely commit beyond one year. Pricing the block
+          at the 1-year rate reflects the contracts they actually sign.
+        </p>
+        <p>
+          <strong>Both moving inputs come from outside the borrower.</strong>
+          The re-lease rate comes from the published series. The check date
+          comes from the contract calendar.
         </p>
       </section>
 
       <section class="sec">
-        <h3 id="uc-02-s04"><span class="sec-n">04</span> Precedent Map</h3>
-        <div class="ftable-wrap">
-          <table class="ftable">
-            <thead>
-              <tr>
-                <th>Covenant feature</th>
-                <th>Precedent</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rolloverPrecedents.map(({ feature, precedent }) => (
-                <tr>
-                  <td class="feat">{feature}</td>
-                  <td>{precedent}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="sec">
-        <h3 id="uc-02-s05"><span class="sec-n">05</span> Limitations</h3>
+        <h3 id="uc-02-s04"><span class="sec-n">04</span> Limitations</h3>
         <p>
-          <strong>This is illustrative, not transactional.</strong> The
-          vintage contract rate, fleet size, anchor share, and closing DSCR
-          are stylized. Only the re-lease anchor and the term curve are
-          live. Panel depth on committed tenors is disclosed per cell above.
-          Thin cells (n&lt;3) should be treated as indicative in real
-          drafting, and the region-pooled fallback in the Market Re-Lease
-          Rate definition exists for that reason. Utilization on
-          re-leased capacity is held at the contracted level. A real
-          exhibit would stress it jointly with rate.
+          <strong>This is illustrative.</strong> The vintage contract rate,
+          fleet size, anchor share and closing DSCR are stylized. Only the
+          re-lease rate and the term curve are live. Panel depth on committed
+          tenors is disclosed per cell above. Treat thin cells (n&lt;3) as
+          indicative. The region-pooled fallback exists for that reason.
+          Utilization on re-leased capacity stays at the contracted level. A
+          fuller exhibit would stress utilization and rate together.
         </p>
       </section>
 
       <p class="source-note">
-        This example draws on CMBS lease-sweep and rollover-reserve
-        practice, aircraft and container ABS re-leasing assumption
-        conventions, and merchant-power re-contracting analysis, adapted to
-        a non-storable compute market where the re-contracting price is
+        This example draws on rollover analysis used in commercial real
+        estate, aircraft and container leasing, and merchant power. It adapts
+        that practice to a compute market where the re-lease price is
         published daily.
       </p>
     </article>
@@ -1152,20 +719,18 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
         <span class="uc-kicker">Use case 03 · Pool surveillance</span>
         <h2>Monitoring a Multi-Generation Pool</h2>
         <p class="uc-lede">
-          Securitized and warehouse pools are not one chip. They are mixed
-          fleets across generations. A worked construction for the composite
-          reference such a pool needs: a unit-weighted basket of the
-          published per-generation series, fixed at closing, verified in
-          surveillance. Modeled on fleet-weighted appraisal conventions in
-          aircraft ABS and vintage-index surveillance in auto ABS. Drafting
-          illustration, not a model form.
+          Securitized and warehouse pools usually hold mixed fleets across chip
+          generations. This worked example builds a pool rate for such a fleet.
+          It is a unit-weighted basket of the published per-generation series,
+          with weights from the asset schedule. Aircraft and auto lenders watch
+          mixed fleets in a similar way. The example is illustrative.
         </p>
       </header>
 
       <section class="uc-rate">
         <div class="rate-kicker">Worked pool (live, calibrating this example)</div>
         <div class="rate-id">{poolRows.map((r) => `${(r.weight * 100).toFixed(0)}% ${r.chip}`).join(' · ')}</div>
-        <div class="rate-price">${fmt(poolRate)}<span class="rate-unit">/GPU-hr · Pool Reference Rate</span></div>
+        <div class="rate-price">${fmt(poolRate)}<span class="rate-unit">/GPU-hr · Pool rate</span></div>
         <div class="rate-meta">
           Unit-weighted basket of Neocloud guaranteed on-demand cells
           <span class="sep">·</span>
@@ -1179,23 +744,20 @@ capacity formerly subject to the Anchor Contract remains un-leased.</pre>
       </section>
 
       <section class="sec">
-        <h3 id="uc-03-s01"><span class="sec-n">01</span> The Pool Reference Rate</h3>
-        <pre class="cov-body">
-<span class="cov-h">"Pool Reference Rate"</span> means, as of any date of determination, the
-weighted average of the CCIR series corresponding to each Generation
-represented in the Asset Schedule (for each Generation, the Neocloud
-guaranteed on-demand series for the applicable region), weighted by
-each Generation's share of Pool GPU units as set forth in the Asset
-Schedule. Weights are fixed as of the Closing Date and adjusted only
-upon an asset substitution, addition, or disposition reflected in a
-Servicer Report.</pre>
+        <h3 id="uc-03-s01"><span class="sec-n">01</span> The Pool Rate</h3>
         <p>
-          Every input is a published series with disclosed panel depth, and
-          the weights come from the deal's own asset schedule, so trustee,
-          servicer, rating surveillance, and investors compute the same
-          number from public data plus one document they already hold. The
-          single-series covenants in Use case 01 run unchanged on the pool
-          rate.
+          The pool rate is the weighted average of the CCIR series for each
+          generation in the asset schedule. For each generation, the example
+          uses the Neocloud guaranteed on-demand series for the United States.
+          Each weight is that generation's share of pool GPU units. Weights
+          stay fixed until a servicer report shows a substitution, addition or
+          disposition.
+        </p>
+        <p>
+          Every input is a published series with disclosed panel depth. The
+          weights come from the deal's own asset schedule. Trustee, servicer,
+          rating analysts and investors can all compute the same number. The
+          watch levels in Use case 01 apply unchanged to the pool rate.
         </p>
       </section>
 
@@ -1205,215 +767,63 @@ Servicer Report.</pre>
           The cross-section of generation pricing is log-linear in age at a
           common slope (≈ −26% per year; see
           <a href="/research/gpu-age-curve">the age-curve note</a>). That has
-          a direct consequence for pools: <strong>a static pool's earning
-          power declines at approximately the same rate regardless of its
-          generation mix.</strong> Mix determines the level. It does not
-          change the slope. The only lever that changes a pool's decline
-          path is substitution: replacing aging units with newer
-          generations. That is the servicer behavior
-          surveillance exists to verify.
+          a direct consequence for pools. <strong>A static pool's earning
+          power declines at about the same rate regardless of its generation
+          mix.</strong> Mix sets the level. It does not change the slope. The
+          only lever that changes a pool's decline path is substitution,
+          replacing aging units with newer generations. Surveillance checks
+          that servicer behavior.
         </p>
         <p>
-          Surveillance therefore watches four things: the Pool Reference
-          Rate against its closing level; mix drift in the Servicer Report
-          against the weights being applied; whether substitutions actually
-          entered the basket on schedule; and panel depth <em>n</em> on each
-          underlying cell, so a thinning input is visible before it matters.
-          Generations without a published cell (a new chip in its first
-          weeks) enter the basket only by amendment, the same discipline as
-          any index addition.
+          Surveillance therefore watches four things. The first is the pool
+          rate against its closing level. The second is mix drift in the
+          servicer report against the weights in use. The third is whether
+          substitutions entered the basket on schedule. The fourth is panel
+          depth <em>n</em> on each underlying cell, so a thinning input shows
+          early. A generation without a published cell (a new chip in its
+          first weeks) stays outside the basket until its series publishes.
         </p>
       </section>
 
       <section class="sec">
-        <h3 id="uc-03-s03"><span class="sec-n">03</span> Precedent and Limitations</h3>
+        <h3 id="uc-03-s03"><span class="sec-n">03</span> Adjacent Practice and Limitations</h3>
         <p>
-          The construction is standard in adjacent asset classes. Aircraft
-          ABS monitors fleet value on appraisals weighted by airframe type
-          and vintage. Container ABS tracks per-diem rates by box type and
-          age. Auto ABS surveillance marks pools against vintage- and
-          segment-level auction indices. GPUs are, if anything, easier: the
-          per-generation series publish daily rather than quarterly.
-          Limitations: the basket inherits each cell's panel depth (thin
-          cells are disclosed, not hidden); unit weighting is one convention
-          (cost-basis or capacity weighting are alternatives the documents
-          can elect); and the pool rate is an earning-power reference for
-          the collateral, not a valuation of it.
+          Adjacent asset classes use the same construction. Aircraft ABS
+          monitors fleet value on appraisals weighted by airframe type and
+          vintage. Container ABS tracks per-diem rates by box type and age.
+          Auto ABS surveillance marks pools against vintage and segment auction
+          data. The per-generation GPU series publish daily.
+        </p>
+        <p>
+          Limitations: the basket inherits each cell's panel depth, and thin
+          cells are disclosed. Unit weighting is one convention. Cost-basis or
+          capacity weighting are alternatives. The pool rate measures the
+          earning power of the collateral. It is not a valuation of it.
         </p>
       </section>
     </article>
 
-    <article class="usecase" id="citation-annex">
+    <article class="usecase" id="data-note">
       <header class="uc-head">
-        <span class="uc-kicker">Citation Annex · Applies to any citing document</span>
-        <h2>Series Citation and Disruption Provisions</h2>
+        <span class="uc-kicker">Note · Using CCIR data</span>
+        <h2>How to Reference CCIR Data</h2>
         <p class="uc-lede">
-          As the administrator, CCIR standardizes the two things only an
-          administrator can: how its series are correctly cited, and what
-          should happen to a citing document if a series materially changes
-          or ceases. The annex below is published for that purpose. It takes
-          no position on commercial terms between parties. Coverage levels,
-          thresholds, remedies, and cure mechanics are matters for the
-          parties and their counsel (Use Case 01 works one such structure as
-          an illustration). It is not legal advice and not a recommended
-          form of agreement.
+          CCIR publishes market data and research for information and
+          monitoring. When a report or internal policy uses a CCIR series, cite
+          the series ID, the publication date and the methodology version in
+          effect. Series IDs such as {REF_SERIES_ID} are stable data
+          identifiers.
         </p>
       </header>
 
       <section class="sec">
-        <p class="calib-note">
-          Incorporation: Part A inserts into the citing document's
-          definitions. Part B inserts as a benchmark-disruption provision
-          wherever the citing document houses rate mechanics. Bracketed items
-          are calibrated by the parties. The calibration notes at the end do
-          not form part of the operative language.
+        <p>
+          The <a href="/documents/data-terms">Data Terms</a> govern use of CCIR
+          data. Nothing on this page is legal, credit or investment advice.
+          CCIR is not a party to any agreement that uses its data. Any
+          commercial terms are matters for the parties and their counsel.
         </p>
-        <button id="annex-copy" class="annex-copy" type="button">Copy annex text</button>
       </section>
-
-      <section class="sec">
-        <h3 id="annex-a"><span class="sec-n">A</span> Part A — Definitions</h3>
-        <pre class="cov-body">
-<span class="cov-h">"Citing Document"</span> means the credit agreement, confirmation, indenture,
-valuation policy, or other instrument incorporating this Annex.
-
-<span class="cov-h">"CRI Reference Rate"</span> means, as of any date of determination, the rate
-published as <strong>[SERIES ID]</strong> by the Reference Rate Administrator on its
-principal website (currently ccir.io), expressed in U.S. dollars per GPU
-per hour, for the most recent Publication Date on or prior to such date.
-
-<span class="cov-h">"Reference Rate Administrator"</span> means Compute Credit Index Research LLC,
-a Delaware limited liability company, or any successor administrator of
-the [SERIES ID] rate that (i) maintains a published methodology
-substantially consistent with the CCIR Methodology in effect on the
-[Closing Date / Trade Date / Effective Date] (or any successor version
-adopted in compliance with the Reference Rate Administrator's published
-Change Management Policy) and (ii) operates with structural independence
-from counterparties to GPU compute transactions.
-
-<span class="cov-h">"CCIR Methodology"</span> means the methodology document published by the
-Reference Rate Administrator at ccir.io/documents/methodology, as in
-effect on the [Closing Date / Trade Date / Effective Date], together with
-any amendment adopted in compliance with the Change Management Policy.
-
-<span class="cov-h">"Change Management Policy"</span> means the change management policy published
-by the Reference Rate Administrator at ccir.io/documents/change-management,
-as in effect on the [Closing Date / Trade Date / Effective Date].
-
-<span class="cov-h">"Publication Date"</span> means each day on which the Reference Rate
-Administrator publishes the CRI Reference Rate in accordance with its
-stated publication schedule.
-
-<span class="cov-h">"Reference Rate Average"</span> means, as of any date of determination, the
-arithmetic mean of the CRI Reference Rate for each of the [thirty (30)]
-consecutive Publication Dates ending on (and including) the most recent
-Publication Date on or prior to such date. [Include if the Citing
-Document tests an average rather than a single print.]</pre>
-      </section>
-
-      <section class="sec">
-        <h3 id="annex-b"><span class="sec-n">B</span> Part B — Reference Rate Disruption</h3>
-        <pre class="cov-body">
-<span class="cov-h">(i)  Reference Rate Disruption Events.</span> Each of the following shall
-constitute a "Reference Rate Disruption Event":
-
-    (A)  <span class="cov-h">Cessation Event:</span> the Reference Rate Administrator publicly
-    announces that it has ceased or will cease to publish the CRI
-    Reference Rate, and no successor administrator has assumed
-    publication;
-
-    (B)  <span class="cov-h">Administrator Event:</span> the Reference Rate Administrator (1)
-    ceases to maintain a published methodology, (2) loses material
-    structural independence from counterparties to GPU compute
-    transactions, or (3) becomes the subject of an enforcement action
-    by a financial regulator for benchmark-related conduct;
-
-    (C)  <span class="cov-h">Material Methodology Change:</span> the Reference Rate Administrator
-    implements a change to the methodology governing the CRI Reference
-    Rate that, in the reasonable determination of the [Determining
-    Party], is not substantively similar to the methodology in effect
-    on the [Closing Date / Trade Date / Effective Date] and would, if
-    applied to the historical period, have produced a Reference Rate
-    Average more than [ten percent (10%)] different from the actual
-    published values; or
-
-    (D)  <span class="cov-h">Publication Disruption:</span> the Reference Rate Administrator
-    fails to publish the CRI Reference Rate for [five (5)] or more
-    consecutive Publication Dates other than as a result of a
-    scheduled publication holiday.
-
-<span class="cov-h">(ii) Replacement Rate Waterfall.</span> Upon the occurrence and during the
-continuance of a Reference Rate Disruption Event, the "Replacement
-Rate" shall be determined by the [Determining Party] in the following
-order of priority:
-
-    First, any rate published by a successor administrator that has
-    publicly assumed responsibility for continued publication of the
-    [SERIES ID] rate using a methodology substantially consistent with
-    the CCIR Methodology then in effect;
-
-    Second, a rate constructed by the [Determining Party] from
-    seller-posted prices of the type and from the source categories
-    specified in the CCIR Methodology, applying the aggregation
-    methodology specified in the CCIR Methodology in effect
-    immediately prior to the Reference Rate Disruption Event;
-
-    Third, any other published GPU compute reference rate selected by
-    the [Determining Party] [(with the consent of [the Required
-    Lenders / the parties])] that (1) is administered by an entity
-    structurally independent from counterparties to GPU compute
-    transactions, (2) covers [PRODUCT] [CHIP] pricing offered by
-    [SEGMENT] in [REGION], and (3) is published with a frequency of at
-    least weekly; or
-
-    Fourth, a rate determined in good faith by the [Determining
-    Party], based on then-available information regarding seller-posted
-    [PRODUCT] [CHIP] prices from [SEGMENT] of the type historically
-    used by the Reference Rate Administrator.
-
-<span class="cov-h">(iii) Level Adjustment.</span> Upon application of any Replacement Rate, the
-[Determining Party] shall adjust each rate-referencing level, threshold,
-or trigger defined in the Citing Document by applying an adjustment
-spread (which may be positive or negative) calculated to neutralize any
-change arising solely from the change in rate input, measured over the
-[thirty (30)]-day period ending on the date of the Reference Rate
-Disruption Event.
-
-<span class="cov-h">(iv) Conforming Changes.</span> The [Determining Party] may, in connection
-with the implementation of any Replacement Rate, make such technical,
-administrative, or operational changes to the Citing Document (including
-to determination schedules, publication-date references, and threshold
-amounts) as it reasonably determines are appropriate[, without further
-consent of the parties].</pre>
-      </section>
-
-      <section class="sec">
-        <h3 id="annex-cal"><span class="sec-n">C</span> Calibration Notes</h3>
-        <div class="ftable-wrap">
-          <table class="ftable">
-            <tbody>
-              <tr><th>[SERIES ID]</th><td>Match the series cell to the exposure: segment × silicon × product × region. Mixed-generation pools: see Use Case 03 (Pool Reference Rate).</td></tr>
-              <tr><th>[Closing Date / Trade Date / Effective Date]</th><td>Use the citing document's version-anchor date convention.</td></tr>
-              <tr><th>[Determining Party]</th><td>Administrative Agent in credit documents; Calculation Agent in confirmations; the valuation designee in fund policies.</td></tr>
-              <tr><th>[30] Publication Dates</th><td>Averaging window, if an average is tested. Longer smooths composition noise; shorter reacts faster. Align with the series' publication cadence.</td></tr>
-              <tr><th>[10]%</th><td>Operationalizes "material" methodology change numerically; calibratable against the Change Management Policy's change classes.</td></tr>
-              <tr><th>[5] days</th><td>Publication-disruption trigger; align with the series' stated publication schedule.</td></tr>
-              <tr><th>Consent brackets</th><td>Bilateral documents typically drop agent-style consent mechanics.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <p class="source-note">
-        This annex is published by the Reference Rate Administrator to
-        standardize how its series are cited and how citing documents may
-        provide for series change or cessation. It is not legal advice, not
-        a recommended form of agreement, and not an offer of any instrument.
-        The Reference Rate Administrator is not a party to, and assumes no
-        obligations or liability under, any document that references its
-        published series. All commercial terms are matters for the parties
-        and their counsel.
-      </p>
     </article>
   </section>
 
@@ -1754,18 +1164,6 @@ consent of the parties].</pre>
       font-weight: var(--weight-strong);
     }
 
-    .annex-copy {
-      font-family: var(--font-mono);
-      font-size: var(--fs-xs);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-eye);
-      color: var(--accent);
-      background: var(--surface-2);
-      border: 1px solid var(--rule);
-      padding: 7px 14px;
-      cursor: pointer;
-    }
-    .annex-copy:hover { border-color: var(--accent); }
 
     .source-note {
       font-family: var(--font-mono) !important;
@@ -1789,25 +1187,4 @@ consent of the parties].</pre>
     }
     .more-soon a { color: var(--link); font-weight: var(--weight-strong); }
   </style>
-
-  <script>
-    const copyBtn = document.getElementById('annex-copy');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', async () => {
-        const parts = Array.from(
-          document.querySelectorAll<HTMLElement>('#citation-annex pre.cov-body'),
-        ).map((p) => p.innerText.trim());
-        const text =
-          'ANNEX [__] — CCIR SERIES CITATION AND DISRUPTION PROVISIONS\n\n' +
-          parts.join('\n\n');
-        try {
-          await navigator.clipboard.writeText(text);
-          copyBtn.textContent = 'Copied';
-        } catch {
-          copyBtn.textContent = 'Copy failed — select manually';
-        }
-        setTimeout(() => { copyBtn.textContent = 'Copy annex text'; }, 2000);
-      });
-    }
-  </script>
 </Base>
