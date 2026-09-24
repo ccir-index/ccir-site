@@ -11,7 +11,7 @@
 import Base from '../../layouts/Base.astro';
 import NoteFooter from '../../components/NoteFooter.astro';
 
-const AS_OF = '2026-09-22';
+const AS_OF = '2026-09-24';
 const PUBLISHED = '2026-09-02';
 
 const LINKS = {
@@ -28,6 +28,8 @@ const LINKS = {
   c0008: 'https://www.regulations.gov/comment/CFTC-2026-1850-0008',
   c0010: 'https://www.regulations.gov/comment/CFTC-2026-1850-0010',
   c0011: 'https://www.regulations.gov/comment/CFTC-2026-1850-0011',
+  c0013: 'https://www.regulations.gov/comment/CFTC-2026-1850-0013',
+  c0014: 'https://www.regulations.gov/comment/CFTC-2026-1850-0014',
   setara: 'https://www.setarafinancial.com/',
 };
 
@@ -195,6 +197,38 @@ const LETTERS: Letter[] = [
       'First-of-kind contracts by Commission approval under 17 CFR 40.3 rather than self-certification; defer perpetual compute futures; a comparability path for non-US administrators; consult BIS and OFAC before listing.',
     ],
     note: 'An index provider; discloses that it "would stand to benefit if the Commission established criteria for compute settlement reference prices". Its central claim is that "the sellers set the settlement price": posted rates are "a publication, not a transaction" and the firms that administer them are the natural short side. Answers Q2(g) "No, not today, and not from any provider, ourselves included."',
+  },
+  {
+    date: '2026-09-10',
+    filer: 'Balthasar Issa, London (personal capacity)',
+    form: 'Comment letter, 9 pages',
+    where: 'regulations.gov',
+    href: LINKS.c0014,
+    onDocket: 'Yes, CFTC-2026-1850-0014 (received Sep 22, posted Sep 23)',
+    topics: 'All four, answered question by question',
+    asks: [
+      'Define "a precisely and narrowly defined hardware generation, configuration, and location as the reference underlier", with tenors short enough to avoid a hardware-generation transition or a contract that "transparently rolls and re-defines the underlying".',
+      '"Require both minimum contributor counts and a cap on a single contributor’s share of index volume", and "ensure that quotes during observation windows are genuinely executable."',
+      '"Credible, transaction-referenced, audited price-reporting infrastructure needs to be established first"; derivatives "should only start to list once that infrastructure exists and has an operating track record".',
+      'Exchanges should consider "power-compute spreads, perhaps something like a ‘compute spark spread’".',
+    ],
+    note: 'Argues that two features of compute are durable: the hardware "depreciates on a functional basis on a roughly annual cycle", and a compute-hour "is not a homogeneous unit". Treats list-price markets and bilateral reserved capacity "almost as two different commodities". Sees perpetual futures as better suited to hardware turnover, with the same reference-price standards as a prerequisite.',
+  },
+  {
+    date: '2026-09-22',
+    filer: 'Persistence Analytics Group LLC',
+    form: 'Comment, no attachment',
+    where: 'regulations.gov',
+    href: LINKS.c0013,
+    onDocket: 'Yes, CFTC-2026-1850-0013 (received Sep 22, posted Sep 23)',
+    topics: 'Cash markets · oversight (not numbered)',
+    asks: [
+      '"Distinguish representation from evidenced availability": represented capacity should not count as deliverable without evidence of its hardware, location, energization, reservation status and dependencies.',
+      'Define "a defined state" of the underlier as well as the commodity itself.',
+      'Contract terms or settlement methods should "identify material-change triggers requiring revalidation."',
+      'Settlement references should "clearly identify eligible compute, evidence supporting inclusion, resource state at the observation time, freshness requirements, material exclusions, and circumstances requiring revalidation or removal from the reference set."',
+    ],
+    note: 'Warns that mixing on-demand, reserved and nominal capacity "may produce a price series without establishing economic equivalence."',
   },
 ];
 
@@ -453,7 +487,7 @@ const TOPICS: Topic[] = [
         Commission to withhold listings until that benchmark exists. Another
         asks it not to wait for a perfect one. Two anonymous filers ask only
         that whoever calculates the index be separated from the firms that
-        trade on it. The newest letter turns to what happens after listing.
+        trade on it. One letter turns to what happens after listing.
         A futures price that lenders adopt becomes a credit signal. The filer
         asks the Commission to say that listing does not validate that use.
       </p>
