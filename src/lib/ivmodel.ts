@@ -56,10 +56,11 @@ const IV_HOURS = 8766;
 // 0.30 (V100 from its scarcity peak) stays as the conservative bound.
 // uContract = 1.0: take-or-pay contract years bill every hour (disclosed).
 export const IV_BASE = { u: 0.75, uContract: 1.0, m: 0.65, r: 0.15, g: 0.18, life: 7 };
-const IV_G = [0.10, 0.30];
-const IV_R = [0.10, 0.20];
+const IV_G = [0.151, 0.194];   // measured bracket: through-cycle -15.1%/yr, from 2024 peak -19.4%/yr (John, 2026-09-24: tighter range)
+const IV_R = [0.125, 0.175];
 const FALLBACK_TENOR = '2Y';
 const IV_MIN_TERM = 2;
+export const IV_HALF_LIFE = 1;   // years: a deal one year old counts half
 const TENOR_YEARS: Record<string, number> = {
   '1M': 1 / 12, '3M': 0.25, '6M': 0.5, '1Y': 1, '2Y': 2, '3Y': 3, '4Y': 4, '5Y': 5,
 };
@@ -169,13 +170,26 @@ function rateLeg(s: Spec): RateLeg | null {
   // and 75th percentile of the deals, each deal counted once.
   const all = signedDeals(s.model, true);
   if (all.length >= 3) {
+    // Recency weighting (John, 2026-09-24): through-life, weighted toward
+    // recent deals. Weight = GPUs x 0.5^(age in years / IV_HALF_LIFE).
+    // The band uses recency weight only (each deal counted once, older
+    // deals discounted), so no single large deal sets it.
+    const nowD = dayNum(meta.as_of_date);
+    const rw = all.map((d) => Math.pow(0.5, (nowD - dayNum(d.signed)) / 365.25 / IV_HALF_LIFE));
     const W = all.reduce((a, d) => a + d.gpus, 0);
-    const rate = all.reduce((a, d) => a + d.value * d.gpus, 0) / W;
-    const vals = all.map((d) => d.value), ones = vals.map(() => 1);
+    const WW = all.reduce((a, d, i) => a + d.gpus * rw[i]!, 0);
+    const rate = all.reduce((a, d, i) => a + d.value * d.gpus * rw[i]!, 0) / WW;
+    const vals = all.map((d) => d.value), ones = rw;
+    const nEff = rw.reduce((a, w) => a + w, 0) ** 2 / rw.reduce((a, w) => a + w * w, 0);
     const dates = all.map((d) => d.signed).sort();
     const tt = anchorTenor(all)!;
     return {
-      method: 'signed', rate, lo: wPct(vals, ones, 0.25), hi: wPct(vals, ones, 0.75),
+      // Band = uncertainty of the AVERAGE rate (John, 2026-09-24: tighter
+      // ranges): rate +/- half the recency-weighted interquartile spread of
+      // deals / sqrt(effective deal count, Kish n = (sum w)^2 / sum w^2).
+      method: 'signed', rate,
+      lo: rate - (wPct(vals, ones, 0.75) - wPct(vals, ones, 0.25)) / 2 / Math.sqrt(nEff),
+      hi: rate + (wPct(vals, ones, 0.75) - wPct(vals, ones, 0.25)) / 2 / Math.sqrt(nEff),
       tenor: tt, years: TENOR_YEARS[tt]!, n: all.length, gpus: W,
       lastDate: dates.at(-1)!, firstDate: dates[0]!,
       estimated: all.filter((d) => d.estimated).length,
@@ -305,6 +319,6 @@ export const H200_EST = {
 export function legText(v: IvCard): string {
   const l = v.leg;
   return l.method === 'signed'
-    ? `through-life signed average (${l.n} deals, ${l.gpus.toLocaleString('en-US')} GPUs, ${l.firstDate?.slice(0, 4) === l.lastDate?.slice(0, 4) ? l.lastDate?.slice(0, 4) : `${l.firstDate?.slice(0, 4)}–${l.lastDate?.slice(0, 4)}`})`
+    ? `recency-weighted signed average (${l.n} deals, ${l.gpus.toLocaleString('en-US')} GPUs, ${l.firstDate?.slice(0, 4) === l.lastDate?.slice(0, 4) ? l.lastDate?.slice(0, 4) : `${l.firstDate?.slice(0, 4)}–${l.lastDate?.slice(0, 4)}`})`
     : `posted on-demand less measured haircut (${Math.round((l.haircut ?? 0) * 100)}%)`;
 }

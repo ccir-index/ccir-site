@@ -345,9 +345,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         {H200_EST.askRatio?.toFixed(2)}) to H200 NVL (sold {H200_EST.nvlT90 != null ? fmtK(H200_EST.nvlT90) : '—'},
         asks {H200_EST.nvlAsk != null ? fmtK(H200_EST.nvlAsk) : '—'}). They are estimates, drawn lighter.</p>
       <p class="ivnote">
-        Rate leg: the chip's through-life signed rate. It is the
-        GPU-weighted average of every signed term deal for the chip, all
-        years, so one hot year does not set the value. Options and
+        Rate leg: the chip's through-life signed rate, weighted toward
+        recent deals. It averages every signed term deal for the chip, by
+        GPUs, and a deal loses half its weight for each year of age. Options and
         subsidized or program deals are left out. A bundled deal enters only
         at its GPU-only estimate. The contract term is the tenor with the
         most GPUs signed. A chip needs three or more deals. With fewer, the
@@ -373,9 +373,12 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         35%. As a check, the deduction that makes the model match executed
         retail sales of {calibChips} is {retailPct}% today.
         The sensitivity range varies one input at a time around base:
-        discount rate 10–20%, decay 10–30% a year, and the rate band. For a
-        signed-rate chip, the rate band spans the 25th to 75th percentile of
-        its deals, each deal counted once. For a fallback chip, it spans the lowest
+        discount rate 12.5–17.5%, decay 15–19% a year (the measured range for prior generations), and the rate band. For a
+        signed-rate chip, the rate is a GPU-weighted average of its deals
+        with recent deals weighted more: a deal loses half its weight for
+        each year of age. The rate band is the uncertainty of that average:
+        half the spread of its deals, divided by the square root of the
+        effective number of deals. For a fallback chip, it spans the lowest
         and highest measured haircut. Corners are never stacked.
         Utilization, margin, and the 7-year life stay at base. The
         discount-rate band is anchored to observed GPU-asset-backed
@@ -692,8 +695,9 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         <strong>Income approach (model-implied).</strong> The headline value
         discounts the income a deployed unit can earn over its service
         life. Every leg is either observed or disclosed. The rate leg is
-        observed. It is the GPU-weighted average of every signed term deal
-        for the chip, across all years. Options and subsidized or program
+        observed. It averages every signed term deal for the chip, weighted
+        by GPUs and by recency: a deal loses half its weight for each year
+        of age. Options and subsidized or program
         deals stay out. A bundled deal enters only at its GPU-only estimate.
         The contract term is the tenor with the most GPUs signed. Where a
         chip has fewer than three deals, the
