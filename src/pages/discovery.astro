@@ -7,7 +7,7 @@
   Owner rulings carried here: CCIR place names and frozen zone labels
   (src/data/discovery_zones.csv), chip + server labels, the 30-day
   no-change display rule (src/data/discovery.ts), daily value = time-weighted
-  average over the UTC day, line = 7-day trailing average, candles daily,
+  average over the UTC day, line and candles daily, dotted 7-day average,
   COOL map palette with no legend, one page with MAP | CHARTS, deep links
   #map and #charts&zone=<id>, no interruption measure, one day late.
 
@@ -103,7 +103,7 @@ const [W0, H0] = map.frame;
               <linearGradient id="negfade" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" style="stop-color:var(--neg);stop-opacity:.2" /><stop offset="100%" style="stop-color:var(--neg);stop-opacity:0" /></linearGradient>
             </defs>
             <g class="gridlines" id="gridlines"></g><path id="area" /><line id="baseline" style="display:none" />
-            <path id="line" fill="none" stroke-width="1.6" /><g id="candles"></g>
+            <path id="line" fill="none" stroke-width="1.6" /><g id="candles"></g><path id="ma" class="ma7" fill="none" />
             <g class="axis" id="xaxis"></g><g class="axis" id="yaxis"></g>
             <rect id="selrect" class="selrect" style="display:none" y="0" height="336" />
             <g id="xhair" style="display:none" pointer-events="none">
@@ -127,7 +127,7 @@ const [W0, H0] = map.frame;
         <li>Each series is one chip, one server and one zone. We never average across zones.</li>
         <li>Price per GPU is the server's spot price divided by its GPUs. Every server shown has 8 GPUs.</li>
         <li>The daily value is the time-weighted average price over the UTC day, 00:00 to 24:00. Each price counts for the time it was in effect. The price in effect at 00:00 carries in from the day before.{closeThrough && <> Through {longDate(closeThrough)}, US history uses the last price of each UTC day.</>}</li>
-        <li>Line charts show the 7-day trailing average of daily values. Candles, prices, changes and map colors use the daily value.</li>
+        <li>Line and candles show daily values, as do prices, changes and map colors. The dotted line is the 7-day trailing average.</li>
         <li>A series whose price has not changed for {STALE_DAYS} days or more is not shown.</li>
         <li>Servers: H100 is p5.48xlarge. H200 standard server is p5e.48xlarge and upgraded server is p5en.48xlarge. B200 is p6-b200.48xlarge, B300 is p6-b300.48xlarge and A100 is p4d.24xlarge (40GB).</li>
         <li>Places are CCIR's names for each region's metro. Zones are numbered Z1, Z2 and so on within each place, in zone ID order. The numbers do not change.</li>
@@ -229,6 +229,7 @@ const [W0, H0] = map.frame;
     :global(.disc .axis text) { fill: var(--ink-dim); font-size: 10.5px; font-family: var(--font-sans); }
     .mark { fill: var(--ink-faint); font-size: var(--fs-xs); font-family: var(--font-mono); }
     :global(.disc .gridlines line) { stroke: var(--rule); stroke-dasharray: 2 3; }
+    .ma7 { stroke: var(--ink-dim); stroke-width: 1.2; stroke-dasharray: 3 3; }
     #baseline { stroke: var(--ink-dim); stroke-dasharray: 4 3; stroke-width: 1.1; opacity: .85; }
     .selrect { fill: var(--surface-3); fill-opacity: .6; stroke: var(--link-dim); }
     #xhair line { stroke: var(--ink-dim); stroke-dasharray: 3 3; }
@@ -422,18 +423,18 @@ const [W0, H0] = map.frame;
       const s = cur(); if (!s) return;
       W = svg.clientWidth || W; svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
       const [t0, t1] = windowBounds(s);
-      // Line: 7-day trailing average of daily values. Candles: daily values.
-      const src: [string, number][] = ctype === 'line'
-        ? s.pts.map(([d], i) => { const w = s.pts.slice(Math.max(0, i - 6), i + 1); return [d, w.reduce((a, p) => a + p[1], 0) / w.length]; })
-        : s.pts;
-      const pts = src.map(([d, v]) => [t(d), v] as [number, number]).filter(([x]) => x >= t0 && x <= t1);
+      // Line and candles: daily values, matching the ticker and changes
+      // (John, 2026-09-24). Dotted overlay: 7-day trailing average.
+      const inWin = ([x]: [number, number]) => x >= t0 && x <= t1;
+      const pts = s.pts.map(([d, v]) => [t(d), v] as [number, number]).filter(inWin);
+      const ma = s.pts.map(([d], i) => { const w = s.pts.slice(Math.max(0, i - 6), i + 1); return [t(d), w.reduce((a, p) => a + p[1], 0) / w.length] as [number, number]; }).filter(inWin);
       const xg = $('xaxis'), yg = $('yaxis'), gg = $('gridlines');
       xg.innerHTML = yg.innerHTML = gg.innerHTML = $('candles').innerHTML = '';
-      $('area').setAttribute('d', ''); $('line').setAttribute('d', ''); scaleState = null;
+      $('area').setAttribute('d', ''); $('line').setAttribute('d', ''); $('ma').setAttribute('d', ''); scaleState = null;
       $('baseline').style.display = 'none';
       const winLbl = zoom ? `${dlabel(t0)}–${dlabel(t1)}` : (rangeDays === 'max' ? 'MAX' : ({ 7: '1W', 30: '1M', 90: '3M' } as Record<number, string>)[rangeDays]);
       if (pts.length >= 2) {
-        let lo = Math.min(...pts.map((p) => p[1])), hi = Math.max(...pts.map((p) => p[1]));
+        let lo = Math.min(...pts.map((p) => p[1]), ...ma.map((p) => p[1])), hi = Math.max(...pts.map((p) => p[1]), ...ma.map((p) => p[1]));
         const steps = [0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 5], step = steps.find((st) => ((hi - lo) || 1) / st <= 6) || 5;
         lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step; if (hi === lo) hi = lo + step;
         const X = (x: number) => PADL + ((x - t0) / ((t1 - t0) || 1)) * (W - PADL - PADR), Y = (v: number) => H - PADB - ((v - lo) / (hi - lo)) * (H - PADT - PADB);
@@ -453,6 +454,7 @@ const [W0, H0] = map.frame;
           $('area').setAttribute('d', `${d}V${H - PADB}H${X(pts[0][0]).toFixed(1)}Z`);
           scaleState = { pts, X, Y, base: pts[0][1] };
         }
+        if (ma.length >= 2) $('ma').setAttribute('d', monotone(ma.map(([x, v]) => [X(x), Y(v)])));
         for (let v = lo; v <= hi + step / 2; v += step) {
           const y = Y(v);
           yg.insertAdjacentHTML('beforeend', `<text x="2" y="${(y + 3).toFixed(1)}">${v.toFixed(2)}</text><text x="${W - 2}" y="${(y + 3).toFixed(1)}" text-anchor="end">${v.toFixed(2)}</text>`);
@@ -471,7 +473,7 @@ const [W0, H0] = map.frame;
         $('mq-winwrap').style.display = (!zoom && (winLbl === '1W' || winLbl === '1M')) ? 'none' : '';
         $('mq-rng').textContent = `${Math.min(...vs).toFixed(2)} – ${Math.max(...vs).toFixed(2)}`;
       }
-      $('chart-title').textContent = `· ${s.chip} · ${s.place} ${s.az}${s.note ? ' · ' + s.note : ''} · ${winLbl}${ctype === 'candle' ? ' · daily candles' : ' · 7-day avg'}`;
+      $('chart-title').textContent = `· ${s.chip} · ${s.place} ${s.az}${s.note ? ' · ' + s.note : ''} · ${winLbl}${ctype === 'candle' ? ' · daily candles' : ' · daily'} · dotted 7-day avg`;
       const mk = $('chart-mark'); mk.setAttribute('x', String(W - PADR - 4)); mk.setAttribute('y', String(H - PADB - 10));
       mk.textContent = `CCIR · ${s.chip} · ${s.place} ${s.az} · ccir.io/discovery`;
       $('xhair').style.display = 'none';
