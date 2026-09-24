@@ -177,9 +177,48 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
       construction and scope.
     </aside>
 
+    <section class="curve-section vintage-section">
+      <header class="sec-head">
+        <div class="kicker">Section 01 · Signed rates by vintage</div>
+        <h2>Signed Rates by Vintage</h2>
+      </header>
+      <div class="table-wrap">
+        <div class="table-head">
+          <span class="th-scope">Filed deals, GPU-only, median by signing half-year</span>
+          <span class="th-meta">USD/GPU-hr</span>
+        </div>
+        <table class="data vintage-table">
+          <thead>
+            <tr>
+              <th class="chip-col">Silicon · tenor</th>
+              {halves.map((h) => <th class="tenor-col">{h}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {vintageRows.map((r, i) => (
+              <tr class={i > 0 && vintageRows[i - 1]!.chip !== r.chip ? 'chip-break' : ''}>
+                <td class="chip-cell"><span class="chip-name">{i === 0 || vintageRows[i - 1]!.chip !== r.chip ? chipDisplay(r.chip) : ''}</span> <span class="layer-tag">{r.tenor}</span></td>
+                {r.cells.map((c) => c
+                  ? <td class="num v-con" title={c.title}>{fmt(c.value)}</td>
+                  : <td class="num empty">·</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="ladder-legend">
+          Each cell is the median signed rate of deals signed in that half-year. Hover for the deals.
+          The table leaves out bundled deals, renewal options and subsidized deals.
+        </div>
+      </div>
+      <p class="instrument-note">
+        B300 deal by deal, with sellers, buyers, trends and filing links:
+        <a href="/research/b300-contract-prices">Signed B300 contract rates, March to August 2026 →</a>
+      </p>
+    </section>
+
     <section class="curve-section ladder-section">
       <header class="sec-head">
-        <div class="kicker">Section 01 · The term ladder</div>
+        <div class="kicker">Section 02 · The term ladder</div>
         <h2>The Term Ladder</h2>
       </header>
 
@@ -235,7 +274,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
 
     <section class="curve-section covenant-section">
       <header class="sec-head">
-        <div class="kicker">Section 02 · Posted and signed</div>
+        <div class="kicker">Section 03 · Posted and signed</div>
         <h2>Posted and Signed Rates</h2>
       </header>
 
@@ -289,7 +328,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
             the value by GPUs times term hours and bill every hour at a flat
             price. We leave out deals priced under a government subsidy.</p>
             <p>Each cell holds deals signed in the twelve months before the
-            snapshot date. The vintage table below shows older deals.</p>
+            snapshot date. The vintage table in Section 01 shows older deals.</p>
             {conLines.length > 0 && <p>{conLines.join(' ')}</p>}
             {fourYearLines.length > 0 && <p>{fourYearLines.join(' ')}</p>}
             {optionLines.length > 0 && <p>Renewal options, listed and never pooled: {optionLines.join(' · ')}.</p>}
@@ -305,45 +344,6 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
           </div>
         </details>
       </div>
-    </section>
-
-    <section class="curve-section vintage-section">
-      <header class="sec-head">
-        <div class="kicker">Section 03 · Signed rates by vintage</div>
-        <h2>Signed Rates by Vintage</h2>
-      </header>
-      <div class="table-wrap">
-        <div class="table-head">
-          <span class="th-scope">Filed deals, GPU-only, median by signing half-year</span>
-          <span class="th-meta">USD/GPU-hr</span>
-        </div>
-        <table class="data vintage-table">
-          <thead>
-            <tr>
-              <th class="chip-col">Silicon · tenor</th>
-              {halves.map((h) => <th class="tenor-col">{h}</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {vintageRows.map((r, i) => (
-              <tr class={i > 0 && vintageRows[i - 1]!.chip !== r.chip ? 'chip-break' : ''}>
-                <td class="chip-cell"><span class="chip-name">{i === 0 || vintageRows[i - 1]!.chip !== r.chip ? chipDisplay(r.chip) : ''}</span> <span class="layer-tag">{r.tenor}</span></td>
-                {r.cells.map((c) => c
-                  ? <td class="num v-con" title={c.title}>{fmt(c.value)}</td>
-                  : <td class="num empty">·</td>)}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div class="ladder-legend">
-          Each cell is the median signed rate of deals signed in that half-year. Hover for the deals.
-          The table leaves out bundled deals, renewal options and subsidized deals.
-        </div>
-      </div>
-      <p class="instrument-note">
-        B300 deal by deal, with sellers, buyers, trends and filing links:
-        <a href="/research/b300-contract-prices">Signed B300 contract rates, March to August 2026 →</a>
-      </p>
     </section>
 
     <p class="instrument-note">
