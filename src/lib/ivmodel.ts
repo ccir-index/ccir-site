@@ -12,8 +12,9 @@
     - Anchor tenor = the tenor with the most GPUs signed.
     - >= 3 deals at the anchor: GPU-weighted least-squares line through
       the deals (x = signing date), read at the LAST deal date, never
-      extrapolated to today. Band = GPU-weighted 25th and 75th percentile
-      residuals added to that rate.
+      extrapolated to today. Band = UNWEIGHTED 25th and 75th percentile
+      residuals added to that rate (John, 2026-09-24: unweighted, so the
+      two largest deals do not set the band alone).
     - Else FALLBACK: posted global neocloud on-demand (bCurve(chip).od)
       x (1 - haircut). Haircut measured at build: median over every card
       chip x tenor of signed median / posted on-demand. Band = the haircut
@@ -32,6 +33,7 @@ import ivRatesRaw from '../data/rates_daily.csv?raw';
 import { bCurve, signedDeals, type SignedDeal } from '../data/term_b';
 import { meta } from '../data/snapshot';
 
+
 const ivParse = (raw: string) => {
   const [head, ...lines] = raw.trim().split(/\r?\n/);
   const cols = head!.split(',');
@@ -41,6 +43,11 @@ const ivParse = (raw: string) => {
   });
 };
 const ivRates = ivParse(ivRatesRaw);
+
+// Stress path utilization (John, 2026-09-24): a fixed, deliberately low
+// utilization for the interruptible (hourly-rental) path, set as a stress
+// case and NOT tied to measured market utilization today.
+export const IV_STRESS_U = 0.40;
 const IV_HOURS = 8766;
 // g (decay after the contract) is MEASURED, not assumed: calibrated
 // 2026-07-27 from the wayback prior-gen rate panel spliced with the live
@@ -164,7 +171,7 @@ function rateLeg(s: Spec): RateLeg | null {
     const res = ys.map((y, i) => y - (yb + b * (xs[i]! - xb)));
     const lastDate = at.map((d) => d.signed).sort().at(-1)!;
     return {
-      method: 'signed', rate, lo: rate + wPct(res, ws, 0.25), hi: rate + wPct(res, ws, 0.75),
+      method: 'signed', rate, lo: rate + wPct(res, res.map(() => 1), 0.25), hi: rate + wPct(res, res.map(() => 1), 0.75),
       tenor: t, years: TENOR_YEARS[t]!, n: at.length, gpus: W, lastDate,
       estimated: at.filter((d) => d.estimated).length,
       od: od?.value ?? NaN, odSellers: od?.sellers ?? 0, haircut: null,
@@ -215,13 +222,13 @@ export const ivCards = IV_SPEC.map((s) => {
   combos.push(bandLo, bandHi);
   const ask = hwm?.ask?.med ?? null;
   const t90 = hwm?.t90?.med ?? null;
-  // No-contract floor: the published Neocloud interruptible cell as the
-  // earning path from day one, at 75% utilization: flat year 1, decay
-  // beyond. The observable form of the re-leasing downside.
+  // Stress path: no term contract, the published Neocloud interruptible
+  // cell as the earning path from day one at IV_STRESS_U utilization: flat
+  // year 1, decay beyond.
   const intRow = ivRates.find((r) => r['series_id'] === `CRI-T2-${s.model}-ALL-INT-OD-ALL`
                                      && r['promotion_status'] === 'Published');
   const intRate = intRow ? Number(intRow['price_headline']) : NaN;
-  const intStress = Number.isFinite(intRate) ? ivValue(intRate, 1, age, IV_BASE.r, IV_BASE.g, IV_BASE.u) : null;
+  const intStress = Number.isFinite(intRate) ? ivValue(intRate, 1, age, IV_BASE.r, IV_BASE.g, IV_STRESS_U, IV_STRESS_U) : null;
   const newCost: NewCost | null = s.newCost
     // Label kept source-neutral on the page (no third-party names); the
     // dollar figure and grade come from hardware_panels.
@@ -235,6 +242,7 @@ export const ivCards = IV_SPEC.map((s) => {
     base, lo, hi, smax, bandLo, bandHi, leg,
     intStress, intRate: Number.isFinite(intRate) ? intRate : null,
     intN: intRow ? Number(intRow['n_sources']) || null : null,
+    intUtil: IV_STRESS_U,
     remaining: Math.max(0, IV_BASE.life - age),
     ask, askN: hwm?.ask?.n ?? null, askSources: hwm?.ask?.sources ?? null,
     t90, t90N: hwm?.t90?.n ?? null,

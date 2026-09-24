@@ -288,7 +288,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
             <div class="ivstrip" aria-hidden="true">
               <div class="ivband" style={`left:${p(v.lo)}%;width:${p(v.hi) - p(v.lo)}%`}></div>
               <div class="ivdot" style={`left:${p(v.base)}%`} title={`model ${fmtUsd(v.base)}`}></div>
-              {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`no-contract floor ${fmtUsd(v.intStress)}: the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) at 75% utilization and 65% net margin from day one`}></div>}
+              {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`stress path ${fmtUsd(v.intStress)}: no term contract, the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) at ${Math.round((v.intUtil ?? 0) * 100)}% utilization and 65% net margin from day one`}></div>}
               {v.ask != null && <div class="ivtick" style={`left:${p(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
               {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)} (n=${v.t90N})`}></div>}
               {v.newCost && <div class="ivcost" style={`left:${p(v.newCost.usd)}%`} title={`new-cost basis ${fmtUsd(v.newCost.usd)}`}></div>}
@@ -310,7 +310,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
             )}
             {v.aboveCost && <div class="ivrow ivabove">Income value is above the cost of a new GPU.</div>}
             {v.intStress != null && (
-              <div class="ivrow"><span class="g g-int"></span>no-contract floor {fmtUsd(v.intStress)}<span class="dim"> · interruptible rate from day one</span></div>
+              <div class="ivrow"><span class="g g-int"></span>stress path {fmtUsd(v.intStress)}<span class="dim"> · no contract, interruptible rate at {Math.round((v.intUtil ?? 0) * 100)}% utilization</span></div>
             )}
             <div class="ivmeta">
               rate leg ${l.rate.toFixed(2)}/hr at {l.tenor} · {legText(v)}{l.method === 'signed' && l.lastDate ? `, read at ${l.lastDate}` : ''}
@@ -356,11 +356,10 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The value carries no replacement-cost cap. Where a new-cost basis
         is known, it prints beside the value. The card says so when the
         income value is higher.
-        The no-contract floor runs the same model on the published Neocloud
-        interruptible rate from day one. That path is flat in year 1,
-        decays beyond, and has no contract years. Utilization stays at 75%.
-        A floating interruptible rate already carries the demand risk. A
-        lower utilization would count that risk twice.
+        The stress path assumes the unit never signs a term contract. It
+        earns the published Neocloud interruptible rate from day one at 40%
+        utilization, flat in year 1 and declining after. The 40% is a stress
+        assumption. It is set well below what marketplaces report today.
         The executed lane is an observed disposition record. It does not
         estimate recovery. Single-unit retail clearings can sit above or
         below a bulk disposition, and no current record measures market
