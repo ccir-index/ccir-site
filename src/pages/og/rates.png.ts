@@ -59,7 +59,7 @@ export const GET: APIRoute = async () => {
 
   const titleRow = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexShrink: 0, marginTop: 20 }, [
     el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', alignItems: 'center', height: 42, fontFamily: 'IBM Plex Serif', fontSize: 34, fontWeight: 600, color: T.ink, letterSpacing: -0.5 }, 'Daily Rates'),
+      el('div', { display: 'flex', alignItems: 'center', height: 42, fontFamily: 'IBM Plex Serif', fontSize: 34, fontWeight: 600, color: T.ink, letterSpacing: -0.5 }, 'Daily Market Rates'),
       el('div', { display: 'flex', alignItems: 'center', height: 19, fontFamily: 'IBM Plex Mono', fontSize: 14, color: T.dim, marginTop: 2 }, 'Guaranteed on-demand · US & EU · median per operator segment'),
     ]),
     el('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }, [
