@@ -256,17 +256,16 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
   })} />
   <section class="wrap page-top">
     <PageHeader title="The Secondary Market" kicker="Market Intelligence · Hardware Residual" asOf={hw.as_of}>
-      <p class="subhead">What a deployed GPU is worth as an earning asset, and what machines list and sell for.</p>
+      <p class="subhead">What a GPU is worth as an earning asset, and what machines list and sell for.</p>
       <p class="standfirst">
-        One value per chip: what a machine is worth deployed and earning,
-        triangulated against the market. The value is
-        <strong>model-implied</strong>, an income approach over CCIR's own
-        daily rental rates, every assumption disclosed. The market checks are
-        observational, in separate lanes.
+        One value and one stress figure per chip. The value is
+        <strong>model-implied</strong>: the GPU's share of what it earns over
+        its life at signed contract rates, with every assumption disclosed.
+        Asks, sales and new-chip prices sit beside it as checks.
       </p>
       <ul class="lede-index">
         <li><span class="arw">→</span> <a href="#income-value">Income-derived value</a></li>
-        <li><span class="arw">→</span> <a href="#record">The record — executed sales &amp; posted asks</a></li>
+        <li><span class="arw">→</span> <a href="#record">The record: executed sales and posted asks</a></li>
         <li><span class="arw">→</span> <a href="#method">Method</a></li>
       </ul>
     </PageHeader>
