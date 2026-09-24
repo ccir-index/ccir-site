@@ -4,7 +4,7 @@ import PageHeader from '../components/PageHeader.astro';
 import hw from '../data/hardware_panels.json';
 import ChipLink from '../components/ChipLink.astro';
 import { meta } from '../data/snapshot';
-import { ivCards, legText, IV_HAIRCUT, IV_CALIB, H200_EST, IV_BASE, IV_SHARE } from '../lib/ivmodel';
+import { ivCards, legText, IV_HAIRCUT, IV_CALIB, IV_BASE, IV_SHARE } from '../lib/ivmodel';
 // Net earnings per GPU in a contract year: rate x hours x take-or-pay (1.0)
 // x net margin x the GPU's cost share. No purchase price needed.
 const earn = (rate: number) => rate * 8766 * IV_BASE.uContract * IV_BASE.m * (1 - IV_SHARE);
@@ -290,9 +290,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
             <div class="ivval">{fmtUsd(v.base)}</div>
             <div class="ivrange">range {fmtK(v.lo)} – {fmtK(v.hi)}</div>
             {(() => {
-              const e = v.model === 'H200' ? H200_EST : null;
-              // H200 estimated ask dropped (John, 2026-09-24); estimated sold stays.
-              const eT90 = e?.t90 ?? null;
+              // H200 SXM estimated ask and sold marks dropped (John, 2026-09-24):
+              // every mark on a card is observed.
               const top = Math.max(v.smax, v.hi * 1.06);
               const q = (x: number) => (100 * x) / top;
               return (<>
@@ -302,7 +301,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
                   {v.intStress != null && <div class="ivint" style={`left:${q(v.intStress)}%`} title={`stress ${fmtUsd(v.intStress)}`}></div>}
                   {v.ask != null && <div class="ivtick" style={`left:${q(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
                   {v.t90 != null && <div class="ivdia" style={`left:${q(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)}`}></div>}
-                  {eT90 != null && <div class="ivdia est" style={`left:${q(eT90)}%`} title={`estimated sold ${fmtUsd(eT90)}`}></div>}
                   {v.newCost && <div class="ivcost" style={`left:${q(v.newCost.usd)}%`} title={`new chip ${fmtUsd(v.newCost.usd)}`}></div>}
                   <span class="ivs0">0</span>
                 </div>
@@ -310,7 +308,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
                   {v.intStress != null && <span><span class="g g-int"></span>stress {fmtK(v.intStress)}</span>}
                   {v.t90 != null && <span><span class="g g-t90"></span>sold {fmtK(v.t90)}</span>}
                   {v.ask != null && <span><span class="g g-ask"></span>ask {fmtK(v.ask)}</span>}
-                  {eT90 != null && <span class="est"><span class="g g-t90"></span>est. sold {fmtK(eT90)}</span>}
                   {v.newCost && <span><span class="g g-cost"></span>new chip {fmtK(v.newCost.usd)}</span>}
                 </div>
               </>);
@@ -339,9 +336,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       </table>
       <p class="ivnote">Net earnings / yr: what the GPU earns in a contract year, billed every
         hour. It is after power, colocation and operations (65% margin), at
-        the GPU's {Math.round((1 - IV_SHARE) * 100)}% share of the deployed position. * Vintage assumed. H200 SXM has no ask or sales record. Its estimated
-        sold mark applies the H100 SXM-to-NVL sold ratio ({H200_EST.t90Ratio?.toFixed(2)}) to H200 NVL
-        sold ({H200_EST.nvlT90 != null ? fmtK(H200_EST.nvlT90) : '—'}). It is an estimate, drawn lighter.</p>
+        the GPU's {Math.round((1 - IV_SHARE) * 100)}% share of the deployed position. * Vintage assumed. H200 SXM has no ask or sales record yet.</p>
       <p class="ivnote">
         Rate leg: the chip's through-life signed rate, weighted toward
         recent deals. It averages every signed term deal for the chip. Each deal
