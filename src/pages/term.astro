@@ -54,13 +54,6 @@ const ladderChips = B_CHIPS.map((x) => x.chip).filter((chip) => chip !== 'GB200'
 const ladder = ladderChips.map((chip) => ({ chip, cells: COLS.map((col) => ({ col, cell: ladderCell(chip, col) })) }));
 const curveAsOf = bCurve('H100').asOf;
 
-// Seller spread per cell, for the details (no names).
-const spreadLines = ladderChips.flatMap((chip) => B_TENORS.flatMap((t) => {
-  const sf = bCurve(chip).sellerFactors[t];
-  if (!sf || sf.length < 2) return [];
-  return [`${chipDisplay(chip)} ${t} ${pctText(sf[0]!.factor)} to ${pctText(sf[sf.length - 1]!.factor)}`];
-}));
-
 // Direct term asks: the disclosed check, from the daily record's pooled
 // neocloud committed cells. The record now also carries the pipeline's
 // modeled (-MOD, "Modeled (preview)") rows, and snapshot.ts does not filter
@@ -266,7 +259,6 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
             shorter one when sellers post it that way.</p>
             <p>Hyperscaler reservation schedules stay out of the factors.
             Section 04 shows them.</p>
-            {spreadLines.length > 0 && <p>Seller discounts vary widely. The range at each cell: {spreadLines.join(' · ')}.</p>}
             {checkLines.length > 0 && <p>The daily record also carries direct posted term asks. We use them
             as a check. Each shows the gap to the ladder value: {checkLines.join(' · ')}.</p>}
           </div>
