@@ -236,9 +236,11 @@ export function vintagePoints(): VintagePoint[] {
 // months to the snapshot, options, subsidized and program deals out, bundled
 // deals only at their GPU-only estimate (GPU_ONLY_EST above, the one copy).
 export interface SignedDeal { deal_id: string; tenor: string; signed: string; value: number; gpus: number; estimated: boolean }
-export function signedDeals(chip: string): SignedDeal[] {
+// allVintages (2026-09-24): the hardware through-life rate reads every signed
+// deal for the chip, not only the trailing 12-month window.
+export function signedDeals(chip: string, allVintages = false): SignedDeal[] {
   return deals.filter((d) => d.chip === chip && !d.subsidized && !isOption(d) && !d.tags.includes('program')
-    && d.signed_key >= CON_WINDOW_START && d.signed_key <= meta.as_of_date
+    && (allVintages || d.signed_key >= CON_WINDOW_START) && d.signed_key <= meta.as_of_date
     && (!isBundled(d) || GPU_ONLY_EST[d.deal_id] != null)
     && d.gpus != null && d.gpus > 0)
     .map((d) => ({

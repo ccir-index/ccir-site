@@ -5,7 +5,7 @@ import hw from '../data/hardware_panels.json';
 import ChipLink from '../components/ChipLink.astro';
 import { ivCards, legText, IV_HAIRCUT, IV_CALIB } from '../lib/ivmodel';
 const hcPct = IV_HAIRCUT ? Math.round(IV_HAIRCUT.haircut * 100) : '—';
-const calibPct = Math.round(IV_CALIB.k * 100);
+const retailPct = IV_CALIB.retailK != null ? Math.round(IV_CALIB.retailK * 100) : '—';
 const calibChips = IV_CALIB.chips.map((c) => c.chip).join(' and ');
 const hcRange = IV_HAIRCUT ? `${Math.round(IV_HAIRCUT.lo * 100)}–${Math.round(IV_HAIRCUT.hi * 100)}%` : '—';
 
@@ -216,7 +216,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
 
 ---
 <Base
-  title="Used GPU Prices & Collateral Valuation — H100, A100, V100 Secondary Market · CCIR"
+  title="Used GPU Prices and Income Value: H100, H200, B200, B300 · CCIR"
   description="What used datacenter GPUs sell for and are listed at over time — H100, H200, A100, V100, L40S, RTX A6000. A three-year executed sales record with current multi-source posted asks. Observed prices, not residual value opinions. An observed-price input for collateral valuation and residual-value work on GPU-backed exposure."
   ogImage="/og/hardware.png?v=iv-cards4"
 >
@@ -224,7 +224,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: 'CCIR Secondary-Market Hardware Prices',
-    description: 'Income-derived, model-implied values for datacenter GPUs (H100, A100, and H200, B200 and B300 modeled-only) computed from signed term deal rates, or posted on-demand rates less a measured haircut, with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a sales record exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
+    description: 'Income-derived, model-implied values for datacenter GPUs (H100, and H200, B200 and B300 modeled-only) computed from through-life signed term deal rates, or posted on-demand rates less a measured haircut, with assumptions disclosed, corroborated by executed secondary-market sale prices and current posted asks where a sales record exists — a three-year documented sales record with monthly medians, volumes, and evidence-graded launch-price comparisons.',
     url: 'https://ccir.io/hardware',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2023-07/..',
@@ -291,7 +291,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
               {v.intStress != null && <div class="ivint" style={`left:${p(v.intStress)}%`} title={`stress path ${fmtUsd(v.intStress)}: no term contract, the published interruptible rate ($${v.intRate}/hr, n=${v.intN}) at ${Math.round((v.intUtil ?? 0) * 100)}% utilization and 65% net margin from day one`}></div>}
               {v.ask != null && <div class="ivtick" style={`left:${p(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
               {v.t90 != null && <div class="ivdia" style={`left:${p(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)} (n=${v.t90N})`}></div>}
-              {v.newCost && <div class="ivcost" style={`left:${p(v.newCost.usd)}%`} title={`new-cost basis ${fmtUsd(v.newCost.usd)}`}></div>}
+              {v.newCost && <div class="ivcost" style={`left:${p(v.newCost.usd)}%`} title={`new chip ${fmtUsd(v.newCost.usd)}`}></div>}
               {/* right endpoint intentionally unlabeled: it is the padded
                   axis max (1.06x the largest mark), not a quantity. Every
                   real value on the strip is named in the rows below. */}
@@ -306,14 +306,14 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
               </>
             )}
             {v.newCost && (
-              <div class="ivrow"><span class="g g-cost"></span>new-cost basis {fmtUsd(v.newCost.usd)}<span class="dim"> · {v.newCost.label} [{v.newCost.grade}]</span></div>
+              <div class="ivrow"><span class="g g-cost"></span>new chip {fmtUsd(v.newCost.usd)}<span class="dim"> · {v.newCost.label} [{v.newCost.grade}]</span></div>
             )}
-            {v.aboveCost && <div class="ivrow ivabove">Value is above the cost of a new GPU.</div>}
+            {v.aboveCost && <div class="ivrow ivabove">Value is above the price of a new chip.</div>}
             {v.intStress != null && (
               <div class="ivrow"><span class="g g-int"></span>stress {fmtUsd(v.intStress)}<span class="dim"> · no contract, interruptible rate at {Math.round((v.intUtil ?? 0) * 100)}% utilization</span></div>
             )}
             <div class="ivmeta">
-              rate leg ${l.rate.toFixed(2)}/hr at {l.tenor} · {legText(v)}{l.method === 'signed' && l.lastDate ? `, read at ${l.lastDate}` : ''}
+              rate leg ${l.rate.toFixed(2)}/hr at {l.tenor} · {legText(v)}
               · rate band ${l.lo.toFixed(2)}–${l.hi.toFixed(2)}/hr
               · {v.remaining.toFixed(1)}yr remaining at 7yr service life{v.vintageAssumed ? ' · vintage assumed' : ''}
             </div>
@@ -324,13 +324,13 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <details class="ivnote-d">
       <summary>Model assumptions & sensitivity</summary>
       <p class="ivnote">
-        Rate leg: signed term deals from the last 12 months. Options and
+        Rate leg: the chip's through-life signed rate. It is the
+        GPU-weighted average of every signed term deal for the chip, all
+        years, so one hot year does not set the value. Options and
         subsidized or program deals are left out. A bundled deal enters only
-        at its GPU-only estimate. The anchor tenor is the tenor with the
-        most GPUs signed. With three or more deals at that tenor, the rate
-        is a GPU-weighted straight line through the deals by signing date.
-        It is read at the last deal date and never carried forward to
-        today. With fewer deals, the rate is the posted global neocloud
+        at its GPU-only estimate. The contract term is the tenor with the
+        most GPUs signed. A chip needs three or more deals. With fewer, the
+        rate is the posted global neocloud
         on-demand rate less a measured haircut. The haircut compares signed
         medians with posted on-demand rates for every chip and tenor that
         has signed deals. It is {hcPct}% today, with a range of {hcRange}.
@@ -346,23 +346,23 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         availability for every chip. A chip with no secondary-market record
         is published <em>modeled only</em>, with no ask or executed check.
         The value on each card is the GPU on its own. The income path above
-        values a deployed, earning position. A GPU alone is worth that less
-        its share of the server and network around it and the cost of
-        getting it earning. We calibrate that gap to executed sales: it is
-        {calibPct}% today, set so the model matches what {calibChips} sell
-        for. Chips with no sales record use the same share.
+        values a deployed, earning position: the GPU, its share of the
+        server, and networking. The GPU's share of that capital cost is
+        about 65% on current prices, so the value is the income value less
+        35%. As a check, the deduction that makes the model match executed
+        retail sales of {calibChips} is {retailPct}% today.
         The sensitivity range varies one input at a time around base:
         discount rate 10–20%, decay 10–30% a year, and the rate band. For a
-        signed-trend chip, the rate band spans the 25th to 75th percentile
-        of deals around the line, each deal counted once. For a fallback chip, it spans the lowest
+        signed-rate chip, the rate band spans the 25th to 75th percentile of
+        its deals, each deal counted once. For a fallback chip, it spans the lowest
         and highest measured haircut. Corners are never stacked.
         Utilization, margin, and the 7-year life stay at base. The
         discount-rate band is anchored to observed GPU-asset-backed
         financing yields in CCIR's <a href="/credit">credit ledger</a>
         (see Method below).
-        The value carries no replacement-cost cap. Where a new-cost basis
-        is known, it prints beside the value. The card says so when the
-        income value is higher.
+        The value carries no replacement-cost cap. Where a sourced price for
+        a new chip is known, it prints beside the value. The card says so
+        when the value is higher.
         The stress path assumes the unit never signs a term contract. It
         earns the published Neocloud interruptible rate from day one at 50%
         utilization, flat in year 1 and declining after. The 40% is a stress
@@ -670,13 +670,11 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         <strong>Income approach (model-implied).</strong> The headline value
         discounts the income a deployed unit can earn over its service
         life. Every leg is either observed or disclosed. The rate leg is
-        observed. It comes from signed term deals filed in the last 12
-        months. Options and subsidized or program deals stay out. A bundled
-        deal enters only at its GPU-only estimate. The anchor tenor is the
-        tenor with the most GPUs signed. Where three or more deals sit at
-        that tenor, a GPU-weighted straight line runs through them by
-        signing date. The rate is that line at the last deal date. The
-        model never extends the line to today. Where fewer deals exist, the
+        observed. It is the GPU-weighted average of every signed term deal
+        for the chip, across all years. Options and subsidized or program
+        deals stay out. A bundled deal enters only at its GPU-only estimate.
+        The contract term is the tenor with the most GPUs signed. Where a
+        chip has fewer than three deals, the
         rate is the posted global neocloud on-demand rate less a haircut.
         The haircut is measured on each build. It is the median gap between
         signed and posted on-demand prices across every chip and tenor with
@@ -685,7 +683,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The assumed legs print with the figure: take-or-pay contract years,
         decay after the contract, utilization, net margin, discount rate,
         and a 7-year service life. The model carries no replacement-cost
-        cap. A new-cost basis prints beside the value where one is known.
+        cap. A sourced new-chip price prints beside the value where one is
+        known. The value is the GPU's 65% share of the deployed income value.
         The value is labeled as a model output everywhere it appears. The
         sale and ask records below check it, and each card shows them.
         Where no market record exists for a chip (H200 SXM, B200, B300),

@@ -75,6 +75,7 @@ interface NewCost { usd: number; label: string; grade: string }
 interface Spec {
   key: string; label: string; model: string; silicon: string; vintage: number;
   modeledOnly: boolean; vintageAssumed: boolean; newCost?: NewCost;
+  published?: boolean;   // false = computed (and used in the cross-check) but not shown
 }
 // New-cost basis (John, 2026-09-24): H100 keeps its hardware_panels basis
 // (DGX teardown / 8, grade B). B200 and B300 carry a system basis: 8-GPU
@@ -86,13 +87,14 @@ const IV_SPEC: Spec[] = [
   // NVL record that does publish is a different good. Never triangulate
   // an SXM value against NVL marks.
   { key: 'H200-141-SXM5', label: 'H200 SXM', model: 'H200', silicon: 'h200-sxm-141gb', vintage: 2024 + 5 / 12, modeledOnly: true, vintageAssumed: false },
-  { key: 'A100-80-SXM4', label: 'A100 80GB', model: 'A100', silicon: 'a100-sxm-80gb', vintage: 2021 + 5 / 12, modeledOnly: false, vintageAssumed: false },
+  // A100 is computed for the retail-sales cross-check but not published (John, 2026-09-24).
+  { key: 'A100-80-SXM4', label: 'A100 80GB', model: 'A100', silicon: 'a100-sxm-80gb', vintage: 2021 + 5 / 12, modeledOnly: false, vintageAssumed: false, published: false },
   // Modeled-only: no secondary-market record yet. Vintage = volume
   // availability, stated as assumed.
   { key: 'B200-180-SXM6', label: 'B200 SXM', model: 'B200', silicon: 'b200-sxm-180gb', vintage: 2025 + 2 / 12, modeledOnly: true, vintageAssumed: true,
-    newCost: { usd: 50000, label: '8-GPU server price / 8, reseller range', grade: 'C' } },
-  { key: 'B300-288-SXM6', label: 'B300 SXM', model: 'B300', silicon: 'b300-sxm-288gb', vintage: 2026, modeledOnly: true, vintageAssumed: true,
-    newCost: { usd: 54000, label: '8-GPU server price / 8, reseller range', grade: 'C' } },
+    // New cost = the GPU chip alone, to match a value that is the GPU alone.
+    newCost: { usd: 35000, label: 'new chip, NVIDIA CEO guidance $30k–$40k (Mar 2024)', grade: 'B' } },
+  { key: 'B300-288-SXM6', label: 'B300 SXM', model: 'B300', silicon: 'b300-sxm-288gb', vintage: 2026, modeledOnly: true, vintageAssumed: true },
 ];
 
 const median = (xs: number[]): number => {
@@ -151,7 +153,7 @@ interface RateLeg {
   method: 'signed' | 'haircut';
   rate: number; lo: number; hi: number;
   tenor: string; years: number;
-  n: number; gpus: number; lastDate: string | null; estimated: number;
+  n: number; gpus: number; lastDate: string | null; firstDate?: string | null; estimated: number;
   od: number; odSellers: number; haircut: number | null;
 }
 function rateLeg(s: Spec): RateLeg | null {
@@ -159,22 +161,22 @@ function rateLeg(s: Spec): RateLeg | null {
   const ds = signedDeals(s.model);
   const t = anchorTenor(ds);
   const at = t ? ds.filter((d) => d.tenor === t) : [];
-  if (t && at.length >= 3) {
-    const ws = at.map((d) => d.gpus), xs = at.map((d) => dayNum(d.signed)), ys = at.map((d) => d.value);
-    const W = ws.reduce((a, b) => a + b, 0);
-    const xb = xs.reduce((a, x, i) => a + ws[i]! * x, 0) / W;
-    const yb = ys.reduce((a, y, i) => a + ws[i]! * y, 0) / W;
-    const sxx = xs.reduce((a, x, i) => a + ws[i]! * (x - xb) ** 2, 0);
-    const sxy = xs.reduce((a, x, i) => a + ws[i]! * (x - xb) * (ys[i]! - yb), 0);
-    const b = sxx > 0 ? sxy / sxx : 0;
-    const xLast = Math.max(...xs);
-    const rate = yb + b * (xLast - xb);
-    const res = ys.map((y, i) => y - (yb + b * (xs[i]! - xb)));
-    const lastDate = at.map((d) => d.signed).sort().at(-1)!;
+  // THROUGH-LIFE rate (John, 2026-09-24): GPU-weighted mean of every signed
+  // deal for the chip, all vintages, so one hot year does not set the value.
+  // Anchor tenor (most GPUs) sets the contract term. Band = unweighted 25th
+  // and 75th percentile of the deals, each deal counted once.
+  const all = signedDeals(s.model, true);
+  if (all.length >= 3) {
+    const W = all.reduce((a, d) => a + d.gpus, 0);
+    const rate = all.reduce((a, d) => a + d.value * d.gpus, 0) / W;
+    const vals = all.map((d) => d.value), ones = vals.map(() => 1);
+    const dates = all.map((d) => d.signed).sort();
+    const tt = anchorTenor(all)!;
     return {
-      method: 'signed', rate, lo: rate + wPct(res, res.map(() => 1), 0.25), hi: rate + wPct(res, res.map(() => 1), 0.75),
-      tenor: t, years: TENOR_YEARS[t]!, n: at.length, gpus: W, lastDate,
-      estimated: at.filter((d) => d.estimated).length,
+      method: 'signed', rate, lo: wPct(vals, ones, 0.25), hi: wPct(vals, ones, 0.75),
+      tenor: tt, years: TENOR_YEARS[tt]!, n: all.length, gpus: W,
+      lastDate: dates.at(-1)!, firstDate: dates[0]!,
+      estimated: all.filter((d) => d.estimated).length,
       od: od?.value ?? NaN, odSellers: od?.sellers ?? 0, haircut: null,
     };
   }
@@ -233,10 +235,8 @@ const ivRaw = IV_SPEC.map((s) => {
                                      && r['promotion_status'] === 'Published');
   const intRate = intRow ? Number(intRow['price_headline']) : NaN;
   const intStress = Number.isFinite(intRate) ? ivValue(intRate, 1, age, IV_BASE.r, IV_BASE.g, IV_STRESS_U, IV_STRESS_U) : null;
-  const newCost: NewCost | null = s.newCost
-    // Label kept source-neutral on the page (no third-party names); the
-    // dollar figure and grade come from hardware_panels.
-    ?? (s.key === 'H100-80-SXM5' && hwm?.basis?.usd ? { usd: hwm.basis.usd, label: 'DGX system teardown / 8', grade: hwm.basis.grade } : null);
+  // New cost is the chip alone, where a sourced figure exists (B200 today).
+  const newCost: NewCost | null = s.newCost ?? null;
   const lo = Math.min(...combos), hi = Math.max(...combos);
   // Strip scale: zero-anchored so mark positions read as magnitudes.
   const smax = Math.max(hi, base, ask ?? 0, t90 ?? 0, intStress ?? 0, newCost?.usd ?? 0) * 1.06;
@@ -255,16 +255,17 @@ const ivRaw = IV_SPEC.map((s) => {
 }).filter((x): x is NonNullable<typeof x> => x != null);
 
 // GPU VALUE (John, 2026-09-24): the income stream above values a DEPLOYED,
-// earning position. A GPU alone is worth that less its share of the rest of
-// the system (server, networking) and the cost of getting it earning.
-// Calibrated at every build on chips with executed sales (sold 90d median):
-// k = 1 - mean(sold / deployed value). Sep-24: H100 0.754, A100 0.864 -> k 19%.
-// One published value per chip = deployed x (1 - k); the stress path takes
-// the same k. Chips with no sales record inherit the calibrated k.
+// earning position. The GPU's share of it = its share of the capital that
+// earns: GPU vs server (CPUs, memory, chassis) and networking. On current
+// prices the GPU is ~60-65% of that cost, so the deduction is a fixed 35%
+// (IV_SHARE), a stated assumption. Cross-check, disclosed beside it: the
+// deduction that makes the model match executed retail sales (H100, A100).
+export const IV_SHARE = 0.35;
 const calib = ivRaw.filter((c) => !c.modeledOnly && c.t90 != null && c.base > 0)
   .map((c) => ({ chip: c.label, ratio: c.t90! / c.base }));
 export const IV_CALIB = {
-  k: calib.length ? 1 - calib.reduce((a, c) => a + c.ratio, 0) / calib.length : 0.2,
+  k: IV_SHARE,
+  retailK: calib.length ? 1 - calib.reduce((a, c) => a + c.ratio, 0) / calib.length : null,
   chips: calib,
 };
 const keep = 1 - IV_CALIB.k;
@@ -276,7 +277,8 @@ export const ivCards = ivRaw.map((c) => {
     ...c, deployed: c.base, base, lo, hi, intStress, smax,
     aboveCost: c.newCost != null && base > c.newCost.usd,
   };
-}).sort((a, b) => b.base - a.base);
+}).filter((c) => IV_SPEC.find((s) => s.key === c.key)?.published !== false)
+  .sort((a, b) => b.base - a.base);
 
 export type IvCard = (typeof ivCards)[number];
 
@@ -284,6 +286,6 @@ export type IvCard = (typeof ivCards)[number];
 export function legText(v: IvCard): string {
   const l = v.leg;
   return l.method === 'signed'
-    ? `signed trend (${l.n} deals, ${l.gpus.toLocaleString('en-US')} GPUs)`
+    ? `through-life signed average (${l.n} deals, ${l.gpus.toLocaleString('en-US')} GPUs, ${l.firstDate?.slice(0, 4)}–${l.lastDate?.slice(0, 4)})`
     : `posted on-demand less measured haircut (${Math.round((l.haircut ?? 0) * 100)}%)`;
 }
