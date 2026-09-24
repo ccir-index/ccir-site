@@ -461,7 +461,11 @@ const [W0, H0] = map.frame;
         const spanDays = (t1 - t0) / DAY, ticks: number[] = [];
         if (spanDays <= 10) for (let x = t0; x <= t1 + DAY / 2; x += DAY) ticks.push(x);
         else for (let i = 0; i <= 6; i++) ticks.push(t0 + (t1 - t0) * i / 6);
-        ticks.forEach((x, i) => { xg.insertAdjacentHTML('beforeend', `<text x="${X(x).toFixed(1)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle'}">${dlabel(x)}</text>`); });
+        ticks.forEach((x, i) => {
+          xg.insertAdjacentHTML('beforeend', `<text x="${X(x).toFixed(1)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle'}">${dlabel(x)}</text>`);
+          // Vertical gridline at each interior date tick, as on /tokens.
+          if (i > 0 && i < ticks.length - 1) gg.insertAdjacentHTML('beforeend', `<line x1="${X(x).toFixed(1)}" x2="${X(x).toFixed(1)}" y1="${PADT}" y2="${H - PADB}"/>`);
+        });
         const vs = pts.map((p) => p[1]), wchg = 100 * (vs[vs.length - 1] / vs[0] - 1);
         $('mq-winlbl').textContent = winLbl; $('mq-win').textContent = sgnp(wchg); $('mq-win').className = clsOf(wchg);
         $('mq-winwrap').style.display = (!zoom && (winLbl === '1W' || winLbl === '1M')) ? 'none' : '';
