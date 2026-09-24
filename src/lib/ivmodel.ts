@@ -47,7 +47,7 @@ const ivRates = ivParse(ivRatesRaw);
 // Stress path utilization (John, 2026-09-24): a fixed, deliberately low
 // utilization for the interruptible (hourly-rental) path, set as a stress
 // case and NOT tied to measured market utilization today.
-export const IV_STRESS_U = 0.40;
+export const IV_STRESS_U = 0.50;   // 40% -> 50% (John, 2026-09-24)
 const IV_HOURS = 8766;
 // g (decay after the contract) is MEASURED, not assumed: calibrated
 // 2026-07-27 from the wayback prior-gen rate panel spliced with the live
@@ -59,6 +59,7 @@ export const IV_BASE = { u: 0.75, uContract: 1.0, m: 0.65, r: 0.15, g: 0.18, lif
 const IV_G = [0.10, 0.30];
 const IV_R = [0.10, 0.20];
 const FALLBACK_TENOR = '2Y';
+const IV_MIN_TERM = 2;
 const TENOR_YEARS: Record<string, number> = {
   '1M': 1 / 12, '3M': 0.25, '6M': 0.5, '1Y': 1, '2Y': 2, '3Y': 3, '4Y': 4, '5Y': 5,
 };
@@ -210,7 +211,10 @@ const ivRaw = IV_SPEC.map((s) => {
   const leg = rateLeg(s);
   if (!leg) return null;
   const age = IV_NOW - s.vintage;
-  const T = leg.years;
+  // Minimum contract term 2 years (John, 2026-09-24): where a chip's signed
+  // deals are all shorter (H200 signs 1Y), one take-or-pay year understates
+  // how the capacity is sold. The rate is the chip's own signed rate.
+  const T = Math.max(leg.years, IV_MIN_TERM);
   const base = ivValue(leg.rate, T, age);
   // One-at-a-time sensitivity around base: discount rate, decay, and the
   // rate band. Corners are never stacked. Life, utilization and margin are

@@ -335,7 +335,8 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         medians with posted on-demand rates for every chip and tenor that
         has signed deals. It is {hcPct}% today, with a range of {hcRange}.
         A fallback chip uses its own anchor tenor where it has any signed
-        deal, else 2Y.
+        deal, else 2Y. Where a chip's signed deals are all shorter than two
+        years, the contract runs two years at that chip's signed rate.
         Income path: the contract years bill every hour. This take-or-pay
         treatment is an assumption. After the contract, the unit re-leases
         at the rate less 18% a year, at 75% utilization. The 18% base is
@@ -363,7 +364,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         is known, it prints beside the value. The card says so when the
         income value is higher.
         The stress path assumes the unit never signs a term contract. It
-        earns the published Neocloud interruptible rate from day one at 40%
+        earns the published Neocloud interruptible rate from day one at 50%
         utilization, flat in year 1 and declining after. The 40% is a stress
         assumption. It is set well below what marketplaces report today.
         The executed lane is an observed disposition record. It does not
