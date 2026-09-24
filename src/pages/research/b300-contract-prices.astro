@@ -89,6 +89,8 @@ const b4 = deals.find((d) => d.term === '4Y')!;
       <p class="standfirst">
         Eleven B300 rental contracts signed since March show three-year rates
         up about {pct(f3.y0, f3.y1)}%, from {fmt2(f3.y0)} to {fmt2(f3.y1)} per GPU-hour.
+        On a three-year contract for 10,000 GPUs, that move is about
+        ${Math.round(cost3) * 10} million.
       </p>
       <ul class="lede-index">
         <li><span class="arw">→</span> <a href="#prices">What prices did</a></li>
@@ -168,7 +170,8 @@ const b4 = deals.find((d) => d.term === '4Y')!;
       <p>
         These contracts range from 128 to 9,200 GPUs. On a three-year contract
         for 1,000 B300s, the move from the March rate to the August rate is
-        about <strong>${Math.round(cost3)} million</strong>. On a five-year
+        about ${Math.round(cost3)} million. On 10,000 GPUs, it is about
+        <strong>${Math.round(cost3) * 10} million</strong>. On a five-year
         contract for 1,000 GPUs, it is about ${Math.round(cost5)} million.
       </p>
       <p>
