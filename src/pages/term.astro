@@ -3,8 +3,7 @@ import Base from '../layouts/Base.astro';
 import { printLine } from '../lib/printline';
 import PageHeader from '../components/PageHeader.astro';
 import CiteBlock from '../components/CiteBlock.astro';
-import TermCurveChart from '../components/TermCurveChart.astro';
-// HyperscalerLadders retired from the page 2026-08-12 (see section 02 note).
+// HyperscalerLadders retired from the page 2026-08-12 (see section 05 note).
 // HyperscalerTermChart PULLED same-day it shipped (John, 2026-07-16): T1 US
 // cells were n=2-4 and cell-to-cell %s manufactured a fake H200 "1Y −26%"
 // (within-provider truth: −7%). REINSTATED 2026-08-12 (John): every T1 US
@@ -13,8 +12,122 @@ import TermCurveChart from '../components/TermCurveChart.astro';
 // lane. Levels-only construction unchanged; OD dot stays detached (OD adds
 // OCI, n=4). Per-provider ladders below remain the within-book view.
 import HyperscalerTermChart from '../components/HyperscalerTermChart.astro';
-import { meta } from '../data/snapshot';
+import { meta, neocloudCommittedCell, headlineValue } from '../data/snapshot';
 import { CHIPS } from '../data/chips';
+import type { Term } from '../data/types';
+import ChipLink from '../components/ChipLink.astro';
+// Construction B (John, 2026-09-23): global neocloud on-demand x the chip's
+// own tenor factor, and the signed-rate layer from filed contracts. Ported
+// from term/ladder-preview (99099d90, 1894ad95) in the market-data voice.
+import { B_CHIPS, B_TENORS, bCurve, conCell, renewalOptions, vintagePoints, CON_WINDOW_START } from '../data/term_b';
+import type { BTenor, BundledDeal } from '../data/term_b';
+
+const fmt = (n: number, dp = 2) => n.toFixed(dp);
+const chipDisplay = (token: string) => token.replace(/-/g, ' ');
+
+// --- Section 01: the term ladder (construction B) ---------------------------
+// Every cell = global neocloud on-demand x the chip's own tenor factor
+// (src/data/term_b.ts). Seller counts stay off the page.
+const COLS = ['OnDemand', ...B_TENORS] as const;
+type Col = typeof COLS[number];
+const colLabel = (c: Col) => (c === 'OnDemand' ? 'On-demand' : c);
+const pctText = (f: number) => `${f < 0 ? '−' : '+'}${Math.abs(f * 100).toFixed(1)}%`;
+
+interface LadderCell { value: number; style: 'full' | 'thin'; title: string }
+function ladderCell(chip: string, col: Col): LadderCell | null {
+  const c = bCurve(chip);
+  if (!c.od) return null;
+  if (col === 'OnDemand') {
+    return { value: c.od.value, style: 'full', title: `${chip} global neocloud on-demand, median across sellers · ${c.asOf}` };
+  }
+  const cell = c.cells[col];
+  if (!cell) return null;
+  return {
+    value: cell.value,
+    style: cell.depth,
+    title: `${chip} ${col} = on-demand ${fmt(c.od.value)} × (1 ${cell.factor < 0 ? '−' : '+'} ${Math.abs(cell.factor * 100).toFixed(1)}%)`,
+  };
+}
+
+const ladderChips = B_CHIPS.map((x) => x.chip).filter((chip) => bCurve(chip).od);
+const ladder = ladderChips.map((chip) => ({ chip, cells: COLS.map((col) => ({ col, cell: ladderCell(chip, col) })) }));
+const curveAsOf = bCurve('H100').asOf;
+
+// Seller spread per cell, for the details (no names).
+const spreadLines = ladderChips.flatMap((chip) => B_TENORS.flatMap((t) => {
+  const sf = bCurve(chip).sellerFactors[t];
+  if (!sf || sf.length < 2) return [];
+  return [`${chipDisplay(chip)} ${t} ${pctText(sf[0]!.factor)} to ${pctText(sf[sf.length - 1]!.factor)}`];
+}));
+
+// Direct term asks: the disclosed check, from the daily record's pooled
+// neocloud committed cells. The record now also carries the pipeline's
+// modeled (-MOD, "Modeled (preview)") rows, and snapshot.ts does not filter
+// them out of neocloudCommittedCell, so a modeled row is skipped here.
+const checkLines = ladderChips.flatMap((chip) => B_TENORS.flatMap((t) => {
+  const d = neocloudCommittedCell(chip, t as Term);
+  const c = bCurve(chip).cells[t];
+  if (!d || !c || d.series_id.endsWith('-MOD')) return [];
+  const pct = (headlineValue(d) / c.value - 1) * 100;
+  return [`${chipDisplay(chip)} ${t} ${fmt(headlineValue(d))} (${pct < 0 ? '−' : '+'}${Math.abs(pct).toFixed(0)}%)`];
+}));
+
+// --- Section 02: posted, signed, gap ----------------------------------------
+const covBlocks = ladderChips.map((chip) => {
+  const cells = COLS.map((col) => {
+    const posted = ladderCell(chip, col);
+    const con = col === 'OnDemand' ? null : conCell(chip, col);
+    const gap = con?.median != null && posted && col !== 'OnDemand' ? (con.median / posted.value - 1) * 100 : null;
+    return { col, posted, con, gap };
+  });
+  return { chip, cells };
+});
+const signedPct = (pct: number) => `${pct < 0 ? '−' : '+'}${Math.abs(pct).toFixed(0)}%`;
+const bundledText = (x: BundledDeal) => x.estimated
+  ? `${fmt(x.value)} estimated GPU-only (filed ${fmt(x.filed)}, ${x.includes})`
+  : `${fmt(x.value)} ${x.includes}`;
+const conLines = covBlocks.flatMap((b) => b.cells.flatMap(({ col, con }) => {
+  if (!con) return [];
+  const parts: string[] = [];
+  if (con.median != null) parts.push(con.min === con.max ? fmt(con.median) : `${fmt(con.median)}, range ${fmt(con.min!)} to ${fmt(con.max!)}`);
+  if (con.bundled.length) parts.push(`Bundled ${con.bundled.map(bundledText).join('; ')}`);
+  return [`${chipDisplay(b.chip)} ${col}: ${parts.join('. ')}.`];
+}));
+const fourYearLines = ladderChips.flatMap((chip) => {
+  const con = conCell(chip, '4Y');
+  if (!con) return [];
+  const parts: string[] = [];
+  if (con.median != null) parts.push(fmt(con.median));
+  if (con.bundled.length) parts.push(`Bundled ${con.bundled.map(bundledText).join('; ')}`);
+  return [`${chipDisplay(chip)} 4Y: ${parts.join('. ')}.`];
+});
+const optionLines = ladderChips.flatMap((chip) => renewalOptions(chip).map((o) => `${chipDisplay(chip)} ${o.raw}: ${fmt(o.value)}`));
+
+// --- Section 03: signed rates by vintage (table) -----------------------------
+// Rows = chip x tenor with at least one GPU-only deal; columns = signing
+// half-years that hold a deal; last column = today's posted ladder value.
+// A cell is the median of GPU-only deals signed in that half; hover lists
+// each deal. Bundled deals, renewal options and subsidized deals stay out.
+// The standalone B300 chart from the preview is replaced by a link to the
+// published note /research/b300-contract-prices, which covers it deal by deal.
+const VINTAGE_CHIPS = ['H100', 'H200', 'B200', 'B300', 'GB200'];
+const V_TENORS = ['6M', '1Y', '2Y', '3Y', '4Y', '5Y'];
+const half = (iso: string) => `${iso.slice(0, 4)} H${Number(iso.slice(5, 7)) <= 6 ? 1 : 2}`;
+const vGpu = vintagePoints().filter((p) => VINTAGE_CHIPS.includes(p.chip) && !p.option && !p.bundled);
+const halves = [...new Set(vGpu.map((p) => half(p.signed)))].sort();
+const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => {
+  const pts = vGpu.filter((p) => p.chip === chip && p.tenor === tenor);
+  if (pts.length === 0) return [];
+  const cells = halves.map((h) => {
+    const inH = pts.filter((p) => half(p.signed) === h).map((p) => p.value);
+    if (inH.length === 0) return null;
+    const s = [...inH].sort((a, b) => a - b);
+    const m = s.length % 2 ? s[(s.length - 1) / 2]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2;
+    return { value: m, title: s.map((v) => fmt(v)).join(', ') };
+  });
+  const posted = B_CHIPS.some((x) => x.chip === chip) ? bCurve(chip).cells[tenor as BTenor] : undefined;
+  return [{ chip, tenor, cells, posted }];
+}));
 // Implied-forwards section CUT (John 2026-07-02) and the metric itself
 // RETIRED (John 2026-09-16, v2.4.0): subtracting one contract's total from
 // the next only yields a marginal-period price when both carry the same
@@ -23,15 +136,15 @@ import { CHIPS } from '../data/chips';
 // record and must not be reinstated without a new ruling.
 ---
 <Base
-  title="GPU Reserved & Committed Pricing — 1M to 3Y Term Structure · CCIR"
-  description="Reserved and committed GPU pricing by tenor, one month to three years — posted committed asks and each operator's discount to on-demand, updated daily. The term structure of GPU compute, and the basis for sizing re-leasing risk on GPU-backed exposure."
+  title="GPU Committed Term Rates by Tenor · CCIR"
+  description="Committed-term GPU rental rates by tenor, from posted neocloud prices, with signed rates from filed contracts beside them. Updated daily."
   ogImage="/og/term-structure-2026-07.png"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
-    name: 'CCIR GPU Committed Term Structure',
-    description: 'Reserved and committed GPU pricing by tenor, one month to three years — posted committed asks and within-provider discounts to on-demand, computed daily as the operator-equal median of each operator’s committed ask against its own on-demand rate.',
+    name: 'CCIR GPU Committed Term Rates',
+    description: 'Committed-term GPU rental rates by tenor. Each cell is the chip’s global neocloud on-demand rate times the chip’s own tenor factor, computed daily from posted prices. Signed rates from filed contracts sit beside the posted cells.',
     url: 'https://ccir.io/term',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2026-05/..',
@@ -45,11 +158,11 @@ import { CHIPS } from '../data/chips';
     isAccessibleForFree: true,
   })} />
   <section class="wrap page-top">
-    <PageHeader title="Committed Term Structure" kicker="Market Intelligence · Committed Term" asOfLabel="" asOf={printLine(meta)}>
+    <PageHeader title="Committed Term Rates" kicker="Market Data · Committed Term · Global" asOfLabel="" asOf={printLine(meta)}>
       <p class="standfirst">
-        The price of guaranteed capacity, by tenor. Posted committed asks from
-        one month to three years, and the discount each tenor carries to
-        on-demand.
+        The price of guaranteed capacity by tenor, for the chips lenders
+        finance. Posted rates start from each chip's global on-demand rate.
+        Signed rates from filed contracts sit beside them.
       </p>
       <ul class="lede-index">
         <li><span class="arw">→</span> <a href="/research/b300-contract-prices">Signed B300 contract rates, March to August 2026</a></li>
@@ -57,43 +170,197 @@ import { CHIPS } from '../data/chips';
     </PageHeader>
 
     <aside class="mi-banner" role="note">
-      <strong>A market-intelligence series on committed-term pricing.</strong>
-      Committed-term cells are a descriptive market-intelligence product.
-      A committed price is a <strong>fixed
-      schedule</strong>: the posted price of a commitment starting today,
-      held for its term. It is not a forecast of future on-demand rates.
-      Construction, geographic scope, and panel-depth conventions are in the
-      chart notes beneath the figure.
+      <strong>Committed-term rates from posted asks and filed contracts.</strong>
+      A committed price is a <strong>fixed schedule</strong>: the posted price
+      of a commitment that starts today, held for its term. It does not
+      forecast future on-demand rates. Each table's notes give its
+      construction and scope.
     </aside>
 
-    <section class="curve-section">
+    <section class="curve-section ladder-section">
       <header class="sec-head">
-        <div class="kicker">Section 01 · Committed asks by tenor</div>
-        <h2>The Neocloud Committed Term Curve</h2>
+        <div class="kicker">Section 01 · The term ladder</div>
+        <h2>The Term Ladder</h2>
       </header>
 
-      <TermCurveChart />
+      <div class="table-wrap">
+        <div class="table-head">
+          <span class="th-scope">Neocloud, guaranteed · all regions</span>
+          <span class="th-meta">USD/GPU-hr · {curveAsOf} listings</span>
+        </div>
+        <table class="data ladder-table term-ladder">
+          <thead>
+            <tr>
+              <th class="chip-col">Silicon</th>
+              {COLS.map((col) => <th class="tenor-col">{colLabel(col)}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {ladder.map(({ chip, cells }) => (
+              <tr>
+                <td class="chip-cell"><div class="chip-name"><ChipLink chip={chip} label={chipDisplay(chip)} /></div></td>
+                {cells.map(({ cell }) =>
+                  cell
+                    ? <td class={`num v-${cell.style}`} title={cell.title}>{fmt(cell.value)}</td>
+                    : <td class="num empty">—</td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="ladder-legend">
+          <span class="lg-full">Accent</span>: tenor factor from three or more sellers ·
+          <span class="lg-thin">muted</span>: two sellers · —: fewer, or no seller posts the tenor.
+          Hover a cell for its construction.
+        </div>
+        <details class="table-foot">
+          <summary>How the ladder is built</summary>
+          <div class="tf-body tf-prose">
+            <p>Every cell is the chip's on-demand rate times the chip's own
+            tenor factor. On-demand is the median across neocloud sellers in
+            every region, each seller counted once. A tenor factor compares each
+            seller's term ask with its own on-demand ask in the same region. The
+            factor is the median of those ratios across sellers. A chip never
+            borrows another chip's factor. A longer tenor can price above a
+            shorter one when sellers post it that way.</p>
+            <p>Hyperscaler reservation schedules stay out of the factors.
+            Section 04 shows them.</p>
+            {spreadLines.length > 0 && <p>Seller discounts vary widely. The range at each cell: {spreadLines.join(' · ')}.</p>}
+            {checkLines.length > 0 && <p>The daily record also carries direct posted term asks. We use them
+            as a check. Each shows the gap to the ladder value: {checkLines.join(' · ')}.</p>}
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="curve-section covenant-section">
+      <header class="sec-head">
+        <div class="kicker">Section 02 · Posted and signed</div>
+        <h2>Posted and Signed Rates</h2>
+      </header>
+
+      <div class="table-wrap">
+        <div class="table-head">
+          <span class="th-scope">Signed: filed deals, GPU-only, signed from {CON_WINDOW_START}</span>
+          <span class="th-meta">USD/GPU-hr</span>
+        </div>
+        <table class="data ladder-table cov-table">
+          <thead>
+            <tr>
+              <th class="chip-col">Silicon · layer</th>
+              {COLS.map((col) => <th class="tenor-col">{colLabel(col)}</th>)}
+            </tr>
+          </thead>
+          {covBlocks.map((b) => (
+            <tbody class="cov-block">
+              <tr>
+                <td class="chip-cell"><span class="chip-name"><ChipLink chip={b.chip} label={chipDisplay(b.chip)} /></span> <span class="layer-tag">Posted</span></td>
+                {b.cells.map(({ posted }) => posted
+                  ? <td class={`num v-${posted.style}`} title={posted.title}>{fmt(posted.value)}</td>
+                  : <td class="num empty">—</td>)}
+              </tr>
+              <tr>
+                <td class="chip-cell"><span class="layer-tag">Signed</span></td>
+                {b.cells.map(({ con }) => con?.median != null
+                  ? <td class="num v-con" title={con.min === con.max ? 'median of GPU-only filed deals' : `median of GPU-only filed deals, range ${fmt(con.min!)} to ${fmt(con.max!)}`}>{fmt(con.median)}</td>
+                  : con && con.bundled.length
+                    ? <td class="num v-bundled" title={con.bundled.map(bundledText).join('; ')}>{fmt(con.bundled[0]!.value)}<sup class="mod-mark">b</sup></td>
+                    : <td class="num empty">—</td>)}
+              </tr>
+              <tr class="cov-row-gap">
+                <td class="chip-cell"><span class="layer-tag">Gap</span></td>
+                {b.cells.map(({ gap }) => gap != null
+                  ? <td class="num v-gap" title="signed median vs posted ladder value">{signedPct(gap)}</td>
+                  : <td class="num empty">—</td>)}
+              </tr>
+            </tbody>
+          ))}
+        </table>
+        <div class="ladder-legend">
+          Posted: the ladder above · Signed: median of GPU-only filed deals ·
+          <sup class="mod-mark lg-m">b</sup>: only bundled deals at that tenor, hover for what they include ·
+          Gap: signed vs posted
+        </div>
+        <details class="table-foot">
+          <summary>How to read the signed rates</summary>
+          <div class="tf-body tf-prose">
+            <p>A signed rate is the price in a filed contract at its tenor. A
+            filing states a rate, or a unit count, a term and a value. We divide
+            the value by GPUs times term hours and bill every hour at a flat
+            price. We leave out deals priced under a government subsidy.</p>
+            <p>Each cell holds deals signed in the twelve months before the
+            snapshot date. The vintage table below shows older deals.</p>
+            {conLines.length > 0 && <p>{conLines.join(' ')}</p>}
+            {fourYearLines.length > 0 && <p>{fourYearLines.join(' ')}</p>}
+            {optionLines.length > 0 && <p>Renewal options, listed and never pooled: {optionLines.join(' · ')}.</p>}
+            <p>A bundled deal prices more than the GPU, such as storage,
+            networking or data center services, with no split. It prints beside
+            the GPU-only median and never enters it. Where we estimate the
+            GPU-only share, the cell shows the estimate. The filed value appears
+            on hover.</p>
+            <p>SharonAI states its B300 rate inclusive of taxes. We treat the
+            $3.30 as pre-tax, as the B300 note does.</p>
+            <p>Disclosure selection is a limit. The sellers that disclose unit
+            counts are small listed companies.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="curve-section vintage-section">
+      <header class="sec-head">
+        <div class="kicker">Section 03 · Signed rates by vintage</div>
+        <h2>Signed Rates by Vintage</h2>
+      </header>
+      <div class="table-wrap">
+        <div class="table-head">
+          <span class="th-scope">Filed deals, GPU-only, median by signing half-year</span>
+          <span class="th-meta">USD/GPU-hr</span>
+        </div>
+        <table class="data vintage-table">
+          <thead>
+            <tr>
+              <th class="chip-col">Silicon · tenor</th>
+              {halves.map((h) => <th class="tenor-col">{h}</th>)}
+              <th class="tenor-col posted-col">Posted today</th>
+            </tr>
+          </thead>
+          <tbody>
+            {vintageRows.map((r, i) => (
+              <tr class={i > 0 && vintageRows[i - 1]!.chip !== r.chip ? 'chip-break' : ''}>
+                <td class="chip-cell"><span class="chip-name">{i === 0 || vintageRows[i - 1]!.chip !== r.chip ? chipDisplay(r.chip) : ''}</span> <span class="layer-tag">{r.tenor}</span></td>
+                {r.cells.map((c) => c
+                  ? <td class="num v-con" title={c.title}>{fmt(c.value)}</td>
+                  : <td class="num empty">·</td>)}
+                {r.posted
+                  ? <td class={`num posted-col v-${r.posted.depth}`}>{fmt(r.posted.value)}</td>
+                  : <td class="num posted-col empty">—</td>}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="ladder-legend">
+          Each cell is the median signed rate of deals signed in that half-year. Hover for the deals.
+          Posted today: the ladder above. The table leaves out bundled deals, renewal options and subsidized deals.
+        </div>
+      </div>
       <p class="instrument-note">
-        Per-chip instrument pages:
-        {CHIPS.map((c, i) => (
-          <>{i > 0 && ' · '}<a href={`/chip/${c.slug}`}>{c.short}</a></>
-        ))}
-        &nbsp;· <a href="/chips">all chips →</a>
-      </p>
-      <p class="population-note">
-        The curve above is computed from operators that post tenor ladders:
-        committed rates quoted as discounts to their own on-demand asks.
-        Capacity-guarantee contracts sold as flexible bands (take-or-pay
-        blocks, duration-banded clusters) are a different product kind.
-        They are recorded as their own series and shown at their duration
-        below, never blended into this curve, including where they price
-        <em>above</em> the operator's own on-demand list.
+        B300 deal by deal, with sellers, buyers, trends and filing links:
+        <a href="/research/b300-contract-prices">Signed B300 contract rates, March to August 2026 →</a>
       </p>
     </section>
 
+    <p class="instrument-note">
+      Per-chip pages:
+      {CHIPS.map((c, i) => (
+        <>{i > 0 && ' · '}<a href={`/chip/${c.slug}`}>{c.short}</a></>
+      ))}
+      &nbsp;· <a href="/chips">all chips →</a>
+    </p>
+
     <section class="curve-section">
       <header class="sec-head">
-        <div class="kicker">Section 02 · Named operators, published schedules</div>
+        <div class="kicker">Section 04 · Named operators, published schedules</div>
         <h2>Hyperscaler Reservation Schedules</h2>
       </header>
 
@@ -103,20 +370,106 @@ import { CHIPS } from '../data/chips';
           above covers the section; component stays in src/components. */}
     </section>
 
-    <CiteBlock what="GPU Committed Term Structure" path="/term" date={meta.as_of_date} />
+    <CiteBlock what="GPU Committed Term Rates" path="/term" date={meta.as_of_date} />
   </section>
 
   <style>
     /* Page chrome (.page-top/.page-head/.mi-banner/.sec-head) is global — base.css. */
-    .sec-lede {
-      font-family: var(--font-mono);
-      font-size: var(--fs-sm);
-      color: var(--ink-dim);
-      line-height: 1.6;
-      margin: 0 0 4px;
-    }
-
     .curve-section { margin: 0 0 36px; }
+
+    /* Sections 01 / 02: row height and padding come from table.data
+       (base.css), the same as the /rates ladder. Both tables share one
+       geometry: fixed layout, the same chip-column width, the remaining
+       width split equally across the tenor columns, so every tenor sits at
+       the same x position in 01 and 02. */
+    table.term-ladder, table.cov-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    table.term-ladder th.chip-col,
+    table.cov-table th.chip-col { text-align: left; width: 22%; }
+    table.term-ladder th.tenor-col,
+    table.cov-table th.tenor-col { text-align: center; padding: 10px 12px; }
+    table.term-ladder .chip-cell,
+    table.cov-table .chip-cell { white-space: nowrap; }
+    table.term-ladder .chip-cell .chip-name,
+    table.cov-table .chip-cell .chip-name {
+      font-family: var(--font-mono);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      font-weight: var(--weight-strong);
+      letter-spacing: 0.04em;
+    }
+    table.term-ladder td.num,
+    table.cov-table td.num {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: var(--fs-lg);
+      font-variant-numeric: tabular-nums;
+    }
+    table.cov-table td.num { font-size: var(--fs-md); }
+    table.term-ladder td.empty,
+    table.cov-table td.empty { color: var(--ink-faint); }
+    .mod-mark {
+      font-size: 0.55em;
+      font-weight: var(--weight-body);
+      font-style: normal;
+      margin-left: 2px;
+      vertical-align: super;
+      line-height: 0;
+      letter-spacing: 0;
+    }
+    /* Depth styles: accent bold = three or more sellers, muted = two. */
+    td.v-full { font-weight: var(--weight-strong); color: var(--accent); cursor: help; }
+    td.v-thin { font-weight: var(--weight-body); color: var(--ink-faint); cursor: help; }
+    /* Signed: plain ink. Bundled: dim with a superscript b. Gap: muted. */
+    td.v-con { font-weight: var(--weight-body); color: var(--ink); }
+    td.v-bundled { font-weight: var(--weight-body); color: var(--ink-dim); cursor: help; }
+    td.v-gap { font-weight: var(--weight-body); color: var(--ink-dim); cursor: help; }
+    .layer-tag {
+      font-family: var(--font-mono);
+      font-size: var(--fs-xs);
+      color: var(--ink-dim);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    table.cov-table .chip-cell .chip-name + .layer-tag { margin-left: 6px; }
+    /* Chip blocks: hairline between sub-rows, a firmer rule between chips. */
+    table.cov-table tbody.cov-block tr.cov-row-gap td { border-bottom: 1px solid var(--rule-2); }
+    .ladder-legend {
+      padding: 8px 16px;
+      border-top: 1px solid var(--rule-2);
+      font-family: var(--font-mono);
+      font-size: calc(var(--fs-xs) - 1px);
+      color: var(--ink-dim);
+      letter-spacing: 0.02em;
+      line-height: 1.6;
+    }
+    .ladder-legend .lg-full { color: var(--accent); font-weight: var(--weight-strong); }
+    .ladder-legend .lg-thin { color: var(--ink-faint); }
+    .ladder-legend .lg-m { font-size: 0.8em; margin-left: 0; color: var(--ink); vertical-align: super; }
+    .tf-prose p { margin: 0 0 6px; max-width: 72ch; }
+
+    /* Section 03: vintage table. */
+    table.vintage-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    table.vintage-table th.chip-col { text-align: left; width: 20%; }
+    table.vintage-table th.tenor-col { text-align: center; padding: 10px 8px; }
+    table.vintage-table td.num { text-align: center; font-family: var(--font-mono); font-size: var(--fs-md); font-variant-numeric: tabular-nums; }
+    table.vintage-table td.empty { color: var(--ink-faint); }
+    table.vintage-table .chip-cell .chip-name { font-family: var(--font-mono); font-size: var(--fs-md); color: var(--ink); font-weight: var(--weight-strong); letter-spacing: 0.04em; }
+    table.vintage-table tr.chip-break td { border-top: 1px solid var(--rule-2); }
+    table.vintage-table .posted-col { border-left: 1px solid var(--rule-2); }
+
+    @media (max-width: 700px) {
+      table.term-ladder th, table.term-ladder td,
+      table.cov-table th, table.cov-table td,
+      table.vintage-table th, table.vintage-table td { padding-left: 4px; padding-right: 4px; }
+      table.term-ladder th.tenor-col, table.cov-table th.tenor-col,
+      table.vintage-table th.tenor-col { padding: 8px 4px; }
+      table.term-ladder td.num, table.cov-table td.num,
+      table.vintage-table td.num { font-size: var(--fs-sm); }
+      table.term-ladder .chip-cell .chip-name,
+      table.cov-table .chip-cell .chip-name,
+      table.vintage-table .chip-cell .chip-name { font-size: var(--fs-sm); letter-spacing: 0.02em; }
+      .table-wrap { overflow-x: auto; }
+    }
 
     .instrument-note {
       font-family: var(--font-mono);
@@ -135,22 +488,6 @@ import { CHIPS } from '../data/chips';
       margin: 14px 0 0;
       padding-top: 10px;
       border-top: 1px solid var(--rule);
-    }
-    .mi-more {
-      margin: 0 0 36px;
-      padding: 12px 16px;
-      border: 1px solid var(--rule);
-      background: var(--surface);
-      max-width: 84ch;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .mi-more a {
-      font-family: var(--font-mono);
-      font-size: var(--fs-sm);
-      color: var(--link);
-      line-height: 1.5;
     }
   </style>
 </Base>

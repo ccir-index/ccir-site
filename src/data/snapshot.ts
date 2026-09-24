@@ -111,10 +111,16 @@ function parseRow(line: string, headers: string[]): Rate {
 function parseAllRows(text: string): Rate[] {
   const lines = text.trim().split(/\r?\n/);
   const headers = splitCsvLine(lines[0]!);
+  // 2026-09-24: the pipeline exports MODELED term rows (series id ends -MOD,
+  // construction=modeled). They are not observed cells and must never enter
+  // the rate pools read by /rates, chip pages, /applications or snapshot
+  // helpers. /term reads its own construction (src/data/term_b.ts).
+  const ci = headers.indexOf('construction');
   return lines.slice(1)
     .filter((l) => l.trim().length > 0)
+    .filter((l) => ci < 0 || splitCsvLine(l)[ci] !== 'modeled')
     .map((line) => parseRow(line, headers))
-    .filter((r) => r.series_id && r.factory_type && r.gpu_model);
+    .filter((r) => r.series_id && r.factory_type && r.gpu_model && !/-MOD$/.test(r.series_id));
 }
 
 function parseCsv(text: string): Rate[] {
