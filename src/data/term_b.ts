@@ -179,9 +179,8 @@ const isBundled = (d: DealRow) => d.bundle === 'all-in';
 
 // GPU-only estimates for bundled deals, matching the published note
 // /research/b300-contract-prices (CPU and storage taken out per deal at
-// posted prices). A bundled deal prints at its estimate beside the median,
-// with the filed value and what it includes on hover. It never enters the
-// GPU-only median.
+// posted prices). A bundled deal enters every signed rate at its estimate,
+// with the filed value and what it includes on hover.
 // The includes text follows the note's wording for these three deals.
 const GPU_ONLY_EST: Record<string, { value: number; includes: string }> = {
   'axe-2026-2304-b300-3y': { value: 4.13, includes: 'includes storage' },
@@ -189,32 +188,51 @@ const GPU_ONLY_EST: Record<string, { value: number; includes: string }> = {
   'brun-2026-1536-b300-4y': { value: 3.94, includes: 'includes CPU servers, storage' },
 };
 
+// Default GPU-only assumption (John, 2026-09-24): a bundled deal with no
+// deal-specific estimate enters at its filed rate less BUNDLE_HAIRCUT. The
+// three measured estimates above took 4-5% off for storage and CPU servers.
+export const BUNDLE_HAIRCUT = 0.05;
+export function gpuOnlyValue(d: DealRow): number {
+  if (!isBundled(d)) return d.usd_gpu_hr;
+  const est = GPU_ONLY_EST[d.deal_id];
+  return est ? est.value : Math.round(d.usd_gpu_hr * (1 - BUNDLE_HAIRCUT) * 100) / 100;
+}
+
 export interface BundledDeal { value: number; filed: number; estimated: boolean; includes: string }
 function bundledOf(d: DealRow): BundledDeal {
   const est = GPU_ONLY_EST[d.deal_id];
-  return est
-    ? { value: est.value, filed: d.usd_gpu_hr, estimated: true, includes: est.includes }
-    : { value: d.usd_gpu_hr, filed: d.usd_gpu_hr, estimated: false, includes: includesText(d) };
+  return { value: gpuOnlyValue(d), filed: d.usd_gpu_hr, estimated: true, includes: est ? est.includes : includesText(d) };
 }
 
 export interface ConCell {
-  median: number | null;          // GPU-only, in window
+  rate: number | null;            // GPU-weighted average, GPU-only (bundled at estimate), in window
   min: number | null;
   max: number | null;
+  n: number;
+  gpus: number;
   sellers: number;
-  bundled: BundledDeal[];
+  bundled: BundledDeal[];         // the bundled deals inside the rate, for hover text
+}
+// GPU-weighted average (John, 2026-09-24): each deal counts by its GPU count.
+// Every pooled deal carries a count; the rows without one are the subsidized
+// IndiaAI rate card, which never pools.
+export function gpuWeighted(xs: { value: number; gpus: number | null }[]): number {
+  const w = xs.reduce((a, x) => a + (x.gpus ?? 0), 0);
+  return w > 0 ? xs.reduce((a, x) => a + x.value * (x.gpus ?? 0), 0) / w : xs.reduce((a, x) => a + x.value, 0) / xs.length;
 }
 export function conCell(chip: string, tenor: string): ConCell | null {
   const pool = deals.filter((d) => d.chip === chip && d.tenor === tenor && !d.subsidized && !isOption(d)
     && d.signed_key >= CON_WINDOW_START);
   if (pool.length === 0) return null;
-  const gpu = pool.filter((d) => !isBundled(d));
-  const xs = gpu.map((d) => d.usd_gpu_hr);
+  const xs = pool.map((d) => ({ value: gpuOnlyValue(d), gpus: d.gpus }));
+  const vs = xs.map((x) => x.value);
   return {
-    median: xs.length ? median(xs) : null,
-    min: xs.length ? Math.min(...xs) : null,
-    max: xs.length ? Math.max(...xs) : null,
-    sellers: new Set(gpu.map((d) => sellerKey(d.seller))).size,
+    rate: gpuWeighted(xs),
+    min: Math.min(...vs),
+    max: Math.max(...vs),
+    n: pool.length,
+    gpus: pool.reduce((a, d) => a + (d.gpus ?? 0), 0),
+    sellers: new Set(pool.map((d) => sellerKey(d.seller))).size,
     bundled: pool.filter(isBundled).map(bundledOf),
   };
 }
@@ -225,10 +243,10 @@ export function renewalOptions(chip: string): { tenor: string; value: number; ra
 }
 
 // Every non-subsidized deal, all vintages, for the vintage chart.
-export interface VintagePoint { chip: string; tenor: string; signed: string; value: number; bundled: boolean; option: boolean }
+export interface VintagePoint { chip: string; tenor: string; signed: string; value: number; gpus: number | null; bundled: boolean; option: boolean }
 export function vintagePoints(): VintagePoint[] {
   return deals.filter((d) => !d.subsidized).map((d) => ({
-    chip: d.chip, tenor: d.tenor, signed: d.signed_key, value: d.usd_gpu_hr, bundled: isBundled(d), option: isOption(d),
+    chip: d.chip, tenor: d.tenor, signed: d.signed_key, value: gpuOnlyValue(d), gpus: d.gpus, bundled: isBundled(d), option: isOption(d),
   }));
 }
 
@@ -241,11 +259,10 @@ export interface SignedDeal { deal_id: string; tenor: string; signed: string; va
 export function signedDeals(chip: string, allVintages = false): SignedDeal[] {
   return deals.filter((d) => d.chip === chip && !d.subsidized && !isOption(d) && !d.tags.includes('program')
     && (allVintages || d.signed_key >= CON_WINDOW_START) && d.signed_key <= meta.as_of_date
-    && (!isBundled(d) || GPU_ONLY_EST[d.deal_id] != null)
     && d.gpus != null && d.gpus > 0)
     .map((d) => ({
       deal_id: d.deal_id, tenor: d.tenor, signed: d.signed_key,
-      value: isBundled(d) ? GPU_ONLY_EST[d.deal_id]!.value : d.usd_gpu_hr,
+      value: gpuOnlyValue(d),
       gpus: d.gpus!, estimated: isBundled(d),
     }));
 }

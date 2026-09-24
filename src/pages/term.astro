@@ -21,6 +21,7 @@ import ChipLink from '../components/ChipLink.astro';
 // from term/ladder-preview (99099d90, 1894ad95) in the market-data voice.
 import { B_CHIPS, B_TENORS, bCurve, conCell, renewalOptions, vintagePoints, CON_WINDOW_START } from '../data/term_b';
 import type { BTenor, BundledDeal } from '../data/term_b';
+import { gpuWeighted } from '../data/term_b';
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 const chipDisplay = (token: string) => token.replace(/-/g, ' ');
@@ -77,7 +78,7 @@ const covBlocks = ladderChips.map((chip) => {
   const cells = COLS.map((col) => {
     const posted = ladderCell(chip, col);
     const con = col === 'OnDemand' ? null : conCell(chip, col);
-    const gap = con?.median != null && posted && col !== 'OnDemand' ? (con.median / posted.value - 1) * 100 : null;
+    const gap = con?.rate != null && posted && col !== 'OnDemand' ? (con.rate / posted.value - 1) * 100 : null;
     return { col, posted, con, gap };
   });
   return { chip, cells };
@@ -89,16 +90,16 @@ const bundledText = (x: BundledDeal) => x.estimated
 const conLines = covBlocks.flatMap((b) => b.cells.flatMap(({ col, con }) => {
   if (!con) return [];
   const parts: string[] = [];
-  if (con.median != null) parts.push(con.min === con.max ? fmt(con.median) : `${fmt(con.median)}, range ${fmt(con.min!)} to ${fmt(con.max!)}`);
-  if (con.bundled.length) parts.push(`Bundled ${con.bundled.map(bundledText).join('; ')}`);
+  if (con.rate != null) parts.push(con.min === con.max ? fmt(con.rate) : `${fmt(con.rate)} GPU-weighted, range ${fmt(con.min!)} to ${fmt(con.max!)}`);
+  if (con.bundled.length) parts.push(`Bundled inside: ${con.bundled.map(bundledText).join('; ')}`);
   return [`${chipDisplay(b.chip)} ${col}: ${parts.join('. ')}.`];
 }));
 const fourYearLines = ladderChips.flatMap((chip) => {
   const con = conCell(chip, '4Y');
   if (!con) return [];
   const parts: string[] = [];
-  if (con.median != null) parts.push(fmt(con.median));
-  if (con.bundled.length) parts.push(`Bundled ${con.bundled.map(bundledText).join('; ')}`);
+  if (con.rate != null) parts.push(fmt(con.rate));
+  if (con.bundled.length) parts.push(`Bundled inside: ${con.bundled.map(bundledText).join('; ')}`);
   return [`${chipDisplay(chip)} 4Y: ${parts.join('. ')}.`];
 });
 const optionLines = ladderChips.flatMap((chip) => renewalOptions(chip).map((o) => `${chipDisplay(chip)} ${o.raw}: ${fmt(o.value)}`));
@@ -106,24 +107,24 @@ const optionLines = ladderChips.flatMap((chip) => renewalOptions(chip).map((o) =
 // --- Section 03: signed rates by vintage (table) -----------------------------
 // Rows = chip x tenor with at least one GPU-only deal; columns = signing
 // half-years that hold a deal; last column = today's posted ladder value.
-// A cell is the median of GPU-only deals signed in that half; hover lists
-// each deal. Bundled deals, renewal options and subsidized deals stay out.
+// A cell is the GPU-weighted average of deals signed in that half (John,
+// 2026-09-24); hover lists each deal. Bundled deals enter at their GPU-only
+// estimate. Renewal options and subsidized deals stay out.
 // The standalone B300 chart from the preview is replaced by a link to the
 // published note /research/b300-contract-prices, which covers it deal by deal.
 const VINTAGE_CHIPS = ['H100', 'H200', 'B200', 'B300', 'GB200'];
 const V_TENORS = ['6M', '1Y', '2Y', '3Y', '4Y', '5Y'];
 const half = (iso: string) => `${iso.slice(0, 4)} H${Number(iso.slice(5, 7)) <= 6 ? 1 : 2}`;
-const vGpu = vintagePoints().filter((p) => VINTAGE_CHIPS.includes(p.chip) && !p.option && !p.bundled);
+const vGpu = vintagePoints().filter((p) => VINTAGE_CHIPS.includes(p.chip) && !p.option);
 const halves = [...new Set(vGpu.map((p) => half(p.signed)))].sort();
 const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => {
   const pts = vGpu.filter((p) => p.chip === chip && p.tenor === tenor);
   if (pts.length === 0) return [];
   const cells = halves.map((h) => {
-    const inH = pts.filter((p) => half(p.signed) === h).map((p) => p.value);
+    const inH = pts.filter((p) => half(p.signed) === h).sort((a, b) => a.value - b.value);
     if (inH.length === 0) return null;
-    const s = [...inH].sort((a, b) => a - b);
-    const m = s.length % 2 ? s[(s.length - 1) / 2]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2;
-    return { value: m, title: s.map((v) => fmt(v)).join(', ') };
+    const title = inH.map((p) => `${fmt(p.value)}${p.bundled ? ' est. GPU-only' : ''} (${p.gpus?.toLocaleString('en-US') ?? '?'} GPUs)`).join(', ');
+    return { value: gpuWeighted(inH), bundled: inH.some((p) => p.bundled), title };
   });
   const posted = B_CHIPS.some((x) => x.chip === chip) ? bCurve(chip).cells[tenor as BTenor] : undefined;
   return [{ chip, tenor, cells, posted }];
@@ -184,7 +185,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
       </header>
       <div class="table-wrap">
         <div class="table-head">
-          <span class="th-scope">Filed deals, GPU-only, median by signing half-year</span>
+          <span class="th-scope">Filed deals, GPU-only, GPU-weighted by signing half-year</span>
           <span class="th-meta">USD/GPU-hr</span>
         </div>
         <table class="data vintage-table">
@@ -199,15 +200,16 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
               <tr class={i > 0 && vintageRows[i - 1]!.chip !== r.chip ? 'chip-break' : ''}>
                 <td class="chip-cell"><span class="chip-name">{i === 0 || vintageRows[i - 1]!.chip !== r.chip ? chipDisplay(r.chip) : ''}</span> <span class="layer-tag">{r.tenor}</span></td>
                 {r.cells.map((c) => c
-                  ? <td class="num v-con" title={c.title}>{fmt(c.value)}</td>
+                  ? <td class="num v-con" title={c.title}>{fmt(c.value)}{c.bundled && <sup class="mod-mark">b</sup>}</td>
                   : <td class="num empty">·</td>)}
               </tr>
             ))}
           </tbody>
         </table>
         <div class="ladder-legend">
-          Each cell is the median signed rate of deals signed in that half-year. Hover for the deals.
-          The table leaves out bundled deals, renewal options and subsidized deals.
+          Each cell is the signed rate of deals signed in that half-year, weighted by GPU count. Hover for the deals.
+          <sup class="mod-mark lg-m">b</sup>: holds a bundled deal at its GPU-only estimate.
+          Renewal options and subsidized deals stay out.
         </div>
       </div>
       <p class="instrument-note">
@@ -300,24 +302,22 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
               </tr>
               <tr>
                 <td class="chip-cell"><span class="layer-tag">Signed</span></td>
-                {b.cells.map(({ con }) => con?.median != null
-                  ? <td class="num v-con" title={con.min === con.max ? 'median of GPU-only filed deals' : `median of GPU-only filed deals, range ${fmt(con.min!)} to ${fmt(con.max!)}`}>{fmt(con.median)}</td>
-                  : con && con.bundled.length
-                    ? <td class="num v-bundled" title={con.bundled.map(bundledText).join('; ')}>{fmt(con.bundled[0]!.value)}<sup class="mod-mark">b</sup></td>
-                    : <td class="num empty">—</td>)}
+                {b.cells.map(({ con }) => con?.rate != null
+                  ? <td class="num v-con" title={`${con.n} deal${con.n === 1 ? '' : 's'}, ${con.gpus.toLocaleString('en-US')} GPUs${con.min === con.max ? '' : `, range ${fmt(con.min!)} to ${fmt(con.max!)}`}${con.bundled.length ? `. Bundled: ${con.bundled.map(bundledText).join('; ')}` : ''}`}>{fmt(con.rate)}{con.bundled.length > 0 && <sup class="mod-mark">b</sup>}</td>
+                  : <td class="num empty">—</td>)}
               </tr>
               <tr class="cov-row-gap">
                 <td class="chip-cell"><span class="layer-tag">Gap</span></td>
                 {b.cells.map(({ gap }) => gap != null
-                  ? <td class="num v-gap" title="signed median vs posted ladder value">{signedPct(gap)}</td>
+                  ? <td class="num v-gap" title="signed rate vs posted ladder value">{signedPct(gap)}</td>
                   : <td class="num empty">—</td>)}
               </tr>
             </tbody>
           ))}
         </table>
         <div class="ladder-legend">
-          Posted: the ladder above · Signed: median of GPU-only filed deals ·
-          <sup class="mod-mark lg-m">b</sup>: only bundled deals at that tenor, hover for what they include ·
+          Posted: the ladder above · Signed: filed deals, weighted by GPU count ·
+          <sup class="mod-mark lg-m">b</sup>: holds a bundled deal at its GPU-only estimate, hover for details ·
           Gap: signed vs posted
         </div>
         <details class="table-foot">
@@ -328,15 +328,16 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
             the value by GPUs times term hours and bill every hour at a flat
             price. We leave out deals priced under a government subsidy.</p>
             <p>Each cell holds deals signed in the twelve months before the
-            snapshot date. The vintage table in Section 01 shows older deals.</p>
+            snapshot date. Each deal counts by its GPU count. The vintage table in Section 01 shows older deals.</p>
             {conLines.length > 0 && <p>{conLines.join(' ')}</p>}
             {fourYearLines.length > 0 && <p>{fourYearLines.join(' ')}</p>}
             {optionLines.length > 0 && <p>Renewal options, listed and never pooled: {optionLines.join(' · ')}.</p>}
             <p>A bundled deal prices more than the GPU, such as storage,
-            networking or data center services, with no split. It prints beside
-            the GPU-only median and never enters it. Where we estimate the
-            GPU-only share, the cell shows the estimate. The filed value appears
-            on hover.</p>
+            networking or data center services, with no split. It enters at a
+            GPU-only estimate. For three B300 deals we price the CPU servers and
+            storage out one by one. Every other bundled deal enters at its filed
+            rate less 5%, the size of those three deductions. The filed value
+            appears on hover.</p>
             <p>SharonAI states its B300 rate inclusive of taxes. We treat the
             $3.30 as pre-tax, as the B300 note does.</p>
             <p>Disclosure selection is a limit. The sellers that disclose unit
