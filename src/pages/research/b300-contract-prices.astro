@@ -112,6 +112,11 @@ const b4 = deals.find((d) => d.term === '4Y')!;
 
     <section class="sec" id="prices">
       <h2><span class="n">01</span> What prices did</h2>
+      <ul class="lede-index keyfigs">
+        <li><span class="arw">→</span> Three-year rates: {fmt2(f3.y0)} to {fmt2(f3.y1)} per GPU-hour, up about {pct(f3.y0, f3.y1)}%</li>
+        <li><span class="arw">→</span> Five-year rates: {fmt2(f5.y0)} to {fmt2(f5.y1)} per GPU-hour, up about {pct(f5.y0, f5.y1)}%</li>
+        <li><span class="arw">→</span> Boost Run, same seller: $3.45 in March, about $3.94 in July, one year longer</li>
+      </ul>
       <div class="measure">
       <p class="lede-para">
         Since March, seven listed companies disclosed 11 B300 rental contracts
@@ -129,7 +134,8 @@ const b4 = deals.find((d) => d.term === '4Y')!;
       <p>
         One seller shows the rise inside its own book. Boost Run rented 1,280
         B300s for three years at $3.45 in March. In July it rented 1,536 for
-        four years at about $3.94, on the same GPU-only basis.
+        four years at about $3.94, on the same GPU-only basis. The July
+        contract is also a year longer.
       </p>
       </div>
 
@@ -166,6 +172,12 @@ const b4 = deals.find((d) => d.term === '4Y')!;
 
     <section class="sec" id="dollars">
       <h2><span class="n">02</span> The move in dollars</h2>
+      <ul class="lede-index keyfigs">
+        <li><span class="arw">→</span> 10,000 GPUs, three years: about ${Math.round(cost3) * 10} million</li>
+        <li><span class="arw">→</span> 10,000 GPUs, five years: about ${Math.round(cost5) * 10} million</li>
+        <li><span class="arw">→</span> Boost Run pair, 10,000 GPUs: about $130 million</li>
+        <li><span class="arw">→</span> SharonAI and Axe Compute, 10,000 GPUs: about $185 million</li>
+      </ul>
       <p>
         These contracts range from 128 to 9,200 GPUs. On a three-year contract
         for 10,000 B300s, the move from the March rate to the August rate is
@@ -320,6 +332,10 @@ const b4 = deals.find((d) => d.term === '4Y')!;
     td.dim { color: var(--ink-dim); }
     td.strong { color: var(--accent); font-weight: var(--weight-strong); }
     td.basis { color: var(--ink-dim); white-space: normal; min-width: 24ch; font-family: var(--font-body); }
+    /* key figures: the subtitle's arrow list, restated per section in data ink */
+    .sec ul.keyfigs { margin: 0 0 16px; font-family: var(--font-mono); font-size: var(--fs-base); color: var(--ink); line-height: 1.5; }
+    .sec ul.keyfigs li { font-family: var(--font-mono); font-size: var(--fs-base); line-height: 1.5; margin: 4px 0; }
+    .sec ul.keyfigs li .arw { color: var(--accent); }
     .src-list { list-style: none; padding: 0; }
     .src-list li { margin-bottom: 8px; font-size: var(--fs-sm); }
   </style>
