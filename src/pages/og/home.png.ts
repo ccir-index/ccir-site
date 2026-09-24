@@ -87,12 +87,12 @@ export const GET: APIRoute = async () => {
       el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 26, fontWeight: 600, letterSpacing: 5, color: T.accent }, 'CCIR'),
       el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 13, letterSpacing: 3, color: T.dim }, 'COMPUTE CREDIT INDEX RESEARCH'),
     ]),
-    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 13, letterSpacing: 3, color: T.dim }, 'DAILY REFERENCE RATES'),
+    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 13, letterSpacing: 3, color: T.dim }, 'DAILY GPU RENTAL RATES'),
   ]);
 
   const titleRow = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexShrink: 0, marginTop: 24 }, [
     el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', alignItems: 'center', height: 46, fontFamily: 'IBM Plex Serif', fontSize: 36, fontWeight: 600, color: T.ink, letterSpacing: -0.5, lineHeight: 1.1 }, 'GPU rental reference rates'),
+      el('div', { display: 'flex', alignItems: 'center', height: 46, fontFamily: 'IBM Plex Serif', fontSize: 36, fontWeight: 600, color: T.ink, letterSpacing: -0.5, lineHeight: 1.1 }, 'Independent GPU price data'),
       el('div', { display: 'flex', alignItems: 'center', height: 20, fontFamily: 'IBM Plex Mono', fontSize: 15, color: T.dim, marginTop: 3 }, 'USD per GPU-hour · on-demand · by operator segment · same panel construction, never blended'),
     ]),
     el('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }, [
@@ -110,7 +110,7 @@ export const GET: APIRoute = async () => {
   ]);
 
   const footer = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0, marginTop: 'auto', paddingTop: 12, borderTop: `1px solid ${T.rule2}` }, [
-    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 14, color: T.dim }, 'No positions. Public prices, citable. — below the publication floor.'),
+    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 14, color: T.dim }, 'No positions. Public prices, documented. — below the publication floor.'),
     el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 15, fontWeight: 600, letterSpacing: 1, color: T.accent }, 'ccir.io'),
   ]);
 

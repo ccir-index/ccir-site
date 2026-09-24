@@ -26,7 +26,8 @@ const groups: Group[] = [
   { role: 'flow', items: [
     { href: '/rates', label: 'Rates' },
     { href: '/term', label: 'Term' },
-    { href: '/tokens', label: 'Tokens' },
+    { href: '/discovery', label: 'Discovery' },
+    { href: '/tokens', label: 'Tokens', match: ['/tokens', '/tokenindex', '/serving'] },
   ] },
   { role: 'financing', items: [
     { href: '/credit', label: 'Credit' },
@@ -38,9 +39,6 @@ const groups: Group[] = [
     { href: '/research', label: 'Research',
       match: ['/research', '/intelligence', '/basis', '/realized',
               '/chip-economics', '/utilization', '/availability'] },
-  ] },
-  { role: 'data', items: [
-    { href: '/explorer', label: 'Explorer' },
   ] },
 ];
 

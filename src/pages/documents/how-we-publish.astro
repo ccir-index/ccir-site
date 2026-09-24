@@ -1,0 +1,113 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { meta } from '../../data/snapshot';
+
+// 2026-09-24 (owner ruling): CCIR is independent market data and research.
+// This page replaces /documents/governance and /documents/change-management
+// (both 301 here) and the retired IOSCO self-assessment.
+---
+<Base
+  title="How We Publish · CCIR"
+  ogImage="/og/documents.png"
+  description="Who publishes CCIR data, the independence it is published under, how changes to the method are versioned and disclosed, and how to question a number."
+  showTape={false}
+>
+  <section class="wrap page-top">
+    <PageHeader title="How We Publish" crumbs={[{ href: '/documents', label: 'Documents' }]} kicker="Documents" asOf={meta.as_of_date} asOfLabel="as published" display>
+      <p class="standfirst">
+        Who publishes the data, the independence it is published under, how
+        the method can change, and how to question a number.
+      </p>
+    </PageHeader>
+
+    <section class="sec">
+      <h2><span class="n">01</span> Publisher</h2>
+      <p>
+        CCIR data and research are published by <strong>Compute Credit Index
+        Research LLC</strong>, a Delaware limited liability company formed
+        March 11, 2026. Contact:
+        <a href="mailto:research@ccir.io">research@ccir.io</a>.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">02</span> Independence</h2>
+      <p>
+        CCIR operates no marketplace, runs no trading desk, and holds no
+        positions in the markets it measures. No revenue depends on the level
+        of any published value. Data partners never buy placement, weight or
+        influence over a published value. Raw contributions stay confidential,
+        and only aggregates publish. CCIR measures prices. It does not value or
+        rate any asset.
+      </p>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">03</span> Versions and Changes</h2>
+      <p>
+        Every published row carries a methodology version. A change to
+        collection, aggregation, panel rules or series definitions increments
+        the version. Values are computed automatically. Nobody adjusts a
+        published value by hand.
+      </p>
+      <ul>
+        <li><strong>Material changes</strong> are announced in the
+        <a href="/documents/changelog">change log</a> before they take effect,
+        with the reason and the expected effect. A change is material when it
+        would move a headline series' 30-day average by more than 10%.</li>
+        <li><strong>Defect fixes</strong> may take effect at once. The fix, its
+        reason and its effect are logged.</li>
+        <li><strong>Restatements</strong> republish history in full under the
+        current version. Prior snapshots stay retrievable in the data
+        repository's history.</li>
+        <li><strong>Series breaks.</strong> When a change alters what a series
+        measures, the old series ends and a new identifier begins. History is
+        never redefined in place.</li>
+        <li><strong>Sources</strong> enter only through a panel version change.
+        A source that stops publishing carries forward at its last good price
+        for up to seven days, then leaves its cells.</li>
+      </ul>
+    </section>
+
+    <section class="sec">
+      <h2><span class="n">04</span> Questions and Corrections</h2>
+      <p>
+        Anyone may question a published value or the treatment of a source by
+        writing to <a href="mailto:research@ccir.io">research@ccir.io</a>. We
+        acknowledge substantive questions within five business days and answer
+        them against the underlying observations and the published
+        <a href="/documents/methodology">method</a>. Where a question finds a
+        defect, the correction and its outcome go in the change log.
+      </p>
+    </section>
+  </section>
+
+  <style>
+    .sec { margin: 26px 0; max-width: 76ch; }
+    .sec h2 {
+      font-family: var(--font-display);
+      font-size: var(--fs-xl);
+      margin: 0 0 10px;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .sec .n {
+      font-family: var(--font-mono);
+      font-size: var(--fs-sm);
+      color: var(--accent);
+      font-weight: var(--weight-strong);
+    }
+    .sec p, .sec ul {
+      font-family: var(--font-body);
+      font-size: var(--fs-md);
+      color: var(--ink);
+      line-height: 1.65;
+      margin: 0 0 12px;
+    }
+    .sec ul { padding-left: 20px; }
+    .sec li { margin-bottom: 6px; }
+    .sec strong { color: var(--accent); }
+  </style>
+</Base>

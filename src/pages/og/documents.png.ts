@@ -17,13 +17,13 @@ const SPEC = {
       ""
     ],
     [
-      "Change management",
-      "Versioning, restatements, series breaks",
+      "How we publish",
+      "Versions, restatements, independence",
       ""
     ],
     [
-      "Governance",
-      "Administrator identity, independence, complaints",
+      "Data terms",
+      "What you may use without asking",
       ""
     ]
   ],

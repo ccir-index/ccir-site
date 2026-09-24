@@ -5,12 +5,11 @@ import { meta } from '../data/snapshot';
 
 const citation = [
   {
-    kicker: 'Lender & borrower counsel',
+    kicker: 'Lenders & credit analysts',
     body:
-      'Market-price covenants, rollover mechanics, and defined-terms ' +
-      'drafting against a published series: series selection, fallback ' +
-      'language, and how the change-management policy behaves inside a ' +
-      'facility over its life.',
+      'Monitoring GPU-backed exposures with published data: which series ' +
+      'fit a collateral pool, how history and restatements work, and ' +
+      'what the data does and does not measure.',
   },
   {
     kicker: 'Rating agencies',
@@ -63,9 +62,8 @@ const audiences = [
       <p class="standfirst">
         CCIR publishes independent market data on GPU compute prices and credit, and
         research built on that data. We operate no marketplace and no
-        trading desk. Write to us about citing a published series (in a
-        credit agreement, a rating analysis, or a surveillance report) or
-        about contributing data.
+        trading desk. Write to us about using the data, licensing it, or
+        contributing to it.
       </p>
     </PageHeader>
 
@@ -76,16 +74,15 @@ const audiences = [
 
     <section class="citation">
       <header class="sec-head">
-        <div class="kicker">Citation & use</div>
-        <h2>Citing a Published Series</h2>
+        <div class="kicker">Using the data</div>
+        <h2>Using CCIR Data</h2>
       </header>
       <p class="prose">
         Every published series is documented. Every cell on
         <a href="/rates">/rates</a> prints its series identifier, the statistic
-        behind it, and panel depth. Methodology, change-management, and
-        governance documents are published at
-        <a href="/documents">/documents</a>. We work through citation and use
-        questions with the people wiring a series into documents and analysis:
+        behind it, and panel depth. The method and data terms are published at
+        <a href="/documents">/documents</a>. We work through use questions
+        with the people building our data into their analysis:
       </p>
       <div class="aud-grid cite-grid">
         {citation.map((c) => (
@@ -96,7 +93,7 @@ const audiences = [
         ))}
       </div>
       <p class="prose cite-foot">
-        Worked covenant, rollover, and pool-surveillance mechanics are at
+        Worked monitoring examples are at
         <a href="/applications">/applications</a>.
       </p>
     </section>

@@ -5,15 +5,15 @@ export const prerender = true;
 
 // OG card for ccir.io/applications. Content mirrors the page; regenerate by editing here.
 const SPEC = {
-  "kicker": "Reference",
+  "kicker": "Monitoring",
   "titleLines": [
     "Applications"
   ],
-  "sub": "How a CCIR reference rate fits into credit agreements and citations.",
+  "sub": "Worked examples of monitoring GPU-backed credit with market data.",
   "rows": [
     [
-      "Covenants",
-      "Drafting against a published H100 series",
+      "Earning power",
+      "Collateral tracked against the market rate",
       ""
     ],
     [
@@ -22,8 +22,8 @@ const SPEC = {
       ""
     ],
     [
-      "Citation",
-      "Benchmark-citation language, worked examples",
+      "Pools",
+      "Monitoring a multi-generation pool",
       ""
     ]
   ],

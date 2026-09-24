@@ -1,16 +1,16 @@
 # Methodology
 
-This document describes current practice for every published CCIR reference series, the Compute Rental Index (CRI): what the numbers measure, where they come from, and how they are computed. Changes to anything on this page are governed by the [Change Management Policy](/documents/change-management).
+This document describes current practice for every published CCIR rental rate series (series identifiers begin `CRI`): what the numbers measure, where they come from, and how they are computed. Changes to anything on this page follow [How We Publish](/documents/how-we-publish).
 
 ## 01 What the Series Are
 
-CCIR publishes daily reference series for GPU rental prices, in U.S. dollars per GPU per hour, on the grain **chip × operator segment × form factor × interruptibility × commitment term × region**. Every price is a **posted, publicly observable list ask** collected from a provider-operated pricing surface — not an executed transaction, not a solicited quote, not a broker-mediated or sponsored feed. If a price is only available through sales contact, it is not in the index.
+CCIR publishes daily series for GPU rental prices, in U.S. dollars per GPU per hour, on the grain **chip × operator segment × form factor × interruptibility × commitment term × region**. Every price is a **posted, publicly observable list ask** collected from a provider-operated pricing surface — not an executed transaction, not a solicited quote, not a broker-mediated or sponsored feed. If a price is only available through sales contact, it is not in the data.
 
 ## 01a Design Rationale
 
 The series measure publicly posted list asks. They do not sample executed transactions, and they do not estimate traded volume. Posted asks are observable without solicitation and reproducible by any third party on the day of observation. They carry no submission channel, so there is nothing to misreport: no transaction sample to select from, no broker mark, no expert judgment.
 
-The series are designed as **reference rates**: suitable for contractual citation, residual-value monitoring, and credit covenants. Not every published row carries that status, and section 04a sets out the test. They are not designed to replicate a volume-weighted average of executed trades. Products that measure executed levels sit outside this methodology and its governance framework.
+The series are market data: a documented, reproducible measure of posted rental prices for monitoring, research and analysis. Section 04a explains how to read each row's status. They are not designed to replicate a volume-weighted average of executed trades. Products that measure executed levels sit outside this methodology.
 
 ## 02 Operator Segments
 
@@ -40,15 +40,15 @@ The headline statistic per cell is the **operator-equal median at every panel de
 
 Panel depth *n* is the trust signal. It publishes beside every headline value with the observation count and the interquartile range, and thin cells should be read as indicative. Because the threshold is a floor on depth rather than a view on price, it never selects among cells that clear it.
 
-Under rapid dislocation (the sudden exit of major sources, widespread collection failure, or extreme dispersion) the administrator may widen the observation window or publish a notice of reduced coverage. Both steps are pre-specified contingencies: each is logged, applies forward only, and changes neither the series identifier nor the definition of the rate.
+Under rapid dislocation (the sudden exit of major sources, widespread collection failure, or extreme dispersion) CCIR may widen the observation window or publish a notice of reduced coverage. Both steps are pre-specified contingencies: each is logged, applies forward only, and changes neither the series identifier nor the definition of the rate.
 
-## 04a What Publishes, and What May Be Cited
+## 04a How to Read a Row's Status
 
-Publication and citability are separate questions, and every row answers both on its face. `promotion_status` reports whether a cell cleared the full threshold in section 04. `product_class` reports what it may be used for.
+Every row carries two status fields. `promotion_status` reports whether a cell cleared the full threshold in section 04. `product_class` reports which panel the cell rests on.
 
-`citable` marks the on-demand reference series. `market_intelligence` marks the committed-term series, together with the on-demand companion published beside them for like-for-like comparison. Those cells are published for context. They rest on a different and generally thinner panel than the on-demand series beside them, so they are not offered for contractual citation. **A citable reference rate is a row reading `product_class = citable` and `promotion_status = Published`**. A substantial share of published rows does not meet both conditions, so the two columns are the test rather than the series identifier.
+`citable` marks the on-demand series on the full panel. The field name predates the current framing and is kept so existing files stay stable. `market_intelligence` marks the committed-term series, together with the on-demand companion published beside them for like-for-like comparison. Those cells rest on a different and generally thinner panel, so read them as context. **The strongest on-demand rows read `product_class = citable` and `promotion_status = Published`**. Many published rows do not meet both conditions, so check the two fields rather than the series identifier.
 
-The published file carries the operator-segment series set out in section 06. An earlier factory-class taxonomy is still computed and surfaces in the [/explorer](/explorer) long tail. Those series are not part of the reference set and are not included in the download.
+The published file carries the operator-segment series set out in section 06. An earlier factory-class taxonomy is still computed and surfaces in the [/explorer](/explorer) long tail. Those series are not part of the main set and are not included in the download.
 
 ## 05 Windows and Composition Stability
 
@@ -71,8 +71,8 @@ Example:  CRI-T2-H100-ALL-GTD-OD-US
           Neocloud · H100 · guaranteed on-demand · United States
 ```
 
-`ALL` on any axis means that axis is pooled for that series. A listing prices the region of its posted location, whichever provider posts it; a hyperscaler's European capacity prices Europe. `Other` on the region axis collects posted locations outside the three named regions; it is a residual, and it is never a substitute for a named region. A listing with no posted location falls back to its provider's home region. `OAM` is the Open Accelerator Module form factor. The reference ladder on [/rates](/rates) shows the guaranteed on-demand US cut per chip and segment, with each cell's series identifier printed beneath the rate.
+`ALL` on any axis means that axis is pooled for that series. A listing prices the region of its posted location, whichever provider posts it; a hyperscaler's European capacity prices Europe. `Other` on the region axis collects posted locations outside the three named regions; it is a residual, and it is never a substitute for a named region. A listing with no posted location falls back to its provider's home region. `OAM` is the Open Accelerator Module form factor. The rate ladder on [/rates](/rates) shows the guaranteed on-demand US cut per chip and segment, with each cell's series identifier printed beneath the rate.
 
 ## 07 Publication, History, Restatement
 
-Series publish daily by 07:30 Eastern Time (ET) at ccir.io. Each print reports the prior complete day in Central time and is dated that day. History is append-only with a methodology version stamped on every row. A value is final when it publishes. After that, no value changes silently. When a defect or a material methodology change requires it, history is restated and republished in full under the current version, per the [Change Management Policy](/documents/change-management). The record from 2026-04-24 was republished in full under v2.4.0; see the [change log](/documents/changelog).
+Series publish daily by 07:30 Eastern Time (ET) at ccir.io. Each print reports the prior complete day in Central time and is dated that day. History is append-only with a methodology version stamped on every row. A value is final when it publishes. After that, no value changes silently. When a defect or a material methodology change requires it, history is restated and republished in full under the current version, per the [How We Publish](/documents/how-we-publish). The record from 2026-04-24 was republished in full under v2.4.0; see the [change log](/documents/changelog).

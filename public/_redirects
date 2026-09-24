@@ -58,3 +58,9 @@
 # analytics show visitors landing on /research/dGhlXJhdG (the L dropped, then
 # truncated). Splat catches every variant and sends them to the piece.
 /research/dGhl* /research/the-rating-case-goes-investment-grade 301
+
+# 2026-09-24: repositioned as independent market data and research. The IOSCO
+# self-assessment is retired; governance and change management fold into one page.
+/documents/iosco /documents/how-we-publish 301
+/documents/governance /documents/how-we-publish 301
+/documents/change-management /documents/how-we-publish 301
