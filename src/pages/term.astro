@@ -131,14 +131,14 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
 ---
 <Base
   title="GPU Term Rates: Posted and Contracted Prices by Tenor · CCIR"
-  description="GPU term rates by tenor: signed contract prices from SEC filings by vintage, the posted reserved-price ladder for H100, H200, B200 and B300, and the gap between them. Updated daily."
+  description="GPU term rates by tenor: contracted prices from public filings by vintage, the posted term ladder for H100, H200, B200 and B300, and the gap between them. Updated daily."
   ogImage="/og/term-structure-2026-07.png"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: 'CCIR GPU Committed Term Rates',
-    description: 'Committed-term GPU rental rates by tenor. Each cell is the chip’s global neocloud on-demand rate times the chip’s own tenor factor, computed daily from posted prices. Contracted rates from filed deals sit beside the posted cells.',
+    description: 'Committed-term GPU rental rates by tenor: posted term rates built under CCIR’s published method, shown against contracted rates from public filings.',
     url: 'https://ccir.io/term',
     creator: { '@type': 'Organization', name: 'CCIR', url: 'https://ccir.io' },
     temporalCoverage: '2026-05/..',
@@ -155,8 +155,8 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
     <PageHeader title="Committed Term Rates" kicker="Market Data · Committed Term · Global" asOfLabel="" asOf={printLine(meta)}>
       <p class="standfirst">
         The price of guaranteed capacity by tenor, for the chips lenders
-        finance. Posted rates start from each chip's global on-demand rate.
-        Contracted rates from filed deals sit beside them.
+        finance. Posted term rates, built under our published method, are
+        shown against contracted rates from public filings.
       </p>
       <ul class="lede-index">
         <li><span class="arw">→</span> <a href="/research/b300-contract-prices">Signed B300 contract rates, March to August 2026</a></li>
