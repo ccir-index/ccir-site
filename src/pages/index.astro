@@ -238,19 +238,13 @@ const researchGroups: ResearchGroup[] = [
       </p>
     </section>
 
-    <!-- Layer 2 — the other surfaces: financing, residual, tokens, data -->
+    <!-- Layer 2 — discovery, tokens, financing, residual -->
     <section class="surface-band">
-      <a class="surface" href="/credit">
-        <span class="s-kicker">Financing</span>
-        <span class="s-title">Credit</span>
-        <span class="s-line">GPU-backed debt as filed — {creditN} instruments tracked, ${creditGpuUsdB}B secured directly by the GPUs.</span>
-        <span class="s-go">Credit tracker →</span>
-      </a>
-      <a class="surface" href="/hardware">
-        <span class="s-kicker">Residual</span>
-        <span class="s-title">Hardware</span>
-        <span class="s-line">Model-implied value of a deployed GPU, from CCIR's own rates, checked against executed sales and posted asks.</span>
-        <span class="s-go">Hardware values →</span>
+      <a class="surface" href="/discovery">
+        <span class="s-kicker">Discovery</span>
+        <span class="s-title">Spot Price Discovery</span>
+        <span class="s-line">Hyperscaler interruptible prices per GPU-hour, zone by zone around the world, with daily history.</span>
+        <span class="s-go">Price discovery →</span>
       </a>
       <a class="surface" href="/tokens">
         <span class="s-kicker">Tokens</span>
@@ -258,11 +252,17 @@ const researchGroups: ResearchGroup[] = [
         <span class="s-line">An index of posted token prices weighted by traffic, with the frontier and open-weight record beside it.</span>
         <span class="s-go">Token index →</span>
       </a>
-      <a class="surface" href="/explorer">
-        <span class="s-kicker">Data</span>
-        <span class="s-title">Explorer</span>
-        <span class="s-line">Every published series by chip, segment, tenor, and region.</span>
-        <span class="s-go">Series explorer →</span>
+      <a class="surface" href="/credit">
+        <span class="s-kicker">Financing</span>
+        <span class="s-title">Credit</span>
+        <span class="s-line">GPU-backed debt from filings: {creditN} instruments tracked, ${creditGpuUsdB}B secured directly by the GPUs.</span>
+        <span class="s-go">Credit tracker →</span>
+      </a>
+      <a class="surface" href="/hardware">
+        <span class="s-kicker">Residual</span>
+        <span class="s-title">Hardware</span>
+        <span class="s-line">Model-implied value of a deployed GPU, from CCIR's own rates, checked against executed sales and posted asks.</span>
+        <span class="s-go">Hardware values →</span>
       </a>
     </section>
 
