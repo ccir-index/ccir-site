@@ -87,7 +87,7 @@ export const GET: APIRoute = async () => {
       el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 26, fontWeight: 600, letterSpacing: 5, color: T.accent }, 'CCIR'),
       el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 13, letterSpacing: 3, color: T.dim }, 'COMPUTE CREDIT INDEX RESEARCH'),
     ]),
-    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 13, letterSpacing: 3, color: T.dim }, 'DAILY GPU RENTAL RATES'),
+    el('div', { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 13, letterSpacing: 3, color: T.dim }, 'TRANSPARENCY FOR COMPUTE MARKETS'),
   ]);
 
   const titleRow = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexShrink: 0, marginTop: 24 }, [

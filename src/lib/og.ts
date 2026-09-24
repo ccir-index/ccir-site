@@ -101,7 +101,7 @@ export function frame(title: string, sub: string, body: unknown, asOf: string) {
   const top = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16 }, [
     el('div', { display: 'flex', alignItems: 'baseline', gap: 12 }, [
       el('div', { display: 'flex', color: C.navy, fontSize: 24, fontWeight: 600, letterSpacing: 3 }, 'CCIR'),
-      el('div', { display: 'flex', color: C.dim, fontSize: 16 }, 'Compute Credit Index Research'),
+      el('div', { display: 'flex', color: C.dim, fontSize: 16 }, 'Compute Credit Index Research · Transparency for compute markets'),
     ]),
     el('div', { display: 'flex', color: C.dim, fontSize: 16 }, `as of ${asOf}`),
   ]);
