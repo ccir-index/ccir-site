@@ -6149,7 +6149,7 @@
       "name": "Valor GPU SPV program (context)",
       "instrument_type": "lease",
       "size_usd_m": 20000,
-      "size_note": "~$20B program: ~$12.5B debt + ~$7.5B equity (incl. up to $2B NVIDIA) — program scale partly rumored; no confirmed close of the full program through 2026-08-09. DISTINCT from xAI's $20B Series E equity round (closed 2026-01-06, xAI PR) — do not conflate Filed (SpaceX Q2-26 10-Q, Notes 9 and 17): at 6/30/26, debt recorded for equipment leases with Valor was $2,039M current plus $11,290M non-current, across three failed sale-leasebacks ($455M plus $4,052M at 12/31/25). Interest expense on these leases was $327M in Q2-26 and $513M in 1H26. The April 2026 lease's own principal is not stated. Valor is a related party: its founder Antonio Gracias is a SpaceX director. The filing does not state a program size.",
+      "size_note": "~$20B program: ~$12.5B debt + ~$7.5B equity (incl. up to $2B NVIDIA) — program scale partly rumored; no confirmed close of the full program through 2026-08-09. DISTINCT from xAI's $20B Series E equity round (closed 2026-01-06, xAI PR) — do not conflate Filed (SpaceX Q2-26 10-Q, Notes 9 and 17): at 6/30/26, debt recorded for equipment leases with Valor was $2,039M current plus $11,290M non-current, across three failed sale-leasebacks ($455M plus $4,052M at 12/31/25). Interest expense on these leases was $327M in Q2-26 and $513M in 1H26. The April 2026 lease's own principal is not stated. Valor is a related party: its founder Antonio Gracias is a SpaceX director. The filing does not state a program size. Filed leases are tracked as three rows (xai-apollo-vci, xai-valor-lease-2, xai-valor-lease-3; $13,329M at 2026-06-30). This program row stays out of totals.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -6170,7 +6170,8 @@
         "date": "2025-10-16",
         "url": "https://finance.yahoo.com/news/musk-xai-pursuing-20-billion-180400834.html"
       },
-      "as_of": "2026-06-30"
+      "as_of": "2026-06-30",
+      "exclude_from_totals": true
     },
     {
       "id": "xai-apollo-vci",
@@ -6178,11 +6179,11 @@
       "issuer": "xAI",
       "ticker": null,
       "issuer_type": "private",
-      "entity": "Valor Compute Infrastructure LP (Valor-managed SPV; lessor)",
-      "name": "Apollo $3.5B capital solution → Valor Compute Infrastructure LP",
+      "entity": "CTC Property LLC (xAI subsidiary; lessee). Lessor: Valor Compute Infrastructure LP",
+      "name": "Valor compute lease I (CTC Property LLC, failed sale-leaseback)",
       "instrument_type": "lease",
-      "size_usd_m": 3500,
-      "size_note": "$3.5B Apollo-managed funds backing a $5.4B total transaction SpaceX's Form S-1 (2026-05-20) describes a November 2025 sale-leaseback of AI infrastructure assets by CTC Property LLC, an xAI subsidiary, with Valor. It is booked as a failed sale-leaseback, and X.AI Corp. guarantees some of CTC's lease obligations. Debt recorded at 12/31/25: $455M current plus $4,052M non-current. The filing does not name Apollo or Valor Compute Infrastructure LP.",
+      "size_usd_m": 4507,
+      "size_note": "$4,507M of lease debt recorded at 2025-12-31 ($455M current plus $4,052M non-current; SpaceX Form S-1). Undiscounted lease payments $6,986M over the term (424B4). Apollo-managed funds lent $3.5B to the lessor (10.00% fixed, due 2030-11): that loan sits on the same GPUs one layer down and is not counted again here. The three Valor leases total $13,329M of debt at 2026-06-30 (Q2 10-Q).",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -6191,55 +6192,21 @@
       "maturity": "Undisclosed",
       "maturity_note": null,
       "seniority": "GPU-backed, asset-based SPV lease; the filed Valor lease is recorded as debt on the xAI (SpaceX) balance sheet",
-      "security": "VCI LP acquires GB200 compute and leases to an xAI subsidiary under triple-net lease; supports xAI's second data center (press ties to Colossus 2, Memphis). No \"Diablo\" site corroborated — treat that name as unverified",
+      "security": "GPU compute equipment owned by the Valor-managed lessor and leased back to CTC Property LLC, an xAI subsidiary. Booked by SpaceX as a failed sale-leaseback, so the lease is recorded as debt. Lease payments are guaranteed by Space Exploration Technologies Corp. or one of its subsidiaries (424B4). No residual value guarantee, purchase-option price or market-value reference appears in the filings. Apollo's release ties this lease to NVIDIA GB200 GPUs.",
       "lenders": [
-        "Apollo (capital solution)",
-        "NVIDIA anchor LP + Valor investors (equity side)"
+        "Valor Compute Infrastructure LP (lessor)",
+        "Apollo-managed funds (loan to the lessor)",
+        "NVIDIA anchor LP (lessor equity, per Apollo release)"
       ],
       "status": "confirmed",
-      "issued": "Closed; PR 2026-01-07 (funds provided ~Nov 2025 per The Information)",
+      "issued": "2025-11-10",
       "source": {
-        "doc": "Apollo press release 2026-01-07; SpaceX Form S-1 filed 2026-05-20, acc 0001628280-26-036936, Notes 10 and 18",
-        "date": "2026-01-07",
+        "doc": "SpaceX Form S-1 (acc 0001628280-26-036936) Notes 10 and 18; SpaceX 424B4 (acc 0001628280-26-042639); Apollo press release 2026-01-07",
+        "date": "2026-06-11",
         "url": "https://www.apollo.com/insights-news/pressreleases/2026/01/apollo-backs-5-4-billion-valor-and-xai-data-center-compute-infrastructure-transaction-with-3-5-billion-capital-solution-3214463"
       },
-      "as_of": "2026-05-20",
+      "as_of": "2026-09-25",
       "offtaker_label": "xAI subsidiary (triple-net lease)"
-    },
-    {
-      "id": "xai-apollo-t2",
-      "collateral_class": "out",
-      "exclude_from_issuance": true,
-      "exclude_reason": "Status not confirmed-closed (strict scope, 2026-07-06).",
-      "issuer": "xAI",
-      "ticker": null,
-      "issuer_type": "private",
-      "entity": "Valor-arranged chip-lease vehicle",
-      "name": "Apollo second tranche",
-      "instrument_type": "lease",
-      "size_usd_m": 3400,
-      "size_note": "~$3.4B (Apollo total → ~$7B)",
-      "rate": {
-        "kind": "undisclosed",
-        "value": null,
-        "note": null
-      },
-      "maturity": "Undisclosed",
-      "maturity_note": null,
-      "seniority": "GPU lease SPV (similar structure)",
-      "security": "Similar GPU lease SPV",
-      "lenders": [
-        "Apollo",
-        "Valor-arranged chip-lease vehicle"
-      ],
-      "status": "press",
-      "issued": "Reported 2026-02-09, \"near final\" — no Apollo close PR found (re-checked 2026-08-09: still none)",
-      "source": {
-        "doc": "The Information; Reuters pickup",
-        "date": "2026-02-09",
-        "url": "https://www.theinformation.com/articles/apollo-nears-3-billion-chip-funding-deal-tied-xai"
-      },
-      "as_of": "2026-08-09"
     },
     {
       "id": "meta-beignet-hyperion",
@@ -9067,6 +9034,72 @@
         "url": "https://finance.yahoo.com/technology/ai/articles/blackstone-finalizes-4-3-billion-210202993.html"
       },
       "as_of": "2026-09-25"
+    },
+    {
+      "id": "xai-valor-lease-2",
+      "collateral_class": "gpu",
+      "issuer": "xAI",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "CTC Property LLC (xAI subsidiary; lessee). Lessor: Valor Compute Infrastructure LP",
+      "name": "Valor compute lease II (CTC Property LLC, failed sale-leaseback)",
+      "instrument_type": "lease",
+      "size_usd_m": 5365,
+      "size_note": "$5,365M of lease debt recorded on the lease amended 2026-02-18; undiscounted payments $6,633M (424B4). The lessor's term loan for this lease is due 2031-02-06; Apollo's role in it is reported by press only.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": null
+      },
+      "maturity": "Undisclosed",
+      "maturity_note": null,
+      "seniority": "GPU-backed, asset-based SPV lease; the filed Valor lease is recorded as debt on the xAI (SpaceX) balance sheet",
+      "security": "GPU compute equipment owned by the Valor-managed lessor and leased back to CTC Property LLC, an xAI subsidiary. Booked by SpaceX as a failed sale-leaseback, so the lease is recorded as debt. Lease payments are guaranteed by Space Exploration Technologies Corp. or one of its subsidiaries (424B4). No residual value guarantee, purchase-option price or market-value reference appears in the filings.",
+      "lenders": [
+        "Valor Compute Infrastructure LP (lessor)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-02-18",
+      "source": {
+        "doc": "SpaceX 424B4 (acc 0001628280-26-042639); SpaceX Q2-2026 10-Q (acc 0001628280-26-052535)",
+        "date": "2026-08-04",
+        "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026052535/"
+      },
+      "as_of": "2026-09-25",
+      "offtaker_label": "xAI subsidiary (triple-net lease)"
+    },
+    {
+      "id": "xai-valor-lease-3",
+      "collateral_class": "gpu",
+      "issuer": "xAI",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "CTC Property LLC (xAI subsidiary; lessee). Lessor: Valor Compute Infrastructure LP",
+      "name": "Valor compute lease III (CTC Property LLC, five-year equipment lease)",
+      "instrument_type": "lease",
+      "size_usd_m": 3457,
+      "size_note": "DERIVED, not filed: $13,329M total Valor lease debt at 2026-06-30 (Q2 10-Q) less $4,507M (lease I) and $5,365M (lease II) as filed. It understates this lease slightly, since leases I and II have amortized. Undiscounted payments $6,587M (424B4).",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": null
+      },
+      "maturity": "Undisclosed",
+      "maturity_note": null,
+      "seniority": "GPU-backed, asset-based SPV lease; the filed Valor lease is recorded as debt on the xAI (SpaceX) balance sheet",
+      "security": "GPU compute equipment owned by the Valor-managed lessor and leased back to CTC Property LLC, an xAI subsidiary. Booked by SpaceX as a failed sale-leaseback, so the lease is recorded as debt. Lease payments are guaranteed by Space Exploration Technologies Corp. or one of its subsidiaries (424B4). No residual value guarantee, purchase-option price or market-value reference appears in the filings.",
+      "lenders": [
+        "Valor Compute Infrastructure LP (lessor)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-04-24",
+      "source": {
+        "doc": "SpaceX Q2-2026 10-Q (acc 0001628280-26-052535); SpaceX 424B4 (acc 0001628280-26-042639)",
+        "date": "2026-08-04",
+        "url": "https://www.sec.gov/Archives/edgar/data/1181412/000162828026052535/"
+      },
+      "as_of": "2026-09-25",
+      "offtaker_label": "xAI subsidiary (triple-net lease)"
     }
   ],
   "retired": [
@@ -9175,6 +9208,12 @@
       "issuer": "Related Digital / Blackstone (Saline Twp, MI)",
       "items": [
         "related-saline-barn — duplicate of related-digital-saline-2045 (same RD Michigan Property Owner I LLC $14B 7.500% senior secured notes due 2045, Saline Township MI campus, PIMCO anchor, BofA structuring agent, both dated 2026-04-24); merged 2026-09-17"
+      ]
+    },
+    {
+      "issuer": "xAI",
+      "items": [
+        "xai-apollo-t2 (~$3.4B Apollo second tranche, press) folded into Valor compute lease II, 2026-09-25"
       ]
     }
   ]
