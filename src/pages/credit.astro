@@ -184,6 +184,9 @@ const types = [...new Set(instruments.map((i: any) => i.instrument_type))];
 // facilities with undisclosed collateral are all tracked but classed apart.
 const inScopeC = instruments.filter((i: any) => i.collateral_class === 'gpu');
 const inScopeUsdB = Math.round(inScopeC.reduce((a: number, i: any) => a + i.size_usd_m, 0) / 1000);
+// Deals, not instruments (John, 2026-09-25): rows that are legs of one financing
+// share a `deal_group` (e.g., IREN Hardware 3 loan + notes) and count once.
+const inScopeDeals = new Set(inScopeC.map((i: any) => i.deal_group ?? i.id)).size;
 
 // Collateral-treatment scan — amortization-family language anywhere in an
 // instrument's filed fields (schedules, depreciated-cost borrowing bases,
@@ -645,8 +648,8 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     <div class="hero-solo">
       <PageHeader title="Compute Credit Tracker" kicker="Market Intelligence · Compute Credit" asOf={AS_OF} />
       <p class="standfirst lede">
-        GPU-backed credit. ${inScopeUsdB}B across {inScopeC.length}
-        instruments is secured directly by the GPUs: the issuance charted
+        GPU-backed credit. ${inScopeUsdB}B across {inScopeDeals}
+        deals is secured directly by the GPUs: the issuance charted
         below. The ledger holds {instruments.length} instruments across
         {issuers.length} issuers.
       </p>
@@ -1125,10 +1128,15 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         disclose amortization mechanics in their filed terms: depreciated-cost
         borrowing bases, scheduled quarterly or monthly amortization,
         debt-service coverage ratio (DSCR)-targeted paydowns, and
-        amortization-plus-balloon structures. Every
-        disclosed schedule points the same direction: collateral value is
-        written down toward zero over the facility's life. No GPU-collateralized
-        instrument on this ledger references a market residual value. The
+        amortization-plus-balloon structures. Most write collateral value
+        down over the facility's life. Some end with a balloon or bullet
+        (CoreWeave DDTL 1.0 and 5.0), which leaves a balance to refinance or
+        repay at maturity. No GPU-collateralized instrument states a residual
+        value. Two reference the market in other ways. IREN's Hardware 3
+        applies GPU disposition proceeds to prepay the debt if Microsoft ends
+        a tranche and no replacement customer is found, and the parent
+        guarantees the rest. CoreWeave's DDTL 5.5 reportedly triggers a cash
+        lockbox if the GPU lease rate falls below a threshold (press). The
         remainder do not disclose amortization mechanics in any primary
         document. The only residual-value references anywhere on the ledger
         sit outside the GPU-collateral scope: the Hyperion data-center JV

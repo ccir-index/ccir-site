@@ -2539,7 +2539,8 @@
         "panel": "spreads",
         "tier": "strong",
         "tag": "IREN H3"
-      }
+      },
+      "deal_group": "iren-hw3"
     },
     {
       "id": "iren-hw3-notes",
@@ -2590,7 +2591,8 @@
         "panel": "operator",
         "tier": "strong",
         "tag": "IREN 5.96"
-      }
+      },
+      "deal_group": "iren-hw3"
     },
     {
       "id": "iren-gpu-leases",
@@ -2657,7 +2659,8 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm"
       },
       "as_of": "2026-08-28",
-      "offtaker_label": "Non-IG customer deployments (issuer statement, program level; counterparty unnamed)"
+      "offtaker_label": "Non-IG customer deployments (issuer statement, program level; counterparty unnamed)",
+      "deal_group": "iren-mackenzie"
     },
     {
       "id": "iren-mackenzie-notes",
@@ -2697,7 +2700,8 @@
         "tier": "weak",
         "tag": "IREN 9.000",
         "context": true
-      }
+      },
+      "deal_group": "iren-mackenzie"
     },
     {
       "issuer_type": "public",
