@@ -403,7 +403,8 @@ const tapeCfg = [
   { id: 'nscale-madison-ddtl', date: '2026-08-27', v: 2.375, tag: 'Nscale Madison', sub: 'customer redacted', compact: true, ring: true, tier: 'mid' as Tier },
 ].map((p) => ({ ...p, inst: inst(p.id) }));
 
-interface Mark { kind: 'dot' | 'diamond' | 'range' | 'ring'; x: number; y?: number; yLo?: number; yHi?: number; rid: string; tier: Tier }
+interface Mark { kind: 'dot' | 'diamond' | 'range' | 'ring'; x: number; y?: number; yLo?: number; yHi?: number; rid: string; tier: Tier; tip?: string }
+const TIER_TIP: Record<Tier, string> = { strong: 'IG contract-backed', mid: 'non-IG or undisclosed contract', weak: 'hardware only' };
 const aMarks: Mark[] = [];
 const aObstacles: { x: number; y: number }[] = [];
 const aLabelItems: LabIn[] = [];
@@ -413,12 +414,14 @@ for (const p of tapeCfg) {
   if (p.v != null && (p as any).ring) {
     // A second facility on the same date and spread: a ring around the
     // shared dot, labeled by the first facility's label.
-    aMarks.push({ kind: 'ring', x: X, y: ay(p.v), rid, tier: p.tier });
+    aMarks.push({ kind: 'ring', x: X, y: ay(p.v), rid, tier: p.tier,
+      tip: `${p.tag} · +${p.v.toFixed(2)} · ${p.date} · ${p.sub ?? TIER_TIP[p.tier]}` });
     continue;
   }
   if (p.v != null) {
     const Y = ay(p.v);
-    aMarks.push({ kind: 'dot', x: X, y: Y, rid, tier: p.tier });
+    aMarks.push({ kind: 'dot', x: X, y: Y, rid, tier: p.tier,
+      tip: `${p.tag} · +${p.v.toFixed(2)} · ${p.date} · ${p.sub ?? TIER_TIP[p.tier]}` });
     aObstacles.push({ x: X, y: Y });
     // Compact points (the dense Jul-Aug 2026 group) carry one line: name and
     // spread. The customer detail is in the ledger row the mark links to.
@@ -432,8 +435,10 @@ for (const p of tapeCfg) {
     aLabelItems.push({ x: X, y: Y, lines, rid, v: p.v });
   } else {
     const yLo = ay(p.lo!), yHi = ay(p.hi!), yEx = ay(p.extra!);
-    aMarks.push({ kind: 'range', x: X, yLo, yHi, rid, tier: p.tier });
-    aMarks.push({ kind: 'diamond', x: X, y: yEx, rid, tier: (p as any).tierExtra ?? p.tier });
+    aMarks.push({ kind: 'range', x: X, yLo, yHi, rid, tier: p.tier,
+      tip: `${p.tag} · +${p.lo!.toFixed(2)} to +${p.hi!.toFixed(2)} on investment-grade contract loans · ${p.date}` });
+    aMarks.push({ kind: 'diamond', x: X, y: yEx, rid, tier: (p as any).tierExtra ?? p.tier,
+      tip: `${p.tag} · +${p.extra!.toFixed(2)} non-IG leg · ${p.date}` });
     aObstacles.push({ x: X, y: yLo }, { x: X, y: yHi }, { x: X, y: yEx }, { x: X, y: (yLo + yHi) / 2 });
     const lines: LabLine[] = [
       { t: `+${p.lo!.toFixed(2)}–${p.hi!.toFixed(2)}`, cls: 'pt-label' },
@@ -682,7 +687,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           <div class="panel-title">GPU-collateral floating spreads</div>
           <div class="panel-sub">
             Spread over SOFR at signing, colored by what backs the loan ·
-            Jul 2023 – Sep 2026
+            Jul 2023 – Sep 2026 · hover a dot for the facility, click to open its ledger row
           </div>
         </div>
         <span class="badge">FILED TERMS</span>
@@ -712,31 +717,20 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
         {aMarks.map((m) =>
           m.kind === 'dot' ? (
-            <circle cx={m.x} cy={m.y} r="4.5" class={`pt hot tier-${m.tier}`} data-row={m.rid} />
+            <circle cx={m.x} cy={m.y} r="5" class={`pt hot tier-${m.tier}`} data-row={m.rid}><title>{m.tip}</title></circle>
           ) : m.kind === 'ring' ? (
-            <circle cx={m.x} cy={m.y} r="8" class={`ring hot tier-stroke-${m.tier}`} data-row={m.rid} />
+            <circle cx={m.x} cy={m.y} r="8.5" class={`ring hot tier-stroke-${m.tier}`} data-row={m.rid}><title>{m.tip}</title></circle>
           ) : m.kind === 'diamond' ? (
-            <path d={`M ${m.x} ${m.y! - 5.5} L ${m.x + 5.5} ${m.y} L ${m.x} ${m.y! + 5.5} L ${m.x - 5.5} ${m.y} Z`} class={`hot tier-fill-${m.tier}`} data-row={m.rid} />
+            <path d={`M ${m.x} ${m.y! - 5.5} L ${m.x + 5.5} ${m.y} L ${m.x} ${m.y! + 5.5} L ${m.x - 5.5} ${m.y} Z`} class={`hot tier-fill-${m.tier}`} data-row={m.rid}><title>{m.tip}</title></path>
           ) : (
             <g class="hot" data-row={m.rid}>
+              <title>{m.tip}</title>
               <line x1={m.x} y1={m.yLo} x2={m.x} y2={m.yHi} class={`range tier-stroke-${m.tier}`} />
               <line x1={m.x - 5} y1={m.yLo} x2={m.x + 5} y2={m.yLo} class={`range tier-stroke-${m.tier}`} />
               <line x1={m.x - 5} y1={m.yHi} x2={m.x + 5} y2={m.yHi} class={`range tier-stroke-${m.tier}`} />
             </g>
           )
         )}
-        {aLabels.map((L) => (
-          <g class="hot" data-row={L.rid}>
-            {L.leader && (
-              <line
-                x1={L.x} y1={L.y + (L.ly > L.y ? 7 : -7)}
-                x2={L.lx} y2={L.ly > L.y ? L.ly + 1 : L.ly + L.h + 1}
-                class="leader"
-              />
-            )}
-            {L.linePos.map((ln) => <text x={L.lx} y={ln.y} class={ln.cls}>{ln.t}</text>)}
-          </g>
-        ))}
       </svg>
       <details class="panel-foot-disclosure">
         <summary>How to read this</summary>
