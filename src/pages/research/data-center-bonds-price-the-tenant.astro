@@ -1,0 +1,334 @@
+---
+import Base from '../../layouts/Base.astro';
+import NoteFooter from '../../components/NoteFooter.astro';
+import creditData from '../../data/credit_instruments.json';
+
+// Data-Center Bonds Price the Tenant (2026-09-25). Takes over the two coupon
+// charts that used to sit on /credit ("Operator bond coupons", panel
+// `coupons`; "Landlord SPV & securitization coupons", panel `leaseback`),
+// approved by John 2026-09-25. Prose: drafts/dc_bonds_price_the_tenant_draft_v1.md.
+//
+// FROZEN: the charts still read the ledger (rows whose `chart.panel` is
+// 'operator' or 'landlord'), but only rows whose plot date (chart.date, else
+// issued) is on or before FREEZE. A dated note must not change when a new
+// bond joins the ledger. Every mark links to its row in the /credit ledger.
+
+const FREEZE = '2026-09-25';
+const instruments = creditData.instruments;
+
+type Tier = 'strong' | 'mid' | 'weak';
+function chartRows(panel: string) {
+  return instruments
+    .filter((i: any) => i.chart?.panel === panel)
+    .map((i: any) => {
+      const c = i.chart;
+      return {
+        id: i.id as string,
+        date: (c.date ?? i.issued) as string,
+        tier: c.tier as Tier,
+        tag: c.tag as string,
+        press: !!c.press,
+        long: !!c.long,
+        v: i.rate.value as number,
+        sizeB: (i.size_usd_m as number) / 1000,
+        endYear: String(i.maturity ?? '').slice(0, 4),
+      };
+    })
+    .filter((p) => p.date <= FREEZE)
+    .sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+}
+const operator = chartRows('operator');
+const landlord = chartRows('landlord');
+
+// ---- chart geometry (same as the /credit panels) ----------------------------
+const W = 920, H = 340;
+const M = { top: 26, right: 30, bottom: 44, left: 46 };
+const x0 = M.left, x1 = W - M.right, y0 = M.top, y1 = H - M.bottom;
+function monthsSince(iso: string, epoch: string): number {
+  const [ey, em] = epoch.split('-').map(Number);
+  const [y, m, d] = iso.split('-').map(Number);
+  return (y - ey) * 12 + (m - em) + ((d ?? 15) - 1) / 30;
+}
+const EPOCH = '2025-09', SPAN = 14; // Sep 2025 to Nov 2026
+const bx = (iso: string) => x0 + (x1 - x0) * (monthsSince(iso, EPOCH) / SPAN);
+const TICKS_X = [
+  { label: 'Oct ’25', iso: '2025-10-15' },
+  { label: 'Dec ’25', iso: '2025-12-15' },
+  { label: 'Feb ’26', iso: '2026-02-15' },
+  { label: 'Apr ’26', iso: '2026-04-15' },
+  { label: 'Jun ’26', iso: '2026-06-15' },
+  { label: 'Aug ’26', iso: '2026-08-15' },
+  { label: 'Oct ’26', iso: '2026-10-15' },
+];
+// Operator panel y: 5% to 10%
+const B_YMIN = 5, B_YMAX = 10;
+const by = (v: number) => y0 + (y1 - y0) * ((B_YMAX - v) / (B_YMAX - B_YMIN));
+const B_TICKS_Y = [5, 6, 7, 8, 9, 10];
+// Landlord panel y: 5.5% to 10.5%; mark area scales with deal size
+const C_YMIN = 5.5, C_YMAX = 10.5;
+const cy = (v: number) => y0 + (y1 - y0) * ((C_YMAX - v) / (C_YMAX - C_YMIN));
+const C_TICKS_Y = [6, 7, 8, 9, 10];
+const crad = (b: number) => Math.max(3.5, 2.6 * Math.sqrt(b));
+const cFmt = (v: number) => v.toFixed(3).replace(/0$/, '');
+const rowHref = (id: string) => `/credit#row-${id}`;
+
+const datasetLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'AI data-center bond coupons by tenant credit, October 2025 to September 2026',
+  description: `Coupons at pricing on ${operator.length + landlord.length} selected data-center bonds: ${operator.length} issued by data-center operators and ${landlord.length} by single-campus landlord and securitization vehicles, sorted by who stands behind the lease. Fixed at ${FREEZE}.`,
+  url: 'https://ccir.io/research/data-center-bonds-price-the-tenant',
+  keywords: ['data center bonds', 'data center bond coupons', 'CoreWeave lease', 'hyperscaler lease', 'lease-backed bonds', 'data center ABS', 'AI data center financing', 'neocloud credit', 'GPU-backed loans'],
+  temporalCoverage: '2025-10/2026-09',
+  creator: { '@type': 'Organization', name: 'Compute Credit Index Research', url: 'https://ccir.io' },
+  isAccessibleForFree: true,
+  isBasedOn: 'https://ccir.io/credit',
+  variableMeasured: ['coupon at pricing, percent', 'deal size, USD', 'tenant credit tier'],
+});
+---
+<Base
+  title="Data-Center Bonds Price the Tenant: Coupons by Lease Credit, Hyperscalers vs CoreWeave · CCIR"
+  description="AI data-center bond coupons sorted by who stands behind the lease. Hyperscaler-leased bonds priced at 5.70% to 7.875%; CoreWeave-leased bonds at 7.00% to 9.875%. The same pattern prices GPU-backed loans."
+  ogImage="/og/data-center-bonds-price-the-tenant.png"
+  article={{ published: '2026-09-25' }}
+>
+  <script is:inline type="application/ld+json" slot="head" set:html={datasetLd} />
+  <section class="wrap top">
+    <header class="page-head">
+      <div class="kicker">Research · 2026-09-25 · Credit</div>
+      <h1>Data-Center Bonds Price the Tenant</h1>
+      <p class="standfirst">
+        A GPU loan is priced on the customer behind its contract. Data-center
+        bonds work the same way. The bond is priced on the tenant behind the
+        lease.
+      </p>
+      <ul class="lede-index">
+        <li><span class="arw">→</span> <a href="#coupons">Coupons by tenant</a></li>
+        <li><span class="arw">→</span> <a href="#band">The tenant sets the band</a></li>
+        <li><span class="arw">→</span> <a href="#method">Method</a></li>
+      </ul>
+    </header>
+
+    <section class="sec" id="coupons">
+      <h2><span class="n">01</span> Coupons by tenant</h2>
+      <div class="measure">
+        <p>
+          Bonds priced October 2025 to September 2026, sorted by who stands
+          behind the lease. These are selected deals with a disclosed coupon.
+        </p>
+      </div>
+      <div class="twrap">
+        <table>
+          <thead><tr><th>Who stands behind the lease</th><th class="num">Bonds</th><th class="num">Coupon range</th></tr></thead>
+          <tbody>
+            <tr><td class="gen">Hyperscaler or investment-grade tenant</td><td class="num">11</td><td class="num strong">5.70% to 7.875%</td></tr>
+            <tr><td class="gen">Google-guaranteed lease (Fluidstack tenant)</td><td class="num">5</td><td class="num strong">6.19% to 7.75%</td></tr>
+            <tr><td class="gen">CoreWeave</td><td class="num">6</td><td class="num strong">7.00% to 9.875%</td></tr>
+            <tr><td class="gen">Other unrated tenants</td><td class="num">3</td><td class="num strong">8.875% to 9.00%</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="cpanel" id="operator-coupons">
+        <div class="cp-head">
+          <div class="cp-title">Operator bond coupons, by offtake credit support</div>
+          <div class="cp-sub">
+            Coupon at pricing, fixed-rate senior secured notes issued by the
+            data-center operator · selected deals · Oct 2025 to Sep 2026 ·
+            hover a dot for the bond, click to open its row in the /credit ledger
+          </div>
+        </div>
+        <div class="legend">
+          <div class="lg-line">
+            <span class="lg-head">By contract support · IG → none</span>
+            <span class="lg-item"><span class="lg-dot tier-strong"></span>Hyperscaler-IG tenant / IG-rated</span>
+            <span class="lg-item"><span class="lg-dot tier-mid"></span>Google-guaranteed lease (Fluidstack tenant)</span>
+            <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud / self-operated, unrated</span>
+          </div>
+          <div class="lg-line">
+            <span class="lg-head">Symbol</span>
+            <span class="lg-item lg-note">● filed bond · ◎ 2042 maturity (longer tenor)</span>
+          </div>
+        </div>
+        <svg viewBox={`0 0 ${W} ${H}`} role="img" data-points={operator.length}
+             aria-label={`Coupons at pricing on ${operator.length} fixed-rate bonds issued by data-center operators, October 2025 to September 2026, colored by the credit behind the lease.`}>
+          {B_TICKS_Y.map((t) => (
+            <>
+              <line x1={x0} y1={by(t)} x2={x1} y2={by(t)} class="grid" />
+              <text x={x0 - 8} y={by(t) + 3} class="tick tick-y">{t.toFixed(1)}</text>
+            </>
+          ))}
+          {TICKS_X.map((t) => (
+            <text x={bx(t.iso)} y={y1 + 24} class="tick tick-x">{t.label}</text>
+          ))}
+          <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
+          {operator.map((p) => (
+            <a href={rowHref(p.id)} class="hot mark" data-row={`row-${p.id}`}>
+              <title>{`${p.tag} · ${p.v.toFixed(3)}% · ${p.date}${p.press ? ' · press' : ''}${p.long ? ' · matures 2042' : ''}`}</title>
+              {p.long && <circle cx={bx(p.date)} cy={by(p.v)} r="8" class={`ring tier-stroke-${p.tier}`} />}
+              <circle cx={bx(p.date)} cy={by(p.v)} r="5" class={p.press ? `pt-hollow tier-stroke-${p.tier}` : `pt tier-${p.tier}`} />
+            </a>
+          ))}
+        </svg>
+        <figcaption class="tfoot">Coupon, percent. Issued by the data-center operator.</figcaption>
+      </figure>
+
+      <figure class="cpanel" id="landlord-coupons">
+        <div class="cp-head">
+          <div class="cp-title">Landlord and securitization coupons, by tenant credit</div>
+          <div class="cp-sub">
+            Coupon at pricing, issued by a single-campus vehicle where the
+            tenant's lease is the credit · selected deals · mark area = deal
+            size · Oct 2025 to Sep 2026 · hover a mark for the deal, click to
+            open its row in the /credit ledger
+          </div>
+        </div>
+        <div class="legend">
+          <div class="lg-line">
+            <span class="lg-head">By tenant credit · IG → none</span>
+            <span class="lg-item"><span class="lg-dot tier-strong"></span>Hyperscaler or IG tenant (Meta, Microsoft, Oracle)</span>
+            <span class="lg-item"><span class="lg-dot tier-mid"></span>Google-guaranteed lease (Fluidstack tenant)</span>
+            <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud or other non-IG tenant (CoreWeave, Jane Street, a SoftBank affiliate)</span>
+          </div>
+          <div class="lg-line">
+            <span class="lg-head">Symbol</span>
+            <span class="lg-item lg-note">● issuer/filing-sourced pricing · ○ press-sourced pricing · ◎ long-dated amortizer, final 2045–49 · mark area = deal size</span>
+          </div>
+        </div>
+        <svg viewBox={`0 0 ${W} ${H}`} role="img" data-points={landlord.length}
+             aria-label={`Coupons at pricing on ${landlord.length} landlord and securitization bonds backed by compute tenant leases, October 2025 to September 2026, colored by tenant credit. Mark area shows deal size.`}>
+          {C_TICKS_Y.map((t) => (
+            <>
+              <line x1={x0} y1={cy(t)} x2={x1} y2={cy(t)} class="grid" />
+              <text x={x0 - 8} y={cy(t) + 3} class="tick tick-y">{t.toFixed(1)}</text>
+            </>
+          ))}
+          {TICKS_X.map((t) => (
+            <text x={bx(t.iso)} y={y1 + 24} class="tick tick-x">{t.label}</text>
+          ))}
+          <line x1={x0} y1={y1} x2={x1} y2={y1} class="axis" />
+          {landlord.map((p) => {
+            const X = bx(p.date), Y = cy(p.v), r = crad(p.sizeB);
+            return (
+              <a href={rowHref(p.id)} class="hot mark" data-row={`row-${p.id}`}>
+                <title>{`${p.tag} · ${cFmt(p.v)}% · $${p.sizeB.toFixed(2)}B · ${p.date}${p.press ? ' · press' : ''}${p.long ? ` · amortizes to ${p.endYear}` : ''}`}</title>
+                {p.long && <circle cx={X} cy={Y} r={r + 3.5} class={`ring tier-stroke-${p.tier}`} />}
+                <circle cx={X} cy={Y} r={r} class={p.press ? `pt-hollow tier-stroke-${p.tier}` : `pt tier-${p.tier}`} />
+              </a>
+            );
+          })}
+        </svg>
+        <figcaption class="tfoot">Coupon, percent. Issued by a single-campus vehicle. Mark area = deal size.</figcaption>
+      </figure>
+
+      <div class="measure">
+        <p>
+          The GPU loans on our ledger show the same order. Loans backed by an
+          investment-grade customer priced at SOFR plus 2.25% to 3.00% in 2026.
+          Loans on unrated customers priced at plus 4.50% to 5.50%. See the
+          <a href="/credit#spreads">live spreads chart</a>.
+        </p>
+      </div>
+    </section>
+
+    <section class="sec" id="band">
+      <h2><span class="n">02</span> The tenant sets the band</h2>
+      <p>
+        Within a band, the issuer matters too. Among bonds due in 2031,
+        CoreWeave-leased notes priced from about 23 basis points tighter to
+        about 265 basis points wider than QTS's Microsoft-leased Odyssey notes.
+        The tighter ones came from operating companies with other assets
+        behind them. The widest came from vehicles that own one campus and
+        nothing else.
+      </p>
+    </section>
+
+    <section class="sec" id="method">
+      <h2><span class="n">03</span> Method</h2>
+      <p>
+        Coupons at pricing, from filings, issuer and counsel releases, and
+        press where marked. The tenant is the lease counterparty named in the
+        filing or release. Each bond links to its row in the
+        <a href="/credit#ledger">/credit ledger</a>. Fixed at {FREEZE}.
+      </p>
+    </section>
+
+    <NoteFooter title="Data-Center Bonds Price the Tenant" published="2026-09-25" />
+  </section>
+
+  <style>
+    .top { padding-top: 32px; }
+    .page-head { max-width: 82ch; margin-bottom: 18px; }
+    .page-head h1 {
+      font-family: var(--font-display);
+      font-size: var(--fs-hero);
+      line-height: var(--lh-display);
+      font-weight: var(--weight-display);
+      margin: 6px 0 14px;
+      letter-spacing: -0.01em;
+    }
+    .sec { margin: 28px 0; max-width: 80ch; }
+    .sec h2 { font-family: var(--font-display); font-size: var(--fs-xl); margin: 0 0 12px; display: flex; align-items: baseline; gap: 12px; }
+    .sec .n { font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--accent); font-weight: var(--weight-strong); }
+    .sec p { font-family: var(--font-body); font-size: var(--fs-md); color: var(--ink); line-height: 1.65; margin: 0 0 13px; }
+    /* the chart section runs wider than the prose measure */
+    #coupons { max-width: none; }
+    #coupons .measure { max-width: 80ch; }
+    .tfoot { font-family: var(--font-mono); font-size: calc(var(--fs-xs) - 1px); color: var(--ink-faint); margin-top: 7px; line-height: 1.5; }
+    .twrap { border: 1px solid var(--rule); background: var(--surface); overflow-x: auto; margin: 0 0 20px; max-width: 720px; }
+    table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); }
+    th, td { padding: 8px 10px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+    thead th { background: var(--surface-2); color: var(--ink-dim); text-transform: uppercase; letter-spacing: var(--tracking-eye); font-size: calc(var(--fs-xs) - 1px); }
+    th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    td.gen { color: var(--ink); font-weight: var(--weight-strong); }
+    td.strong { color: var(--accent); font-weight: var(--weight-strong); }
+
+    /* --- coupon charts (moved from /credit 2026-09-25) --------------------- */
+    .cpanel { margin: 0 0 24px; max-width: 1120px; }
+    .cpanel > .cp-head, .cpanel > .legend, .cpanel > svg { background: var(--surface); border-left: 1px solid var(--rule); border-right: 1px solid var(--rule); }
+    .cp-head { border-top: 1px solid var(--rule); padding: 14px 16px 8px; }
+    .cpanel > svg { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--rule); }
+    .cp-title { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--weight-display); color: var(--ink); }
+    .cp-sub { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim); margin-top: 4px; letter-spacing: 0.03em; line-height: 1.5; }
+    /* Tier ramp, strong to weak support: the same per-theme colors as /credit.
+       Light (editorial) values by default, dark (terminal) below. */
+    .cpanel {
+      --ct-strong: #0d9488;
+      --ct-mid: #b9770a;
+      --ct-weak: #c11f57;
+    }
+    :global(html[data-theme="terminal"]) .cpanel {
+      --ct-strong: #2dd4bf;
+      --ct-mid: #ffb400;
+      --ct-weak: #ff4d84;
+    }
+    .grid { stroke: color-mix(in srgb, var(--rule) 70%, transparent); stroke-width: 1; }
+    .axis { stroke: var(--rule-2); stroke-width: 1; }
+    .tick { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-faint); }
+    .tick-y { text-anchor: end; }
+    .tick-x { text-anchor: middle; }
+    .pt-hollow { fill: none; stroke-width: 1.6; }
+    .ring { fill: none; stroke-width: 1.4; opacity: 0.85; }
+    .tier-strong { fill: var(--ct-strong); }
+    .tier-mid { fill: var(--ct-mid); }
+    .tier-weak { fill: var(--ct-weak); }
+    .tier-stroke-strong { stroke: var(--ct-strong); }
+    .tier-stroke-mid { stroke: var(--ct-mid); }
+    .tier-stroke-weak { stroke: var(--ct-weak); }
+    .hot { cursor: pointer; }
+    .hot:hover { opacity: 0.75; }
+    .legend {
+      display: flex; flex-direction: column; gap: 5px;
+      padding: 0 16px 10px;
+      font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--ink-dim);
+    }
+    .lg-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; }
+    .lg-head { color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.04em; }
+    .lg-item { display: inline-flex; align-items: center; gap: 6px; }
+    .lg-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .lg-dot.tier-strong { background: var(--ct-strong); }
+    .lg-dot.tier-mid { background: var(--ct-mid); }
+    .lg-dot.tier-weak { background: var(--ct-weak); }
+    .lg-note { color: var(--ink-faint); }
+  </style>
+</Base>
