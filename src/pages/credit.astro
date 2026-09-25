@@ -124,13 +124,17 @@ const RATED_LINES = [
   { ids: ['iren-hw3-ddtl', 'iren-hw3-notes'], label: 'USPP + DDTL package' },
   { ids: ['crwv-ddtl-4'], label: 'DDTL 4.0' },
   { ids: ['nscale-ward-ddtl-baa1'], label: 'DDTL (Ward County SPV)' },
+  { ids: ['nscale-madison-ddtl'], label: 'DDTL (Madison County SPV)' },
   { ids: ['lambda-tlb-926'], label: 'Term Loan B' },
   { ids: ['crwv-ddtl-5'], label: 'DDTL 5.0' },
   { ids: ['crwv-ddtl-2600-2026'], label: 'DDTL 5.5' },
 ];
 const ratedCovered = new Set(RATED_LINES.flatMap((l) => l.ids));
+// GPU collateral only (John, 2026-09-25): rated data-center, landlord and
+// securitization paper keeps its grades on the ledger row but stays off this
+// table, whose rule is that the borrower owns and pledges the GPUs.
 const ratedExtras = instruments
-  .filter((i: any) => i.facility_ratings?.length && !ratedCovered.has(i.id))
+  .filter((i: any) => i.facility_ratings?.length && !ratedCovered.has(i.id) && i.collateral_class === 'gpu')
   .map((i: any) => ({ ids: [i.id], label: i.instrument_type }));
 const fmtLadderSize = (m: number) =>
   m >= 1000 ? `$${+(m / 1000).toFixed(2)}B` : `$${Math.round(m)}M`;
