@@ -1013,12 +1013,19 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     <div class="ledger-head" id="ledger">
       <h2>Instrument ledger</h2>
       <p class="standfirst">
-        Every live instrument across the panel. Filter by issuer, type,
+        Every live instrument across the panel. GPU-backed financings are
+        the core; convertibles, unsecured notes and selected data-center
+        financings are kept for context. Filter by collateral, issuer, type,
         seniority, lender, or confirmation status. Click a column header to
         sort. Each row links the filing or release it was taken from.
       </p>
     </div>
     <div class="filters" id="credit-filters">
+      <select id="f-coll" aria-label="Filter by collateral">
+        <option value="">All collateral</option>
+        <option value="gpu">GPU-backed</option>
+        <option value="context">Context</option>
+      </select>
       <select id="f-issuer" aria-label="Filter by issuer">
         <option value="">All issuers</option>
         {issuers.map((i) => <option value={i}>{i}</option>)}
@@ -1068,6 +1075,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
             <tr
               id={`row-${i.id}`}
               data-issuer={i.issuer}
+              data-coll={i.collateral_class === 'gpu' ? 'gpu' : 'context'}
               data-type={i.instrument_type}
               data-sen={senClass(i.seniority)}
               data-status={i.status}
@@ -1222,6 +1230,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
 
   <script is:inline>
     (function () {
+      var selColl = document.getElementById('f-coll');
       var selIssuer = document.getElementById('f-issuer');
       var selType = document.getElementById('f-type');
       var selSen = document.getElementById('f-sen');
@@ -1244,12 +1253,14 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       }
 
       function apply() {
+        var vc = selColl.value;
         var vi = selIssuer.value, vt = selType.value, vs = selSen.value,
             vst = selStatus.value, vl = selLender.value,
             vq = q.value.trim().toLowerCase();
         var shown = 0;
         rows.forEach(function (r) {
           var ok =
+            (!vc || r.dataset.coll === vc) &&
             (!vi || r.dataset.issuer === vi) &&
             (!vt || r.dataset.type === vt) &&
             (!vs || r.dataset.sen === vs) &&
@@ -1314,7 +1325,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         });
       });
 
-      [selIssuer, selType, selSen, selStatus, selLender].forEach(function (el) {
+      [selColl, selIssuer, selType, selSen, selStatus, selLender].forEach(function (el) {
         el.addEventListener('change', apply);
       });
       q.addEventListener('input', apply);
@@ -1379,7 +1390,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           var row = document.getElementById(el.getAttribute('data-row'));
           if (!row) return;
           ev.preventDefault();
-          selIssuer.value = ''; selType.value = ''; selSen.value = '';
+          selColl.value = ''; selIssuer.value = ''; selType.value = ''; selSen.value = '';
           selStatus.value = ''; selLender.value = ''; q.value = '';
           apply();
           row.scrollIntoView({ behavior: 'smooth', block: 'center' });
