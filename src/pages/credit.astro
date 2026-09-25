@@ -40,15 +40,22 @@ const AS_OF =
 const byId = new Map(instruments.map((i: any) => [i.id, i]));
 
 // "By issuer" nav, derived from the page allowlist so adding an issuer to
-// ISSUERS is the only edit needed. Ordered by tracked row count, descending,
-// which puts the deepest capital stacks first.
+// ISSUERS is the only edit needed. GPU first (John, 2026-09-25): issuers with
+// GPU-collateral rows lead, ordered by GPU-secured dollars; the rest follow by
+// tracked row count.
 const issuerNav = Object.entries(ISSUERS)
-  .map(([slug, def]) => ({
-    slug,
-    display: def.display,
-    n: instruments.filter((i: any) => i.issuer === def.match).length,
-  }))
-  .sort((a, b) => b.n - a.n || a.display.localeCompare(b.display));
+  .map(([slug, def]) => {
+    const rows = instruments.filter((i: any) => i.issuer === def.match);
+    return {
+      slug,
+      display: def.display,
+      n: rows.length,
+      gpuUsd: rows.filter((i: any) => i.collateral_class === 'gpu')
+        .reduce((a: number, i: any) => a + (i.size_usd_m || 0), 0),
+    };
+  })
+  .sort((a, b) => (b.gpuUsd > 0 ? 1 : 0) - (a.gpuUsd > 0 ? 1 : 0)
+    || b.gpuUsd - a.gpuUsd || b.n - a.n || a.display.localeCompare(b.display));
 function inst(id: string): any {
   const r = byId.get(id);
   if (!r) throw new Error(`credit_instruments.json: missing id ${id}`);
@@ -638,12 +645,10 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     <div class="hero-solo">
       <PageHeader title="Compute Credit Tracker" kicker="Market Intelligence · Compute Credit" asOf={AS_OF} />
       <p class="standfirst lede">
-        GPU-backed credit, tracked as filed. ${inScopeUsdB}B across
-        {inScopeC.length} instruments is secured directly by the GPUs: the
-        issuance charted below. The ledger holds {instruments.length}
-        instruments across {issuers.length} issuers, including convertibles,
-        unsecured notes and selected data-center financings kept for
-        context.
+        GPU-backed credit. ${inScopeUsdB}B across {inScopeC.length}
+        instruments is secured directly by the GPUs: the issuance charted
+        below. The ledger holds {instruments.length} instruments across
+        {issuers.length} issuers.
       </p>
       <div class="disclosure">
         <strong>Sourced as filed</strong>
