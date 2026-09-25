@@ -9,11 +9,11 @@
   it. Undisclosed stays undisclosed — no estimates. Retired instruments are
   excluded from the table and listed in the methodology note.
 
-  Charts read the same JSON by instrument id (inst() throws at build time if
-  an id disappears), so the tape can never drift from the ledger. Chart
-  labels are placed by a build-time greedy solver (layoutLabels) that
-  guarantees no label-label or label-mark overlap; a faint leader line is
-  drawn whenever a label had to move away from its mark.
+  The three scatter charts are filters over the same JSON: a row is plotted
+  when it carries a `chart` field (see chartRows below), so the charts can
+  never drift from the ledger. The charts draw dots only, with <title>
+  tooltips and click-to-ledger; the label solver (layoutLabels) still runs
+  but its output is not rendered.
 */
 import Base from '../layouts/Base.astro';
 import PageHeader from '../components/PageHeader.astro';
@@ -375,6 +375,28 @@ function layoutLabels(items: LabIn[], marks: { x: number; y: number }[]): LabOut
   return placed;
 }
 
+// ---- Chart membership: the `chart` field on a ledger row ---------------------
+// The three scatter panels below are filters over credit_instruments.json.
+// A row joins a panel when its `chart` object is set, at the time the row is
+// added to the ledger:
+//   chart = { panel: 'spreads' | 'operator' | 'landlord', tier, tag,
+//             date?  (plot date, when it differs from `issued`),
+//             flags: press, long, ring, sub, compact, context (Chart B grey
+//             context set), lo / hi / extra / tier_extra (DDTL 2.0 range) }
+// The tier is a human call recorded on the row (what backs the credit), and
+// the y value is the row's own rate.value. Nothing is inferred here.
+type Tier = 'strong' | 'mid' | 'weak';
+function chartRows(panel: string) {
+  return instruments
+    .filter((i: any) => i.chart?.panel === panel)
+    .map((i: any) => {
+      const c = i.chart;
+      return { ...c, id: i.id, date: (c.date ?? i.issued) as string, tier: c.tier as Tier, inst: i };
+    })
+    .sort((a: any, b: any) =>
+      a.date.localeCompare(b.date) || (a.ring ? 1 : 0) - (b.ring ? 1 : 0) || a.id.localeCompare(b.id));
+}
+
 // ---- Chart A: GPU-collateral SOFR spread tape -------------------------------
 // x = signing/closing date per filing; y = filed spread over SOFR (pp).
 const A_EPOCH = '2023-06';
@@ -391,22 +413,12 @@ const ay = (v: number) => y0 + (y1 - y0) * ((A_YMAX - v) / A_YMAX);
 //   mid    = customer offtake contracts, no single-IG wrap (2.0/2.1 IG+unrated mix; 3.0 = OpenAI, single/unrated; 5.0 = 2 non-IG customers;
 //            5.5 = unrated take-or-pay customers; Nscale Iceland and Madison = customer redacted in the filing)
 //   weak   = unwrapped GPU-only / non-IG leg
-type Tier = 'strong' | 'mid' | 'weak';
-const tapeCfg = [
-  { id: 'crwv-ddtl-1', date: '2023-07-30', v: 9.62, tag: 'CRWV DDTL 1.0', sub: "as amended '24", tier: 'weak' as Tier },
-  { id: 'crwv-ddtl-2', date: '2024-05-16', v: null, lo: 6.0, hi: 6.5, extra: 13.0, tag: 'CRWV DDTL 2.0', sub: 'IG / non-IG', tier: 'strong' as Tier, tierExtra: 'mid' as Tier },
-  { id: 'crwv-ddtl-3', date: '2025-07-28', v: 4.0, tag: 'CRWV DDTL 3.0', sub: 'OpenAI offtake', tier: 'mid' as Tier },
-  { id: 'crwv-ddtl-2-1', date: '2025-09-29', v: 4.25, tag: 'CRWV DDTL 2.1', sub: null, tier: 'mid' as Tier },
-  { id: 'crwv-ddtl-4', date: '2026-03-30', v: 2.25, tag: 'CRWV DDTL 4.0', sub: 'contract-wrapped', tier: 'strong' as Tier },
-  { id: 'crwv-ddtl-5', date: '2026-05-15', v: 4.5, tag: 'CRWV DDTL 5.0', sub: '2 non-IG customers', tier: 'mid' as Tier },
-  { id: 'iren-hw3-ddtl', date: '2026-05-29', v: 2.25, tag: 'IREN H3', sub: null, tier: 'strong' as Tier },
-  { id: 'nbis-secured-tl-775', date: '2026-07-10', v: 2.5, tag: 'Nebius TL', sub: 'IG customer', compact: true, tier: 'strong' as Tier },
-  { id: 'nscale-iceland-macquarie', date: '2026-07-29', v: 5.5, tag: 'Nscale Iceland', sub: 'customer redacted', compact: true, tier: 'mid' as Tier },
-  { id: 'crwv-ddtl-2600-2026', date: '2026-08-07', v: 5.5, tag: 'CRWV DDTL 5.5', sub: 'unrated customers', compact: true, tier: 'mid' as Tier },
-  { id: 'lambda-tlb-926', date: '2026-08-12', v: 3.0, tag: 'Lambda TLB', sub: 'NVIDIA offtake', compact: true, tier: 'strong' as Tier },
-  { id: 'nscale-ward-ddtl-baa1', date: '2026-08-27', v: 2.375, tag: 'Nscale Ward, Madison', sub: 'Microsoft', compact: true, tier: 'strong' as Tier },
-  { id: 'nscale-madison-ddtl', date: '2026-08-27', v: 2.375, tag: 'Nscale Madison', sub: 'customer redacted', compact: true, ring: true, tier: 'mid' as Tier },
-].map((p) => ({ ...p, inst: inst(p.id) }));
+const tapeCfg = chartRows('spreads').map((p: any) => ({
+  ...p,
+  sub: (p.sub ?? null) as string | null,
+  v: p.lo != null ? null : (p.inst.rate.value as number),
+  tierExtra: p.tier_extra as Tier | undefined,
+}));
 
 interface Mark { kind: 'dot' | 'diamond' | 'range' | 'ring'; x: number; y?: number; yLo?: number; yHi?: number; rid: string; tier: Tier; tip?: string }
 const TIER_TIP: Record<Tier, string> = { strong: 'IG contract-backed', mid: 'non-IG or undisclosed contract', weak: 'hardware only' };
@@ -482,29 +494,18 @@ const by = (v: number) => y0 + (y1 - y0) * ((B_YMAX - v) / (B_YMAX - B_YMIN));
 //   weak   = neocloud / self-operated offtake, unrated
 // `long` marks the 2042 maturities — their coupon embeds ~16y of duration
 // the 2030–31 bonds don't, so they are not like-for-like on the y-axis.
-const bondPath = [
-  { id: 'wulf-notes-7750-2030', date: '2025-10-22', tag: 'WULF 7.750', tier: 'mid' as Tier },
-  { id: 'cifr-7125-2030', date: '2025-11-13', tag: 'CIFR 7.125', tier: 'mid' as Tier },
-  { id: 'apld-9250-2030', date: '2025-11-20', tag: 'APLD 9.250', tier: 'weak' as Tier },
-  { id: 'cifr-6125-2031', date: '2026-02-11', tag: 'CIFR 6.125', tier: 'strong' as Tier },
-  { id: 'hut-riverbend-6192-2042', date: '2026-04-30', tag: 'HUT 6.192', tier: 'strong' as Tier, long: true },
-  { id: 'iren-hw3-notes', date: '2026-05-29', tag: 'IREN 5.96', tier: 'strong' as Tier },
-  { id: 'hut-beaconpoint-6129-2042', date: '2026-06-09', tag: 'HUT 6.129', tier: 'strong' as Tier, long: true },
-  { id: 'cifr-6000-2031', date: '2026-06-15', tag: 'CIFR 6.000', tier: 'strong' as Tier },
-  { id: 'clsk-csdc-7875-2031', date: '2026-09-18', tag: 'CLSK 7.875', tier: 'strong' as Tier },
-].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
+const bondPath = chartRows('operator')
+  .filter((p: any) => !p.context)
+  .map((p: any) => ({ ...p, v: p.inst.rate.value as number }));
 
 // Context: the other filed project bonds of the window. Scope: CORPORATE
 // issuers only — bonds with recourse to an operating company's balance
 // sheet. Non-recourse landlord SPV paper (Meridian Arc, the WULF Flash
 // Compute JV) moved to the leaseback panel below 2026-08-09; the seat —
 // who answers for the debt — is the boundary between the two charts.
-const bondContext = [
-  { id: 'apld-6750-2031', date: '2026-03-10', tag: 'APLD 6.750', tier: 'strong' as Tier, press: false },
-  { id: 'corz-7750-2031', date: '2026-05-06', tag: 'CORZ 7.750', tier: 'weak' as Tier, press: false },
-  { id: 'apld-7000-2031', date: '2026-06-16', tag: 'APLD 7.000', tier: 'weak' as Tier, press: false },
-  { id: 'iren-mackenzie-notes', date: '2026-08-25', tag: 'IREN 9.000', tier: 'weak' as Tier, press: false },
-].map((p) => ({ ...p, inst: inst(p.id), v: inst(p.id).rate.value as number }));
+const bondContext = chartRows('operator')
+  .filter((p: any) => p.context)
+  .map((p: any) => ({ ...p, press: !!p.press, v: p.inst.rate.value as number }));
 
 const bObstacles = [
   ...bondPath.map((p) => ({ x: bx(p.date), y: by(p.v) })),
@@ -548,21 +549,14 @@ const bondLine = bondPath.map((p) => `${bx(p.date).toFixed(1)},${by(p.v).toFixed
 const C_YMIN = 5.5, C_YMAX = 10.5;
 const cy = (v: number) => y0 + (y1 - y0) * ((C_YMAX - v) / (C_YMAX - C_YMIN));
 const C_TICKS_Y = [6, 7, 8, 9, 10];
-const leasebackCfg = [
-  { id: 'prime-elkgrove-7500-2031', date: '2026-06-02', tag: 'Prime Elk Grove (CoreWeave)', tier: 'weak' as Tier, press: false, long: false },
-  { id: 'meta-beignet-hyperion', date: '2025-10-16', tag: 'Hyperion (Meta)', tier: 'strong' as Tier, press: true, long: true },
-  { id: 'wulf-jv-7250-2030', date: '2025-12-29', tag: 'WULF JV (Fluidstack)', tier: 'mid' as Tier, press: false, long: false },
-  { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc (Fluidstack)', tier: 'mid' as Tier, press: false, long: false },
-  { id: 'galaxy-helios2-9875-2031', date: '2026-07-23', tag: 'Helios II (CoreWeave)', tier: 'weak' as Tier, press: false, long: false },
-  { id: 'meta-elpaso', date: '2026-07-27', tag: 'Sopaipilla (Meta)', tier: 'strong' as Tier, press: true, long: true },
-  { id: 'zenith-arc-2031', date: '2026-08-13', tag: 'Zenith Arc (Jane Street)', tier: 'weak' as Tier, press: true, long: false },
-  { id: 'qts-odyssey-2031', date: '2026-08-18', tag: 'QTS Odyssey (Microsoft)', tier: 'strong' as Tier, press: true, long: false },
-  { id: 'digital-drive-coreweave-bond-2026', date: '2026-09-23', tag: 'Digital Drive (CoreWeave)', tier: 'weak' as Tier, press: true, long: false },
-].map((p) => ({
+const leasebackCfg = chartRows('landlord').map((p: any) => ({
   ...p,
-  inst: inst(p.id),
-  v: inst(p.id).rate.value as number,
-  sizeB: (inst(p.id).size_usd_m as number) / 1000,
+  press: !!p.press,
+  long: !!p.long,
+  v: p.inst.rate.value as number,
+  sizeB: (p.inst.size_usd_m as number) / 1000,
+  // Final year for the long-dated amortizers (tooltip only).
+  endYear: String(p.inst.maturity ?? '').slice(0, 4),
 }));
 const crad = (b: number) => Math.max(3.5, 2.6 * Math.sqrt(b));
 const cFmt = (v: number) => v.toFixed(3).replace(/0$/, '');
@@ -882,16 +876,16 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       <div class="legend">
         <div class="lg-line">
           <span class="lg-head">By tenant credit · IG → none</span>
-          <span class="lg-item"><span class="lg-dot tier-strong"></span>Hyperscaler tenant (Meta, Microsoft)</span>
+          <span class="lg-item"><span class="lg-dot tier-strong"></span>Hyperscaler or IG tenant (Meta, Microsoft, Oracle)</span>
           <span class="lg-item"><span class="lg-dot tier-mid"></span>Google-guaranteed lease (Fluidstack tenant)</span>
-          <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud or other unrated tenant (CoreWeave, Jane Street)</span>
+          <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud or other non-IG tenant (CoreWeave, Jane Street, a SoftBank affiliate)</span>
         </div>
         <div class="lg-line">
           <span class="lg-head">Symbol</span>
-          <span class="lg-item lg-note">● issuer/filing-sourced pricing · ○ press-sourced pricing · ◎ fully amortizing 2048–49 · mark area ∝ deal size</span>
+          <span class="lg-item lg-note">● issuer/filing-sourced pricing · ○ press-sourced pricing · ◎ long-dated amortizer, final 2045–49 · mark area ∝ deal size</span>
         </div>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Coupons on non-recourse landlord and securitization paper backed by compute tenant leases, priced October 2025 to September 2026. Hyperscaler-tenant paper priced at 6.58 to 7.534 percent; Google-guaranteed Fluidstack leases at 6.25 and 7.25 percent; CoreWeave-tenant paper at 7.50 to 9.875 percent. Mark area is proportional to deal size.">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Coupons on non-recourse landlord and securitization paper backed by compute tenant leases, priced October 2025 to September 2026. Paper on hyperscaler or investment-grade tenants priced at 5.70 to 7.534 percent; Google-guaranteed Fluidstack leases at 6.25 and 7.25 percent; CoreWeave-tenant paper at 7.50 to 9.875 percent; Jane Street and SoftBank-affiliate paper at 8.875 percent. Mark area is proportional to deal size.">
         {C_TICKS_Y.map((t) => (
           <>
             <line x1={x0} y1={cy(t)} x2={x1} y2={cy(t)} class="grid" />
@@ -906,7 +900,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           const X = bx(p.date), Y = cy(p.v), r = crad(p.sizeB);
           return (
             <g class="hot" data-row={`row-${p.id}`}>
-              <title>{`${p.tag} · ${cFmt(p.v)}% · $${p.sizeB.toFixed(2)}B · ${p.date}${p.press ? ' · press' : ''}${p.long ? ' · amortizes to 2048-49' : ''}`}</title>
+              <title>{`${p.tag} · ${cFmt(p.v)}% · $${p.sizeB.toFixed(2)}B · ${p.date}${p.press ? ' · press' : ''}${p.long ? ` · amortizes to ${p.endYear}` : ''}`}</title>
               {p.long && <circle cx={X} cy={Y} r={r + 3.5} class={`ring tier-stroke-${p.tier}`} />}
               <circle cx={X} cy={Y} r={r} class={p.press ? `pt-hollow tier-stroke-${p.tier}` : `pt tier-${p.tier}`} />
             </g>
@@ -927,20 +921,27 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
             direct leasebacks priced at 6.58% (Hyperion, Oct 2025) and 7.534%
             (Sopaipilla, Jul 2026, ~40bp wide of Hyperion per the pricing
             coverage). QTS's Odyssey notes, on a Microsoft lease, priced at
-            7.228% (Aug 2026, press). Google-guaranteed Fluidstack leases priced
+            7.228% (Aug 2026, press). QTS's Fayetteville notes, also on a
+            Microsoft lease, priced at 5.70% for 10 years (Apr 2026, press).
+            Related Digital's Saline notes, on an Oracle lease for the OpenAI
+            build, priced at 7.50% and run to 2045 (Apr 2026, coupon per
+            press). Google-guaranteed Fluidstack leases priced
             at 6.25–7.25%. Three prints sit on CoreWeave leases: Prime Elk Grove
             at 7.50% (Jun 2026), Helios Phase II at 9.875% (Jul 2026) and
             Digital Drive at 9.25% (Sep 2026, press). Zenith Arc, leased to
             Jane Street, priced at 8.875% (Aug 2026; coupon and size per S&P's
-            final rating). The gap to hyperscaler
+            final rating). SB Energy's SE Cosmos notes also priced at 8.875%
+            (May 2026). A SoftBank affiliate is the tenant, and SoftBank Group
+            guarantees the lease. The gap to hyperscaler
             paper is not fixed. Among the 2031 notes, Prime Elk Grove priced
             about 27 basis points over QTS Odyssey, and Helios Phase II about
             265 basis points over it.
           </p>
           <p>
             Comparability caveats. Tenor: the two Meta notes amortize fully
-            to 2048–49 (◎), so their coupons embed decades of duration the
-            2030–31 bonds don't. Sourcing: the Meta, QTS Odyssey and Digital Drive coupons are
+            to 2048–49 and the Saline notes run to 2045 (◎), so their coupons
+            embed decades of duration the 2030–31 bonds don't. Sourcing: the
+            Meta, QTS, Saline and Digital Drive coupons are
             press-sourced, and Zenith Arc's comes from S&P's rating record,
             hence the hollow marks. The Meta notes are rated
             A+/AA− but no issuer statement discloses pricing. The other

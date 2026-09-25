@@ -54,7 +54,13 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000222/crwv-20260331.htm"
       },
       "as_of": "2026-08-18",
-      "offtaker_label": "Customer contracts (counterparties redacted in the filing)"
+      "offtaker_label": "Customer contracts (counterparties redacted in the filing)",
+      "chart": {
+        "panel": "spreads",
+        "tier": "weak",
+        "tag": "CRWV DDTL 1.0",
+        "sub": "as amended '24"
+      }
     },
     {
       "id": "crwv-ddtl-2",
@@ -91,7 +97,17 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000119312525227562/d910811d8k.htm"
       },
       "as_of": "2026-08-18",
-      "offtaker_label": "Investment-grade and non-IG customers (unnamed; advance rates split by grade)"
+      "offtaker_label": "Investment-grade and non-IG customers (unnamed; advance rates split by grade)",
+      "chart": {
+        "panel": "spreads",
+        "tier": "strong",
+        "tag": "CRWV DDTL 2.0",
+        "sub": "IG / non-IG",
+        "lo": 6.0,
+        "hi": 6.5,
+        "extra": 13.0,
+        "tier_extra": "mid"
+      }
     },
     {
       "id": "crwv-ddtl-2-1",
@@ -125,7 +141,12 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm"
       },
       "as_of": "2026-08-18",
-      "offtaker_label": "Microsoft (the Albatross MSA) and OpenAI, both named in the conformed agreement"
+      "offtaker_label": "Microsoft (the Albatross MSA) and OpenAI, both named in the conformed agreement",
+      "chart": {
+        "panel": "spreads",
+        "tier": "mid",
+        "tag": "CRWV DDTL 2.1"
+      }
     },
     {
       "id": "crwv-ddtl-3",
@@ -162,7 +183,13 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962825000033/crwv-20250728.htm"
       },
       "as_of": "2026-08-18",
-      "offtaker_label": "OpenAI OpCo, LLC (named unredacted in the filing)"
+      "offtaker_label": "OpenAI OpCo, LLC (named unredacted in the filing)",
+      "chart": {
+        "panel": "spreads",
+        "tier": "mid",
+        "tag": "CRWV DDTL 3.0",
+        "sub": "OpenAI offtake"
+      }
     },
     {
       "id": "crwv-ddtl-4",
@@ -208,7 +235,13 @@
           "public": "2026-03-31"
         }
       ],
-      "offtaker_label": "Meta take-or-pay (per CoreWeave release; the filed agreement redacts the customer)"
+      "offtaker_label": "Meta take-or-pay (per CoreWeave release; the filed agreement redacts the customer)",
+      "chart": {
+        "panel": "spreads",
+        "tier": "strong",
+        "tag": "CRWV DDTL 4.0",
+        "sub": "contract-wrapped"
+      }
     },
     {
       "id": "crwv-ddtl-5",
@@ -256,7 +289,13 @@
           "public": "2026-04-30"
         }
       ],
-      "offtaker_label": "Two unrated customers"
+      "offtaker_label": "Two unrated customers",
+      "chart": {
+        "panel": "spreads",
+        "tier": "mid",
+        "tag": "CRWV DDTL 5.0",
+        "sub": "2 non-IG customers"
+      }
     },
     {
       "id": "crwv-ddtl-2600-2026",
@@ -305,7 +344,14 @@
           "public": "2026-07-16"
         }
       ],
-      "offtaker_label": "Unrated take-or-pay customers"
+      "offtaker_label": "Unrated take-or-pay customers",
+      "chart": {
+        "panel": "spreads",
+        "tier": "mid",
+        "tag": "CRWV DDTL 5.5",
+        "sub": "unrated customers",
+        "compact": true
+      }
     },
     {
       "id": "crwv-notes-9250-2030",
@@ -929,7 +975,14 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1513845/000110465926084452/tm2620683d1_6k.htm"
       },
       "as_of": "2026-08-12",
-      "offtaker_label": "Investment-grade customer (unnamed)"
+      "offtaker_label": "Investment-grade customer (unnamed)",
+      "chart": {
+        "panel": "spreads",
+        "tier": "strong",
+        "tag": "Nebius TL",
+        "sub": "IG customer",
+        "compact": true
+      }
     },
     {
       "id": "nbis-conv-2029",
@@ -1234,7 +1287,12 @@
         "date": "2025-10-23",
         "url": "https://www.sec.gov/Archives/edgar/data/1083301/000110465925101866/tm2529300d1_8k.htm"
       },
-      "as_of": "2026-06-30"
+      "as_of": "2026-06-30",
+      "chart": {
+        "panel": "operator",
+        "tier": "mid",
+        "tag": "WULF 7.750"
+      }
     },
     {
       "id": "wulf-conv-2030",
@@ -1409,7 +1467,12 @@
         "date": "2025-12-29",
         "url": "https://www.sec.gov/Archives/edgar/data/1083301/000110465925124839/tm2534384d1_8k.htm"
       },
-      "as_of": "2026-07-06"
+      "as_of": "2026-07-06",
+      "chart": {
+        "panel": "landlord",
+        "tier": "mid",
+        "tag": "WULF JV (Fluidstack)"
+      }
     },
     {
       "id": "apld-9250-2030",
@@ -1443,7 +1506,12 @@
         "date": "2026-04-08",
         "url": "https://www.sec.gov/Archives/edgar/data/1144879/000114487926000030/apld-20260228.htm"
       },
-      "as_of": "2026-05-31"
+      "as_of": "2026-05-31",
+      "chart": {
+        "panel": "operator",
+        "tier": "weak",
+        "tag": "APLD 9.250"
+      }
     },
     {
       "id": "apld-6750-2031",
@@ -1476,7 +1544,13 @@
         "date": "2026-06-17",
         "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315226009538/form8-k.htm"
       },
-      "as_of": "2026-06-17"
+      "as_of": "2026-06-17",
+      "chart": {
+        "panel": "operator",
+        "tier": "strong",
+        "tag": "APLD 6.750",
+        "context": true
+      }
     },
     {
       "id": "apld-7000-2031",
@@ -1509,7 +1583,13 @@
         "date": "2026-06-16",
         "url": "https://www.sec.gov/Archives/edgar/data/1144879/000149315226028899/form8-k.htm"
       },
-      "as_of": "2026-06-16"
+      "as_of": "2026-06-16",
+      "chart": {
+        "panel": "operator",
+        "tier": "weak",
+        "tag": "APLD 7.000",
+        "context": true
+      }
     },
     {
       "id": "apld-conv-2030",
@@ -1982,7 +2062,12 @@
         "date": "2025-11-24",
         "url": "https://www.sec.gov/Archives/edgar/data/1819989/000095010325014692/dp237330_8k.htm"
       },
-      "as_of": "2026-09-24"
+      "as_of": "2026-09-24",
+      "chart": {
+        "panel": "operator",
+        "tier": "mid",
+        "tag": "CIFR 7.125"
+      }
     },
     {
       "id": "cifr-6125-2031",
@@ -2015,7 +2100,12 @@
         "date": "2026-02-11",
         "url": "https://www.sec.gov/Archives/edgar/data/1819989/000095010326001966/dp241421_8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-03-31",
+      "chart": {
+        "panel": "operator",
+        "tier": "strong",
+        "tag": "CIFR 6.125"
+      }
     },
     {
       "id": "cifr-6000-2031",
@@ -2048,7 +2138,12 @@
         "date": "2026-06-15",
         "url": "https://www.sec.gov/Archives/edgar/data/1819989/000095010326008994/dp248453_8k.htm"
       },
-      "as_of": "2026-06-30"
+      "as_of": "2026-06-30",
+      "chart": {
+        "panel": "operator",
+        "tier": "strong",
+        "tag": "CIFR 6.000"
+      }
     },
     {
       "id": "cifr-rcf",
@@ -2439,7 +2534,12 @@
           "public": "2026-06-01"
         }
       ],
-      "offtaker_label": "Microsoft take-or-pay"
+      "offtaker_label": "Microsoft take-or-pay",
+      "chart": {
+        "panel": "spreads",
+        "tier": "strong",
+        "tag": "IREN H3"
+      }
     },
     {
       "id": "iren-hw3-notes",
@@ -2485,7 +2585,12 @@
           "public": "2026-06-01"
         }
       ],
-      "offtaker_label": "Microsoft take-or-pay"
+      "offtaker_label": "Microsoft take-or-pay",
+      "chart": {
+        "panel": "operator",
+        "tier": "strong",
+        "tag": "IREN 5.96"
+      }
     },
     {
       "id": "iren-gpu-leases",
@@ -2586,7 +2691,13 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm"
       },
       "as_of": "2026-08-28",
-      "offtaker_label": "Non-IG customer deployments (issuer statement, program level; counterparty unnamed)"
+      "offtaker_label": "Non-IG customer deployments (issuer statement, program level; counterparty unnamed)",
+      "chart": {
+        "panel": "operator",
+        "tier": "weak",
+        "tag": "IREN 9.000",
+        "context": true
+      }
     },
     {
       "issuer_type": "public",
@@ -2721,7 +2832,13 @@
         "date": "2026-05-06",
         "url": "https://www.sec.gov/Archives/edgar/data/1839341/000119312526208905/d47435d8k.htm"
       },
-      "as_of": "2026-06-30"
+      "as_of": "2026-06-30",
+      "chart": {
+        "panel": "operator",
+        "tier": "weak",
+        "tag": "CORZ 7.750",
+        "context": true
+      }
     },
     {
       "id": "corz-finance-leases",
@@ -2853,7 +2970,12 @@
         "url": "https://www.sec.gov/Archives/edgar/data/827876/000119312526395727/clsk-ex99_1.htm"
       },
       "as_of": "2026-09-25",
-      "offtaker_label": "Meta, through its subsidiary Anviran, LLC (named in CleanSpark's filed investor deck)"
+      "offtaker_label": "Meta, through its subsidiary Anviran, LLC (named in CleanSpark's filed investor deck)",
+      "chart": {
+        "panel": "operator",
+        "tier": "strong",
+        "tag": "CLSK 7.875"
+      }
     },
     {
       "id": "clsk-conv-2032",
@@ -3881,7 +4003,13 @@
           "grade": "BBB-",
           "public": "2026-09-23"
         }
-      ]
+      ],
+      "chart": {
+        "panel": "operator",
+        "tier": "strong",
+        "tag": "HUT 6.192",
+        "long": true
+      }
     },
     {
       "id": "hut-beaconpoint-6129-2042",
@@ -3914,7 +4042,13 @@
         "date": "2026-06-10",
         "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465926071952/tm2617190d1_8k.htm"
       },
-      "as_of": "2026-06-30"
+      "as_of": "2026-06-30",
+      "chart": {
+        "panel": "operator",
+        "tier": "strong",
+        "tag": "HUT 6.129",
+        "long": true
+      }
     },
     {
       "id": "hut-falconx",
@@ -5515,7 +5649,13 @@
         "date": "2026-04-20",
         "url": "https://www.lw.com/en/news/latham-advises-on-meridian-arc-holdco-senior-secured-notes-offering-to-finance-ai-data-center"
       },
-      "as_of": "2026-08-09"
+      "as_of": "2026-08-09",
+      "chart": {
+        "panel": "landlord",
+        "tier": "mid",
+        "tag": "Meridian Arc (Fluidstack)",
+        "date": "2026-04-16"
+      }
     },
     {
       "id": "fluidstack-macquarie",
@@ -6131,7 +6271,15 @@
         "date": "2025-10-21",
         "url": "https://www.spglobal.com/ratings/en/regulatory/article/-/view/sourceId/101651795"
       },
-      "as_of": "2026-07-02"
+      "as_of": "2026-07-02",
+      "chart": {
+        "panel": "landlord",
+        "tier": "strong",
+        "tag": "Hyperion (Meta)",
+        "date": "2025-10-16",
+        "press": true,
+        "long": true
+      }
     },
     {
       "id": "meta-elpaso",
@@ -6166,7 +6314,14 @@
         "date": "2026-07-28",
         "url": "https://pitchbook.com/news/articles/investors-flock-to-12-5b-data-center-bond-deal-for-blackrock-sponsored-sopaipilla"
       },
-      "as_of": "2026-07-28"
+      "as_of": "2026-07-28",
+      "chart": {
+        "panel": "landlord",
+        "tier": "strong",
+        "tag": "Sopaipilla (Meta)",
+        "press": true,
+        "long": true
+      }
     },
     {
       "id": "apollo-blackstone-anthropic-tpu-spv",
@@ -6639,7 +6794,13 @@
         "date": "2026-07-28",
         "url": "https://www.sec.gov/Archives/edgar/data/1859392/000185939226000079/glxy-20260728.htm"
       },
-      "as_of": "2026-08-10"
+      "as_of": "2026-08-10",
+      "chart": {
+        "panel": "landlord",
+        "tier": "weak",
+        "tag": "Helios II (CoreWeave)",
+        "date": "2026-07-23"
+      }
     },
     {
       "id": "palebluedot-brookfield-tor",
@@ -7214,7 +7375,14 @@
           "public": "2026-08-11"
         }
       ],
-      "offtaker_label": "NVIDIA take-or-pay"
+      "offtaker_label": "NVIDIA take-or-pay",
+      "chart": {
+        "panel": "spreads",
+        "tier": "strong",
+        "tag": "Lambda TLB",
+        "sub": "NVIDIA offtake",
+        "compact": true
+      }
     },
     {
       "id": "lambda-jpm-shortdated-2026",
@@ -7292,7 +7460,14 @@
           "public": "2026-08-12"
         }
       ],
-      "offtaker_label": "Microsoft take-or-pay (named as Customer in the filed credit agreement)"
+      "offtaker_label": "Microsoft take-or-pay (named as Customer in the filed credit agreement)",
+      "chart": {
+        "panel": "spreads",
+        "tier": "strong",
+        "tag": "Nscale Ward, Madison",
+        "sub": "Microsoft",
+        "compact": true
+      }
     },
     {
       "id": "nscale-madison-ddtl",
@@ -7334,7 +7509,15 @@
           "public": "2026-08-31"
         }
       ],
-      "offtaker_label": "Customer name redacted in the filed credit agreement"
+      "offtaker_label": "Customer name redacted in the filed credit agreement",
+      "chart": {
+        "panel": "spreads",
+        "tier": "mid",
+        "tag": "Nscale Madison",
+        "sub": "customer redacted",
+        "compact": true,
+        "ring": true
+      }
     },
     {
       "id": "nscale-iceland-macquarie",
@@ -7368,7 +7551,14 @@
         "url": "https://www.sec.gov/Archives/edgar/data/2110365/000119312526395475/"
       },
       "as_of": "2026-09-20",
-      "offtaker_label": "Customer name redacted in the filed facility agreement"
+      "offtaker_label": "Customer name redacted in the filed facility agreement",
+      "chart": {
+        "panel": "spreads",
+        "tier": "mid",
+        "tag": "Nscale Iceland",
+        "sub": "customer redacted",
+        "compact": true
+      }
     },
     {
       "id": "nscale-glomfjord-macquarie",
@@ -8307,7 +8497,14 @@
         "date": "2026-04-24",
         "url": "https://www.related.com/press-releases/2026-04-24/related-digital-announces-financing-16-billion-oracle-data-center-project"
       },
-      "offtaker_label": "Oracle (for the OpenAI build; BBB negative / Baa2 negative per press)"
+      "offtaker_label": "Oracle (for the OpenAI build; BBB negative / Baa2 negative per press)",
+      "chart": {
+        "panel": "landlord",
+        "tier": "strong",
+        "tag": "Related Saline (Oracle)",
+        "press": true,
+        "long": true
+      }
     },
     {
       "ticker": null,
@@ -8349,7 +8546,13 @@
         "date": "2026-04-06",
         "url": "https://www.datacenterdynamics.com/en/news/blackstone-owned-qts-data-centers-looks-to-raise-46bn-starting-with-10-year-investment-grade-green-bond-sale/"
       },
-      "offtaker_label": "Microsoft (20-year triple-net lease)"
+      "offtaker_label": "Microsoft (20-year triple-net lease)",
+      "chart": {
+        "panel": "landlord",
+        "tier": "strong",
+        "tag": "QTS Fayetteville (Microsoft)",
+        "press": true
+      }
     },
     {
       "ticker": null,
@@ -8399,7 +8602,13 @@
         "date": "2026-08-18",
         "url": "https://www.investing.com/news/stock-market-news/microsoftlinked-qts-bond-sale-draws-8-billion-in-demand--bloomberg-93CH-4863795"
       },
-      "offtaker_label": "Microsoft"
+      "offtaker_label": "Microsoft",
+      "chart": {
+        "panel": "landlord",
+        "tier": "strong",
+        "tag": "QTS Odyssey (Microsoft)",
+        "press": true
+      }
     },
     {
       "ticker": null,
@@ -8446,7 +8655,13 @@
         "date": "2026-08-13",
         "url": "https://www.briefs.co/news/market-making-giant-s-lease-guaranty-anchors-2-25b-data-cent/"
       },
-      "offtaker_label": "Jane Street (trading firm; compute facility, AI use not stated)"
+      "offtaker_label": "Jane Street (trading firm; compute facility, AI use not stated)",
+      "chart": {
+        "panel": "landlord",
+        "tier": "weak",
+        "tag": "Zenith Arc (Jane Street)",
+        "press": true
+      }
     },
     {
       "ticker": null,
@@ -8493,7 +8708,12 @@
         "date": "2026-06-02",
         "url": "https://www.spglobal.com/ratings/en/regulatory/article/-/view/type/HTML/id/3584909"
       },
-      "offtaker_label": "CoreWeave (15-year lease, ~$2.2B revenue)"
+      "offtaker_label": "CoreWeave (15-year lease, ~$2.2B revenue)",
+      "chart": {
+        "panel": "landlord",
+        "tier": "weak",
+        "tag": "Prime Elk Grove (CoreWeave)"
+      }
     },
     {
       "ticker": null,
@@ -8615,7 +8835,13 @@
         "date": "2026-09-23",
         "url": "https://www.briefs.co/news/blue-owl-backed-data-center-borrower-lands-1-1-billion-with/"
       },
-      "offtaker_label": "CoreWeave (long-term leases)"
+      "offtaker_label": "CoreWeave (long-term leases)",
+      "chart": {
+        "panel": "landlord",
+        "tier": "weak",
+        "tag": "Digital Drive (CoreWeave)",
+        "press": true
+      }
     },
     {
       "id": "galaxy-exch-0050-2031",
@@ -8719,7 +8945,12 @@
         "url": "https://www.sec.gov/Archives/edgar/data/2133037/000162828026062846/sbenergy-sx1a2.htm"
       },
       "as_of": "2026-06-30",
-      "offtaker_label": "SoftBank affiliate (15-year triple-net lease; SoftBank Group guaranty)"
+      "offtaker_label": "SoftBank affiliate (15-year triple-net lease; SoftBank Group guaranty)",
+      "chart": {
+        "panel": "landlord",
+        "tier": "weak",
+        "tag": "SE Cosmos (SoftBank affiliate)"
+      }
     },
     {
       "id": "zankore-gpu-tl-2026",
