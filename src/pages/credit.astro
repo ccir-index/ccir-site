@@ -117,7 +117,8 @@ const TYPE_LABEL: Record<string, string> = {
 // register row with facility_ratings joins automatically as its own line.
 const GRADE_RANK: Record<string, number> = {
   'A': 1, 'A (low)': 2, 'A3': 3, 'Baa1': 4, 'Baa2': 5, 'Baa3': 6,
-  'Ba1': 7, 'Ba2': 8, 'BB+': 8.5, 'Ba3': 9, 'BB': 9.5, 'BB-': 10,
+  'BBB+': 3.5, 'BBB': 4.5, 'BBB-': 5.5,
+  'Ba1': 7, 'Ba2': 8, 'BB+': 8.5, 'Ba3': 9, 'BB': 9.5, 'BB-': 10, 'BB-(EXP)': 10, 'B+': 11,
 };
 const RATED_LINES = [
   { ids: ['iren-hw3-ddtl', 'iren-hw3-notes'], label: 'USPP + DDTL package' },

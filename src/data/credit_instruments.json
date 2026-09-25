@@ -3874,7 +3874,14 @@
         "date": "2026-05-01",
         "url": "https://www.sec.gov/Archives/edgar/data/1964789/000110465926053247/tm2613163d1_8k.htm"
       },
-      "as_of": "2026-06-30"
+      "as_of": "2026-09-25",
+      "facility_ratings": [
+        {
+          "agency": "S&P",
+          "grade": "BBB-",
+          "public": "2026-09-23"
+        }
+      ]
     },
     {
       "id": "hut-beaconpoint-6129-2042",
@@ -8350,7 +8357,7 @@
       "collateral_class": "landlord_spv",
       "exclude_from_issuance": true,
       "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
-      "as_of": "2026-09-06",
+      "as_of": "2026-09-25",
       "maturity_note": null,
       "facility_ratings": [
         {
@@ -8360,8 +8367,8 @@
         },
         {
           "agency": "Fitch",
-          "grade": "BBB- (expected)",
-          "public": "2026-08"
+          "grade": "BBB-",
+          "public": "2026-09-03"
         }
       ],
       "id": "qts-odyssey-2031",
@@ -8410,8 +8417,8 @@
         },
         {
           "agency": "S&P",
-          "grade": "BB (preliminary)",
-          "public": "2026-08-13"
+          "grade": "BB",
+          "public": "2026-09-04"
         }
       ],
       "id": "zenith-arc-2031",
@@ -8423,8 +8430,8 @@
       "size_note": "Priced 2026-08-13 (briefs.co, Bloomberg, IFR): talk 'high-8% area', priced at 99.5 to yield almost 9% at the wide end of discussions; IFR: 'Zenith faces buyside pushback in latest data centre bond'. Moody's Ba2 corporate family and notes, stable, citing construction risk and a high loan-to-cost ratio. Funds development and construction of a 149 MW data center and substation in Central Oklahoma. Tenant JS Data Center LLC, a Jane Street Group subsidiary, under a 15-year absolute triple-net lease with a Jane Street lease guaranty. Sources call it a compute facility; AI use is not stated. Bookrunners not named in accessible sources. S&P (2026-08-13) assigned a preliminary 'BB' rating, outlook positive, to proposed senior secured notes \"for up to $2.25 billion maturing in 2031\". Jane Street Group's rating (BB/Positive) caps it. S&P adds: the 15-year triple-net lease has 3% annual escalators and two five-year renewals, with all tenant payments guaranteed by Jane Street Group. Prairieland LLC provides a $150M parent completion guaranty. Alston holds an approximately $1.2B GMP contract. Minimum DSCR is about 1.18x, falling to 1.13x at the 2031 balloon. Data halls are due in Q4 2027 and Q4 2028. The $2.25B final size remains press: S&P's figure is a ceiling, and no final S&P rating was found.",
       "rate": {
         "kind": "fixed",
-        "value": 9.0,
-        "note": "About 9% yield at 99.5 (press); coupon not stated"
+        "value": 8.875,
+        "note": "8.875% notes due 2031-08-31 per S&P's final rating (2026-09-04, S&P public rating-actions list); press had reported about 9% yield at 99.5"
       },
       "maturity": "2031",
       "seniority": "Senior secured",
@@ -8447,9 +8454,14 @@
       "collateral_class": "landlord_spv",
       "exclude_from_issuance": true,
       "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
-      "as_of": "2026-09-06",
+      "as_of": "2026-09-25",
       "maturity_note": null,
       "facility_ratings": [
+        {
+          "agency": "Fitch",
+          "grade": "BB-",
+          "public": "2026-06-15"
+        },
         {
           "agency": "S&P",
           "grade": "Rated (grade not on file)",
@@ -8562,16 +8574,27 @@
       "collateral_class": "landlord_spv",
       "exclude_from_issuance": true,
       "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
-      "as_of": "2026-09-23",
+      "as_of": "2026-09-25",
       "maturity_note": "Five-year notes (press); maturity date not reported",
-      "facility_ratings": [],
+      "facility_ratings": [
+        {
+          "agency": "S&P",
+          "grade": "BB-",
+          "public": "2026-09-22"
+        },
+        {
+          "agency": "Fitch",
+          "grade": "BB-(EXP)",
+          "public": "2026-09-22"
+        }
+      ],
       "id": "digital-drive-coreweave-bond-2026",
       "issuer": "Digital Drive project (PowerHouse Data Centers / Chirisa Technology Parks; Blue Owl equity)",
       "entity": "Digital Drive, Chesterfield County, Virginia",
       "name": "$1.1B five-year notes (priced 9/23; CoreWeave lease)",
       "instrument_type": "bond",
-      "size_usd_m": 1100,
-      "size_note": "Press (Bloomberg 2026-09-23, via briefs.co): priced $1.1B of five-year notes at 98.5 to yield 9.25%. S&P rated the notes BB-, as quoted by press (S&P page not on file): \"Exposure to a single, speculative-grade tenant remains the key risk.\" Sponsors are affiliates of Blue Owl Capital, Cedarwood Investment Group LP and PowerHouse Data Centers LLC. Collateral is 76 MW of IT capacity at the Digital Drive campus near Richmond, VA, leased to CoreWeave for 15 years under a $2.94B contract, with operations expected in 2027-28. The 8/19 pre-marketing report cited an initial 300 MW for the site and a roughly $1.15B size (Bloomberg via briefs.co). Coupon not reported.",
+      "size_usd_m": 1085,
+      "size_note": "Press (Bloomberg 2026-09-23, via briefs.co): priced $1.1B of five-year notes at 98.5 to yield 9.25%. S&P rated the notes BB-, as quoted by press (S&P page not on file): \"Exposure to a single, speculative-grade tenant remains the key risk.\" Sponsors are affiliates of Blue Owl Capital, Cedarwood Investment Group LP and PowerHouse Data Centers LLC. Collateral is 76 MW of IT capacity at the Digital Drive campus near Richmond, VA, leased to CoreWeave for 15 years under a $2.94B contract, with operations expected in 2027-28. The 8/19 pre-marketing report cited an initial 300 MW for the site and a roughly $1.15B size (Bloomberg via briefs.co). Coupon not reported. S&P lists the notes at $1.085B under the issuer name DDC 01 Propco LLC (final BB-, 2026-09-22); press reported $1.1B.",
       "rate": {
         "kind": "fixed",
         "value": 9.25,
