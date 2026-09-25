@@ -116,11 +116,12 @@ as_of_date,canonical_model_id,model_display,in_panel,in_frontier,providers
 2026-09-25,inkling,Inkling,True,True,thinkingmachines
 2026-09-25,inklingsmall,Inkling-Small,True,True,thinkingmachines
 2026-09-25,kimik2.5,Kimi K2.5,True,False,
-2026-09-25,kimik2.6,Kimi K2.6,True,False,
-2026-09-25,kimik2.7code,Kimi K2.7 Code,True,False,
+2026-09-25,kimik2.6,kimi-k2.6,True,True,moonshot
+2026-09-25,kimik2.7code,kimi-k2.7-code,True,True,moonshot
+2026-09-25,kimik2.7codehighspeed,kimi-k2.7-code-highspeed,False,True,moonshot
 2026-09-25,kimik2instruct,Kimi K2 Instruct,True,False,
 2026-09-25,kimik2thinking,Kimi K2 Thinking,True,False,
-2026-09-25,kimik3,Kimi K3,True,True,moonshot
+2026-09-25,kimik3,kimi-k3,True,True,moonshot
 2026-09-25,llama3.21binstruct,Llama 3.2 1B,True,False,
 2026-09-25,llama3.370binstruct,Llama 3.3 70B (FP8),True,False,
 2026-09-25,llama4maverick17b128einstruct,Llama 4 Maverick,True,False,
