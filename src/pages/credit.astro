@@ -1049,6 +1049,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           <tr>
             <th class="sortable" data-key="issuer">Issuer</th>
             <th class="sortable" data-key="name">Instrument</th>
+            <th>Source</th>
             <th class="sortable" data-key="type">Type</th>
             <th class="sortable sort-num" data-key="size">Size $M</th>
             <th class="sortable sort-num" data-key="rate">Rate</th>
@@ -1057,7 +1058,6 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
             <th class="sortable" data-key="sen">Seniority</th>
             <th>Lenders / Agents</th>
             <th class="sortable" data-key="status">Status</th>
-            <th>Source</th>
           </tr>
         </thead>
         <tbody>
@@ -1082,6 +1082,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
                 {i.name}
                 {(i.entity || i.security || i.size_note) && <span class="has-note" aria-hidden="true">†</span>}
               </td>
+              <td class="c-src"><a href={i.source.url} target="_blank" rel="noopener noreferrer" title={i.source.doc}>{i.source.doc.split(';')[0]}</a></td>
               <td class="c-type">{TYPE_LABEL[i.instrument_type] ?? i.instrument_type}</td>
               <td class="c-size num" title={i.size_note ?? ''}>{fmtSize(i.size_usd_m)}</td>
               <td class="c-rate" title={rateTitle(i.rate)}>
@@ -1099,7 +1100,6 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
                 )}
               </td>
               <td class="c-status"><span class={`chip chip-${i.status}`}>{i.status}</span></td>
-              <td class="c-src"><a href={i.source.url} target="_blank" rel="noopener noreferrer" title={i.source.doc}>{i.source.doc.split(';')[0]}</a></td>
             </tr>
           ))}
         </tbody>
@@ -1420,7 +1420,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         var table = document.getElementById('credit-table');
         if (!table) return;
         var ths = table.querySelectorAll('thead th');
-        var KEY = 'credit-col-widths-v1';
+        var KEY = 'credit-col-widths-v2'; // v2 2026-09-25: Source moved to column 3
         var saved = null;
         try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
         if (saved && saved.length !== ths.length) saved = null;
