@@ -147,6 +147,7 @@ const ratedLadder = [...RATED_LINES, ...ratedExtras]
       issuer: rows[0].issuer,
       name: l.label,
       size: fmtLadderSize(rows.reduce((a, r) => a + (r.size_usd_m || 0), 0)),
+      sizeM: rows.reduce((a, r) => a + (r.size_usd_m || 0), 0),
       offtaker: rows[0].offtaker_label ?? '—',
       // Anchor into the ledger below. A package line covers more than one
       // ledger row; we jump to the first and name the rest in the tooltip,
@@ -965,16 +966,21 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       </p>
     </div>
     <div class="table-wrap rated-wrap">
-      <table class="data rated-grid">
+      <table class="data rated-grid" id="rated-grid">
         <thead>
           <tr>
-            <th>Grade</th><th>On record</th><th>Issuer</th>
-            <th>Financing</th><th>Size</th><th>Offtaker</th>
+            <th class="sortable sort-num" data-key="rank">Grade</th>
+            <th class="sortable" data-key="date">On record</th>
+            <th class="sortable" data-key="issuer">Issuer</th>
+            <th class="sortable" data-key="name">Financing</th>
+            <th class="sortable sort-num" data-key="size">Size</th>
+            <th class="sortable" data-key="offtaker">Offtaker</th>
           </tr>
         </thead>
         <tbody>
-          {ratedLadder.map((l: any) => (
-            <tr>
+          {ratedLadder.map((l: any, idx: number) => (
+            <tr data-orig={idx} data-rank={l.rank} data-date={l.public} data-issuer={l.issuer}
+                data-name={l.name} data-size={l.sizeM} data-offtaker={l.offtaker}>
               <td class="grade">{l.grades}</td>
               <td class="mono-dim r-date">{l.public}</td>
               <td class="r-issuer" data-label="Issuer">{l.issuer}</td>
@@ -1295,6 +1301,53 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
       });
       q.addEventListener('input', apply);
       apply();
+
+      // --- rated table: click a header to sort (2026-09-25) ------------------
+      // Same cycle as the ledger: ascending, descending, then back to the
+      // default order (best grade first). Grade sorts by agency rank.
+      (function () {
+        var table = document.getElementById('rated-grid');
+        if (!table) return;
+        var tbody = table.querySelector('tbody');
+        var ths = table.querySelectorAll('th.sortable');
+        var key = null, dir = 1;
+        function val(tr, k, num) {
+          var v = tr.dataset[k];
+          if (v === undefined || v === '') return null;
+          return num ? parseFloat(v) : String(v).toLowerCase();
+        }
+        function sortRows(num) {
+          var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+          rows.sort(function (a, b) {
+            if (!key) return a.dataset.orig - b.dataset.orig;
+            var va = val(a, key, num), vb = val(b, key, num);
+            if (va === null && vb === null) return a.dataset.orig - b.dataset.orig;
+            if (va === null) return 1;
+            if (vb === null) return -1;
+            if (va < vb) return -1 * dir;
+            if (va > vb) return 1 * dir;
+            return a.dataset.orig - b.dataset.orig;
+          });
+          rows.forEach(function (r) { tbody.appendChild(r); });
+        }
+        ths.forEach(function (th) {
+          th.addEventListener('click', function () {
+            var k = th.dataset.key;
+            if (key === k) {
+              if (dir === 1) { dir = -1; } else { key = null; dir = 1; }
+            } else { key = k; dir = 1; }
+            ths.forEach(function (h) {
+              h.classList.remove('sort-asc', 'sort-desc');
+              h.removeAttribute('aria-sort');
+            });
+            if (key) {
+              th.classList.add(dir === 1 ? 'sort-asc' : 'sort-desc');
+              th.setAttribute('aria-sort', dir === 1 ? 'ascending' : 'descending');
+            }
+            sortRows(th.classList.contains('sort-num'));
+          });
+        });
+      })();
 
       // --- chart mark / rated ladder -> ledger row ---------------------------
       // Clicking a data point (or its label, or a rated-ladder financing
@@ -1752,20 +1805,20 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     #credit-table.resizable .c-lenders .lender-first,
     #credit-table.resizable .c-src a { max-width: 100%; }
     #credit-table td { font-size: var(--fs-sm); }
-    #credit-table th.sortable {
+    #credit-table th.sortable, #rated-grid th.sortable {
       cursor: pointer;
       user-select: none;
       white-space: nowrap;
     }
-    #credit-table th.sortable::after {
+    #credit-table th.sortable::after, #rated-grid th.sortable::after {
       content: '↕';
       margin-left: 5px;
       opacity: 0.35;
       font-size: 0.9em;
     }
-    #credit-table th.sortable:hover { color: var(--ink); }
-    #credit-table th.sort-asc::after { content: '▲'; opacity: 1; color: var(--accent); }
-    #credit-table th.sort-desc::after { content: '▼'; opacity: 1; color: var(--accent); }
+    #credit-table th.sortable:hover, #rated-grid th.sortable:hover { color: var(--ink); }
+    #credit-table th.sort-asc::after, #rated-grid th.sort-asc::after { content: '▲'; opacity: 1; color: var(--accent); }
+    #credit-table th.sort-desc::after, #rated-grid th.sort-desc::after { content: '▼'; opacity: 1; color: var(--accent); }
     #credit-table tbody tr.stripe:not(:hover) td {
       background: color-mix(in srgb, var(--surface-2) 55%, transparent);
     }
