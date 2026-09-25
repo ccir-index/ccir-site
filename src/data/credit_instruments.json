@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "as_of": "2026-09-21",
+    "as_of": "2026-09-25",
     "compiled_from": [
       "ccir-v2-notebooks/research/credit_ledger_public_FULL_2026_07_04.md",
       "ccir-v2-notebooks/research/credit_ledger_private_FULL_2026_07_04.md",
@@ -557,10 +557,10 @@
       "ticker": "CRWV",
       "issuer_type": "public",
       "entity": null,
-      "name": "2.875% Convertible Senior Notes due 2033 (priced 9/18; settles 9/22)",
+      "name": "2.875% Convertible Senior Notes due 2033",
       "instrument_type": "convertible",
-      "size_usd_m": 3700,
-      "size_note": "$3.7B aggregate principal, priced 2026-09-18 in a Rule 144A private offering, upsized from the $3.0B proposed on 2026-09-17; settlement scheduled 2026-09-22. Initial purchasers' option for up to $500M more within 13 days of first issuance. Initial conversion rate 10.2194 shares per $1,000 principal (conversion price about $97.85, a 22.50% premium to the $79.88 close on 2026-09-17). Net proceeds about $3,644.5M (about $4,137.0M if the option is exercised in full); about $498.8M funds capped calls with an initial cap price of $199.70 (150% premium), the remainder for general corporate purposes. Optional redemption from 2030-04-05, subject to a 130% stock-price test. The 9/17 8-K also filed an Equity Distribution Agreement for up to 35,000,000 Class A shares (at-the-market and collared forward sales), not a credit row.",
+      "size_usd_m": 4200,
+      "size_note": "$4.2B aggregate principal, closed 2026-09-22 in a Rule 144A private offering. Includes the $500M initial purchasers' option, exercised in full. Priced 2026-09-18 at $3.7B, upsized from the $3.0B proposed on 2026-09-17. Initial conversion rate 10.2194 shares per $1,000 principal (conversion price about $97.85, a 22.50% premium to the $79.88 close on 2026-09-17). Net proceeds $4,137.0M before offering expenses. Capped calls cost about $566.2M, including additional capped calls entered 2026-09-18 for the option notes; initial cap price $199.70 (150% premium). The remainder is for general corporate purposes. Optional redemption from 2030-04-05, subject to a 130% stock-price test. The 9/17 8-K also filed an Equity Distribution Agreement for up to 35,000,000 Class A shares (at-the-market and collared forward sales), not a credit row.",
       "rate": {
         "kind": "fixed",
         "value": 2.875,
@@ -570,15 +570,17 @@
       "maturity_note": null,
       "seniority": "Senior unsecured; guaranteed by the subsidiaries that guarantee the 9.250% 2030, 9.000% 2031, 9.750% 2031, 9.625% 2032 and 8.500% 2032 notes and the 2031 and 2032 converts",
       "security": null,
-      "lenders": [],
+      "lenders": [
+        "144A QIBs; U.S. Bank Trust Co. (trustee)"
+      ],
       "status": "confirmed",
-      "issued": "2026-09-18",
+      "issued": "2026-09-22",
       "source": {
-        "doc": "CoreWeave pricing release 2026-09-18 (investors.coreweave.com); proposal 8-K 9/17/26 acc 0001769628-26-000429. Pricing/closing 8-K not yet on EDGAR at 2026-09-21",
-        "date": "2026-09-18",
-        "url": "https://investors.coreweave.com/news/news-details/2026/CoreWeave-Prices-Upsized-3-7-Billion-Convertible-Senior-Notes-Offering/default.aspx"
+        "doc": "8-K 9/22/26 Item 1.01 (closing; Indenture EX-4.1), acc 0001769628-26-000432; pricing release 2026-09-18; proposal 8-K 9/17/26 acc 0001769628-26-000429",
+        "date": "2026-09-22",
+        "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000432/crwv-20260917.htm"
       },
-      "as_of": "2026-09-21"
+      "as_of": "2026-09-22"
     },
     {
       "id": "crwv-rcf",
@@ -1250,7 +1252,7 @@
       "rate": {
         "kind": "fixed",
         "value": 2.75,
-        "note": "Conversion ~$8.48; capped calls to $12.80"
+        "note": "Effective 3.3%; Conversion ~$8.48; capped calls to $12.80"
       },
       "maturity": "2030-02-01",
       "maturity_note": null,
@@ -1262,11 +1264,11 @@
       "status": "confirmed",
       "issued": "2024-10",
       "source": {
-        "doc": "Q1-26 10-Q Note 10",
-        "date": "2026-05-08",
-        "url": "https://www.sec.gov/Archives/edgar/data/1083301/000108330126000092/wulf-20260331.htm"
+        "doc": "Q2-26 10-Q (6/30/26 balance), acc 0001083301-26-000166",
+        "date": "2026-08-05",
+        "url": "https://www.sec.gov/Archives/edgar/data/1083301/000108330126000166/wulf-20260630.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "wulf-conv-2031",
@@ -1332,11 +1334,11 @@
       "status": "confirmed",
       "issued": "2025-10-31",
       "source": {
-        "doc": "8-K 10/31/25",
+        "doc": "8-K 10/31/25; Q2-26 10-Q (6/30/26 balance), acc 0001083301-26-000166",
         "date": "2025-10-31",
         "url": "https://www.sec.gov/Archives/edgar/data/1083301/000110465925104928/tm2529894d1_8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "wulf-rcf",
@@ -1909,11 +1911,11 @@
       "status": "confirmed",
       "issued": "2025-05-22",
       "source": {
-        "doc": "8-K 5/22/25",
+        "doc": "8-K 5/22/25; Q2-26 10-Q (6/30/26 balance), acc 0001819989-26-000041",
         "date": "2025-05-22",
         "url": "https://www.sec.gov/Archives/edgar/data/1819989/000119312525125152/d86394d8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "cifr-conv-2031",
@@ -1943,11 +1945,11 @@
       "status": "confirmed",
       "issued": "2025-09-30",
       "source": {
-        "doc": "8-K 10/1/25",
+        "doc": "8-K 10/1/25; Q2-26 10-Q (6/30/26 balance), acc 0001819989-26-000041",
         "date": "2025-10-01",
         "url": "https://www.sec.gov/Archives/edgar/data/1819989/000119312525225645/d52925d8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "cifr-7125-2030",
@@ -1959,7 +1961,7 @@
       "name": "7.125% Senior Secured Notes due 2030 — Barber Lake",
       "instrument_type": "bond",
       "size_usd_m": 1733,
-      "size_note": "$1,400M + $333M add-on; outstanding in full per the Q2-26 10-Q debt table (6/30/26) $94.5M classified short-term at 6/30/26 (scheduled principal due within one year; Q2-26 10-Q).",
+      "size_note": "$1,400M + $333M add-on; outstanding in full at 6/30/26, with $94.5M classified short-term (scheduled principal due within one year; Q2-26 10-Q). Collateral context (8-K 9/24/26): the Barber Lake lease with Fluidstack was amended. Data halls are now due between Q4 2026 and Q1 2027, with first rent expected in Q4 2026. Cipher bears the first $359.3M of costs above the initial budget. The tenant reimburses 50% of any costs above that amount over the twenty-year term. A leading AI lab, unnamed in the filing, made a binding commitment to a follow-on ten-year lease. That takes the contracted term to twenty years and adds about $5.2B of contracted revenue.",
       "rate": {
         "kind": "fixed",
         "value": 7.125,
@@ -1968,7 +1970,7 @@
       "maturity": "2030-11-15",
       "maturity_note": null,
       "seniority": "Senior secured, subsidiary-level; parent completion guarantee",
-      "security": "1st liens + equity + Fluidstack lockbox; Google warrant pledge; Barber Lake (Colorado City TX) 10-yr Fluidstack lease with Google backstop",
+      "security": "1st liens + equity + Fluidstack lockbox; Google warrant pledge; Barber Lake (Colorado City TX) 10-yr Fluidstack lease with Google backstop; follow-on 10-yr lease commitment from an unnamed AI lab (8-K 9/24/26)",
       "lenders": [
         "Morgan Stanley (representative, 144A)",
         "Wilmington Trust (trustee)"
@@ -1976,11 +1978,11 @@
       "status": "confirmed",
       "issued": "2025-11-13",
       "source": {
-        "doc": "8-K 11/13/25; add-on 8-K 11/24/25; Q2-26 10-Q (acc 0001819989-26-000041)",
+        "doc": "8-K 11/13/25; add-on 8-K 11/24/25; Q2-26 10-Q (acc 0001819989-26-000041); lease amendment 8-K 9/24/26 (filed 9/25/26), acc 0001819989-26-000043",
         "date": "2025-11-24",
         "url": "https://www.sec.gov/Archives/edgar/data/1819989/000095010325014692/dp237330_8k.htm"
       },
-      "as_of": "2026-06-30"
+      "as_of": "2026-09-24"
     },
     {
       "id": "cifr-6125-2031",
@@ -2214,11 +2216,11 @@
       "status": "confirmed",
       "issued": "2024-12-06",
       "source": {
-        "doc": "Q3 FY26 10-Q Note 16; FY25 10-K 8/28/25",
+        "doc": "Q3 FY26 10-Q Note 16; FY25 10-K 8/28/25; FY26 10-K Note 23 (6/30/26 balance), acc 0001878848-26-000052",
         "date": "2026-05-08",
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000026/iren-20260331.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "iren-conv-2029",
@@ -2248,11 +2250,11 @@
       "status": "confirmed",
       "issued": "2025-06-13",
       "source": {
-        "doc": "Q3 FY26 10-Q Note 16; FY25 10-K 8/28/25",
+        "doc": "Q3 FY26 10-Q Note 16; FY25 10-K 8/28/25; FY26 10-K Note 23 (6/30/26 balance), acc 0001878848-26-000052",
         "date": "2026-05-08",
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000026/iren-20260331.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "iren-conv-2031",
@@ -2282,11 +2284,11 @@
       "status": "confirmed",
       "issued": "2025-10-14",
       "source": {
-        "doc": "8-K 10/14/25",
+        "doc": "8-K 10/14/25; FY26 10-K Note 23 (6/30/26 balance), acc 0001878848-26-000052",
         "date": "2025-10-14",
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000114036125038083/ef20056955_8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "iren-conv-2032",
@@ -2316,11 +2318,11 @@
       "status": "confirmed",
       "issued": "2025-12-08",
       "source": {
-        "doc": "8-K 12/8/25",
+        "doc": "8-K 12/8/25; FY26 10-K Note 23 (6/30/26 balance), acc 0001878848-26-000052",
         "date": "2025-12-08",
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000114036125044888/ef20060782_8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "iren-conv-jun-2033",
@@ -2350,11 +2352,11 @@
       "status": "confirmed",
       "issued": "2025-12-08",
       "source": {
-        "doc": "8-K 12/8/25; Q2 FY26 10-Q",
+        "doc": "8-K 12/8/25; Q2 FY26 10-Q; FY26 10-K Note 23 (6/30/26 balance), acc 0001878848-26-000052",
         "date": "2025-12-08",
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000114036125044888/ef20060782_8k.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "iren-conv-dec-2033",
@@ -2372,7 +2374,7 @@
       "rate": {
         "kind": "fixed",
         "value": 1,
-        "note": "Conversion $73.07; capped calls to $110.30 ($201.3M — Santander, BMO, Citi, CACIB, Mizuho, Scotia, UBS)"
+        "note": "Effective 1.18% (FY26 10-K); Conversion $73.07; capped calls to $110.30 ($201.3M — Santander, BMO, Citi, CACIB, Mizuho, Scotia, UBS)"
       },
       "maturity": "2033-12-01",
       "maturity_note": null,
@@ -2384,11 +2386,11 @@
       "status": "confirmed",
       "issued": "2026-05-14",
       "source": {
-        "doc": "8-K 5/14/26",
+        "doc": "8-K 5/14/26; FY26 10-K Note 23 (6/30/26 balance), acc 0001878848-26-000052",
         "date": "2026-05-14",
         "url": "https://www.sec.gov/Archives/edgar/data/1878848/000114036126021285/ef20073507_8k.htm"
       },
-      "as_of": "2026-05-14"
+      "as_of": "2026-06-30"
     },
     {
       "id": "iren-hw3-ddtl",
@@ -2399,12 +2401,14 @@
       "entity": "IE US Hardware 3 LLC (borrower)",
       "name": "Hardware 3 DDTL (Microsoft-contract financing)",
       "instrument_type": "credit_facility",
-      "size_usd_m": 1550,
-      "size_note": "~$1.5B commitment. As at 6/30/26 (FY26 10-K): $413M funded, $1,132M unfunded commitment remaining subject to conditions precedent. Drawn in four tranches aligned to delivery milestones under the Microsoft Agreement; principal repayable monthly per the amortization schedule in the Credit Agreement. Size shown is the commitment, not the drawn balance. RATED (2026-06-01 close release): Fitch A / DBRS A (low) on the $3.65B package (USPP + DDTL, Microsoft offtake); company claims highest publicly rated GPU financing and first GPU financing in the US private placement market; blended cost of debt 6.00%. Non-recourse to the general credit of the Group except limited IREN Limited guarantees. Parent guarantees the SPV's pre-closing interest-rate and power hedge obligations tranche-by-tranche as drawn, callable only after demand on the SPV and expiry of the cure period, stepping down as each tranche transfers into the secured structure (Tranche 1 transferred; balance expected by end of calendar 2026). If Microsoft validly terminates a funded tranche and no replacement qualified customer is secured in the remarketing period, the Parent guarantees the debt and notes allocated to that tranche net of GPU disposition proceeds applied to prepayment, payable within five business days of demand, plus any upfront termination amount owed to Microsoft.",
+      "size_usd_m": 1545,
+      "size_note": "$1,545M commitment (Credit Agreement, EX-10.35). As at 6/30/26 (FY26 10-K): $413M funded, $1,132M unfunded commitment remaining subject to conditions precedent. Drawn in four tranches aligned to delivery milestones under the Microsoft Agreement; principal repayable monthly per the amortization schedule in the Credit Agreement. Size shown is the commitment, not the drawn balance. RATED (2026-06-01 close release): Fitch A / DBRS A (low) on the $3.65B package (USPP + DDTL, Microsoft offtake); company claims highest publicly rated GPU financing and first GPU financing in the US private placement market; blended cost of debt 6.00%. Non-recourse to the general credit of the Group except limited IREN Limited guarantees. Parent guarantees the SPV's pre-closing interest-rate and power hedge obligations tranche-by-tranche as drawn, callable only after demand on the SPV and expiry of the cure period, stepping down as each tranche transfers into the secured structure (Tranche 1 transferred; balance expected by end of calendar 2026). If Microsoft validly terminates a funded tranche and no replacement qualified customer is secured in the remarketing period, the Parent guarantees the debt and notes allocated to that tranche net of GPU disposition proceeds applied to prepayment, payable within five business days of demand, plus any upfront termination amount owed to Microsoft.",
       "rate": {
         "kind": "sofr_spread",
         "value": 2.25,
-        "note": "1-month SOFR + 2.25%, payable monthly in arrears; 0.40% on undrawn; hedged with JPM + J. Aron/GS"
+        "value_low": 2.25,
+        "value_high": 2.5,
+        "note": "Term SOFR plus a ratings grid (EX-10.35): 2.50% unrated; 2.375% at BBB (DBRS), Baa3 (Moody's) or BBB- (Fitch); 2.25% at A (low) (DBRS), A- (Fitch) or A3 (Moody's). Value shows the 2.25% tier, which matches the Fitch A and DBRS A (low) ratings below. Payable monthly in arrears; 0.40% undrawn fee; hedged with JPM + J. Aron/GS. FY26 10-K effective rate 7.12%; the 10-K debt table dates issuance 6/30/26."
       },
       "maturity": "2031-12-31",
       "maturity_note": "Or earlier on final Microsoft fee",
@@ -2418,9 +2422,9 @@
       "status": "confirmed",
       "issued": "2026-05-29",
       "source": {
-        "doc": "FY26 10-K (year ended 6/30/26), filed 8/27/26 — Note: GPU Financing",
+        "doc": "FY26 10-K (year ended 6/30/26), filed 8/27/26, Note 23 Debt; Credit Agreement EX-10.35, Note Purchase Agreement EX-10.36, Common Terms Agreement EX-10.37, Limited Parent Guarantees EX-10.38 and EX-10.54 (acc 0001878848-26-000052)",
         "date": "2026-08-27",
-        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm"
+        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/a1035creditagreement.htm"
       },
       "as_of": "2026-06-30",
       "facility_ratings": [
@@ -2451,7 +2455,7 @@
       "rate": {
         "kind": "fixed",
         "value": 5.96,
-        "note": "Fixed 5.96% per annum, payable monthly in arrears"
+        "note": "Fixed 5.96% per annum, payable monthly in arrears. FY26 10-K effective rate 7.05%; the 10-K debt table dates issuance 6/11/26."
       },
       "maturity": "2031-12-31",
       "maturity_note": null,
@@ -2464,9 +2468,9 @@
       "status": "confirmed",
       "issued": "2026-05-29",
       "source": {
-        "doc": "FY26 10-K (year ended 6/30/26), filed 8/27/26 — Note: GPU Financing",
+        "doc": "FY26 10-K (year ended 6/30/26), filed 8/27/26, Note 23 Debt; Credit Agreement EX-10.35, Note Purchase Agreement EX-10.36, Common Terms Agreement EX-10.37, Limited Parent Guarantees EX-10.38 and EX-10.54 (acc 0001878848-26-000052)",
         "date": "2026-08-27",
-        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm"
+        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/a1036notepurchaseagreeme.htm"
       },
       "as_of": "2026-06-30",
       "facility_ratings": [
@@ -2492,12 +2496,12 @@
       "entity": null,
       "name": "GPU leases (Aug 2025 36-mo; Nov 2025 24-mo Dell Financial)",
       "instrument_type": "lease",
-      "size_usd_m": 274.3,
-      "size_note": "$274.3M PV on balance sheet 3/31/26 ($101.8M B200/B300 + $199.8M Dell facility)",
+      "size_usd_m": 243.8,
+      "size_note": "$243.8M PV of finance lease liabilities at 6/30/26 (FY26 10-K Note 22), down from $274.3M at 3/31/26 ($101.8M B200/B300 + $199.8M Dell facility at that date). Weighted-average remaining term 1.9 years.",
       "rate": {
         "kind": "fixed",
-        "value": 9.7,
-        "note": "Implicit; portfolio weighted average 9.7% per filings"
+        "value": 9.9,
+        "note": "Implicit; weighted-average discount rate 9.9% at 6/30/26 (FY26 10-K)"
       },
       "maturity": "~2027–2028",
       "maturity_note": null,
@@ -2510,11 +2514,11 @@
       "status": "confirmed",
       "issued": "2025-08-23",
       "source": {
-        "doc": "FY25 10-K; Q2+Q3 FY26 10-Qs",
-        "date": "2026-05-08",
-        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000026/iren-20260331.htm"
+        "doc": "FY26 10-K Note 22, filed 8/27/26; FY25 10-K; Q2+Q3 FY26 10-Qs",
+        "date": "2026-08-27",
+        "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "iren-mackenzie-tl",
@@ -2645,11 +2649,11 @@
       "status": "confirmed",
       "issued": "2024-08-19",
       "source": {
-        "doc": "8-K 8/19/24; Q1-26 10-Q Note 6",
+        "doc": "8-K 8/19/24; Q1-26 10-Q Note 6; Q2-26 10-Q (6/30/26 balance), acc 0001839341-26-000014",
         "date": "2026-05-06",
         "url": "https://www.sec.gov/Archives/edgar/data/1839341/000162828024037702/core-20240813.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "corz-conv-2031",
@@ -2679,11 +2683,11 @@
       "status": "confirmed",
       "issued": "2024-12-05",
       "source": {
-        "doc": "8-K 12/5/24; 10-Q",
+        "doc": "8-K 12/5/24; 10-Q; Q2-26 10-Q (6/30/26 balance), acc 0001839341-26-000014",
         "date": "2024-12-05",
         "url": "https://www.sec.gov/Archives/edgar/data/1839341/000162828024050080/core-20241202.htm"
       },
-      "as_of": "2026-03-31"
+      "as_of": "2026-06-30"
     },
     {
       "id": "corz-7750-2031",
@@ -2828,7 +2832,7 @@
       "name": "7.875% Senior Secured Notes due 2031 (Sandersville GA, 175 MW; priced 9/18, closing 9/25)",
       "instrument_type": "bond",
       "size_usd_m": 2276,
-      "size_note": "Priced 2026-09-18 at 98.500% of principal in a Rule 144A / Regulation S private offering; closing expected 2026-09-25. Proceeds fund the remaining build-out of the Sandersville Facility, reimburse CleanSpark for prior equity contributions and fund debt service reserves. The facility is under a 20-year lease with two five-year extensions to a tenant the filings describe only as a \"high-investment grade, leading global technology company\": about $6.6B of contracted revenue over the initial term, 175 MW of critical IT load, deliveries expected from Q4 2027 (8-K 7/14/26).",
+      "size_note": "Priced 2026-09-18 at 98.500% of principal in a Rule 144A / Regulation S private offering; closing expected 2026-09-25. Proceeds fund the remaining build-out of the Sandersville Facility, reimburse CleanSpark for prior equity contributions and fund debt service reserves. The facility is under a 20-year lease with two five-year extensions to a tenant the filings describe only as a \"high-investment grade, leading global technology company\": about $6.6B of contracted revenue over the initial term, 175 MW of critical IT load, deliveries expected from Q4 2027 (8-K 7/14/26). The offering launched at $2.227B on 2026-09-17 (8-K EX-99.2) and was upsized at pricing. No closing 8-K was on EDGAR as of 2026-09-25.",
       "rate": {
         "kind": "fixed",
         "value": 7.875,
@@ -2848,7 +2852,7 @@
         "date": "2026-09-18",
         "url": "https://www.sec.gov/Archives/edgar/data/827876/000119312526395727/clsk-ex99_1.htm"
       },
-      "as_of": "2026-09-21",
+      "as_of": "2026-09-25",
       "offtaker_label": "Investment-grade technology tenant (unnamed in the filings)"
     },
     {
@@ -4147,7 +4151,7 @@
       "name": "5.00% Convertible Senior Notes due 2032",
       "instrument_type": "convertible",
       "size_usd_m": 310,
-      "size_note": "$310.0M, including full exercise of the initial purchasers' $40.0M option. Issued concurrently with an exchange of $198.15M of the 4.500% 2031 notes. A maximum of 11,451,803 ordinary shares may be issued on conversion at the 36.9413 maximum conversion rate. No capped call.",
+      "size_note": "$310.0M, including full exercise of the initial purchasers' $40.0M option. Issued concurrently with an exchange of $198.15M of the 4.500% 2031 notes. A maximum of 11,451,803 ordinary shares may be issued on conversion at the 36.9413 maximum conversion rate. No capped call. Net proceeds $298.5M (company investor presentation, 8-K 9/14/26 EX-99.1).",
       "rate": {
         "kind": "fixed",
         "value": 5,
@@ -4163,11 +4167,11 @@
       "status": "confirmed",
       "issued": "2026-08-21",
       "source": {
-        "doc": "8-K Items 1.01/2.03/3.02/8.01 (event 2026-08-18, filed 2026-08-21), acc 0001213900-26-092599; Indenture dated 2026-08-21",
+        "doc": "8-K Items 1.01/2.03/3.02/8.01 (event 2026-08-18, filed 2026-08-21), acc 0001213900-26-092599; Indenture dated 2026-08-21; net proceeds from 8-K 9/14/26 EX-99.1, acc 0001213900-26-099424",
         "date": "2026-08-21",
         "url": "https://www.sec.gov/Archives/edgar/data/2042022/000121390026092599/ea0302925-8k_white.htm"
       },
-      "as_of": "2026-08-24"
+      "as_of": "2026-09-14"
     },
     {
       "id": "wyfi-landsbankinn",
@@ -5811,22 +5815,24 @@
       "id": "cerebras-revolver",
       "collateral_class": "secured_undisclosed",
       "issuer": "Cerebras Systems",
-      "ticker": null,
-      "issuer_type": "private",
+      "ticker": "CBRS",
+      "issuer_type": "public",
       "entity": null,
       "name": "Syndicated revolving credit facility",
       "instrument_type": "credit_facility",
       "size_usd_m": 850,
-      "size_note": "Per 10-Q: $250M LC-only at signing Apr 14, 2026 → full $850M for general corporate purposes after IPO conditions met Jun 17, 2026",
+      "size_note": "Per 10-Q: $250M LC-only at signing Apr 14, 2026 → full $850M for general corporate purposes after IPO conditions met Jun 17, 2026 No borrowings at 6/30/26. Liquidity covenant: unrestricted cash plus undrawn commitments of at least $150.0M at each quarter end (Q2-26 10-Q).",
       "rate": {
-        "kind": "floating_other",
-        "value": null,
-        "note": "Variable (base/term rate + undisclosed margins) + commitment fees"
+        "kind": "sofr_spread",
+        "value": 2.25,
+        "value_low": 2.0,
+        "value_high": 2.25,
+        "note": "From the 6/17/26 Phase Two date: Term SOFR + 2.25% (or a base rate), stepping down to 2.00% on an enhanced debt to EBITDA ratio; 0.375% commitment fee on undrawn commitments. Before that date: SOFR + 1.50% and a 0.250% fee (Q2-26 10-Q)."
       },
-      "maturity": "~2031-04",
-      "maturity_note": "5-year",
+      "maturity": "2031-04-14",
+      "maturity_note": "Five-year term (Q2-26 10-Q)",
       "seniority": "Secured corporate revolver + guaranty",
-      "security": "LCs to DC landlords/developers pre-IPO; not a GPU-SPV",
+      "security": "From the 6/17/26 Phase Two date, liens on substantially all assets, with carveouts that include securitization and leased infrastructure assets. Before that date, cash collateral only, backing LCs to data-center landlords and developers.",
       "lenders": [
         "Morgan Stanley (JLA; MS Senior Funding admin + collateral agent)",
         "Citi",
@@ -5841,11 +5847,11 @@
       "status": "confirmed",
       "issued": "2026-04-15",
       "source": {
-        "doc": "cerebras.ai release + SEC 10-Q",
-        "date": "2026-04-15",
-        "url": "https://www.cerebras.ai/press-release/cerebras-systems-closes-usd850-million-revolving-credit-facility"
+        "doc": "cerebras.ai release 2026-04-15; Q2-26 10-Q filed 2026-08-12, acc 0001628280-26-056357 (Liquidity; Note 10)",
+        "date": "2026-08-12",
+        "url": "https://www.sec.gov/Archives/edgar/data/2021728/000162828026056357/cbrs-20260630.htm"
       },
-      "as_of": "2026-06-17"
+      "as_of": "2026-06-30"
     },
     {
       "id": "xai-ms-package",
@@ -5857,14 +5863,14 @@
       "name": "Morgan Stanley-led secured debt package ($3B senior secured notes + $1B fixed-rate TL + $1B TLB)",
       "instrument_type": "bond",
       "size_usd_m": 5000,
-      "size_note": "Oversubscribed; $3B notes + $1B fixed TL + $1B TLB",
+      "size_note": "Oversubscribed; $3B notes + $1B fixed TL + $1B TLB. Notes issued at 100% of principal. REPAID IN FULL in March 2026 with proceeds of the $20,000M SpaceX Bridge Loan (dated 2026-03-02, Goldman Sachs Bank USA as agent). The exact repayment day is not stated. SpaceX booked a $1,526M loss on extinguishment in Q1 2026, which also covers the repaid X term loans. xAI is now a SpaceX subsidiary (SpaceX Form S-1).",
       "rate": {
         "kind": "fixed",
         "value": 12.5,
-        "note": "Notes 12.5% (raised from 12%); fixed TL 12.5%; TLB SOFR+7.25 @ 96 OID (from S+700 @ 97). Pricing press-reported (Reuters); maturities not captured. Bloomberg reported (Mar 2, 2026) post SpaceX–xAI combination plan to repay ~$17.5B of X/xAI debt in full — press"
+        "note": "Filed: notes and fixed TL 12.50%; floating TL Term SOFR + 7.25% (or ABR + 6.25%). Call prices 106.25% before 2027-07-15, then 103.13% before 2028-07-15 (SpaceX Form S-1). TLB OID of 96 (from S+700 at 97) is press-reported (Reuters)."
       },
-      "maturity": "Not captured",
-      "maturity_note": null,
+      "maturity": "2030-06-30",
+      "maturity_note": "All three tranches due 2030-06-30 (SpaceX Form S-1). Repaid in March 2026 from the SpaceX Bridge Loan.",
       "seniority": "Corporate-level secured",
       "security": "Specific collateral pool undisclosed; Colossus (Memphis) buildout",
       "lenders": [
@@ -5873,11 +5879,11 @@
       "status": "confirmed",
       "issued": "2025-07-01",
       "source": {
-        "doc": "Morgan Stanley statement (completion); Reuters (pricing)",
-        "date": "2025-07-01",
-        "url": "https://x.com/MorganStanley/status/1939768047780172184"
+        "doc": "SpaceX Form S-1 filed 2026-05-20, acc 0001628280-26-036936, Note 10 Debt (terms, maturity, repayment); Morgan Stanley statement 2025-07-01 (completion); Reuters (TLB pricing)",
+        "date": "2026-05-20",
+        "url": "https://www.sec.gov/Archives/edgar/data/0001181412/000162828026036936/spaceexplorationtechnologi.htm"
       },
-      "as_of": "2026-07-02"
+      "as_of": "2026-05-20"
     },
     {
       "id": "xai-valor-program",
@@ -5891,7 +5897,7 @@
       "name": "Valor GPU SPV program (context)",
       "instrument_type": "lease",
       "size_usd_m": 20000,
-      "size_note": "~$20B program: ~$12.5B debt + ~$7.5B equity (incl. up to $2B NVIDIA) — program scale partly rumored; no confirmed close of the full program through 2026-08-09. DISTINCT from xAI's $20B Series E equity round (closed 2026-01-06, xAI PR) — do not conflate",
+      "size_note": "~$20B program: ~$12.5B debt + ~$7.5B equity (incl. up to $2B NVIDIA) — program scale partly rumored; no confirmed close of the full program through 2026-08-09. DISTINCT from xAI's $20B Series E equity round (closed 2026-01-06, xAI PR) — do not conflate Filed (SpaceX Q2-26 10-Q, Notes 9 and 17): at 6/30/26, debt recorded for equipment leases with Valor was $2,039M current plus $11,290M non-current, across three failed sale-leasebacks ($455M plus $4,052M at 12/31/25). Interest expense on these leases was $327M in Q2-26 and $513M in 1H26. The April 2026 lease's own principal is not stated. Valor is a related party: its founder Antonio Gracias is a SpaceX director. The filing does not state a program size.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -5908,11 +5914,11 @@
       "status": "press",
       "issued": "Reported 2025-10-16",
       "source": {
-        "doc": "Bloomberg Oct 16, 2025; The Information — program scale partly RUMORED; Jan/Feb 2026 Apollo tranches are the confirmed transactions under it",
+        "doc": "Bloomberg Oct 16, 2025; The Information (program scale partly RUMORED; Jan/Feb 2026 Apollo tranches are the confirmed transactions under it); SpaceX Q2-26 10-Q filed 2026-08-04, acc 0001628280-26-052535, Notes 9 and 17 (filed lease debt)",
         "date": "2025-10-16",
         "url": "https://finance.yahoo.com/news/musk-xai-pursuing-20-billion-180400834.html"
       },
-      "as_of": "2026-07-02"
+      "as_of": "2026-06-30"
     },
     {
       "id": "xai-apollo-vci",
@@ -5924,7 +5930,7 @@
       "name": "Apollo $3.5B capital solution → Valor Compute Infrastructure LP",
       "instrument_type": "lease",
       "size_usd_m": 3500,
-      "size_note": "$3.5B Apollo-managed funds backing a $5.4B total transaction",
+      "size_note": "$3.5B Apollo-managed funds backing a $5.4B total transaction SpaceX's Form S-1 (2026-05-20) describes a November 2025 sale-leaseback of AI infrastructure assets by CTC Property LLC, an xAI subsidiary, with Valor. It is booked as a failed sale-leaseback, and X.AI Corp. guarantees some of CTC's lease obligations. Debt recorded at 12/31/25: $455M current plus $4,052M non-current. The filing does not name Apollo or Valor Compute Infrastructure LP.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -5932,7 +5938,7 @@
       },
       "maturity": "Undisclosed",
       "maturity_note": null,
-      "seniority": "GPU-backed, asset-based SPV; off xAI's balance sheet",
+      "seniority": "GPU-backed, asset-based SPV lease; the filed Valor lease is recorded as debt on the xAI (SpaceX) balance sheet",
       "security": "VCI LP acquires GB200 compute and leases to an xAI subsidiary under triple-net lease; supports xAI's second data center (press ties to Colossus 2, Memphis). No \"Diablo\" site corroborated — treat that name as unverified",
       "lenders": [
         "Apollo (capital solution)",
@@ -5941,11 +5947,11 @@
       "status": "confirmed",
       "issued": "Closed; PR 2026-01-07 (funds provided ~Nov 2025 per The Information)",
       "source": {
-        "doc": "Apollo press release",
+        "doc": "Apollo press release 2026-01-07; SpaceX Form S-1 filed 2026-05-20, acc 0001628280-26-036936, Notes 10 and 18",
         "date": "2026-01-07",
         "url": "https://www.apollo.com/insights-news/pressreleases/2026/01/apollo-backs-5-4-billion-valor-and-xai-data-center-compute-infrastructure-transaction-with-3-5-billion-capital-solution-3214463"
       },
-      "as_of": "2026-07-02",
+      "as_of": "2026-05-20",
       "offtaker_label": "xAI subsidiary (triple-net lease)"
     },
     {
@@ -6677,7 +6683,7 @@
       "name": "$18B project loan - Jupiter campus (Stargate)",
       "instrument_type": "credit_facility",
       "size_usd_m": 18000,
-      "size_note": "$18B bank loan reported secured early Nov 2025 (~20-bank group). Separate: Dona Ana County authorized a $165B industrial revenue bond conduit ceiling - an authorization, not an issuance; never count it",
+      "size_note": "$18B bank loan reported secured early Nov 2025 (~20-bank group). Separate: Dona Ana County authorized a $165B industrial revenue bond conduit ceiling - an authorization, not an issuance; never count it Press (FT, relayed by ts2.tech on 2026-09-20): the $18B loans were quoted at 89-91 cents, and banks reportedly struggled to distribute them. Press (Bloomberg Law, 2026-09-24): Oracle sent a force majeure notice to Blue Owl's Stack Infrastructure unit. A person familiar said Oracle could win a rent delay of up to three years. The site's gas pipeline faced repeated permit denials and was delayed to Feb 1, 2027. Oracle said such notices are commonplace at this scale. Stack said the notice does not change the financial commitments.",
       "rate": {
         "kind": "sofr_spread",
         "value": 2.5,
@@ -6688,16 +6694,17 @@
       "seniority": "Project-level",
       "security": "Jupiter hyperscale AI campus, Santa Teresa NM; Oracle Cloud Infrastructure 18-yr lease, OpenAI primary end user (Stargate)",
       "lenders": [
-        "~20-bank group; SMBC, BNP Paribas, Goldman Sachs, MUFG admin agents (press)"
+        "~20-bank group; SMBC, BNP Paribas, Goldman Sachs, MUFG admin agents (press)",
+        "Banco Santander, Jefferies (syndicate members, press: FT via ts2.tech 2026-09-20)"
       ],
       "status": "press",
       "issued": "Reported 2025-11-10",
       "source": {
-        "doc": "Bloomberg-derived press (loan, pricing); DCD 9/25 (Oracle 18-yr lease reveal); ABQ Journal (campus, IRB)",
+        "doc": "Bloomberg-derived press (loan, pricing); DCD 9/25 (Oracle 18-yr lease reveal); ABQ Journal (campus, IRB); FT via ts2.tech 2026-09-20 (loan quotes); Bloomberg Law 2026-09-24 (force majeure notice)",
         "date": "2025-11-10",
         "url": "https://www.datacenterdynamics.com/en/news/oracle-revealed-as-tenant-of-project-jupiter-data-center-campus-in-new-mexico/"
       },
-      "as_of": "2026-08-09"
+      "as_of": "2026-09-24"
     },
     {
       "id": "galaxy-helios1-facility",
@@ -6846,11 +6853,11 @@
       "issuer": "Cloud Capital (Realty Income JV)",
       "ticker": null,
       "issuer_type": "private",
-      "entity": "Cloud Capital ABS Master Trust (programmatic JV with Realty Income + a global institutional investor; seed assets >$6B)",
-      "name": "$520M master-trust ABS - Amazon-leased hyperscale data centers",
+      "entity": "Lohrasp Enterprise II LLC, Series 2026-1 (issuer, per KBRA); Cloud Capital ABS Master Trust (programmatic JV with Realty Income + a global institutional investor; seed assets >$6B)",
+      "name": "$520M master-trust ABS - 80 MW Northern Virginia hyperscale data center",
       "instrument_type": "bond",
       "size_usd_m": 520,
-      "size_note": "$520M inaugural issuance from the new master trust, 7/29/26; first DC ABS rated triple-A by three agencies (Fitch/DBRS/KBRA); collateral Amazon-leased hyperscale DCs. A separate ~$1.325B Cloud Capital ABS reported earlier in 2026 (DCD) is NOT yet carried - date/entity unverified",
+      "size_note": "$520M inaugural issuance from the new master trust, 7/29/26; first DC ABS rated triple-A by three agencies (Fitch/DBRS/KBRA). Collateral is one 80 MW data center (LC3, Loudoun County, VA) leased to one unnamed investment-grade hyperscaler. About 13.8 years of lease term remain, and annualized adjusted base rent is about $65.1M (KBRA preliminary report, 2026-07-07). A separate ~$1.325B Cloud Capital ABS reported earlier in 2026 (DCD) is NOT yet carried - date/entity unverified",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -6859,18 +6866,20 @@
       "maturity": "Undisclosed",
       "maturity_note": null,
       "seniority": "Senior secured (securitization)",
-      "security": "Amazon-leased hyperscale data centers (master trust collateral pool)",
+      "security": "One 80 MW data center (LC3, Loudoun County, VA): fee simple interest and a mortgage; leased to an unnamed investment-grade hyperscaler",
       "lenders": [
-        "Bookrunners not named in release"
+        "Guggenheim Securities (sole structuring advisor, sole active bookrunner)",
+        "Deutsche Bank Securities (passive bookrunner)",
+        "Morgan Stanley (passive bookrunner)"
       ],
       "status": "confirmed",
       "issued": "2026-07-29",
       "source": {
-        "doc": "Cloud Capital release 7/29/26; Realty Income JV release (program, seed >$6B)",
+        "doc": "Cloud Capital release 7/29/26; Realty Income JV release (program, seed >$6B); KBRA preliminary ratings, Lohrasp Enterprise II LLC Series 2026-1 (2026-07-07)",
         "date": "2026-07-29",
         "url": "https://www.prnewswire.com/news-releases/cloud-capital-launches-new-data-center-abs-master-trust-completes-520-million-triple-a-rated-issuance-302838401.html"
       },
-      "as_of": "2026-08-09"
+      "as_of": "2026-09-25"
     },
     {
       "id": "databank-hyperscale-2025",
@@ -6881,10 +6890,10 @@
       "ticker": null,
       "issuer_type": "private",
       "entity": "DataBank hyperscale master trust (separate from its colocation ABS program)",
-      "name": "$1.1B hyperscale master-trust securitization (green)",
+      "name": "$1.07B hyperscale master-trust securitization (green)",
       "instrument_type": "bond",
-      "size_usd_m": 1100,
-      "size_note": "$1.1B, 9/24/25; first Moody's-rated data-center ABS (dual S&P/Moody's), green framework; collateral is DataBank's hyperscale (AI-tenant) footprint. DataBank's multi-tenant COLO securitizations (2024-1 $456M, Jan-26 $665M) are outside the AI-linked landlord scope and not carried",
+      "size_usd_m": 1067,
+      "size_note": "$1,067M: Class A-2 $975M (S&P A-, Moody's A3) plus Class B $92M (S&P BBB-); the release headline rounds to $1.1B. 9/24/25; first data-center ABS dual-rated by S&P and Moody's, green framework. Refinances loans on three facilities leased almost entirely to hyperscale and emerging hyperscale providers: ATL4, IAD3 and LGA3. DataBank's multi-tenant COLO securitizations (2024-1 $456M, Jan-26 $665M) are outside the AI-linked landlord scope and not carried",
       "rate": {
         "kind": "undisclosed",
         "value": null,
@@ -6893,9 +6902,11 @@
       "maturity": "Undisclosed",
       "maturity_note": null,
       "seniority": "Senior secured (securitization)",
-      "security": "Hyperscale data centers and associated tenant leases (master trust)",
+      "security": "ATL4, IAD3 and LGA3 hyperscale data centers and associated tenant leases (master trust)",
       "lenders": [
-        "Bookrunners not named in release"
+        "Deutsche Bank Securities (structuring agent, joint active bookrunner)",
+        "Guggenheim Securities (joint active bookrunner)",
+        "TD Securities (joint active bookrunner)"
       ],
       "status": "confirmed",
       "issued": "2025-09-24",
@@ -6904,7 +6915,7 @@
         "date": "2025-09-24",
         "url": "https://www.prnewswire.com/news-releases/databank-raises-1-1-billion-in-hyperscale-asset-securitization-302565290.html"
       },
-      "as_of": "2026-08-09"
+      "as_of": "2026-09-25"
     },
     {
       "as_of": "2026-08-27",
@@ -7182,11 +7193,11 @@
       "name": "Residual value guaranties — PORTS-Pike leases (payment obligation capped at $105B)",
       "instrument_type": "other",
       "size_usd_m": 105000,
-      "size_note": "Not a principal amount. $105B is the cumulative cap on NVIDIA's aggregate payment obligation for its initial commitment under multiple residual value guaranties covering ~4.25 GW of IT load in the aggregate. NVIDIA may provide credit support for ~3.8 GW more at its sole discretion; that increment is an option, not an obligation, and is not included in the $105B. An Agreement generally becomes effective only on commencement of the applicable lease; payment obligations are further conditioned on the Lessor satisfying ready-for-service conditions, expected to begin in 2028. On a Trigger Event (OpenAI insolvency causing a lease default, or OpenAI payment failure) NVIDIA pays the shortfall between the guaranteed minimum lease value and amounts recovered through a replacement lease or sale, and may elect to assume the lease, require reletting, initiate a sale, allow termination, or defer remedies up to one year while paying specified project agreement costs. OpenAI has agreed to reimburse and indemnify NVIDIA for all amounts actually paid. Distinct from the NVIDIA $500B financing platforms announced 2026-08-10 with Apollo, BlackRock, Blackstone, Brookfield, Goldman Sachs and KKR: those are memorandums of understanding, no 8-K was filed for them, and no facility has priced or closed under any of them. SB Energy is not one of the six. Press in July 2026 reported a guarantee of \"over $250B\" for this site; the filed cap for the initial commitment is $105B. Separately, and equity rather than debt: NVIDIA will invest $1.5B in SB Energy. Form of Residual Value Guaranty filed as Exhibit 10.1 to the 10-Q for the quarter ended 2026-07-26 (filed 2026-08-26). 10-Q Note 10 adds: guarantee amounts increase as each of nine construction phases completes, the first expected in fiscal year 2029; the guarantees \"are limited to defined portions of lease and power payments and not the full cost of the site or all of the tenant's obligations\"; the amount \"is expected to decrease over the course of each phase's 20-year lease term\"; \"In exchange for the guarantees, the site will exclusively host NVIDIA AI infrastructure, subject to limited exceptions.\" Maximum gross exposure table: SB Energy guarantees $105.0B; total guarantees $108.5B including $3.5B AI-cloud land/power/shell guarantees. No liability or fee disclosed.",
+      "size_note": "Not a principal amount. $105B is the cumulative cap on NVIDIA's aggregate payment obligation for its initial commitment under multiple residual value guaranties covering ~4.25 GW of IT load in the aggregate. NVIDIA may provide credit support for ~3.78 GW-IT more at its sole discretion; that increment is an option, not an obligation, and is not included in the $105B. An Agreement generally becomes effective only on commencement of the applicable lease; payment obligations are further conditioned on the Lessor satisfying ready-for-service conditions, expected to begin in 2028. On a Trigger Event (OpenAI insolvency causing a lease default, or OpenAI payment failure) NVIDIA pays the shortfall between the guaranteed minimum lease value and amounts recovered through a replacement lease or sale, and may elect to assume the lease, require reletting, initiate a sale, allow termination, or defer remedies up to one year while paying specified project agreement costs. OpenAI has agreed to reimburse and indemnify NVIDIA for all amounts actually paid. Distinct from the NVIDIA $500B financing platforms announced 2026-08-10 with Apollo, BlackRock, Blackstone, Brookfield, Goldman Sachs and KKR: those are memorandums of understanding, no 8-K was filed for them, and no facility has priced or closed under any of them. SB Energy is not one of the six. Press in July 2026 reported a guarantee of \"over $250B\" for this site; the filed cap for the initial commitment is $105B. Separately, and equity rather than debt: NVIDIA will invest $1.5B in SB Energy. Form of Residual Value Guaranty filed as Exhibit 10.1 to the 10-Q for the quarter ended 2026-07-26 (filed 2026-08-26). 10-Q Note 10 adds: guarantee amounts increase as each of nine construction phases completes, the first expected in fiscal year 2029; the guarantees \"are limited to defined portions of lease and power payments and not the full cost of the site or all of the tenant's obligations\"; the amount \"is expected to decrease over the course of each phase's 20-year lease term\"; \"In exchange for the guarantees, the site will exclusively host NVIDIA AI infrastructure, subject to limited exceptions.\" Maximum gross exposure table: SB Energy guarantees $105.0B; total guarantees $108.5B including $3.5B AI-cloud land/power/shell guarantees. No liability disclosed. SB Energy S-1/A No. 2 (2026-09-21) adds: on 2026-08-17, 17 SB Energy subsidiaries signed 17 leases with an OpenAI affiliate covering about 8.0 GW-IT at the PORTS-Pike Technology Campus. Each lease has a 20-year initial term and four five-year tenant extension options. If NVIDIA does not guarantee the remaining 3.78 GW-IT by a date certain, OpenAI must find a replacement guarantor rated A- or better by S&P (or the Moody's equivalent). SB Energy says it did \"not offer and do not owe any compensation to NVIDIA\" for the guaranties; OpenAI compensates NVIDIA under a separate agreement.",
       "rate": {
         "kind": "undisclosed",
         "value": null,
-        "note": "No rate. A contingent shortfall guaranty carries no coupon or spread. Any guaranty fee is not disclosed."
+        "note": "No rate. A contingent shortfall guaranty carries no coupon or spread. SB Energy owes NVIDIA no fee. OpenAI compensates NVIDIA under a separate agreement whose terms are not disclosed (SB Energy S-1/A, 2026-09-21)."
       },
       "maturity": "Earliest of: 20th anniversary of commencement of the applicable lease; termination of the applicable lease by OpenAI per its terms; OpenAI achieving a satisfactory credit rating; other customary termination events",
       "maturity_note": "Per-lease, not a single date. The credit-rating release is the notable term: the guaranty extinguishes if the tenant becomes rated to a satisfactory standard.",
@@ -7198,11 +7209,11 @@
       "status": "confirmed",
       "issued": "2026-08-17",
       "source": {
-        "doc": "10-Q for the quarter ended 2026-07-26, Note 10 Commitments and Contingencies (Guarantees) and Exhibit 10.1 Form of Residual Value Guaranty, filed 2026-08-26, acc 0001045810-26-000075; originally 8-K Items 1.01/2.03 filed 2026-08-17, acc 0001045810-26-000069",
+        "doc": "10-Q for the quarter ended 2026-07-26, Note 10 Commitments and Contingencies (Guarantees) and Exhibit 10.1 Form of Residual Value Guaranty, filed 2026-08-26, acc 0001045810-26-000075; originally 8-K Items 1.01/2.03 filed 2026-08-17, acc 0001045810-26-000069; SB Energy S-1/A No. 2 filed 2026-09-21, acc 0001628280-26-062846",
         "date": "2026-08-26",
         "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"
       },
-      "as_of": "2026-08-26",
+      "as_of": "2026-09-21",
       "offtaker_label": "OpenAI lease (unrated tenant; guaranty releases on a satisfactory rating)"
     },
     {
@@ -8071,13 +8082,18 @@
       "collateral_class": "landlord_spv",
       "exclude_from_issuance": true,
       "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
-      "as_of": "2026-09-06",
+      "as_of": "2026-09-25",
       "maturity_note": null,
       "facility_ratings": [
         {
           "agency": "Moody's",
           "grade": "Ba2",
           "public": "2026-08"
+        },
+        {
+          "agency": "S&P",
+          "grade": "BB (preliminary)",
+          "public": "2026-08-13"
         }
       ],
       "id": "zenith-arc-2031",
@@ -8086,7 +8102,7 @@
       "name": "$2.25B senior secured green notes due 2031 (149 MW Oklahoma facility; Jane Street 15-year lease)",
       "instrument_type": "bond",
       "size_usd_m": 2250,
-      "size_note": "Priced 2026-08-13 (briefs.co, Bloomberg, IFR): talk 'high-8% area', priced at 99.5 to yield almost 9% at the wide end of discussions; IFR: 'Zenith faces buyside pushback in latest data centre bond'. Moody's Ba2 corporate family and notes, stable, citing construction risk and a high loan-to-cost ratio. Funds development and construction of a 149 MW data center and substation in Central Oklahoma. Tenant JS Data Center LLC, a Jane Street Group subsidiary, under a 15-year absolute triple-net lease with a Jane Street lease guaranty. Sources call it a compute facility; AI use is not stated. Bookrunners not named in accessible sources.",
+      "size_note": "Priced 2026-08-13 (briefs.co, Bloomberg, IFR): talk 'high-8% area', priced at 99.5 to yield almost 9% at the wide end of discussions; IFR: 'Zenith faces buyside pushback in latest data centre bond'. Moody's Ba2 corporate family and notes, stable, citing construction risk and a high loan-to-cost ratio. Funds development and construction of a 149 MW data center and substation in Central Oklahoma. Tenant JS Data Center LLC, a Jane Street Group subsidiary, under a 15-year absolute triple-net lease with a Jane Street lease guaranty. Sources call it a compute facility; AI use is not stated. Bookrunners not named in accessible sources. S&P (2026-08-13) assigned a preliminary 'BB' rating, outlook positive, to proposed senior secured notes \"for up to $2.25 billion maturing in 2031\". Jane Street Group's rating (BB/Positive) caps it. S&P adds: the 15-year triple-net lease has 3% annual escalators and two five-year renewals, with all tenant payments guaranteed by Jane Street Group. Prairieland LLC provides a $150M parent completion guaranty. Alston holds an approximately $1.2B GMP contract. Minimum DSCR is about 1.18x, falling to 1.13x at the 2031 balloon. Data halls are due in Q4 2027 and Q4 2028. The $2.25B final size remains press: S&P's figure is a ceiling, and no final S&P rating was found.",
       "rate": {
         "kind": "fixed",
         "value": 9.0,
@@ -8101,7 +8117,7 @@
       "status": "press",
       "issued": "2026-08-13",
       "source": {
-        "doc": "briefs.co 'Market-making giant's lease guaranty anchors $2.25B data center bond' (2026-08-13); IFR 'Zenith preps junk bond to fund Jane Street-backed data center'; Bloomberg 2026-08-13; Moody's Ba2 rating release (referenced, not on file)",
+        "doc": "briefs.co 'Market-making giant's lease guaranty anchors $2.25B data center bond' (2026-08-13); IFR 'Zenith preps junk bond to fund Jane Street-backed data center'; Bloomberg 2026-08-13; Moody's Ba2 rating release (referenced, not on file); S&P preliminary rating release 2026-08-13 (spglobal.com/ratings, article 3611194)",
         "date": "2026-08-13",
         "url": "https://www.briefs.co/news/market-making-giant-s-lease-guaranty-anchors-2-25b-data-cent/"
       },
@@ -8227,34 +8243,36 @@
       "issuer_type": "private",
       "collateral_class": "landlord_spv",
       "exclude_from_issuance": true,
-      "exclude_reason": "Not launched: Goldman Sachs sounding out investors 2026-08-19; expected in market September 2026. Re-checked 2026-09-16: no launch or pricing found.",
-      "as_of": "2026-09-16",
-      "maturity_note": "Undisclosed",
+      "exclude_reason": "Secured by a data-center campus lease, not GPUs. Priced 2026-09-23 per press; no issuer release.",
+      "as_of": "2026-09-23",
+      "maturity_note": "Five-year notes (press); maturity date not reported",
       "facility_ratings": [],
       "id": "digital-drive-coreweave-bond-2026",
       "issuer": "Digital Drive project (PowerHouse Data Centers / Chirisa Technology Parks; Blue Owl equity)",
       "entity": "Digital Drive, Chesterfield County, Virginia",
-      "name": "~$1.15B speculative-grade bond (pre-marketing; CoreWeave leases)",
+      "name": "$1.1B five-year notes (priced 9/23; CoreWeave lease)",
       "instrument_type": "bond",
-      "size_usd_m": 1150,
-      "size_note": "Bloomberg 2026-08-19 (via briefs.co): Goldman Sachs sounding out investors for a roughly $1.15B speculative-grade bond backed by long-term CoreWeave leases at the Digital Drive site (104 acres, five facilities, initial 300 MW, first building Q3 2027); 'nothing is final', expected to hit the market in September. Developers PowerHouse Data Centers (American Real Estate Partners) and Chirisa; Blue Owl Capital funds provide the $5B JV equity. Recorded as rumored.",
+      "size_usd_m": 1100,
+      "size_note": "Press (Bloomberg 2026-09-23, via briefs.co): priced $1.1B of five-year notes at 98.5 to yield 9.25%. S&P rated the notes BB-, as quoted by press (S&P page not on file): \"Exposure to a single, speculative-grade tenant remains the key risk.\" Sponsors are affiliates of Blue Owl Capital, Cedarwood Investment Group LP and PowerHouse Data Centers LLC. Collateral is 76 MW of IT capacity at the Digital Drive campus near Richmond, VA, leased to CoreWeave for 15 years under a $2.94B contract, with operations expected in 2027-28. The 8/19 pre-marketing report cited an initial 300 MW for the site and a roughly $1.15B size (Bloomberg via briefs.co). Coupon not reported.",
       "rate": {
-        "kind": "undisclosed",
-        "value": null,
-        "note": "Not disclosed (not launched)"
+        "kind": "fixed",
+        "value": 9.25,
+        "note": "Yield 9.25% at 98.5 (press); coupon not reported"
       },
       "maturity": null,
       "seniority": "Undisclosed",
-      "security": "Digital Drive campus; long-term CoreWeave leases (press)",
+      "security": "76 MW at the Digital Drive campus; 15-year CoreWeave lease (press)",
       "lenders": [
-        "Goldman Sachs (sounding out investors)"
+        "Goldman Sachs (lead, press)",
+        "Citigroup (lead, press)",
+        "Deutsche Bank (lead, press)"
       ],
-      "status": "rumored",
-      "issued": "Pre-marketing (2026-08-19)",
+      "status": "press",
+      "issued": "2026-09-23",
       "source": {
-        "doc": "Bloomberg 'Goldman Sounds Out Investors for CoreWeave-Tied Data Center Bond' (2026-08-19, via briefs.co)",
-        "date": "2026-08-19",
-        "url": "https://www.briefs.co/news/goldman-sachs-explores-1-15b-bond-sale-for-coreweave-data-ce/"
+        "doc": "Bloomberg 'CoreWeave-Tied Data Center Raises $1.1 Billion in Junk Bonds' (2026-09-23, via briefs.co); Bloomberg 2026-08-19 (pre-marketing, via briefs.co)",
+        "date": "2026-09-23",
+        "url": "https://www.briefs.co/news/blue-owl-backed-data-center-borrower-lands-1-1-billion-with/"
       },
       "offtaker_label": "CoreWeave (long-term leases)",
       "exclude_from_totals": true
@@ -8305,7 +8323,7 @@
       "name": "BIT Assets Collateralized Loan and additional facilities (related party)",
       "instrument_type": "credit_facility",
       "size_usd_m": 700,
-      "size_note": "April 2025 facility up to $400.0M (upsized July/October 2025 from $200.0M) plus $300.0M of additional facilities (October 2025 $100.0M; December 2025, January, February and March 2026 $50.0M each); all drawn in full as of the 20-F date. Each drawdown repays in fixed monthly instalments over 24 months. Related-party long-term borrowings $521.8M at 12/31/25; $545.6M long-term plus $167.8M short-term at 3/31/26; $633.1M at 6/30/26 (Q1/Q2-26 6-Ks). Separately, a BTC Collateralized Loan with BIT Group (up to $400.0M, fixed 8.35%, Bitcoin collateral) was drawn $118.0M and fully repaid as of the 20-F date.",
+      "size_note": "April 2025 facility up to $400.0M (upsized July/October 2025 from $200.0M) plus $300.0M of additional facilities (October 2025 $100.0M; December 2025, January, February and March 2026 $50.0M each); all drawn in full as of the 20-F date. Each drawdown repays in fixed monthly instalments over 24 months. Related-party long-term borrowings $521.8M at 12/31/25; $545.6M long-term plus $167.8M short-term at 3/31/26; $633.1M at 6/30/26 (Q1/Q2-26 6-Ks). Separately, a BTC Collateralized Loan with BIT Group (up to $400.0M, fixed 8.35%, Bitcoin collateral) was drawn $118.0M and fully repaid as of the 20-F date. The Q2-26 6-K's non-cash disclosures also show in-kind related-party borrowings in digital assets of $316.6M in 1H26, with $242.4M repaid in digital assets.",
       "rate": {
         "kind": "floating_other",
         "value": null,
