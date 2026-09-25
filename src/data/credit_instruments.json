@@ -112,7 +112,7 @@
       "maturity": "2031-03",
       "maturity_note": "Quarterly amortization from Jul 2026",
       "seniority": "Senior secured (SPV); DDTL 2.0 collateral package",
-      "security": "DDTL 2.0 collateral package; filed advance rates for this tranche: 90% of Albatross and 75% of OpenAI capital expenditures (both counterparties named in the conformed agreement), net of six-year straight-line depreciation",
+      "security": "DDTL 2.0 collateral package; filed advance rates for this tranche: 90% of Albatross and 75% of OpenAI capital expenditures (both counterparties named in the conformed agreement; the agreement defines the Albatross MSA as CoreWeave's Master Services Agreement with Microsoft Corporation), net of six-year straight-line depreciation",
       "lenders": [
         "U.S. Bank Trust Co. (admin/collateral)",
         "Lenders party thereto"
@@ -125,7 +125,7 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1769628/000176962826000104/crwv-20251231.htm"
       },
       "as_of": "2026-08-18",
-      "offtaker_label": "Albatross and OpenAI (both named in the conformed agreement)"
+      "offtaker_label": "Microsoft (the Albatross MSA) and OpenAI, both named in the conformed agreement"
     },
     {
       "id": "crwv-ddtl-3",
@@ -208,7 +208,7 @@
           "public": "2026-03-31"
         }
       ],
-      "offtaker_label": "Meta take-or-pay"
+      "offtaker_label": "Meta take-or-pay (per CoreWeave release; the filed agreement redacts the customer)"
     },
     {
       "id": "crwv-ddtl-5",
@@ -2832,7 +2832,7 @@
       "name": "7.875% Senior Secured Notes due 2031 (Sandersville GA, 175 MW; priced 9/18, closing 9/25)",
       "instrument_type": "bond",
       "size_usd_m": 2276,
-      "size_note": "Priced 2026-09-18 at 98.500% of principal in a Rule 144A / Regulation S private offering; closing expected 2026-09-25. Proceeds fund the remaining build-out of the Sandersville Facility, reimburse CleanSpark for prior equity contributions and fund debt service reserves. The facility is under a 20-year lease with two five-year extensions to a tenant the filings describe only as a \"high-investment grade, leading global technology company\": about $6.6B of contracted revenue over the initial term, 175 MW of critical IT load, deliveries expected from Q4 2027 (8-K 7/14/26). The offering launched at $2.227B on 2026-09-17 (8-K EX-99.2) and was upsized at pricing. No closing 8-K was on EDGAR as of 2026-09-25.",
+      "size_note": "Priced 2026-09-18 at 98.500% of principal in a Rule 144A / Regulation S private offering; closing expected 2026-09-25. Proceeds fund the remaining build-out of the Sandersville Facility, reimburse CleanSpark for prior equity contributions and fund debt service reserves. The facility is under a 20-year lease with two five-year extensions to a tenant the 8-K of 7/14/26 describes as a \"high-investment grade, leading global technology company\". CleanSpark's filed investor deck (8-K EX-99.1, accession 0001193125-26-393758) names it: \"The Tenant (Anviran, LLC) is a wholly owned subsidiary of Meta\": about $6.6B of contracted revenue over the initial term, 175 MW of critical IT load, deliveries expected from Q4 2027 (8-K 7/14/26). The offering launched at $2.227B on 2026-09-17 (8-K EX-99.2) and was upsized at pricing. No closing 8-K was on EDGAR as of 2026-09-25.",
       "rate": {
         "kind": "fixed",
         "value": 7.875,
@@ -2853,7 +2853,7 @@
         "url": "https://www.sec.gov/Archives/edgar/data/827876/000119312526395727/clsk-ex99_1.htm"
       },
       "as_of": "2026-09-25",
-      "offtaker_label": "Investment-grade technology tenant (unnamed in the filings)"
+      "offtaker_label": "Meta, through its subsidiary Anviran, LLC (named in CleanSpark's filed investor deck)"
     },
     {
       "id": "clsk-conv-2032",
