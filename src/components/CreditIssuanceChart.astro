@@ -36,7 +36,7 @@ const cumPath = bars.map((b, i) => `${i === 0 ? 'M' : 'L'} ${bx(i).toFixed(1)} $
 ---
 <figure class="ci">
   <svg viewBox={`0 0 ${W} ${H}`} role="img"
-       aria-label={`Compute-infrastructure debt issuance by quarter from 2024, three series by collateral seat. GPU-collateralized issuance peaks near twenty billion dollars a quarter; operator campus-secured runs single-digit billions; landlord SPV and securitization issuance reaches nearly forty billion in late 2025. The cumulative GPU-collateralized line reaches ${sumB(gpuRows).toFixed(0)} billion. The current quarter is marked as quarter-to-date.`}>
+       aria-label={`Compute-infrastructure debt issuance by quarter from 2024, three series by collateral. GPU-collateralized issuance peaks near twenty billion dollars a quarter; operator campus-secured runs single-digit billions; landlord SPV and securitization issuance reaches nearly forty billion in late 2025. The cumulative GPU-collateralized line reaches ${sumB(gpuRows).toFixed(0)} billion. The current quarter is marked as quarter-to-date.`}>
     {barTicks.map((t) => (
       <>
         <line x1={x0} y1={byBar(t)} x2={x1} y2={byBar(t)} class="ci-grid" />
