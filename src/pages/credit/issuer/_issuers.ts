@@ -32,4 +32,6 @@ export const ISSUERS: Record<string, { match: string; display: string }> = {
   'xai': { match: 'xAI', display: 'xAI' },
   'fermi': { match: 'Fermi Inc.', display: 'Fermi' },
   'riot': { match: 'Riot Platforms, Inc.', display: 'Riot Platforms' },
+  'cleanspark': { match: 'CleanSpark, Inc.', display: 'CleanSpark' },
+  'cerebras': { match: 'Cerebras Systems', display: 'Cerebras' },
 };

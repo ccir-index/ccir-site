@@ -1,9 +1,9 @@
 {
-  "copied_at": "2026-09-24T18:42:05.177Z",
+  "copied_at": "2026-09-25T13:24:07.824Z",
   "source": "C:/Users/19136/CCIR/scratch/term_filings/deals.csv",
-  "source_mtime": "2026-09-24T14:15:00.606Z",
-  "rows_in_source": 94,
-  "rows_used": 55,
+  "source_mtime": "2026-09-25T13:01:13.153Z",
+  "rows_in_source": 104,
+  "rows_used": 62,
   "rule": "grade A|B; any comparability tier; stated over implied; chip in H100/H200/B200/B300/GB200/GB300; canonical tenor map, free text dropped",
   "rows": [
     {
@@ -1051,6 +1051,145 @@
       "seller": "IndiaAI empaneled CSPs (14 providers incl. Yotta, E2E, Jio, Tata Comm, Sify, NTT/Neysa, CtrlS, Cyfuture, NxtGen; empanelment requires matching the L1 bid)",
       "bundled": "GPU instance incl. block storage per instance; tax basis not stated on the card; INR",
       "subsidized": true
+    },
+    {
+      "deal_id": "wyfi-2025-48-h200-3y",
+      "chip": "H200",
+      "tenor": "3Y",
+      "tenor_raw": "3Y",
+      "signed_key": "2025-10-01",
+      "usd_gpu_hr": 1.74,
+      "gpus": 48,
+      "basis": "implied",
+      "grade": "A",
+      "comparability": "descriptive",
+      "tags": [],
+      "bundle": "gpu-only (presumed)",
+      "take_or_pay": "yes (presumed)",
+      "seller": "WhiteFiber",
+      "bundled": "GPU cloud service; no split",
+      "subsidized": false
+    },
+    {
+      "deal_id": "soluna-hpe-2024-512-h100-3y",
+      "chip": "H100",
+      "tenor": "3Y",
+      "tenor_raw": "3Y",
+      "signed_key": "2024-06-18",
+      "usd_gpu_hr": 2.53,
+      "gpus": 512,
+      "basis": "implied",
+      "grade": "B",
+      "comparability": "ceiling",
+      "tags": [
+        "all-in"
+      ],
+      "bundle": "all-in",
+      "take_or_pay": "yes",
+      "seller": "Hewlett Packard Enterprise (HPE GreenLake for Supercomputing)",
+      "bundled": "GPU IaaS incl. base storage, HPE-operated data center, power, network; no data egress fees",
+      "subsidized": false
+    },
+    {
+      "deal_id": "cedarcross-2024-80-h100-2y",
+      "chip": "H100",
+      "tenor": "2Y",
+      "tenor_raw": "2Y",
+      "signed_key": "2024-04-25",
+      "usd_gpu_hr": 2.87,
+      "gpus": 80,
+      "basis": "implied",
+      "grade": "A",
+      "comparability": "descriptive",
+      "tags": [],
+      "bundle": "gpu-only (presumed)",
+      "take_or_pay": "yes (presumed)",
+      "seller": "Cedarcross International Technologies (49% investee of Alset Capital, TSXV: KSUM)",
+      "bundled": "compute leasing; hosting not split",
+      "subsidized": false
+    },
+    {
+      "deal_id": "ds-2025-p1-5000-b200-3y",
+      "chip": "B200",
+      "tenor": "3Y",
+      "tenor_raw": "3Y",
+      "signed_key": "2025-07-10",
+      "usd_gpu_hr": 3.09,
+      "gpus": 5000,
+      "basis": "implied",
+      "grade": "A",
+      "comparability": "descriptive",
+      "tags": [
+        "all-in",
+        "option"
+      ],
+      "bundle": "all-in",
+      "take_or_pay": "yes (presumed)",
+      "seller": "Datasection Inc. (TSE 3905)",
+      "bundled": "AI data center service; dedicated servers; hosting not split",
+      "subsidized": false
+    },
+    {
+      "deal_id": "ds-2025-p2-10000-b200-3y",
+      "chip": "B200",
+      "tenor": "3Y",
+      "tenor_raw": "3Y",
+      "signed_key": "2025-10-03",
+      "usd_gpu_hr": 3.04,
+      "gpus": 10000,
+      "basis": "implied",
+      "grade": "A",
+      "comparability": "descriptive",
+      "tags": [
+        "all-in",
+        "option"
+      ],
+      "bundle": "all-in",
+      "take_or_pay": "yes (presumed)",
+      "seller": "Datasection Inc. (TSE 3905)",
+      "bundled": "hosted in a leased facility in Australia; no split",
+      "subsidized": false
+    },
+    {
+      "deal_id": "ds-2025-p2-10000-b300-3y-resign",
+      "chip": "B300",
+      "tenor": "3Y",
+      "tenor_raw": "3Y",
+      "signed_key": "2025-12-19",
+      "usd_gpu_hr": 3.39,
+      "gpus": 10000,
+      "basis": "implied",
+      "grade": "A",
+      "comparability": "descriptive",
+      "tags": [
+        "all-in",
+        "option"
+      ],
+      "bundle": "all-in",
+      "take_or_pay": "yes (presumed)",
+      "seller": "Datasection Inc. (TSE 3905)",
+      "bundled": "setup fee covers dedicated cluster configuration, network and security design",
+      "subsidized": false
+    },
+    {
+      "deal_id": "ds-2026-usaiinfra-4696-b200-3y",
+      "chip": "B200",
+      "tenor": "3Y",
+      "tenor_raw": "3Y",
+      "signed_key": "2026-09-18",
+      "usd_gpu_hr": 4.26,
+      "gpus": 4696,
+      "basis": "implied",
+      "grade": "B",
+      "comparability": "descriptive",
+      "tags": [
+        "option"
+      ],
+      "bundle": "unknown",
+      "take_or_pay": "yes (presumed)",
+      "seller": "Datasection Inc. (TSE 3905)",
+      "bundled": "no split",
+      "subsidized": false
     }
   ]
 }

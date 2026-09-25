@@ -2856,6 +2856,74 @@
       "offtaker_label": "Investment-grade technology tenant (unnamed in the filings)"
     },
     {
+      "id": "clsk-conv-2032",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "CleanSpark, Inc.",
+      "ticker": "CLSK",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "0% Convertible Senior Notes due 2032",
+      "instrument_type": "convertible",
+      "size_usd_m": 1150,
+      "size_note": "$1,150.0M issued November 2025 in a Rule 144A offering (indenture dated 2025-11-13). Net proceeds about $1,130.7M; about $460.0M used to repurchase common stock. Not convertible early at 6/30/26.",
+      "rate": {
+        "kind": "fixed",
+        "value": 0,
+        "note": "Effective 0.27%; initial conversion price about $19.16 (52.1832 shares per $1,000)"
+      },
+      "maturity": "2032-02-15",
+      "maturity_note": null,
+      "seniority": "Senior unsecured",
+      "security": null,
+      "lenders": [
+        "144A QIBs"
+      ],
+      "status": "confirmed",
+      "issued": "2025-11",
+      "source": {
+        "doc": "Q2 FY26 10-Q filed 2026-08-06, acc 0001193125-26-338382, Note 9 Debt",
+        "date": "2026-08-06",
+        "url": "https://www.sec.gov/Archives/edgar/data/827876/000119312526338382/clsk-20260630.htm"
+      },
+      "as_of": "2026-06-30"
+    },
+    {
+      "id": "clsk-conv-2030",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "CleanSpark, Inc.",
+      "ticker": "CLSK",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "0% Convertible Senior Notes due 2030",
+      "instrument_type": "convertible",
+      "size_usd_m": 650,
+      "size_note": "$650.0M issued December 2024 in a Rule 144A offering, including the initial purchasers' $100.0M option, exercised in full. Net proceeds about $633.7M before capped calls; $145.0M used to repurchase common stock.",
+      "rate": {
+        "kind": "fixed",
+        "value": 0,
+        "note": "Effective 0.46%; capped call transactions"
+      },
+      "maturity": "2030-06-15",
+      "maturity_note": null,
+      "seniority": "Senior unsecured",
+      "security": null,
+      "lenders": [
+        "144A QIBs"
+      ],
+      "status": "confirmed",
+      "issued": "2024-12",
+      "source": {
+        "doc": "Q2 FY26 10-Q filed 2026-08-06, acc 0001193125-26-338382, Note 9 Debt",
+        "date": "2026-08-06",
+        "url": "https://www.sec.gov/Archives/edgar/data/827876/000119312526338382/clsk-20260630.htm"
+      },
+      "as_of": "2026-06-30"
+    },
+    {
       "id": "dlr-global-rcf",
       "collateral_class": "out",
       "exclude_from_issuance": true,
@@ -5824,10 +5892,8 @@
       "size_note": "Per 10-Q: $250M LC-only at signing Apr 14, 2026 → full $850M for general corporate purposes after IPO conditions met Jun 17, 2026 No borrowings at 6/30/26. Liquidity covenant: unrestricted cash plus undrawn commitments of at least $150.0M at each quarter end (Q2-26 10-Q).",
       "rate": {
         "kind": "sofr_spread",
-        "value": 2.25,
-        "value_low": 2.0,
-        "value_high": 2.25,
-        "note": "From the 6/17/26 Phase Two date: Term SOFR + 2.25% (or a base rate), stepping down to 2.00% on an enhanced debt to EBITDA ratio; 0.375% commitment fee on undrawn commitments. Before that date: SOFR + 1.50% and a 0.250% fee (Q2-26 10-Q)."
+        "value": 1.5,
+        "note": "SOFR + 1.50% at signing (2026-04-14, Phase One, LC-only; 0.250% commitment fee). From the 6/17/26 Phase Two date: Term SOFR + 2.25% (or a base rate), stepping down to 2.00% on an enhanced debt to EBITDA ratio; 0.375% commitment fee on undrawn commitments (Q2-26 10-Q)."
       },
       "maturity": "2031-04-14",
       "maturity_note": "Five-year term (Q2-26 10-Q)",
@@ -5845,13 +5911,48 @@
         "SVB (First Citizens)"
       ],
       "status": "confirmed",
-      "issued": "2026-04-15",
+      "issued": "2026-04-14",
       "source": {
         "doc": "cerebras.ai release 2026-04-15; Q2-26 10-Q filed 2026-08-12, acc 0001628280-26-056357 (Liquidity; Note 10)",
         "date": "2026-08-12",
         "url": "https://www.sec.gov/Archives/edgar/data/2021728/000162828026056357/cbrs-20260630.htm"
       },
       "as_of": "2026-06-30"
+    },
+    {
+      "id": "cerebras-openai-wcl",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Customer-funded working capital loan secured by a lockbox account and repayable in compute capacity and service fees, not GPU-collateral (strict scope).",
+      "issuer": "Cerebras Systems",
+      "ticker": "CBRS",
+      "issuer_type": "public",
+      "entity": "Cerebras Systems Inc. (borrower); OpenAI OpCo, LLC (lender and customer under the Master Relationship Agreement)",
+      "name": "OpenAI Working Capital Loan (secured promissory note, ~$1.0B, 6%)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 1004.6,
+      "size_note": "$1,004.6M principal funded by OpenAI in January 2026 under the December 2025 Master Relationship Agreement, to build the capacity Cerebras sells to OpenAI. The lender is also the customer: OpenAI is committed to buy 750 MW of inference capacity. The loan may be repaid in cash or, under the MRA and the note, through service fees, compute capacity, hardware and other credits. $918.2M outstanding at 6/30/26 after $86.3M of non-cash billing credits; no cash payments had been made ($736.0M current, $182.2M non-current). Scheduled to amortize in equal installments over three years, starting after delivery of the final tranche of the initial 250 MW. Accounted for as debt under ASC 470.",
+      "rate": {
+        "kind": "fixed",
+        "value": 6,
+        "note": "6% stated per annum, unless waived or deemed paid under the note and the MRA"
+      },
+      "maturity": "2032-12-31",
+      "maturity_note": "No later than 2032-12-31, unless repaid earlier or accelerated",
+      "seniority": "Secured promissory note",
+      "security": "First-priority security interest in a lockbox account and the amounts held in it",
+      "lenders": [
+        "OpenAI OpCo, LLC (lender and customer)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-01",
+      "source": {
+        "doc": "Q2-26 10-Q filed 2026-08-12, acc 0001628280-26-056357, Note 10 Debt and the OpenAI Collaboration note",
+        "date": "2026-08-12",
+        "url": "https://www.sec.gov/Archives/edgar/data/2021728/000162828026056357/cbrs-20260630.htm"
+      },
+      "as_of": "2026-06-30",
+      "offtaker_label": "OpenAI (lender is also the customer)"
     },
     {
       "id": "xai-ms-package",
@@ -6266,6 +6367,40 @@
       "as_of": "2026-08-26"
     },
     {
+      "id": "qmls-conv-2028",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "QumulusAI",
+      "ticker": "QMLS",
+      "issuer_type": "public",
+      "entity": "QumulusAI (issuer); an unnamed investor (holder)",
+      "name": "7% Senior Secured Convertible Notes (March 2026 facility, up to $45M)",
+      "instrument_type": "convertible",
+      "size_usd_m": 45,
+      "size_note": "Securities purchase agreement 2026-03-26 for up to $45.0M: an initial $15.0M tranche funded 2026-03-26 and up to $30.0M of later tranches. $1.174M of issuance costs. Carried at fair value under the fair value option (initial fair value $36.875M). Principal outstanding at 6/30/26 is not stated in the Q2 10-Q.",
+      "rate": {
+        "kind": "fixed",
+        "value": 7,
+        "note": "7% per annum; convertible at $11.50 per share"
+      },
+      "maturity": "2028-07-16",
+      "maturity_note": "Maturity of the initial tranche; later tranches not dated in the 10-Q",
+      "seniority": "Senior secured",
+      "security": "Collateral not described in the Q2 10-Q",
+      "lenders": [
+        "Unnamed investor (securities purchase agreement)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-03-26",
+      "source": {
+        "doc": "10-Q for the quarter ended 2026-06-30, Note 17 (acc 0001437749-26-028924)",
+        "date": "2026-08-25",
+        "url": "https://www.sec.gov/Archives/edgar/data/2084026/000143774926028924/quma20260630_10q.htm"
+      },
+      "as_of": "2026-06-30"
+    },
+    {
       "id": "sharonai-conv-2032",
       "collateral_class": "out",
       "exclude_from_issuance": true,
@@ -6638,6 +6773,41 @@
       "as_of": "2026-07-28"
     },
     {
+      "id": "aligned-devco-rcf-2026",
+      "collateral_class": "dc_adjacent",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "issuer": "Aligned Data Centers",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": null,
+      "name": "$2.58B development revolving credit facility (six later-stage assets)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 2580,
+      "size_note": "Press (Data Center Knowledge, 2026-03-26): closed a $2.58B revolving credit facility to finance later-stage development assets. Six data centers in Dallas, Phoenix and Northern Virginia. Three-year maturity with two one-year extension options. Lenders are insurance companies, pension funds and other institutions, with PGIM as anchor lender.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not reported"
+      },
+      "maturity": "~2029-03",
+      "maturity_note": "Three years plus two one-year extension options (press)",
+      "seniority": "Secured revolving facility (ranking not stated)",
+      "security": "Six later-stage development data centers (Dallas, Phoenix, Northern Virginia)",
+      "lenders": [
+        "PGIM (anchor lender)",
+        "Insurance companies, pension funds and other institutions (unnamed)"
+      ],
+      "status": "press",
+      "issued": "2026-03-26",
+      "source": {
+        "doc": "Data Center Knowledge 2026-03-26",
+        "date": "2026-03-26",
+        "url": "https://www.datacenterknowledge.com/investing/aligned-data-centers-closes-on-credit-facility"
+      },
+      "as_of": "2026-09-25"
+    },
+    {
       "id": "compass-abs-2026-2",
       "collateral_class": "dc_adjacent",
       "exclude_from_issuance": true,
@@ -6670,6 +6840,49 @@
         "url": "https://www.datacenterdynamics.com/en/news/compass-datacenters-raises-413-million-in-abs-bonds/"
       },
       "as_of": "2026-07-28"
+    },
+    {
+      "id": "compass-abs-2026-1",
+      "collateral_class": "dc_adjacent",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Data-center real-estate/lease securitization, not GPUs (strict scope). Closing not confirmed in the sources on file.",
+      "issuer": "Compass Datacenters",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "Compass Datacenters (Series 2026-1 securitization; issuer entity per press)",
+      "name": "Series 2026-1 ABS, ~$830M (six hyperscale data centers, Phoenix and Toronto)",
+      "instrument_type": "bond",
+      "size_usd_m": 830,
+      "size_note": "Press (Bisnow 2026-02-10, citing a Moody's presale): Compass planned to raise about $830M by securitizing six new, fully leased data centers (five in Phoenix, one in Toronto) with 198.2 MW of capacity and an appraised value of $3.6B. Four investment-grade hyperscale tenants on long-term leases, with $219.6M of annualized base rent. Moody's rated the planned notes AAA and AA. Anticipated repayment date February 2031; legal final February 2056. Pricing and closing are not confirmed in the sources on file.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Coupons not reported"
+      },
+      "maturity": "2031-02",
+      "maturity_note": "Anticipated repayment date February 2031; legal final February 2056 (press)",
+      "seniority": "Senior secured (securitization)",
+      "security": "Six fully leased hyperscale data centers in Phoenix and Toronto and their leases",
+      "lenders": [
+        "Bookrunners not named in press coverage"
+      ],
+      "status": "press",
+      "issued": "Reported 2026-02-10",
+      "source": {
+        "doc": "Bisnow 2026-02-10 (Moody's presale figures)",
+        "date": "2026-02-10",
+        "url": "https://www.bisnow.com/national/news/data-center-capital-markets/brookfields-compass-datacenters-raising-830m-securitizing-6-big-tech-data-centers-133152"
+      },
+      "as_of": "2026-09-25",
+      "facility_ratings": [
+        {
+          "agency": "Moody's",
+          "grade": "AAA / AA (presale)",
+          "public": "2026-02"
+        }
+      ],
+      "offtaker_label": "Four investment-grade hyperscale tenants (unnamed)",
+      "exclude_from_totals": true
     },
     {
       "id": "stargate-jupiter-nm",
@@ -6914,6 +7127,43 @@
         "doc": "DataBank release 9/24/25",
         "date": "2025-09-24",
         "url": "https://www.prnewswire.com/news-releases/databank-raises-1-1-billion-in-hyperscale-asset-securitization-302565290.html"
+      },
+      "as_of": "2026-09-25"
+    },
+    {
+      "id": "databank-redoak-construction-2026",
+      "collateral_class": "dc_adjacent",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "issuer": "DataBank",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "Red Oak (Dallas) campus construction financing",
+      "name": "$2.65B Red Oak campus construction financing (upsized from $2.0B)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 2650,
+      "size_note": "Upsized 2026-06-15 from $2.0B to $2.65B: $400M of added bank financing plus $250M of notes placed privately. The upsize funds a fourth building with 60 MW of incremental IT capacity. The release describes customers as hyperscale, cloud and enterprise and does not name an AI tenant. The same release announced an $800M corporate revolver due 2031 (Citizens lead), which is not carried here.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not disclosed in the release"
+      },
+      "maturity": "Undisclosed",
+      "maturity_note": null,
+      "seniority": "Construction financing (bank loans and private placement notes)",
+      "security": "Red Oak campus, Dallas area (four buildings)",
+      "lenders": [
+        "Bank syndicate from the April 2026 announcement",
+        "MUFG (lead private placement agent)",
+        "TD Securities, Barclays (joint placement agents)",
+        "Citibank, Citizens Bank, National Bank of Canada (co-agents)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-06-15",
+      "source": {
+        "doc": "DataBank release 2026-06-15 (PRNewswire)",
+        "date": "2026-06-15",
+        "url": "https://www.prnewswire.com/news-releases/databank-closes-1-45-billion-in-new-financing-across-two-transactions-302800012.html"
       },
       "as_of": "2026-09-25"
     },
@@ -7182,6 +7432,40 @@
       "as_of": "2026-08-17"
     },
     {
+      "id": "riot-conv-2030",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Convertible / equity-linked note — not GPU-collateralized (strict scope, 2026-07-06).",
+      "issuer": "Riot Platforms, Inc.",
+      "ticker": "RIOT",
+      "issuer_type": "public",
+      "entity": null,
+      "name": "0.75% Convertible Senior Notes due 2030",
+      "instrument_type": "convertible",
+      "size_usd_m": 594.4,
+      "size_note": "$594.4M principal at 6/30/26 (Q2-26 10-Q Note 11). The 2024-12-11 closing sold $525M. Holder-convertible during Q3 2026 after the 130% stock-price test was met in the 30 trading days to 6/30/26; the company intends to settle any conversions in shares.",
+      "rate": {
+        "kind": "fixed",
+        "value": 0.75,
+        "note": "Payable semiannually January 15 and July 15; initial conversion price about $14.86 (67.2767 shares per $1,000)"
+      },
+      "maturity": "2030-01-15",
+      "maturity_note": null,
+      "seniority": "Senior unsecured",
+      "security": null,
+      "lenders": [
+        "144A; Citigroup, BTIG and Cantor Fitzgerald (representatives); U.S. Bank Trust Co. (trustee)"
+      ],
+      "status": "confirmed",
+      "issued": "2024-12-11",
+      "source": {
+        "doc": "8-K 12/11/24 Items 1.01/2.03/3.02, acc 0001104659-24-127656; Q2-26 10-Q (6/30/26 balance), acc 0001104659-26-093448",
+        "date": "2026-08-10",
+        "url": "https://www.sec.gov/Archives/edgar/data/1167419/000110465926093448/riot-20260630x10q.htm"
+      },
+      "as_of": "2026-06-30"
+    },
+    {
       "id": "nvda-sbenergy-ports-rvg",
       "collateral_class": "dc_adjacent",
       "exclude_from_issuance": true,
@@ -7354,6 +7638,40 @@
         "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/0002071778-26-000051-index.htm"
       },
       "as_of": "2026-08-18"
+    },
+    {
+      "id": "frmi-yorkville-note-2027",
+      "collateral_class": "out",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Senior unsecured corporate obligation — no GPU collateral (strict scope, 2026-07-06).",
+      "issuer": "Fermi Inc.",
+      "ticker": "FRMI",
+      "issuer_type": "public",
+      "entity": "Fermi Inc. (borrower); YA II PN, Ltd. (a Yorkville Advisors fund, lender)",
+      "name": "Senior unsecured promissory note (Yorkville, up to $156.25M committed, stepping down)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 156.25,
+      "size_note": "Entered 2026-03-30 with a committed principal of $156.25M. The commitment falls by about $26.0M every 30 days (about $78.1M at 6/30/26). Up to five advances through 2026-10-01, each funded net of a 4% premium. Undrawn at 6/30/26; draws after that date are not stated. Monthly amortization starts 30 days after the first advance. At least $10M of each payment is settled in common stock (caps of 8,000,000 shares per payment and 40,000,000 in total). Monthly exit fee on outstanding principal: 0% for the first 180 days, 1% to day 365, then 1.33%.",
+      "rate": {
+        "kind": "fixed",
+        "value": 0,
+        "note": "0% per annum; 18% on an event of default. Advances funded net of a 4% premium"
+      },
+      "maturity": "2027-09",
+      "maturity_note": "September 2027 (exact day not stated)",
+      "seniority": "Senior unsecured",
+      "security": null,
+      "lenders": [
+        "YA II PN, Ltd. (Yorkville Advisors Global, LP)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-03-30",
+      "source": {
+        "doc": "Q2-26 10-Q filed 2026-08-14, acc 0002071778-26-000051, debt note (Promissory Note)",
+        "date": "2026-08-14",
+        "url": "https://www.sec.gov/Archives/edgar/data/2071778/000207177826000051/frmi-20260630.htm"
+      },
+      "as_of": "2026-06-30"
     },
     {
       "id": "btdr-conv-2029",
@@ -8243,7 +8561,7 @@
       "issuer_type": "private",
       "collateral_class": "landlord_spv",
       "exclude_from_issuance": true,
-      "exclude_reason": "Secured by a data-center campus lease, not GPUs. Priced 2026-09-23 per press; no issuer release.",
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
       "as_of": "2026-09-23",
       "maturity_note": "Five-year notes (press); maturity date not reported",
       "facility_ratings": [],
@@ -8274,8 +8592,7 @@
         "date": "2026-09-23",
         "url": "https://www.briefs.co/news/blue-owl-backed-data-center-borrower-lands-1-1-billion-with/"
       },
-      "offtaker_label": "CoreWeave (long-term leases)",
-      "exclude_from_totals": true
+      "offtaker_label": "CoreWeave (long-term leases)"
     },
     {
       "id": "galaxy-exch-0050-2031",
@@ -8344,6 +8661,154 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1899123/000121390026049770/ea0272611-20f_bitdeer.htm"
       },
       "as_of": "2026-08-10"
+    },
+    {
+      "id": "se-cosmos-8875-2031",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "issuer": "SB Energy, Inc.",
+      "ticker": "SBE",
+      "issuer_type": "public",
+      "entity": "SE Cosmos, LLC (issuer; wholly owned SB Energy subsidiary). Not guaranteed by SB Energy or its other subsidiaries",
+      "name": "8.875% Senior Secured Notes due 2031 (Cosmos Technology Campus, Travis County TX, ~50 MW)",
+      "instrument_type": "bond",
+      "size_usd_m": 999,
+      "size_note": "$999.0M in a Rule 144A / Regulation S offering; purchase agreement 2026-04-30, settled 2026-05-07. Issued at 99.500% for net proceeds of about $994.0M. Part of the proceeds repaid in full the Cosmos Bridge Loan ($425.0M commitment; $342.3M drawn 2026-04-01). $999.0M outstanding at 6/30/26. The campus has about 50 MW of critical IT capacity under a 15-year triple-net lease to a SoftBank affiliate, with expected aggregate rent of about $2.5B. A SoftBank Group affiliate guarantees the tenant's obligations (about $2.9B anticipated exposure). A parent entity provided a completion guaranty for the noteholders and the tenant. First disclosed in the SB Energy S-1.",
+      "rate": {
+        "kind": "fixed",
+        "value": 8.875,
+        "note": "Issued at 99.500%; yield to maturity 9.002%; payable semiannually May 1 and November 1"
+      },
+      "maturity": "2031-05-01",
+      "maturity_note": null,
+      "seniority": "Senior secured, project-level",
+      "security": "First-priority lien on substantially all assets of SE Cosmos, LLC: pledge of its equity held by Cosmos Pledgor, LLC, mortgages on its real property and a security agreement over its personal property",
+      "lenders": [
+        "144A / Reg S noteholders",
+        "Wilmington Trust, N.A. (trustee and collateral agent)"
+      ],
+      "status": "confirmed",
+      "issued": "2026-05-07",
+      "source": {
+        "doc": "SB Energy S-1/A No. 2 filed 2026-09-21, acc 0001628280-26-062846 (Description of Certain Indebtedness; MD&A)",
+        "date": "2026-09-21",
+        "url": "https://www.sec.gov/Archives/edgar/data/2133037/000162828026062846/sbenergy-sx1a2.htm"
+      },
+      "as_of": "2026-06-30",
+      "offtaker_label": "SoftBank affiliate (15-year triple-net lease; SoftBank Group guaranty)"
+    },
+    {
+      "id": "zankore-gpu-tl-2026",
+      "collateral_class": "secured_undisclosed",
+      "issuer": "Zankore",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "Zankore (Indonesia; NVIDIA is an equity backer)",
+      "name": "$3.1B senior term loan to buy NVIDIA GPUs (Indonesia and Southeast Asia)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 3100,
+      "size_note": "Press (Bloomberg, The Next Web, 2026-09-09): up to $3.1B senior term loan facility signed to buy and deploy NVIDIA GPUs in Indonesia and Southeast Asia. Initial deployment of 100 MW in Indonesia, rising to about 200 MW by the first half of 2027. NVIDIA is an equity backer and the hardware supplier; no NVIDIA guarantee is reported. Press describes the borrower as about one month old. Rate, tenor and collateral not reported.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not reported"
+      },
+      "maturity": null,
+      "maturity_note": "Tenor not reported",
+      "seniority": "Senior term loan (press)",
+      "security": "Not reported; press says what secures the loan is unclear",
+      "lenders": [
+        "Citigroup (sole debt adviser, senior mandated lead arranger)",
+        "ING",
+        "Natixis CIB",
+        "Qatar National Bank",
+        "UOB"
+      ],
+      "status": "press",
+      "issued": "2026-09-09",
+      "source": {
+        "doc": "Bloomberg 2026-09-09; The Next Web 2026-09-09",
+        "date": "2026-09-09",
+        "url": "https://thenextweb.com/news/zankore-3-1bn-gpu-loan-indonesia-nvidia"
+      },
+      "as_of": "2026-09-25"
+    },
+    {
+      "id": "data-2026-800d-cmbs",
+      "collateral_class": "dc_adjacent",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Data-center real-estate/lease securitization, not GPU-collateral (AI-linked landlord scope, 2026-08-09).",
+      "issuer": "GI Partners (TechCore)",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "DATA 2026-800D Mortgage Trust (single-asset CMBS)",
+      "name": "$375M single-asset CMBS, 30 MW Elk Grove Village IL data center",
+      "instrument_type": "bond",
+      "size_usd_m": 375,
+      "size_note": "Press (electroneconomics Substack, relaying Fitch figures): $375M loan from GI Partners' TechCore vehicle, priced 2026-09-09. Collateral is a 174,000 sq ft, 30 MW data center in Elk Grove Village, Illinois, leased to one investment-grade hyperscale tenant across three data halls. LTV 51.4% of the ~$730M purchase price; 76.7% of Fitch's stressed value of $488.9M. AI use is not stated. Coupons and closing date not on file.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not reported"
+      },
+      "maturity": "Undisclosed",
+      "maturity_note": null,
+      "seniority": "Senior secured (CMBS)",
+      "security": "Mortgage on a 30 MW data center in Elk Grove Village, IL; one investment-grade hyperscale tenant",
+      "lenders": [
+        "CMBS investors (bookrunners not named)"
+      ],
+      "status": "press",
+      "issued": "2026-09-09",
+      "source": {
+        "doc": "electroneconomics Substack 'Model updates, September 2026' (Fitch figures relayed)",
+        "date": "2026-09",
+        "url": "https://electroneconomics.substack.com/p/model-updates-september-2026"
+      },
+      "as_of": "2026-09-25",
+      "offtaker_label": "Investment-grade hyperscale tenant (unnamed)"
+    },
+    {
+      "id": "airtrunk-syd3-construction-2026",
+      "collateral_class": "landlord_spv",
+      "exclude_from_issuance": true,
+      "exclude_reason": "Secured by real estate / data-center campus, not GPUs (strict scope, 2026-07-06).",
+      "issuer": "AirTrunk (Blackstone)",
+      "ticker": null,
+      "issuer_type": "private",
+      "entity": "AirTrunk SYD3 (Sydney) project",
+      "name": "A$4.3B five-year construction loan, SYD3 hyperscale data center (Sydney)",
+      "instrument_type": "credit_facility",
+      "size_usd_m": 3000,
+      "size_note": "A$4.3B; about $3.0B as reported by Bloomberg. Press (Bloomberg via Yahoo Finance, 2026-07-22): Blackstone-owned AirTrunk finalized a five-year construction loan for its SYD3 hyperscale data center in Australia. More lenders may join. Rate not reported.",
+      "rate": {
+        "kind": "undisclosed",
+        "value": null,
+        "note": "Not reported"
+      },
+      "maturity": "~2031",
+      "maturity_note": "Five-year tenor (press); maturity date not reported",
+      "seniority": "Construction loan (ranking not reported)",
+      "security": "SYD3 hyperscale data center, Sydney",
+      "lenders": [
+        "Crédit Agricole",
+        "DBS",
+        "Deutsche Bank",
+        "HSBC",
+        "ING",
+        "MUFG",
+        "Morgan Stanley",
+        "UOB"
+      ],
+      "status": "press",
+      "issued": "2026-07-22",
+      "source": {
+        "doc": "Bloomberg 2026-07-22 (via Yahoo Finance)",
+        "date": "2026-07-22",
+        "url": "https://finance.yahoo.com/technology/ai/articles/blackstone-finalizes-4-3-billion-210202993.html"
+      },
+      "as_of": "2026-09-25"
     }
   ],
   "retired": [
