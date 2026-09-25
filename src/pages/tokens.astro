@@ -999,6 +999,9 @@ const vvPts = vv.map((p) => [p.date, p.vvti]);
   }
 
   .tbl { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+  /* Phones (mobile pass 2026-09-24): grid cells may shrink below the
+     table's natural width; the table scrolls inside its cell. */
+  .grid2 > div { min-width: 0; overflow-x: auto; }
   .tbl th {
     text-align: left; font-family: var(--font-mono); font-size: var(--fs-xs);
     text-transform: uppercase; letter-spacing: 0.04em;

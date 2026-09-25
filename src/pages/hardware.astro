@@ -911,6 +911,12 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .iv table.ivlegs { width: 100%; max-width: 880px; border-collapse: collapse; font-family: var(--font-mono); font-size: var(--fs-xs); margin: 10px 0 4px; }
     .iv table.ivlegs th, .iv table.ivlegs td { padding: 5px 8px; border-bottom: 1px solid var(--rule); text-align: left; }
     .iv table.ivlegs th { color: var(--ink-dim); font-weight: 500; }
+    /* Phones (mobile pass 2026-09-24): the assumptions table scrolls
+       sideways inside its own box. */
+    @media (max-width: 700px) {
+      .iv table.ivlegs { display: block; overflow-x: auto; max-width: 100%; }
+      .iv table.ivlegs td, .iv table.ivlegs th { white-space: nowrap; }
+    }
     .iv table.ivlegs .num { text-align: right; font-variant-numeric: tabular-nums; }
     .iv .ivmeta {
       margin-top: 8px; font-family: var(--font-mono); font-size: var(--fs-xs);

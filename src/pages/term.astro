@@ -171,7 +171,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
       </header>
       <div class="table-wrap">
         <div class="table-head">
-          <span class="th-scope">Filed deals, GPU-only, GPU-weighted by signing half-year</span>
+          <span class="th-scope">Filed deals, GPU-only, weighted by deal size, by signing half-year</span>
           <span class="th-meta">USD/GPU-hr</span>
         </div>
         <table class="data vintage-table">
@@ -438,6 +438,12 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
       table.cov-table .chip-cell .chip-name,
       table.vintage-table .chip-cell .chip-name { font-size: var(--fs-sm); letter-spacing: 0.02em; }
       .table-wrap { overflow-x: auto; }
+      /* Phones (mobile pass 2026-09-24): hold a readable minimum width and
+         scroll sideways inside the frame instead of crushing the columns. */
+      table.vintage-table { min-width: 640px; }
+      table.term-ladder, table.cov-table { min-width: 600px; }
+      table.term-ladder th.chip-col, table.cov-table th.chip-col,
+      table.vintage-table th.chip-col { width: 130px; }
     }
 
     .instrument-note {
