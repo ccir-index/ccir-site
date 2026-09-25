@@ -550,6 +550,7 @@ const leasebackCfg = [
   { id: 'fluidstack-meridian-arc', date: '2026-04-16', tag: 'Meridian Arc (Fluidstack)', tier: 'mid' as Tier, press: false, long: false },
   { id: 'galaxy-helios2-9875-2031', date: '2026-07-23', tag: 'Helios II (CoreWeave)', tier: 'weak' as Tier, press: false, long: false },
   { id: 'meta-elpaso', date: '2026-07-27', tag: 'Sopaipilla (Meta)', tier: 'strong' as Tier, press: true, long: true },
+  { id: 'zenith-arc-2031', date: '2026-08-13', tag: 'Zenith Arc (Jane Street)', tier: 'weak' as Tier, press: true, long: false },
   { id: 'qts-odyssey-2031', date: '2026-08-18', tag: 'QTS Odyssey (Microsoft)', tier: 'strong' as Tier, press: true, long: false },
   { id: 'digital-drive-coreweave-bond-2026', date: '2026-09-23', tag: 'Digital Drive (CoreWeave)', tier: 'weak' as Tier, press: true, long: false },
 ].map((p) => ({
@@ -782,7 +783,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           <div class="panel-sub">
             Coupon at pricing, fixed-rate senior secured 144A notes issued by the
             data-center operator, colored by who backs the lease ·
-            Oct 2025 – Sep 2026
+            Oct 2025 – Sep 2026 · hover a dot for the bond, click to open its ledger row
           </div>
         </div>
         <span class="badge">FILED TERMS</span>
@@ -816,26 +817,14 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
         {bondContext.map((p) => (
           <>
             {(p as any).long && <circle cx={bx(p.date)} cy={by(p.v)} r="7.5" class={`ring tier-stroke-${p.tier}`} />}
-            <circle cx={bx(p.date)} cy={by(p.v)} r="4" class={p.press ? `pt-hollow hot tier-stroke-${p.tier}` : `pt hot tier-${p.tier}`} data-row={`row-${p.id}`} />
+            <circle cx={bx(p.date)} cy={by(p.v)} r="5" class={p.press ? `pt-hollow hot tier-stroke-${p.tier}` : `pt hot tier-${p.tier}`} data-row={`row-${p.id}`}><title>{`${p.tag} · ${p.date}${p.press ? ' · press' : ''}`}</title></circle>
           </>
         ))}
         {bondPath.map((p) => (
           <>
             {(p as any).long && <circle cx={bx(p.date)} cy={by(p.v)} r="8" class={`ring tier-stroke-${p.tier}`} />}
-            <circle cx={bx(p.date)} cy={by(p.v)} r="4.5" class={`pt hot tier-${p.tier}`} data-row={`row-${p.id}`} />
+            <circle cx={bx(p.date)} cy={by(p.v)} r="5" class={`pt hot tier-${p.tier}`} data-row={`row-${p.id}`}><title>{`${p.tag} · ${p.date}${(p as any).long ? ' · matures 2042' : ''}`}</title></circle>
           </>
-        ))}
-        {bLabels.map((L) => (
-          <g class="hot" data-row={L.rid}>
-            {L.leader && (
-              <line
-                x1={L.x} y1={L.y + (L.ly > L.y ? 7 : -7)}
-                x2={L.lx} y2={L.ly > L.y ? L.ly + 1 : L.ly + L.h + 1}
-                class="leader"
-              />
-            )}
-            {L.linePos.map((ln) => <text x={L.lx} y={ln.y} class={ln.cls}>{ln.t}</text>)}
-          </g>
         ))}
       </svg>
       <details class="panel-foot-disclosure">
@@ -880,7 +869,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           <div class="panel-title">Landlord SPV &amp; securitization coupons — non-recourse, by tenant credit</div>
           <div class="panel-sub">
             Coupon at pricing, non-recourse landlord vehicles where the tenant's
-            lease is the credit · mark area ∝ deal size · Oct 2025 – Sep 2026
+            lease is the credit · mark area ∝ deal size · Oct 2025 – Sep 2026 · hover a mark for the deal, click to open its ledger row
           </div>
         </div>
         <span class="badge">AT PRICING</span>
@@ -890,7 +879,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           <span class="lg-head">By tenant credit · IG → none</span>
           <span class="lg-item"><span class="lg-dot tier-strong"></span>Hyperscaler tenant (Meta, Microsoft)</span>
           <span class="lg-item"><span class="lg-dot tier-mid"></span>Google-guaranteed lease (Fluidstack tenant)</span>
-          <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud tenant (CoreWeave)</span>
+          <span class="lg-item"><span class="lg-dot tier-weak"></span>Neocloud or other unrated tenant (CoreWeave, Jane Street)</span>
         </div>
         <div class="lg-line">
           <span class="lg-head">Symbol</span>
@@ -912,23 +901,12 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           const X = bx(p.date), Y = cy(p.v), r = crad(p.sizeB);
           return (
             <g class="hot" data-row={`row-${p.id}`}>
+              <title>{`${p.tag} · ${cFmt(p.v)}% · $${p.sizeB.toFixed(2)}B · ${p.date}${p.press ? ' · press' : ''}${p.long ? ' · amortizes to 2048-49' : ''}`}</title>
               {p.long && <circle cx={X} cy={Y} r={r + 3.5} class={`ring tier-stroke-${p.tier}`} />}
               <circle cx={X} cy={Y} r={r} class={p.press ? `pt-hollow tier-stroke-${p.tier}` : `pt tier-${p.tier}`} />
             </g>
           );
         })}
-        {cLabels.map((L) => (
-          <g class="hot" data-row={L.rid}>
-            {L.leader && (
-              <line
-                x1={L.x} y1={L.y + (L.ly > L.y ? 7 : -7)}
-                x2={L.lx} y2={L.ly > L.y ? L.ly + 1 : L.ly + L.h + 1}
-                class="leader"
-              />
-            )}
-            {L.linePos.map((ln) => <text x={L.lx} y={ln.y} class={ln.cls}>{ln.t}</text>)}
-          </g>
-        ))}
       </svg>
       <details class="panel-foot-disclosure">
         <summary>How to read this</summary>
@@ -947,7 +925,9 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
             7.228% (Aug 2026, press). Google-guaranteed Fluidstack leases priced
             at 6.25–7.25%. Three prints sit on CoreWeave leases: Prime Elk Grove
             at 7.50% (Jun 2026), Helios Phase II at 9.875% (Jul 2026) and
-            Digital Drive at 9.25% (Sep 2026, press). The gap to hyperscaler
+            Digital Drive at 9.25% (Sep 2026, press). Zenith Arc, leased to
+            Jane Street, priced at 8.875% (Aug 2026; coupon and size per S&P's
+            final rating). The gap to hyperscaler
             paper is not fixed. Among the 2031 notes, Prime Elk Grove priced
             about 27 basis points over QTS Odyssey, and Helios Phase II about
             265 basis points over it.
@@ -956,7 +936,8 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
             Comparability caveats. Tenor: the two Meta notes amortize fully
             to 2048–49 (◎), so their coupons embed decades of duration the
             2030–31 bonds don't. Sourcing: the Meta, QTS Odyssey and Digital Drive coupons are
-            press-sourced, hence the hollow marks. The Meta notes are rated
+            press-sourced, and Zenith Arc's comes from S&P's rating record,
+            hence the hollow marks. The Meta notes are rated
             A+/AA− but no issuer statement discloses pricing. The other
             coupons come from filings or issuer and counsel releases. Two
             multi-tenant data-center securitizations priced in the same
