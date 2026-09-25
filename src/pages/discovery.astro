@@ -158,7 +158,9 @@ const [W0, H0] = map.frame;
     .tape-inner { display: flex; animation: disc-scroll 60s linear infinite; }
     @keyframes disc-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
     @media (prefers-reduced-motion: reduce) { .tape-inner { animation: none; } .tape { overflow-x: auto; } }
-    :global(.disc .tcell) { display: inline-flex; gap: 8px; align-items: baseline; padding: 0 22px; border-right: 1px solid var(--rule); }
+    :global(.disc .tcell) { display: inline-flex; gap: 8px; align-items: baseline; padding: 0 22px; border-right: 1px solid var(--rule); cursor: pointer; }
+    :global(.disc .tcell:hover .sym) { color: var(--link); }
+    .tape:active .tape-inner, .tape:focus-within .tape-inner { animation-play-state: paused; }
     :global(.disc .tcell .sym) { color: var(--ink-dim); font-weight: 600; }
     :global(.disc .tcell .val) { font-weight: 600; color: var(--ink); }
 
@@ -197,7 +199,13 @@ const [W0, H0] = map.frame;
     :global(.disc .lbar i) { position: absolute; left: 0; top: 0; bottom: 0; }
 
     .layout { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
-    @media (max-width: 760px) { .layout { grid-template-columns: 1fr; } }
+    /* Phones: the selected zone's chart comes first, the zone rail below it
+       in a short scrolling box (mobile pass 2026-09-24). */
+    @media (max-width: 760px) {
+      .layout { grid-template-columns: 1fr; }
+      .layout .maincol { order: -1; }
+      .layout .side { max-height: 360px; }
+    }
     .side { background: var(--surface); padding: 8px 0; max-height: 760px; overflow: auto; }
     .side h2, .chartpanel h2 { font-family: var(--font-mono); margin: 2px 12px 8px; font-size: var(--fs-xs); letter-spacing: .1em; color: var(--ink-dim); text-transform: uppercase; font-weight: 600; }
     :global(.disc .geogroup + .geogroup) { margin-top: 14px; }
@@ -260,6 +268,7 @@ const [W0, H0] = map.frame;
 
     const DATA = JSON.parse(document.getElementById('disc-data')!.textContent || '{}') as { rows: (Row & { start: string; p: [number, number][] })[]; asof: string; views: View[]; chips: string[] };
     const HASH0 = location.hash;
+    const MAPW = Number((document.getElementById('zmap') as unknown as SVGSVGElement | null)?.viewBox.baseVal.width) || 1000;
     const DAY = 86400000, t = (d: string) => Date.parse(d + 'T00:00:00Z');
     DATA.rows.forEach((s) => { const t0 = t(s.start); s.pts = s.p.map(([o, v]) => [new Date(t0 + o * DAY).toISOString().slice(0, 10), v]); });
     const $ = (id: string) => document.getElementById(id)!;
@@ -309,25 +318,30 @@ const [W0, H0] = map.frame;
       const zoomed = view.name !== 'World';
       const byPlace = groupBy(rows, (s) => s.place);
       let dots = '', labels: { place: string; x: number; y: number; n: number }[] = [];
+      // Phones draw the map at ~1/3 scale; grow dots, rings and labels so they
+      // stay legible and tappable (mobile pass 2026-09-24).
+      const svgW = ($('zmap') as unknown as SVGSVGElement).clientWidth || MAPW;
+      const u = Math.min(2.2, Math.max(1, (MAPW / svgW) * 0.8));
+      const dotR = 5 * u;
       byPlace.forEach((rs, place) => {
         const cx = view.tx + view.k * rs[0].x, cy = view.ty + view.k * rs[0].y;
         // World view: the tightest ring that keeps 5px dots from touching, so
         // a place's zones stay on its own ground (Aragon had one dot in France).
-        const ring = (n: number) => 5.5 / Math.sin(Math.PI / n);
-        const rr = rs.length > 1 ? (zoomed ? 16 + 2 * rs.length : ring(rs.length)) : 0;
+        const ring = (n: number) => (dotR + 0.5) / Math.sin(Math.PI / n);
+        const rr = rs.length > 1 ? (zoomed ? (16 + 2 * rs.length) * u : ring(rs.length)) : 0;
         labels.push({ place, x: cx, y: cy + rr, n: rs.length });
         [...rs].sort((a, b) => a.az.localeCompare(b.az, 'en', { numeric: true }) || a.instance.localeCompare(b.instance)).forEach((s, i) => {
           // Two zones sit side by side (same latitude); more go round a ring.
           const a = rs.length === 2 ? Math.PI * i + Math.PI : 2 * Math.PI * i / rs.length - Math.PI / 2;
           const x = cx + rr * Math.cos(a), y = cy + rr * Math.sin(a);
-          dots += `<circle class="zdot${s.id === selId ? ' sel' : ''}" data-id="${esc(s.id)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="${colFor(V(s) / med - 1)}"><title>${esc(`${s.place} ${s.az} · ${s.instance} · $${V(s).toFixed(2)}/GPU-hr`)}</title></circle>`;
+          dots += `<circle class="zdot${s.id === selId ? ' sel' : ''}" data-id="${esc(s.id)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dotR.toFixed(1)}" fill="${colFor(V(s) / med - 1)}"><title>${esc(`${s.place} ${s.az} · ${s.instance} · $${V(s).toFixed(2)}/GPU-hr`)}</title></circle>`;
         });
       });
       // Drop a label that would collide with one already placed (larger places
       // first); the zoomed views show every label.
       const kept: typeof labels = [];
-      labels.sort((a, b) => b.n - a.n).forEach((l) => { if (kept.every((k) => Math.abs(k.x - l.x) > 90 || Math.abs(k.y - l.y) > 18)) kept.push(l); });
-      $('labels').innerHTML = kept.map((l) => `<text class="rlabel" x="${l.x.toFixed(1)}" y="${(l.y + 20).toFixed(1)}" text-anchor="middle">${esc(l.place)}</text>`).join('');
+      labels.sort((a, b) => b.n - a.n).forEach((l) => { if (kept.every((k) => Math.abs(k.x - l.x) > 90 * u || Math.abs(k.y - l.y) > 18 * u)) kept.push(l); });
+      $('labels').innerHTML = kept.map((l) => `<text class="rlabel" x="${l.x.toFixed(1)}" y="${(l.y + 20 * u).toFixed(1)}" text-anchor="middle" style="font-size:${(12 * u).toFixed(1)}px;stroke-width:${(3 * u).toFixed(1)}px">${esc(l.place)}</text>`).join('');
       $('dots').innerHTML = dots;
       $('dots').querySelectorAll<SVGCircleElement>('circle').forEach((c) => c.addEventListener('click', () => select(c.dataset.id!, true)));
       // Ladder, sortable by zone or price; a second click flips the order.
@@ -362,7 +376,7 @@ const [W0, H0] = map.frame;
     const tailOf = (s: Row) => { const last = t(s.pts[s.pts.length - 1][0]); return s.pts.filter(([d]) => t(d) >= last - 30 * DAY); };
     function renderTape() {
       const rows = ofChip();
-      const cells = rows.map((s) => `<span class="tcell"><span class="sym">${chip} · ${esc(s.place)} ${s.az}${s.note ? ' ' + s.note.split(' ')[0] : ''}</span><span class="val">${V(s).toFixed(2)}</span><span class="${clsOf(s.st!.d1)}">${sgnp(s.st!.d1)}</span></span>`).join('');
+      const cells = rows.map((s) => `<span class="tcell" role="button" tabindex="0" data-id="${esc(s.id)}"><span class="sym">${chip} · ${esc(s.place)} ${s.az}${s.note ? ' ' + s.note.split(' ')[0] : ''}</span><span class="val">${V(s).toFixed(2)}</span><span class="${clsOf(s.st!.d1)}">${sgnp(s.st!.d1)}</span></span>`).join('');
       $('tape').innerHTML = cells + cells;
       $('tape').style.animationDuration = `${Math.max(60, rows.length * 6)}s`;
     }
@@ -460,9 +474,11 @@ const [W0, H0] = map.frame;
           yg.insertAdjacentHTML('beforeend', `<text x="2" y="${(y + 3).toFixed(1)}">${v.toFixed(2)}</text><text x="${W - 2}" y="${(y + 3).toFixed(1)}" text-anchor="end">${v.toFixed(2)}</text>`);
           gg.insertAdjacentHTML('beforeend', `<line x1="${PADL}" x2="${W - PADR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}"/>`);
         }
+        // Tick count follows the chart width so labels never overlap.
         const spanDays = (t1 - t0) / DAY, ticks: number[] = [];
-        if (spanDays <= 10) for (let x = t0; x <= t1 + DAY / 2; x += DAY) ticks.push(x);
-        else for (let i = 0; i <= 6; i++) ticks.push(t0 + (t1 - t0) * i / 6);
+        const nT = Math.max(2, Math.min(6, Math.floor((W - PADL - PADR) / 80)));
+        if (spanDays <= nT) for (let x = t0; x <= t1 + DAY / 2; x += DAY) ticks.push(x);
+        else for (let i = 0; i <= nT; i++) ticks.push(t0 + (t1 - t0) * i / nT);
         ticks.forEach((x, i) => {
           xg.insertAdjacentHTML('beforeend', `<text x="${X(x).toFixed(1)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle'}">${dlabel(x)}</text>`);
           // Vertical gridline at each interior date tick, as on /tokens.
@@ -475,7 +491,7 @@ const [W0, H0] = map.frame;
       }
       $('chart-title').textContent = `· ${s.chip} · ${s.place} ${s.az}${s.note ? ' · ' + s.note : ''} · ${winLbl}${ctype === 'candle' ? ' · daily candles' : ' · daily'} · dotted 7-day avg`;
       const mk = $('chart-mark'); mk.setAttribute('x', String(W - PADR - 4)); mk.setAttribute('y', String(H - PADB - 10));
-      mk.textContent = `CCIR · ${s.chip} · ${s.place} ${s.az} · ccir.io/discovery`;
+      mk.textContent = W < 560 ? 'ccir.io/discovery' : `CCIR · ${s.chip} · ${s.place} ${s.az} · ccir.io/discovery`;
       $('xhair').style.display = 'none';
       document.querySelectorAll<HTMLButtonElement>('#ranges button').forEach((b) => b.classList.toggle('on', !zoom && String(rangeDays) === b.dataset.range));
       document.querySelectorAll<HTMLButtonElement>('#type-tabs button').forEach((b) => b.classList.toggle('on', b.dataset.type === ctype));
@@ -488,6 +504,18 @@ const [W0, H0] = map.frame;
       for (const [id, v] of [['mq-d1', st.d1], ['mq-d7', st.d7], ['mq-d30', st.d30]] as [string, number | null][]) { $(id).textContent = sgnp(v); $(id).className = clsOf(v); }
       $('mq-d1abs').textContent = st.d1abs == null ? '–' : `${st.d1abs >= 0 ? '+' : '−'}${Math.abs(st.d1abs).toFixed(2)}`; $('mq-d1abs').className = clsOf(st.d1abs);
     }
+    // Ticker: tap or click a cell to open that zone's chart (mobile pass).
+    $('tape').addEventListener('click', (e) => {
+      const c = (e.target as HTMLElement).closest<HTMLElement>('.tcell');
+      if (!c?.dataset.id) return;
+      select(c.dataset.id, true);
+      if (window.innerWidth <= 760) document.querySelector('.maincol')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    $('tape').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const c = (e.target as HTMLElement).closest<HTMLElement>('.tcell');
+      if (c?.dataset.id) { e.preventDefault(); select(c.dataset.id, true); }
+    });
     function select(id: string, toCharts: boolean) {
       selId = id; zoom = null;
       renderMap(); renderRail(); renderHero(); renderChart();
