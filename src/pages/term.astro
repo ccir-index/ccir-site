@@ -3,15 +3,8 @@ import Base from '../layouts/Base.astro';
 import { printLine } from '../lib/printline';
 import PageHeader from '../components/PageHeader.astro';
 import CiteBlock from '../components/CiteBlock.astro';
-// HyperscalerLadders retired from the page 2026-08-12 (see section 05 note).
-// HyperscalerTermChart PULLED same-day it shipped (John, 2026-07-16): T1 US
-// cells were n=2-4 and cell-to-cell %s manufactured a fake H200 "1Y −26%"
-// (within-provider truth: −7%). REINSTATED 2026-08-12 (John): every T1 US
-// committed cell now prints the same three-provider panel (aws|azure|gcp)
-// after the aws RI convertible-fallback fix landed the missing H100 1Y
-// lane. Levels-only construction unchanged; OD dot stays detached (OD adds
-// OCI, n=4). Per-provider ladders below remain the within-book view.
-import HyperscalerTermChart from '../components/HyperscalerTermChart.astro';
+// Hyperscaler reservation schedules (section 04) DROPPED from the page
+// 2026-09-24 (John). HyperscalerTermChart stays in src/components.
 import { meta, neocloudCommittedCell, headlineValue } from '../data/snapshot';
 import { CHIPS } from '../data/chips';
 import type { Term } from '../data/types';
@@ -257,8 +250,7 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
             factor is the median of those ratios across sellers. A chip never
             borrows another chip's factor. A longer tenor can price above a
             shorter one when sellers post it that way.</p>
-            <p>Hyperscaler reservation schedules stay out of the factors.
-            Section 04 shows them.</p>
+            <p>Hyperscaler reservation schedules stay out of the factors.</p>
             {checkLines.length > 0 && <p>The daily record also carries direct posted term asks. We use them
             as a check. Each shows the gap to the ladder value: {checkLines.join(' · ')}.</p>}
           </div>
@@ -346,18 +338,6 @@ const vintageRows = VINTAGE_CHIPS.flatMap((chip) => V_TENORS.flatMap((tenor) => 
       ))}
       &nbsp;· <a href="/chips">all chips →</a>
     </p>
-
-    <section class="curve-section">
-      <header class="sec-head">
-        <div class="kicker">Section 04 · Named operators, published schedules</div>
-        <h2>Hyperscaler Reservation Schedules</h2>
-      </header>
-
-      <HyperscalerTermChart />
-      {/* HyperscalerLadders (H100-only per-provider schedules) RETIRED from
-          the page 2026-08-12 (John): the multi-chip uniform-panel chart
-          above covers the section; component stays in src/components. */}
-    </section>
 
     <CiteBlock what="GPU Committed Term Rates" path="/term" date={meta.as_of_date} />
   </section>
