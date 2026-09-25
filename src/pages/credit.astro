@@ -1571,12 +1571,12 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
        teal/blue collapses in the dark theme and teal/amber/red left two
        adjacent warm hues too close; this set separates cleanly in both.
        Reinforced by y-position + legend, so color is redundant. */
-    .panel {
+    .panel, .chart-zoom {
       --ct-strong: #0d9488;
       --ct-mid: #b9770a;
       --ct-weak: #c11f57;
     }
-    html[data-theme="terminal"] .panel {
+    html[data-theme="terminal"] .panel, html[data-theme="terminal"] .chart-zoom {
       --ct-strong: #2dd4bf;
       --ct-mid: #ffb400;
       --ct-weak: #ff4d84;
