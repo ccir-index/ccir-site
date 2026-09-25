@@ -638,12 +638,12 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     <div class="hero-solo">
       <PageHeader title="Compute Credit Tracker" kicker="Market Intelligence · Compute Credit" asOf={AS_OF} />
       <p class="standfirst lede">
-        The debt stack behind AI compute: GPU-backed loans and the credit
-        around them, tracked as filed. {instruments.length} instruments
-        across {issuers.length} issuers. ${inScopeUsdB}B across
-        {inScopeC.length} is secured directly by the GPUs: the issuance
-        measure charted below. Convertibles, unsecured notes, and
-        data-center credit are tracked for context.
+        GPU-backed credit, tracked as filed. ${inScopeUsdB}B across
+        {inScopeC.length} instruments is secured directly by the GPUs: the
+        issuance charted below. The ledger holds {instruments.length}
+        instruments across {issuers.length} issuers, including convertibles,
+        unsecured notes and selected data-center financings kept for
+        context.
       </p>
       <div class="disclosure">
         <strong>Sourced as filed</strong>
@@ -669,9 +669,9 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
     <div class="panel" id="issuance">
       <div class="panel-head">
         <div>
-          <div class="panel-title">Compute-infrastructure debt issuance — observed, by quarter</div>
+          <div class="panel-title">GPU-collateralized debt issuance, by quarter</div>
           <div class="panel-sub">
-            Amount issued by quarter and collateral · line = cumulative
+            Amount issued by quarter · line = cumulative
             GPU-collateralized debt tracked
           </div>
         </div>
@@ -781,7 +781,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           <div class="panel-title">Operator bond coupons — corporate issuers, by offtake credit support</div>
           <div class="panel-sub">
             Coupon at pricing, fixed-rate senior secured 144A notes issued by the
-            data-center operator, colored by who backs the lease ·
+            data-center operator, colored by who backs the lease · selected deals ·
             Oct 2025 – Sep 2026 · hover a dot for the bond, click to open its ledger row
           </div>
         </div>
@@ -868,7 +868,7 @@ const cLabels = layoutLabels(cLabelItems, cObstacles);
           <div class="panel-title">Landlord SPV &amp; securitization coupons — non-recourse, by tenant credit</div>
           <div class="panel-sub">
             Coupon at pricing, non-recourse landlord vehicles where the tenant's
-            lease is the credit · mark area ∝ deal size · Oct 2025 – Sep 2026 · hover a mark for the deal, click to open its ledger row
+            lease is the credit · selected deals · mark area ∝ deal size · Oct 2025 – Sep 2026 · hover a mark for the deal, click to open its ledger row
           </div>
         </div>
         <span class="badge">AT PRICING</span>

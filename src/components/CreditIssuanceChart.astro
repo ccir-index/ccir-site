@@ -14,7 +14,7 @@
   Observed only — no modeling of drawdowns or amortization.
 */
 import {
-  bars, barTicks, cumTicks, maxBar, maxCum, Y_TICKS,
+  bars, barTicksGpu as barTicks, cumTicks, maxBarGpu as maxBar, maxCum, Y_TICKS,
   gpuRows, ocRows, lsRows, clRows, suRows, sumB, qLabel, preBaseUsd, preOtherUsd, g, o, l, byClass,
   asOf, currentQ, windowQ, instruments,
 } from '../lib/creditIssuance';
@@ -27,7 +27,7 @@ const M = { top: 20, right: 58, bottom: 40, left: 54 };
 const x0 = M.left, x1 = W - M.right, y0 = M.top, y1 = H - M.bottom;
 const n = bars.length;
 const band = (x1 - x0) / n;
-const barW = Math.min(band * 0.24, 17);
+const barW = Math.min(band * 0.5, 34);
 const bx = (i: number) => x0 + band * (i + 0.5);
 const byBar = (v: number) => y1 - (v / maxBar) * (y1 - y0);
 const byCum = (v: number) => y1 - (v / maxCum) * (y1 - y0);
@@ -36,7 +36,7 @@ const cumPath = bars.map((b, i) => `${i === 0 ? 'M' : 'L'} ${bx(i).toFixed(1)} $
 ---
 <figure class="ci">
   <svg viewBox={`0 0 ${W} ${H}`} role="img"
-       aria-label={`Compute-infrastructure debt issuance by quarter from 2024, three series by collateral. GPU-collateralized issuance peaks near twenty billion dollars a quarter; operator campus-secured runs single-digit billions; landlord SPV and securitization issuance reaches nearly forty billion in late 2025. The cumulative GPU-collateralized line reaches ${sumB(gpuRows).toFixed(0)} billion. The current quarter is marked as quarter-to-date.`}>
+       aria-label={`GPU-collateralized debt issuance by quarter from 2024, with a cumulative line reaching ${sumB(gpuRows).toFixed(0)} billion dollars. The current quarter is marked as quarter-to-date.`}>
     {barTicks.map((t) => (
       <>
         <line x1={x0} y1={byBar(t)} x2={x1} y2={byBar(t)} class="ci-grid" />
@@ -51,17 +51,9 @@ const cumPath = bars.map((b, i) => `${i === 0 ? 'M' : 'L'} ${bx(i).toFixed(1)} $
 
     {bars.map((b, i) => (
       <>
-        <rect x={bx(i) - barW * 1.5 - 2} y={byBar(b.gpu_b)} width={barW}
+        <rect x={bx(i) - barW / 2} y={byBar(b.gpu_b)} width={barW}
               height={Math.max(0, y1 - byBar(b.gpu_b))} class={b.qtd ? 'ci-bar ci-qtd' : 'ci-bar'}>
-          <title>{`${qLabel(b.q)}${b.qtd ? ' (QTD)' : ''} — GPU-collateralized $${b.gpu_b.toFixed(1)}B · $${b.cum_b.toFixed(0)}B cumulative`}</title>
-        </rect>
-        <rect x={bx(i) - barW / 2} y={byBar(b.oc_b)} width={barW}
-              height={Math.max(0, y1 - byBar(b.oc_b))} class={b.qtd ? 'ci-bar3 ci-qtd' : 'ci-bar3'}>
-          <title>{`${qLabel(b.q)}${b.qtd ? ' (QTD)' : ''} — operator campus-secured $${b.oc_b.toFixed(1)}B`}</title>
-        </rect>
-        <rect x={bx(i) + barW / 2 + 2} y={byBar(b.ls_b)} width={barW}
-              height={Math.max(0, y1 - byBar(b.ls_b))} class={b.qtd ? 'ci-bar2 ci-qtd' : 'ci-bar2'}>
-          <title>{`${qLabel(b.q)}${b.qtd ? ' (QTD)' : ''} — landlord SPV/securitization $${b.ls_b.toFixed(1)}B`}</title>
+          <title>{`${qLabel(b.q)}${b.qtd ? ' (QTD)' : ''}: GPU-collateralized $${b.gpu_b.toFixed(1)}B · $${b.cum_b.toFixed(0)}B cumulative`}</title>
         </rect>
         <text x={bx(i)} y={y1 + 16} class="ci-tick ci-tick-x">{qLabel(b.q)}{b.qtd ? '*' : ''}</text>
       </>
@@ -74,29 +66,19 @@ const cumPath = bars.map((b, i) => `${i === 0 ? 'M' : 'L'} ${bx(i).toFixed(1)} $
   </svg>
   <div class="ci-legend">
     <span class="ci-lg"><span class="ci-swatch ci-sw1"></span>GPU-collateralized</span>
-    <span class="ci-lg"><span class="ci-swatch ci-sw3"></span>Operator campus-secured</span>
-    <span class="ci-lg"><span class="ci-swatch ci-sw2"></span>Landlord SPV &amp; securitization</span>
     <span class="ci-lg ci-lg-note">* current quarter, partial — backfills as filings land</span>
   </div>
 
   <details class="ci-notes">
     <summary>Notes</summary>
     <p>
-      Series are read from a per-instrument collateral classification set row
-      by row from the filed security descriptions (2026-08-09 curation pass).
-      GPU-collateralized: {gpuRows.length} instruments, ${sumB(gpuRows).toFixed(1)}B,
-      disclosed GPU/equipment collateral only. Operator campus-secured:
-      {ocRows.length} instruments, ${sumB(ocRows).toFixed(1)}B, operator-issued
-      paper secured by a named campus or site (Cipher, Applied Digital,
-      Hut 8, Core Scientific, TeraWulf and peers). Landlord SPV &amp;
-      securitization: {lsRows.length} instruments, ${sumB(lsRows).toFixed(1)}B,
-      non-recourse landlord vehicles and lease securitizations with an
-      AI-compute-linked tenant or purpose (Hyperion, Sopaipilla, Vantage,
-      Stargate campus loans, Meridian Arc, hyperscale-NNN ABS). Multi-tenant
-      colocation securitizations sit outside this boundary by construction
-      ({byClass('dc_adjacent').length} captured rows,
-      ${sumB(byClass('dc_adjacent')).toFixed(1)}B, held as adjacent; the
-      wider colo ABS market is not tracked). As of {asOf}.
+      Bars are GPU-collateralized issuance: {gpuRows.length} instruments,
+      ${sumB(gpuRows).toFixed(1)}B, where the filed security describes the GPUs
+      or equipment as collateral (collateral set row by row from the filings,
+      2026-08-09 curation pass). Data-center paper secured by a campus or a
+      tenant's lease is tracked in the ledger as context and is not charted
+      here; its coupons appear in the two selected-deal charts below.
+      As of {asOf}.
       Observed from filings: amount issued at close, not drawn balance. No
       drawdown or amortization is modeled. The current quarter (*) is
       partial. The tracker records deals when filings or releases land, so
@@ -109,18 +91,14 @@ const cumPath = bars.map((b, i) => `${i === 0 ? 'M' : 'L'} ${bx(i).toFixed(1)} $
       not assigned to a collateral series. Convertibles, unsecured notes,
       crypto-collateralized loans, program umbrellas, and unconfirmed deals
       are outside the measure entirely.
-      {(g.undated + o.undated + l.undated) > 0 && (
-        <> Undated (in totals, not in bars): GPU {g.undated} (${(g.undatedUsd / 1000).toFixed(1)}B),
-        operator campus {o.undated} (${(o.undatedUsd / 1000).toFixed(1)}B),
-        landlord {l.undated} (${(l.undatedUsd / 1000).toFixed(1)}B).</>
+      {g.undated > 0 && (
+        <> Undated (in the total, not in the bars): {g.undated} instruments
+        (${(g.undatedUsd / 1000).toFixed(1)}B).</>
       )}
-      Pre-2024 issuance (GPU ${(preBaseUsd / 1000).toFixed(1)}B, other ${(preOtherUsd / 1000).toFixed(1)}B)
-      sits in the cumulative line's starting level, outside the bars.
-      Coverage: the GPU and operator-campus series come from issuer-by-issuer
-      capture. The landlord series was widened 2026-08-09 by a systematic
-      review of AI-linked campus financings and hyperscale-NNN
-      securitizations (2024 onward). A small verification tail remains, so
-      its earlier bars can still step up as deals are confirmed.
+      Pre-2024 GPU issuance (${(preBaseUsd / 1000).toFixed(1)}B) sits in the
+      cumulative line's starting level, outside the bars.
+      Coverage: GPU-collateralized issuance comes from issuer-by-issuer
+      capture and weekly SEC filing sweeps.
     </p>
   </details>
 </figure>

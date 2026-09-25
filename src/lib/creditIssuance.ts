@@ -100,4 +100,8 @@ export const maxBar = axisMax(Math.max(...bars.map((b) => Math.max(b.gpu_b, b.oc
 export const maxCum = axisMax(Math.max(...bars.map((b) => b.cum_b), 1));
 export const barTicks = Array.from({ length: Y_TICKS + 1 }, (_, k) => Math.round((maxBar / Y_TICKS) * k));
 export const cumTicks = Array.from({ length: Y_TICKS + 1 }, (_, k) => Math.round((maxCum / Y_TICKS) * k));
+// GPU-only bar scale (2026-09-25, /credit went GPU-focused). The shared maxBar
+// above stays as is: the dated 2026-09-06 share card still reads it.
+export const maxBarGpu = axisMax(Math.max(...bars.map((b) => b.gpu_b), 1));
+export const barTicksGpu = Array.from({ length: Y_TICKS + 1 }, (_, k) => Math.round((maxBarGpu / Y_TICKS) * k));
 export const qLabel = (q: string) => q.replace('-', ' ');
