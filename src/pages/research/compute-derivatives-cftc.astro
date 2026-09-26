@@ -11,7 +11,7 @@
 import Base from '../../layouts/Base.astro';
 import NoteFooter from '../../components/NoteFooter.astro';
 
-const AS_OF = '2026-09-24';
+const AS_OF = '2026-09-26';
 const PUBLISHED = '2026-09-02';
 
 const LINKS = {
@@ -30,6 +30,7 @@ const LINKS = {
   c0011: 'https://www.regulations.gov/comment/CFTC-2026-1850-0011',
   c0013: 'https://www.regulations.gov/comment/CFTC-2026-1850-0013',
   c0014: 'https://www.regulations.gov/comment/CFTC-2026-1850-0014',
+  c0018: 'https://www.regulations.gov/comment/CFTC-2026-1850-0018',
   setara: 'https://www.setarafinancial.com/',
 };
 
@@ -229,6 +230,21 @@ const LETTERS: Letter[] = [
       'Settlement references should "clearly identify eligible compute, evidence supporting inclusion, resource state at the observation time, freshness requirements, material exclusions, and circumstances requiring revalidation or removal from the reference set."',
     ],
     note: 'Warns that mixing on-demand, reserved and nominal capacity "may produce a price series without establishing economic equivalence."',
+  },  {
+    filer: 'Compute Capital (USA), Inc.',
+    form: 'Comment letter, 6 pages',
+    where: 'regulations.gov',
+    href: LINKS.c0018,
+    onDocket: 'Yes, CFTC-2026-1850-0018 (received Sep 25, posted Sep 25)',
+    topics: 'Cash markets · oversight · customer protection · perpetuals (numbered)',
+    asks: [
+      'Recognize that "a compute future listed in isolation from a documented, reportable OTC book will not produce the robust market the Chairman described."',
+      '"Evaluate DCM filings against whether the settlement series is a transaction print with governance the Commission can inspect, not a posted offer the supplier administers."',
+      'Encourage, "and where the statute already allows require," side-by-side OTC infrastructure: ISDA documentation, named Commodity Reference Prices, calculation-agent standards and separate credit confirmations.',
+      '"Treat auction or dealer-poll determination of a tradable GPU-hour as a legitimate supplement when the tape is thin."',
+      '"Do not treat a perpetual listed future as the answer to long-dated commercial risk."',
+    ],
+    note: 'Argues that listed futures "inherit liquidity from the OTC market they sit next to. They do not invent it."',
   },
 ];
 
