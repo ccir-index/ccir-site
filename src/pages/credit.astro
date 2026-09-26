@@ -24,14 +24,15 @@ import CreditIssuanceChart from '../components/CreditIssuanceChart.astro';
 // stale the first time an issuer was added (2026-08-24, WhiteFiber and
 // ChronoScale). Order follows ledger row count, most-tracked first.
 import { ISSUERS } from './credit/issuer/_issuers';
-import { coreInstruments, gpuIssuers, RELATED_PAGE } from '../lib/creditSplit';
+import { coreInstruments, coreRetired, RELATED_PAGE } from '../lib/creditSplit';
 import { fmtRate, rateTitle, fmtSize, senClass, TYPE_LABEL } from '../lib/creditFormat';
 
 // The ledger on this page is the CORE set: GPU-collateral rows plus the same
 // issuers' other debt (src/lib/creditSplit.ts). Related data-center and miner
 // debt lives in a collapsed ledger on the data-center bonds note.
 const instruments = coreInstruments;
-const retired = creditData.retired;
+// Retired rows of related issuers are listed with the related ledger on the note.
+const retired = coreRetired;
 
 // "As of" = latest row-level verification date, so the kicker tracks the
 // ledger itself; _meta.as_of is only a fallback if rows ever lack the field.
@@ -49,9 +50,9 @@ const byId = new Map(instruments.map((i: any) => [i.id, i]));
 // GPU-collateral rows lead, ordered by GPU-secured dollars; the rest follow by
 // tracked row count.
 const issuerNav = Object.entries(ISSUERS)
-  .filter(([, def]) => gpuIssuers.has(def.match))
   .map(([slug, def]) => {
-    const rows = instruments.filter((i: any) => i.issuer === def.match);
+    // All rows, related included, so related-only issuers keep their row-count order.
+    const rows = creditData.instruments.filter((i: any) => i.issuer === def.match);
     return {
       slug,
       display: def.display,
@@ -457,7 +458,7 @@ const A_TICKS_X = [
 ---
 <Base
   title="Compute Credit Tracker · CCIR"
-  description={`GPU-backed loans from SEC filings and issuer releases: coupons, spreads, collateral, lenders and ratings, every row linked to its source. CoreWeave, Crusoe, Nscale, Applied Digital, IREN, Lambda, Nebius, xAI, Core Scientific and ${gpuIssuers.size - 9} more issuers.`}
+  description={`GPU-backed loans from SEC filings and issuer releases: coupons, spreads, collateral, lenders and ratings, every row linked to its source. CoreWeave, Crusoe, Nscale, Applied Digital, IREN, Lambda, Nebius, xAI, Core Scientific and ${new Set(instruments.map((i: any) => i.issuer)).size - 9} more issuers.`}
   ogImage="/og/credit-issuance-20260906.png"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
@@ -746,6 +747,7 @@ const A_TICKS_X = [
         <thead>
           <tr>
             <th class="sortable" data-key="issuer">Issuer</th>
+            <th>Lenders / Agents</th>
             <th class="sortable" data-key="name">Instrument</th>
             <th>Source</th>
             <th class="sortable" data-key="type">Type</th>
@@ -754,7 +756,6 @@ const A_TICKS_X = [
             <th class="sortable" data-key="issued">Issued</th>
             <th class="sortable" data-key="mat">Maturity</th>
             <th class="sortable" data-key="sen">Seniority</th>
-            <th>Lenders / Agents</th>
             <th class="sortable" data-key="status">Status</th>
           </tr>
         </thead>
@@ -777,6 +778,14 @@ const A_TICKS_X = [
                 <span class="issuer-name">{i.issuer}</span>
                 {i.ticker && <span class="ticker mono">{i.ticker}</span>}
               </td>
+              <td class="c-lenders" title={(i.lenders ?? []).join(' · ')}>
+                {(i.lenders ?? []).length === 0 ? '—' : (
+                  <>
+                    <span class="lender-first">{i.lenders[0]}</span>
+                    {i.lenders.length > 1 && <span class="lender-more">+{i.lenders.length - 1}</span>}
+                  </>
+                )}
+              </td>
               <td class="c-name" title={[i.entity, i.security, i.size_note].filter(Boolean).join(' · ')}>
                 {i.name}
                 {(i.entity || i.security || i.size_note) && <span class="has-note" aria-hidden="true">†</span>}
@@ -790,14 +799,6 @@ const A_TICKS_X = [
               <td class="c-issued mono" title={i.issued ?? ''}>{i.issued ?? '—'}</td>
               <td class="c-mat" title={i.maturity_note ?? ''}>{i.maturity ?? '—'}</td>
               <td class="c-sen" title={i.seniority ?? ''}>{senClass(i.seniority)}</td>
-              <td class="c-lenders" title={(i.lenders ?? []).join(' · ')}>
-                {(i.lenders ?? []).length === 0 ? '—' : (
-                  <>
-                    <span class="lender-first">{i.lenders[0]}</span>
-                    {i.lenders.length > 1 && <span class="lender-more">+{i.lenders.length - 1}</span>}
-                  </>
-                )}
-              </td>
               <td class="c-status"><span class={`chip chip-${i.status}`}>{i.status}</span></td>
             </tr>
           ))}
@@ -968,7 +969,7 @@ const A_TICKS_X = [
       var sortKey = null, sortDir = 1;
       var NUMERIC = { size: true, rate: true };
       function rowVal(r, key) {
-        if (key === 'name') return r.cells[1].textContent.trim().toLowerCase();
+        if (key === 'name') return r.querySelector('.c-name').textContent.trim().toLowerCase();
         var v = r.dataset[key];
         if (NUMERIC[key]) {
           var n = parseFloat(v);
@@ -1127,7 +1128,7 @@ const A_TICKS_X = [
         var table = document.getElementById('credit-table');
         if (!table) return;
         var ths = table.querySelectorAll('thead th');
-        var KEY = 'credit-col-widths-v2'; // v2 2026-09-25: Source moved to column 3
+        var KEY = 'credit-col-widths-v3'; // v3 2026-09-26: Lenders moved to column 2
         var saved = null;
         try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
         if (saved && saved.length !== ths.length) saved = null;

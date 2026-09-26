@@ -3,25 +3,26 @@
 // GPU-collateral row. Selected by hand, not maintained to completeness, so it
 // sits collapsed on the data-center bonds note. Same columns as the /credit
 // ledger, one row per instrument, each row linking its source. No totals.
-import { relatedInstruments } from '../lib/creditSplit';
+import { relatedInstruments, relatedRetired, ledgerAsOf } from '../lib/creditSplit';
 import { fmtRate, rateTitle, fmtSize, senClass, TYPE_LABEL } from '../lib/creditFormat';
 
 const rows = [...relatedInstruments].sort((a: any, b: any) =>
   a.issuer.localeCompare(b.issuer) || String(a.issued ?? '').localeCompare(String(b.issued ?? '')));
-const asOf = rows.map((i: any) => i.as_of).filter(Boolean).sort().at(-1);
 ---
 <details class="rel-ledger" id="related-ledger">
   <summary>Related debt ledger (selected, not maintained to completeness)</summary>
   <p class="rel-lede">
     Debt from data-center landlords, miners and hyperscaler joint ventures.
     We add a row by hand when it helps price GPU risk. Rows are dated; the
-    set is a selection, so it carries no totals. Latest row check {asOf}.
+    set is a selection, so it carries no totals.
   </p>
+  <p class="rel-updated">Ledger updated {ledgerAsOf}</p>
   <div class="rel-scroll">
     <table class="data rel-table">
       <thead>
         <tr>
           <th>Issuer</th>
+          <th>Lenders / Agents</th>
           <th>Instrument</th>
           <th>Source</th>
           <th>Type</th>
@@ -30,7 +31,6 @@ const asOf = rows.map((i: any) => i.as_of).filter(Boolean).sort().at(-1);
           <th>Issued</th>
           <th>Maturity</th>
           <th>Seniority</th>
-          <th>Lenders / Agents</th>
           <th>Status</th>
         </tr>
       </thead>
@@ -41,6 +41,11 @@ const asOf = rows.map((i: any) => i.as_of).filter(Boolean).sort().at(-1);
               <span class="clip w-issuer" title={i.issuer}>{i.issuer}</span>
               {i.ticker && <span class="r-ticker">{i.ticker}</span>}
             </td>
+            <td class="r-lenders" title={(i.lenders ?? []).join(' · ')}>
+              {(i.lenders ?? []).length === 0 ? '—' : (
+                <><span class="clip w-lender">{i.lenders[0]}</span>{i.lenders.length > 1 && <span class="r-more"> +{i.lenders.length - 1}</span>}</>
+              )}
+            </td>
             <td class="r-name" title={[i.name, i.entity, i.security, i.size_note].filter(Boolean).join(' · ')}><span class="clip w-name">{i.name}</span></td>
             <td class="r-src"><a href={i.source.url} target="_blank" rel="noopener noreferrer" title={i.source.doc}>{i.source.doc.split(';')[0]}</a></td>
             <td>{TYPE_LABEL[i.instrument_type] ?? i.instrument_type}</td>
@@ -49,11 +54,6 @@ const asOf = rows.map((i: any) => i.as_of).filter(Boolean).sort().at(-1);
             <td title={i.issued ?? ''}><span class="clip w-date">{i.issued ?? '—'}</span></td>
             <td title={[i.maturity, i.maturity_note].filter(Boolean).join(' · ')}><span class="clip w-date">{i.maturity ?? '—'}</span></td>
             <td class="r-sen" title={i.seniority ?? ''}>{senClass(i.seniority)}</td>
-            <td class="r-lenders" title={(i.lenders ?? []).join(' · ')}>
-              {(i.lenders ?? []).length === 0 ? '—' : (
-                <><span class="clip w-lender">{i.lenders[0]}</span>{i.lenders.length > 1 && <span class="r-more"> +{i.lenders.length - 1}</span>}</>
-              )}
-            </td>
             <td><span class={`r-chip r-chip-${i.status}`}>{i.status}</span></td>
           </tr>
         ))}
@@ -65,6 +65,20 @@ const asOf = rows.map((i: any) => i.as_of).filter(Boolean).sort().at(-1);
     company, lender or arranger statement; press, from reporting only;
     rumored, in talks with no close announced.
   </p>
+  {relatedRetired.length > 0 && (
+    <details class="rel-retired">
+      <summary>Retired and excluded instruments</summary>
+      <p class="rel-foot">
+        Instruments verified repaid, extinguished, settled, superseded, or
+        determined not to be debt. They stay listed so the history can be audited.
+      </p>
+      <ul class="rel-retired-list">
+        {relatedRetired.map((r: any) => (
+          <li><strong>{r.issuer}</strong><ul>{r.items.map((it: string) => <li>{it}</li>)}</ul></li>
+        ))}
+      </ul>
+    </details>
+  )}
 </details>
 
 <script is:inline>
@@ -107,6 +121,23 @@ const asOf = rows.map((i: any) => i.as_of).filter(Boolean).sort().at(-1);
     color: var(--ink-dim); line-height: 1.6; max-width: 90ch; margin: 6px 0 10px;
   }
   .rel-foot { color: var(--ink-faint); margin-top: 10px; }
+  .rel-updated {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--ink-faint); letter-spacing: 0.04em; margin: 0 0 10px;
+  }
+  .rel-retired { margin: 10px 0 0; }
+  .rel-retired > summary {
+    list-style: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: var(--tracking-eye); text-transform: uppercase;
+    color: var(--ink-dim); padding: 6px 0;
+  }
+  .rel-retired > summary::-webkit-details-marker { display: none; }
+  .rel-retired > summary::before { content: '▸ '; color: var(--accent); }
+  .rel-retired[open] > summary::before { content: '▾ '; }
+  .rel-retired-list { font-size: var(--fs-sm); color: var(--ink-dim); line-height: 1.6; max-width: 90ch; }
+  .rel-retired-list strong { color: var(--ink); }
+  .rel-retired-list ul { padding-left: 16px; margin: 2px 0 8px; }
   .rel-scroll { overflow-x: auto; border: 1px solid var(--rule); max-width: 100%; }
   .rel-table { min-width: 1120px; }
   .rel-table th, .rel-table td { text-align: left; white-space: nowrap; }

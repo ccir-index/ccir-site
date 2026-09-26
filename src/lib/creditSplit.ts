@@ -18,6 +18,16 @@ export const coreInstruments = all.filter(isCore);
 export const relatedInstruments = all.filter((i) => !isCore(i));
 export const coreIds = new Set(coreInstruments.map((i) => i.id));
 
+// Retired entries follow the same split. A retired issuer string can carry a
+// suffix ("Nebius Group N.V. (adjacent non-debt)"), so match on the prefix.
+const retiredIsCore = (r: any): boolean =>
+  [...gpuIssuers].some((g) => r.issuer === g || r.issuer.startsWith(g + ' '));
+const allRetired = (creditData as any).retired as any[];
+export const coreRetired = allRetired.filter(retiredIsCore);
+export const relatedRetired = allRetired.filter((r) => !retiredIsCore(r));
+// The ledger's own dated stamp, for surfaces that show the related set.
+export const ledgerAsOf: string = (creditData as any)._meta.as_of;
+
 // Where a ledger row lives. Chart marks and cross-links use this.
 export const RELATED_PAGE = '/research/data-center-bonds-price-the-tenant';
 export const rowHref = (id: string): string =>
