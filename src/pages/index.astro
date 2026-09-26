@@ -8,6 +8,7 @@ import ChipLink from '../components/ChipLink.astro';
 import { TIERS, TIER_LABELS_SHORT, TERM_DISPLAY } from '../data/types';
 import type { Rate, Term, Tier } from '../data/types';
 import creditData from '../data/credit_instruments.json';
+import { coreInstruments } from '../lib/creditSplit';
 
 // --- surface band (redesign/v1) -------------------------------------------
 // The other three surfaces, few words each. The credit stat reuses /credit's
@@ -15,7 +16,8 @@ import creditData from '../data/credit_instruments.json';
 // tile and the tracker can never disagree.
 const creditGpuRows = creditData.instruments.filter((i: any) => i.collateral_class === 'gpu');
 const creditGpuUsdB = Math.round(creditGpuRows.reduce((a: number, i: any) => a + i.size_usd_m, 0) / 1000);
-const creditN = creditData.instruments.length;
+// CORE ledger only: GPU rows plus the same issuers' other debt (src/lib/creditSplit.ts).
+const creditN = coreInstruments.length;
 
 const fmt = (n: number, dp = 2) => n.toFixed(dp);
 

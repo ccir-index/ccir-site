@@ -2,6 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import NoteFooter from '../../components/NoteFooter.astro';
 import creditData from '../../data/credit_instruments.json';
+import RelatedDebtLedger from '../../components/RelatedDebtLedger.astro';
+import { rowHref } from '../../lib/creditSplit';
 
 // Data-Center Bonds Price the Tenant (2026-09-25). Takes over the two coupon
 // charts that used to sit on /credit ("Operator bond coupons", panel
@@ -11,7 +13,9 @@ import creditData from '../../data/credit_instruments.json';
 // FROZEN: the charts still read the ledger (rows whose `chart.panel` is
 // 'operator' or 'landlord'), but only rows whose plot date (chart.date, else
 // issued) is on or before FREEZE. A dated note must not change when a new
-// bond joins the ledger. Every mark links to its row in the /credit ledger.
+// bond joins the ledger. Every mark links to its ledger row: rows of GPU
+// issuers on /credit, related rows in the collapsed ledger on this page
+// (src/lib/creditSplit.ts, split 2026-09-26).
 
 const FREEZE = '2026-09-25';
 const instruments = creditData.instruments;
@@ -70,7 +74,6 @@ const cy = (v: number) => y0 + (y1 - y0) * ((C_YMAX - v) / (C_YMAX - C_YMIN));
 const C_TICKS_Y = [6, 7, 8, 9, 10];
 const crad = (b: number) => Math.max(3.5, 2.6 * Math.sqrt(b));
 const cFmt = (v: number) => v.toFixed(3).replace(/0$/, '');
-const rowHref = (id: string) => `/credit#row-${id}`;
 
 const datasetLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -135,7 +138,7 @@ const datasetLd = JSON.stringify({
           <div class="cp-sub">
             Coupon at pricing, fixed-rate senior secured notes issued by the
             data-center operator · selected deals · Oct 2025 to Sep 2026 ·
-            hover a dot for the bond, click to open its row in the /credit ledger
+            hover a dot for the bond, click to open its ledger row
           </div>
         </div>
         <div class="legend">
@@ -180,7 +183,7 @@ const datasetLd = JSON.stringify({
             Coupon at pricing, issued by a single-campus vehicle where the
             tenant's lease is the credit · selected deals · mark area = deal
             size · Oct 2025 to Sep 2026 · hover a mark for the deal, click to
-            open its row in the /credit ledger
+            open its ledger row
           </div>
         </div>
         <div class="legend">
@@ -248,10 +251,13 @@ const datasetLd = JSON.stringify({
       <p>
         Coupons at pricing, from filings, issuer and counsel releases, and
         press where marked. The tenant is the lease counterparty named in the
-        filing or release. Each bond links to its row in the
-        <a href="/credit#ledger">/credit ledger</a>. Fixed at {FREEZE}.
+        filing or release. Each bond links to its ledger row. Bonds of GPU
+        borrowers link to the <a href="/credit#ledger">/credit ledger</a>.
+        The rest link to the related debt ledger below. The charts are fixed
+        at {FREEZE}.
       </p>
     </section>
+    <RelatedDebtLedger />
 
     <NoteFooter title="Data-Center Bonds Price the Tenant" published="2026-09-25" />
   </section>

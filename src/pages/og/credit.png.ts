@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { frame, toPng, el, C } from '../../lib/og';
 import creditData from '../../data/credit_instruments.json';
+import { coreInstruments, gpuIssuers } from '../../lib/creditSplit';
 
 export const prerender = true;
 
@@ -63,8 +64,9 @@ const AS_OF =
     .at(-1) ?? creditData._meta.as_of;
 
 export const GET: APIRoute = async () => {
-  const nInstruments = creditData.instruments.length;
-  const nIssuers = new Set(creditData.instruments.map((i: any) => i.issuer)).size;
+  // CORE ledger, the set /credit shows (src/lib/creditSplit.ts).
+  const nInstruments = coreInstruments.length;
+  const nIssuers = gpuIssuers.size;
 
   const body = el('div', { display: 'flex', flexDirection: 'column', flexGrow: 1 }, [
     el('div', { display: 'flex', gap: 20 }, [

@@ -24,14 +24,19 @@ import CreditIssuanceChart from '../components/CreditIssuanceChart.astro';
 // stale the first time an issuer was added (2026-08-24, WhiteFiber and
 // ChronoScale). Order follows ledger row count, most-tracked first.
 import { ISSUERS } from './credit/issuer/_issuers';
+import { coreInstruments, gpuIssuers, RELATED_PAGE } from '../lib/creditSplit';
+import { fmtRate, rateTitle, fmtSize, senClass, TYPE_LABEL } from '../lib/creditFormat';
 
-const instruments = creditData.instruments;
+// The ledger on this page is the CORE set: GPU-collateral rows plus the same
+// issuers' other debt (src/lib/creditSplit.ts). Related data-center and miner
+// debt lives in a collapsed ledger on the data-center bonds note.
+const instruments = coreInstruments;
 const retired = creditData.retired;
 
 // "As of" = latest row-level verification date, so the kicker tracks the
 // ledger itself; _meta.as_of is only a fallback if rows ever lack the field.
 const AS_OF =
-  instruments
+  creditData.instruments
     .map((i: any) => i.as_of)
     .filter(Boolean)
     .sort()
@@ -44,6 +49,7 @@ const byId = new Map(instruments.map((i: any) => [i.id, i]));
 // GPU-collateral rows lead, ordered by GPU-secured dollars; the rest follow by
 // tracked row count.
 const issuerNav = Object.entries(ISSUERS)
+  .filter(([, def]) => gpuIssuers.has(def.match))
   .map(([slug, def]) => {
     const rows = instruments.filter((i: any) => i.issuer === def.match);
     return {
@@ -63,29 +69,7 @@ function inst(id: string): any {
 }
 
 // --- rate / size formatting ------------------------------------------------
-function fmtRate(rate: any): string {
-  if (rate.kind === 'undisclosed') return 'Undisclosed';
-  if (rate.kind === 'sofr_spread') {
-    if (rate.value == null && rate.value_low != null)
-      return `SOFR +${rate.value_low.toFixed(2)}–${rate.value_high.toFixed(2)}%`;
-    return `SOFR +${rate.value.toFixed(2)}%`;
-  }
-  if (rate.kind === 'fixed') {
-    if (rate.value == null && rate.value_low != null)
-      return `${rate.value_low.toFixed(2)}–${rate.value_high.toFixed(2)}%`;
-    if (rate.value == null) return 'See note';
-    return `${rate.value.toFixed(3).replace(/0$/, '')}%`;
-  }
-  // floating_other — benchmark lives in the note; show its lead clause.
-  if (rate.note) {
-    const short = rate.note.split(';')[0];
-    return short.length > 34 ? short.slice(0, 32) + '…' : short;
-  }
-  return 'Floating';
-}
-function rateTitle(rate: any): string {
-  return rate.note ?? '';
-}
+// fmtRate, rateTitle, fmtSize, senClass, TYPE_LABEL: src/lib/creditFormat.ts
 // Sort key for the issued column: first ISO date inside the value (a few
 // rows carry prose like 'Assumed 2021' or 'Priced ~2026-04-16/17').
 const issuedSortKey = (v: any) => {
@@ -97,27 +81,6 @@ const issuedSortKey = (v: any) => {
 function rateSortKey(rate: any): number | null {
   return rate.value ?? rate.value_low ?? null;
 }
-function fmtSize(v: number | null): string {
-  if (v == null) return '—';
-  if (v >= 1000) return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
-  if (v >= 10) return v.toLocaleString('en-US', { maximumFractionDigits: 1 });
-  return v.toLocaleString('en-US', { maximumFractionDigits: 2 });
-}
-function senClass(seniority: string | null): string {
-  const s = (seniority ?? '').toLowerCase();
-  if (s.includes('unsecured')) return 'unsecured';
-  if (s.includes('secured') || s.includes('mortgage') || s.includes('lien')) return 'secured';
-  return 'other';
-}
-const TYPE_LABEL: Record<string, string> = {
-  bond: 'Bond',
-  convertible: 'Convertible',
-  credit_facility: 'Credit facility',
-  lease: 'Lease',
-  abs: 'ABS',
-  other: 'Other',
-};
-
 // --- facets ------------------------------------------------------------------
 // Rated-ladder grid: lines from rows carrying facility_ratings. The config
 // only groups multi-instrument packages and sets short labels; any new
@@ -494,7 +457,7 @@ const A_TICKS_X = [
 ---
 <Base
   title="Compute Credit Tracker · CCIR"
-  description="GPU-backed loans and compute-infrastructure financing from SEC filings and issuer releases: coupons, spreads, collateral, lenders and ratings, every row linked to its source. CoreWeave, Crusoe, Nscale, Applied Digital, IREN, Hut 8, TeraWulf, Lambda, Nebius and 40 more issuers."
+  description={`GPU-backed loans from SEC filings and issuer releases: coupons, spreads, collateral, lenders and ratings, every row linked to its source. CoreWeave, Crusoe, Nscale, Applied Digital, IREN, Lambda, Nebius, xAI, Core Scientific and ${gpuIssuers.size - 9} more issuers.`}
   ogImage="/og/credit-issuance-20260906.png"
 >
   <script is:inline type="application/ld+json" slot="head" set:html={JSON.stringify({
@@ -549,8 +512,8 @@ const A_TICKS_X = [
       <p class="standfirst lede">
         GPU-backed credit. ${inScopeUsdB}B across {inScopeDeals}
         deals is secured directly by the GPUs: the issuance charted
-        below. The ledger holds {instruments.length} instruments across
-        {issuers.length} issuers.
+        below. The ledger also lists these issuers' other debt:
+        convertibles, notes and credit lines.
       </p>
       <div class="disclosure">
         <strong>Sourced as filed</strong>
@@ -738,9 +701,9 @@ const A_TICKS_X = [
     <div class="ledger-head" id="ledger">
       <h2>Instrument ledger</h2>
       <p class="standfirst">
-        Every live instrument across the panel. GPU-backed financings are
-        the core; convertibles, unsecured notes and selected data-center
-        financings are kept for context. Filter by collateral, issuer, type,
+        Every live GPU-backed financing, plus the same issuers' other debt.
+        Related data-center and miner financing is in a collapsed ledger on
+        the <a href={RELATED_PAGE}>data-center bonds note</a>. Filter by collateral, issuer, type,
         seniority, lender, or confirmation status. Click a column header to
         sort. Each row links the filing or release it was taken from.
       </p>

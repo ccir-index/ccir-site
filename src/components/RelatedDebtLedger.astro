@@ -1,0 +1,144 @@
+---
+// Related debt ledger (John, 2026-09-26): debt from issuers with no
+// GPU-collateral row. Selected by hand, not maintained to completeness, so it
+// sits collapsed on the data-center bonds note. Same columns as the /credit
+// ledger, one row per instrument, each row linking its source. No totals.
+import { relatedInstruments } from '../lib/creditSplit';
+import { fmtRate, rateTitle, fmtSize, senClass, TYPE_LABEL } from '../lib/creditFormat';
+
+const rows = [...relatedInstruments].sort((a: any, b: any) =>
+  a.issuer.localeCompare(b.issuer) || String(a.issued ?? '').localeCompare(String(b.issued ?? '')));
+const asOf = rows.map((i: any) => i.as_of).filter(Boolean).sort().at(-1);
+---
+<details class="rel-ledger" id="related-ledger">
+  <summary>Related debt ledger (selected, not maintained to completeness)</summary>
+  <p class="rel-lede">
+    Debt from data-center landlords, miners and hyperscaler joint ventures.
+    We add a row by hand when it helps price GPU risk. Rows are dated; the
+    set is a selection, so it carries no totals. Latest row check {asOf}.
+  </p>
+  <div class="rel-scroll">
+    <table class="data rel-table">
+      <thead>
+        <tr>
+          <th>Issuer</th>
+          <th>Instrument</th>
+          <th>Source</th>
+          <th>Type</th>
+          <th class="num">Size $M</th>
+          <th>Rate</th>
+          <th>Issued</th>
+          <th>Maturity</th>
+          <th>Seniority</th>
+          <th>Lenders / Agents</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((i: any) => (
+          <tr id={`row-${i.id}`}>
+            <td class="r-issuer">
+              <span class="clip w-issuer" title={i.issuer}>{i.issuer}</span>
+              {i.ticker && <span class="r-ticker">{i.ticker}</span>}
+            </td>
+            <td class="r-name" title={[i.name, i.entity, i.security, i.size_note].filter(Boolean).join(' · ')}><span class="clip w-name">{i.name}</span></td>
+            <td class="r-src"><a href={i.source.url} target="_blank" rel="noopener noreferrer" title={i.source.doc}>{i.source.doc.split(';')[0]}</a></td>
+            <td>{TYPE_LABEL[i.instrument_type] ?? i.instrument_type}</td>
+            <td class="num" title={i.size_note ?? ''}>{fmtSize(i.size_usd_m)}</td>
+            <td title={rateTitle(i.rate)}><span class:list={['clip w-rate', { dim: i.rate.kind === 'undisclosed' }]}>{fmtRate(i.rate)}</span></td>
+            <td title={i.issued ?? ''}><span class="clip w-date">{i.issued ?? '—'}</span></td>
+            <td title={[i.maturity, i.maturity_note].filter(Boolean).join(' · ')}><span class="clip w-date">{i.maturity ?? '—'}</span></td>
+            <td class="r-sen" title={i.seniority ?? ''}>{senClass(i.seniority)}</td>
+            <td class="r-lenders" title={(i.lenders ?? []).join(' · ')}>
+              {(i.lenders ?? []).length === 0 ? '—' : (
+                <><span class="clip w-lender">{i.lenders[0]}</span>{i.lenders.length > 1 && <span class="r-more"> +{i.lenders.length - 1}</span>}</>
+              )}
+            </td>
+            <td><span class={`r-chip r-chip-${i.status}`}>{i.status}</span></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="rel-foot">
+    Hover a cell for entity, collateral and size notes. Status: confirmed by a
+    company, lender or arranger statement; press, from reporting only;
+    rumored, in talks with no close announced.
+  </p>
+</details>
+
+<script is:inline>
+  // A chart mark or a shared link can point at a row inside the collapsed
+  // ledger. Open it, then scroll the row into view and flash it.
+  (function () {
+    function openTo(hash) {
+      if (!hash || hash.indexOf('#row-') !== 0) return;
+      var row = document.getElementById(hash.slice(1));
+      var box = document.getElementById('related-ledger');
+      if (!row || !box || !box.contains(row)) return;
+      box.open = true;
+      // Scroll after layout: the row had no box while the ledger was shut.
+      requestAnimationFrame(function () {
+        row.scrollIntoView({ block: 'center' });
+        row.classList.remove('r-flash');
+        void row.offsetWidth;
+        row.classList.add('r-flash');
+      });
+    }
+    window.addEventListener('hashchange', function () { openTo(location.hash); });
+    window.addEventListener('load', function () { openTo(location.hash); });
+  })();
+</script>
+
+<style>
+  .rel-ledger { margin: 18px 0 0; max-width: 1120px; }
+  .rel-ledger > summary {
+    list-style: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: var(--tracking-eye); text-transform: uppercase;
+    color: var(--accent); font-weight: var(--weight-strong);
+    padding: 6px 0;
+  }
+  .rel-ledger > summary::-webkit-details-marker { display: none; }
+  .rel-ledger > summary::before { content: '▸ '; }
+  .rel-ledger[open] > summary::before { content: '▾ '; }
+  .rel-lede, .rel-foot {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    color: var(--ink-dim); line-height: 1.6; max-width: 90ch; margin: 6px 0 10px;
+  }
+  .rel-foot { color: var(--ink-faint); margin-top: 10px; }
+  .rel-scroll { overflow-x: auto; border: 1px solid var(--rule); max-width: 100%; }
+  .rel-table { min-width: 1120px; }
+  .rel-table th, .rel-table td { text-align: left; white-space: nowrap; }
+  .rel-table td.num, .rel-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .clip {
+    display: inline-block; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; vertical-align: bottom;
+  }
+  .w-issuer { max-width: 200px; display: block; }
+  .w-name { max-width: 280px; }
+  .w-lender { max-width: 165px; }
+  .w-rate { max-width: 170px; }
+  .w-date { max-width: 120px; }
+  .r-ticker { font-size: var(--fs-xs); color: var(--ink-dim); letter-spacing: 0.06em; }
+  .r-src a {
+    display: inline-block; max-width: 180px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom;
+  }
+  .r-more { color: var(--ink-faint); }
+  .r-sen { text-transform: capitalize; }
+  .dim { color: var(--ink-faint); }
+  .r-chip {
+    font-family: var(--font-mono); font-size: var(--fs-xs);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 1px 6px; border: 1px solid;
+  }
+  .r-chip-confirmed { color: var(--pos); border-color: color-mix(in srgb, var(--pos) 55%, transparent); }
+  .r-chip-press { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 55%, transparent); }
+  .r-chip-rumored { color: var(--neutral); border-color: color-mix(in srgb, var(--neutral) 55%, transparent); }
+  tr.r-flash td { animation: r-flash 2.2s ease-out; }
+  @keyframes r-flash {
+    0%, 35% { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+    100% { background: transparent; }
+  }
+</style>
