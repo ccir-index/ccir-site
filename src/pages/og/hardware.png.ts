@@ -51,7 +51,6 @@ function ivCard(v: (typeof ivCards)[number], CARD_W: number) {
   const items = [
     ...(v.modeledOnly ? [] : [`ask ${usd(v.ask)}`, `sold 90d ${usd(v.t90)}`]),
     ...(v.newCost ? [`new chip ${usd(v.newCost.usd)}`] : []),
-    ...(v.intStress != null ? [`stress ${usd(v.intStress)}`] : []),
   ];
   const rows = [
     el('div', { display: 'flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 16, fontSize: 12.5, marginTop: 8 },

@@ -19,8 +19,8 @@ const LEVEL_LABELS: Record<number, string> = {
   4: 'Level 4 (Escalate)',
 };
 // Use case 02: collateral value and loan-to-value from /hardware (John,
-// 2026-09-24). The fleet is marked at the model value per GPU, with its range
-// and the 2024-25 replay stress. LTV watch levels are illustrative.
+// 2026-09-24). The fleet is marked at the model value per GPU, with its range.
+// Stress case pulled from live (John, 2026-09-26). LTV watch levels are illustrative.
 const FLEET = 8000;
 const FACILITY = 200_000_000;
 const b200Card = ivCards.find((c) => c.model === 'B200');
@@ -53,7 +53,6 @@ const valueCases = b200Card ? [
   { name: 'Model value', per: b200Card.base },
   { name: 'Range, low', per: b200Card.lo },
   { name: 'Range, high', per: b200Card.hi },
-  { name: 'Stress (2024–25 replay)', per: b200Card.intStress },
 ].map((c) => {
   const v = c.per * FLEET, x = FACILITY / v, lv = ltvLevel(x);
   return { ...c, value: v, ltv: x, level: lv, label: LEVEL_LABELS[lv] };
@@ -79,10 +78,9 @@ const POOL = [
 ];
 const poolRows = POOL.map((p) => {
   const c = ivCards.find((x) => x.model === p.chip);
-  return c ? { ...p, units: Math.round(p.weight * FLEET), per: c.base, stress: c.intStress } : null;
+  return c ? { ...p, units: Math.round(p.weight * FLEET), per: c.base } : null;
 }).filter((r): r is NonNullable<typeof r> => r != null);
 const poolValue = poolRows.reduce((a, r) => a + r.units * r.per, 0);
-const poolStress = poolRows.reduce((a, r) => a + r.units * r.stress, 0);
 
 // ---------------------------------------------------------------------------
 // Use case 01: re-leasing (rollover) risk on B200 (John, 2026-09-24).
@@ -149,7 +147,7 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
     secs: [
       ['uc-02-s01', 'Why Mark the Collateral'],
       ['uc-02-s02', 'Hypothetical Exposure'],
-      ['uc-02-s03', 'Value, Range and Stress'],
+      ['uc-02-s03', 'Value and Range'],
       ['uc-02-s04', 'Mixed-Generation Pools'],
       ['uc-02-s05', 'Limitations'],
     ],
@@ -436,8 +434,8 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         <p>
           Most credit documents amortize GPU collateral on a fixed schedule.
           A published value gives the lender a second view that moves with
-          the market. It comes with a range and a stress case, so the lender
-          can see how much cushion the loan has in each.
+          the market. It comes with a range, so the lender can see how much
+          cushion the loan has at each end.
         </p>
       </section>
 
@@ -458,13 +456,11 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
       </section>
 
       <section class="sec">
-        <h3 id="uc-02-s03"><span class="sec-n">03</span> Value, Range and Stress</h3>
+        <h3 id="uc-02-s03"><span class="sec-n">03</span> Value and Range</h3>
         <p>
           The example sets loan-to-value levels at {pctS(LTV_LEVELS[0])},
           {' '}{pctS(LTV_LEVELS[1])} and {pctS(LTV_LEVELS[2])}. The table marks
-          the fleet at the model value, both ends of its range and the stress
-          case. The stress case assumes no contract and replays the 2024–25
-          H100 decline, when on-demand rates fell 61% in 18 months.
+          the fleet at the model value and both ends of its range.
         </p>
         <div class="ftable-wrap">
           <table class="ftable">
@@ -501,10 +497,8 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
           </table>
         </div>
         <p>
-          <strong>The stress case is where the cushion shows.</strong> A loan
-          that sits at baseline on the model value can move to escalation if
-          the fleet loses its contracts in a downturn. The contract book is
-          what protects the lender, and Use case 01 sizes that risk.
+          The value assumes the fleet's contracts hold. Use case 01 sizes
+          the risk that they roll off into a weaker market.
         </p>
         <p>
           The value is recomputed with each daily data refresh. The levels in
@@ -524,7 +518,7 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
         <div class="ftable-wrap">
           <table class="traj">
             <thead>
-              <tr><th>Generation</th><th class="num">Units</th><th class="num">Per GPU</th><th class="num">Value</th><th class="num">Stress</th></tr>
+              <tr><th>Generation</th><th class="num">Units</th><th class="num">Per GPU</th><th class="num">Value</th></tr>
             </thead>
             <tbody>
               {poolRows.map((r) => (
@@ -533,7 +527,6 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
                   <td class="num">{r.units.toLocaleString('en-US')}</td>
                   <td class="num">{fmtK(r.per)}</td>
                   <td class="num">{fmtM(r.units * r.per)}</td>
-                  <td class="num">{fmtM(r.units * r.stress)}</td>
                 </tr>
               ))}
               <tr>
@@ -541,7 +534,6 @@ const toc: { id: string; kicker: string; label: string; secs: string[][] }[] = [
                 <td class="num">{FLEET.toLocaleString('en-US')}</td>
                 <td class="num">{fmtK(poolValue / FLEET)}</td>
                 <td class="num"><strong>{fmtM(poolValue)}</strong></td>
-                <td class="num">{fmtM(poolStress)}</td>
               </tr>
             </tbody>
           </table>

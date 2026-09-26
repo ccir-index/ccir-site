@@ -259,7 +259,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     <PageHeader title="The Secondary Market" kicker="Market Data · Hardware" asOf={meta.as_of_date}>
       <p class="subhead">What a GPU is worth as an earning asset, and what machines list and sell for.</p>
       <p class="standfirst">
-        One value and one stress figure per chip. The value is
+        One value per chip. The value is
         <strong>model-implied</strong>: the GPU's share of what it earns over
         its life at contracted rates, with every assumption disclosed.
         Asks, sales and new-chip prices sit beside it as checks.
@@ -298,14 +298,12 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
                 <div class="ivstrip" aria-hidden="true">
                   <div class="ivband" style={`left:${q(v.lo)}%;width:${q(v.hi) - q(v.lo)}%`}></div>
                   <div class="ivdot" style={`left:${q(v.base)}%`} title={`GPU value ${fmtUsd(v.base)}`}></div>
-                  {v.intStress != null && <div class="ivint" style={`left:${q(v.intStress)}%`} title={`stress ${fmtUsd(v.intStress)}`}></div>}
                   {v.ask != null && <div class="ivtick" style={`left:${q(v.ask)}%`} title={`ask ${fmtUsd(v.ask)}`}></div>}
                   {v.t90 != null && <div class="ivdia" style={`left:${q(v.t90)}%`} title={`sold 90d ${fmtUsd(v.t90)}`}></div>}
                   {v.newCost && <div class="ivcost" style={`left:${q(v.newCost.usd)}%`} title={`new chip ${fmtUsd(v.newCost.usd)}`}></div>}
                   <span class="ivs0">0</span>
                 </div>
                 <div class="ivkeys">
-                  {v.intStress != null && <span><span class="g g-int"></span>stress {fmtK(v.intStress)}</span>}
                   {v.t90 != null && <span><span class="g g-t90"></span>sold {fmtK(v.t90)}</span>}
                   {v.ask != null && <span><span class="g g-ask"></span>ask {fmtK(v.ask)}</span>}
                   {v.newCost && <span><span class="g g-cost"></span>new chip {fmtK(v.newCost.usd)}</span>}
@@ -319,7 +317,7 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       <details class="ivnote-d">
       <summary>Model assumptions & sensitivity</summary>
       <table class="ivlegs">
-        <thead><tr><th>Chip</th><th class="num">Rate $/hr</th><th class="num">Band</th><th>Term</th><th>Basis</th><th class="num">Net earnings / yr</th><th class="num">Crash after contract</th><th class="num">Life left</th></tr></thead>
+        <thead><tr><th>Chip</th><th class="num">Rate $/hr</th><th class="num">Band</th><th>Term</th><th>Basis</th><th class="num">Net earnings / yr</th><th class="num">Life left</th></tr></thead>
         <tbody>
           {ivCards.map((v) => (
             <tr>
@@ -329,7 +327,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
               <td>{Math.max(v.leg.years, 2)}Y</td>
               <td>{legText(v)}</td>
               <td class="num">{fmtK(earn(v.leg.rate))}</td>
-              <td class="num">{fmtK(v.crashAfter)}</td>
               <td class="num">{v.remaining.toFixed(1)}y{v.vintageAssumed ? '*' : ''}</td>
             </tr>
           ))}
@@ -383,14 +380,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
         The value carries no replacement-cost cap. Where a sourced price for
         a new chip is known, it prints beside the value. The card says so
         when the value is higher.
-        The stress path replays a real event. The unit signs no term
-        contract. Its rate starts at the contracted rate and follows the path
-        H100 on-demand took from its 2024 high. It fell 61% over 18 months.
-        A year later it stood at 71% of the start. After that it declines at
-        the base rate. Utilization and margin stay at base.
-        Crash after contract, in the table: the contract runs its term at
-        the contracted rate. The rate then drops to the replay's low and stays
-        there. The gap to the value shows what the contract protects.
         The executed lane is an observed disposition record. It does not
         estimate recovery. Single-unit retail clearings can sit above or
         below a bulk disposition, and no current record measures market
@@ -853,14 +842,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
       transform: translate(-50%, -50%);
       box-shadow: 0 0 0 2px var(--surface);
     }
-    /* Stress (2024-25 replay) — hollow ring: the same model on the revocable-
-       occupancy earning path (no contract). */
-    .iv .ivint {
-      position: absolute; top: 9.5px; width: 9px; height: 9px;
-      border-radius: 50%; background: var(--surface);
-      border: 2px solid var(--ink-dim);
-      transform: translate(-50%, -50%);
-    }
     .iv .ivtick {
       position: absolute; top: 3px; width: 2px; height: 13px;
       background: var(--ink); transform: translateX(-50%);
@@ -890,12 +871,6 @@ const volBars = [...volByMonth.entries()].sort().map(([m, u]) => ({
     .iv .g-t90 {
       width: 7px; height: 7px; background: var(--ink-dim);
       transform: rotate(45deg); vertical-align: 0;
-    }
-    /* matches the strip's hollow-ring mark (.ivint) */
-    .iv .g-int {
-      width: 7px; height: 7px; border-radius: 50%;
-      background: var(--surface); border: 2px solid var(--ink-dim);
-      vertical-align: -1px;
     }
     /* New-cost basis: dashed tick on the strip, dashed glyph in the row. */
     .iv .ivcost {

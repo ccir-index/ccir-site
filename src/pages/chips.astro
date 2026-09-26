@@ -91,7 +91,7 @@ const rows = CHIPS.map((def) => {
               <td class="num strongv">{spot ? `$${fmt(headlineValue(spot))}` : '—'}{spot && <span class="cellmeta">{headlineStatOf(spot)}</span>}</td>
               <td class="num">{committed ? `$${fmt(committed.value)}` : '—'}{committed && <span class="cellmeta">{committed.term} · MI</span>}</td>
               <td class="num">{intr ? `$${fmt(headlineValue(intr))}` : '—'}{intr && <span class="cellmeta">{headlineStatOf(intr)}</span>}</td>
-              <td class="num">{iv ? fmtUsd(iv.base) : '—'}{iv && <span class="cellmeta">{def.hwLabel} · stress {iv.intStress != null ? fmtK(iv.intStress) : '—'}</span>}</td>
+              <td class="num">{iv ? fmtUsd(iv.base) : '—'}{iv && <span class="cellmeta">{def.hwLabel}</span>}</td>
             </tr>
           ))}
         </tbody>
